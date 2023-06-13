@@ -43,6 +43,8 @@ definition {
 
 		SitePages.addPublicPage(pageName = "Home");
 
+		SitePages.gotoPageMenuItem(menuItem = "Configure", pageName = "Home");
+
 		Page.addPageTranslations(
 			page = "Home",
 			pageTranslation = "es_ES",
@@ -72,6 +74,12 @@ definition {
 		SitePages.addPublicChildPage(
 			childPageName = "Blog Page",
 			parentPageName = "Home"
+		);
+
+		SitePages.gotoPageMenuItem(
+			menuItem = "Configure",
+			pageName = "Blog Page",
+			parentPagesHierarchy = "Home"
 		);
 
 		Page.addPageTranslations(

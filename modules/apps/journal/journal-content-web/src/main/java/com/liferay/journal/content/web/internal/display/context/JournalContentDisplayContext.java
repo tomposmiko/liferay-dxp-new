@@ -145,13 +145,6 @@ public class JournalContentDisplayContext {
 			return _article;
 		}
 
-		_article = (JournalArticle)_portletRequest.getAttribute(
-			WebKeys.JOURNAL_ARTICLE);
-
-		if (_article != null) {
-			return _article;
-		}
-
 		long articleResourcePrimKey = ParamUtil.getLong(
 			_portletRequest, "articleResourcePrimKey");
 
@@ -176,13 +169,6 @@ public class JournalContentDisplayContext {
 	}
 
 	public JournalArticleDisplay getArticleDisplay() {
-		if (_articleDisplay != null) {
-			return _articleDisplay;
-		}
-
-		_articleDisplay = (JournalArticleDisplay)_portletRequest.getAttribute(
-			WebKeys.JOURNAL_ARTICLE_DISPLAY);
-
 		if (_articleDisplay != null) {
 			return _articleDisplay;
 		}
@@ -458,7 +444,7 @@ public class JournalContentDisplayContext {
 
 		Group scopeGroup = themeDisplay.getScopeGroup();
 
-		if (!scopeGroup.isStaged() ||
+		if (scopeGroup.isStaged() &&
 			!scopeGroup.isInStagingPortlet(JournalPortletKeys.JOURNAL)) {
 
 			groupId = scopeGroup.getLiveGroupId();
@@ -714,6 +700,42 @@ public class JournalContentDisplayContext {
 		}
 		catch (Exception e) {
 			_log.error("Unable to get edit template URL", e);
+
+			return StringPool.BLANK;
+		}
+	}
+
+	public String getURLViewHistory() {
+		try {
+			JournalArticle article = getArticle();
+
+			ThemeDisplay themeDisplay =
+				(ThemeDisplay)_portletRequest.getAttribute(
+					WebKeys.THEME_DISPLAY);
+
+			PortletURL portletURL = PortletURLFactoryUtil.create(
+				_portletRequest, JournalPortletKeys.JOURNAL,
+				PortletRequest.RENDER_PHASE);
+
+			portletURL.setParameter("mvcPath", "/view_article_history.jsp");
+
+			PortletDisplay portletDisplay = themeDisplay.getPortletDisplay();
+
+			portletURL.setParameter(
+				"referringPortletResource", portletDisplay.getId());
+
+			portletURL.setParameter(
+				"groupId", String.valueOf(article.getGroupId()));
+			portletURL.setParameter("articleId", article.getArticleId());
+			portletURL.setParameter(
+				"hideDefaultSuccessMessage", Boolean.TRUE.toString());
+			portletURL.setParameter("showHeader", Boolean.TRUE.toString());
+			portletURL.setWindowState(LiferayWindowState.POP_UP);
+
+			return portletURL.toString();
+		}
+		catch (Exception e) {
+			_log.error("Unable to get view history URL", e);
 
 			return StringPool.BLANK;
 		}

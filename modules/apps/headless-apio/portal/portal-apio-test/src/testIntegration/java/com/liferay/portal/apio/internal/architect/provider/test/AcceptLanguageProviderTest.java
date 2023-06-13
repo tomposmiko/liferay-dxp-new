@@ -24,6 +24,7 @@ import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.model.UserConstants;
 import com.liferay.portal.kernel.service.GroupLocalServiceUtil;
 import com.liferay.portal.kernel.service.ServiceContext;
+import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.service.UserLocalServiceUtil;
 import com.liferay.portal.kernel.test.rule.DeleteAfterTestRun;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
@@ -52,7 +53,7 @@ import org.junit.runner.RunWith;
 import org.springframework.mock.web.MockHttpServletRequest;
 
 /**
- * @author Ruben Pulido
+ * @author Rubén Pulido
  */
 @RunWith(Arquillian.class)
 public class AcceptLanguageProviderTest {
@@ -85,21 +86,27 @@ public class AcceptLanguageProviderTest {
 			false, Constants.TEST, Constants.TEST, true,
 			StringUtil.randomString(20),
 			StringUtil.randomString(10) + "@" + StringUtil.randomString(10), 0,
-			null, Locale.ITALY, StringUtil.randomString(20), null,
+			null, LocaleUtil.ITALY, StringUtil.randomString(20), null,
 			StringUtil.randomString(10), 0, 0, true, 1, 1, 2000, null,
 			new long[] {_group.getGroupId()}, new long[0], new long[0],
 			new long[0], false, new ServiceContext());
 	}
 
 	@Test
-	public void testCreateContextWithNoAcceptLanguageGuestUser() {
+	public void testCreateContextWithNoAcceptLanguageGuestUser()
+		throws Exception {
+
+		User defaultUser = _userLocalService.getDefaultUser(
+			TestPropsValues.getCompanyId());
+
 		MockHttpServletRequest mockHttpServletRequest =
 			new MockHttpServletRequest();
 
 		AcceptLanguage acceptLanguage = _provider.createContext(
 			mockHttpServletRequest);
 
-		Assert.assertNull(acceptLanguage.getPreferredLocale());
+		Assert.assertEquals(
+			defaultUser.getLocale(), acceptLanguage.getPreferredLocale());
 	}
 
 	@Test
@@ -126,5 +133,8 @@ public class AcceptLanguageProviderTest {
 
 	@DeleteAfterTestRun
 	private User _user;
+
+	@Inject
+	private UserLocalService _userLocalService;
 
 }

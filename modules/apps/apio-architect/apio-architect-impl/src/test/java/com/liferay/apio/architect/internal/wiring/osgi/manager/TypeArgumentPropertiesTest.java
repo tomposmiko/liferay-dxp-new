@@ -52,7 +52,11 @@ public class TypeArgumentPropertiesTest {
 		).filter(
 			field -> "KEY_IDENTIFIER_CLASS".equals(field.getName())
 		).map(
-			field -> Try.fromFallible(() -> (String)field.get(null)).orElse("")
+			field -> Try.fromFallible(
+				() -> (String)field.get(null)
+			).orElse(
+				""
+			)
 		).allMatch(
 			new HashSet<>()::add
 		);

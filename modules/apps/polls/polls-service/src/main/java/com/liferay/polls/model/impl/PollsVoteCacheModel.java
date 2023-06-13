@@ -17,7 +17,6 @@ package com.liferay.polls.model.impl;
 import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.polls.model.PollsVote;
-
 import com.liferay.portal.kernel.model.CacheModel;
 import com.liferay.portal.kernel.util.HashUtil;
 import com.liferay.portal.kernel.util.StringBundler;
@@ -33,12 +32,12 @@ import java.util.Date;
  * The cache model class for representing PollsVote in entity cache.
  *
  * @author Brian Wing Shun Chan
- * @see PollsVote
  * @generated
  */
 @ProviderType
-public class PollsVoteCacheModel implements CacheModel<PollsVote>,
-	Externalizable {
+public class PollsVoteCacheModel
+	implements CacheModel<PollsVote>, Externalizable {
+
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj) {
@@ -178,8 +177,7 @@ public class PollsVoteCacheModel implements CacheModel<PollsVote>,
 	}
 
 	@Override
-	public void writeExternal(ObjectOutput objectOutput)
-		throws IOException {
+	public void writeExternal(ObjectOutput objectOutput) throws IOException {
 		if (uuid == null) {
 			objectOutput.writeUTF("");
 		}
@@ -224,4 +222,5 @@ public class PollsVoteCacheModel implements CacheModel<PollsVote>,
 	public long choiceId;
 	public long lastPublishDate;
 	public long voteDate;
+
 }

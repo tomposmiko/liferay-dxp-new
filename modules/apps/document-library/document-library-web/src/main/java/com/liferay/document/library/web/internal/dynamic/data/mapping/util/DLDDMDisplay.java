@@ -33,7 +33,7 @@ import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
 /**
- * @author Eduardo Garcia
+ * @author Eduardo García
  * @author Roberto Díaz
  */
 @Component(
@@ -54,7 +54,10 @@ public class DLDDMDisplay extends BaseDDMDisplay {
 		return LanguageUtil.get(
 			resourceBundle,
 			JavaConstants.JAVAX_PORTLET_DESCRIPTION.concat(
-				StringPool.PERIOD).concat(PortletKeys.DOCUMENT_LIBRARY_ADMIN));
+				StringPool.PERIOD
+			).concat(
+				PortletKeys.DOCUMENT_LIBRARY_ADMIN
+			));
 	}
 
 	@Override

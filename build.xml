@@ -590,7 +590,7 @@ message.
 				>
 					<fileset
 						dir="lib/portal"
-						includes="aopalliance.jar,asm-debug-all.jar,aspectj-rt.jar,aspectj-weaver.jar,bnd.jar,c3p0.jar,cglib-nodep.jar,com.liferay.portal.slim.runtime.jar,commons-beanutils.jar,commons-chain.jar,commons-codec.jar,commons-collections.jar,commons-compress.jar,commons-configuration.jar,commons-dbcp.jar,commons-digester.jar,commons-discovery.jar,commons-fileupload.jar,commons-httpclient.jar,commons-io.jar,commons-lang.jar,commons-logging.jar,commons-math.jar,commons-pool.jar,commons-validator.jar,concurrent.jar,dom4j.jar,easyconf.jar,hibernate-commons-annotations.jar,hibernate-core.jar,hikaricp.jar,httpclient.jar,httpcore.jar,httpmime.jar,jabsorb.jar,jakarta-regexp.jar,javassist.jar,jaxb-impl.jar,jaxen.jar,jcl-over-slf4j.jar,jdom.jar,jna.jar,jodconverter.jar,jodd-bean.jar,jodd-core.jar,json-java.jar,jsr107cache.jar,kxml2.jar,liferay-icu4j.jar,log4j.jar,log4j-extras.jar,mchange-commons-java.jar,netty-all.jar,portal-impl.jar,rome.jar,saaj-api.jar,saaj-impl.jar,serializer.jar,slf4j-api.jar,spring-aop.jar,spring-aspects.jar,spring-beans.jar,spring-context.jar,spring-context-support.jar,spring-core.jar,spring-expression.jar,spring-jdbc.jar,spring-jms.jar,spring-orm.jar,spring-oxm.jar,spring-tx.jar,spring-web.jar,spring-webmvc.jar,stax.jar,stax-ex.jar,streambuffer.jar,stringtemplate.jar,tika-core.jar,tika-parsers.jar,tomcat-jdbc.jar,tomcat-juli.jar,util-java.jar,util-slf4j.jar,util-taglib.jar,wstx.jar,xalan.jar,xbean.jar,xbean-spring.jar,xercesImpl.jar,xml-apis.jar,xmlsec.jar,xmpcore.jar,xpp3.jar,xstream.jar,xz.jar"
+						includes="aopalliance.jar,asm-analysis.jar,asm-commons.jar,asm-tree.jar,asm-util.jar,asm.jar,aspectj-rt.jar,aspectj-weaver.jar,c3p0.jar,cglib-nodep.jar,com.liferay.portal.slim.runtime.jar,commons-beanutils.jar,commons-chain.jar,commons-codec.jar,commons-collections.jar,commons-compress.jar,commons-configuration.jar,commons-dbcp.jar,commons-digester.jar,commons-discovery.jar,commons-fileupload.jar,commons-httpclient.jar,commons-io.jar,commons-lang.jar,commons-logging.jar,commons-math.jar,commons-pool.jar,commons-validator.jar,concurrent.jar,dom4j.jar,easyconf.jar,hibernate-commons-annotations.jar,hibernate-core.jar,hikaricp.jar,httpclient.jar,httpcore.jar,httpmime.jar,jabsorb.jar,jakarta-regexp.jar,javassist.jar,jaxb-impl.jar,jaxen.jar,jcl-over-slf4j.jar,jdom.jar,jna.jar,jodconverter.jar,jodd-bean.jar,jodd-core.jar,json-java.jar,jsr107cache.jar,kxml2.jar,liferay-icu4j.jar,log4j.jar,log4j-extras.jar,mchange-commons-java.jar,netty-all.jar,portal-impl.jar,rome.jar,saaj-api.jar,saaj-impl.jar,serializer.jar,slf4j-api.jar,spring-aop.jar,spring-aspects.jar,spring-beans.jar,spring-context.jar,spring-context-support.jar,spring-core.jar,spring-expression.jar,spring-jdbc.jar,spring-jms.jar,spring-orm.jar,spring-oxm.jar,spring-tx.jar,spring-web.jar,spring-webmvc.jar,stax.jar,stax-ex.jar,streambuffer.jar,stringtemplate.jar,tika-core.jar,tika-parsers.jar,tomcat-jdbc.jar,tomcat-juli.jar,util-java.jar,util-slf4j.jar,util-taglib.jar,wstx.jar,xalan.jar,xbean.jar,xbean-spring.jar,xercesImpl.jar,xml-apis.jar,xmlsec.jar,xmpcore.jar,xpp3.jar,xstream.jar,xz.jar"
 					/>
 				</copy>
 			</then>
@@ -1370,23 +1370,35 @@ print AdminControl.invoke(appManager, 'startApplication', 'liferay-portal')
 
 		<delete dir="${basedir}/.gradle" />
 
-		<setup-sdk />
+		<setup-sdk setupbinariescache="false" />
 
-		<gradle-execute dir="modules" forcedcacheenabled="false" task="clean">
-			<arg value="-Dmaven.local.ignore=true" />
+		<gradle-execute dir="modules" forcedcacheenabled="false" setupbinariescache="false" task="clean">
+			<arg value="--continue" />
+			<arg value="--parallel" />
 		</gradle-execute>
 
-		<gradle-execute dir="modules" forcedcacheenabled="false" task="classes">
-			<arg value="-Dmaven.local.ignore=true" />
+		<gradle-execute dir="modules" forcedcacheenabled="false" setupbinariescache="false" task="classes">
+			<arg value="--continue" />
+			<arg value="--parallel" />
 			<arg value="testClasses" />
 			<arg value="testIntegrationClasses" />
 		</gradle-execute>
 
-		<gradle-execute dir="modules/sdk/gradle-util" failonerror="false" forcedcacheenabled="false" task="findbugsMain">
-			<arg value="-Dmaven.local.ignore=true" />
-		</gradle-execute>
-
 		<ant dir="portal-web" inheritAll="false" target="update-gradle-cache" />
+
+		<echo append="true" file="${basedir}/.gitignore">
+!/.gradle
+/.gradle/*
+!/.gradle/caches
+/.gradle/caches/*
+!/.gradle/caches/modules-2
+/.gradle/caches/modules-2/*
+!/.gradle/caches/modules-2/files-2.1</echo>
+
+		<execute>
+			git add --all
+			git checkout HEAD -- .gitignore
+		</execute>
 	</target>
 
 	<target name="validate-xml">

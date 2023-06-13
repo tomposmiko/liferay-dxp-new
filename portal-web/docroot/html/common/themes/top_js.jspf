@@ -309,7 +309,7 @@
 			%>
 
 			getAvailableLangPath: function() {
-				return '<%= PortalUtil.getStaticResourceURL(request, "available_languages.jsp", jsLastModified) %>';
+				return '<%= PortalUtil.getStaticResourceURL(request, "available_languages.jsp", LanguageUtil.getLastModified()) %>';
 			},
 			getCombine: function() {
 				return <%= themeDisplay.isThemeJsFastLoad() %>;
@@ -393,7 +393,7 @@
 	long jsBundleConfigLastModified = PortalWebResourcesUtil.getLastModified(PortalWebResourceConstants.RESOURCE_TYPE_JS_BUNDLE_CONFIG);
 	%>
 
-	<script src="<%= HtmlUtil.escape(themeDisplay.getCDNDynamicResourcesHost() + PortalWebResourcesUtil.getContextPath(PortalWebResourceConstants.RESOURCE_TYPE_JS_BUNDLE_CONFIG) + "/js_bundle_config?t=" + jsBundleConfigLastModified) %>" type="text/javascript"></script>
+	<script data-senna-track="temporary" src="<%= HtmlUtil.escape(themeDisplay.getCDNDynamicResourcesHost() + PortalWebResourcesUtil.getContextPath(PortalWebResourceConstants.RESOURCE_TYPE_JS_BUNDLE_CONFIG) + "/js_bundle_config?t=" + jsBundleConfigLastModified) %>" type="text/javascript"></script>
 </c:if>
 
 <script data-senna-track="temporary" type="text/javascript">
@@ -433,21 +433,13 @@
 <%-- Analytics --%>
 
 <%
-String liferayAnalyticsKey = PrefsPropsUtil.getString(company.getCompanyId(), PropsKeys.ADMIN_LIFERAY_ANALYTICS_KEY);
-
-UnicodeProperties groupTypeSettings = group.getTypeSettingsProperties();
-
-if (Validator.isNull(liferayAnalyticsKey)) {
-	liferayAnalyticsKey = groupTypeSettings.getProperty(GroupConstants.TYPE_SETTINGS_KEY_LIFERAY_ANALYTICS_KEY);
-}
-
 String liferayAnalyticsDataSourceId = PrefsPropsUtil.getString(company.getCompanyId(), "liferayAnalyticsDataSourceId");
 String liferayAnalyticsEndpointURL = PrefsPropsUtil.getString(company.getCompanyId(), "liferayAnalyticsEndpointURL");
 boolean liferayAnalyticsEnableAllGroupIds = PrefsPropsUtil.getBoolean(company.getCompanyId(), "liferayAnalyticsEnableAllGroupIds");
 String[] liferayAnalyticsGroupIds = PrefsPropsUtil.getStringArray(company.getCompanyId(), "liferayAnalyticsGroupIds", StringPool.COMMA);
 %>
 
-<c:if test="<%= _isAnalyticsTrackingEnabled(liferayAnalyticsKey, liferayAnalyticsDataSourceId, liferayAnalyticsEndpointURL, liferayAnalyticsEnableAllGroupIds, liferayAnalyticsGroupIds, String.valueOf(group.getGroupId()), layout.isTypeControlPanel()) %>">
+<c:if test="<%= _isAnalyticsTrackingEnabled(liferayAnalyticsDataSourceId, liferayAnalyticsEndpointURL, liferayAnalyticsEnableAllGroupIds, liferayAnalyticsGroupIds, group, layout.isTypeControlPanel(), request) %>">
 	<script data-senna-track="permanent" id="liferayAnalyticsScript" type="text/javascript">
 		(function(u, c, a, m, o, l) {
 			o = 'script';
@@ -460,12 +452,11 @@ String[] liferayAnalyticsGroupIds = PrefsPropsUtil.getStringArray(company.getCom
 			m.parentNode.insertBefore(a, m);
 		})('https://analytics-js-cdn.liferay.com', function() {
 			var config = {
-				analyticsKey: '<%= HtmlUtil.escapeJS(liferayAnalyticsKey) %>',
 				dataSourceId: '<%= HtmlUtil.escapeJS(liferayAnalyticsDataSourceId) %>',
 				endpointUrl: '<%= HtmlUtil.escapeJS(liferayAnalyticsEndpointURL) %>'
 			};
 
-			Analytics.create(config);
+			Analytics.create(...config);
 
 			Analytics.registerMiddleware(
 				function(request) {
@@ -493,7 +484,7 @@ String[] liferayAnalyticsGroupIds = PrefsPropsUtil.getStringArray(company.getCom
 						Analytics.dispose();
 
 						if (!themeDisplay.isControlPanel()) {
-							Analytics.create(config);
+							Analytics.create(...config);
 
 							if (themeDisplay.isSignedIn()) {
 								Analytics.setIdentity(
@@ -514,6 +505,8 @@ String[] liferayAnalyticsGroupIds = PrefsPropsUtil.getStringArray(company.getCom
 </c:if>
 
 <%
+UnicodeProperties groupTypeSettings = group.getTypeSettingsProperties();
+
 String[] analyticsTypes = PrefsPropsUtil.getStringArray(company.getCompanyId(), PropsKeys.ADMIN_ANALYTICS_TYPES, StringPool.NEW_LINE);
 
 for (String analyticsType : analyticsTypes) {
@@ -586,18 +579,40 @@ private static String _getDateFormatPattern(Locale locale) {
 	String dateFormatPattern = _dateFormatPatterns.get(languageId);
 
 	if (dateFormatPattern == null) {
+		boolean endDelimiter = false;
+
+		String delimiterString = StringPool.FORWARD_SLASH;
+
 		SimpleDateFormat simpleDateFormat = (SimpleDateFormat)DateFormat.getDateInstance(DateFormat.SHORT, locale);
 
 		dateFormatPattern = simpleDateFormat.toPattern();
 
-		if (dateFormatPattern.indexOf("y") == 0) {
-			dateFormatPattern = "%Y/%m/%d";
+		for (char dateDelimiter : _DATE_DELIMITERS) {
+			if (dateFormatPattern.indexOf(dateDelimiter) != -1) {
+				delimiterString = String.valueOf(dateDelimiter);
+
+				endDelimiter = dateFormatPattern.endsWith(delimiterString);
+
+				break;
+			}
 		}
-		else if (dateFormatPattern.indexOf("d") == 0) {
-			dateFormatPattern = "%d/%m/%Y";
+
+		int dayOrder = dateFormatPattern.indexOf('d');
+		int monthOrder = dateFormatPattern.indexOf('M');
+		int yearOrder = dateFormatPattern.indexOf('y');
+
+		if ((yearOrder < dayOrder) && (yearOrder < monthOrder)) {
+			dateFormatPattern = StringBundler.concat("%Y", delimiterString, "%m", delimiterString, "%d");
+		}
+		else if (dayOrder < monthOrder) {
+			dateFormatPattern = StringBundler.concat("%d", delimiterString, "%m", delimiterString, "%Y");
 		}
 		else {
-			dateFormatPattern = "%m/%d/%Y";
+			dateFormatPattern = StringBundler.concat("%m", delimiterString, "%d", delimiterString, "%Y");
+		}
+
+		if (endDelimiter) {
+			dateFormatPattern += delimiterString;
 		}
 
 		_dateFormatPatterns.put(languageId, dateFormatPattern);
@@ -606,13 +621,9 @@ private static String _getDateFormatPattern(Locale locale) {
 	return dateFormatPattern;
 }
 
-private static boolean _isAnalyticsTrackingEnabled(String liferayAnalyticsKey, String liferayAnalyticsDataSourceId, String liferayAnalyticsEndpointURL, boolean liferayAnalyticsEnableAllGroupIds, String[] liferayAnalyticsGroupIds, String groupId, boolean controlPanel) {
+private static boolean _isAnalyticsTrackingEnabled(String liferayAnalyticsDataSourceId, String liferayAnalyticsEndpointURL, boolean liferayAnalyticsEnableAllGroupIds, String[] liferayAnalyticsGroupIds, Group group, boolean controlPanel, HttpServletRequest request) {
 	if (controlPanel) {
 		return false;
-	}
-
-	if (Validator.isNotNull(liferayAnalyticsKey)) {
-		return true;
 	}
 
 	if (Validator.isNull(liferayAnalyticsDataSourceId)) {
@@ -623,12 +634,32 @@ private static boolean _isAnalyticsTrackingEnabled(String liferayAnalyticsKey, S
 		return false;
 	}
 
-	if (liferayAnalyticsEnableAllGroupIds || ArrayUtil.contains(liferayAnalyticsGroupIds, groupId)) {
+	if (Objects.equals(request.getRequestURI(), "/c/portal/api/jsonws")) {
+		return false;
+	}
+
+	if (_isSharedFormEnabled(liferayAnalyticsGroupIds, group, request)) {
+		return true;
+	}
+
+	if (liferayAnalyticsEnableAllGroupIds || ArrayUtil.contains(liferayAnalyticsGroupIds, String.valueOf(group.getGroupId()))) {
 		return true;
 	}
 
 	return false;
 }
+
+private static boolean _isSharedFormEnabled(String[] liferayAnalyticsGroupIds, Group group, HttpServletRequest request) {
+	if (Objects.equals(group.getGroupKey(), "Forms")) {
+		return ArrayUtil.contains(liferayAnalyticsGroupIds, String.valueOf(request.getAttribute("refererGroupId")));
+	}
+
+	return false;
+}
+
+private static final char[] _DATE_DELIMITERS = {
+	CharPool.DASH, CharPool.FORWARD_SLASH, CharPool.PERIOD
+};
 
 private static final Map<String, String> _dateFormatPatterns = new ConcurrentHashMap<>();
 %>

@@ -40,6 +40,7 @@ import com.liferay.portal.kernel.model.LayoutConstants;
 import com.liferay.portal.kernel.model.LayoutRevision;
 import com.liferay.portal.kernel.model.LayoutSet;
 import com.liferay.portal.kernel.model.LayoutSetBranch;
+import com.liferay.portal.kernel.model.LayoutType;
 import com.liferay.portal.kernel.model.LayoutTypeController;
 import com.liferay.portal.kernel.portlet.LiferayPortletRequest;
 import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
@@ -507,6 +508,11 @@ public class LayoutsAdminDisplayContext {
 
 			layoutJSONObject.put(
 				"homePageTitle", _getHomePageTitle(privateLayout));
+
+			LayoutType layoutType = layout.getLayoutType();
+
+			layoutJSONObject.put("parentable", layoutType.isParentable());
+
 			layoutJSONObject.put("plid", layout.getPlid());
 
 			PortletURL portletURL = getPortletURL();

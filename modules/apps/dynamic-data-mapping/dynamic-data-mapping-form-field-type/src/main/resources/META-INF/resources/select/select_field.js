@@ -169,6 +169,10 @@ AUI.add(
 
 							instance._open = false;
 
+							if (instance._isErrorRequired()) {
+								instance.showErrorMessage();
+							}
+
 							instance.fire('closeList');
 						}
 					},
@@ -285,6 +289,10 @@ AUI.add(
 						instance.set('value', value);
 
 						instance.render();
+
+						if (instance._isErrorRequired()) {
+							instance.showErrorMessage();
+						}
 					},
 
 					showErrorMessage: function() {
@@ -302,6 +310,10 @@ AUI.add(
 					toggleList: function(event) {
 						var instance = this;
 
+						if (event) {
+							event.stopPropagation();
+						}
+
 						var container = instance.get('container');
 
 						var selectTrigger = container.one('.select-field-trigger');
@@ -314,7 +326,7 @@ AUI.add(
 
 							var userView = container.ancestor('.ddm-user-view-content');
 
-							if (userView) {
+							if (event && userView) {
 								var selectInputNode = event.currentTarget.one('.input-select-wrapper')._node;
 
 								var dropdownMenu = event.currentTarget.one('.dropdown-menu');
@@ -355,6 +367,24 @@ AUI.add(
 					},
 
 					_getOptions: function(options) {
+						var instance = this;
+
+						if (instance.get('readOnly')) {
+
+							var selectedValue = instance.get('selectedValue');
+
+							if ((selectedValue !== undefined) && (selectedValue.length > 0)) {
+								options = [];
+
+								options.push({
+									label: instance.get('selectedValue'),
+									value: instance.get('selectedValue')
+								});
+							}
+
+							return options;
+						}
+
 						return options || [];
 					},
 
@@ -491,6 +521,22 @@ AUI.add(
 						return !container.contains(event.target);
 					},
 
+					_isErrorRequired: function() {
+						var instance = this;
+
+						var required = instance.get('required');
+
+						var valid = instance.get('valid');
+
+						var value = instance.getValue();
+
+						if (required && !valid && (value.length < 1)) {
+							return true;
+						}
+
+						return false;
+					},
+
 					_isListOpen: function() {
 						var instance = this;
 
@@ -583,6 +629,10 @@ AUI.add(
 
 						if (value.length == 0) {
 							return true;
+						}
+
+						if (instance.get('readOnly')) {
+							instance.set('selectedValue', value);
 						}
 
 						var fixedOptions = instance.get('fixedOptions');

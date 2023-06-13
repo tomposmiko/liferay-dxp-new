@@ -35,18 +35,22 @@ import com.liferay.oauth2.provider.service.OAuth2ApplicationScopeAliasesLocalSer
 public abstract class OAuth2ApplicationScopeAliasesBaseImpl
 	extends OAuth2ApplicationScopeAliasesModelImpl
 	implements OAuth2ApplicationScopeAliases {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
-	 * Never modify or reference this class directly. All methods that expect a o auth2 application scope aliases model instance should use the {@link OAuth2ApplicationScopeAliases} interface instead.
+	 * Never modify or reference this class directly. All methods that expect a o auth2 application scope aliases model instance should use the <code>OAuth2ApplicationScopeAliases</code> interface instead.
 	 */
 	@Override
 	public void persist() {
 		if (this.isNew()) {
-			OAuth2ApplicationScopeAliasesLocalServiceUtil.addOAuth2ApplicationScopeAliases(this);
+			OAuth2ApplicationScopeAliasesLocalServiceUtil.
+				addOAuth2ApplicationScopeAliases(this);
 		}
 		else {
-			OAuth2ApplicationScopeAliasesLocalServiceUtil.updateOAuth2ApplicationScopeAliases(this);
+			OAuth2ApplicationScopeAliasesLocalServiceUtil.
+				updateOAuth2ApplicationScopeAliases(this);
 		}
 	}
+
 }

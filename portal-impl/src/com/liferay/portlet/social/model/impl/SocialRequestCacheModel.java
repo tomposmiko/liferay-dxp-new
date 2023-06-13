@@ -19,7 +19,6 @@ import aQute.bnd.annotation.ProviderType;
 import com.liferay.portal.kernel.model.CacheModel;
 import com.liferay.portal.kernel.util.HashUtil;
 import com.liferay.portal.kernel.util.StringBundler;
-
 import com.liferay.social.kernel.model.SocialRequest;
 
 import java.io.Externalizable;
@@ -31,12 +30,12 @@ import java.io.ObjectOutput;
  * The cache model class for representing SocialRequest in entity cache.
  *
  * @author Brian Wing Shun Chan
- * @see SocialRequest
  * @generated
  */
 @ProviderType
-public class SocialRequestCacheModel implements CacheModel<SocialRequest>,
-	Externalizable {
+public class SocialRequestCacheModel
+	implements CacheModel<SocialRequest>, Externalizable {
+
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj) {
@@ -47,7 +46,8 @@ public class SocialRequestCacheModel implements CacheModel<SocialRequest>,
 			return false;
 		}
 
-		SocialRequestCacheModel socialRequestCacheModel = (SocialRequestCacheModel)obj;
+		SocialRequestCacheModel socialRequestCacheModel =
+			(SocialRequestCacheModel)obj;
 
 		if (requestId == socialRequestCacheModel.requestId) {
 			return true;
@@ -161,8 +161,7 @@ public class SocialRequestCacheModel implements CacheModel<SocialRequest>,
 	}
 
 	@Override
-	public void writeExternal(ObjectOutput objectOutput)
-		throws IOException {
+	public void writeExternal(ObjectOutput objectOutput) throws IOException {
 		if (uuid == null) {
 			objectOutput.writeUTF("");
 		}
@@ -213,4 +212,5 @@ public class SocialRequestCacheModel implements CacheModel<SocialRequest>,
 	public String extraData;
 	public long receiverUserId;
 	public int status;
+
 }

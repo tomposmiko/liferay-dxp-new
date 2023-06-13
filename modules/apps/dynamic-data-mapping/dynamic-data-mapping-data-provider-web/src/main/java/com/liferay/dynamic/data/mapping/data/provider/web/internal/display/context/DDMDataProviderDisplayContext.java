@@ -47,6 +47,7 @@ import com.liferay.portal.kernel.bean.BeanParamUtil;
 import com.liferay.portal.kernel.dao.search.SearchContainer;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.language.LanguageUtil;
+import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.portlet.PortalPreferences;
 import com.liferay.portal.kernel.portlet.PortletPreferencesFactoryUtil;
@@ -609,8 +610,7 @@ public class DDMDataProviderDisplayContext {
 
 		List<DDMDataProviderInstance> results =
 			_ddmDataProviderInstanceService.search(
-				_ddmDataProviderRequestHelper.getCompanyId(),
-				new long[] {_ddmDataProviderRequestHelper.getScopeGroupId()},
+				_ddmDataProviderRequestHelper.getCompanyId(), _getGroupIds(),
 				getKeywords(), ddmDataProviderSearch.getStart(),
 				ddmDataProviderSearch.getEnd(),
 				ddmDataProviderSearch.getOrderByComparator());
@@ -622,11 +622,25 @@ public class DDMDataProviderDisplayContext {
 		DDMDataProviderSearch ddmDataProviderSearch) {
 
 		int total = _ddmDataProviderInstanceService.searchCount(
-			_ddmDataProviderRequestHelper.getCompanyId(),
-			new long[] {_ddmDataProviderRequestHelper.getScopeGroupId()},
+			_ddmDataProviderRequestHelper.getCompanyId(), _getGroupIds(),
 			getKeywords());
 
 		ddmDataProviderSearch.setTotal(total);
+	}
+
+	private long[] _getGroupIds() {
+		long scopeGroupId = _ddmDataProviderRequestHelper.getScopeGroupId();
+
+		ThemeDisplay themeDisplay =
+			_ddmDataProviderRequestHelper.getThemeDisplay();
+
+		Group scopeGroup = themeDisplay.getScopeGroup();
+
+		if (scopeGroup.isStagingGroup()) {
+			scopeGroupId = scopeGroup.getLiveGroupId();
+		}
+
+		return new long[] {scopeGroupId};
 	}
 
 	private static final String[] _DISPLAY_VIEWS = {"descriptive", "list"};

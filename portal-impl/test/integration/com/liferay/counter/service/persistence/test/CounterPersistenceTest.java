@@ -18,7 +18,6 @@ import com.liferay.counter.kernel.exception.NoSuchCounterException;
 import com.liferay.counter.kernel.model.Counter;
 import com.liferay.counter.kernel.service.persistence.CounterPersistence;
 import com.liferay.counter.kernel.service.persistence.CounterUtil;
-
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQueryFactoryUtil;
 import com.liferay.portal.kernel.dao.orm.ProjectionFactoryUtil;
@@ -33,13 +32,6 @@ import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import com.liferay.portal.test.rule.PersistenceTestRule;
 import com.liferay.portal.test.rule.TransactionalTestRule;
 
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.ClassRule;
-import org.junit.Rule;
-import org.junit.Test;
-
 import java.io.Serializable;
 
 import java.util.ArrayList;
@@ -49,14 +41,23 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.junit.After;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.ClassRule;
+import org.junit.Rule;
+import org.junit.Test;
+
 /**
  * @generated
  */
 public class CounterPersistenceTest {
+
 	@ClassRule
 	@Rule
-	public static final AggregateTestRule aggregateTestRule = new AggregateTestRule(new LiferayIntegrationTestRule(),
-			PersistenceTestRule.INSTANCE,
+	public static final AggregateTestRule aggregateTestRule =
+		new AggregateTestRule(
+			new LiferayIntegrationTestRule(), PersistenceTestRule.INSTANCE,
 			new TransactionalTestRule(Propagation.REQUIRED));
 
 	@Before
@@ -96,7 +97,8 @@ public class CounterPersistenceTest {
 
 		_persistence.remove(newCounter);
 
-		Counter existingCounter = _persistence.fetchByPrimaryKey(newCounter.getPrimaryKey());
+		Counter existingCounter = _persistence.fetchByPrimaryKey(
+			newCounter.getPrimaryKey());
 
 		Assert.assertNull(existingCounter);
 	}
@@ -116,18 +118,20 @@ public class CounterPersistenceTest {
 
 		_counters.add(_persistence.update(newCounter));
 
-		Counter existingCounter = _persistence.findByPrimaryKey(newCounter.getPrimaryKey());
+		Counter existingCounter = _persistence.findByPrimaryKey(
+			newCounter.getPrimaryKey());
 
 		Assert.assertEquals(existingCounter.getName(), newCounter.getName());
-		Assert.assertEquals(existingCounter.getCurrentId(),
-			newCounter.getCurrentId());
+		Assert.assertEquals(
+			existingCounter.getCurrentId(), newCounter.getCurrentId());
 	}
 
 	@Test
 	public void testFindByPrimaryKeyExisting() throws Exception {
 		Counter newCounter = addCounter();
 
-		Counter existingCounter = _persistence.findByPrimaryKey(newCounter.getPrimaryKey());
+		Counter existingCounter = _persistence.findByPrimaryKey(
+			newCounter.getPrimaryKey());
 
 		Assert.assertEquals(existingCounter, newCounter);
 	}
@@ -141,20 +145,21 @@ public class CounterPersistenceTest {
 
 	@Test
 	public void testFindAll() throws Exception {
-		_persistence.findAll(QueryUtil.ALL_POS, QueryUtil.ALL_POS,
-			getOrderByComparator());
+		_persistence.findAll(
+			QueryUtil.ALL_POS, QueryUtil.ALL_POS, getOrderByComparator());
 	}
 
 	protected OrderByComparator<Counter> getOrderByComparator() {
-		return OrderByComparatorFactoryUtil.create("Counter", "name", true,
-			"currentId", true);
+		return OrderByComparatorFactoryUtil.create(
+			"Counter", "name", true, "currentId", true);
 	}
 
 	@Test
 	public void testFetchByPrimaryKeyExisting() throws Exception {
 		Counter newCounter = addCounter();
 
-		Counter existingCounter = _persistence.fetchByPrimaryKey(newCounter.getPrimaryKey());
+		Counter existingCounter = _persistence.fetchByPrimaryKey(
+			newCounter.getPrimaryKey());
 
 		Assert.assertEquals(existingCounter, newCounter);
 	}
@@ -171,6 +176,7 @@ public class CounterPersistenceTest {
 	@Test
 	public void testFetchByPrimaryKeysWithMultiplePrimaryKeysWhereAllPrimaryKeysExist()
 		throws Exception {
+
 		Counter newCounter1 = addCounter();
 		Counter newCounter2 = addCounter();
 
@@ -179,18 +185,20 @@ public class CounterPersistenceTest {
 		primaryKeys.add(newCounter1.getPrimaryKey());
 		primaryKeys.add(newCounter2.getPrimaryKey());
 
-		Map<Serializable, Counter> counters = _persistence.fetchByPrimaryKeys(primaryKeys);
+		Map<Serializable, Counter> counters = _persistence.fetchByPrimaryKeys(
+			primaryKeys);
 
 		Assert.assertEquals(2, counters.size());
-		Assert.assertEquals(newCounter1,
-			counters.get(newCounter1.getPrimaryKey()));
-		Assert.assertEquals(newCounter2,
-			counters.get(newCounter2.getPrimaryKey()));
+		Assert.assertEquals(
+			newCounter1, counters.get(newCounter1.getPrimaryKey()));
+		Assert.assertEquals(
+			newCounter2, counters.get(newCounter2.getPrimaryKey()));
 	}
 
 	@Test
 	public void testFetchByPrimaryKeysWithMultiplePrimaryKeysWhereNoPrimaryKeysExist()
 		throws Exception {
+
 		String pk1 = RandomTestUtil.randomString();
 
 		String pk2 = RandomTestUtil.randomString();
@@ -200,7 +208,8 @@ public class CounterPersistenceTest {
 		primaryKeys.add(pk1);
 		primaryKeys.add(pk2);
 
-		Map<Serializable, Counter> counters = _persistence.fetchByPrimaryKeys(primaryKeys);
+		Map<Serializable, Counter> counters = _persistence.fetchByPrimaryKeys(
+			primaryKeys);
 
 		Assert.assertTrue(counters.isEmpty());
 	}
@@ -208,6 +217,7 @@ public class CounterPersistenceTest {
 	@Test
 	public void testFetchByPrimaryKeysWithMultiplePrimaryKeysWhereSomePrimaryKeysExist()
 		throws Exception {
+
 		Counter newCounter = addCounter();
 
 		String pk = RandomTestUtil.randomString();
@@ -217,46 +227,49 @@ public class CounterPersistenceTest {
 		primaryKeys.add(newCounter.getPrimaryKey());
 		primaryKeys.add(pk);
 
-		Map<Serializable, Counter> counters = _persistence.fetchByPrimaryKeys(primaryKeys);
+		Map<Serializable, Counter> counters = _persistence.fetchByPrimaryKeys(
+			primaryKeys);
 
 		Assert.assertEquals(1, counters.size());
-		Assert.assertEquals(newCounter, counters.get(newCounter.getPrimaryKey()));
+		Assert.assertEquals(
+			newCounter, counters.get(newCounter.getPrimaryKey()));
 	}
 
 	@Test
-	public void testFetchByPrimaryKeysWithNoPrimaryKeys()
-		throws Exception {
+	public void testFetchByPrimaryKeysWithNoPrimaryKeys() throws Exception {
 		Set<Serializable> primaryKeys = new HashSet<Serializable>();
 
-		Map<Serializable, Counter> counters = _persistence.fetchByPrimaryKeys(primaryKeys);
+		Map<Serializable, Counter> counters = _persistence.fetchByPrimaryKeys(
+			primaryKeys);
 
 		Assert.assertTrue(counters.isEmpty());
 	}
 
 	@Test
-	public void testFetchByPrimaryKeysWithOnePrimaryKey()
-		throws Exception {
+	public void testFetchByPrimaryKeysWithOnePrimaryKey() throws Exception {
 		Counter newCounter = addCounter();
 
 		Set<Serializable> primaryKeys = new HashSet<Serializable>();
 
 		primaryKeys.add(newCounter.getPrimaryKey());
 
-		Map<Serializable, Counter> counters = _persistence.fetchByPrimaryKeys(primaryKeys);
+		Map<Serializable, Counter> counters = _persistence.fetchByPrimaryKeys(
+			primaryKeys);
 
 		Assert.assertEquals(1, counters.size());
-		Assert.assertEquals(newCounter, counters.get(newCounter.getPrimaryKey()));
+		Assert.assertEquals(
+			newCounter, counters.get(newCounter.getPrimaryKey()));
 	}
 
 	@Test
-	public void testDynamicQueryByPrimaryKeyExisting()
-		throws Exception {
+	public void testDynamicQueryByPrimaryKeyExisting() throws Exception {
 		Counter newCounter = addCounter();
 
-		DynamicQuery dynamicQuery = DynamicQueryFactoryUtil.forClass(Counter.class,
-				_dynamicQueryClassLoader);
+		DynamicQuery dynamicQuery = DynamicQueryFactoryUtil.forClass(
+			Counter.class, _dynamicQueryClassLoader);
 
-		dynamicQuery.add(RestrictionsFactoryUtil.eq("name", newCounter.getName()));
+		dynamicQuery.add(
+			RestrictionsFactoryUtil.eq("name", newCounter.getName()));
 
 		List<Counter> result = _persistence.findWithDynamicQuery(dynamicQuery);
 
@@ -269,11 +282,11 @@ public class CounterPersistenceTest {
 
 	@Test
 	public void testDynamicQueryByPrimaryKeyMissing() throws Exception {
-		DynamicQuery dynamicQuery = DynamicQueryFactoryUtil.forClass(Counter.class,
-				_dynamicQueryClassLoader);
+		DynamicQuery dynamicQuery = DynamicQueryFactoryUtil.forClass(
+			Counter.class, _dynamicQueryClassLoader);
 
-		dynamicQuery.add(RestrictionsFactoryUtil.eq("name",
-				RandomTestUtil.randomString()));
+		dynamicQuery.add(
+			RestrictionsFactoryUtil.eq("name", RandomTestUtil.randomString()));
 
 		List<Counter> result = _persistence.findWithDynamicQuery(dynamicQuery);
 
@@ -281,19 +294,18 @@ public class CounterPersistenceTest {
 	}
 
 	@Test
-	public void testDynamicQueryByProjectionExisting()
-		throws Exception {
+	public void testDynamicQueryByProjectionExisting() throws Exception {
 		Counter newCounter = addCounter();
 
-		DynamicQuery dynamicQuery = DynamicQueryFactoryUtil.forClass(Counter.class,
-				_dynamicQueryClassLoader);
+		DynamicQuery dynamicQuery = DynamicQueryFactoryUtil.forClass(
+			Counter.class, _dynamicQueryClassLoader);
 
 		dynamicQuery.setProjection(ProjectionFactoryUtil.property("name"));
 
 		Object newName = newCounter.getName();
 
-		dynamicQuery.add(RestrictionsFactoryUtil.in("name",
-				new Object[] { newName }));
+		dynamicQuery.add(
+			RestrictionsFactoryUtil.in("name", new Object[] {newName}));
 
 		List<Object> result = _persistence.findWithDynamicQuery(dynamicQuery);
 
@@ -306,13 +318,14 @@ public class CounterPersistenceTest {
 
 	@Test
 	public void testDynamicQueryByProjectionMissing() throws Exception {
-		DynamicQuery dynamicQuery = DynamicQueryFactoryUtil.forClass(Counter.class,
-				_dynamicQueryClassLoader);
+		DynamicQuery dynamicQuery = DynamicQueryFactoryUtil.forClass(
+			Counter.class, _dynamicQueryClassLoader);
 
 		dynamicQuery.setProjection(ProjectionFactoryUtil.property("name"));
 
-		dynamicQuery.add(RestrictionsFactoryUtil.in("name",
-				new Object[] { RandomTestUtil.randomString() }));
+		dynamicQuery.add(
+			RestrictionsFactoryUtil.in(
+				"name", new Object[] {RandomTestUtil.randomString()}));
 
 		List<Object> result = _persistence.findWithDynamicQuery(dynamicQuery);
 
@@ -334,4 +347,5 @@ public class CounterPersistenceTest {
 	private List<Counter> _counters = new ArrayList<Counter>();
 	private CounterPersistence _persistence;
 	private ClassLoader _dynamicQueryClassLoader;
+
 }

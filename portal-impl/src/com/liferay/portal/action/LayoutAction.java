@@ -171,10 +171,7 @@ public class LayoutAction extends Action {
 				plid = layout.getPlid();
 			}
 
-			ActionForward actionForward = processLayout(
-				actionMapping, request, response, plid);
-
-			return actionForward;
+			return processLayout(actionMapping, request, response, plid);
 		}
 
 		try {

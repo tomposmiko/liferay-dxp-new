@@ -32,12 +32,13 @@ import com.liferay.dynamic.data.mapping.service.DDMContentLocalServiceUtil;
  * @generated
  */
 @ProviderType
-public abstract class DDMContentBaseImpl extends DDMContentModelImpl
-	implements DDMContent {
+public abstract class DDMContentBaseImpl
+	extends DDMContentModelImpl implements DDMContent {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
-	 * Never modify or reference this class directly. All methods that expect a ddm content model instance should use the {@link DDMContent} interface instead.
+	 * Never modify or reference this class directly. All methods that expect a ddm content model instance should use the <code>DDMContent</code> interface instead.
 	 */
 	@Override
 	public void persist() {
@@ -48,4 +49,5 @@ public abstract class DDMContentBaseImpl extends DDMContentModelImpl
 			DDMContentLocalServiceUtil.updateDDMContent(this);
 		}
 	}
+
 }

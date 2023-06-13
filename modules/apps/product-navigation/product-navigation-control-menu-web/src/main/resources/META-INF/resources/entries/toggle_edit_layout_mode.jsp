@@ -22,6 +22,7 @@ taglib uri="http://liferay.com/tld/theme" prefix="liferay-theme" %>
 
 <%@ page import="com.liferay.petra.string.StringPool" %><%@
 page import="com.liferay.portal.kernel.util.Constants" %><%@
+page import="com.liferay.portal.kernel.util.HtmlUtil" %><%@
 page import="com.liferay.portal.kernel.util.HttpUtil" %><%@
 page import="com.liferay.portal.kernel.util.ParamUtil" %>
 
@@ -64,7 +65,7 @@ if (Objects.equals(mode, Constants.EDIT)) {
 	$('#<portlet:namespace />mode').on(
 		'change',
 		function(event) {
-			Liferay.Util.navigate('<%= redirect %>');
+			Liferay.Util.navigate('<%= HtmlUtil.escapeJS(redirect) %>');
 		}
 	);
 </aui:script>

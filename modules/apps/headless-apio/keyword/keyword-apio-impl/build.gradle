@@ -1,6 +1,6 @@
 dependencies {
 	compileOnly group: "com.liferay", name: "com.liferay.apio.architect.api", version: "1.0.0"
-	compileOnly group: "com.liferay", name: "com.liferay.content.space.apio.api", version: "1.0.0"
+	compileOnly group: "com.liferay", name: "com.liferay.content.space.apio.api", version: "1.2.0"
 	compileOnly group: "com.liferay", name: "com.liferay.keyword.apio.api", version: "1.0.0"
 	compileOnly group: "com.liferay", name: "com.liferay.person.apio.api", version: "1.0.0"
 	compileOnly group: "com.liferay", name: "com.liferay.portal.apio.api", version: "1.0.0"

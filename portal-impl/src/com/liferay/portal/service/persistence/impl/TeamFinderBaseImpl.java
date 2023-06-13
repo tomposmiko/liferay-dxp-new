@@ -32,18 +32,19 @@ import java.util.Set;
  * @generated
  */
 public class TeamFinderBaseImpl extends BasePersistenceImpl<Team> {
+
 	public TeamFinderBaseImpl() {
 		setModelClass(Team.class);
 
+		Map<String, String> dbColumnNames = new HashMap<String, String>();
+
+		dbColumnNames.put("uuid", "uuid_");
+
 		try {
 			Field field = BasePersistenceImpl.class.getDeclaredField(
-					"_dbColumnNames");
+				"_dbColumnNames");
 
 			field.setAccessible(true);
-
-			Map<String, String> dbColumnNames = new HashMap<String, String>();
-
-			dbColumnNames.put("uuid", "uuid_");
 
 			field.set(this, dbColumnNames);
 		}
@@ -79,5 +80,8 @@ public class TeamFinderBaseImpl extends BasePersistenceImpl<Team> {
 
 	@BeanReference(type = TeamPersistence.class)
 	protected TeamPersistence teamPersistence;
-	private static final Log _log = LogFactoryUtil.getLog(TeamFinderBaseImpl.class);
+
+	private static final Log _log = LogFactoryUtil.getLog(
+		TeamFinderBaseImpl.class);
+
 }

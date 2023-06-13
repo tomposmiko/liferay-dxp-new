@@ -17,7 +17,6 @@ package com.liferay.portal.kernel.model;
 import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.expando.kernel.model.ExpandoBridge;
-
 import com.liferay.portal.kernel.service.ServiceContext;
 
 import java.io.Serializable;
@@ -37,6 +36,7 @@ import java.util.Objects;
  */
 @ProviderType
 public class ListTypeWrapper implements ListType, ModelWrapper<ListType> {
+
 	public ListTypeWrapper(ListType listType) {
 		_listType = listType;
 	}
@@ -106,40 +106,40 @@ public class ListTypeWrapper implements ListType, ModelWrapper<ListType> {
 	}
 
 	/**
-	* Returns the list type ID of this list type.
-	*
-	* @return the list type ID of this list type
-	*/
+	 * Returns the list type ID of this list type.
+	 *
+	 * @return the list type ID of this list type
+	 */
 	@Override
 	public long getListTypeId() {
 		return _listType.getListTypeId();
 	}
 
 	/**
-	* Returns the mvcc version of this list type.
-	*
-	* @return the mvcc version of this list type
-	*/
+	 * Returns the mvcc version of this list type.
+	 *
+	 * @return the mvcc version of this list type
+	 */
 	@Override
 	public long getMvccVersion() {
 		return _listType.getMvccVersion();
 	}
 
 	/**
-	* Returns the name of this list type.
-	*
-	* @return the name of this list type
-	*/
+	 * Returns the name of this list type.
+	 *
+	 * @return the name of this list type
+	 */
 	@Override
 	public String getName() {
 		return _listType.getName();
 	}
 
 	/**
-	* Returns the primary key of this list type.
-	*
-	* @return the primary key of this list type
-	*/
+	 * Returns the primary key of this list type.
+	 *
+	 * @return the primary key of this list type
+	 */
 	@Override
 	public long getPrimaryKey() {
 		return _listType.getPrimaryKey();
@@ -151,10 +151,10 @@ public class ListTypeWrapper implements ListType, ModelWrapper<ListType> {
 	}
 
 	/**
-	* Returns the type of this list type.
-	*
-	* @return the type of this list type
-	*/
+	 * Returns the type of this list type.
+	 *
+	 * @return the type of this list type
+	 */
 	@Override
 	public String getType() {
 		return _listType.getType();
@@ -206,30 +206,30 @@ public class ListTypeWrapper implements ListType, ModelWrapper<ListType> {
 	}
 
 	/**
-	* Sets the list type ID of this list type.
-	*
-	* @param listTypeId the list type ID of this list type
-	*/
+	 * Sets the list type ID of this list type.
+	 *
+	 * @param listTypeId the list type ID of this list type
+	 */
 	@Override
 	public void setListTypeId(long listTypeId) {
 		_listType.setListTypeId(listTypeId);
 	}
 
 	/**
-	* Sets the mvcc version of this list type.
-	*
-	* @param mvccVersion the mvcc version of this list type
-	*/
+	 * Sets the mvcc version of this list type.
+	 *
+	 * @param mvccVersion the mvcc version of this list type
+	 */
 	@Override
 	public void setMvccVersion(long mvccVersion) {
 		_listType.setMvccVersion(mvccVersion);
 	}
 
 	/**
-	* Sets the name of this list type.
-	*
-	* @param name the name of this list type
-	*/
+	 * Sets the name of this list type.
+	 *
+	 * @param name the name of this list type
+	 */
 	@Override
 	public void setName(String name) {
 		_listType.setName(name);
@@ -241,10 +241,10 @@ public class ListTypeWrapper implements ListType, ModelWrapper<ListType> {
 	}
 
 	/**
-	* Sets the primary key of this list type.
-	*
-	* @param primaryKey the primary key of this list type
-	*/
+	 * Sets the primary key of this list type.
+	 *
+	 * @param primaryKey the primary key of this list type
+	 */
 	@Override
 	public void setPrimaryKey(long primaryKey) {
 		_listType.setPrimaryKey(primaryKey);
@@ -256,10 +256,10 @@ public class ListTypeWrapper implements ListType, ModelWrapper<ListType> {
 	}
 
 	/**
-	* Sets the type of this list type.
-	*
-	* @param type the type of this list type
-	*/
+	 * Sets the type of this list type.
+	 *
+	 * @param type the type of this list type
+	 */
 	@Override
 	public void setType(String type) {
 		_listType.setType(type);
@@ -330,4 +330,5 @@ public class ListTypeWrapper implements ListType, ModelWrapper<ListType> {
 	}
 
 	private final ListType _listType;
+
 }

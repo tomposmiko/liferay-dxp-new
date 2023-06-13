@@ -14,9 +14,12 @@
 
 package com.liferay.frontend.js.loader.modules.extender.internal;
 
+import com.liferay.portal.configuration.metatype.bnd.util.ConfigurableUtil;
 import com.liferay.portal.kernel.servlet.PortalWebResourceConstants;
 import com.liferay.portal.kernel.servlet.PortalWebResources;
 import com.liferay.portal.servlet.delegate.ServletContextDelegate;
+
+import java.util.Map;
 
 import javax.servlet.ServletContext;
 
@@ -25,35 +28,53 @@ import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
+import org.osgi.service.component.annotations.Modified;
 import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Raymond Augé
  */
-@Component(enabled = false, immediate = true, service = {})
+@Component(
+	configurationPid = "com.liferay.frontend.js.loader.modules.extender.internal.Details",
+	enabled = false, immediate = true,
+	service = JSLoaderModulesPortalWebResources.class
+)
 public class JSLoaderModulesPortalWebResources {
 
 	@Activate
-	protected void activate(BundleContext bundleContext) {
-		try {
-			PortalWebResources portalWebResources =
-				new InternalPortalWebResources(
-					_jsLoaderModulesServlet.getServletContext());
+	@Modified
+	protected void activate(
+		BundleContext bundleContext, Map<String, Object> properties) {
 
-			_serviceRegistration = bundleContext.registerService(
-				PortalWebResources.class, portalWebResources, null);
-		}
-		catch (NoClassDefFoundError ncdfe) {
-			throw new RuntimeException(ncdfe);
-		}
+		_bundleContext = bundleContext;
+
+		Details details = ConfigurableUtil.createConfigurable(
+			Details.class, properties);
+
+		_portalWebResources = new InternalPortalWebResources(
+			_jsLoaderModulesServlet.getServletContext());
+
+		_setEnabled(!details.useLoaderVersion4x());
 	}
 
 	@Deactivate
 	protected void deactivate() {
-		if (_serviceRegistration != null) {
+		_setEnabled(false);
+	}
+
+	private synchronized void _setEnabled(boolean enabled) {
+		if (enabled && (_serviceRegistration == null)) {
+			_serviceRegistration = _bundleContext.registerService(
+				PortalWebResources.class, _portalWebResources, null);
+		}
+		else if (!enabled && (_serviceRegistration != null)) {
 			_serviceRegistration.unregister();
+
+			_serviceRegistration = null;
 		}
 	}
+
+	private BundleContext _bundleContext;
 
 	@Reference
 	private JSLoaderModulesServlet _jsLoaderModulesServlet;
@@ -61,6 +82,7 @@ public class JSLoaderModulesPortalWebResources {
 	@Reference
 	private JSLoaderModulesTracker _jsLoaderModulesTracker;
 
+	private InternalPortalWebResources _portalWebResources;
 	private ServiceRegistration<?> _serviceRegistration;
 
 	private class InternalPortalWebResources implements PortalWebResources {

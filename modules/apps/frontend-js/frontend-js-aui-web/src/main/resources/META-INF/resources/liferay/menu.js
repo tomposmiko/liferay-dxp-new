@@ -102,7 +102,11 @@ AUI.add(
 
 					handles.length = 0;
 
-					instance._overlay.hide();
+					var overlay = instance._overlay;
+
+					if (overlay) {
+						overlay.hide();
+					}
 
 					var trigger = instance._activeTrigger;
 
@@ -522,7 +526,11 @@ AUI.add(
 							var selectedItem = descendants.item(event.newVal);
 
 							if (selectedItem) {
-								bodyNode.one('ul').setAttribute('aria-activedescendant', selectedItem.guid());
+								var overlayList = bodyNode.one('ul');
+
+								if (overlayList) {
+									overlayList.setAttribute('aria-activedescendant', selectedItem.guid());
+								}
 							}
 						}
 					);
@@ -635,6 +643,14 @@ AUI.add(
 									menuInstance._closeActiveMenu();
 								},
 								menuInstance
+							),
+							Liferay.on(
+								'dropdownShow',
+								function(event) {
+									if (event.src !== 'LiferayMenu') {
+										menuInstance._closeActiveMenu();
+									}
+								}
 							)
 						);
 
@@ -646,6 +662,13 @@ AUI.add(
 					}
 
 					menuInstance._positionActiveMenu();
+
+					Liferay.fire(
+						'dropdownShow',
+						{
+							src: 'LiferayMenu'
+						}
+					);
 
 					event.halt();
 				}

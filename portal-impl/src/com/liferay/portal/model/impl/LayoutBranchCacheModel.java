@@ -31,12 +31,12 @@ import java.io.ObjectOutput;
  * The cache model class for representing LayoutBranch in entity cache.
  *
  * @author Brian Wing Shun Chan
- * @see LayoutBranch
  * @generated
  */
 @ProviderType
-public class LayoutBranchCacheModel implements CacheModel<LayoutBranch>,
-	Externalizable, MVCCModel {
+public class LayoutBranchCacheModel
+	implements CacheModel<LayoutBranch>, Externalizable, MVCCModel {
+
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj) {
@@ -47,10 +47,12 @@ public class LayoutBranchCacheModel implements CacheModel<LayoutBranch>,
 			return false;
 		}
 
-		LayoutBranchCacheModel layoutBranchCacheModel = (LayoutBranchCacheModel)obj;
+		LayoutBranchCacheModel layoutBranchCacheModel =
+			(LayoutBranchCacheModel)obj;
 
 		if ((layoutBranchId == layoutBranchCacheModel.layoutBranchId) &&
-				(mvccVersion == layoutBranchCacheModel.mvccVersion)) {
+			(mvccVersion == layoutBranchCacheModel.mvccVersion)) {
+
 			return true;
 		}
 
@@ -169,8 +171,7 @@ public class LayoutBranchCacheModel implements CacheModel<LayoutBranch>,
 	}
 
 	@Override
-	public void writeExternal(ObjectOutput objectOutput)
-		throws IOException {
+	public void writeExternal(ObjectOutput objectOutput) throws IOException {
 		objectOutput.writeLong(mvccVersion);
 
 		objectOutput.writeLong(layoutBranchId);
@@ -220,4 +221,5 @@ public class LayoutBranchCacheModel implements CacheModel<LayoutBranch>,
 	public String name;
 	public String description;
 	public boolean master;
+
 }

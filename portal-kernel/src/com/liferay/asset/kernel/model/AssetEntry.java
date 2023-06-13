@@ -25,19 +25,20 @@ import com.liferay.portal.kernel.util.Accessor;
  *
  * @author Brian Wing Shun Chan
  * @see AssetEntryModel
- * @see com.liferay.portlet.asset.model.impl.AssetEntryImpl
- * @see com.liferay.portlet.asset.model.impl.AssetEntryModelImpl
  * @generated
  */
 @ImplementationClassName("com.liferay.portlet.asset.model.impl.AssetEntryImpl")
 @ProviderType
 public interface AssetEntry extends AssetEntryModel, PersistedModel {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
-	 * Never modify this interface directly. Add methods to {@link com.liferay.portlet.asset.model.impl.AssetEntryImpl} and rerun ServiceBuilder to automatically copy the method declarations to this interface.
+	 * Never modify this interface directly. Add methods to <code>com.liferay.portlet.asset.model.impl.AssetEntryImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
 	 */
-	public static final Accessor<AssetEntry, Long> ENTRY_ID_ACCESSOR = new Accessor<AssetEntry, Long>() {
+	public static final Accessor<AssetEntry, Long> ENTRY_ID_ACCESSOR =
+		new Accessor<AssetEntry, Long>() {
+
 			@Override
 			public Long get(AssetEntry assetEntry) {
 				return assetEntry.getEntryId();
@@ -52,6 +53,7 @@ public interface AssetEntry extends AssetEntryModel, PersistedModel {
 			public Class<AssetEntry> getTypeClass() {
 				return AssetEntry.class;
 			}
+
 		};
 
 	public AssetRenderer<?> getAssetRenderer();
@@ -65,4 +67,5 @@ public interface AssetEntry extends AssetEntryModel, PersistedModel {
 	public String[] getTagNames();
 
 	public java.util.List<AssetTag> getTags();
+
 }

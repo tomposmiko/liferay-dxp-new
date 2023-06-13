@@ -1,0 +1,80 @@
+{namespace QuantitySelector}
+
+{template .render}
+	{@param quantity: int}
+	{@param? minQuantity: int}
+	{@param? maxQuantity: int}
+	{@param? allowedQuantities: list<number>}
+	{@param? _prevAvailable: bool}
+	{@param? _nextAvailable: bool}
+	{@param? _handleFormSubmit: any}
+	{@param? _handleInputKeyUp: any}
+	{@param? _handleArrowKeys: any}
+	{@param? _handlePrevQuantityButtonPressed: any}
+	{@param? _handleNextQuantityButtonPressed: any}
+	{@param? _handleSelectOption: any}
+
+	{let $prevClass kind="text"}
+		commerce-quantity-selector__btn
+		{if $_prevAvailable == false}
+			{sp}is-disabled
+		{/if}
+	{/let}
+
+	{let $nextClass kind="text"}
+		commerce-quantity-selector__btn
+		{if $_nextAvailable == false}
+			{sp}is-disabled
+		{/if}
+	{/let}
+
+	<div class="commerce-quantity-selector">
+		{if isNonnull($allowedQuantities)}
+			<form data-onsubmit="{$_handleFormSubmit}">
+				<select
+					class="commerce-quantity-selector__select"
+					data-onchange="{$_handleSelectOption}"
+				>
+					{foreach $option in $allowedQuantities}
+						{let $optionAttributes kind="attributes"}
+							value="{$option}"
+							{if $option == $quantity}
+								selected="selected"
+							{/if}
+						{/let}
+						<option {$optionAttributes}>{$option}</option>
+					{/foreach}
+				</select>
+			</form>
+		{else}
+			<button
+				class="{$prevClass}"
+				data-onclick="{$_handlePrevQuantityButtonPressed}"
+				tabindex="-1"
+			>
+				-
+			</button>
+
+			<form data-onsubmit="{$_handleFormSubmit}">
+				<input
+					name="quantity"
+					type="number"
+					class="commerce-quantity-selector__input"
+					{if isNonnull($minQuantity)}min="{$minQuantity}"{/if}
+					{if isNonnull($maxQuantity)}max="{$maxQuantity}"{/if}
+					data-onkeyup="{$_handleInputKeyUp}"
+					data-onkeydown="{$_handleArrowKeys}"
+					value="{$quantity}"
+				>
+			</form>
+
+			<button
+				class="{$nextClass}"
+				data-onclick="{$_handleNextQuantityButtonPressed}"
+				tabindex="-1"
+			>
+				+
+			</button>
+		{/if}
+	</div>
+{/template}

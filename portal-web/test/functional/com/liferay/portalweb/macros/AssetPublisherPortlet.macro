@@ -518,6 +518,14 @@ definition {
 
 			SelectFrame(locator1 = "IFrame#SELECT_SITES");
 
+			LexiconEntry.changeDisplayStyle(displayStyle = "table");
+
+			if (!("${siteScopeType}" == "Parent Site")) {
+				Type(locator1 = "TextInput#SITE_SEARCH_KEYWORDS", value1 = "${siteName}");
+
+				KeyPress(locator1 = "TextInput#SEARCH", value1 = "\RETURN");
+			}
+
 			AssertTextEquals(
 				locator1 = "APConfigurationSites#SITES_TABLE_NAME",
 				value1 = "${siteName}"
@@ -918,7 +926,6 @@ definition {
 
 			AssertElementNotPresent(
 				locator1 = "Ratings#YOUR_RATING_STAR",
-				key_ratingStarPosition = "${ratingPosition}",
 				key_ratingStarPosition = MathUtil.sum("${ratingPosition}", "1")
 			);
 		}
@@ -1575,6 +1582,13 @@ definition {
 			locator1 = "APConfiguration#SOURCE_SCOPE_ASSET_TYPE_SELECT",
 			value1 = "${selectedAssetConfiguration}"
 		);
+
+		if (isSet(assetSubtypeConfiguration)) {
+			AssertSelectedLabel(
+				locator1 = "APConfiguration#SOURCE_SCOPE_ASSET_SUBTYPE_SELECT",
+				value1 = "${assetSubtypeConfiguration}"
+			);
+		}
 
 		SelectFrameTop();
 	}

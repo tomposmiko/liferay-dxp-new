@@ -14,6 +14,7 @@
 
 package com.liferay.journal.internal.util;
 
+import com.liferay.document.library.kernel.service.DLAppLocalService;
 import com.liferay.dynamic.data.mapping.model.DDMFormFieldType;
 import com.liferay.dynamic.data.mapping.model.DDMStructure;
 import com.liferay.dynamic.data.mapping.storage.DDMFormValues;
@@ -23,6 +24,7 @@ import com.liferay.dynamic.data.mapping.storage.Fields;
 import com.liferay.dynamic.data.mapping.util.DDM;
 import com.liferay.dynamic.data.mapping.util.DDMFieldsCounter;
 import com.liferay.dynamic.data.mapping.util.FieldsToDDMFormValuesConverter;
+import com.liferay.exportimport.kernel.lar.ExportImportThreadLocal;
 import com.liferay.journal.exception.ArticleContentException;
 import com.liferay.journal.model.JournalArticle;
 import com.liferay.journal.service.JournalArticleLocalService;
@@ -36,6 +38,7 @@ import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONException;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Group;
@@ -43,11 +46,14 @@ import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.service.GroupLocalService;
 import com.liferay.portal.kernel.service.LayoutLocalService;
+import com.liferay.portal.kernel.util.AggregateResourceBundle;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.kernel.util.Http;
 import com.liferay.portal.kernel.util.LocaleUtil;
+import com.liferay.portal.kernel.util.Portal;
+import com.liferay.portal.kernel.util.ResourceBundleUtil;
 import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
@@ -66,6 +72,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
+import java.util.ResourceBundle;
 import java.util.Set;
 
 import org.osgi.service.component.annotations.Component;
@@ -550,7 +557,26 @@ public class JournalConverterImpl implements JournalConverter {
 
 		Serializable serializable = null;
 
-		if (DDMFormFieldType.JOURNAL_ARTICLE.equals(type)) {
+		if (Objects.equals(DDMFormFieldType.DOCUMENT_LIBRARY, type)) {
+			try {
+				JSONObject jsonObject = JSONFactoryUtil.createJSONObject(
+					dynamicContentElement.getText());
+
+				if (!ExportImportThreadLocal.isImportInProcess()) {
+					String uuid = jsonObject.getString("uuid");
+					long groupId = jsonObject.getLong("groupId");
+
+					_dlAppLocalService.getFileEntryByUuidAndGroupId(
+						uuid, groupId);
+				}
+
+				serializable = jsonObject.toString();
+			}
+			catch (Exception e) {
+				return StringPool.BLANK;
+			}
+		}
+		else if (Objects.equals(DDMFormFieldType.JOURNAL_ARTICLE, type)) {
 			try {
 				JSONObject jsonObject = JSONFactoryUtil.createJSONObject(
 					dynamicContentElement.getText());
@@ -558,12 +584,33 @@ public class JournalConverterImpl implements JournalConverter {
 				Long classPK = jsonObject.getLong("classPK");
 
 				if (Validator.isNotNull(classPK)) {
-					JournalArticle journalArticle =
+					JournalArticle article =
 						_journalArticleLocalService.fetchLatestArticle(classPK);
 
-					String title = journalArticle.getTitle(defaultLocale);
+					if (article != null) {
+						jsonObject.put("groupId", article.getGroupId());
 
-					jsonObject.put("title", title);
+						String title = article.getTitle(defaultLocale);
+
+						if (article.isInTrash()) {
+							jsonObject.put(
+								"message",
+								LanguageUtil.get(
+									_getResourceBundle(defaultLocale),
+									"the-selected-web-content-was-moved-to-" +
+										"the-recycle-bin"));
+						}
+
+						jsonObject.put("title", title);
+						jsonObject.put("uuid", article.getUuid());
+					}
+					else {
+						jsonObject.put(
+							"message",
+							LanguageUtil.get(
+								_getResourceBundle(defaultLocale),
+								"the-selected-web-content-was-deleted"));
+					}
 				}
 
 				serializable = jsonObject.toString();
@@ -573,7 +620,7 @@ public class JournalConverterImpl implements JournalConverter {
 					dataType, dynamicContentElement.getText());
 			}
 		}
-		else if (DDMFormFieldType.LINK_TO_PAGE.equals(type)) {
+		else if (Objects.equals(DDMFormFieldType.LINK_TO_PAGE, type)) {
 			String[] values = StringUtil.split(
 				dynamicContentElement.getText(), CharPool.AT);
 
@@ -604,7 +651,7 @@ public class JournalConverterImpl implements JournalConverter {
 
 			serializable = jsonObject.toString();
 		}
-		else if (DDMFormFieldType.SELECT.equals(type)) {
+		else if (Objects.equals(DDMFormFieldType.SELECT, type)) {
 			JSONArray jsonArray = JSONFactoryUtil.createJSONArray();
 
 			List<Element> optionElements = dynamicContentElement.elements(
@@ -964,7 +1011,10 @@ public class JournalConverterImpl implements JournalConverter {
 		}
 
 		String fieldsDisplayValue = fieldName.concat(
-			DDM.INSTANCE_SEPARATOR).concat(instanceId);
+			DDM.INSTANCE_SEPARATOR
+		).concat(
+			instanceId
+		);
 
 		Field fieldsDisplayField = ddmFields.get(DDM.FIELDS_DISPLAY_NAME);
 
@@ -1117,12 +1167,23 @@ public class JournalConverterImpl implements JournalConverter {
 		}
 	}
 
+	private ResourceBundle _getResourceBundle(Locale locale) {
+		ResourceBundle classResourceBundle = ResourceBundleUtil.getBundle(
+			locale, "com.liferay.journal.lang");
+
+		return new AggregateResourceBundle(
+			classResourceBundle, _portal.getResourceBundle(locale));
+	}
+
 	private static final Log _log = LogFactoryUtil.getLog(
 		JournalConverterImpl.class);
 
 	private final Map<String, String> _ddmDataTypes;
 	private final Map<String, String> _ddmMetadataAttributes;
 	private final Map<String, String> _ddmTypesToJournalTypes;
+
+	@Reference
+	private DLAppLocalService _dlAppLocalService;
 
 	@Reference
 	private FieldsToDDMFormValuesConverter _fieldsToDDMFormValuesConverter;
@@ -1140,5 +1201,8 @@ public class JournalConverterImpl implements JournalConverter {
 
 	@Reference(unbind = "-")
 	private LayoutLocalService _layoutLocalService;
+
+	@Reference
+	private Portal _portal;
 
 }

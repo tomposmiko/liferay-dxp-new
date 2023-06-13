@@ -26,6 +26,10 @@ AUI.add(
 						validator: Lang.isString
 					},
 
+					openViewMoreFileEntryTypesURL: {
+						validator: Lang.isString
+					},
+
 					searchContainerId: {
 						validator: Lang.isString
 					},
@@ -100,7 +104,7 @@ AUI.add(
 						return instance._folderId;
 					},
 
-					onActionItemClicked: function(event) {
+					handleActionItemClicked: function(event) {
 						var instance = this;
 
 						var action = event.data.item.data.action;
@@ -132,7 +136,23 @@ AUI.add(
 						}
 					},
 
-					onFilterItemClicked: function(event) {
+					handleCreationMenuMoreButtonClicked: function(event) {
+						var instance = this;
+
+						Liferay.Util.openWindow(
+							{
+								dialog: {
+									destroyOnHide: true,
+									modal: true
+								},
+								id: instance.ns('selectAddMenuItem'),
+								title: Liferay.Language.get('more'),
+								uri: instance.get('openViewMoreFileEntryTypesURL')
+							}
+						);
+					},
+
+					handleFilterItemClicked: function(event) {
 						var instance = this;
 
 						var itemData = event.data.item.data;

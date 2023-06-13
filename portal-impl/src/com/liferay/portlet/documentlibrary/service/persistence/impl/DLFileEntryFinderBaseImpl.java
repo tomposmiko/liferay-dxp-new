@@ -16,7 +16,6 @@ package com.liferay.portlet.documentlibrary.service.persistence.impl;
 
 import com.liferay.document.library.kernel.model.DLFileEntry;
 import com.liferay.document.library.kernel.service.persistence.DLFileEntryPersistence;
-
 import com.liferay.portal.kernel.bean.BeanReference;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
@@ -32,20 +31,22 @@ import java.util.Set;
  * @author Brian Wing Shun Chan
  * @generated
  */
-public class DLFileEntryFinderBaseImpl extends BasePersistenceImpl<DLFileEntry> {
+public class DLFileEntryFinderBaseImpl
+	extends BasePersistenceImpl<DLFileEntry> {
+
 	public DLFileEntryFinderBaseImpl() {
 		setModelClass(DLFileEntry.class);
 
+		Map<String, String> dbColumnNames = new HashMap<String, String>();
+
+		dbColumnNames.put("uuid", "uuid_");
+		dbColumnNames.put("size", "size_");
+
 		try {
 			Field field = BasePersistenceImpl.class.getDeclaredField(
-					"_dbColumnNames");
+				"_dbColumnNames");
 
 			field.setAccessible(true);
-
-			Map<String, String> dbColumnNames = new HashMap<String, String>();
-
-			dbColumnNames.put("uuid", "uuid_");
-			dbColumnNames.put("size", "size_");
 
 			field.set(this, dbColumnNames);
 		}
@@ -77,10 +78,14 @@ public class DLFileEntryFinderBaseImpl extends BasePersistenceImpl<DLFileEntry> 
 	 */
 	public void setDLFileEntryPersistence(
 		DLFileEntryPersistence dlFileEntryPersistence) {
+
 		this.dlFileEntryPersistence = dlFileEntryPersistence;
 	}
 
 	@BeanReference(type = DLFileEntryPersistence.class)
 	protected DLFileEntryPersistence dlFileEntryPersistence;
-	private static final Log _log = LogFactoryUtil.getLog(DLFileEntryFinderBaseImpl.class);
+
+	private static final Log _log = LogFactoryUtil.getLog(
+		DLFileEntryFinderBaseImpl.class);
+
 }

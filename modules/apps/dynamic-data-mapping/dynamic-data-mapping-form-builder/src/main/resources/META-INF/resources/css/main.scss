@@ -11,6 +11,14 @@
 
 @import "form-builder-drag-and-drop";
 
+.modal div[class*="ae-toolbar-"][role="toolbar"] {
+	z-index: 9990;
+}
+
+* div[class*="ae-toolbar-"][role="toolbar"] {
+	z-index: 1000;
+}
+
 .clay-tooltip, .tooltip {
 	padding-top: 10px;
 

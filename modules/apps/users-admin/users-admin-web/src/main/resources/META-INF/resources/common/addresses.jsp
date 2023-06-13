@@ -133,7 +133,7 @@ else {
 			namespace: '<portlet:namespace />',
 			on: {
 				'clone': function(event) {
-					var guid = event.guid;
+					var guid = event.guid - 1;
 					var row = event.row;
 
 					var dynamicSelects = row.one('select[data-componentType=dynamic_select]');

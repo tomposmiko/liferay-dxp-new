@@ -79,11 +79,6 @@ AUI.add(
 							}
 
 							if (field !== trigger) {
-								if (instance !== trigger) {
-									delete fieldContext.errorMessage;
-									delete fieldContext.valid;
-								}
-
 								if (fieldContext.valueChanged && !Util.compare(field.get('value'), fieldContext.value)) {
 									field.setValue(fieldContext.value);
 								}
@@ -97,6 +92,13 @@ AUI.add(
 
 							fieldContext = field.processEvaluationContext(fieldContext, result);
 
+							var currentContext = field.get('context');
+
+							if (!currentContext.visited || fieldContext.valid !== false) {
+								currentContext.errorMessage = '';
+								currentContext.valid = true;
+							}
+
 							fieldContext = A.merge(
 								field.get('context'),
 								{
@@ -109,6 +111,10 @@ AUI.add(
 								},
 								field.getEvaluationContext(fieldContext)
 							);
+
+							if (fieldContext.valid) {
+								fieldContext.visited = true;
+							}
 
 							field.set('context', fieldContext);
 						}

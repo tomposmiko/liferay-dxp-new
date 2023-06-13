@@ -32,12 +32,13 @@ import com.liferay.trash.service.TrashEntryLocalServiceUtil;
  * @generated
  */
 @ProviderType
-public abstract class TrashEntryBaseImpl extends TrashEntryModelImpl
-	implements TrashEntry {
+public abstract class TrashEntryBaseImpl
+	extends TrashEntryModelImpl implements TrashEntry {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
-	 * Never modify or reference this class directly. All methods that expect a trash entry model instance should use the {@link TrashEntry} interface instead.
+	 * Never modify or reference this class directly. All methods that expect a trash entry model instance should use the <code>TrashEntry</code> interface instead.
 	 */
 	@Override
 	public void persist() {
@@ -48,4 +49,5 @@ public abstract class TrashEntryBaseImpl extends TrashEntryModelImpl
 			TrashEntryLocalServiceUtil.updateTrashEntry(this);
 		}
 	}
+
 }

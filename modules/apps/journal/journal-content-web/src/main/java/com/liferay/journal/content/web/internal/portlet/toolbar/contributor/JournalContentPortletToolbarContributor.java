@@ -37,6 +37,7 @@ import com.liferay.portal.kernel.servlet.taglib.ui.URLMenuItem;
 import com.liferay.portal.kernel.theme.PortletDisplay;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.HtmlUtil;
+import com.liferay.portal.kernel.util.Http;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.WebKeys;
 
@@ -55,7 +56,7 @@ import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
 /**
- * @author Eduardo Garcia
+ * @author Eduardo García
  */
 @Component(
 	immediate = true,
@@ -92,7 +93,7 @@ public class JournalContentPortletToolbarContributor
 		portletURL.setParameter(
 			"redirect",
 			_getAddJournalArticleRedirectURL(themeDisplay, portletRequest));
-		portletURL.setParameter("referringPlid", String.valueOf(plid));
+		portletURL.setParameter("refererPlid", String.valueOf(plid));
 		portletURL.setParameter("showHeader", Boolean.FALSE.toString());
 
 		portletURL.setWindowState(LiferayWindowState.POP_UP);
@@ -151,7 +152,11 @@ public class JournalContentPortletToolbarContributor
 
 			urlMenuItem.setLabel(label);
 
-			urlMenuItem.setURL(portletURL.toString());
+			String url = _http.addParameter(
+				portletURL.toString(), "refererPlid", plid);
+
+			urlMenuItem.setURL(url);
+
 			urlMenuItem.setUseDialog(true);
 
 			menuItems.add(urlMenuItem);
@@ -241,6 +246,9 @@ public class JournalContentPortletToolbarContributor
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		JournalContentPortletToolbarContributor.class);
+
+	@Reference
+	private Http _http;
 
 	@Reference
 	private JournalFolderService _journalFolderService;

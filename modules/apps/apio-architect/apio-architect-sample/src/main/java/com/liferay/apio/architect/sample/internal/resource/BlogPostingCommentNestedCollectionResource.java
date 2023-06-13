@@ -49,8 +49,8 @@ public class BlogPostingCommentNestedCollectionResource
 		NestedCollectionRoutes.Builder<Comment, Long, Long> builder) {
 
 		return builder.addGetter(
-			(id, pagination) ->
-				_blogPostingCommentActionRouter.retrievePage(pagination, id)
+			(id, pagination) -> _blogPostingCommentActionRouter.retrievePage(
+				pagination, id)
 		).addCreator(
 			_blogPostingCommentActionRouter::create, Credentials.class,
 			(credentials, blogPostingModelId) -> hasPermission(credentials),

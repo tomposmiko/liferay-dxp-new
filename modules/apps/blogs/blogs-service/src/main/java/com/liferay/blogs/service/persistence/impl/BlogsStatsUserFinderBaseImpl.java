@@ -16,7 +16,6 @@ package com.liferay.blogs.service.persistence.impl;
 
 import com.liferay.blogs.model.BlogsStatsUser;
 import com.liferay.blogs.service.persistence.BlogsStatsUserPersistence;
-
 import com.liferay.portal.kernel.bean.BeanReference;
 import com.liferay.portal.kernel.service.persistence.impl.BasePersistenceImpl;
 
@@ -24,7 +23,9 @@ import com.liferay.portal.kernel.service.persistence.impl.BasePersistenceImpl;
  * @author Brian Wing Shun Chan
  * @generated
  */
-public class BlogsStatsUserFinderBaseImpl extends BasePersistenceImpl<BlogsStatsUser> {
+public class BlogsStatsUserFinderBaseImpl
+	extends BasePersistenceImpl<BlogsStatsUser> {
+
 	public BlogsStatsUserFinderBaseImpl() {
 		setModelClass(BlogsStatsUser.class);
 	}
@@ -45,9 +46,11 @@ public class BlogsStatsUserFinderBaseImpl extends BasePersistenceImpl<BlogsStats
 	 */
 	public void setBlogsStatsUserPersistence(
 		BlogsStatsUserPersistence blogsStatsUserPersistence) {
+
 		this.blogsStatsUserPersistence = blogsStatsUserPersistence;
 	}
 
 	@BeanReference(type = BlogsStatsUserPersistence.class)
 	protected BlogsStatsUserPersistence blogsStatsUserPersistence;
+
 }

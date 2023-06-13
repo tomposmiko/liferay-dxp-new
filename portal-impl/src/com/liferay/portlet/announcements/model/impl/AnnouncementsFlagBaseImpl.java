@@ -34,10 +34,11 @@ import com.liferay.announcements.kernel.service.AnnouncementsFlagLocalServiceUti
 @ProviderType
 public abstract class AnnouncementsFlagBaseImpl
 	extends AnnouncementsFlagModelImpl implements AnnouncementsFlag {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
-	 * Never modify or reference this class directly. All methods that expect a announcements flag model instance should use the {@link AnnouncementsFlag} interface instead.
+	 * Never modify or reference this class directly. All methods that expect a announcements flag model instance should use the <code>AnnouncementsFlag</code> interface instead.
 	 */
 	@Override
 	public void persist() {
@@ -48,4 +49,5 @@ public abstract class AnnouncementsFlagBaseImpl
 			AnnouncementsFlagLocalServiceUtil.updateAnnouncementsFlag(this);
 		}
 	}
+
 }

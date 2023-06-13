@@ -17,7 +17,6 @@ package com.liferay.powwow.model;
 import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.expando.kernel.model.ExpandoBridge;
-
 import com.liferay.portal.kernel.model.ModelWrapper;
 import com.liferay.portal.kernel.service.ServiceContext;
 
@@ -38,8 +37,9 @@ import java.util.Objects;
  * @generated
  */
 @ProviderType
-public class PowwowParticipantWrapper implements PowwowParticipant,
-	ModelWrapper<PowwowParticipant> {
+public class PowwowParticipantWrapper
+	implements PowwowParticipant, ModelWrapper<PowwowParticipant> {
+
 	public PowwowParticipantWrapper(PowwowParticipant powwowParticipant) {
 		_powwowParticipant = powwowParticipant;
 	}
@@ -158,7 +158,8 @@ public class PowwowParticipantWrapper implements PowwowParticipant,
 
 	@Override
 	public Object clone() {
-		return new PowwowParticipantWrapper((PowwowParticipant)_powwowParticipant.clone());
+		return new PowwowParticipantWrapper(
+			(PowwowParticipant)_powwowParticipant.clone());
 	}
 
 	@Override
@@ -167,30 +168,30 @@ public class PowwowParticipantWrapper implements PowwowParticipant,
 	}
 
 	/**
-	* Returns the company ID of this powwow participant.
-	*
-	* @return the company ID of this powwow participant
-	*/
+	 * Returns the company ID of this powwow participant.
+	 *
+	 * @return the company ID of this powwow participant
+	 */
 	@Override
 	public long getCompanyId() {
 		return _powwowParticipant.getCompanyId();
 	}
 
 	/**
-	* Returns the create date of this powwow participant.
-	*
-	* @return the create date of this powwow participant
-	*/
+	 * Returns the create date of this powwow participant.
+	 *
+	 * @return the create date of this powwow participant
+	 */
 	@Override
 	public Date getCreateDate() {
 		return _powwowParticipant.getCreateDate();
 	}
 
 	/**
-	* Returns the email address of this powwow participant.
-	*
-	* @return the email address of this powwow participant
-	*/
+	 * Returns the email address of this powwow participant.
+	 *
+	 * @return the email address of this powwow participant
+	 */
 	@Override
 	public String getEmailAddress() {
 		return _powwowParticipant.getEmailAddress();
@@ -202,80 +203,80 @@ public class PowwowParticipantWrapper implements PowwowParticipant,
 	}
 
 	/**
-	* Returns the group ID of this powwow participant.
-	*
-	* @return the group ID of this powwow participant
-	*/
+	 * Returns the group ID of this powwow participant.
+	 *
+	 * @return the group ID of this powwow participant
+	 */
 	@Override
 	public long getGroupId() {
 		return _powwowParticipant.getGroupId();
 	}
 
 	/**
-	* Returns the modified date of this powwow participant.
-	*
-	* @return the modified date of this powwow participant
-	*/
+	 * Returns the modified date of this powwow participant.
+	 *
+	 * @return the modified date of this powwow participant
+	 */
 	@Override
 	public Date getModifiedDate() {
 		return _powwowParticipant.getModifiedDate();
 	}
 
 	/**
-	* Returns the name of this powwow participant.
-	*
-	* @return the name of this powwow participant
-	*/
+	 * Returns the name of this powwow participant.
+	 *
+	 * @return the name of this powwow participant
+	 */
 	@Override
 	public String getName() {
 		return _powwowParticipant.getName();
 	}
 
 	/**
-	* Returns the participant user ID of this powwow participant.
-	*
-	* @return the participant user ID of this powwow participant
-	*/
+	 * Returns the participant user ID of this powwow participant.
+	 *
+	 * @return the participant user ID of this powwow participant
+	 */
 	@Override
 	public long getParticipantUserId() {
 		return _powwowParticipant.getParticipantUserId();
 	}
 
 	/**
-	* Returns the participant user uuid of this powwow participant.
-	*
-	* @return the participant user uuid of this powwow participant
-	*/
+	 * Returns the participant user uuid of this powwow participant.
+	 *
+	 * @return the participant user uuid of this powwow participant
+	 */
 	@Override
 	public String getParticipantUserUuid() {
 		return _powwowParticipant.getParticipantUserUuid();
 	}
 
 	/**
-	* Returns the powwow meeting ID of this powwow participant.
-	*
-	* @return the powwow meeting ID of this powwow participant
-	*/
+	 * Returns the powwow meeting ID of this powwow participant.
+	 *
+	 * @return the powwow meeting ID of this powwow participant
+	 */
 	@Override
 	public long getPowwowMeetingId() {
 		return _powwowParticipant.getPowwowMeetingId();
 	}
 
 	/**
-	* Returns the powwow participant ID of this powwow participant.
-	*
-	* @return the powwow participant ID of this powwow participant
-	*/
+	 * Returns the powwow participant ID of this powwow participant.
+	 *
+	 * @return the powwow participant ID of this powwow participant
+	 */
 	@Override
 	public long getPowwowParticipantId() {
 		return _powwowParticipant.getPowwowParticipantId();
 	}
 
 	/**
-	* Returns the primary key of this powwow participant.
-	*
-	* @return the primary key of this powwow participant
-	*/
+	 * Returns the primary key of this powwow participant.
+	 *
+	 * @return the primary key of this powwow participant
+	 */
 	@Override
 	public long getPrimaryKey() {
 		return _powwowParticipant.getPrimaryKey();
@@ -287,50 +288,50 @@ public class PowwowParticipantWrapper implements PowwowParticipant,
 	}
 
 	/**
-	* Returns the status of this powwow participant.
-	*
-	* @return the status of this powwow participant
-	*/
+	 * Returns the status of this powwow participant.
+	 *
+	 * @return the status of this powwow participant
+	 */
 	@Override
 	public int getStatus() {
 		return _powwowParticipant.getStatus();
 	}
 
 	/**
-	* Returns the type of this powwow participant.
-	*
-	* @return the type of this powwow participant
-	*/
+	 * Returns the type of this powwow participant.
+	 *
+	 * @return the type of this powwow participant
+	 */
 	@Override
 	public int getType() {
 		return _powwowParticipant.getType();
 	}
 
 	/**
-	* Returns the user ID of this powwow participant.
-	*
-	* @return the user ID of this powwow participant
-	*/
+	 * Returns the user ID of this powwow participant.
+	 *
+	 * @return the user ID of this powwow participant
+	 */
 	@Override
 	public long getUserId() {
 		return _powwowParticipant.getUserId();
 	}
 
 	/**
-	* Returns the user name of this powwow participant.
-	*
-	* @return the user name of this powwow participant
-	*/
+	 * Returns the user name of this powwow participant.
+	 *
+	 * @return the user name of this powwow participant
+	 */
 	@Override
 	public String getUserName() {
 		return _powwowParticipant.getUserName();
 	}
 
 	/**
-	* Returns the user uuid of this powwow participant.
-	*
-	* @return the user uuid of this powwow participant
-	*/
+	 * Returns the user uuid of this powwow participant.
+	 *
+	 * @return the user uuid of this powwow participant
+	 */
 	@Override
 	public String getUserUuid() {
 		return _powwowParticipant.getUserUuid();
@@ -367,30 +368,30 @@ public class PowwowParticipantWrapper implements PowwowParticipant,
 	}
 
 	/**
-	* Sets the company ID of this powwow participant.
-	*
-	* @param companyId the company ID of this powwow participant
-	*/
+	 * Sets the company ID of this powwow participant.
+	 *
+	 * @param companyId the company ID of this powwow participant
+	 */
 	@Override
 	public void setCompanyId(long companyId) {
 		_powwowParticipant.setCompanyId(companyId);
 	}
 
 	/**
-	* Sets the create date of this powwow participant.
-	*
-	* @param createDate the create date of this powwow participant
-	*/
+	 * Sets the create date of this powwow participant.
+	 *
+	 * @param createDate the create date of this powwow participant
+	 */
 	@Override
 	public void setCreateDate(Date createDate) {
 		_powwowParticipant.setCreateDate(createDate);
 	}
 
 	/**
-	* Sets the email address of this powwow participant.
-	*
-	* @param emailAddress the email address of this powwow participant
-	*/
+	 * Sets the email address of this powwow participant.
+	 *
+	 * @param emailAddress the email address of this powwow participant
+	 */
 	@Override
 	public void setEmailAddress(String emailAddress) {
 		_powwowParticipant.setEmailAddress(emailAddress);
@@ -399,6 +400,7 @@ public class PowwowParticipantWrapper implements PowwowParticipant,
 	@Override
 	public void setExpandoBridgeAttributes(
 		com.liferay.portal.kernel.model.BaseModel<?> baseModel) {
+
 		_powwowParticipant.setExpandoBridgeAttributes(baseModel);
 	}
 
@@ -413,30 +415,30 @@ public class PowwowParticipantWrapper implements PowwowParticipant,
 	}
 
 	/**
-	* Sets the group ID of this powwow participant.
-	*
-	* @param groupId the group ID of this powwow participant
-	*/
+	 * Sets the group ID of this powwow participant.
+	 *
+	 * @param groupId the group ID of this powwow participant
+	 */
 	@Override
 	public void setGroupId(long groupId) {
 		_powwowParticipant.setGroupId(groupId);
 	}
 
 	/**
-	* Sets the modified date of this powwow participant.
-	*
-	* @param modifiedDate the modified date of this powwow participant
-	*/
+	 * Sets the modified date of this powwow participant.
+	 *
+	 * @param modifiedDate the modified date of this powwow participant
+	 */
 	@Override
 	public void setModifiedDate(Date modifiedDate) {
 		_powwowParticipant.setModifiedDate(modifiedDate);
 	}
 
 	/**
-	* Sets the name of this powwow participant.
-	*
-	* @param name the name of this powwow participant
-	*/
+	 * Sets the name of this powwow participant.
+	 *
+	 * @param name the name of this powwow participant
+	 */
 	@Override
 	public void setName(String name) {
 		_powwowParticipant.setName(name);
@@ -448,50 +450,50 @@ public class PowwowParticipantWrapper implements PowwowParticipant,
 	}
 
 	/**
-	* Sets the participant user ID of this powwow participant.
-	*
-	* @param participantUserId the participant user ID of this powwow participant
-	*/
+	 * Sets the participant user ID of this powwow participant.
+	 *
+	 * @param participantUserId the participant user ID of this powwow participant
+	 */
 	@Override
 	public void setParticipantUserId(long participantUserId) {
 		_powwowParticipant.setParticipantUserId(participantUserId);
 	}
 
 	/**
-	* Sets the participant user uuid of this powwow participant.
-	*
-	* @param participantUserUuid the participant user uuid of this powwow participant
-	*/
+	 * Sets the participant user uuid of this powwow participant.
+	 *
+	 * @param participantUserUuid the participant user uuid of this powwow participant
+	 */
 	@Override
 	public void setParticipantUserUuid(String participantUserUuid) {
 		_powwowParticipant.setParticipantUserUuid(participantUserUuid);
 	}
 
 	/**
-	* Sets the powwow meeting ID of this powwow participant.
-	*
-	* @param powwowMeetingId the powwow meeting ID of this powwow participant
-	*/
+	 * Sets the powwow meeting ID of this powwow participant.
+	 *
+	 * @param powwowMeetingId the powwow meeting ID of this powwow participant
+	 */
 	@Override
 	public void setPowwowMeetingId(long powwowMeetingId) {
 		_powwowParticipant.setPowwowMeetingId(powwowMeetingId);
 	}
 
 	/**
-	* Sets the powwow participant ID of this powwow participant.
-	*
-	* @param powwowParticipantId the powwow participant ID of this powwow participant
-	*/
+	 * Sets the powwow participant ID of this powwow participant.
+	 *
+	 * @param powwowParticipantId the powwow participant ID of this powwow participant
+	 */
 	@Override
 	public void setPowwowParticipantId(long powwowParticipantId) {
 		_powwowParticipant.setPowwowParticipantId(powwowParticipantId);
 	}
 
 	/**
-	* Sets the primary key of this powwow participant.
-	*
-	* @param primaryKey the primary key of this powwow participant
-	*/
+	 * Sets the primary key of this powwow participant.
+	 *
+	 * @param primaryKey the primary key of this powwow participant
+	 */
 	@Override
 	public void setPrimaryKey(long primaryKey) {
 		_powwowParticipant.setPrimaryKey(primaryKey);
@@ -503,63 +505,66 @@ public class PowwowParticipantWrapper implements PowwowParticipant,
 	}
 
 	/**
-	* Sets the status of this powwow participant.
-	*
-	* @param status the status of this powwow participant
-	*/
+	 * Sets the status of this powwow participant.
+	 *
+	 * @param status the status of this powwow participant
+	 */
 	@Override
 	public void setStatus(int status) {
 		_powwowParticipant.setStatus(status);
 	}
 
 	/**
-	* Sets the type of this powwow participant.
-	*
-	* @param type the type of this powwow participant
-	*/
+	 * Sets the type of this powwow participant.
+	 *
+	 * @param type the type of this powwow participant
+	 */
 	@Override
 	public void setType(int type) {
 		_powwowParticipant.setType(type);
 	}
 
 	/**
-	* Sets the user ID of this powwow participant.
-	*
-	* @param userId the user ID of this powwow participant
-	*/
+	 * Sets the user ID of this powwow participant.
+	 *
+	 * @param userId the user ID of this powwow participant
+	 */
 	@Override
 	public void setUserId(long userId) {
 		_powwowParticipant.setUserId(userId);
 	}
 
 	/**
-	* Sets the user name of this powwow participant.
-	*
-	* @param userName the user name of this powwow participant
-	*/
+	 * Sets the user name of this powwow participant.
+	 *
+	 * @param userName the user name of this powwow participant
+	 */
 	@Override
 	public void setUserName(String userName) {
 		_powwowParticipant.setUserName(userName);
 	}
 
 	/**
-	* Sets the user uuid of this powwow participant.
-	*
-	* @param userUuid the user uuid of this powwow participant
-	*/
+	 * Sets the user uuid of this powwow participant.
+	 *
+	 * @param userUuid the user uuid of this powwow participant
+	 */
 	@Override
 	public void setUserUuid(String userUuid) {
 		_powwowParticipant.setUserUuid(userUuid);
 	}
 
 	@Override
-	public com.liferay.portal.kernel.model.CacheModel<PowwowParticipant> toCacheModel() {
+	public com.liferay.portal.kernel.model.CacheModel<PowwowParticipant>
+		toCacheModel() {
+
 		return _powwowParticipant.toCacheModel();
 	}
 
 	@Override
 	public PowwowParticipant toEscapedModel() {
-		return new PowwowParticipantWrapper(_powwowParticipant.toEscapedModel());
+		return new PowwowParticipantWrapper(
+			_powwowParticipant.toEscapedModel());
 	}
 
 	@Override
@@ -569,7 +574,8 @@ public class PowwowParticipantWrapper implements PowwowParticipant,
 
 	@Override
 	public PowwowParticipant toUnescapedModel() {
-		return new PowwowParticipantWrapper(_powwowParticipant.toUnescapedModel());
+		return new PowwowParticipantWrapper(
+			_powwowParticipant.toUnescapedModel());
 	}
 
 	@Override
@@ -587,10 +593,13 @@ public class PowwowParticipantWrapper implements PowwowParticipant,
 			return false;
 		}
 
-		PowwowParticipantWrapper powwowParticipantWrapper = (PowwowParticipantWrapper)obj;
+		PowwowParticipantWrapper powwowParticipantWrapper =
+			(PowwowParticipantWrapper)obj;
 
-		if (Objects.equals(_powwowParticipant,
-					powwowParticipantWrapper._powwowParticipant)) {
+		if (Objects.equals(
+				_powwowParticipant,
+				powwowParticipantWrapper._powwowParticipant)) {
+
 			return true;
 		}
 
@@ -618,4 +627,5 @@ public class PowwowParticipantWrapper implements PowwowParticipant,
 	}
 
 	private final PowwowParticipant _powwowParticipant;
+
 }

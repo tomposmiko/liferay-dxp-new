@@ -21,7 +21,6 @@ import com.liferay.exportimport.kernel.lar.ManifestSummary;
 import com.liferay.exportimport.kernel.lar.PortletDataContext;
 import com.liferay.exportimport.kernel.lar.StagedModelDataHandlerUtil;
 import com.liferay.exportimport.kernel.lar.StagedModelType;
-
 import com.liferay.portal.kernel.bean.BeanReference;
 import com.liferay.portal.kernel.dao.db.DB;
 import com.liferay.portal.kernel.dao.db.DBManagerUtil;
@@ -47,7 +46,6 @@ import com.liferay.portal.kernel.transaction.Transactional;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.spring.extender.service.ServiceReference;
-
 import com.liferay.site.navigation.model.SiteNavigationMenuItem;
 import com.liferay.site.navigation.service.SiteNavigationMenuItemLocalService;
 import com.liferay.site.navigation.service.persistence.SiteNavigationMenuItemPersistence;
@@ -68,17 +66,17 @@ import javax.sql.DataSource;
  *
  * @author Brian Wing Shun Chan
  * @see com.liferay.site.navigation.service.impl.SiteNavigationMenuItemLocalServiceImpl
- * @see com.liferay.site.navigation.service.SiteNavigationMenuItemLocalServiceUtil
  * @generated
  */
 @ProviderType
 public abstract class SiteNavigationMenuItemLocalServiceBaseImpl
-	extends BaseLocalServiceImpl implements SiteNavigationMenuItemLocalService,
-		IdentifiableOSGiService {
+	extends BaseLocalServiceImpl
+	implements SiteNavigationMenuItemLocalService, IdentifiableOSGiService {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
-	 * Never modify or reference this class directly. Always use {@link com.liferay.site.navigation.service.SiteNavigationMenuItemLocalServiceUtil} to access the site navigation menu item local service.
+	 * Never modify or reference this class directly. Use <code>SiteNavigationMenuItemLocalService</code> via injection or a <code>org.osgi.util.tracker.ServiceTracker</code> or use <code>com.liferay.site.navigation.service.SiteNavigationMenuItemLocalServiceUtil</code>.
 	 */
 
 	/**
@@ -91,6 +89,7 @@ public abstract class SiteNavigationMenuItemLocalServiceBaseImpl
 	@Override
 	public SiteNavigationMenuItem addSiteNavigationMenuItem(
 		SiteNavigationMenuItem siteNavigationMenuItem) {
+
 		siteNavigationMenuItem.setNew(true);
 
 		return siteNavigationMenuItemPersistence.update(siteNavigationMenuItem);
@@ -106,7 +105,9 @@ public abstract class SiteNavigationMenuItemLocalServiceBaseImpl
 	@Transactional(enabled = false)
 	public SiteNavigationMenuItem createSiteNavigationMenuItem(
 		long siteNavigationMenuItemId) {
-		return siteNavigationMenuItemPersistence.create(siteNavigationMenuItemId);
+
+		return siteNavigationMenuItemPersistence.create(
+			siteNavigationMenuItemId);
 	}
 
 	/**
@@ -119,8 +120,11 @@ public abstract class SiteNavigationMenuItemLocalServiceBaseImpl
 	@Indexable(type = IndexableType.DELETE)
 	@Override
 	public SiteNavigationMenuItem deleteSiteNavigationMenuItem(
-		long siteNavigationMenuItemId) throws PortalException {
-		return siteNavigationMenuItemPersistence.remove(siteNavigationMenuItemId);
+			long siteNavigationMenuItemId)
+		throws PortalException {
+
+		return siteNavigationMenuItemPersistence.remove(
+			siteNavigationMenuItemId);
 	}
 
 	/**
@@ -133,6 +137,7 @@ public abstract class SiteNavigationMenuItemLocalServiceBaseImpl
 	@Override
 	public SiteNavigationMenuItem deleteSiteNavigationMenuItem(
 		SiteNavigationMenuItem siteNavigationMenuItem) {
+
 		return siteNavigationMenuItemPersistence.remove(siteNavigationMenuItem);
 	}
 
@@ -140,8 +145,8 @@ public abstract class SiteNavigationMenuItemLocalServiceBaseImpl
 	public DynamicQuery dynamicQuery() {
 		Class<?> clazz = getClass();
 
-		return DynamicQueryFactoryUtil.forClass(SiteNavigationMenuItem.class,
-			clazz.getClassLoader());
+		return DynamicQueryFactoryUtil.forClass(
+			SiteNavigationMenuItem.class, clazz.getClassLoader());
 	}
 
 	/**
@@ -152,14 +157,15 @@ public abstract class SiteNavigationMenuItemLocalServiceBaseImpl
 	 */
 	@Override
 	public <T> List<T> dynamicQuery(DynamicQuery dynamicQuery) {
-		return siteNavigationMenuItemPersistence.findWithDynamicQuery(dynamicQuery);
+		return siteNavigationMenuItemPersistence.findWithDynamicQuery(
+			dynamicQuery);
 	}
 
 	/**
 	 * Performs a dynamic query on the database and returns a range of the matching rows.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link com.liferay.site.navigation.model.impl.SiteNavigationMenuItemModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>com.liferay.site.navigation.model.impl.SiteNavigationMenuItemModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param dynamicQuery the dynamic query
@@ -168,17 +174,18 @@ public abstract class SiteNavigationMenuItemLocalServiceBaseImpl
 	 * @return the range of matching rows
 	 */
 	@Override
-	public <T> List<T> dynamicQuery(DynamicQuery dynamicQuery, int start,
-		int end) {
-		return siteNavigationMenuItemPersistence.findWithDynamicQuery(dynamicQuery,
-			start, end);
+	public <T> List<T> dynamicQuery(
+		DynamicQuery dynamicQuery, int start, int end) {
+
+		return siteNavigationMenuItemPersistence.findWithDynamicQuery(
+			dynamicQuery, start, end);
 	}
 
 	/**
 	 * Performs a dynamic query on the database and returns an ordered range of the matching rows.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link com.liferay.site.navigation.model.impl.SiteNavigationMenuItemModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>com.liferay.site.navigation.model.impl.SiteNavigationMenuItemModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param dynamicQuery the dynamic query
@@ -188,10 +195,12 @@ public abstract class SiteNavigationMenuItemLocalServiceBaseImpl
 	 * @return the ordered range of matching rows
 	 */
 	@Override
-	public <T> List<T> dynamicQuery(DynamicQuery dynamicQuery, int start,
-		int end, OrderByComparator<T> orderByComparator) {
-		return siteNavigationMenuItemPersistence.findWithDynamicQuery(dynamicQuery,
-			start, end, orderByComparator);
+	public <T> List<T> dynamicQuery(
+		DynamicQuery dynamicQuery, int start, int end,
+		OrderByComparator<T> orderByComparator) {
+
+		return siteNavigationMenuItemPersistence.findWithDynamicQuery(
+			dynamicQuery, start, end, orderByComparator);
 	}
 
 	/**
@@ -202,7 +211,8 @@ public abstract class SiteNavigationMenuItemLocalServiceBaseImpl
 	 */
 	@Override
 	public long dynamicQueryCount(DynamicQuery dynamicQuery) {
-		return siteNavigationMenuItemPersistence.countWithDynamicQuery(dynamicQuery);
+		return siteNavigationMenuItemPersistence.countWithDynamicQuery(
+			dynamicQuery);
 	}
 
 	/**
@@ -213,16 +223,19 @@ public abstract class SiteNavigationMenuItemLocalServiceBaseImpl
 	 * @return the number of rows matching the dynamic query
 	 */
 	@Override
-	public long dynamicQueryCount(DynamicQuery dynamicQuery,
-		Projection projection) {
-		return siteNavigationMenuItemPersistence.countWithDynamicQuery(dynamicQuery,
-			projection);
+	public long dynamicQueryCount(
+		DynamicQuery dynamicQuery, Projection projection) {
+
+		return siteNavigationMenuItemPersistence.countWithDynamicQuery(
+			dynamicQuery, projection);
 	}
 
 	@Override
 	public SiteNavigationMenuItem fetchSiteNavigationMenuItem(
 		long siteNavigationMenuItemId) {
-		return siteNavigationMenuItemPersistence.fetchByPrimaryKey(siteNavigationMenuItemId);
+
+		return siteNavigationMenuItemPersistence.fetchByPrimaryKey(
+			siteNavigationMenuItemId);
 	}
 
 	/**
@@ -235,6 +248,7 @@ public abstract class SiteNavigationMenuItemLocalServiceBaseImpl
 	@Override
 	public SiteNavigationMenuItem fetchSiteNavigationMenuItemByUuidAndGroupId(
 		String uuid, long groupId) {
+
 		return siteNavigationMenuItemPersistence.fetchByUUID_G(uuid, groupId);
 	}
 
@@ -247,15 +261,20 @@ public abstract class SiteNavigationMenuItemLocalServiceBaseImpl
 	 */
 	@Override
 	public SiteNavigationMenuItem getSiteNavigationMenuItem(
-		long siteNavigationMenuItemId) throws PortalException {
-		return siteNavigationMenuItemPersistence.findByPrimaryKey(siteNavigationMenuItemId);
+			long siteNavigationMenuItemId)
+		throws PortalException {
+
+		return siteNavigationMenuItemPersistence.findByPrimaryKey(
+			siteNavigationMenuItemId);
 	}
 
 	@Override
 	public ActionableDynamicQuery getActionableDynamicQuery() {
-		ActionableDynamicQuery actionableDynamicQuery = new DefaultActionableDynamicQuery();
+		ActionableDynamicQuery actionableDynamicQuery =
+			new DefaultActionableDynamicQuery();
 
-		actionableDynamicQuery.setBaseLocalService(siteNavigationMenuItemLocalService);
+		actionableDynamicQuery.setBaseLocalService(
+			siteNavigationMenuItemLocalService);
 		actionableDynamicQuery.setClassLoader(getClassLoader());
 		actionableDynamicQuery.setModelClass(SiteNavigationMenuItem.class);
 
@@ -266,12 +285,17 @@ public abstract class SiteNavigationMenuItemLocalServiceBaseImpl
 	}
 
 	@Override
-	public IndexableActionableDynamicQuery getIndexableActionableDynamicQuery() {
-		IndexableActionableDynamicQuery indexableActionableDynamicQuery = new IndexableActionableDynamicQuery();
+	public IndexableActionableDynamicQuery
+		getIndexableActionableDynamicQuery() {
 
-		indexableActionableDynamicQuery.setBaseLocalService(siteNavigationMenuItemLocalService);
+		IndexableActionableDynamicQuery indexableActionableDynamicQuery =
+			new IndexableActionableDynamicQuery();
+
+		indexableActionableDynamicQuery.setBaseLocalService(
+			siteNavigationMenuItemLocalService);
 		indexableActionableDynamicQuery.setClassLoader(getClassLoader());
-		indexableActionableDynamicQuery.setModelClass(SiteNavigationMenuItem.class);
+		indexableActionableDynamicQuery.setModelClass(
+			SiteNavigationMenuItem.class);
 
 		indexableActionableDynamicQuery.setPrimaryKeyPropertyName(
 			"siteNavigationMenuItemId");
@@ -281,7 +305,9 @@ public abstract class SiteNavigationMenuItemLocalServiceBaseImpl
 
 	protected void initActionableDynamicQuery(
 		ActionableDynamicQuery actionableDynamicQuery) {
-		actionableDynamicQuery.setBaseLocalService(siteNavigationMenuItemLocalService);
+
+		actionableDynamicQuery.setBaseLocalService(
+			siteNavigationMenuItemLocalService);
 		actionableDynamicQuery.setClassLoader(getClassLoader());
 		actionableDynamicQuery.setModelClass(SiteNavigationMenuItem.class);
 
@@ -292,52 +318,69 @@ public abstract class SiteNavigationMenuItemLocalServiceBaseImpl
 	@Override
 	public ExportActionableDynamicQuery getExportActionableDynamicQuery(
 		final PortletDataContext portletDataContext) {
-		final ExportActionableDynamicQuery exportActionableDynamicQuery = new ExportActionableDynamicQuery() {
+
+		final ExportActionableDynamicQuery exportActionableDynamicQuery =
+			new ExportActionableDynamicQuery() {
+
 				@Override
 				public long performCount() throws PortalException {
-					ManifestSummary manifestSummary = portletDataContext.getManifestSummary();
+					ManifestSummary manifestSummary =
+						portletDataContext.getManifestSummary();
 
 					StagedModelType stagedModelType = getStagedModelType();
 
 					long modelAdditionCount = super.performCount();
 
-					manifestSummary.addModelAdditionCount(stagedModelType,
-						modelAdditionCount);
+					manifestSummary.addModelAdditionCount(
+						stagedModelType, modelAdditionCount);
 
-					long modelDeletionCount = ExportImportHelperUtil.getModelDeletionCount(portletDataContext,
-							stagedModelType);
+					long modelDeletionCount =
+						ExportImportHelperUtil.getModelDeletionCount(
+							portletDataContext, stagedModelType);
 
-					manifestSummary.addModelDeletionCount(stagedModelType,
-						modelDeletionCount);
+					manifestSummary.addModelDeletionCount(
+						stagedModelType, modelDeletionCount);
 
 					return modelAdditionCount;
 				}
+
 			};
 
 		initActionableDynamicQuery(exportActionableDynamicQuery);
 
-		exportActionableDynamicQuery.setAddCriteriaMethod(new ActionableDynamicQuery.AddCriteriaMethod() {
+		exportActionableDynamicQuery.setAddCriteriaMethod(
+			new ActionableDynamicQuery.AddCriteriaMethod() {
+
 				@Override
 				public void addCriteria(DynamicQuery dynamicQuery) {
-					portletDataContext.addDateRangeCriteria(dynamicQuery,
-						"modifiedDate");
+					portletDataContext.addDateRangeCriteria(
+						dynamicQuery, "modifiedDate");
 				}
+
 			});
 
-		exportActionableDynamicQuery.setCompanyId(portletDataContext.getCompanyId());
+		exportActionableDynamicQuery.setCompanyId(
+			portletDataContext.getCompanyId());
 
-		exportActionableDynamicQuery.setGroupId(portletDataContext.getScopeGroupId());
+		exportActionableDynamicQuery.setGroupId(
+			portletDataContext.getScopeGroupId());
 
-		exportActionableDynamicQuery.setPerformActionMethod(new ActionableDynamicQuery.PerformActionMethod<SiteNavigationMenuItem>() {
+		exportActionableDynamicQuery.setPerformActionMethod(
+			new ActionableDynamicQuery.PerformActionMethod
+				<SiteNavigationMenuItem>() {
+
 				@Override
 				public void performAction(
-					SiteNavigationMenuItem siteNavigationMenuItem)
+						SiteNavigationMenuItem siteNavigationMenuItem)
 					throws PortalException {
-					StagedModelDataHandlerUtil.exportStagedModel(portletDataContext,
-						siteNavigationMenuItem);
+
+					StagedModelDataHandlerUtil.exportStagedModel(
+						portletDataContext, siteNavigationMenuItem);
 				}
+
 			});
-		exportActionableDynamicQuery.setStagedModelType(new StagedModelType(
+		exportActionableDynamicQuery.setStagedModelType(
+			new StagedModelType(
 				PortalUtil.getClassNameId(
 					SiteNavigationMenuItem.class.getName())));
 
@@ -350,13 +393,17 @@ public abstract class SiteNavigationMenuItemLocalServiceBaseImpl
 	@Override
 	public PersistedModel deletePersistedModel(PersistedModel persistedModel)
 		throws PortalException {
-		return siteNavigationMenuItemLocalService.deleteSiteNavigationMenuItem((SiteNavigationMenuItem)persistedModel);
+
+		return siteNavigationMenuItemLocalService.deleteSiteNavigationMenuItem(
+			(SiteNavigationMenuItem)persistedModel);
 	}
 
 	@Override
 	public PersistedModel getPersistedModel(Serializable primaryKeyObj)
 		throws PortalException {
-		return siteNavigationMenuItemPersistence.findByPrimaryKey(primaryKeyObj);
+
+		return siteNavigationMenuItemPersistence.findByPrimaryKey(
+			primaryKeyObj);
 	}
 
 	/**
@@ -367,8 +414,10 @@ public abstract class SiteNavigationMenuItemLocalServiceBaseImpl
 	 * @return the matching site navigation menu items, or an empty list if no matches were found
 	 */
 	@Override
-	public List<SiteNavigationMenuItem> getSiteNavigationMenuItemsByUuidAndCompanyId(
-		String uuid, long companyId) {
+	public List<SiteNavigationMenuItem>
+		getSiteNavigationMenuItemsByUuidAndCompanyId(
+			String uuid, long companyId) {
+
 		return siteNavigationMenuItemPersistence.findByUuid_C(uuid, companyId);
 	}
 
@@ -383,11 +432,13 @@ public abstract class SiteNavigationMenuItemLocalServiceBaseImpl
 	 * @return the range of matching site navigation menu items, or an empty list if no matches were found
 	 */
 	@Override
-	public List<SiteNavigationMenuItem> getSiteNavigationMenuItemsByUuidAndCompanyId(
-		String uuid, long companyId, int start, int end,
-		OrderByComparator<SiteNavigationMenuItem> orderByComparator) {
-		return siteNavigationMenuItemPersistence.findByUuid_C(uuid, companyId,
-			start, end, orderByComparator);
+	public List<SiteNavigationMenuItem>
+		getSiteNavigationMenuItemsByUuidAndCompanyId(
+			String uuid, long companyId, int start, int end,
+			OrderByComparator<SiteNavigationMenuItem> orderByComparator) {
+
+		return siteNavigationMenuItemPersistence.findByUuid_C(
+			uuid, companyId, start, end, orderByComparator);
 	}
 
 	/**
@@ -400,7 +451,9 @@ public abstract class SiteNavigationMenuItemLocalServiceBaseImpl
 	 */
 	@Override
 	public SiteNavigationMenuItem getSiteNavigationMenuItemByUuidAndGroupId(
-		String uuid, long groupId) throws PortalException {
+			String uuid, long groupId)
+		throws PortalException {
+
 		return siteNavigationMenuItemPersistence.findByUUID_G(uuid, groupId);
 	}
 
@@ -408,7 +461,7 @@ public abstract class SiteNavigationMenuItemLocalServiceBaseImpl
 	 * Returns a range of all the site navigation menu items.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link com.liferay.site.navigation.model.impl.SiteNavigationMenuItemModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>com.liferay.site.navigation.model.impl.SiteNavigationMenuItemModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param start the lower bound of the range of site navigation menu items
@@ -416,8 +469,9 @@ public abstract class SiteNavigationMenuItemLocalServiceBaseImpl
 	 * @return the range of site navigation menu items
 	 */
 	@Override
-	public List<SiteNavigationMenuItem> getSiteNavigationMenuItems(int start,
-		int end) {
+	public List<SiteNavigationMenuItem> getSiteNavigationMenuItems(
+		int start, int end) {
+
 		return siteNavigationMenuItemPersistence.findAll(start, end);
 	}
 
@@ -441,6 +495,7 @@ public abstract class SiteNavigationMenuItemLocalServiceBaseImpl
 	@Override
 	public SiteNavigationMenuItem updateSiteNavigationMenuItem(
 		SiteNavigationMenuItem siteNavigationMenuItem) {
+
 		return siteNavigationMenuItemPersistence.update(siteNavigationMenuItem);
 	}
 
@@ -449,7 +504,9 @@ public abstract class SiteNavigationMenuItemLocalServiceBaseImpl
 	 *
 	 * @return the site navigation menu item local service
 	 */
-	public SiteNavigationMenuItemLocalService getSiteNavigationMenuItemLocalService() {
+	public SiteNavigationMenuItemLocalService
+		getSiteNavigationMenuItemLocalService() {
+
 		return siteNavigationMenuItemLocalService;
 	}
 
@@ -460,7 +517,9 @@ public abstract class SiteNavigationMenuItemLocalServiceBaseImpl
 	 */
 	public void setSiteNavigationMenuItemLocalService(
 		SiteNavigationMenuItemLocalService siteNavigationMenuItemLocalService) {
-		this.siteNavigationMenuItemLocalService = siteNavigationMenuItemLocalService;
+
+		this.siteNavigationMenuItemLocalService =
+			siteNavigationMenuItemLocalService;
 	}
 
 	/**
@@ -468,7 +527,9 @@ public abstract class SiteNavigationMenuItemLocalServiceBaseImpl
 	 *
 	 * @return the site navigation menu item persistence
 	 */
-	public SiteNavigationMenuItemPersistence getSiteNavigationMenuItemPersistence() {
+	public SiteNavigationMenuItemPersistence
+		getSiteNavigationMenuItemPersistence() {
+
 		return siteNavigationMenuItemPersistence;
 	}
 
@@ -479,7 +540,9 @@ public abstract class SiteNavigationMenuItemLocalServiceBaseImpl
 	 */
 	public void setSiteNavigationMenuItemPersistence(
 		SiteNavigationMenuItemPersistence siteNavigationMenuItemPersistence) {
-		this.siteNavigationMenuItemPersistence = siteNavigationMenuItemPersistence;
+
+		this.siteNavigationMenuItemPersistence =
+			siteNavigationMenuItemPersistence;
 	}
 
 	/**
@@ -487,7 +550,9 @@ public abstract class SiteNavigationMenuItemLocalServiceBaseImpl
 	 *
 	 * @return the counter local service
 	 */
-	public com.liferay.counter.kernel.service.CounterLocalService getCounterLocalService() {
+	public com.liferay.counter.kernel.service.CounterLocalService
+		getCounterLocalService() {
+
 		return counterLocalService;
 	}
 
@@ -497,7 +562,9 @@ public abstract class SiteNavigationMenuItemLocalServiceBaseImpl
 	 * @param counterLocalService the counter local service
 	 */
 	public void setCounterLocalService(
-		com.liferay.counter.kernel.service.CounterLocalService counterLocalService) {
+		com.liferay.counter.kernel.service.CounterLocalService
+			counterLocalService) {
+
 		this.counterLocalService = counterLocalService;
 	}
 
@@ -506,7 +573,9 @@ public abstract class SiteNavigationMenuItemLocalServiceBaseImpl
 	 *
 	 * @return the user local service
 	 */
-	public com.liferay.portal.kernel.service.UserLocalService getUserLocalService() {
+	public com.liferay.portal.kernel.service.UserLocalService
+		getUserLocalService() {
+
 		return userLocalService;
 	}
 
@@ -517,6 +586,7 @@ public abstract class SiteNavigationMenuItemLocalServiceBaseImpl
 	 */
 	public void setUserLocalService(
 		com.liferay.portal.kernel.service.UserLocalService userLocalService) {
+
 		this.userLocalService = userLocalService;
 	}
 
@@ -543,7 +613,9 @@ public abstract class SiteNavigationMenuItemLocalServiceBaseImpl
 	 *
 	 * @return the site navigation menu local service
 	 */
-	public com.liferay.site.navigation.service.SiteNavigationMenuLocalService getSiteNavigationMenuLocalService() {
+	public com.liferay.site.navigation.service.SiteNavigationMenuLocalService
+		getSiteNavigationMenuLocalService() {
+
 		return siteNavigationMenuLocalService;
 	}
 
@@ -553,7 +625,9 @@ public abstract class SiteNavigationMenuItemLocalServiceBaseImpl
 	 * @param siteNavigationMenuLocalService the site navigation menu local service
 	 */
 	public void setSiteNavigationMenuLocalService(
-		com.liferay.site.navigation.service.SiteNavigationMenuLocalService siteNavigationMenuLocalService) {
+		com.liferay.site.navigation.service.SiteNavigationMenuLocalService
+			siteNavigationMenuLocalService) {
+
 		this.siteNavigationMenuLocalService = siteNavigationMenuLocalService;
 	}
 
@@ -573,11 +647,13 @@ public abstract class SiteNavigationMenuItemLocalServiceBaseImpl
 	 */
 	public void setSiteNavigationMenuPersistence(
 		SiteNavigationMenuPersistence siteNavigationMenuPersistence) {
+
 		this.siteNavigationMenuPersistence = siteNavigationMenuPersistence;
 	}
 
 	public void afterPropertiesSet() {
-		persistedModelLocalServiceRegistry.register("com.liferay.site.navigation.model.SiteNavigationMenuItem",
+		persistedModelLocalServiceRegistry.register(
+			"com.liferay.site.navigation.model.SiteNavigationMenuItem",
 			siteNavigationMenuItemLocalService);
 	}
 
@@ -611,15 +687,16 @@ public abstract class SiteNavigationMenuItemLocalServiceBaseImpl
 	 */
 	protected void runSQL(String sql) {
 		try {
-			DataSource dataSource = siteNavigationMenuItemPersistence.getDataSource();
+			DataSource dataSource =
+				siteNavigationMenuItemPersistence.getDataSource();
 
 			DB db = DBManagerUtil.getDB();
 
 			sql = db.buildSQL(sql);
 			sql = PortalUtil.transformSQL(sql);
 
-			SqlUpdate sqlUpdate = SqlUpdateFactoryUtil.getSqlUpdate(dataSource,
-					sql);
+			SqlUpdate sqlUpdate = SqlUpdateFactoryUtil.getSqlUpdate(
+				dataSource, sql);
 
 			sqlUpdate.update();
 		}
@@ -629,19 +706,39 @@ public abstract class SiteNavigationMenuItemLocalServiceBaseImpl
 	}
 
 	@BeanReference(type = SiteNavigationMenuItemLocalService.class)
-	protected SiteNavigationMenuItemLocalService siteNavigationMenuItemLocalService;
+	protected SiteNavigationMenuItemLocalService
+		siteNavigationMenuItemLocalService;
+
 	@BeanReference(type = SiteNavigationMenuItemPersistence.class)
-	protected SiteNavigationMenuItemPersistence siteNavigationMenuItemPersistence;
-	@ServiceReference(type = com.liferay.counter.kernel.service.CounterLocalService.class)
-	protected com.liferay.counter.kernel.service.CounterLocalService counterLocalService;
-	@ServiceReference(type = com.liferay.portal.kernel.service.UserLocalService.class)
-	protected com.liferay.portal.kernel.service.UserLocalService userLocalService;
+	protected SiteNavigationMenuItemPersistence
+		siteNavigationMenuItemPersistence;
+
+	@ServiceReference(
+		type = com.liferay.counter.kernel.service.CounterLocalService.class
+	)
+	protected com.liferay.counter.kernel.service.CounterLocalService
+		counterLocalService;
+
+	@ServiceReference(
+		type = com.liferay.portal.kernel.service.UserLocalService.class
+	)
+	protected com.liferay.portal.kernel.service.UserLocalService
+		userLocalService;
+
 	@ServiceReference(type = UserPersistence.class)
 	protected UserPersistence userPersistence;
-	@BeanReference(type = com.liferay.site.navigation.service.SiteNavigationMenuLocalService.class)
-	protected com.liferay.site.navigation.service.SiteNavigationMenuLocalService siteNavigationMenuLocalService;
+
+	@BeanReference(
+		type = com.liferay.site.navigation.service.SiteNavigationMenuLocalService.class
+	)
+	protected com.liferay.site.navigation.service.SiteNavigationMenuLocalService
+		siteNavigationMenuLocalService;
+
 	@BeanReference(type = SiteNavigationMenuPersistence.class)
 	protected SiteNavigationMenuPersistence siteNavigationMenuPersistence;
+
 	@ServiceReference(type = PersistedModelLocalServiceRegistry.class)
-	protected PersistedModelLocalServiceRegistry persistedModelLocalServiceRegistry;
+	protected PersistedModelLocalServiceRegistry
+		persistedModelLocalServiceRegistry;
+
 }

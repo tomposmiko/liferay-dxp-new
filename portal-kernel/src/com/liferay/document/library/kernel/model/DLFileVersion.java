@@ -26,20 +26,23 @@ import com.liferay.portal.kernel.util.Accessor;
  *
  * @author Brian Wing Shun Chan
  * @see DLFileVersionModel
- * @see com.liferay.portlet.documentlibrary.model.impl.DLFileVersionImpl
- * @see com.liferay.portlet.documentlibrary.model.impl.DLFileVersionModelImpl
  * @generated
  */
-@ImplementationClassName("com.liferay.portlet.documentlibrary.model.impl.DLFileVersionImpl")
+@ImplementationClassName(
+	"com.liferay.portlet.documentlibrary.model.impl.DLFileVersionImpl"
+)
 @ProviderType
-public interface DLFileVersion extends DLFileVersionModel, PersistedModel,
-	TreeModel {
+public interface DLFileVersion
+	extends DLFileVersionModel, PersistedModel, TreeModel {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
-	 * Never modify this interface directly. Add methods to {@link com.liferay.portlet.documentlibrary.model.impl.DLFileVersionImpl} and rerun ServiceBuilder to automatically copy the method declarations to this interface.
+	 * Never modify this interface directly. Add methods to <code>com.liferay.portlet.documentlibrary.model.impl.DLFileVersionImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
 	 */
-	public static final Accessor<DLFileVersion, Long> FILE_VERSION_ID_ACCESSOR = new Accessor<DLFileVersion, Long>() {
+	public static final Accessor<DLFileVersion, Long> FILE_VERSION_ID_ACCESSOR =
+		new Accessor<DLFileVersion, Long>() {
+
 			@Override
 			public Long get(DLFileVersion dlFileVersion) {
 				return dlFileVersion.getFileVersionId();
@@ -54,6 +57,7 @@ public interface DLFileVersion extends DLFileVersionModel, PersistedModel,
 			public Class<DLFileVersion> getTypeClass() {
 				return DLFileVersion.class;
 			}
+
 		};
 
 	@Override
@@ -63,13 +67,15 @@ public interface DLFileVersion extends DLFileVersionModel, PersistedModel,
 	public java.io.InputStream getContentStream(boolean incrementCounter)
 		throws com.liferay.portal.kernel.exception.PortalException;
 
-	public java.util.List<com.liferay.dynamic.data.mapping.kernel.DDMStructure> getDDMStructures()
+	public java.util.List<com.liferay.dynamic.data.mapping.kernel.DDMStructure>
+			getDDMStructures()
 		throws com.liferay.portal.kernel.exception.PortalException;
 
 	public DLFileEntryType getDLFileEntryType()
 		throws com.liferay.portal.kernel.exception.PortalException;
 
-	public com.liferay.portal.kernel.util.UnicodeProperties getExtraSettingsProperties();
+	public com.liferay.portal.kernel.util.UnicodeProperties
+		getExtraSettingsProperties();
 
 	public DLFileEntry getFileEntry()
 		throws com.liferay.portal.kernel.exception.PortalException;
@@ -80,5 +86,7 @@ public interface DLFileVersion extends DLFileVersionModel, PersistedModel,
 	public String getIcon();
 
 	public void setExtraSettingsProperties(
-		com.liferay.portal.kernel.util.UnicodeProperties extraSettingsProperties);
+		com.liferay.portal.kernel.util.UnicodeProperties
+			extraSettingsProperties);
+
 }

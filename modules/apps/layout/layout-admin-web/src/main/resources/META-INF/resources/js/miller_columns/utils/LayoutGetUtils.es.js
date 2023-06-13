@@ -5,6 +5,7 @@
  * @return {boolean} Returns whether a column is child of an item or not
  * @review
  */
+
 function columnIsItemChild(columnIndex, item, itemColumnIndex) {
 	return item.active && (itemColumnIndex < columnIndex);
 }
@@ -16,6 +17,7 @@ function columnIsItemChild(columnIndex, item, itemColumnIndex) {
  * @return {string}
  * @review
  */
+
 function getColumnActiveItem(layoutColumns, columnIndex) {
 	const column = layoutColumns[columnIndex];
 
@@ -36,6 +38,7 @@ function getColumnActiveItem(layoutColumns, columnIndex) {
  * undefined if the column is empty
  * @review
  */
+
 function getColumnLastItem(layoutColumns, columnIndex) {
 	const column = layoutColumns[columnIndex];
 
@@ -49,6 +52,7 @@ function getColumnLastItem(layoutColumns, columnIndex) {
  * @return {object|null}
  * @review
  */
+
 function getHomeItem(layoutColumns) {
 	let item = null;
 
@@ -71,6 +75,7 @@ function getHomeItem(layoutColumns) {
  * @return {object|null}
  * @review
  */
+
 function getItem(layoutColumns, itemPlid) {
 	let item = null;
 
@@ -92,6 +97,7 @@ function getItem(layoutColumns, itemPlid) {
  * @return {object[]|null}
  * @review
  */
+
 function getItemColumn(layoutColumns, itemPlid) {
 	let column = null;
 
@@ -117,6 +123,7 @@ function getItemColumn(layoutColumns, itemPlid) {
  * @return {number}
  * @review
  */
+
 function getItemColumnIndex(layoutColumns, itemPlid) {
 	const column = getItemColumn(layoutColumns, itemPlid);
 
@@ -130,6 +137,7 @@ function getItemColumnIndex(layoutColumns, itemPlid) {
  * @return {boolean} Returns wheter an item is child of a given item
  * @review
  */
+
 function itemIsParent(layoutColumns, childItemPlid, parentItemPlid) {
 	const childItemColumnIndex = getItemColumnIndex(
 		layoutColumns,

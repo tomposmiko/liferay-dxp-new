@@ -17,7 +17,6 @@ package com.liferay.portal.kernel.model;
 import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.expando.kernel.model.ExpandoBridge;
-
 import com.liferay.portal.kernel.service.ServiceContext;
 
 import java.io.Serializable;
@@ -36,8 +35,9 @@ import java.util.Objects;
  * @generated
  */
 @ProviderType
-public class OrgGroupRoleWrapper implements OrgGroupRole,
-	ModelWrapper<OrgGroupRole> {
+public class OrgGroupRoleWrapper
+	implements OrgGroupRole, ModelWrapper<OrgGroupRole> {
+
 	public OrgGroupRoleWrapper(OrgGroupRole orgGroupRole) {
 		_orgGroupRole = orgGroupRole;
 	}
@@ -116,14 +116,15 @@ public class OrgGroupRoleWrapper implements OrgGroupRole,
 	@Override
 	public boolean containsOrganization(
 		java.util.List<Organization> organizations) {
+
 		return _orgGroupRole.containsOrganization(organizations);
 	}
 
 	/**
-	* Returns the company ID of this org group role.
-	*
-	* @return the company ID of this org group role
-	*/
+	 * Returns the company ID of this org group role.
+	 *
+	 * @return the company ID of this org group role
+	 */
 	@Override
 	public long getCompanyId() {
 		return _orgGroupRole.getCompanyId();
@@ -135,42 +136,44 @@ public class OrgGroupRoleWrapper implements OrgGroupRole,
 	}
 
 	/**
-	* Returns the group ID of this org group role.
-	*
-	* @return the group ID of this org group role
-	*/
+	 * Returns the group ID of this org group role.
+	 *
+	 * @return the group ID of this org group role
+	 */
 	@Override
 	public long getGroupId() {
 		return _orgGroupRole.getGroupId();
 	}
 
 	/**
-	* Returns the mvcc version of this org group role.
-	*
-	* @return the mvcc version of this org group role
-	*/
+	 * Returns the mvcc version of this org group role.
+	 *
+	 * @return the mvcc version of this org group role
+	 */
 	@Override
 	public long getMvccVersion() {
 		return _orgGroupRole.getMvccVersion();
 	}
 
 	/**
-	* Returns the organization ID of this org group role.
-	*
-	* @return the organization ID of this org group role
-	*/
+	 * Returns the organization ID of this org group role.
+	 *
+	 * @return the organization ID of this org group role
+	 */
 	@Override
 	public long getOrganizationId() {
 		return _orgGroupRole.getOrganizationId();
 	}
 
 	/**
-	* Returns the primary key of this org group role.
-	*
-	* @return the primary key of this org group role
-	*/
+	 * Returns the primary key of this org group role.
+	 *
+	 * @return the primary key of this org group role
+	 */
 	@Override
-	public com.liferay.portal.kernel.service.persistence.OrgGroupRolePK getPrimaryKey() {
+	public com.liferay.portal.kernel.service.persistence.OrgGroupRolePK
+		getPrimaryKey() {
+
 		return _orgGroupRole.getPrimaryKey();
 	}
 
@@ -180,10 +183,10 @@ public class OrgGroupRoleWrapper implements OrgGroupRole,
 	}
 
 	/**
-	* Returns the role ID of this org group role.
-	*
-	* @return the role ID of this org group role
-	*/
+	 * Returns the role ID of this org group role.
+	 *
+	 * @return the role ID of this org group role
+	 */
 	@Override
 	public long getRoleId() {
 		return _orgGroupRole.getRoleId();
@@ -215,10 +218,10 @@ public class OrgGroupRoleWrapper implements OrgGroupRole,
 	}
 
 	/**
-	* Sets the company ID of this org group role.
-	*
-	* @param companyId the company ID of this org group role
-	*/
+	 * Sets the company ID of this org group role.
+	 *
+	 * @param companyId the company ID of this org group role
+	 */
 	@Override
 	public void setCompanyId(long companyId) {
 		_orgGroupRole.setCompanyId(companyId);
@@ -240,20 +243,20 @@ public class OrgGroupRoleWrapper implements OrgGroupRole,
 	}
 
 	/**
-	* Sets the group ID of this org group role.
-	*
-	* @param groupId the group ID of this org group role
-	*/
+	 * Sets the group ID of this org group role.
+	 *
+	 * @param groupId the group ID of this org group role
+	 */
 	@Override
 	public void setGroupId(long groupId) {
 		_orgGroupRole.setGroupId(groupId);
 	}
 
 	/**
-	* Sets the mvcc version of this org group role.
-	*
-	* @param mvccVersion the mvcc version of this org group role
-	*/
+	 * Sets the mvcc version of this org group role.
+	 *
+	 * @param mvccVersion the mvcc version of this org group role
+	 */
 	@Override
 	public void setMvccVersion(long mvccVersion) {
 		_orgGroupRole.setMvccVersion(mvccVersion);
@@ -265,23 +268,25 @@ public class OrgGroupRoleWrapper implements OrgGroupRole,
 	}
 
 	/**
-	* Sets the organization ID of this org group role.
-	*
-	* @param organizationId the organization ID of this org group role
-	*/
+	 * Sets the organization ID of this org group role.
+	 *
+	 * @param organizationId the organization ID of this org group role
+	 */
 	@Override
 	public void setOrganizationId(long organizationId) {
 		_orgGroupRole.setOrganizationId(organizationId);
 	}
 
 	/**
-	* Sets the primary key of this org group role.
-	*
-	* @param primaryKey the primary key of this org group role
-	*/
+	 * Sets the primary key of this org group role.
+	 *
+	 * @param primaryKey the primary key of this org group role
+	 */
 	@Override
 	public void setPrimaryKey(
-		com.liferay.portal.kernel.service.persistence.OrgGroupRolePK primaryKey) {
+		com.liferay.portal.kernel.service.persistence.OrgGroupRolePK
+			primaryKey) {
+
 		_orgGroupRole.setPrimaryKey(primaryKey);
 	}
 
@@ -291,10 +296,10 @@ public class OrgGroupRoleWrapper implements OrgGroupRole,
 	}
 
 	/**
-	* Sets the role ID of this org group role.
-	*
-	* @param roleId the role ID of this org group role
-	*/
+	 * Sets the role ID of this org group role.
+	 *
+	 * @param roleId the role ID of this org group role
+	 */
 	@Override
 	public void setRoleId(long roleId) {
 		_orgGroupRole.setRoleId(roleId);
@@ -365,4 +370,5 @@ public class OrgGroupRoleWrapper implements OrgGroupRole,
 	}
 
 	private final OrgGroupRole _orgGroupRole;
+
 }

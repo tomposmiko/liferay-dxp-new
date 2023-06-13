@@ -50,7 +50,7 @@ import javax.xml.stream.XMLStreamReader;
 
 /**
  * @author Brian Wing Shun Chan
- * @author Mate Thurzo
+ * @author Máté Thurzó
  */
 @ProviderType
 public class StagedModelDataHandlerUtil {
@@ -691,12 +691,9 @@ public class StagedModelDataHandlerUtil {
 			return null;
 		}
 
-		StagedModelDataHandler<T> stagedModelDataHandler =
-			(StagedModelDataHandler<T>)
-				StagedModelDataHandlerRegistryUtil.getStagedModelDataHandler(
-					ExportImportClassedModelUtil.getClassName(stagedModel));
-
-		return stagedModelDataHandler;
+		return (StagedModelDataHandler<T>)
+			StagedModelDataHandlerRegistryUtil.getStagedModelDataHandler(
+				ExportImportClassedModelUtil.getClassName(stagedModel));
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(

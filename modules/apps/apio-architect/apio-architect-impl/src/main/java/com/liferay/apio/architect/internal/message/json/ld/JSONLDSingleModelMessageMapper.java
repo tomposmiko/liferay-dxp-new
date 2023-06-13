@@ -14,13 +14,13 @@
 
 package com.liferay.apio.architect.internal.message.json.ld;
 
-import static com.liferay.apio.architect.internal.message.json.ld.JSONLDMessageMapperUtil.getOperationTypes;
+import static com.liferay.apio.architect.internal.message.json.ld.JSONLDMessageMapperUtil.getActionId;
+import static com.liferay.apio.architect.internal.message.json.ld.JSONLDMessageMapperUtil.getActionTypes;
 
+import com.liferay.apio.architect.internal.action.ActionSemantics;
 import com.liferay.apio.architect.internal.list.FunctionalList;
 import com.liferay.apio.architect.internal.message.json.JSONObjectBuilder;
 import com.liferay.apio.architect.internal.message.json.SingleModelMessageMapper;
-import com.liferay.apio.architect.operation.HTTPMethod;
-import com.liferay.apio.architect.operation.Operation;
 import com.liferay.apio.architect.single.model.SingleModel;
 
 import java.util.List;
@@ -51,6 +51,28 @@ public class JSONLDSingleModelMessageMapper<T>
 	}
 
 	@Override
+	public void mapActionSemanticsExpectedResourceURL(
+		JSONObjectBuilder jsonObjectBuilder, String url) {
+
+		jsonObjectBuilder.field(
+			"expects"
+		).stringValue(
+			url
+		);
+	}
+
+	@Override
+	public void mapActionSemanticsURL(
+		JSONObjectBuilder jsonObjectBuilder, String url) {
+
+		jsonObjectBuilder.field(
+			"target"
+		).stringValue(
+			url
+		);
+	}
+
+	@Override
 	public void mapBooleanField(
 		JSONObjectBuilder jsonObjectBuilder, String fieldName, Boolean value) {
 
@@ -75,28 +97,15 @@ public class JSONLDSingleModelMessageMapper<T>
 	}
 
 	@Override
-	public void mapEmbeddedOperationFormURL(
+	public void mapEmbeddedActionMethod(
 		JSONObjectBuilder singleModelJSONObjectBuilder,
-		JSONObjectBuilder operationJSONObjectBuilder,
-		FunctionalList<String> embeddedPathElements, String url) {
+		JSONObjectBuilder actionJSONObjectBuilder,
+		FunctionalList<String> embeddedPathElements, String httpMethod) {
 
-		operationJSONObjectBuilder.field(
-			"expects"
-		).stringValue(
-			url
-		);
-	}
-
-	@Override
-	public void mapEmbeddedOperationMethod(
-		JSONObjectBuilder singleModelJSONObjectBuilder,
-		JSONObjectBuilder operationJSONObjectBuilder,
-		FunctionalList<String> embeddedPathElements, HTTPMethod httpMethod) {
-
-		operationJSONObjectBuilder.field(
+		actionJSONObjectBuilder.field(
 			"method"
 		).stringValue(
-			httpMethod.name()
+			httpMethod
 		);
 	}
 
@@ -238,22 +247,13 @@ public class JSONLDSingleModelMessageMapper<T>
 	}
 
 	@Override
-	public void mapFormURL(JSONObjectBuilder jsonObjectBuilder, String url) {
-		jsonObjectBuilder.field(
-			"expects"
-		).stringValue(
-			url
-		);
-	}
-
-	@Override
 	public void mapHTTPMethod(
-		JSONObjectBuilder jsonObjectBuilder, HTTPMethod httpMethod) {
+		JSONObjectBuilder jsonObjectBuilder, String httpMethod) {
 
 		jsonObjectBuilder.field(
 			"method"
 		).stringValue(
-			httpMethod.name()
+			httpMethod
 		);
 	}
 
@@ -355,17 +355,6 @@ public class JSONLDSingleModelMessageMapper<T>
 	}
 
 	@Override
-	public void mapOperationURL(
-		JSONObjectBuilder jsonObjectBuilder, String url) {
-
-		jsonObjectBuilder.field(
-			"target"
-		).stringValue(
-			url
-		);
-	}
-
-	@Override
 	public void mapSelfURL(JSONObjectBuilder jsonObjectBuilder, String url) {
 		jsonObjectBuilder.field(
 			"@id"
@@ -413,26 +402,28 @@ public class JSONLDSingleModelMessageMapper<T>
 	@Override
 	public void onFinish(
 		JSONObjectBuilder resourceJSONObjectBuilder,
-		JSONObjectBuilder operationJSONObjectBuilder, Operation operation) {
+		JSONObjectBuilder actionJSONObjectBuilder,
+		ActionSemantics actionSemantics) {
 
-		operationJSONObjectBuilder.field(
+		actionJSONObjectBuilder.field(
 			"@id"
 		).stringValue(
-			"_:" + operation.getName()
+			getActionId(
+				actionSemantics.getResource(), actionSemantics.getActionName())
 		);
 
-		operationJSONObjectBuilder.field(
+		actionJSONObjectBuilder.field(
 			"@type"
 		).arrayValue(
 		).addAllStrings(
-			getOperationTypes(operation)
+			getActionTypes(actionSemantics.getActionName())
 		);
 
 		resourceJSONObjectBuilder.field(
 			"operation"
 		).arrayValue(
 		).add(
-			operationJSONObjectBuilder
+			actionJSONObjectBuilder
 		);
 	}
 
@@ -455,25 +446,27 @@ public class JSONLDSingleModelMessageMapper<T>
 	}
 
 	@Override
-	public void onFinishEmbeddedOperation(
+	public void onFinishEmbeddedAction(
 		JSONObjectBuilder singleModelJSONObjectBuilder,
-		JSONObjectBuilder operationJSONObjectBuilder,
-		FunctionalList<String> embeddedPathElements, Operation operation) {
+		JSONObjectBuilder actionJSONObjectBuilder,
+		FunctionalList<String> embeddedPathElements,
+		ActionSemantics actionSemantics) {
 
 		String head = embeddedPathElements.head();
 		String[] tail = _getTail(embeddedPathElements);
 
-		operationJSONObjectBuilder.field(
+		actionJSONObjectBuilder.field(
 			"@id"
 		).stringValue(
-			"_:" + operation.getName()
+			getActionId(
+				actionSemantics.getResource(), actionSemantics.getActionName())
 		);
 
-		operationJSONObjectBuilder.field(
+		actionJSONObjectBuilder.field(
 			"@type"
 		).arrayValue(
 		).addAllStrings(
-			getOperationTypes(operation)
+			getActionTypes(actionSemantics.getActionName())
 		);
 
 		singleModelJSONObjectBuilder.nestedField(
@@ -482,7 +475,7 @@ public class JSONLDSingleModelMessageMapper<T>
 			"operation"
 		).arrayValue(
 		).add(
-			operationJSONObjectBuilder
+			actionJSONObjectBuilder
 		);
 	}
 

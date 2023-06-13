@@ -1,4 +1,6 @@
 Bundle-Name: Liferay Folder Apio API
 Bundle-SymbolicName: com.liferay.folder.apio.api
-Bundle-Version: 1.0.5
-Export-Package: com.liferay.folder.apio.architect.identifier
+Bundle-Version: 1.1.2
+Export-Package:\
+	com.liferay.folder.apio.architect.identifier,\
+	com.liferay.folder.apio.architect.model

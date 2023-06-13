@@ -33,12 +33,12 @@ import java.util.Date;
  * The cache model class for representing UserGroup in entity cache.
  *
  * @author Brian Wing Shun Chan
- * @see UserGroup
  * @generated
  */
 @ProviderType
-public class UserGroupCacheModel implements CacheModel<UserGroup>,
-	Externalizable, MVCCModel {
+public class UserGroupCacheModel
+	implements CacheModel<UserGroup>, Externalizable, MVCCModel {
+
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj) {
@@ -52,7 +52,8 @@ public class UserGroupCacheModel implements CacheModel<UserGroup>,
 		UserGroupCacheModel userGroupCacheModel = (UserGroupCacheModel)obj;
 
 		if ((userGroupId == userGroupCacheModel.userGroupId) &&
-				(mvccVersion == userGroupCacheModel.mvccVersion)) {
+			(mvccVersion == userGroupCacheModel.mvccVersion)) {
+
 			return true;
 		}
 
@@ -202,8 +203,7 @@ public class UserGroupCacheModel implements CacheModel<UserGroup>,
 	}
 
 	@Override
-	public void writeExternal(ObjectOutput objectOutput)
-		throws IOException {
+	public void writeExternal(ObjectOutput objectOutput) throws IOException {
 		objectOutput.writeLong(mvccVersion);
 
 		if (uuid == null) {
@@ -268,4 +268,5 @@ public class UserGroupCacheModel implements CacheModel<UserGroup>,
 	public String name;
 	public String description;
 	public boolean addedByLDAPImport;
+
 }

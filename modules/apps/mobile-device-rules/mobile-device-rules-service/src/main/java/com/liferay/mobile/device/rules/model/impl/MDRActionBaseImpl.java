@@ -32,12 +32,13 @@ import com.liferay.mobile.device.rules.service.MDRActionLocalServiceUtil;
  * @generated
  */
 @ProviderType
-public abstract class MDRActionBaseImpl extends MDRActionModelImpl
-	implements MDRAction {
+public abstract class MDRActionBaseImpl
+	extends MDRActionModelImpl implements MDRAction {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
-	 * Never modify or reference this class directly. All methods that expect a mdr action model instance should use the {@link MDRAction} interface instead.
+	 * Never modify or reference this class directly. All methods that expect a mdr action model instance should use the <code>MDRAction</code> interface instead.
 	 */
 	@Override
 	public void persist() {
@@ -48,4 +49,5 @@ public abstract class MDRActionBaseImpl extends MDRActionModelImpl
 			MDRActionLocalServiceUtil.updateMDRAction(this);
 		}
 	}
+
 }

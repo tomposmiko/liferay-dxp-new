@@ -14,19 +14,22 @@
 
 package com.liferay.apio.architect.internal.annotation.representor.types;
 
+import static com.liferay.apio.architect.annotation.FieldMode.READ_ONLY;
+import static com.liferay.apio.architect.annotation.Vocabulary.LinkTo.ResourceType.CHILD_COLLECTION;
+
 import static java.util.Arrays.asList;
 
 import com.liferay.apio.architect.annotation.Id;
 import com.liferay.apio.architect.annotation.Vocabulary.BidirectionalModel;
 import com.liferay.apio.architect.annotation.Vocabulary.Field;
-import com.liferay.apio.architect.annotation.Vocabulary.LinkedModel;
-import com.liferay.apio.architect.annotation.Vocabulary.RelatedCollection;
+import com.liferay.apio.architect.annotation.Vocabulary.LinkTo;
 import com.liferay.apio.architect.annotation.Vocabulary.RelativeURL;
 import com.liferay.apio.architect.annotation.Vocabulary.Type;
 import com.liferay.apio.architect.identifier.Identifier;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * @author Víctor Galán
@@ -91,15 +94,33 @@ public interface Dummy extends Identifier<Long> {
 		return 1L;
 	}
 
-	@Field("linkedModel1")
-	@LinkedModel(IntegerIdentifier.class)
-	public default Integer getLinkedModel1() {
+	@Field("linkToChildCollection1")
+	@LinkTo(resource = IntegerIdentifier.class, resourceType = CHILD_COLLECTION)
+	public default Integer getLinkToChildCollection1() {
 		return 1;
 	}
 
-	@Field("linkedModel2")
-	@LinkedModel(StringIdentifier.class)
-	public default String getLinkedModel2() {
+	@Field("linkToChildCollection2")
+	@LinkTo(resource = StringIdentifier.class, resourceType = CHILD_COLLECTION)
+	public default String getLinkToChildCollection2() {
+		return "2d1d";
+	}
+
+	@Field(mode = READ_ONLY, value = "linkToChildCollectionList")
+	@LinkTo(resource = IntegerIdentifier.class, resourceType = CHILD_COLLECTION)
+	public default List<Integer> getLinkToChildCollectionList() {
+		return asList(1, 2, 3);
+	}
+
+	@Field("linkToSingle1")
+	@LinkTo(resource = IntegerIdentifier.class)
+	public default Integer getLinkToSingle1() {
+		return 1;
+	}
+
+	@Field("linkToSingle2")
+	@LinkTo(resource = StringIdentifier.class)
+	public default String getLinkToSingle2() {
 		return "2d1d";
 	}
 
@@ -113,29 +134,17 @@ public interface Dummy extends Identifier<Long> {
 		return 20L;
 	}
 
-	@Field("stringListField1")
-	public default List<String> getNumberListField() {
-		return asList("one", "two", "three");
+	@Field("numberListField1")
+	public default List<Long> getNumberListField1() {
+		return asList(1L, 2L, 3L);
 	}
 
-	@Field("stringListField2")
-	public default List<String> getNumberListField2() {
-		return asList("four", "five", "six");
+	@Field("numberListField2")
+	public default List<Long> getNumberListField2() {
+		return asList(4L, 5L, 6L);
 	}
 
-	@Field("relatedCollection1")
-	@RelatedCollection(IntegerIdentifier.class)
-	public default Integer getRelatedCollection1() {
-		return 1;
-	}
-
-	@Field("relatedCollection2")
-	@RelatedCollection(StringIdentifier.class)
-	public default String getRelatedCollection2() {
-		return "2d1d";
-	}
-
-	@Field("relativeUrl1")
+	@Field(mode = READ_ONLY, value = "relativeUrl1")
 	@RelativeURL
 	public default String getRelativeUrl1() {
 		return "/first";
@@ -152,22 +161,22 @@ public interface Dummy extends Identifier<Long> {
 		return "string1";
 	}
 
-	@Field("stringField2")
-	public default String getStringField2() {
-		return "string2";
+	@Field("stringFieldOptional")
+	public default Optional<String> getStringFieldOptional() {
+		return Optional.of("string2");
 	}
 
-	@Field("numberListField1")
-	public default List<Integer> getStringListField1() {
-		return asList(1, 2, 3);
+	@Field("stringListField1")
+	public default List<String> getStringListField1() {
+		return asList("one", "two", "three");
 	}
 
-	@Field("numberListField2")
-	public default List<Integer> getStringListField2() {
-		return asList(4, 5, 6);
+	@Field("stringListField2")
+	public default List<String> getStringListField2() {
+		return asList("four", "five", "six");
 	}
 
-	public class DummpyImpl implements Dummy {
+	public class DummyImpl implements Dummy {
 	}
 
 	public interface IntegerIdentifier extends Identifier<Integer> {

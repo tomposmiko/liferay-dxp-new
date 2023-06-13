@@ -18,9 +18,7 @@ import com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery;
 import com.liferay.portal.kernel.model.Role;
 import com.liferay.portal.kernel.service.RoleLocalService;
 import com.liferay.portal.kernel.util.StringBundler;
-
 import com.liferay.roles.uad.constants.RolesUADConstants;
-
 import com.liferay.user.associated.data.exporter.DynamicQueryUADExporter;
 
 import org.osgi.service.component.annotations.Reference;
@@ -37,7 +35,9 @@ import org.osgi.service.component.annotations.Reference;
  * @author Brian Wing Shun Chan
  * @generated
  */
-public abstract class BaseRoleUADExporter extends DynamicQueryUADExporter<Role> {
+public abstract class BaseRoleUADExporter
+	extends DynamicQueryUADExporter<Role> {
+
 	@Override
 	public Class<Role> getTypeClass() {
 		return Role.class;
@@ -81,4 +81,5 @@ public abstract class BaseRoleUADExporter extends DynamicQueryUADExporter<Role> 
 
 	@Reference
 	protected RoleLocalService roleLocalService;
+
 }

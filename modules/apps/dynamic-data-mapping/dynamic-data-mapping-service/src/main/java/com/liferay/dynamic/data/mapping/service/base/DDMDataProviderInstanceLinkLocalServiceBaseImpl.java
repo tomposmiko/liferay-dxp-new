@@ -19,7 +19,6 @@ import aQute.bnd.annotation.ProviderType;
 import com.liferay.dynamic.data.mapping.model.DDMDataProviderInstanceLink;
 import com.liferay.dynamic.data.mapping.service.DDMDataProviderInstanceLinkLocalService;
 import com.liferay.dynamic.data.mapping.service.persistence.DDMDataProviderInstanceLinkPersistence;
-
 import com.liferay.portal.kernel.bean.BeanReference;
 import com.liferay.portal.kernel.dao.db.DB;
 import com.liferay.portal.kernel.dao.db.DBManagerUtil;
@@ -59,17 +58,18 @@ import javax.sql.DataSource;
  *
  * @author Brian Wing Shun Chan
  * @see com.liferay.dynamic.data.mapping.service.impl.DDMDataProviderInstanceLinkLocalServiceImpl
- * @see com.liferay.dynamic.data.mapping.service.DDMDataProviderInstanceLinkLocalServiceUtil
  * @generated
  */
 @ProviderType
 public abstract class DDMDataProviderInstanceLinkLocalServiceBaseImpl
 	extends BaseLocalServiceImpl
-	implements DDMDataProviderInstanceLinkLocalService, IdentifiableOSGiService {
+	implements DDMDataProviderInstanceLinkLocalService,
+			   IdentifiableOSGiService {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
-	 * Never modify or reference this class directly. Always use {@link com.liferay.dynamic.data.mapping.service.DDMDataProviderInstanceLinkLocalServiceUtil} to access the ddm data provider instance link local service.
+	 * Never modify or reference this class directly. Use <code>DDMDataProviderInstanceLinkLocalService</code> via injection or a <code>org.osgi.util.tracker.ServiceTracker</code> or use <code>com.liferay.dynamic.data.mapping.service.DDMDataProviderInstanceLinkLocalServiceUtil</code>.
 	 */
 
 	/**
@@ -82,9 +82,11 @@ public abstract class DDMDataProviderInstanceLinkLocalServiceBaseImpl
 	@Override
 	public DDMDataProviderInstanceLink addDDMDataProviderInstanceLink(
 		DDMDataProviderInstanceLink ddmDataProviderInstanceLink) {
+
 		ddmDataProviderInstanceLink.setNew(true);
 
-		return ddmDataProviderInstanceLinkPersistence.update(ddmDataProviderInstanceLink);
+		return ddmDataProviderInstanceLinkPersistence.update(
+			ddmDataProviderInstanceLink);
 	}
 
 	/**
@@ -97,7 +99,9 @@ public abstract class DDMDataProviderInstanceLinkLocalServiceBaseImpl
 	@Transactional(enabled = false)
 	public DDMDataProviderInstanceLink createDDMDataProviderInstanceLink(
 		long dataProviderInstanceLinkId) {
-		return ddmDataProviderInstanceLinkPersistence.create(dataProviderInstanceLinkId);
+
+		return ddmDataProviderInstanceLinkPersistence.create(
+			dataProviderInstanceLinkId);
 	}
 
 	/**
@@ -110,8 +114,11 @@ public abstract class DDMDataProviderInstanceLinkLocalServiceBaseImpl
 	@Indexable(type = IndexableType.DELETE)
 	@Override
 	public DDMDataProviderInstanceLink deleteDDMDataProviderInstanceLink(
-		long dataProviderInstanceLinkId) throws PortalException {
-		return ddmDataProviderInstanceLinkPersistence.remove(dataProviderInstanceLinkId);
+			long dataProviderInstanceLinkId)
+		throws PortalException {
+
+		return ddmDataProviderInstanceLinkPersistence.remove(
+			dataProviderInstanceLinkId);
 	}
 
 	/**
@@ -124,15 +131,17 @@ public abstract class DDMDataProviderInstanceLinkLocalServiceBaseImpl
 	@Override
 	public DDMDataProviderInstanceLink deleteDDMDataProviderInstanceLink(
 		DDMDataProviderInstanceLink ddmDataProviderInstanceLink) {
-		return ddmDataProviderInstanceLinkPersistence.remove(ddmDataProviderInstanceLink);
+
+		return ddmDataProviderInstanceLinkPersistence.remove(
+			ddmDataProviderInstanceLink);
 	}
 
 	@Override
 	public DynamicQuery dynamicQuery() {
 		Class<?> clazz = getClass();
 
-		return DynamicQueryFactoryUtil.forClass(DDMDataProviderInstanceLink.class,
-			clazz.getClassLoader());
+		return DynamicQueryFactoryUtil.forClass(
+			DDMDataProviderInstanceLink.class, clazz.getClassLoader());
 	}
 
 	/**
@@ -143,14 +152,15 @@ public abstract class DDMDataProviderInstanceLinkLocalServiceBaseImpl
 	 */
 	@Override
 	public <T> List<T> dynamicQuery(DynamicQuery dynamicQuery) {
-		return ddmDataProviderInstanceLinkPersistence.findWithDynamicQuery(dynamicQuery);
+		return ddmDataProviderInstanceLinkPersistence.findWithDynamicQuery(
+			dynamicQuery);
 	}
 
 	/**
 	 * Performs a dynamic query on the database and returns a range of the matching rows.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link com.liferay.dynamic.data.mapping.model.impl.DDMDataProviderInstanceLinkModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>com.liferay.dynamic.data.mapping.model.impl.DDMDataProviderInstanceLinkModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param dynamicQuery the dynamic query
@@ -159,17 +169,18 @@ public abstract class DDMDataProviderInstanceLinkLocalServiceBaseImpl
 	 * @return the range of matching rows
 	 */
 	@Override
-	public <T> List<T> dynamicQuery(DynamicQuery dynamicQuery, int start,
-		int end) {
-		return ddmDataProviderInstanceLinkPersistence.findWithDynamicQuery(dynamicQuery,
-			start, end);
+	public <T> List<T> dynamicQuery(
+		DynamicQuery dynamicQuery, int start, int end) {
+
+		return ddmDataProviderInstanceLinkPersistence.findWithDynamicQuery(
+			dynamicQuery, start, end);
 	}
 
 	/**
 	 * Performs a dynamic query on the database and returns an ordered range of the matching rows.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link com.liferay.dynamic.data.mapping.model.impl.DDMDataProviderInstanceLinkModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>com.liferay.dynamic.data.mapping.model.impl.DDMDataProviderInstanceLinkModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param dynamicQuery the dynamic query
@@ -179,10 +190,12 @@ public abstract class DDMDataProviderInstanceLinkLocalServiceBaseImpl
 	 * @return the ordered range of matching rows
 	 */
 	@Override
-	public <T> List<T> dynamicQuery(DynamicQuery dynamicQuery, int start,
-		int end, OrderByComparator<T> orderByComparator) {
-		return ddmDataProviderInstanceLinkPersistence.findWithDynamicQuery(dynamicQuery,
-			start, end, orderByComparator);
+	public <T> List<T> dynamicQuery(
+		DynamicQuery dynamicQuery, int start, int end,
+		OrderByComparator<T> orderByComparator) {
+
+		return ddmDataProviderInstanceLinkPersistence.findWithDynamicQuery(
+			dynamicQuery, start, end, orderByComparator);
 	}
 
 	/**
@@ -193,7 +206,8 @@ public abstract class DDMDataProviderInstanceLinkLocalServiceBaseImpl
 	 */
 	@Override
 	public long dynamicQueryCount(DynamicQuery dynamicQuery) {
-		return ddmDataProviderInstanceLinkPersistence.countWithDynamicQuery(dynamicQuery);
+		return ddmDataProviderInstanceLinkPersistence.countWithDynamicQuery(
+			dynamicQuery);
 	}
 
 	/**
@@ -204,16 +218,19 @@ public abstract class DDMDataProviderInstanceLinkLocalServiceBaseImpl
 	 * @return the number of rows matching the dynamic query
 	 */
 	@Override
-	public long dynamicQueryCount(DynamicQuery dynamicQuery,
-		Projection projection) {
-		return ddmDataProviderInstanceLinkPersistence.countWithDynamicQuery(dynamicQuery,
-			projection);
+	public long dynamicQueryCount(
+		DynamicQuery dynamicQuery, Projection projection) {
+
+		return ddmDataProviderInstanceLinkPersistence.countWithDynamicQuery(
+			dynamicQuery, projection);
 	}
 
 	@Override
 	public DDMDataProviderInstanceLink fetchDDMDataProviderInstanceLink(
 		long dataProviderInstanceLinkId) {
-		return ddmDataProviderInstanceLinkPersistence.fetchByPrimaryKey(dataProviderInstanceLinkId);
+
+		return ddmDataProviderInstanceLinkPersistence.fetchByPrimaryKey(
+			dataProviderInstanceLinkId);
 	}
 
 	/**
@@ -225,15 +242,20 @@ public abstract class DDMDataProviderInstanceLinkLocalServiceBaseImpl
 	 */
 	@Override
 	public DDMDataProviderInstanceLink getDDMDataProviderInstanceLink(
-		long dataProviderInstanceLinkId) throws PortalException {
-		return ddmDataProviderInstanceLinkPersistence.findByPrimaryKey(dataProviderInstanceLinkId);
+			long dataProviderInstanceLinkId)
+		throws PortalException {
+
+		return ddmDataProviderInstanceLinkPersistence.findByPrimaryKey(
+			dataProviderInstanceLinkId);
 	}
 
 	@Override
 	public ActionableDynamicQuery getActionableDynamicQuery() {
-		ActionableDynamicQuery actionableDynamicQuery = new DefaultActionableDynamicQuery();
+		ActionableDynamicQuery actionableDynamicQuery =
+			new DefaultActionableDynamicQuery();
 
-		actionableDynamicQuery.setBaseLocalService(ddmDataProviderInstanceLinkLocalService);
+		actionableDynamicQuery.setBaseLocalService(
+			ddmDataProviderInstanceLinkLocalService);
 		actionableDynamicQuery.setClassLoader(getClassLoader());
 		actionableDynamicQuery.setModelClass(DDMDataProviderInstanceLink.class);
 
@@ -244,12 +266,17 @@ public abstract class DDMDataProviderInstanceLinkLocalServiceBaseImpl
 	}
 
 	@Override
-	public IndexableActionableDynamicQuery getIndexableActionableDynamicQuery() {
-		IndexableActionableDynamicQuery indexableActionableDynamicQuery = new IndexableActionableDynamicQuery();
+	public IndexableActionableDynamicQuery
+		getIndexableActionableDynamicQuery() {
 
-		indexableActionableDynamicQuery.setBaseLocalService(ddmDataProviderInstanceLinkLocalService);
+		IndexableActionableDynamicQuery indexableActionableDynamicQuery =
+			new IndexableActionableDynamicQuery();
+
+		indexableActionableDynamicQuery.setBaseLocalService(
+			ddmDataProviderInstanceLinkLocalService);
 		indexableActionableDynamicQuery.setClassLoader(getClassLoader());
-		indexableActionableDynamicQuery.setModelClass(DDMDataProviderInstanceLink.class);
+		indexableActionableDynamicQuery.setModelClass(
+			DDMDataProviderInstanceLink.class);
 
 		indexableActionableDynamicQuery.setPrimaryKeyPropertyName(
 			"dataProviderInstanceLinkId");
@@ -259,7 +286,9 @@ public abstract class DDMDataProviderInstanceLinkLocalServiceBaseImpl
 
 	protected void initActionableDynamicQuery(
 		ActionableDynamicQuery actionableDynamicQuery) {
-		actionableDynamicQuery.setBaseLocalService(ddmDataProviderInstanceLinkLocalService);
+
+		actionableDynamicQuery.setBaseLocalService(
+			ddmDataProviderInstanceLinkLocalService);
 		actionableDynamicQuery.setClassLoader(getClassLoader());
 		actionableDynamicQuery.setModelClass(DDMDataProviderInstanceLink.class);
 
@@ -273,20 +302,25 @@ public abstract class DDMDataProviderInstanceLinkLocalServiceBaseImpl
 	@Override
 	public PersistedModel deletePersistedModel(PersistedModel persistedModel)
 		throws PortalException {
-		return ddmDataProviderInstanceLinkLocalService.deleteDDMDataProviderInstanceLink((DDMDataProviderInstanceLink)persistedModel);
+
+		return ddmDataProviderInstanceLinkLocalService.
+			deleteDDMDataProviderInstanceLink(
+				(DDMDataProviderInstanceLink)persistedModel);
 	}
 
 	@Override
 	public PersistedModel getPersistedModel(Serializable primaryKeyObj)
 		throws PortalException {
-		return ddmDataProviderInstanceLinkPersistence.findByPrimaryKey(primaryKeyObj);
+
+		return ddmDataProviderInstanceLinkPersistence.findByPrimaryKey(
+			primaryKeyObj);
 	}
 
 	/**
 	 * Returns a range of all the ddm data provider instance links.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link com.liferay.dynamic.data.mapping.model.impl.DDMDataProviderInstanceLinkModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>com.liferay.dynamic.data.mapping.model.impl.DDMDataProviderInstanceLinkModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param start the lower bound of the range of ddm data provider instance links
@@ -296,6 +330,7 @@ public abstract class DDMDataProviderInstanceLinkLocalServiceBaseImpl
 	@Override
 	public List<DDMDataProviderInstanceLink> getDDMDataProviderInstanceLinks(
 		int start, int end) {
+
 		return ddmDataProviderInstanceLinkPersistence.findAll(start, end);
 	}
 
@@ -319,7 +354,9 @@ public abstract class DDMDataProviderInstanceLinkLocalServiceBaseImpl
 	@Override
 	public DDMDataProviderInstanceLink updateDDMDataProviderInstanceLink(
 		DDMDataProviderInstanceLink ddmDataProviderInstanceLink) {
-		return ddmDataProviderInstanceLinkPersistence.update(ddmDataProviderInstanceLink);
+
+		return ddmDataProviderInstanceLinkPersistence.update(
+			ddmDataProviderInstanceLink);
 	}
 
 	/**
@@ -327,7 +364,9 @@ public abstract class DDMDataProviderInstanceLinkLocalServiceBaseImpl
 	 *
 	 * @return the ddm data provider instance link local service
 	 */
-	public DDMDataProviderInstanceLinkLocalService getDDMDataProviderInstanceLinkLocalService() {
+	public DDMDataProviderInstanceLinkLocalService
+		getDDMDataProviderInstanceLinkLocalService() {
+
 		return ddmDataProviderInstanceLinkLocalService;
 	}
 
@@ -337,8 +376,11 @@ public abstract class DDMDataProviderInstanceLinkLocalServiceBaseImpl
 	 * @param ddmDataProviderInstanceLinkLocalService the ddm data provider instance link local service
 	 */
 	public void setDDMDataProviderInstanceLinkLocalService(
-		DDMDataProviderInstanceLinkLocalService ddmDataProviderInstanceLinkLocalService) {
-		this.ddmDataProviderInstanceLinkLocalService = ddmDataProviderInstanceLinkLocalService;
+		DDMDataProviderInstanceLinkLocalService
+			ddmDataProviderInstanceLinkLocalService) {
+
+		this.ddmDataProviderInstanceLinkLocalService =
+			ddmDataProviderInstanceLinkLocalService;
 	}
 
 	/**
@@ -346,7 +388,9 @@ public abstract class DDMDataProviderInstanceLinkLocalServiceBaseImpl
 	 *
 	 * @return the ddm data provider instance link persistence
 	 */
-	public DDMDataProviderInstanceLinkPersistence getDDMDataProviderInstanceLinkPersistence() {
+	public DDMDataProviderInstanceLinkPersistence
+		getDDMDataProviderInstanceLinkPersistence() {
+
 		return ddmDataProviderInstanceLinkPersistence;
 	}
 
@@ -356,8 +400,11 @@ public abstract class DDMDataProviderInstanceLinkLocalServiceBaseImpl
 	 * @param ddmDataProviderInstanceLinkPersistence the ddm data provider instance link persistence
 	 */
 	public void setDDMDataProviderInstanceLinkPersistence(
-		DDMDataProviderInstanceLinkPersistence ddmDataProviderInstanceLinkPersistence) {
-		this.ddmDataProviderInstanceLinkPersistence = ddmDataProviderInstanceLinkPersistence;
+		DDMDataProviderInstanceLinkPersistence
+			ddmDataProviderInstanceLinkPersistence) {
+
+		this.ddmDataProviderInstanceLinkPersistence =
+			ddmDataProviderInstanceLinkPersistence;
 	}
 
 	/**
@@ -365,7 +412,9 @@ public abstract class DDMDataProviderInstanceLinkLocalServiceBaseImpl
 	 *
 	 * @return the counter local service
 	 */
-	public com.liferay.counter.kernel.service.CounterLocalService getCounterLocalService() {
+	public com.liferay.counter.kernel.service.CounterLocalService
+		getCounterLocalService() {
+
 		return counterLocalService;
 	}
 
@@ -375,12 +424,15 @@ public abstract class DDMDataProviderInstanceLinkLocalServiceBaseImpl
 	 * @param counterLocalService the counter local service
 	 */
 	public void setCounterLocalService(
-		com.liferay.counter.kernel.service.CounterLocalService counterLocalService) {
+		com.liferay.counter.kernel.service.CounterLocalService
+			counterLocalService) {
+
 		this.counterLocalService = counterLocalService;
 	}
 
 	public void afterPropertiesSet() {
-		persistedModelLocalServiceRegistry.register("com.liferay.dynamic.data.mapping.model.DDMDataProviderInstanceLink",
+		persistedModelLocalServiceRegistry.register(
+			"com.liferay.dynamic.data.mapping.model.DDMDataProviderInstanceLink",
 			ddmDataProviderInstanceLinkLocalService);
 	}
 
@@ -414,15 +466,16 @@ public abstract class DDMDataProviderInstanceLinkLocalServiceBaseImpl
 	 */
 	protected void runSQL(String sql) {
 		try {
-			DataSource dataSource = ddmDataProviderInstanceLinkPersistence.getDataSource();
+			DataSource dataSource =
+				ddmDataProviderInstanceLinkPersistence.getDataSource();
 
 			DB db = DBManagerUtil.getDB();
 
 			sql = db.buildSQL(sql);
 			sql = PortalUtil.transformSQL(sql);
 
-			SqlUpdate sqlUpdate = SqlUpdateFactoryUtil.getSqlUpdate(dataSource,
-					sql);
+			SqlUpdate sqlUpdate = SqlUpdateFactoryUtil.getSqlUpdate(
+				dataSource, sql);
 
 			sqlUpdate.update();
 		}
@@ -432,11 +485,21 @@ public abstract class DDMDataProviderInstanceLinkLocalServiceBaseImpl
 	}
 
 	@BeanReference(type = DDMDataProviderInstanceLinkLocalService.class)
-	protected DDMDataProviderInstanceLinkLocalService ddmDataProviderInstanceLinkLocalService;
+	protected DDMDataProviderInstanceLinkLocalService
+		ddmDataProviderInstanceLinkLocalService;
+
 	@BeanReference(type = DDMDataProviderInstanceLinkPersistence.class)
-	protected DDMDataProviderInstanceLinkPersistence ddmDataProviderInstanceLinkPersistence;
-	@ServiceReference(type = com.liferay.counter.kernel.service.CounterLocalService.class)
-	protected com.liferay.counter.kernel.service.CounterLocalService counterLocalService;
+	protected DDMDataProviderInstanceLinkPersistence
+		ddmDataProviderInstanceLinkPersistence;
+
+	@ServiceReference(
+		type = com.liferay.counter.kernel.service.CounterLocalService.class
+	)
+	protected com.liferay.counter.kernel.service.CounterLocalService
+		counterLocalService;
+
 	@ServiceReference(type = PersistedModelLocalServiceRegistry.class)
-	protected PersistedModelLocalServiceRegistry persistedModelLocalServiceRegistry;
+	protected PersistedModelLocalServiceRegistry
+		persistedModelLocalServiceRegistry;
+
 }

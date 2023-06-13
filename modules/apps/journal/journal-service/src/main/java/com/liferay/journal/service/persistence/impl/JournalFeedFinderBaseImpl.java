@@ -16,7 +16,6 @@ package com.liferay.journal.service.persistence.impl;
 
 import com.liferay.journal.model.JournalFeed;
 import com.liferay.journal.service.persistence.JournalFeedPersistence;
-
 import com.liferay.portal.kernel.bean.BeanReference;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
@@ -32,20 +31,22 @@ import java.util.Set;
  * @author Brian Wing Shun Chan
  * @generated
  */
-public class JournalFeedFinderBaseImpl extends BasePersistenceImpl<JournalFeed> {
+public class JournalFeedFinderBaseImpl
+	extends BasePersistenceImpl<JournalFeed> {
+
 	public JournalFeedFinderBaseImpl() {
 		setModelClass(JournalFeed.class);
 
+		Map<String, String> dbColumnNames = new HashMap<String, String>();
+
+		dbColumnNames.put("uuid", "uuid_");
+		dbColumnNames.put("id", "id_");
+
 		try {
 			Field field = BasePersistenceImpl.class.getDeclaredField(
-					"_dbColumnNames");
+				"_dbColumnNames");
 
 			field.setAccessible(true);
-
-			Map<String, String> dbColumnNames = new HashMap<String, String>();
-
-			dbColumnNames.put("uuid", "uuid_");
-			dbColumnNames.put("id", "id_");
 
 			field.set(this, dbColumnNames);
 		}
@@ -77,10 +78,14 @@ public class JournalFeedFinderBaseImpl extends BasePersistenceImpl<JournalFeed> 
 	 */
 	public void setJournalFeedPersistence(
 		JournalFeedPersistence journalFeedPersistence) {
+
 		this.journalFeedPersistence = journalFeedPersistence;
 	}
 
 	@BeanReference(type = JournalFeedPersistence.class)
 	protected JournalFeedPersistence journalFeedPersistence;
-	private static final Log _log = LogFactoryUtil.getLog(JournalFeedFinderBaseImpl.class);
+
+	private static final Log _log = LogFactoryUtil.getLog(
+		JournalFeedFinderBaseImpl.class);
+
 }

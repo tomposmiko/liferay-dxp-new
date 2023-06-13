@@ -79,7 +79,7 @@ public class BlogEntriesManagementToolbarDisplayContext {
 								themeDisplay.getScopeGroupId());
 
 							dropdownItem.setIcon(
-								trashEnabled ? "trash" : "times");
+								trashEnabled ? "trash" : "times-circle");
 
 							String label = "delete";
 

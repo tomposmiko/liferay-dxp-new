@@ -235,6 +235,7 @@ public class SolrIndexSearcher extends BaseIndexSearcher {
 		_solrConfiguration = ConfigurableUtil.createConfigurable(
 			SolrConfiguration.class, properties);
 
+		_defaultCollection = _solrConfiguration.defaultCollection();
 		_logExceptionsOnly = _solrConfiguration.logExceptionsOnly();
 	}
 
@@ -396,7 +397,11 @@ public class SolrIndexSearcher extends BaseIndexSearcher {
 		}
 
 		document.addText(
-			Field.SNIPPET.concat(StringPool.UNDERLINE).concat(snippetFieldName),
+			Field.SNIPPET.concat(
+				StringPool.UNDERLINE
+			).concat(
+				snippetFieldName
+			),
 			StringUtil.merge(list, StringPool.TRIPLE_PERIOD));
 	}
 
@@ -547,9 +552,7 @@ public class SolrIndexSearcher extends BaseIndexSearcher {
 		QueryResponse queryResponse = doSearch(
 			searchContext, query, start, end, false);
 
-		Hits hits = processResponse(queryResponse, searchContext, query);
-
-		return hits;
+		return processResponse(queryResponse, searchContext, query);
 	}
 
 	protected void excludeTags(
@@ -565,7 +568,8 @@ public class SolrIndexSearcher extends BaseIndexSearcher {
 
 		SolrClient solrClient = _solrClientManager.getSolrClient();
 
-		return solrClient.query(solrQuery, SolrRequest.METHOD.POST);
+		return solrClient.query(
+			_defaultCollection, solrQuery, SolrRequest.METHOD.POST);
 	}
 
 	protected String getExcludeTagsString(
@@ -607,7 +611,7 @@ public class SolrIndexSearcher extends BaseIndexSearcher {
 
 		Stream<Map.Entry<String, JSONObject>> stream = entrySet.stream();
 
-		String jsonString = stream.map(
+		return stream.map(
 			entry -> StringBundler.concat(
 				StringPool.QUOTE, entry.getKey(), StringPool.QUOTE,
 				StringPool.COLON, entry.getValue())
@@ -616,8 +620,6 @@ public class SolrIndexSearcher extends BaseIndexSearcher {
 				StringPool.COMMA, StringPool.OPEN_CURLY_BRACE,
 				StringPool.CLOSE_CURLY_BRACE)
 		);
-
-		return jsonString;
 	}
 
 	protected String getSortFieldName(Sort sort, String scoreFieldName) {
@@ -876,6 +878,7 @@ public class SolrIndexSearcher extends BaseIndexSearcher {
 	private static final Log _log = LogFactoryUtil.getLog(
 		SolrIndexSearcher.class);
 
+	private String _defaultCollection;
 	private FacetProcessor<SolrQuery> _facetProcessor;
 	private FilterTranslator<String> _filterTranslator;
 	private GroupByTranslator _groupByTranslator;

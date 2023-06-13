@@ -30,6 +30,7 @@ import java.util.List;
  */
 @ProviderType
 public class FolderSoap implements Serializable {
+
 	public static FolderSoap toSoapModel(Folder model) {
 		FolderSoap soapModel = new FolderSoap();
 
@@ -185,4 +186,5 @@ public class FolderSoap implements Serializable {
 	private String _fullName;
 	private String _displayName;
 	private int _remoteMessageCount;
+
 }

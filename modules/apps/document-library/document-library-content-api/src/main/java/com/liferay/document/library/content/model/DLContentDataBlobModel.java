@@ -27,6 +27,7 @@ import java.sql.Blob;
  */
 @ProviderType
 public class DLContentDataBlobModel {
+
 	public DLContentDataBlobModel() {
 	}
 
@@ -57,4 +58,5 @@ public class DLContentDataBlobModel {
 
 	private long _contentId;
 	private Blob _dataBlob;
+
 }

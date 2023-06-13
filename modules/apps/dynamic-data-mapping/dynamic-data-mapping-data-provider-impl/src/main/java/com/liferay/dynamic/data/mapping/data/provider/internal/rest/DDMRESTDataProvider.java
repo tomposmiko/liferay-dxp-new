@@ -20,6 +20,7 @@ import com.jayway.jsonpath.JsonPath;
 import com.liferay.dynamic.data.mapping.data.provider.DDMDataProvider;
 import com.liferay.dynamic.data.mapping.data.provider.DDMDataProviderContext;
 import com.liferay.dynamic.data.mapping.data.provider.DDMDataProviderException;
+import com.liferay.dynamic.data.mapping.data.provider.DDMDataProviderInputParametersSettings;
 import com.liferay.dynamic.data.mapping.data.provider.DDMDataProviderOutputParametersSettings;
 import com.liferay.dynamic.data.mapping.data.provider.DDMDataProviderRequest;
 import com.liferay.dynamic.data.mapping.data.provider.DDMDataProviderResponse;
@@ -28,6 +29,7 @@ import com.liferay.petra.string.CharPool;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.cache.MultiVMPool;
 import com.liferay.portal.kernel.cache.PortalCache;
+import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.kernel.util.Http;
 import com.liferay.portal.kernel.util.KeyValuePair;
 import com.liferay.portal.kernel.util.ListUtil;
@@ -41,12 +43,15 @@ import java.io.Serializable;
 import java.net.ConnectException;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import jodd.http.HttpException;
 import jodd.http.HttpRequest;
@@ -79,10 +84,7 @@ public class DDMRESTDataProvider implements DDMDataProvider {
 			DDMDataProviderResponseOutput ddmDataProviderResponseOutput =
 				ddmDataProviderResponse.get("Default-Output");
 
-			List<KeyValuePair> results = ddmDataProviderResponseOutput.getValue(
-				List.class);
-
-			return results;
+			return ddmDataProviderResponseOutput.getValue(List.class);
 		}
 		catch (Exception e) {
 			throw new DDMDataProviderException(e);
@@ -104,9 +106,8 @@ public class DDMRESTDataProvider implements DDMDataProvider {
 				return DDMDataProviderResponse.error(
 					DDMDataProviderResponse.Status.SERVICE_UNAVAILABLE);
 			}
-			else {
-				throw new DDMDataProviderException(he);
-			}
+
+			throw new DDMDataProviderException(he);
 		}
 		catch (Exception e) {
 			throw new DDMDataProviderException(e);
@@ -132,7 +133,7 @@ public class DDMRESTDataProvider implements DDMDataProvider {
 
 			url = StringUtil.replaceFirst(
 				url, String.format("{%s}", pathParameter.getKey()),
-				pathParameter.getValue());
+				HtmlUtil.escapeURL(pathParameter.getValue()));
 		}
 
 		return url;
@@ -315,11 +316,31 @@ public class DDMRESTDataProvider implements DDMDataProvider {
 		return httpRequest.url();
 	}
 
-	protected Map<String, String> getPathParameters(
+	protected Map<String, String> getParameters(
 		DDMDataProviderRequest ddmDataProviderRequest,
 		DDMRESTDataProviderSettings ddmRESTDataProviderSettings) {
 
 		Map<String, String> parameters = ddmDataProviderRequest.getParameters();
+
+		Stream<DDMDataProviderInputParametersSettings> stream = Arrays.stream(
+			ddmRESTDataProviderSettings.inputParameters());
+
+		return stream.filter(
+			inputParameter -> parameters.containsKey(
+				inputParameter.inputParameterName())
+		).collect(
+			Collectors.toMap(
+				DDMDataProviderInputParametersSettings::inputParameterName,
+				value -> parameters.get(value.inputParameterName()))
+		);
+	}
+
+	protected Map<String, String> getPathParameters(
+		DDMDataProviderRequest ddmDataProviderRequest,
+		DDMRESTDataProviderSettings ddmRESTDataProviderSettings) {
+
+		Map<String, String> parameters = getParameters(
+			ddmDataProviderRequest, ddmRESTDataProviderSettings);
 
 		Map<String, String> pathParameters = new HashMap<>();
 
@@ -346,7 +367,7 @@ public class DDMRESTDataProvider implements DDMDataProvider {
 			ddmDataProviderRequest, ddmRESTDataProviderSettings);
 
 		return MapUtil.filter(
-			ddmDataProviderRequest.getParameters(),
+			getParameters(ddmDataProviderRequest, ddmRESTDataProviderSettings),
 			new PredicateFilter<Map.Entry<String, String>>() {
 
 				@Override

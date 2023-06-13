@@ -32,12 +32,13 @@ import com.liferay.dynamic.data.mapping.service.DDMStructureLocalServiceUtil;
  * @generated
  */
 @ProviderType
-public abstract class DDMStructureBaseImpl extends DDMStructureModelImpl
-	implements DDMStructure {
+public abstract class DDMStructureBaseImpl
+	extends DDMStructureModelImpl implements DDMStructure {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
-	 * Never modify or reference this class directly. All methods that expect a ddm structure model instance should use the {@link DDMStructure} interface instead.
+	 * Never modify or reference this class directly. All methods that expect a ddm structure model instance should use the <code>DDMStructure</code> interface instead.
 	 */
 	@Override
 	public void persist() {
@@ -48,4 +49,5 @@ public abstract class DDMStructureBaseImpl extends DDMStructureModelImpl
 			DDMStructureLocalServiceUtil.updateDDMStructure(this);
 		}
 	}
+
 }

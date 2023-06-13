@@ -84,8 +84,13 @@ public class MBThreadServiceImpl extends MBThreadServiceBaseImpl {
 			QueryDefinition<MBThread> queryDefinition = new QueryDefinition<>(
 				status, start, end, null);
 
-			return mbThreadFinder.findByG_U_LPD(
-				groupId, userId, modifiedDate, queryDefinition);
+			if (includeAnonymous) {
+				return mbThreadFinder.findByG_U_LPD(
+					groupId, userId, modifiedDate, queryDefinition);
+			}
+
+			return mbThreadFinder.findByG_U_LPD_A(
+				groupId, userId, modifiedDate, false, queryDefinition);
 		}
 
 		long[] categoryIds = mbCategoryService.getCategoryIds(
@@ -161,16 +166,14 @@ public class MBThreadServiceImpl extends MBThreadServiceBaseImpl {
 				return mbThreadFinder.filterFindByS_G_U_C(
 					groupId, userId, categoryIds, queryDefinition);
 			}
+
+			if (includeAnonymous) {
+				threadIds = mbMessageFinder.filterFindByG_U_C_S(
+					groupId, userId, categoryIds, status, start, end);
+			}
 			else {
-				if (includeAnonymous) {
-					threadIds = mbMessageFinder.filterFindByG_U_C_S(
-						groupId, userId, categoryIds, status, start, end);
-				}
-				else {
-					threadIds = mbMessageFinder.filterFindByG_U_C_A_S(
-						groupId, userId, categoryIds, false, status, start,
-						end);
-				}
+				threadIds = mbMessageFinder.filterFindByG_U_C_A_S(
+					groupId, userId, categoryIds, false, status, start, end);
 			}
 		}
 
@@ -212,8 +215,13 @@ public class MBThreadServiceImpl extends MBThreadServiceBaseImpl {
 			QueryDefinition<MBThread> queryDefinition = new QueryDefinition<>(
 				status);
 
-			return mbThreadFinder.countByG_U_LPD(
-				groupId, userId, modifiedDate, queryDefinition);
+			if (includeAnonymous) {
+				return mbThreadFinder.countByG_U_LPD(
+					groupId, userId, modifiedDate, queryDefinition);
+			}
+
+			return mbThreadFinder.countByG_U_LPD_A(
+				groupId, userId, modifiedDate, false, queryDefinition);
 		}
 
 		long[] categoryIds = mbCategoryService.getCategoryIds(
@@ -273,24 +281,22 @@ public class MBThreadServiceImpl extends MBThreadServiceBaseImpl {
 			return mbMessageFinder.filterCountByG_U_C_S(
 				groupId, 0, categoryIds, status);
 		}
-		else {
-			if (subscribed) {
-				QueryDefinition<MBThread> queryDefinition =
-					new QueryDefinition<>(status);
 
-				return mbThreadFinder.filterCountByS_G_U_C(
-					groupId, userId, categoryIds, queryDefinition);
-			}
-			else {
-				if (includeAnonymous) {
-					return mbMessageFinder.filterCountByG_U_C_S(
-						groupId, userId, categoryIds, status);
-				}
+		if (subscribed) {
+			QueryDefinition<MBThread> queryDefinition = new QueryDefinition<>(
+				status);
 
-				return mbMessageFinder.filterCountByG_U_C_A_S(
-					groupId, userId, categoryIds, false, status);
-			}
+			return mbThreadFinder.filterCountByS_G_U_C(
+				groupId, userId, categoryIds, queryDefinition);
 		}
+
+		if (includeAnonymous) {
+			return mbMessageFinder.filterCountByG_U_C_S(
+				groupId, userId, categoryIds, status);
+		}
+
+		return mbMessageFinder.filterCountByG_U_C_A_S(
+			groupId, userId, categoryIds, false, status);
 	}
 
 	@Override
@@ -325,13 +331,12 @@ public class MBThreadServiceImpl extends MBThreadServiceBaseImpl {
 		if (status == WorkflowConstants.STATUS_ANY) {
 			return mbThreadFinder.filterCountByG_C(groupId, categoryId);
 		}
-		else {
-			QueryDefinition<MBThread> queryDefinition = new QueryDefinition<>(
-				status);
 
-			return mbThreadFinder.filterCountByG_C(
-				groupId, categoryId, queryDefinition);
-		}
+		QueryDefinition<MBThread> queryDefinition = new QueryDefinition<>(
+			status);
+
+		return mbThreadFinder.filterCountByG_C(
+			groupId, categoryId, queryDefinition);
 	}
 
 	@Override

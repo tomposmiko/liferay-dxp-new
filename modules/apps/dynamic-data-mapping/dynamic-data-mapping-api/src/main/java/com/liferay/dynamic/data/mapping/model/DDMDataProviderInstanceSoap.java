@@ -26,14 +26,16 @@ import java.util.List;
  * This class is used by SOAP remote services, specifically {@link com.liferay.dynamic.data.mapping.service.http.DDMDataProviderInstanceServiceSoap}.
  *
  * @author Brian Wing Shun Chan
- * @see com.liferay.dynamic.data.mapping.service.http.DDMDataProviderInstanceServiceSoap
  * @generated
  */
 @ProviderType
 public class DDMDataProviderInstanceSoap implements Serializable {
+
 	public static DDMDataProviderInstanceSoap toSoapModel(
 		DDMDataProviderInstance model) {
-		DDMDataProviderInstanceSoap soapModel = new DDMDataProviderInstanceSoap();
+
+		DDMDataProviderInstanceSoap soapModel =
+			new DDMDataProviderInstanceSoap();
 
 		soapModel.setUuid(model.getUuid());
 		soapModel.setDataProviderInstanceId(model.getDataProviderInstanceId());
@@ -53,7 +55,9 @@ public class DDMDataProviderInstanceSoap implements Serializable {
 
 	public static DDMDataProviderInstanceSoap[] toSoapModels(
 		DDMDataProviderInstance[] models) {
-		DDMDataProviderInstanceSoap[] soapModels = new DDMDataProviderInstanceSoap[models.length];
+
+		DDMDataProviderInstanceSoap[] soapModels =
+			new DDMDataProviderInstanceSoap[models.length];
 
 		for (int i = 0; i < models.length; i++) {
 			soapModels[i] = toSoapModel(models[i]);
@@ -64,10 +68,13 @@ public class DDMDataProviderInstanceSoap implements Serializable {
 
 	public static DDMDataProviderInstanceSoap[][] toSoapModels(
 		DDMDataProviderInstance[][] models) {
+
 		DDMDataProviderInstanceSoap[][] soapModels = null;
 
 		if (models.length > 0) {
-			soapModels = new DDMDataProviderInstanceSoap[models.length][models[0].length];
+			soapModels =
+				new DDMDataProviderInstanceSoap
+					[models.length][models[0].length];
 		}
 		else {
 			soapModels = new DDMDataProviderInstanceSoap[0][0];
@@ -82,13 +89,16 @@ public class DDMDataProviderInstanceSoap implements Serializable {
 
 	public static DDMDataProviderInstanceSoap[] toSoapModels(
 		List<DDMDataProviderInstance> models) {
-		List<DDMDataProviderInstanceSoap> soapModels = new ArrayList<DDMDataProviderInstanceSoap>(models.size());
+
+		List<DDMDataProviderInstanceSoap> soapModels =
+			new ArrayList<DDMDataProviderInstanceSoap>(models.size());
 
 		for (DDMDataProviderInstance model : models) {
 			soapModels.add(toSoapModel(model));
 		}
 
-		return soapModels.toArray(new DDMDataProviderInstanceSoap[soapModels.size()]);
+		return soapModels.toArray(
+			new DDMDataProviderInstanceSoap[soapModels.size()]);
 	}
 
 	public DDMDataProviderInstanceSoap() {
@@ -210,4 +220,5 @@ public class DDMDataProviderInstanceSoap implements Serializable {
 	private String _description;
 	private String _definition;
 	private String _type;
+
 }

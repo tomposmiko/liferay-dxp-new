@@ -17,7 +17,6 @@ package com.liferay.dynamic.data.mapping.model.impl;
 import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.dynamic.data.mapping.model.DDMTemplate;
-
 import com.liferay.portal.kernel.model.CacheModel;
 import com.liferay.portal.kernel.util.HashUtil;
 import com.liferay.portal.kernel.util.StringBundler;
@@ -33,12 +32,12 @@ import java.util.Date;
  * The cache model class for representing DDMTemplate in entity cache.
  *
  * @author Brian Wing Shun Chan
- * @see DDMTemplate
  * @generated
  */
 @ProviderType
-public class DDMTemplateCacheModel implements CacheModel<DDMTemplate>,
-	Externalizable {
+public class DDMTemplateCacheModel
+	implements CacheModel<DDMTemplate>, Externalizable {
+
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj) {
@@ -49,7 +48,8 @@ public class DDMTemplateCacheModel implements CacheModel<DDMTemplate>,
 			return false;
 		}
 
-		DDMTemplateCacheModel ddmTemplateCacheModel = (DDMTemplateCacheModel)obj;
+		DDMTemplateCacheModel ddmTemplateCacheModel =
+			(DDMTemplateCacheModel)obj;
 
 		if (templateId == ddmTemplateCacheModel.templateId) {
 			return true;
@@ -258,6 +258,7 @@ public class DDMTemplateCacheModel implements CacheModel<DDMTemplate>,
 	@Override
 	public void readExternal(ObjectInput objectInput)
 		throws ClassNotFoundException, IOException {
+
 		uuid = objectInput.readUTF();
 
 		templateId = objectInput.readLong();
@@ -300,8 +301,7 @@ public class DDMTemplateCacheModel implements CacheModel<DDMTemplate>,
 	}
 
 	@Override
-	public void writeExternal(ObjectOutput objectOutput)
-		throws IOException {
+	public void writeExternal(ObjectOutput objectOutput) throws IOException {
 		if (uuid == null) {
 			objectOutput.writeUTF("");
 		}
@@ -443,4 +443,5 @@ public class DDMTemplateCacheModel implements CacheModel<DDMTemplate>,
 	public String smallImageURL;
 	public long lastPublishDate;
 	public String _resourceClassName;
+
 }

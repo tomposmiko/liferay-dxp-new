@@ -45,8 +45,8 @@ public interface OctaConsumer<A, B, C, D, E, F, G, H> {
 	 *
 	 * @return an empty {@code OctaConsumer} that doesn't perform any operation
 	 */
-	public static <A, B, C, D, E, F, G, H>
-		OctaConsumer<A, B, C, D, E, F, G, H> empty() {
+	public static <A, B, C, D, E, F, G, H> OctaConsumer<A, B, C, D, E, F, G, H>
+		empty() {
 
 		return (a, b, c, d, e, f, g, h) -> {
 		};

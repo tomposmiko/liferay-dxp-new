@@ -33,12 +33,12 @@ import java.util.Date;
  * The cache model class for representing Organization in entity cache.
  *
  * @author Brian Wing Shun Chan
- * @see Organization
  * @generated
  */
 @ProviderType
-public class OrganizationCacheModel implements CacheModel<Organization>,
-	Externalizable, MVCCModel {
+public class OrganizationCacheModel
+	implements CacheModel<Organization>, Externalizable, MVCCModel {
+
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj) {
@@ -49,10 +49,12 @@ public class OrganizationCacheModel implements CacheModel<Organization>,
 			return false;
 		}
 
-		OrganizationCacheModel organizationCacheModel = (OrganizationCacheModel)obj;
+		OrganizationCacheModel organizationCacheModel =
+			(OrganizationCacheModel)obj;
 
 		if ((organizationId == organizationCacheModel.organizationId) &&
-				(mvccVersion == organizationCacheModel.mvccVersion)) {
+			(mvccVersion == organizationCacheModel.mvccVersion)) {
+
 			return true;
 		}
 
@@ -243,8 +245,7 @@ public class OrganizationCacheModel implements CacheModel<Organization>,
 	}
 
 	@Override
-	public void writeExternal(ObjectOutput objectOutput)
-		throws IOException {
+	public void writeExternal(ObjectOutput objectOutput) throws IOException {
 		objectOutput.writeLong(mvccVersion);
 
 		if (uuid == null) {
@@ -337,4 +338,5 @@ public class OrganizationCacheModel implements CacheModel<Organization>,
 	public long statusId;
 	public String comments;
 	public long logoId;
+
 }

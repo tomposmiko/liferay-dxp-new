@@ -17,9 +17,7 @@ package com.liferay.portal.kernel.model;
 import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.expando.kernel.model.ExpandoBridge;
-
 import com.liferay.exportimport.kernel.lar.StagedModelType;
-
 import com.liferay.portal.kernel.service.ServiceContext;
 
 import java.io.Serializable;
@@ -39,8 +37,9 @@ import java.util.Objects;
  * @generated
  */
 @ProviderType
-public class LayoutFriendlyURLWrapper implements LayoutFriendlyURL,
-	ModelWrapper<LayoutFriendlyURL> {
+public class LayoutFriendlyURLWrapper
+	implements LayoutFriendlyURL, ModelWrapper<LayoutFriendlyURL> {
+
 	public LayoutFriendlyURLWrapper(LayoutFriendlyURL layoutFriendlyURL) {
 		_layoutFriendlyURL = layoutFriendlyURL;
 	}
@@ -166,7 +165,8 @@ public class LayoutFriendlyURLWrapper implements LayoutFriendlyURL,
 
 	@Override
 	public Object clone() {
-		return new LayoutFriendlyURLWrapper((LayoutFriendlyURL)_layoutFriendlyURL.clone());
+		return new LayoutFriendlyURLWrapper(
+			(LayoutFriendlyURL)_layoutFriendlyURL.clone());
 	}
 
 	@Override
@@ -175,20 +175,20 @@ public class LayoutFriendlyURLWrapper implements LayoutFriendlyURL,
 	}
 
 	/**
-	* Returns the company ID of this layout friendly url.
-	*
-	* @return the company ID of this layout friendly url
-	*/
+	 * Returns the company ID of this layout friendly url.
+	 *
+	 * @return the company ID of this layout friendly url
+	 */
 	@Override
 	public long getCompanyId() {
 		return _layoutFriendlyURL.getCompanyId();
 	}
 
 	/**
-	* Returns the create date of this layout friendly url.
-	*
-	* @return the create date of this layout friendly url
-	*/
+	 * Returns the create date of this layout friendly url.
+	 *
+	 * @return the create date of this layout friendly url
+	 */
 	@Override
 	public Date getCreateDate() {
 		return _layoutFriendlyURL.getCreateDate();
@@ -200,90 +200,90 @@ public class LayoutFriendlyURLWrapper implements LayoutFriendlyURL,
 	}
 
 	/**
-	* Returns the friendly url of this layout friendly url.
-	*
-	* @return the friendly url of this layout friendly url
-	*/
+	 * Returns the friendly url of this layout friendly url.
+	 *
+	 * @return the friendly url of this layout friendly url
+	 */
 	@Override
 	public String getFriendlyURL() {
 		return _layoutFriendlyURL.getFriendlyURL();
 	}
 
 	/**
-	* Returns the group ID of this layout friendly url.
-	*
-	* @return the group ID of this layout friendly url
-	*/
+	 * Returns the group ID of this layout friendly url.
+	 *
+	 * @return the group ID of this layout friendly url
+	 */
 	@Override
 	public long getGroupId() {
 		return _layoutFriendlyURL.getGroupId();
 	}
 
 	/**
-	* Returns the language ID of this layout friendly url.
-	*
-	* @return the language ID of this layout friendly url
-	*/
+	 * Returns the language ID of this layout friendly url.
+	 *
+	 * @return the language ID of this layout friendly url
+	 */
 	@Override
 	public String getLanguageId() {
 		return _layoutFriendlyURL.getLanguageId();
 	}
 
 	/**
-	* Returns the last publish date of this layout friendly url.
-	*
-	* @return the last publish date of this layout friendly url
-	*/
+	 * Returns the last publish date of this layout friendly url.
+	 *
+	 * @return the last publish date of this layout friendly url
+	 */
 	@Override
 	public Date getLastPublishDate() {
 		return _layoutFriendlyURL.getLastPublishDate();
 	}
 
 	/**
-	* Returns the layout friendly url ID of this layout friendly url.
-	*
-	* @return the layout friendly url ID of this layout friendly url
-	*/
+	 * Returns the layout friendly url ID of this layout friendly url.
+	 *
+	 * @return the layout friendly url ID of this layout friendly url
+	 */
 	@Override
 	public long getLayoutFriendlyURLId() {
 		return _layoutFriendlyURL.getLayoutFriendlyURLId();
 	}
 
 	/**
-	* Returns the modified date of this layout friendly url.
-	*
-	* @return the modified date of this layout friendly url
-	*/
+	 * Returns the modified date of this layout friendly url.
+	 *
+	 * @return the modified date of this layout friendly url
+	 */
 	@Override
 	public Date getModifiedDate() {
 		return _layoutFriendlyURL.getModifiedDate();
 	}
 
 	/**
-	* Returns the mvcc version of this layout friendly url.
-	*
-	* @return the mvcc version of this layout friendly url
-	*/
+	 * Returns the mvcc version of this layout friendly url.
+	 *
+	 * @return the mvcc version of this layout friendly url
+	 */
 	@Override
 	public long getMvccVersion() {
 		return _layoutFriendlyURL.getMvccVersion();
 	}
 
 	/**
-	* Returns the plid of this layout friendly url.
-	*
-	* @return the plid of this layout friendly url
-	*/
+	 * Returns the plid of this layout friendly url.
+	 *
+	 * @return the plid of this layout friendly url
+	 */
 	@Override
 	public long getPlid() {
 		return _layoutFriendlyURL.getPlid();
 	}
 
 	/**
-	* Returns the primary key of this layout friendly url.
-	*
-	* @return the primary key of this layout friendly url
-	*/
+	 * Returns the primary key of this layout friendly url.
+	 *
+	 * @return the primary key of this layout friendly url
+	 */
 	@Override
 	public long getPrimaryKey() {
 		return _layoutFriendlyURL.getPrimaryKey();
@@ -295,50 +295,50 @@ public class LayoutFriendlyURLWrapper implements LayoutFriendlyURL,
 	}
 
 	/**
-	* Returns the private layout of this layout friendly url.
-	*
-	* @return the private layout of this layout friendly url
-	*/
+	 * Returns the private layout of this layout friendly url.
+	 *
+	 * @return the private layout of this layout friendly url
+	 */
 	@Override
 	public boolean getPrivateLayout() {
 		return _layoutFriendlyURL.getPrivateLayout();
 	}
 
 	/**
-	* Returns the user ID of this layout friendly url.
-	*
-	* @return the user ID of this layout friendly url
-	*/
+	 * Returns the user ID of this layout friendly url.
+	 *
+	 * @return the user ID of this layout friendly url
+	 */
 	@Override
 	public long getUserId() {
 		return _layoutFriendlyURL.getUserId();
 	}
 
 	/**
-	* Returns the user name of this layout friendly url.
-	*
-	* @return the user name of this layout friendly url
-	*/
+	 * Returns the user name of this layout friendly url.
+	 *
+	 * @return the user name of this layout friendly url
+	 */
 	@Override
 	public String getUserName() {
 		return _layoutFriendlyURL.getUserName();
 	}
 
 	/**
-	* Returns the user uuid of this layout friendly url.
-	*
-	* @return the user uuid of this layout friendly url
-	*/
+	 * Returns the user uuid of this layout friendly url.
+	 *
+	 * @return the user uuid of this layout friendly url
+	 */
 	@Override
 	public String getUserUuid() {
 		return _layoutFriendlyURL.getUserUuid();
 	}
 
 	/**
-	* Returns the uuid of this layout friendly url.
-	*
-	* @return the uuid of this layout friendly url
-	*/
+	 * Returns the uuid of this layout friendly url.
+	 *
+	 * @return the uuid of this layout friendly url
+	 */
 	@Override
 	public String getUuid() {
 		return _layoutFriendlyURL.getUuid();
@@ -365,10 +365,10 @@ public class LayoutFriendlyURLWrapper implements LayoutFriendlyURL,
 	}
 
 	/**
-	* Returns <code>true</code> if this layout friendly url is private layout.
-	*
-	* @return <code>true</code> if this layout friendly url is private layout; <code>false</code> otherwise
-	*/
+	 * Returns <code>true</code> if this layout friendly url is private layout.
+	 *
+	 * @return <code>true</code> if this layout friendly url is private layout; <code>false</code> otherwise
+	 */
 	@Override
 	public boolean isPrivateLayout() {
 		return _layoutFriendlyURL.isPrivateLayout();
@@ -385,20 +385,20 @@ public class LayoutFriendlyURLWrapper implements LayoutFriendlyURL,
 	}
 
 	/**
-	* Sets the company ID of this layout friendly url.
-	*
-	* @param companyId the company ID of this layout friendly url
-	*/
+	 * Sets the company ID of this layout friendly url.
+	 *
+	 * @param companyId the company ID of this layout friendly url
+	 */
 	@Override
 	public void setCompanyId(long companyId) {
 		_layoutFriendlyURL.setCompanyId(companyId);
 	}
 
 	/**
-	* Sets the create date of this layout friendly url.
-	*
-	* @param createDate the create date of this layout friendly url
-	*/
+	 * Sets the create date of this layout friendly url.
+	 *
+	 * @param createDate the create date of this layout friendly url
+	 */
 	@Override
 	public void setCreateDate(Date createDate) {
 		_layoutFriendlyURL.setCreateDate(createDate);
@@ -420,70 +420,70 @@ public class LayoutFriendlyURLWrapper implements LayoutFriendlyURL,
 	}
 
 	/**
-	* Sets the friendly url of this layout friendly url.
-	*
-	* @param friendlyURL the friendly url of this layout friendly url
-	*/
+	 * Sets the friendly url of this layout friendly url.
+	 *
+	 * @param friendlyURL the friendly url of this layout friendly url
+	 */
 	@Override
 	public void setFriendlyURL(String friendlyURL) {
 		_layoutFriendlyURL.setFriendlyURL(friendlyURL);
 	}
 
 	/**
-	* Sets the group ID of this layout friendly url.
-	*
-	* @param groupId the group ID of this layout friendly url
-	*/
+	 * Sets the group ID of this layout friendly url.
+	 *
+	 * @param groupId the group ID of this layout friendly url
+	 */
 	@Override
 	public void setGroupId(long groupId) {
 		_layoutFriendlyURL.setGroupId(groupId);
 	}
 
 	/**
-	* Sets the language ID of this layout friendly url.
-	*
-	* @param languageId the language ID of this layout friendly url
-	*/
+	 * Sets the language ID of this layout friendly url.
+	 *
+	 * @param languageId the language ID of this layout friendly url
+	 */
 	@Override
 	public void setLanguageId(String languageId) {
 		_layoutFriendlyURL.setLanguageId(languageId);
 	}
 
 	/**
-	* Sets the last publish date of this layout friendly url.
-	*
-	* @param lastPublishDate the last publish date of this layout friendly url
-	*/
+	 * Sets the last publish date of this layout friendly url.
+	 *
+	 * @param lastPublishDate the last publish date of this layout friendly url
+	 */
 	@Override
 	public void setLastPublishDate(Date lastPublishDate) {
 		_layoutFriendlyURL.setLastPublishDate(lastPublishDate);
 	}
 
 	/**
-	* Sets the layout friendly url ID of this layout friendly url.
-	*
-	* @param layoutFriendlyURLId the layout friendly url ID of this layout friendly url
-	*/
+	 * Sets the layout friendly url ID of this layout friendly url.
+	 *
+	 * @param layoutFriendlyURLId the layout friendly url ID of this layout friendly url
+	 */
 	@Override
 	public void setLayoutFriendlyURLId(long layoutFriendlyURLId) {
 		_layoutFriendlyURL.setLayoutFriendlyURLId(layoutFriendlyURLId);
 	}
 
 	/**
-	* Sets the modified date of this layout friendly url.
-	*
-	* @param modifiedDate the modified date of this layout friendly url
-	*/
+	 * Sets the modified date of this layout friendly url.
+	 *
+	 * @param modifiedDate the modified date of this layout friendly url
+	 */
 	@Override
 	public void setModifiedDate(Date modifiedDate) {
 		_layoutFriendlyURL.setModifiedDate(modifiedDate);
 	}
 
 	/**
-	* Sets the mvcc version of this layout friendly url.
-	*
-	* @param mvccVersion the mvcc version of this layout friendly url
-	*/
+	 * Sets the mvcc version of this layout friendly url.
+	 *
+	 * @param mvccVersion the mvcc version of this layout friendly url
+	 */
 	@Override
 	public void setMvccVersion(long mvccVersion) {
 		_layoutFriendlyURL.setMvccVersion(mvccVersion);
@@ -495,20 +495,20 @@ public class LayoutFriendlyURLWrapper implements LayoutFriendlyURL,
 	}
 
 	/**
-	* Sets the plid of this layout friendly url.
-	*
-	* @param plid the plid of this layout friendly url
-	*/
+	 * Sets the plid of this layout friendly url.
+	 *
+	 * @param plid the plid of this layout friendly url
+	 */
 	@Override
 	public void setPlid(long plid) {
 		_layoutFriendlyURL.setPlid(plid);
 	}
 
 	/**
-	* Sets the primary key of this layout friendly url.
-	*
-	* @param primaryKey the primary key of this layout friendly url
-	*/
+	 * Sets the primary key of this layout friendly url.
+	 *
+	 * @param primaryKey the primary key of this layout friendly url
+	 */
 	@Override
 	public void setPrimaryKey(long primaryKey) {
 		_layoutFriendlyURL.setPrimaryKey(primaryKey);
@@ -520,50 +520,50 @@ public class LayoutFriendlyURLWrapper implements LayoutFriendlyURL,
 	}
 
 	/**
-	* Sets whether this layout friendly url is private layout.
-	*
-	* @param privateLayout the private layout of this layout friendly url
-	*/
+	 * Sets whether this layout friendly url is private layout.
+	 *
+	 * @param privateLayout the private layout of this layout friendly url
+	 */
 	@Override
 	public void setPrivateLayout(boolean privateLayout) {
 		_layoutFriendlyURL.setPrivateLayout(privateLayout);
 	}
 
 	/**
-	* Sets the user ID of this layout friendly url.
-	*
-	* @param userId the user ID of this layout friendly url
-	*/
+	 * Sets the user ID of this layout friendly url.
+	 *
+	 * @param userId the user ID of this layout friendly url
+	 */
 	@Override
 	public void setUserId(long userId) {
 		_layoutFriendlyURL.setUserId(userId);
 	}
 
 	/**
-	* Sets the user name of this layout friendly url.
-	*
-	* @param userName the user name of this layout friendly url
-	*/
+	 * Sets the user name of this layout friendly url.
+	 *
+	 * @param userName the user name of this layout friendly url
+	 */
 	@Override
 	public void setUserName(String userName) {
 		_layoutFriendlyURL.setUserName(userName);
 	}
 
 	/**
-	* Sets the user uuid of this layout friendly url.
-	*
-	* @param userUuid the user uuid of this layout friendly url
-	*/
+	 * Sets the user uuid of this layout friendly url.
+	 *
+	 * @param userUuid the user uuid of this layout friendly url
+	 */
 	@Override
 	public void setUserUuid(String userUuid) {
 		_layoutFriendlyURL.setUserUuid(userUuid);
 	}
 
 	/**
-	* Sets the uuid of this layout friendly url.
-	*
-	* @param uuid the uuid of this layout friendly url
-	*/
+	 * Sets the uuid of this layout friendly url.
+	 *
+	 * @param uuid the uuid of this layout friendly url
+	 */
 	@Override
 	public void setUuid(String uuid) {
 		_layoutFriendlyURL.setUuid(uuid);
@@ -576,7 +576,8 @@ public class LayoutFriendlyURLWrapper implements LayoutFriendlyURL,
 
 	@Override
 	public LayoutFriendlyURL toEscapedModel() {
-		return new LayoutFriendlyURLWrapper(_layoutFriendlyURL.toEscapedModel());
+		return new LayoutFriendlyURLWrapper(
+			_layoutFriendlyURL.toEscapedModel());
 	}
 
 	@Override
@@ -586,7 +587,8 @@ public class LayoutFriendlyURLWrapper implements LayoutFriendlyURL,
 
 	@Override
 	public LayoutFriendlyURL toUnescapedModel() {
-		return new LayoutFriendlyURLWrapper(_layoutFriendlyURL.toUnescapedModel());
+		return new LayoutFriendlyURLWrapper(
+			_layoutFriendlyURL.toUnescapedModel());
 	}
 
 	@Override
@@ -604,10 +606,13 @@ public class LayoutFriendlyURLWrapper implements LayoutFriendlyURL,
 			return false;
 		}
 
-		LayoutFriendlyURLWrapper layoutFriendlyURLWrapper = (LayoutFriendlyURLWrapper)obj;
+		LayoutFriendlyURLWrapper layoutFriendlyURLWrapper =
+			(LayoutFriendlyURLWrapper)obj;
 
-		if (Objects.equals(_layoutFriendlyURL,
-					layoutFriendlyURLWrapper._layoutFriendlyURL)) {
+		if (Objects.equals(
+				_layoutFriendlyURL,
+				layoutFriendlyURLWrapper._layoutFriendlyURL)) {
+
 			return true;
 		}
 
@@ -640,4 +645,5 @@ public class LayoutFriendlyURLWrapper implements LayoutFriendlyURL,
 	}
 
 	private final LayoutFriendlyURL _layoutFriendlyURL;
+
 }

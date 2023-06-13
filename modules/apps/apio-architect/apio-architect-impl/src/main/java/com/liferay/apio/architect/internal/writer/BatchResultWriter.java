@@ -14,7 +14,7 @@
 
 package com.liferay.apio.architect.internal.writer;
 
-import static com.liferay.apio.architect.internal.url.URLCreator.createSingleURL;
+import static com.liferay.apio.architect.internal.url.URLCreator.createItemResourceURL;
 
 import com.liferay.apio.architect.batch.BatchResult;
 import com.liferay.apio.architect.internal.alias.PathFunction;
@@ -23,6 +23,8 @@ import com.liferay.apio.architect.internal.message.json.JSONObjectBuilder;
 import com.liferay.apio.architect.internal.request.RequestInfo;
 import com.liferay.apio.architect.internal.url.ApplicationURL;
 import com.liferay.apio.architect.representor.Representor;
+import com.liferay.apio.architect.resource.Resource.Id;
+import com.liferay.apio.architect.resource.Resource.Item;
 
 import java.util.Collection;
 import java.util.List;
@@ -70,15 +72,16 @@ public class BatchResultWriter<T> {
 
 			_pathFunction.apply(
 				_batchResult.resourceName, identifier
+			).map(
+				path -> Item.of(path.getName(), Id.of("", path.getId()))
 			).ifPresent(
-				path -> {
-					_batchResultMessageMapper.onStartItem(
-						_jsonObjectBuilder, itemJsonObjectBuilder);
+				item -> {
+					Optional<String> optionalURL = createItemResourceURL(
+						applicationURL, item);
 
-					String url = createSingleURL(applicationURL, path);
-
-					_batchResultMessageMapper.mapItemSelfURL(
-						_jsonObjectBuilder, itemJsonObjectBuilder, url);
+					optionalURL.ifPresent(
+						url -> _batchResultMessageMapper.mapItemSelfURL(
+							_jsonObjectBuilder, itemJsonObjectBuilder, url));
 
 					_batchResultMessageMapper.mapItemTypes(
 						_jsonObjectBuilder, itemJsonObjectBuilder, types);
@@ -109,8 +112,8 @@ public class BatchResultWriter<T> {
 			BatchResult<T> batchResult) {
 
 			return batchResultMessageMapper -> pathFunction ->
-				representorFunction -> requestInfo ->
-					() -> new BatchResultWriter<>(
+				representorFunction ->
+					requestInfo -> () -> new BatchResultWriter<>(
 						batchResult, batchResultMessageMapper, pathFunction,
 						representorFunction, requestInfo);
 		}

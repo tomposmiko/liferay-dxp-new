@@ -45,8 +45,8 @@ public interface HeptaConsumer<A, B, C, D, E, F, G> {
 	 *
 	 * @return an empty {@code HeptaConsumer} that doesn't perform any operation
 	 */
-	public static <A, B, C, D, E, F, G>
-		HeptaConsumer<A, B, C, D, E, F, G> empty() {
+	public static <A, B, C, D, E, F, G> HeptaConsumer<A, B, C, D, E, F, G>
+		empty() {
 
 		return (a, b, c, d, e, f, g) -> {
 		};

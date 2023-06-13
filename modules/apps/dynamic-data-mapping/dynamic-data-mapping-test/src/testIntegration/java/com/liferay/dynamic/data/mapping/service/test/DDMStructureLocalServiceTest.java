@@ -70,7 +70,7 @@ import org.junit.runner.RunWith;
 import org.skyscreamer.jsonassert.JSONAssert;
 
 /**
- * @author Eduardo Garcia
+ * @author Eduardo García
  */
 @RunWith(Arquillian.class)
 public class DDMStructureLocalServiceTest extends BaseDDMServiceTestCase {
@@ -832,6 +832,66 @@ public class DDMStructureLocalServiceTest extends BaseDDMServiceTestCase {
 		Assert.assertEquals(
 			dataProviderInstanceLinks.toString(), 0,
 			dataProviderInstanceLinks.size());
+	}
+
+	@Test
+	public void testValidateIndexTypePropertyDefaultValue() throws Exception {
+		DDMForm ddmForm = DDMFormTestUtil.createDDMForm("Field1");
+
+		DDMStructure structure = ddmStructureTestHelper.addStructure(
+			ddmForm, StorageType.JSON.getValue());
+
+		DDMStructure structureAfterUpdate = updateStructure(structure);
+
+		DDMForm ddmFormAfterUpdate = structureAfterUpdate.getDDMForm();
+
+		List<DDMFormField> ddmFormField = ddmFormAfterUpdate.getDDMFormFields();
+
+		DDMFormField textField = ddmFormField.get(0);
+
+		Assert.assertEquals(StringPool.BLANK, textField.getIndexType());
+	}
+
+	@Test
+	public void testValidateIndexTypePropertyValue1() throws Exception {
+		DDMForm ddmForm = DDMFormTestUtil.createDDMForm("Field1");
+
+		DDMFormTestUtil.setIndexTypeProperty(ddmForm, "text");
+
+		DDMStructure structure = ddmStructureTestHelper.addStructure(
+			ddmForm, StorageType.JSON.getValue());
+
+		DDMStructure structureAfterUpdate = updateStructure(structure);
+
+		DDMForm ddmFormAfterUpdate = structureAfterUpdate.getDDMForm();
+
+		List<DDMFormField> ddmFormFieldAfterUpdate =
+			ddmFormAfterUpdate.getDDMFormFields();
+
+		DDMFormField textFieldAfterUpdate = ddmFormFieldAfterUpdate.get(0);
+
+		Assert.assertEquals("text", textFieldAfterUpdate.getIndexType());
+	}
+
+	@Test
+	public void testValidateIndexTypePropertyValue2() throws Exception {
+		DDMForm ddmForm = DDMFormTestUtil.createDDMForm("Field1");
+
+		DDMFormTestUtil.setIndexTypeProperty(ddmForm, "none");
+
+		DDMStructure structure = ddmStructureTestHelper.addStructure(
+			ddmForm, StorageType.JSON.getValue());
+
+		DDMStructure structureAfterUpdate = updateStructure(structure);
+
+		DDMForm ddmFormAfterUpdate = structureAfterUpdate.getDDMForm();
+
+		List<DDMFormField> ddmFormFieldAfterUpdate =
+			ddmFormAfterUpdate.getDDMFormFields();
+
+		DDMFormField textFieldAfterUpdate = ddmFormFieldAfterUpdate.get(0);
+
+		Assert.assertEquals("none", textFieldAfterUpdate.getIndexType());
 	}
 
 	@Test(expected = InvalidParentStructureException.class)

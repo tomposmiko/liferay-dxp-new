@@ -66,8 +66,6 @@ definition {
 	}
 
 	macro addPageTranslations {
-		SitePages.gotoPageMenuItem(menuItem = "Configure", pageName = "${page}");
-
 		PortletEntry.changeLocale(fieldName = "Name", locale = "${pageTranslation}");
 
 		PortletEntry.inputName(name = "${pageTranslationName}");
@@ -201,15 +199,46 @@ definition {
 		Button.clickSave();
 	}
 
-	macro getGroupIdFromHtmlSource {
-		var portalURL = PropsUtil.get("portal.url");
-		var pageURL = selenium.getAttribute("//li[@class='control-menu-nav-item']/a[contains(@data-qa-id,'editLayout')]@href");
-		var partialPageURL = StringUtil.stripBetween("${pageURL}", "${portalURL}", "GroupPagesPortlet_groupId=");
-		var groupId = StringUtil.extractFirst("${partialPageURL}", "&");
+	macro getAuthTokenFromHtmlSource {
+		var javaScript = '''
+		var authToken = Liferay.authToken;
 
-		echo("## * Group ID: ${groupId}");
+		return authToken;
+		''';
 
-		return "${groupId}";
+		var authToken = selenium.getEval("${javaScript}");
+
+		echo("## * Auth Token: ${authToken}");
+
+		return "${authToken}";
+	}
+
+	macro getPlidFromHtmlSource {
+		var javaScript = '''
+		var plid = Liferay.ThemeDisplay.getPlid();
+
+		return plid;
+		''';
+
+		var plid = selenium.getEval("${javaScript}");
+
+		echo("## * p_l_id: ${plid}");
+
+		return "${plid}";
+	}
+
+	macro getTextCountFromHtmlSource {
+		var pageSource = selenium.getHtmlSource();
+
+		echo("## * Page Source: ${pageSource}");
+
+		return "${pageSource}";
+
+		var count = StringUtil.count("${pageSource}", "${text}");
+
+		echo("## * Count: ${count}");
+
+		return "${count}";
 	}
 
 	macro gotoChildPagePG {
@@ -354,10 +383,10 @@ definition {
 
 		SelectFrame(locator1 = "SitePages#LOGO_UPLOAD_IMAGE_IFRAME");
 
-		AssertClick(locator1 = "SitePages#LOGO_UPLOAD_IMAGE_BUTTON", value1 = "Select");
+		AssertElementPresent(locator1 = "SitePages#LOGO_UPLOAD_IMAGE_BUTTON");
 
-		SikuliUploadCommonFile(
-			locator1 = "OS#FILE_DIALOG_BOX_FILE_NAME_FIELD_PNG",
+		UploadCommonFile.uploadCommonFileHiddenNoMouseOver(
+			locator1 = "TextInput#FILE",
 			value1 = "${logoFile}"
 		);
 
@@ -530,8 +559,8 @@ definition {
 	macro viewNoDeletePagesAssociatedWithSiteTemplate {
 		if (isSet(pageName)) {
 			Click(
-				locator1 = "SitePages#LIST_GROUP_ITEM_CARET_ICON_SPECIFIC",
-				key_pageName = "${pageName}"
+				locator1 = "SitePages#LIST_GROUP_ITEM",
+				key_itemName = "${pageName}"
 			);
 		}
 
@@ -675,6 +704,14 @@ definition {
 			value1 = "${pageName3}",
 			key_index = "4"
 		);
+
+		if (isSet(pageName4)) {
+			AssertTextEquals.assertPartialText(
+				locator1 = "SitePages#LIST_GROUP_ITEM_ROW_ENTRY",
+				value1 = "${pageName4}",
+				key_index = "5"
+			);
+		}
 	}
 
 	macro viewPageTemplate {

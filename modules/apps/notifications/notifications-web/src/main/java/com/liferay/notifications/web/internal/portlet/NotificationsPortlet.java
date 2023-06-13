@@ -66,7 +66,7 @@ import org.osgi.service.component.annotations.Reference;
 )
 public class NotificationsPortlet extends MVCPortlet {
 
-	public void deleteAllNotifications(
+	public void deleteNotifications(
 			ActionRequest actionRequest, ActionResponse actionResponse)
 		throws Exception {
 
@@ -76,6 +76,9 @@ public class NotificationsPortlet extends MVCPortlet {
 		for (long userNotificationEventId : userNotificationEventIds) {
 			_deleteUserNotificationEvent(userNotificationEventId);
 		}
+
+		_addSuccessMessage(
+			actionRequest, "notifications-were-deleted-successfully");
 
 		_sendRedirect(actionRequest, actionResponse);
 	}
@@ -88,6 +91,9 @@ public class NotificationsPortlet extends MVCPortlet {
 			actionRequest, "userNotificationEventId");
 
 		_deleteUserNotificationEvent(userNotificationEventId);
+
+		_addSuccessMessage(
+			actionRequest, "notification-was-deleted-successfully");
 
 		_sendRedirect(actionRequest, actionResponse);
 	}
@@ -106,14 +112,9 @@ public class NotificationsPortlet extends MVCPortlet {
 			themeDisplay.getUserId(),
 			UserNotificationDeliveryConstants.TYPE_WEBSITE, actionRequired);
 
-		ResourceBundle resourceBundle =
-			_resourceBundleLoader.loadResourceBundle(themeDisplay.getLocale());
-
-		SessionMessages.add(
-			actionRequest, "requestProcessed",
-			LanguageUtil.get(
-				resourceBundle,
-				"all-notifications-were-marked-as-read-successfully"));
+		_addSuccessMessage(
+			actionRequest,
+			"all-notifications-were-marked-as-read-successfully");
 
 		_sendRedirect(actionRequest, actionResponse);
 	}
@@ -127,6 +128,9 @@ public class NotificationsPortlet extends MVCPortlet {
 
 		updateArchived(userNotificationEventId, true);
 
+		_addSuccessMessage(
+			actionRequest, "notification-was-marked-as-read-successfully");
+
 		_sendRedirect(actionRequest, actionResponse);
 	}
 
@@ -138,6 +142,9 @@ public class NotificationsPortlet extends MVCPortlet {
 			actionRequest, "userNotificationEventId");
 
 		updateArchived(userNotificationEventId, false);
+
+		_addSuccessMessage(
+			actionRequest, "notification-was-marked-as-unread-successfully");
 
 		_sendRedirect(actionRequest, actionResponse);
 	}
@@ -153,6 +160,9 @@ public class NotificationsPortlet extends MVCPortlet {
 			updateArchived(userNotificationEventId, true);
 		}
 
+		_addSuccessMessage(
+			actionRequest, "notifications-were-marked-as-read-successfully");
+
 		_sendRedirect(actionRequest, actionResponse);
 	}
 
@@ -166,6 +176,9 @@ public class NotificationsPortlet extends MVCPortlet {
 		for (long userNotificationEventId : userNotificationEventIds) {
 			updateArchived(userNotificationEventId, false);
 		}
+
+		_addSuccessMessage(
+			actionRequest, "notifications-were-marked-as-unread-successfully");
 
 		_sendRedirect(actionRequest, actionResponse);
 	}
@@ -186,8 +199,8 @@ public class NotificationsPortlet extends MVCPortlet {
 			String actionName = ParamUtil.getString(
 				actionRequest, ActionRequest.ACTION_NAME);
 
-			if (actionName.equals("deleteAllNotifications")) {
-				deleteAllNotifications(actionRequest, actionResponse);
+			if (actionName.equals("deleteNotifications")) {
+				deleteNotifications(actionRequest, actionResponse);
 			}
 			else if (actionName.equals("deleteUserNotificationEvent")) {
 				deleteUserNotificationEvent(actionRequest, actionResponse);
@@ -239,14 +252,15 @@ public class NotificationsPortlet extends MVCPortlet {
 				updateArchived(userNotificationEventId, true);
 			}
 		}
+
+		_addSuccessMessage(
+			actionRequest,
+			"you-have-unsubscribed-from-this-asset-successfully");
 	}
 
 	public void updateUserNotificationDelivery(
 			ActionRequest actionRequest, ActionResponse actionResponse)
 		throws Exception {
-
-		ThemeDisplay themeDisplay = (ThemeDisplay)actionRequest.getAttribute(
-			WebKeys.THEME_DISPLAY);
 
 		long[] userNotificationDeliveryIds = ParamUtil.getLongValues(
 			actionRequest, "userNotificationDeliveryIds");
@@ -260,13 +274,8 @@ public class NotificationsPortlet extends MVCPortlet {
 					userNotificationDeliveryId, deliver);
 		}
 
-		ResourceBundle resourceBundle =
-			_resourceBundleLoader.loadResourceBundle(themeDisplay.getLocale());
-
-		SessionMessages.add(
-			actionRequest, "requestProcessed",
-			LanguageUtil.get(
-				resourceBundle, "your-configuration-was-saved-sucessfully"));
+		_addSuccessMessage(
+			actionRequest, "your-configuration-was-saved-sucessfully");
 
 		_sendRedirect(actionRequest, actionResponse);
 	}
@@ -293,6 +302,20 @@ public class NotificationsPortlet extends MVCPortlet {
 
 		_userNotificationEventLocalService.updateUserNotificationEvent(
 			userNotificationEvent);
+	}
+
+	private void _addSuccessMessage(
+		ActionRequest actionRequest, String message) {
+
+		ThemeDisplay themeDisplay = (ThemeDisplay)actionRequest.getAttribute(
+			WebKeys.THEME_DISPLAY);
+
+		ResourceBundle resourceBundle =
+			_resourceBundleLoader.loadResourceBundle(themeDisplay.getLocale());
+
+		SessionMessages.add(
+			actionRequest, "requestProcessed",
+			LanguageUtil.get(resourceBundle, message));
 	}
 
 	private void _deleteUserNotificationEvent(long userNotificationEventId) {

@@ -165,14 +165,14 @@ definition {
 		Panel.expandPanel(panel = "Configuration");
 
 		BlogsEntry.addSmallImage(
-			navTab = "Documents and Media",
+			navTab = "Upload Image",
 			uploadFileName = "Document_3.jpg"
 		);
 
 		PortletEntry.publish();
 
 		Navigator.gotoStagedSitePage(
-			pageName = "Site Page Name",
+			pageName = "Staging Blogs Page",
 			siteName = "Site Name"
 		);
 
@@ -198,7 +198,7 @@ definition {
 		);
 
 		Navigator.gotoStagedSitePage(
-			pageName = "Site Page Name",
+			pageName = "Staging Blogs Page",
 			siteName = "Site Name"
 		);
 
@@ -217,7 +217,7 @@ definition {
 		PortletEntry.publish();
 
 		Navigator.gotoStagedSitePage(
-			pageName = "Site Page Name",
+			pageName = "Staging Blogs Page",
 			siteName = "Site Name"
 		);
 
@@ -226,7 +226,7 @@ definition {
 		Staging.publishToLive();
 
 		Navigator.gotoStagedSitePage(
-			pageName = "Site Page Name",
+			pageName = "Staging Blogs Page",
 			siteName = "Site Name"
 		);
 
@@ -265,7 +265,7 @@ definition {
 
 		Navigator.gotoNavItem(navItem = "Images");
 
-		AssertElementNotPresent(
+		AssertElementPresent(
 			locator1 = "Card#SPECIFIC_LARGE_TEXT",
 			value1 = "${rowEntry}",
 			key_cardText = "Document_3.jpg"
@@ -351,7 +351,7 @@ definition {
 			entryTitle = "Blogs Entry Title 3"
 		);
 
-		BlogsEntry.addEntryExternalURL(entryExternalURL = "www.liferay.com");
+		AlloyEditor.addEntryExternalURL(entryExternalURL = "www.liferay.com");
 
 		PortletEntry.publish();
 
@@ -376,6 +376,8 @@ definition {
 			uploadFileName = "Document_1.jpg"
 		);
 
+		Navigator.gotoSitePage(pageName = "Staging Blogs Page", siteName = "Site Name");
+
 		BlogsNavigator.gotoEntryPG(
 			entryContent = "Blogs Entry Content 2",
 			entryTitle = "Blogs Entry Title 2"
@@ -387,8 +389,10 @@ definition {
 			entryTitle = "Blogs Entry Title 2"
 		);
 
+		Navigator.gotoSitePage(pageName = "Staging Blogs Page", siteName = "Site Name");
+
 		BlogsNavigator.gotoEntryPG(
-			entryContent = "Blogs Entry Content",
+			entryContent = "Blogs Entry Content 3",
 			entryTitle = "Blogs Entry Title 3"
 		);
 
@@ -413,6 +417,8 @@ definition {
 			uploadFileName = "Document_1.jpg"
 		);
 
+		Navigator.gotoSitePage(pageName = "Staging Blogs Page", siteName = "Site Name");
+
 		BlogsNavigator.gotoEntryPG(
 			entryContent = "Blogs Entry Content 2",
 			entryTitle = "Blogs Entry Title 2"
@@ -423,6 +429,8 @@ definition {
 			entryInlineImage = "Document_2.jpg",
 			entryTitle = "Blogs Entry Title 2"
 		);
+
+		Navigator.gotoSitePage(pageName = "Staging Blogs Page", siteName = "Site Name");
 
 		BlogsNavigator.gotoEntryPG(
 			entryContent = "Blogs Entry Content 3",

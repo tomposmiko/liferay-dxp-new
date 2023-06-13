@@ -16,7 +16,6 @@ package com.liferay.dynamic.data.lists.service.persistence.impl;
 
 import com.liferay.dynamic.data.lists.model.DDLRecordSet;
 import com.liferay.dynamic.data.lists.service.persistence.DDLRecordSetPersistence;
-
 import com.liferay.portal.kernel.bean.BeanReference;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
@@ -32,20 +31,22 @@ import java.util.Set;
  * @author Brian Wing Shun Chan
  * @generated
  */
-public class DDLRecordSetFinderBaseImpl extends BasePersistenceImpl<DDLRecordSet> {
+public class DDLRecordSetFinderBaseImpl
+	extends BasePersistenceImpl<DDLRecordSet> {
+
 	public DDLRecordSetFinderBaseImpl() {
 		setModelClass(DDLRecordSet.class);
 
+		Map<String, String> dbColumnNames = new HashMap<String, String>();
+
+		dbColumnNames.put("uuid", "uuid_");
+		dbColumnNames.put("settings", "settings_");
+
 		try {
 			Field field = BasePersistenceImpl.class.getDeclaredField(
-					"_dbColumnNames");
+				"_dbColumnNames");
 
 			field.setAccessible(true);
-
-			Map<String, String> dbColumnNames = new HashMap<String, String>();
-
-			dbColumnNames.put("uuid", "uuid_");
-			dbColumnNames.put("settings", "settings_");
 
 			field.set(this, dbColumnNames);
 		}
@@ -77,10 +78,14 @@ public class DDLRecordSetFinderBaseImpl extends BasePersistenceImpl<DDLRecordSet
 	 */
 	public void setDDLRecordSetPersistence(
 		DDLRecordSetPersistence ddlRecordSetPersistence) {
+
 		this.ddlRecordSetPersistence = ddlRecordSetPersistence;
 	}
 
 	@BeanReference(type = DDLRecordSetPersistence.class)
 	protected DDLRecordSetPersistence ddlRecordSetPersistence;
-	private static final Log _log = LogFactoryUtil.getLog(DDLRecordSetFinderBaseImpl.class);
+
+	private static final Log _log = LogFactoryUtil.getLog(
+		DDLRecordSetFinderBaseImpl.class);
+
 }

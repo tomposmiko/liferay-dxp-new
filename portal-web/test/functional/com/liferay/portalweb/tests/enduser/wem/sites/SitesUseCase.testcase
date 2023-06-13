@@ -50,6 +50,8 @@ definition {
 			uploadFrom = "dependencies"
 		);
 
+		UsersAndOrganizationsNavigator.gotoOrganizations();
+
 		Organization.viewCP(
 			orgName = "Space Program Academy of Continuing Education",
 			orgType = "Organization"
@@ -1153,15 +1155,7 @@ definition {
 
 		LAR.exportSuccess();
 
-		LexiconEntry.changeDisplayStyle(displayStyle = "table");
-
-		var valueName = selenium.getText("//tr/td[7]//span/a");
-
-		echo("value name ${valueName}");
-
-		var larFileName = RegexUtil.replace("${valueName}", "([a-zA-z0-9_.-]*)[(0-9KB)]*", "1");
-
-		echo("import file name ${larFileName}");
+		var larFileName = LAR.getLarFileName();
 
 		LexiconEntry.changeDisplayStyle(displayStyle = "list");
 

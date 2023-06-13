@@ -25,19 +25,22 @@ import com.liferay.portal.kernel.util.Accessor;
  *
  * @author Brian Wing Shun Chan
  * @see KaleoTimerModel
- * @see com.liferay.portal.workflow.kaleo.model.impl.KaleoTimerImpl
- * @see com.liferay.portal.workflow.kaleo.model.impl.KaleoTimerModelImpl
  * @generated
  */
-@ImplementationClassName("com.liferay.portal.workflow.kaleo.model.impl.KaleoTimerImpl")
+@ImplementationClassName(
+	"com.liferay.portal.workflow.kaleo.model.impl.KaleoTimerImpl"
+)
 @ProviderType
 public interface KaleoTimer extends KaleoTimerModel, PersistedModel {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
-	 * Never modify this interface directly. Add methods to {@link com.liferay.portal.workflow.kaleo.model.impl.KaleoTimerImpl} and rerun ServiceBuilder to automatically copy the method declarations to this interface.
+	 * Never modify this interface directly. Add methods to <code>com.liferay.portal.workflow.kaleo.model.impl.KaleoTimerImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
 	 */
-	public static final Accessor<KaleoTimer, Long> KALEO_TIMER_ID_ACCESSOR = new Accessor<KaleoTimer, Long>() {
+	public static final Accessor<KaleoTimer, Long> KALEO_TIMER_ID_ACCESSOR =
+		new Accessor<KaleoTimer, Long>() {
+
 			@Override
 			public Long get(KaleoTimer kaleoTimer) {
 				return kaleoTimer.getKaleoTimerId();
@@ -52,9 +55,11 @@ public interface KaleoTimer extends KaleoTimerModel, PersistedModel {
 			public Class<KaleoTimer> getTypeClass() {
 				return KaleoTimer.class;
 			}
+
 		};
 
 	public java.util.List<KaleoTaskAssignment> getKaleoTaskReassignments();
 
 	public boolean isRecurring();
+
 }

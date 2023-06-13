@@ -64,6 +64,7 @@ import com.liferay.portal.kernel.search.IndexerRegistryUtil;
 import com.liferay.portal.kernel.service.ClassNameLocalService;
 import com.liferay.portal.kernel.service.RepositoryLocalService;
 import com.liferay.portal.kernel.service.ServiceContext;
+import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
 import com.liferay.portal.kernel.transaction.Propagation;
 import com.liferay.portal.kernel.transaction.TransactionConfig;
 import com.liferay.portal.kernel.transaction.TransactionInvokerUtil;
@@ -97,7 +98,7 @@ import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
 
 /**
- * @author Mate Thurzo
+ * @author Máté Thurzó
  */
 @Component(immediate = true, service = StagedModelDataHandler.class)
 public class FileEntryStagedModelDataHandler
@@ -604,7 +605,8 @@ public class FileEntryStagedModelDataHandler
 				}
 
 				if (ExportImportThreadLocal.isStagingInProcess()) {
-					_overrideFileVersion(importedFileEntry, version);
+					_overrideFileVersion(
+						importedFileEntry, version, serviceContext);
 				}
 			}
 			else {
@@ -806,7 +808,10 @@ public class FileEntryStagedModelDataHandler
 			Element structureFieldsElement =
 				(Element)fileEntryElement.selectSingleNode(
 					"structure-fields[@structureUuid='".concat(
-						ddmStructure.getUuid()).concat("']"));
+						ddmStructure.getUuid()
+					).concat(
+						"']"
+					));
 
 			if (structureFieldsElement == null) {
 				continue;
@@ -896,8 +901,11 @@ public class FileEntryStagedModelDataHandler
 	}
 
 	private void _overrideFileVersion(
-			final FileEntry importedFileEntry, final String version)
+			final FileEntry importedFileEntry, final String version,
+			ServiceContext serviceContext)
 		throws PortalException {
+
+		ServiceContextThreadLocal.pushServiceContext(serviceContext);
 
 		try {
 			TransactionInvokerUtil.invoke(
@@ -942,6 +950,9 @@ public class FileEntryStagedModelDataHandler
 		}
 		catch (Throwable t) {
 			throw new PortalException(t);
+		}
+		finally {
+			ServiceContextThreadLocal.popServiceContext();
 		}
 	}
 

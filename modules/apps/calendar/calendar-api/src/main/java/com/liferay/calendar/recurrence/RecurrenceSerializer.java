@@ -179,18 +179,20 @@ public class RecurrenceSerializer {
 			rDateList.setDatesUtc(dateValues);
 			rDateList.setName(_EXDATE);
 
-			data = data.concat(StringPool.NEW_LINE).concat(rDateList.toIcal());
+			data = data.concat(
+				StringPool.NEW_LINE
+			).concat(
+				rDateList.toIcal()
+			);
 		}
 
 		return data;
 	}
 
 	private static DateValue _toDateValue(Calendar jCalendar) {
-		DateValue dateValue = new DateValueImpl(
+		return new DateValueImpl(
 			jCalendar.get(Calendar.YEAR), jCalendar.get(Calendar.MONTH) + 1,
 			jCalendar.get(Calendar.DATE));
-
-		return dateValue;
 	}
 
 	private static Calendar _toJCalendar(

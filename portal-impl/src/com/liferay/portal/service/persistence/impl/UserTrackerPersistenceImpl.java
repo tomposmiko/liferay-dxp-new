@@ -59,52 +59,32 @@ import java.util.Set;
  * </p>
  *
  * @author Brian Wing Shun Chan
- * @see UserTrackerPersistence
- * @see com.liferay.portal.kernel.service.persistence.UserTrackerUtil
  * @generated
  */
 @ProviderType
-public class UserTrackerPersistenceImpl extends BasePersistenceImpl<UserTracker>
-	implements UserTrackerPersistence {
+public class UserTrackerPersistenceImpl
+	extends BasePersistenceImpl<UserTracker> implements UserTrackerPersistence {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
-	 * Never modify or reference this class directly. Always use {@link UserTrackerUtil} to access the user tracker persistence. Modify <code>service.xml</code> and rerun ServiceBuilder to regenerate this class.
+	 * Never modify or reference this class directly. Always use <code>UserTrackerUtil</code> to access the user tracker persistence. Modify <code>service.xml</code> and rerun ServiceBuilder to regenerate this class.
 	 */
-	public static final String FINDER_CLASS_NAME_ENTITY = UserTrackerImpl.class.getName();
-	public static final String FINDER_CLASS_NAME_LIST_WITH_PAGINATION = FINDER_CLASS_NAME_ENTITY +
-		".List1";
-	public static final String FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION = FINDER_CLASS_NAME_ENTITY +
-		".List2";
-	public static final FinderPath FINDER_PATH_WITH_PAGINATION_FIND_ALL = new FinderPath(UserTrackerModelImpl.ENTITY_CACHE_ENABLED,
-			UserTrackerModelImpl.FINDER_CACHE_ENABLED, UserTrackerImpl.class,
-			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findAll", new String[0]);
-	public static final FinderPath FINDER_PATH_WITHOUT_PAGINATION_FIND_ALL = new FinderPath(UserTrackerModelImpl.ENTITY_CACHE_ENABLED,
-			UserTrackerModelImpl.FINDER_CACHE_ENABLED, UserTrackerImpl.class,
-			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findAll", new String[0]);
-	public static final FinderPath FINDER_PATH_COUNT_ALL = new FinderPath(UserTrackerModelImpl.ENTITY_CACHE_ENABLED,
-			UserTrackerModelImpl.FINDER_CACHE_ENABLED, Long.class,
-			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countAll", new String[0]);
-	public static final FinderPath FINDER_PATH_WITH_PAGINATION_FIND_BY_COMPANYID =
-		new FinderPath(UserTrackerModelImpl.ENTITY_CACHE_ENABLED,
-			UserTrackerModelImpl.FINDER_CACHE_ENABLED, UserTrackerImpl.class,
-			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByCompanyId",
-			new String[] {
-				Long.class.getName(),
-				
-			Integer.class.getName(), Integer.class.getName(),
-				OrderByComparator.class.getName()
-			});
-	public static final FinderPath FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_COMPANYID =
-		new FinderPath(UserTrackerModelImpl.ENTITY_CACHE_ENABLED,
-			UserTrackerModelImpl.FINDER_CACHE_ENABLED, UserTrackerImpl.class,
-			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByCompanyId",
-			new String[] { Long.class.getName() },
-			UserTrackerModelImpl.COMPANYID_COLUMN_BITMASK);
-	public static final FinderPath FINDER_PATH_COUNT_BY_COMPANYID = new FinderPath(UserTrackerModelImpl.ENTITY_CACHE_ENABLED,
-			UserTrackerModelImpl.FINDER_CACHE_ENABLED, Long.class,
-			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByCompanyId",
-			new String[] { Long.class.getName() });
+	public static final String FINDER_CLASS_NAME_ENTITY =
+		UserTrackerImpl.class.getName();
+
+	public static final String FINDER_CLASS_NAME_LIST_WITH_PAGINATION =
+		FINDER_CLASS_NAME_ENTITY + ".List1";
+
+	public static final String FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION =
+		FINDER_CLASS_NAME_ENTITY + ".List2";
+
+	private FinderPath _finderPathWithPaginationFindAll;
+	private FinderPath _finderPathWithoutPaginationFindAll;
+	private FinderPath _finderPathCountAll;
+	private FinderPath _finderPathWithPaginationFindByCompanyId;
+	private FinderPath _finderPathWithoutPaginationFindByCompanyId;
+	private FinderPath _finderPathCountByCompanyId;
 
 	/**
 	 * Returns all the user trackers where companyId = &#63;.
@@ -114,15 +94,15 @@ public class UserTrackerPersistenceImpl extends BasePersistenceImpl<UserTracker>
 	 */
 	@Override
 	public List<UserTracker> findByCompanyId(long companyId) {
-		return findByCompanyId(companyId, QueryUtil.ALL_POS, QueryUtil.ALL_POS,
-			null);
+		return findByCompanyId(
+			companyId, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
 	}
 
 	/**
 	 * Returns a range of all the user trackers where companyId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link UserTrackerModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>UserTrackerModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param companyId the company ID
@@ -131,7 +111,9 @@ public class UserTrackerPersistenceImpl extends BasePersistenceImpl<UserTracker>
 	 * @return the range of matching user trackers
 	 */
 	@Override
-	public List<UserTracker> findByCompanyId(long companyId, int start, int end) {
+	public List<UserTracker> findByCompanyId(
+		long companyId, int start, int end) {
+
 		return findByCompanyId(companyId, start, end, null);
 	}
 
@@ -139,7 +121,7 @@ public class UserTrackerPersistenceImpl extends BasePersistenceImpl<UserTracker>
 	 * Returns an ordered range of all the user trackers where companyId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link UserTrackerModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>UserTrackerModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param companyId the company ID
@@ -149,8 +131,10 @@ public class UserTrackerPersistenceImpl extends BasePersistenceImpl<UserTracker>
 	 * @return the ordered range of matching user trackers
 	 */
 	@Override
-	public List<UserTracker> findByCompanyId(long companyId, int start,
-		int end, OrderByComparator<UserTracker> orderByComparator) {
+	public List<UserTracker> findByCompanyId(
+		long companyId, int start, int end,
+		OrderByComparator<UserTracker> orderByComparator) {
+
 		return findByCompanyId(companyId, start, end, orderByComparator, true);
 	}
 
@@ -158,7 +142,7 @@ public class UserTrackerPersistenceImpl extends BasePersistenceImpl<UserTracker>
 	 * Returns an ordered range of all the user trackers where companyId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link UserTrackerModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>UserTrackerModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param companyId the company ID
@@ -169,29 +153,34 @@ public class UserTrackerPersistenceImpl extends BasePersistenceImpl<UserTracker>
 	 * @return the ordered range of matching user trackers
 	 */
 	@Override
-	public List<UserTracker> findByCompanyId(long companyId, int start,
-		int end, OrderByComparator<UserTracker> orderByComparator,
+	public List<UserTracker> findByCompanyId(
+		long companyId, int start, int end,
+		OrderByComparator<UserTracker> orderByComparator,
 		boolean retrieveFromCache) {
+
 		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
-				(orderByComparator == null)) {
+			(orderByComparator == null)) {
+
 			pagination = false;
-			finderPath = FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_COMPANYID;
-			finderArgs = new Object[] { companyId };
+			finderPath = _finderPathWithoutPaginationFindByCompanyId;
+			finderArgs = new Object[] {companyId};
 		}
 		else {
-			finderPath = FINDER_PATH_WITH_PAGINATION_FIND_BY_COMPANYID;
-			finderArgs = new Object[] { companyId, start, end, orderByComparator };
+			finderPath = _finderPathWithPaginationFindByCompanyId;
+			finderArgs = new Object[] {
+				companyId, start, end, orderByComparator
+			};
 		}
 
 		List<UserTracker> list = null;
 
 		if (retrieveFromCache) {
-			list = (List<UserTracker>)FinderCacheUtil.getResult(finderPath,
-					finderArgs, this);
+			list = (List<UserTracker>)FinderCacheUtil.getResult(
+				finderPath, finderArgs, this);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (UserTracker userTracker : list) {
@@ -208,8 +197,8 @@ public class UserTrackerPersistenceImpl extends BasePersistenceImpl<UserTracker>
 			StringBundler query = null;
 
 			if (orderByComparator != null) {
-				query = new StringBundler(3 +
-						(orderByComparator.getOrderByFields().length * 2));
+				query = new StringBundler(
+					3 + (orderByComparator.getOrderByFields().length * 2));
 			}
 			else {
 				query = new StringBundler(3);
@@ -220,11 +209,10 @@ public class UserTrackerPersistenceImpl extends BasePersistenceImpl<UserTracker>
 			query.append(_FINDER_COLUMN_COMPANYID_COMPANYID_2);
 
 			if (orderByComparator != null) {
-				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
-					orderByComparator);
+				appendOrderByComparator(
+					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
 			}
-			else
-			 if (pagination) {
+			else if (pagination) {
 				query.append(UserTrackerModelImpl.ORDER_BY_JPQL);
 			}
 
@@ -242,16 +230,16 @@ public class UserTrackerPersistenceImpl extends BasePersistenceImpl<UserTracker>
 				qPos.add(companyId);
 
 				if (!pagination) {
-					list = (List<UserTracker>)QueryUtil.list(q, getDialect(),
-							start, end, false);
+					list = (List<UserTracker>)QueryUtil.list(
+						q, getDialect(), start, end, false);
 
 					Collections.sort(list);
 
 					list = Collections.unmodifiableList(list);
 				}
 				else {
-					list = (List<UserTracker>)QueryUtil.list(q, getDialect(),
-							start, end);
+					list = (List<UserTracker>)QueryUtil.list(
+						q, getDialect(), start, end);
 				}
 
 				cacheResult(list);
@@ -280,11 +268,12 @@ public class UserTrackerPersistenceImpl extends BasePersistenceImpl<UserTracker>
 	 * @throws NoSuchUserTrackerException if a matching user tracker could not be found
 	 */
 	@Override
-	public UserTracker findByCompanyId_First(long companyId,
-		OrderByComparator<UserTracker> orderByComparator)
+	public UserTracker findByCompanyId_First(
+			long companyId, OrderByComparator<UserTracker> orderByComparator)
 		throws NoSuchUserTrackerException {
-		UserTracker userTracker = fetchByCompanyId_First(companyId,
-				orderByComparator);
+
+		UserTracker userTracker = fetchByCompanyId_First(
+			companyId, orderByComparator);
 
 		if (userTracker != null) {
 			return userTracker;
@@ -310,10 +299,11 @@ public class UserTrackerPersistenceImpl extends BasePersistenceImpl<UserTracker>
 	 * @return the first matching user tracker, or <code>null</code> if a matching user tracker could not be found
 	 */
 	@Override
-	public UserTracker fetchByCompanyId_First(long companyId,
-		OrderByComparator<UserTracker> orderByComparator) {
-		List<UserTracker> list = findByCompanyId(companyId, 0, 1,
-				orderByComparator);
+	public UserTracker fetchByCompanyId_First(
+		long companyId, OrderByComparator<UserTracker> orderByComparator) {
+
+		List<UserTracker> list = findByCompanyId(
+			companyId, 0, 1, orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -331,11 +321,12 @@ public class UserTrackerPersistenceImpl extends BasePersistenceImpl<UserTracker>
 	 * @throws NoSuchUserTrackerException if a matching user tracker could not be found
 	 */
 	@Override
-	public UserTracker findByCompanyId_Last(long companyId,
-		OrderByComparator<UserTracker> orderByComparator)
+	public UserTracker findByCompanyId_Last(
+			long companyId, OrderByComparator<UserTracker> orderByComparator)
 		throws NoSuchUserTrackerException {
-		UserTracker userTracker = fetchByCompanyId_Last(companyId,
-				orderByComparator);
+
+		UserTracker userTracker = fetchByCompanyId_Last(
+			companyId, orderByComparator);
 
 		if (userTracker != null) {
 			return userTracker;
@@ -361,16 +352,17 @@ public class UserTrackerPersistenceImpl extends BasePersistenceImpl<UserTracker>
 	 * @return the last matching user tracker, or <code>null</code> if a matching user tracker could not be found
 	 */
 	@Override
-	public UserTracker fetchByCompanyId_Last(long companyId,
-		OrderByComparator<UserTracker> orderByComparator) {
+	public UserTracker fetchByCompanyId_Last(
+		long companyId, OrderByComparator<UserTracker> orderByComparator) {
+
 		int count = countByCompanyId(companyId);
 
 		if (count == 0) {
 			return null;
 		}
 
-		List<UserTracker> list = findByCompanyId(companyId, count - 1, count,
-				orderByComparator);
+		List<UserTracker> list = findByCompanyId(
+			companyId, count - 1, count, orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -389,9 +381,11 @@ public class UserTrackerPersistenceImpl extends BasePersistenceImpl<UserTracker>
 	 * @throws NoSuchUserTrackerException if a user tracker with the primary key could not be found
 	 */
 	@Override
-	public UserTracker[] findByCompanyId_PrevAndNext(long userTrackerId,
-		long companyId, OrderByComparator<UserTracker> orderByComparator)
+	public UserTracker[] findByCompanyId_PrevAndNext(
+			long userTrackerId, long companyId,
+			OrderByComparator<UserTracker> orderByComparator)
 		throws NoSuchUserTrackerException {
+
 		UserTracker userTracker = findByPrimaryKey(userTrackerId);
 
 		Session session = null;
@@ -401,13 +395,13 @@ public class UserTrackerPersistenceImpl extends BasePersistenceImpl<UserTracker>
 
 			UserTracker[] array = new UserTrackerImpl[3];
 
-			array[0] = getByCompanyId_PrevAndNext(session, userTracker,
-					companyId, orderByComparator, true);
+			array[0] = getByCompanyId_PrevAndNext(
+				session, userTracker, companyId, orderByComparator, true);
 
 			array[1] = userTracker;
 
-			array[2] = getByCompanyId_PrevAndNext(session, userTracker,
-					companyId, orderByComparator, false);
+			array[2] = getByCompanyId_PrevAndNext(
+				session, userTracker, companyId, orderByComparator, false);
 
 			return array;
 		}
@@ -419,14 +413,15 @@ public class UserTrackerPersistenceImpl extends BasePersistenceImpl<UserTracker>
 		}
 	}
 
-	protected UserTracker getByCompanyId_PrevAndNext(Session session,
-		UserTracker userTracker, long companyId,
+	protected UserTracker getByCompanyId_PrevAndNext(
+		Session session, UserTracker userTracker, long companyId,
 		OrderByComparator<UserTracker> orderByComparator, boolean previous) {
+
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(4 +
-					(orderByComparator.getOrderByConditionFields().length * 3) +
+			query = new StringBundler(
+				4 + (orderByComparator.getOrderByConditionFields().length * 3) +
 					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
@@ -438,7 +433,8 @@ public class UserTrackerPersistenceImpl extends BasePersistenceImpl<UserTracker>
 		query.append(_FINDER_COLUMN_COMPANYID_COMPANYID_2);
 
 		if (orderByComparator != null) {
-			String[] orderByConditionFields = orderByComparator.getOrderByConditionFields();
+			String[] orderByConditionFields =
+				orderByComparator.getOrderByConditionFields();
 
 			if (orderByConditionFields.length > 0) {
 				query.append(WHERE_AND);
@@ -508,10 +504,10 @@ public class UserTrackerPersistenceImpl extends BasePersistenceImpl<UserTracker>
 		qPos.add(companyId);
 
 		if (orderByComparator != null) {
-			Object[] values = orderByComparator.getOrderByConditionValues(userTracker);
+			for (Object orderByConditionValue :
+					orderByComparator.getOrderByConditionValues(userTracker)) {
 
-			for (Object value : values) {
-				qPos.add(value);
+				qPos.add(orderByConditionValue);
 			}
 		}
 
@@ -532,8 +528,10 @@ public class UserTrackerPersistenceImpl extends BasePersistenceImpl<UserTracker>
 	 */
 	@Override
 	public void removeByCompanyId(long companyId) {
-		for (UserTracker userTracker : findByCompanyId(companyId,
-				QueryUtil.ALL_POS, QueryUtil.ALL_POS, null)) {
+		for (UserTracker userTracker :
+				findByCompanyId(
+					companyId, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null)) {
+
 			remove(userTracker);
 		}
 	}
@@ -546,12 +544,12 @@ public class UserTrackerPersistenceImpl extends BasePersistenceImpl<UserTracker>
 	 */
 	@Override
 	public int countByCompanyId(long companyId) {
-		FinderPath finderPath = FINDER_PATH_COUNT_BY_COMPANYID;
+		FinderPath finderPath = _finderPathCountByCompanyId;
 
-		Object[] finderArgs = new Object[] { companyId };
+		Object[] finderArgs = new Object[] {companyId};
 
-		Long count = (Long)FinderCacheUtil.getResult(finderPath, finderArgs,
-				this);
+		Long count = (Long)FinderCacheUtil.getResult(
+			finderPath, finderArgs, this);
 
 		if (count == null) {
 			StringBundler query = new StringBundler(2);
@@ -590,26 +588,12 @@ public class UserTrackerPersistenceImpl extends BasePersistenceImpl<UserTracker>
 		return count.intValue();
 	}
 
-	private static final String _FINDER_COLUMN_COMPANYID_COMPANYID_2 = "userTracker.companyId = ?";
-	public static final FinderPath FINDER_PATH_WITH_PAGINATION_FIND_BY_USERID = new FinderPath(UserTrackerModelImpl.ENTITY_CACHE_ENABLED,
-			UserTrackerModelImpl.FINDER_CACHE_ENABLED, UserTrackerImpl.class,
-			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByUserId",
-			new String[] {
-				Long.class.getName(),
-				
-			Integer.class.getName(), Integer.class.getName(),
-				OrderByComparator.class.getName()
-			});
-	public static final FinderPath FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_USERID =
-		new FinderPath(UserTrackerModelImpl.ENTITY_CACHE_ENABLED,
-			UserTrackerModelImpl.FINDER_CACHE_ENABLED, UserTrackerImpl.class,
-			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByUserId",
-			new String[] { Long.class.getName() },
-			UserTrackerModelImpl.USERID_COLUMN_BITMASK);
-	public static final FinderPath FINDER_PATH_COUNT_BY_USERID = new FinderPath(UserTrackerModelImpl.ENTITY_CACHE_ENABLED,
-			UserTrackerModelImpl.FINDER_CACHE_ENABLED, Long.class,
-			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByUserId",
-			new String[] { Long.class.getName() });
+	private static final String _FINDER_COLUMN_COMPANYID_COMPANYID_2 =
+		"userTracker.companyId = ?";
+
+	private FinderPath _finderPathWithPaginationFindByUserId;
+	private FinderPath _finderPathWithoutPaginationFindByUserId;
+	private FinderPath _finderPathCountByUserId;
 
 	/**
 	 * Returns all the user trackers where userId = &#63;.
@@ -626,7 +610,7 @@ public class UserTrackerPersistenceImpl extends BasePersistenceImpl<UserTracker>
 	 * Returns a range of all the user trackers where userId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link UserTrackerModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>UserTrackerModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param userId the user ID
@@ -643,7 +627,7 @@ public class UserTrackerPersistenceImpl extends BasePersistenceImpl<UserTracker>
 	 * Returns an ordered range of all the user trackers where userId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link UserTrackerModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>UserTrackerModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param userId the user ID
@@ -653,8 +637,10 @@ public class UserTrackerPersistenceImpl extends BasePersistenceImpl<UserTracker>
 	 * @return the ordered range of matching user trackers
 	 */
 	@Override
-	public List<UserTracker> findByUserId(long userId, int start, int end,
+	public List<UserTracker> findByUserId(
+		long userId, int start, int end,
 		OrderByComparator<UserTracker> orderByComparator) {
+
 		return findByUserId(userId, start, end, orderByComparator, true);
 	}
 
@@ -662,7 +648,7 @@ public class UserTrackerPersistenceImpl extends BasePersistenceImpl<UserTracker>
 	 * Returns an ordered range of all the user trackers where userId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link UserTrackerModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>UserTrackerModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param userId the user ID
@@ -673,29 +659,32 @@ public class UserTrackerPersistenceImpl extends BasePersistenceImpl<UserTracker>
 	 * @return the ordered range of matching user trackers
 	 */
 	@Override
-	public List<UserTracker> findByUserId(long userId, int start, int end,
+	public List<UserTracker> findByUserId(
+		long userId, int start, int end,
 		OrderByComparator<UserTracker> orderByComparator,
 		boolean retrieveFromCache) {
+
 		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
-				(orderByComparator == null)) {
+			(orderByComparator == null)) {
+
 			pagination = false;
-			finderPath = FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_USERID;
-			finderArgs = new Object[] { userId };
+			finderPath = _finderPathWithoutPaginationFindByUserId;
+			finderArgs = new Object[] {userId};
 		}
 		else {
-			finderPath = FINDER_PATH_WITH_PAGINATION_FIND_BY_USERID;
-			finderArgs = new Object[] { userId, start, end, orderByComparator };
+			finderPath = _finderPathWithPaginationFindByUserId;
+			finderArgs = new Object[] {userId, start, end, orderByComparator};
 		}
 
 		List<UserTracker> list = null;
 
 		if (retrieveFromCache) {
-			list = (List<UserTracker>)FinderCacheUtil.getResult(finderPath,
-					finderArgs, this);
+			list = (List<UserTracker>)FinderCacheUtil.getResult(
+				finderPath, finderArgs, this);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (UserTracker userTracker : list) {
@@ -712,8 +701,8 @@ public class UserTrackerPersistenceImpl extends BasePersistenceImpl<UserTracker>
 			StringBundler query = null;
 
 			if (orderByComparator != null) {
-				query = new StringBundler(3 +
-						(orderByComparator.getOrderByFields().length * 2));
+				query = new StringBundler(
+					3 + (orderByComparator.getOrderByFields().length * 2));
 			}
 			else {
 				query = new StringBundler(3);
@@ -724,11 +713,10 @@ public class UserTrackerPersistenceImpl extends BasePersistenceImpl<UserTracker>
 			query.append(_FINDER_COLUMN_USERID_USERID_2);
 
 			if (orderByComparator != null) {
-				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
-					orderByComparator);
+				appendOrderByComparator(
+					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
 			}
-			else
-			 if (pagination) {
+			else if (pagination) {
 				query.append(UserTrackerModelImpl.ORDER_BY_JPQL);
 			}
 
@@ -746,16 +734,16 @@ public class UserTrackerPersistenceImpl extends BasePersistenceImpl<UserTracker>
 				qPos.add(userId);
 
 				if (!pagination) {
-					list = (List<UserTracker>)QueryUtil.list(q, getDialect(),
-							start, end, false);
+					list = (List<UserTracker>)QueryUtil.list(
+						q, getDialect(), start, end, false);
 
 					Collections.sort(list);
 
 					list = Collections.unmodifiableList(list);
 				}
 				else {
-					list = (List<UserTracker>)QueryUtil.list(q, getDialect(),
-							start, end);
+					list = (List<UserTracker>)QueryUtil.list(
+						q, getDialect(), start, end);
 				}
 
 				cacheResult(list);
@@ -784,10 +772,12 @@ public class UserTrackerPersistenceImpl extends BasePersistenceImpl<UserTracker>
 	 * @throws NoSuchUserTrackerException if a matching user tracker could not be found
 	 */
 	@Override
-	public UserTracker findByUserId_First(long userId,
-		OrderByComparator<UserTracker> orderByComparator)
+	public UserTracker findByUserId_First(
+			long userId, OrderByComparator<UserTracker> orderByComparator)
 		throws NoSuchUserTrackerException {
-		UserTracker userTracker = fetchByUserId_First(userId, orderByComparator);
+
+		UserTracker userTracker = fetchByUserId_First(
+			userId, orderByComparator);
 
 		if (userTracker != null) {
 			return userTracker;
@@ -813,8 +803,9 @@ public class UserTrackerPersistenceImpl extends BasePersistenceImpl<UserTracker>
 	 * @return the first matching user tracker, or <code>null</code> if a matching user tracker could not be found
 	 */
 	@Override
-	public UserTracker fetchByUserId_First(long userId,
-		OrderByComparator<UserTracker> orderByComparator) {
+	public UserTracker fetchByUserId_First(
+		long userId, OrderByComparator<UserTracker> orderByComparator) {
+
 		List<UserTracker> list = findByUserId(userId, 0, 1, orderByComparator);
 
 		if (!list.isEmpty()) {
@@ -833,9 +824,10 @@ public class UserTrackerPersistenceImpl extends BasePersistenceImpl<UserTracker>
 	 * @throws NoSuchUserTrackerException if a matching user tracker could not be found
 	 */
 	@Override
-	public UserTracker findByUserId_Last(long userId,
-		OrderByComparator<UserTracker> orderByComparator)
+	public UserTracker findByUserId_Last(
+			long userId, OrderByComparator<UserTracker> orderByComparator)
 		throws NoSuchUserTrackerException {
+
 		UserTracker userTracker = fetchByUserId_Last(userId, orderByComparator);
 
 		if (userTracker != null) {
@@ -862,16 +854,17 @@ public class UserTrackerPersistenceImpl extends BasePersistenceImpl<UserTracker>
 	 * @return the last matching user tracker, or <code>null</code> if a matching user tracker could not be found
 	 */
 	@Override
-	public UserTracker fetchByUserId_Last(long userId,
-		OrderByComparator<UserTracker> orderByComparator) {
+	public UserTracker fetchByUserId_Last(
+		long userId, OrderByComparator<UserTracker> orderByComparator) {
+
 		int count = countByUserId(userId);
 
 		if (count == 0) {
 			return null;
 		}
 
-		List<UserTracker> list = findByUserId(userId, count - 1, count,
-				orderByComparator);
+		List<UserTracker> list = findByUserId(
+			userId, count - 1, count, orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -890,9 +883,11 @@ public class UserTrackerPersistenceImpl extends BasePersistenceImpl<UserTracker>
 	 * @throws NoSuchUserTrackerException if a user tracker with the primary key could not be found
 	 */
 	@Override
-	public UserTracker[] findByUserId_PrevAndNext(long userTrackerId,
-		long userId, OrderByComparator<UserTracker> orderByComparator)
+	public UserTracker[] findByUserId_PrevAndNext(
+			long userTrackerId, long userId,
+			OrderByComparator<UserTracker> orderByComparator)
 		throws NoSuchUserTrackerException {
+
 		UserTracker userTracker = findByPrimaryKey(userTrackerId);
 
 		Session session = null;
@@ -902,13 +897,13 @@ public class UserTrackerPersistenceImpl extends BasePersistenceImpl<UserTracker>
 
 			UserTracker[] array = new UserTrackerImpl[3];
 
-			array[0] = getByUserId_PrevAndNext(session, userTracker, userId,
-					orderByComparator, true);
+			array[0] = getByUserId_PrevAndNext(
+				session, userTracker, userId, orderByComparator, true);
 
 			array[1] = userTracker;
 
-			array[2] = getByUserId_PrevAndNext(session, userTracker, userId,
-					orderByComparator, false);
+			array[2] = getByUserId_PrevAndNext(
+				session, userTracker, userId, orderByComparator, false);
 
 			return array;
 		}
@@ -920,14 +915,15 @@ public class UserTrackerPersistenceImpl extends BasePersistenceImpl<UserTracker>
 		}
 	}
 
-	protected UserTracker getByUserId_PrevAndNext(Session session,
-		UserTracker userTracker, long userId,
+	protected UserTracker getByUserId_PrevAndNext(
+		Session session, UserTracker userTracker, long userId,
 		OrderByComparator<UserTracker> orderByComparator, boolean previous) {
+
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(4 +
-					(orderByComparator.getOrderByConditionFields().length * 3) +
+			query = new StringBundler(
+				4 + (orderByComparator.getOrderByConditionFields().length * 3) +
 					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
@@ -939,7 +935,8 @@ public class UserTrackerPersistenceImpl extends BasePersistenceImpl<UserTracker>
 		query.append(_FINDER_COLUMN_USERID_USERID_2);
 
 		if (orderByComparator != null) {
-			String[] orderByConditionFields = orderByComparator.getOrderByConditionFields();
+			String[] orderByConditionFields =
+				orderByComparator.getOrderByConditionFields();
 
 			if (orderByConditionFields.length > 0) {
 				query.append(WHERE_AND);
@@ -1009,10 +1006,10 @@ public class UserTrackerPersistenceImpl extends BasePersistenceImpl<UserTracker>
 		qPos.add(userId);
 
 		if (orderByComparator != null) {
-			Object[] values = orderByComparator.getOrderByConditionValues(userTracker);
+			for (Object orderByConditionValue :
+					orderByComparator.getOrderByConditionValues(userTracker)) {
 
-			for (Object value : values) {
-				qPos.add(value);
+				qPos.add(orderByConditionValue);
 			}
 		}
 
@@ -1033,8 +1030,10 @@ public class UserTrackerPersistenceImpl extends BasePersistenceImpl<UserTracker>
 	 */
 	@Override
 	public void removeByUserId(long userId) {
-		for (UserTracker userTracker : findByUserId(userId, QueryUtil.ALL_POS,
-				QueryUtil.ALL_POS, null)) {
+		for (UserTracker userTracker :
+				findByUserId(
+					userId, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null)) {
+
 			remove(userTracker);
 		}
 	}
@@ -1047,12 +1046,12 @@ public class UserTrackerPersistenceImpl extends BasePersistenceImpl<UserTracker>
 	 */
 	@Override
 	public int countByUserId(long userId) {
-		FinderPath finderPath = FINDER_PATH_COUNT_BY_USERID;
+		FinderPath finderPath = _finderPathCountByUserId;
 
-		Object[] finderArgs = new Object[] { userId };
+		Object[] finderArgs = new Object[] {userId};
 
-		Long count = (Long)FinderCacheUtil.getResult(finderPath, finderArgs,
-				this);
+		Long count = (Long)FinderCacheUtil.getResult(
+			finderPath, finderArgs, this);
 
 		if (count == null) {
 			StringBundler query = new StringBundler(2);
@@ -1091,27 +1090,12 @@ public class UserTrackerPersistenceImpl extends BasePersistenceImpl<UserTracker>
 		return count.intValue();
 	}
 
-	private static final String _FINDER_COLUMN_USERID_USERID_2 = "userTracker.userId = ?";
-	public static final FinderPath FINDER_PATH_WITH_PAGINATION_FIND_BY_SESSIONID =
-		new FinderPath(UserTrackerModelImpl.ENTITY_CACHE_ENABLED,
-			UserTrackerModelImpl.FINDER_CACHE_ENABLED, UserTrackerImpl.class,
-			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findBySessionId",
-			new String[] {
-				String.class.getName(),
-				
-			Integer.class.getName(), Integer.class.getName(),
-				OrderByComparator.class.getName()
-			});
-	public static final FinderPath FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_SESSIONID =
-		new FinderPath(UserTrackerModelImpl.ENTITY_CACHE_ENABLED,
-			UserTrackerModelImpl.FINDER_CACHE_ENABLED, UserTrackerImpl.class,
-			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findBySessionId",
-			new String[] { String.class.getName() },
-			UserTrackerModelImpl.SESSIONID_COLUMN_BITMASK);
-	public static final FinderPath FINDER_PATH_COUNT_BY_SESSIONID = new FinderPath(UserTrackerModelImpl.ENTITY_CACHE_ENABLED,
-			UserTrackerModelImpl.FINDER_CACHE_ENABLED, Long.class,
-			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countBySessionId",
-			new String[] { String.class.getName() });
+	private static final String _FINDER_COLUMN_USERID_USERID_2 =
+		"userTracker.userId = ?";
+
+	private FinderPath _finderPathWithPaginationFindBySessionId;
+	private FinderPath _finderPathWithoutPaginationFindBySessionId;
+	private FinderPath _finderPathCountBySessionId;
 
 	/**
 	 * Returns all the user trackers where sessionId = &#63;.
@@ -1121,15 +1105,15 @@ public class UserTrackerPersistenceImpl extends BasePersistenceImpl<UserTracker>
 	 */
 	@Override
 	public List<UserTracker> findBySessionId(String sessionId) {
-		return findBySessionId(sessionId, QueryUtil.ALL_POS, QueryUtil.ALL_POS,
-			null);
+		return findBySessionId(
+			sessionId, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
 	}
 
 	/**
 	 * Returns a range of all the user trackers where sessionId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link UserTrackerModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>UserTrackerModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param sessionId the session ID
@@ -1138,8 +1122,9 @@ public class UserTrackerPersistenceImpl extends BasePersistenceImpl<UserTracker>
 	 * @return the range of matching user trackers
 	 */
 	@Override
-	public List<UserTracker> findBySessionId(String sessionId, int start,
-		int end) {
+	public List<UserTracker> findBySessionId(
+		String sessionId, int start, int end) {
+
 		return findBySessionId(sessionId, start, end, null);
 	}
 
@@ -1147,7 +1132,7 @@ public class UserTrackerPersistenceImpl extends BasePersistenceImpl<UserTracker>
 	 * Returns an ordered range of all the user trackers where sessionId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link UserTrackerModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>UserTrackerModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param sessionId the session ID
@@ -1157,8 +1142,10 @@ public class UserTrackerPersistenceImpl extends BasePersistenceImpl<UserTracker>
 	 * @return the ordered range of matching user trackers
 	 */
 	@Override
-	public List<UserTracker> findBySessionId(String sessionId, int start,
-		int end, OrderByComparator<UserTracker> orderByComparator) {
+	public List<UserTracker> findBySessionId(
+		String sessionId, int start, int end,
+		OrderByComparator<UserTracker> orderByComparator) {
+
 		return findBySessionId(sessionId, start, end, orderByComparator, true);
 	}
 
@@ -1166,7 +1153,7 @@ public class UserTrackerPersistenceImpl extends BasePersistenceImpl<UserTracker>
 	 * Returns an ordered range of all the user trackers where sessionId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link UserTrackerModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>UserTrackerModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param sessionId the session ID
@@ -1177,9 +1164,11 @@ public class UserTrackerPersistenceImpl extends BasePersistenceImpl<UserTracker>
 	 * @return the ordered range of matching user trackers
 	 */
 	@Override
-	public List<UserTracker> findBySessionId(String sessionId, int start,
-		int end, OrderByComparator<UserTracker> orderByComparator,
+	public List<UserTracker> findBySessionId(
+		String sessionId, int start, int end,
+		OrderByComparator<UserTracker> orderByComparator,
 		boolean retrieveFromCache) {
+
 		sessionId = Objects.toString(sessionId, "");
 
 		boolean pagination = true;
@@ -1187,21 +1176,24 @@ public class UserTrackerPersistenceImpl extends BasePersistenceImpl<UserTracker>
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
-				(orderByComparator == null)) {
+			(orderByComparator == null)) {
+
 			pagination = false;
-			finderPath = FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_SESSIONID;
-			finderArgs = new Object[] { sessionId };
+			finderPath = _finderPathWithoutPaginationFindBySessionId;
+			finderArgs = new Object[] {sessionId};
 		}
 		else {
-			finderPath = FINDER_PATH_WITH_PAGINATION_FIND_BY_SESSIONID;
-			finderArgs = new Object[] { sessionId, start, end, orderByComparator };
+			finderPath = _finderPathWithPaginationFindBySessionId;
+			finderArgs = new Object[] {
+				sessionId, start, end, orderByComparator
+			};
 		}
 
 		List<UserTracker> list = null;
 
 		if (retrieveFromCache) {
-			list = (List<UserTracker>)FinderCacheUtil.getResult(finderPath,
-					finderArgs, this);
+			list = (List<UserTracker>)FinderCacheUtil.getResult(
+				finderPath, finderArgs, this);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (UserTracker userTracker : list) {
@@ -1218,8 +1210,8 @@ public class UserTrackerPersistenceImpl extends BasePersistenceImpl<UserTracker>
 			StringBundler query = null;
 
 			if (orderByComparator != null) {
-				query = new StringBundler(3 +
-						(orderByComparator.getOrderByFields().length * 2));
+				query = new StringBundler(
+					3 + (orderByComparator.getOrderByFields().length * 2));
 			}
 			else {
 				query = new StringBundler(3);
@@ -1239,11 +1231,10 @@ public class UserTrackerPersistenceImpl extends BasePersistenceImpl<UserTracker>
 			}
 
 			if (orderByComparator != null) {
-				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
-					orderByComparator);
+				appendOrderByComparator(
+					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
 			}
-			else
-			 if (pagination) {
+			else if (pagination) {
 				query.append(UserTrackerModelImpl.ORDER_BY_JPQL);
 			}
 
@@ -1263,16 +1254,16 @@ public class UserTrackerPersistenceImpl extends BasePersistenceImpl<UserTracker>
 				}
 
 				if (!pagination) {
-					list = (List<UserTracker>)QueryUtil.list(q, getDialect(),
-							start, end, false);
+					list = (List<UserTracker>)QueryUtil.list(
+						q, getDialect(), start, end, false);
 
 					Collections.sort(list);
 
 					list = Collections.unmodifiableList(list);
 				}
 				else {
-					list = (List<UserTracker>)QueryUtil.list(q, getDialect(),
-							start, end);
+					list = (List<UserTracker>)QueryUtil.list(
+						q, getDialect(), start, end);
 				}
 
 				cacheResult(list);
@@ -1301,11 +1292,12 @@ public class UserTrackerPersistenceImpl extends BasePersistenceImpl<UserTracker>
 	 * @throws NoSuchUserTrackerException if a matching user tracker could not be found
 	 */
 	@Override
-	public UserTracker findBySessionId_First(String sessionId,
-		OrderByComparator<UserTracker> orderByComparator)
+	public UserTracker findBySessionId_First(
+			String sessionId, OrderByComparator<UserTracker> orderByComparator)
 		throws NoSuchUserTrackerException {
-		UserTracker userTracker = fetchBySessionId_First(sessionId,
-				orderByComparator);
+
+		UserTracker userTracker = fetchBySessionId_First(
+			sessionId, orderByComparator);
 
 		if (userTracker != null) {
 			return userTracker;
@@ -1331,10 +1323,11 @@ public class UserTrackerPersistenceImpl extends BasePersistenceImpl<UserTracker>
 	 * @return the first matching user tracker, or <code>null</code> if a matching user tracker could not be found
 	 */
 	@Override
-	public UserTracker fetchBySessionId_First(String sessionId,
-		OrderByComparator<UserTracker> orderByComparator) {
-		List<UserTracker> list = findBySessionId(sessionId, 0, 1,
-				orderByComparator);
+	public UserTracker fetchBySessionId_First(
+		String sessionId, OrderByComparator<UserTracker> orderByComparator) {
+
+		List<UserTracker> list = findBySessionId(
+			sessionId, 0, 1, orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -1352,11 +1345,12 @@ public class UserTrackerPersistenceImpl extends BasePersistenceImpl<UserTracker>
 	 * @throws NoSuchUserTrackerException if a matching user tracker could not be found
 	 */
 	@Override
-	public UserTracker findBySessionId_Last(String sessionId,
-		OrderByComparator<UserTracker> orderByComparator)
+	public UserTracker findBySessionId_Last(
+			String sessionId, OrderByComparator<UserTracker> orderByComparator)
 		throws NoSuchUserTrackerException {
-		UserTracker userTracker = fetchBySessionId_Last(sessionId,
-				orderByComparator);
+
+		UserTracker userTracker = fetchBySessionId_Last(
+			sessionId, orderByComparator);
 
 		if (userTracker != null) {
 			return userTracker;
@@ -1382,16 +1376,17 @@ public class UserTrackerPersistenceImpl extends BasePersistenceImpl<UserTracker>
 	 * @return the last matching user tracker, or <code>null</code> if a matching user tracker could not be found
 	 */
 	@Override
-	public UserTracker fetchBySessionId_Last(String sessionId,
-		OrderByComparator<UserTracker> orderByComparator) {
+	public UserTracker fetchBySessionId_Last(
+		String sessionId, OrderByComparator<UserTracker> orderByComparator) {
+
 		int count = countBySessionId(sessionId);
 
 		if (count == 0) {
 			return null;
 		}
 
-		List<UserTracker> list = findBySessionId(sessionId, count - 1, count,
-				orderByComparator);
+		List<UserTracker> list = findBySessionId(
+			sessionId, count - 1, count, orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -1410,9 +1405,11 @@ public class UserTrackerPersistenceImpl extends BasePersistenceImpl<UserTracker>
 	 * @throws NoSuchUserTrackerException if a user tracker with the primary key could not be found
 	 */
 	@Override
-	public UserTracker[] findBySessionId_PrevAndNext(long userTrackerId,
-		String sessionId, OrderByComparator<UserTracker> orderByComparator)
+	public UserTracker[] findBySessionId_PrevAndNext(
+			long userTrackerId, String sessionId,
+			OrderByComparator<UserTracker> orderByComparator)
 		throws NoSuchUserTrackerException {
+
 		sessionId = Objects.toString(sessionId, "");
 
 		UserTracker userTracker = findByPrimaryKey(userTrackerId);
@@ -1424,13 +1421,13 @@ public class UserTrackerPersistenceImpl extends BasePersistenceImpl<UserTracker>
 
 			UserTracker[] array = new UserTrackerImpl[3];
 
-			array[0] = getBySessionId_PrevAndNext(session, userTracker,
-					sessionId, orderByComparator, true);
+			array[0] = getBySessionId_PrevAndNext(
+				session, userTracker, sessionId, orderByComparator, true);
 
 			array[1] = userTracker;
 
-			array[2] = getBySessionId_PrevAndNext(session, userTracker,
-					sessionId, orderByComparator, false);
+			array[2] = getBySessionId_PrevAndNext(
+				session, userTracker, sessionId, orderByComparator, false);
 
 			return array;
 		}
@@ -1442,14 +1439,15 @@ public class UserTrackerPersistenceImpl extends BasePersistenceImpl<UserTracker>
 		}
 	}
 
-	protected UserTracker getBySessionId_PrevAndNext(Session session,
-		UserTracker userTracker, String sessionId,
+	protected UserTracker getBySessionId_PrevAndNext(
+		Session session, UserTracker userTracker, String sessionId,
 		OrderByComparator<UserTracker> orderByComparator, boolean previous) {
+
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(4 +
-					(orderByComparator.getOrderByConditionFields().length * 3) +
+			query = new StringBundler(
+				4 + (orderByComparator.getOrderByConditionFields().length * 3) +
 					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
@@ -1470,7 +1468,8 @@ public class UserTrackerPersistenceImpl extends BasePersistenceImpl<UserTracker>
 		}
 
 		if (orderByComparator != null) {
-			String[] orderByConditionFields = orderByComparator.getOrderByConditionFields();
+			String[] orderByConditionFields =
+				orderByComparator.getOrderByConditionFields();
 
 			if (orderByConditionFields.length > 0) {
 				query.append(WHERE_AND);
@@ -1542,10 +1541,10 @@ public class UserTrackerPersistenceImpl extends BasePersistenceImpl<UserTracker>
 		}
 
 		if (orderByComparator != null) {
-			Object[] values = orderByComparator.getOrderByConditionValues(userTracker);
+			for (Object orderByConditionValue :
+					orderByComparator.getOrderByConditionValues(userTracker)) {
 
-			for (Object value : values) {
-				qPos.add(value);
+				qPos.add(orderByConditionValue);
 			}
 		}
 
@@ -1566,8 +1565,10 @@ public class UserTrackerPersistenceImpl extends BasePersistenceImpl<UserTracker>
 	 */
 	@Override
 	public void removeBySessionId(String sessionId) {
-		for (UserTracker userTracker : findBySessionId(sessionId,
-				QueryUtil.ALL_POS, QueryUtil.ALL_POS, null)) {
+		for (UserTracker userTracker :
+				findBySessionId(
+					sessionId, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null)) {
+
 			remove(userTracker);
 		}
 	}
@@ -1582,12 +1583,12 @@ public class UserTrackerPersistenceImpl extends BasePersistenceImpl<UserTracker>
 	public int countBySessionId(String sessionId) {
 		sessionId = Objects.toString(sessionId, "");
 
-		FinderPath finderPath = FINDER_PATH_COUNT_BY_SESSIONID;
+		FinderPath finderPath = _finderPathCountBySessionId;
 
-		Object[] finderArgs = new Object[] { sessionId };
+		Object[] finderArgs = new Object[] {sessionId};
 
-		Long count = (Long)FinderCacheUtil.getResult(finderPath, finderArgs,
-				this);
+		Long count = (Long)FinderCacheUtil.getResult(
+			finderPath, finderArgs, this);
 
 		if (count == null) {
 			StringBundler query = new StringBundler(2);
@@ -1637,8 +1638,11 @@ public class UserTrackerPersistenceImpl extends BasePersistenceImpl<UserTracker>
 		return count.intValue();
 	}
 
-	private static final String _FINDER_COLUMN_SESSIONID_SESSIONID_2 = "userTracker.sessionId = ?";
-	private static final String _FINDER_COLUMN_SESSIONID_SESSIONID_3 = "(userTracker.sessionId IS NULL OR userTracker.sessionId = '')";
+	private static final String _FINDER_COLUMN_SESSIONID_SESSIONID_2 =
+		"userTracker.sessionId = ?";
+
+	private static final String _FINDER_COLUMN_SESSIONID_SESSIONID_3 =
+		"(userTracker.sessionId IS NULL OR userTracker.sessionId = '')";
 
 	public UserTrackerPersistenceImpl() {
 		setModelClass(UserTracker.class);
@@ -1651,8 +1655,9 @@ public class UserTrackerPersistenceImpl extends BasePersistenceImpl<UserTracker>
 	 */
 	@Override
 	public void cacheResult(UserTracker userTracker) {
-		EntityCacheUtil.putResult(UserTrackerModelImpl.ENTITY_CACHE_ENABLED,
-			UserTrackerImpl.class, userTracker.getPrimaryKey(), userTracker);
+		EntityCacheUtil.putResult(
+			UserTrackerModelImpl.ENTITY_CACHE_ENABLED, UserTrackerImpl.class,
+			userTracker.getPrimaryKey(), userTracker);
 
 		userTracker.resetOriginalValues();
 	}
@@ -1666,8 +1671,10 @@ public class UserTrackerPersistenceImpl extends BasePersistenceImpl<UserTracker>
 	public void cacheResult(List<UserTracker> userTrackers) {
 		for (UserTracker userTracker : userTrackers) {
 			if (EntityCacheUtil.getResult(
-						UserTrackerModelImpl.ENTITY_CACHE_ENABLED,
-						UserTrackerImpl.class, userTracker.getPrimaryKey()) == null) {
+					UserTrackerModelImpl.ENTITY_CACHE_ENABLED,
+					UserTrackerImpl.class, userTracker.getPrimaryKey()) ==
+						null) {
+
 				cacheResult(userTracker);
 			}
 			else {
@@ -1680,7 +1687,7 @@ public class UserTrackerPersistenceImpl extends BasePersistenceImpl<UserTracker>
 	 * Clears the cache for all user trackers.
 	 *
 	 * <p>
-	 * The {@link com.liferay.portal.kernel.dao.orm.EntityCache} and {@link com.liferay.portal.kernel.dao.orm.FinderCache} are both cleared by this method.
+	 * The <code>com.liferay.portal.kernel.dao.orm.EntityCache</code> and <code>com.liferay.portal.kernel.dao.orm.FinderCache</code> are both cleared by this method.
 	 * </p>
 	 */
 	@Override
@@ -1696,13 +1703,14 @@ public class UserTrackerPersistenceImpl extends BasePersistenceImpl<UserTracker>
 	 * Clears the cache for the user tracker.
 	 *
 	 * <p>
-	 * The {@link com.liferay.portal.kernel.dao.orm.EntityCache} and {@link com.liferay.portal.kernel.dao.orm.FinderCache} are both cleared by this method.
+	 * The <code>com.liferay.portal.kernel.dao.orm.EntityCache</code> and <code>com.liferay.portal.kernel.dao.orm.FinderCache</code> are both cleared by this method.
 	 * </p>
 	 */
 	@Override
 	public void clearCache(UserTracker userTracker) {
-		EntityCacheUtil.removeResult(UserTrackerModelImpl.ENTITY_CACHE_ENABLED,
-			UserTrackerImpl.class, userTracker.getPrimaryKey());
+		EntityCacheUtil.removeResult(
+			UserTrackerModelImpl.ENTITY_CACHE_ENABLED, UserTrackerImpl.class,
+			userTracker.getPrimaryKey());
 
 		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
 		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
@@ -1714,7 +1722,8 @@ public class UserTrackerPersistenceImpl extends BasePersistenceImpl<UserTracker>
 		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
 
 		for (UserTracker userTracker : userTrackers) {
-			EntityCacheUtil.removeResult(UserTrackerModelImpl.ENTITY_CACHE_ENABLED,
+			EntityCacheUtil.removeResult(
+				UserTrackerModelImpl.ENTITY_CACHE_ENABLED,
 				UserTrackerImpl.class, userTracker.getPrimaryKey());
 		}
 	}
@@ -1747,6 +1756,7 @@ public class UserTrackerPersistenceImpl extends BasePersistenceImpl<UserTracker>
 	@Override
 	public UserTracker remove(long userTrackerId)
 		throws NoSuchUserTrackerException {
+
 		return remove((Serializable)userTrackerId);
 	}
 
@@ -1760,21 +1770,22 @@ public class UserTrackerPersistenceImpl extends BasePersistenceImpl<UserTracker>
 	@Override
 	public UserTracker remove(Serializable primaryKey)
 		throws NoSuchUserTrackerException {
+
 		Session session = null;
 
 		try {
 			session = openSession();
 
-			UserTracker userTracker = (UserTracker)session.get(UserTrackerImpl.class,
-					primaryKey);
+			UserTracker userTracker = (UserTracker)session.get(
+				UserTrackerImpl.class, primaryKey);
 
 			if (userTracker == null) {
 				if (_log.isDebugEnabled()) {
 					_log.debug(_NO_SUCH_ENTITY_WITH_PRIMARY_KEY + primaryKey);
 				}
 
-				throw new NoSuchUserTrackerException(_NO_SUCH_ENTITY_WITH_PRIMARY_KEY +
-					primaryKey);
+				throw new NoSuchUserTrackerException(
+					_NO_SUCH_ENTITY_WITH_PRIMARY_KEY + primaryKey);
 			}
 
 			return remove(userTracker);
@@ -1798,8 +1809,8 @@ public class UserTrackerPersistenceImpl extends BasePersistenceImpl<UserTracker>
 			session = openSession();
 
 			if (!session.contains(userTracker)) {
-				userTracker = (UserTracker)session.get(UserTrackerImpl.class,
-						userTracker.getPrimaryKeyObj());
+				userTracker = (UserTracker)session.get(
+					UserTrackerImpl.class, userTracker.getPrimaryKeyObj());
 			}
 
 			if (userTracker != null) {
@@ -1832,15 +1843,16 @@ public class UserTrackerPersistenceImpl extends BasePersistenceImpl<UserTracker>
 
 				throw new IllegalArgumentException(
 					"Implement ModelWrapper in userTracker proxy " +
-					invocationHandler.getClass());
+						invocationHandler.getClass());
 			}
 
 			throw new IllegalArgumentException(
 				"Implement ModelWrapper in custom UserTracker implementation " +
-				userTracker.getClass());
+					userTracker.getClass());
 		}
 
-		UserTrackerModelImpl userTrackerModelImpl = (UserTrackerModelImpl)userTracker;
+		UserTrackerModelImpl userTrackerModelImpl =
+			(UserTrackerModelImpl)userTracker;
 
 		Session session = null;
 
@@ -1866,94 +1878,95 @@ public class UserTrackerPersistenceImpl extends BasePersistenceImpl<UserTracker>
 		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
 
 		if (!UserTrackerModelImpl.COLUMN_BITMASK_ENABLED) {
-			FinderCacheUtil.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
+			FinderCacheUtil.clearCache(
+				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
 		}
-		else
-		 if (isNew) {
-			Object[] args = new Object[] { userTrackerModelImpl.getCompanyId() };
+		else if (isNew) {
+			Object[] args = new Object[] {userTrackerModelImpl.getCompanyId()};
 
-			FinderCacheUtil.removeResult(FINDER_PATH_COUNT_BY_COMPANYID, args);
-			FinderCacheUtil.removeResult(FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_COMPANYID,
-				args);
+			FinderCacheUtil.removeResult(_finderPathCountByCompanyId, args);
+			FinderCacheUtil.removeResult(
+				_finderPathWithoutPaginationFindByCompanyId, args);
 
-			args = new Object[] { userTrackerModelImpl.getUserId() };
+			args = new Object[] {userTrackerModelImpl.getUserId()};
 
-			FinderCacheUtil.removeResult(FINDER_PATH_COUNT_BY_USERID, args);
-			FinderCacheUtil.removeResult(FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_USERID,
-				args);
+			FinderCacheUtil.removeResult(_finderPathCountByUserId, args);
+			FinderCacheUtil.removeResult(
+				_finderPathWithoutPaginationFindByUserId, args);
 
-			args = new Object[] { userTrackerModelImpl.getSessionId() };
+			args = new Object[] {userTrackerModelImpl.getSessionId()};
 
-			FinderCacheUtil.removeResult(FINDER_PATH_COUNT_BY_SESSIONID, args);
-			FinderCacheUtil.removeResult(FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_SESSIONID,
-				args);
+			FinderCacheUtil.removeResult(_finderPathCountBySessionId, args);
+			FinderCacheUtil.removeResult(
+				_finderPathWithoutPaginationFindBySessionId, args);
 
-			FinderCacheUtil.removeResult(FINDER_PATH_COUNT_ALL,
-				FINDER_ARGS_EMPTY);
-			FinderCacheUtil.removeResult(FINDER_PATH_WITHOUT_PAGINATION_FIND_ALL,
-				FINDER_ARGS_EMPTY);
+			FinderCacheUtil.removeResult(
+				_finderPathCountAll, FINDER_ARGS_EMPTY);
+			FinderCacheUtil.removeResult(
+				_finderPathWithoutPaginationFindAll, FINDER_ARGS_EMPTY);
 		}
-
 		else {
 			if ((userTrackerModelImpl.getColumnBitmask() &
-					FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_COMPANYID.getColumnBitmask()) != 0) {
+				 _finderPathWithoutPaginationFindByCompanyId.
+					 getColumnBitmask()) != 0) {
+
 				Object[] args = new Object[] {
-						userTrackerModelImpl.getOriginalCompanyId()
-					};
+					userTrackerModelImpl.getOriginalCompanyId()
+				};
 
-				FinderCacheUtil.removeResult(FINDER_PATH_COUNT_BY_COMPANYID,
-					args);
-				FinderCacheUtil.removeResult(FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_COMPANYID,
-					args);
+				FinderCacheUtil.removeResult(_finderPathCountByCompanyId, args);
+				FinderCacheUtil.removeResult(
+					_finderPathWithoutPaginationFindByCompanyId, args);
 
-				args = new Object[] { userTrackerModelImpl.getCompanyId() };
+				args = new Object[] {userTrackerModelImpl.getCompanyId()};
 
-				FinderCacheUtil.removeResult(FINDER_PATH_COUNT_BY_COMPANYID,
-					args);
-				FinderCacheUtil.removeResult(FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_COMPANYID,
-					args);
+				FinderCacheUtil.removeResult(_finderPathCountByCompanyId, args);
+				FinderCacheUtil.removeResult(
+					_finderPathWithoutPaginationFindByCompanyId, args);
 			}
 
 			if ((userTrackerModelImpl.getColumnBitmask() &
-					FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_USERID.getColumnBitmask()) != 0) {
+				 _finderPathWithoutPaginationFindByUserId.getColumnBitmask()) !=
+					 0) {
+
 				Object[] args = new Object[] {
-						userTrackerModelImpl.getOriginalUserId()
-					};
+					userTrackerModelImpl.getOriginalUserId()
+				};
 
-				FinderCacheUtil.removeResult(FINDER_PATH_COUNT_BY_USERID, args);
-				FinderCacheUtil.removeResult(FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_USERID,
-					args);
+				FinderCacheUtil.removeResult(_finderPathCountByUserId, args);
+				FinderCacheUtil.removeResult(
+					_finderPathWithoutPaginationFindByUserId, args);
 
-				args = new Object[] { userTrackerModelImpl.getUserId() };
+				args = new Object[] {userTrackerModelImpl.getUserId()};
 
-				FinderCacheUtil.removeResult(FINDER_PATH_COUNT_BY_USERID, args);
-				FinderCacheUtil.removeResult(FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_USERID,
-					args);
+				FinderCacheUtil.removeResult(_finderPathCountByUserId, args);
+				FinderCacheUtil.removeResult(
+					_finderPathWithoutPaginationFindByUserId, args);
 			}
 
 			if ((userTrackerModelImpl.getColumnBitmask() &
-					FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_SESSIONID.getColumnBitmask()) != 0) {
+				 _finderPathWithoutPaginationFindBySessionId.
+					 getColumnBitmask()) != 0) {
+
 				Object[] args = new Object[] {
-						userTrackerModelImpl.getOriginalSessionId()
-					};
+					userTrackerModelImpl.getOriginalSessionId()
+				};
 
-				FinderCacheUtil.removeResult(FINDER_PATH_COUNT_BY_SESSIONID,
-					args);
-				FinderCacheUtil.removeResult(FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_SESSIONID,
-					args);
+				FinderCacheUtil.removeResult(_finderPathCountBySessionId, args);
+				FinderCacheUtil.removeResult(
+					_finderPathWithoutPaginationFindBySessionId, args);
 
-				args = new Object[] { userTrackerModelImpl.getSessionId() };
+				args = new Object[] {userTrackerModelImpl.getSessionId()};
 
-				FinderCacheUtil.removeResult(FINDER_PATH_COUNT_BY_SESSIONID,
-					args);
-				FinderCacheUtil.removeResult(FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_SESSIONID,
-					args);
+				FinderCacheUtil.removeResult(_finderPathCountBySessionId, args);
+				FinderCacheUtil.removeResult(
+					_finderPathWithoutPaginationFindBySessionId, args);
 			}
 		}
 
-		EntityCacheUtil.putResult(UserTrackerModelImpl.ENTITY_CACHE_ENABLED,
-			UserTrackerImpl.class, userTracker.getPrimaryKey(), userTracker,
-			false);
+		EntityCacheUtil.putResult(
+			UserTrackerModelImpl.ENTITY_CACHE_ENABLED, UserTrackerImpl.class,
+			userTracker.getPrimaryKey(), userTracker, false);
 
 		userTracker.resetOriginalValues();
 
@@ -1961,7 +1974,7 @@ public class UserTrackerPersistenceImpl extends BasePersistenceImpl<UserTracker>
 	}
 
 	/**
-	 * Returns the user tracker with the primary key or throws a {@link com.liferay.portal.kernel.exception.NoSuchModelException} if it could not be found.
+	 * Returns the user tracker with the primary key or throws a <code>com.liferay.portal.kernel.exception.NoSuchModelException</code> if it could not be found.
 	 *
 	 * @param primaryKey the primary key of the user tracker
 	 * @return the user tracker
@@ -1970,6 +1983,7 @@ public class UserTrackerPersistenceImpl extends BasePersistenceImpl<UserTracker>
 	@Override
 	public UserTracker findByPrimaryKey(Serializable primaryKey)
 		throws NoSuchUserTrackerException {
+
 		UserTracker userTracker = fetchByPrimaryKey(primaryKey);
 
 		if (userTracker == null) {
@@ -1977,15 +1991,15 @@ public class UserTrackerPersistenceImpl extends BasePersistenceImpl<UserTracker>
 				_log.debug(_NO_SUCH_ENTITY_WITH_PRIMARY_KEY + primaryKey);
 			}
 
-			throw new NoSuchUserTrackerException(_NO_SUCH_ENTITY_WITH_PRIMARY_KEY +
-				primaryKey);
+			throw new NoSuchUserTrackerException(
+				_NO_SUCH_ENTITY_WITH_PRIMARY_KEY + primaryKey);
 		}
 
 		return userTracker;
 	}
 
 	/**
-	 * Returns the user tracker with the primary key or throws a {@link NoSuchUserTrackerException} if it could not be found.
+	 * Returns the user tracker with the primary key or throws a <code>NoSuchUserTrackerException</code> if it could not be found.
 	 *
 	 * @param userTrackerId the primary key of the user tracker
 	 * @return the user tracker
@@ -1994,6 +2008,7 @@ public class UserTrackerPersistenceImpl extends BasePersistenceImpl<UserTracker>
 	@Override
 	public UserTracker findByPrimaryKey(long userTrackerId)
 		throws NoSuchUserTrackerException {
+
 		return findByPrimaryKey((Serializable)userTrackerId);
 	}
 
@@ -2005,8 +2020,9 @@ public class UserTrackerPersistenceImpl extends BasePersistenceImpl<UserTracker>
 	 */
 	@Override
 	public UserTracker fetchByPrimaryKey(Serializable primaryKey) {
-		Serializable serializable = EntityCacheUtil.getResult(UserTrackerModelImpl.ENTITY_CACHE_ENABLED,
-				UserTrackerImpl.class, primaryKey);
+		Serializable serializable = EntityCacheUtil.getResult(
+			UserTrackerModelImpl.ENTITY_CACHE_ENABLED, UserTrackerImpl.class,
+			primaryKey);
 
 		if (serializable == nullModel) {
 			return null;
@@ -2020,19 +2036,21 @@ public class UserTrackerPersistenceImpl extends BasePersistenceImpl<UserTracker>
 			try {
 				session = openSession();
 
-				userTracker = (UserTracker)session.get(UserTrackerImpl.class,
-						primaryKey);
+				userTracker = (UserTracker)session.get(
+					UserTrackerImpl.class, primaryKey);
 
 				if (userTracker != null) {
 					cacheResult(userTracker);
 				}
 				else {
-					EntityCacheUtil.putResult(UserTrackerModelImpl.ENTITY_CACHE_ENABLED,
+					EntityCacheUtil.putResult(
+						UserTrackerModelImpl.ENTITY_CACHE_ENABLED,
 						UserTrackerImpl.class, primaryKey, nullModel);
 				}
 			}
 			catch (Exception e) {
-				EntityCacheUtil.removeResult(UserTrackerModelImpl.ENTITY_CACHE_ENABLED,
+				EntityCacheUtil.removeResult(
+					UserTrackerModelImpl.ENTITY_CACHE_ENABLED,
 					UserTrackerImpl.class, primaryKey);
 
 				throw processException(e);
@@ -2059,11 +2077,13 @@ public class UserTrackerPersistenceImpl extends BasePersistenceImpl<UserTracker>
 	@Override
 	public Map<Serializable, UserTracker> fetchByPrimaryKeys(
 		Set<Serializable> primaryKeys) {
+
 		if (primaryKeys.isEmpty()) {
 			return Collections.emptyMap();
 		}
 
-		Map<Serializable, UserTracker> map = new HashMap<Serializable, UserTracker>();
+		Map<Serializable, UserTracker> map =
+			new HashMap<Serializable, UserTracker>();
 
 		if (primaryKeys.size() == 1) {
 			Iterator<Serializable> iterator = primaryKeys.iterator();
@@ -2082,8 +2102,9 @@ public class UserTrackerPersistenceImpl extends BasePersistenceImpl<UserTracker>
 		Set<Serializable> uncachedPrimaryKeys = null;
 
 		for (Serializable primaryKey : primaryKeys) {
-			Serializable serializable = EntityCacheUtil.getResult(UserTrackerModelImpl.ENTITY_CACHE_ENABLED,
-					UserTrackerImpl.class, primaryKey);
+			Serializable serializable = EntityCacheUtil.getResult(
+				UserTrackerModelImpl.ENTITY_CACHE_ENABLED,
+				UserTrackerImpl.class, primaryKey);
 
 			if (serializable != nullModel) {
 				if (serializable == null) {
@@ -2103,8 +2124,8 @@ public class UserTrackerPersistenceImpl extends BasePersistenceImpl<UserTracker>
 			return map;
 		}
 
-		StringBundler query = new StringBundler((uncachedPrimaryKeys.size() * 2) +
-				1);
+		StringBundler query = new StringBundler(
+			uncachedPrimaryKeys.size() * 2 + 1);
 
 		query.append(_SQL_SELECT_USERTRACKER_WHERE_PKS_IN);
 
@@ -2136,7 +2157,8 @@ public class UserTrackerPersistenceImpl extends BasePersistenceImpl<UserTracker>
 			}
 
 			for (Serializable primaryKey : uncachedPrimaryKeys) {
-				EntityCacheUtil.putResult(UserTrackerModelImpl.ENTITY_CACHE_ENABLED,
+				EntityCacheUtil.putResult(
+					UserTrackerModelImpl.ENTITY_CACHE_ENABLED,
 					UserTrackerImpl.class, primaryKey, nullModel);
 			}
 		}
@@ -2164,7 +2186,7 @@ public class UserTrackerPersistenceImpl extends BasePersistenceImpl<UserTracker>
 	 * Returns a range of all the user trackers.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link UserTrackerModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>UserTrackerModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param start the lower bound of the range of user trackers
@@ -2180,7 +2202,7 @@ public class UserTrackerPersistenceImpl extends BasePersistenceImpl<UserTracker>
 	 * Returns an ordered range of all the user trackers.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link UserTrackerModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>UserTrackerModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param start the lower bound of the range of user trackers
@@ -2189,8 +2211,9 @@ public class UserTrackerPersistenceImpl extends BasePersistenceImpl<UserTracker>
 	 * @return the ordered range of user trackers
 	 */
 	@Override
-	public List<UserTracker> findAll(int start, int end,
-		OrderByComparator<UserTracker> orderByComparator) {
+	public List<UserTracker> findAll(
+		int start, int end, OrderByComparator<UserTracker> orderByComparator) {
+
 		return findAll(start, end, orderByComparator, true);
 	}
 
@@ -2198,7 +2221,7 @@ public class UserTrackerPersistenceImpl extends BasePersistenceImpl<UserTracker>
 	 * Returns an ordered range of all the user trackers.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link UserTrackerModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>UserTrackerModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param start the lower bound of the range of user trackers
@@ -2208,29 +2231,31 @@ public class UserTrackerPersistenceImpl extends BasePersistenceImpl<UserTracker>
 	 * @return the ordered range of user trackers
 	 */
 	@Override
-	public List<UserTracker> findAll(int start, int end,
-		OrderByComparator<UserTracker> orderByComparator,
+	public List<UserTracker> findAll(
+		int start, int end, OrderByComparator<UserTracker> orderByComparator,
 		boolean retrieveFromCache) {
+
 		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
-				(orderByComparator == null)) {
+			(orderByComparator == null)) {
+
 			pagination = false;
-			finderPath = FINDER_PATH_WITHOUT_PAGINATION_FIND_ALL;
+			finderPath = _finderPathWithoutPaginationFindAll;
 			finderArgs = FINDER_ARGS_EMPTY;
 		}
 		else {
-			finderPath = FINDER_PATH_WITH_PAGINATION_FIND_ALL;
-			finderArgs = new Object[] { start, end, orderByComparator };
+			finderPath = _finderPathWithPaginationFindAll;
+			finderArgs = new Object[] {start, end, orderByComparator};
 		}
 
 		List<UserTracker> list = null;
 
 		if (retrieveFromCache) {
-			list = (List<UserTracker>)FinderCacheUtil.getResult(finderPath,
-					finderArgs, this);
+			list = (List<UserTracker>)FinderCacheUtil.getResult(
+				finderPath, finderArgs, this);
 		}
 
 		if (list == null) {
@@ -2238,13 +2263,13 @@ public class UserTrackerPersistenceImpl extends BasePersistenceImpl<UserTracker>
 			String sql = null;
 
 			if (orderByComparator != null) {
-				query = new StringBundler(2 +
-						(orderByComparator.getOrderByFields().length * 2));
+				query = new StringBundler(
+					2 + (orderByComparator.getOrderByFields().length * 2));
 
 				query.append(_SQL_SELECT_USERTRACKER);
 
-				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
-					orderByComparator);
+				appendOrderByComparator(
+					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
 
 				sql = query.toString();
 			}
@@ -2264,16 +2289,16 @@ public class UserTrackerPersistenceImpl extends BasePersistenceImpl<UserTracker>
 				Query q = session.createQuery(sql);
 
 				if (!pagination) {
-					list = (List<UserTracker>)QueryUtil.list(q, getDialect(),
-							start, end, false);
+					list = (List<UserTracker>)QueryUtil.list(
+						q, getDialect(), start, end, false);
 
 					Collections.sort(list);
 
 					list = Collections.unmodifiableList(list);
 				}
 				else {
-					list = (List<UserTracker>)QueryUtil.list(q, getDialect(),
-							start, end);
+					list = (List<UserTracker>)QueryUtil.list(
+						q, getDialect(), start, end);
 				}
 
 				cacheResult(list);
@@ -2311,8 +2336,8 @@ public class UserTrackerPersistenceImpl extends BasePersistenceImpl<UserTracker>
 	 */
 	@Override
 	public int countAll() {
-		Long count = (Long)FinderCacheUtil.getResult(FINDER_PATH_COUNT_ALL,
-				FINDER_ARGS_EMPTY, this);
+		Long count = (Long)FinderCacheUtil.getResult(
+			_finderPathCountAll, FINDER_ARGS_EMPTY, this);
 
 		if (count == null) {
 			Session session = null;
@@ -2324,12 +2349,12 @@ public class UserTrackerPersistenceImpl extends BasePersistenceImpl<UserTracker>
 
 				count = (Long)q.uniqueResult();
 
-				FinderCacheUtil.putResult(FINDER_PATH_COUNT_ALL,
-					FINDER_ARGS_EMPTY, count);
+				FinderCacheUtil.putResult(
+					_finderPathCountAll, FINDER_ARGS_EMPTY, count);
 			}
 			catch (Exception e) {
-				FinderCacheUtil.removeResult(FINDER_PATH_COUNT_ALL,
-					FINDER_ARGS_EMPTY);
+				FinderCacheUtil.removeResult(
+					_finderPathCountAll, FINDER_ARGS_EMPTY);
 
 				throw processException(e);
 			}
@@ -2350,6 +2375,88 @@ public class UserTrackerPersistenceImpl extends BasePersistenceImpl<UserTracker>
 	 * Initializes the user tracker persistence.
 	 */
 	public void afterPropertiesSet() {
+		_finderPathWithPaginationFindAll = new FinderPath(
+			UserTrackerModelImpl.ENTITY_CACHE_ENABLED,
+			UserTrackerModelImpl.FINDER_CACHE_ENABLED, UserTrackerImpl.class,
+			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findAll", new String[0]);
+
+		_finderPathWithoutPaginationFindAll = new FinderPath(
+			UserTrackerModelImpl.ENTITY_CACHE_ENABLED,
+			UserTrackerModelImpl.FINDER_CACHE_ENABLED, UserTrackerImpl.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findAll",
+			new String[0]);
+
+		_finderPathCountAll = new FinderPath(
+			UserTrackerModelImpl.ENTITY_CACHE_ENABLED,
+			UserTrackerModelImpl.FINDER_CACHE_ENABLED, Long.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countAll",
+			new String[0]);
+
+		_finderPathWithPaginationFindByCompanyId = new FinderPath(
+			UserTrackerModelImpl.ENTITY_CACHE_ENABLED,
+			UserTrackerModelImpl.FINDER_CACHE_ENABLED, UserTrackerImpl.class,
+			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByCompanyId",
+			new String[] {
+				Long.class.getName(), Integer.class.getName(),
+				Integer.class.getName(), OrderByComparator.class.getName()
+			});
+
+		_finderPathWithoutPaginationFindByCompanyId = new FinderPath(
+			UserTrackerModelImpl.ENTITY_CACHE_ENABLED,
+			UserTrackerModelImpl.FINDER_CACHE_ENABLED, UserTrackerImpl.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByCompanyId",
+			new String[] {Long.class.getName()},
+			UserTrackerModelImpl.COMPANYID_COLUMN_BITMASK);
+
+		_finderPathCountByCompanyId = new FinderPath(
+			UserTrackerModelImpl.ENTITY_CACHE_ENABLED,
+			UserTrackerModelImpl.FINDER_CACHE_ENABLED, Long.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByCompanyId",
+			new String[] {Long.class.getName()});
+
+		_finderPathWithPaginationFindByUserId = new FinderPath(
+			UserTrackerModelImpl.ENTITY_CACHE_ENABLED,
+			UserTrackerModelImpl.FINDER_CACHE_ENABLED, UserTrackerImpl.class,
+			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByUserId",
+			new String[] {
+				Long.class.getName(), Integer.class.getName(),
+				Integer.class.getName(), OrderByComparator.class.getName()
+			});
+
+		_finderPathWithoutPaginationFindByUserId = new FinderPath(
+			UserTrackerModelImpl.ENTITY_CACHE_ENABLED,
+			UserTrackerModelImpl.FINDER_CACHE_ENABLED, UserTrackerImpl.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByUserId",
+			new String[] {Long.class.getName()},
+			UserTrackerModelImpl.USERID_COLUMN_BITMASK);
+
+		_finderPathCountByUserId = new FinderPath(
+			UserTrackerModelImpl.ENTITY_CACHE_ENABLED,
+			UserTrackerModelImpl.FINDER_CACHE_ENABLED, Long.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByUserId",
+			new String[] {Long.class.getName()});
+
+		_finderPathWithPaginationFindBySessionId = new FinderPath(
+			UserTrackerModelImpl.ENTITY_CACHE_ENABLED,
+			UserTrackerModelImpl.FINDER_CACHE_ENABLED, UserTrackerImpl.class,
+			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findBySessionId",
+			new String[] {
+				String.class.getName(), Integer.class.getName(),
+				Integer.class.getName(), OrderByComparator.class.getName()
+			});
+
+		_finderPathWithoutPaginationFindBySessionId = new FinderPath(
+			UserTrackerModelImpl.ENTITY_CACHE_ENABLED,
+			UserTrackerModelImpl.FINDER_CACHE_ENABLED, UserTrackerImpl.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findBySessionId",
+			new String[] {String.class.getName()},
+			UserTrackerModelImpl.SESSIONID_COLUMN_BITMASK);
+
+		_finderPathCountBySessionId = new FinderPath(
+			UserTrackerModelImpl.ENTITY_CACHE_ENABLED,
+			UserTrackerModelImpl.FINDER_CACHE_ENABLED, Long.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countBySessionId",
+			new String[] {String.class.getName()});
 	}
 
 	public void destroy() {
@@ -2361,13 +2468,31 @@ public class UserTrackerPersistenceImpl extends BasePersistenceImpl<UserTracker>
 
 	@BeanReference(type = CompanyProviderWrapper.class)
 	protected CompanyProvider companyProvider;
-	private static final String _SQL_SELECT_USERTRACKER = "SELECT userTracker FROM UserTracker userTracker";
-	private static final String _SQL_SELECT_USERTRACKER_WHERE_PKS_IN = "SELECT userTracker FROM UserTracker userTracker WHERE userTrackerId IN (";
-	private static final String _SQL_SELECT_USERTRACKER_WHERE = "SELECT userTracker FROM UserTracker userTracker WHERE ";
-	private static final String _SQL_COUNT_USERTRACKER = "SELECT COUNT(userTracker) FROM UserTracker userTracker";
-	private static final String _SQL_COUNT_USERTRACKER_WHERE = "SELECT COUNT(userTracker) FROM UserTracker userTracker WHERE ";
+
+	private static final String _SQL_SELECT_USERTRACKER =
+		"SELECT userTracker FROM UserTracker userTracker";
+
+	private static final String _SQL_SELECT_USERTRACKER_WHERE_PKS_IN =
+		"SELECT userTracker FROM UserTracker userTracker WHERE userTrackerId IN (";
+
+	private static final String _SQL_SELECT_USERTRACKER_WHERE =
+		"SELECT userTracker FROM UserTracker userTracker WHERE ";
+
+	private static final String _SQL_COUNT_USERTRACKER =
+		"SELECT COUNT(userTracker) FROM UserTracker userTracker";
+
+	private static final String _SQL_COUNT_USERTRACKER_WHERE =
+		"SELECT COUNT(userTracker) FROM UserTracker userTracker WHERE ";
+
 	private static final String _ORDER_BY_ENTITY_ALIAS = "userTracker.";
-	private static final String _NO_SUCH_ENTITY_WITH_PRIMARY_KEY = "No UserTracker exists with the primary key ";
-	private static final String _NO_SUCH_ENTITY_WITH_KEY = "No UserTracker exists with the key {";
-	private static final Log _log = LogFactoryUtil.getLog(UserTrackerPersistenceImpl.class);
+
+	private static final String _NO_SUCH_ENTITY_WITH_PRIMARY_KEY =
+		"No UserTracker exists with the primary key ";
+
+	private static final String _NO_SUCH_ENTITY_WITH_KEY =
+		"No UserTracker exists with the key {";
+
+	private static final Log _log = LogFactoryUtil.getLog(
+		UserTrackerPersistenceImpl.class);
+
 }

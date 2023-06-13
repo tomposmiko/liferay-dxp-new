@@ -287,6 +287,14 @@ public class IncludeTag extends AttributesTagSupport {
 			return null;
 		}
 
+		if (customJspServletContextName.contains("/../")) {
+			_log.error(
+				"Illegal directory traversal in " +
+					customJspServletContextName);
+
+			return null;
+		}
+
 		String customPage = CustomJspRegistryUtil.getCustomJspFileName(
 			customJspServletContextName, page);
 
@@ -442,11 +450,10 @@ public class IncludeTag extends AttributesTagSupport {
 			if (portalContext) {
 				return;
 			}
-			else {
-				sb.append(" You must not use a taglib from a module and set ");
-				sb.append("the attribute \"servletContext\". Inline the ");
-				sb.append("content directly where the taglib is invoked.");
-			}
+
+			sb.append(" You must not use a taglib from a module and set the ");
+			sb.append("attribute \"servletContext\". Inline the content ");
+			sb.append("directly where the taglib is invoked.");
 		}
 		else if (portalContext) {
 			Class<?> clazz = getClass();

@@ -26,11 +26,11 @@ import java.util.List;
  * This class is used by SOAP remote services, specifically {@link com.liferay.tasks.service.http.TasksEntryServiceSoap}.
  *
  * @author Ryan Park
- * @see com.liferay.tasks.service.http.TasksEntryServiceSoap
  * @generated
  */
 @ProviderType
 public class TasksEntrySoap implements Serializable {
+
 	public static TasksEntrySoap toSoapModel(TasksEntry model) {
 		TasksEntrySoap soapModel = new TasksEntrySoap();
 
@@ -80,7 +80,8 @@ public class TasksEntrySoap implements Serializable {
 	}
 
 	public static TasksEntrySoap[] toSoapModels(List<TasksEntry> models) {
-		List<TasksEntrySoap> soapModels = new ArrayList<TasksEntrySoap>(models.size());
+		List<TasksEntrySoap> soapModels = new ArrayList<TasksEntrySoap>(
+			models.size());
 
 		for (TasksEntry model : models) {
 			soapModels.add(toSoapModel(model));
@@ -226,4 +227,5 @@ public class TasksEntrySoap implements Serializable {
 	private Date _dueDate;
 	private Date _finishDate;
 	private int _status;
+
 }

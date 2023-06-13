@@ -23,10 +23,9 @@ import com.liferay.apio.architect.identifier.Identifier;
  * that perform those requests.
  *
  * @author Alejandro Hernández
- * @param  <T> the type to which the actions defined inside this router are
- *         applied
- * @review
+ * @param  <T> the type to apply to the actions this router defines
  */
 @ConsumerType
+@SuppressWarnings("unused")
 public interface ActionRouter<T extends Identifier<?>> {
 }

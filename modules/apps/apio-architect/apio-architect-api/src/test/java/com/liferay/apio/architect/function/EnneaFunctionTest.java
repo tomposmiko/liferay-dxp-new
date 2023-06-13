@@ -29,10 +29,10 @@ public class EnneaFunctionTest {
 	@Test
 	public void testOnInvokingAndThenShouldExecuteBothFunctions() {
 		EnneaFunction
-			<String, String, String, String, String, String, String,
-			 String, String, String> firstFunction = (
-				string1, string2, string3, string4, string5, string6,
-				string7, string8, string9) ->
+			<String, String, String, String, String, String, String, String,
+			 String, String> firstFunction =
+				(string1, string2, string3, string4, string5, string6, string7,
+				 string8, string9) ->
 					string1 + string2 + string3 + string4 + string5 + string6 +
 						string7 + string8 + string9;
 
@@ -50,10 +50,10 @@ public class EnneaFunctionTest {
 	@Test(expected = NullPointerException.class)
 	public void testOnInvokingAndThenWithNullAfterFunctionThrowsException() {
 		EnneaFunction
-			<String, String, String, String, String, String, String,
-			 String, String, String> firstFunction = (
-				string1, string2, string3, string4, string5, string6,
-				string7, string8, string9) ->
+			<String, String, String, String, String, String, String, String,
+			 String, String> firstFunction =
+				(string1, string2, string3, string4, string5, string6, string7,
+				 string8, string9) ->
 					string1 + string2 + string3 + string4 + string5 + string6 +
 						string7 + string8 + string9;
 

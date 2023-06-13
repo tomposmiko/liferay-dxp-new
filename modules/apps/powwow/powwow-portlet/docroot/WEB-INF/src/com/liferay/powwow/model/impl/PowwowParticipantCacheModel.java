@@ -19,7 +19,6 @@ import aQute.bnd.annotation.ProviderType;
 import com.liferay.portal.kernel.model.CacheModel;
 import com.liferay.portal.kernel.util.HashUtil;
 import com.liferay.portal.kernel.util.StringBundler;
-
 import com.liferay.powwow.model.PowwowParticipant;
 
 import java.io.Externalizable;
@@ -33,12 +32,12 @@ import java.util.Date;
  * The cache model class for representing PowwowParticipant in entity cache.
  *
  * @author Shinn Lok
- * @see PowwowParticipant
  * @generated
  */
 @ProviderType
-public class PowwowParticipantCacheModel implements CacheModel<PowwowParticipant>,
-	Externalizable {
+public class PowwowParticipantCacheModel
+	implements CacheModel<PowwowParticipant>, Externalizable {
+
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj) {
@@ -49,9 +48,12 @@ public class PowwowParticipantCacheModel implements CacheModel<PowwowParticipant
 			return false;
 		}
 
-		PowwowParticipantCacheModel powwowParticipantCacheModel = (PowwowParticipantCacheModel)obj;
+		PowwowParticipantCacheModel powwowParticipantCacheModel =
+			(PowwowParticipantCacheModel)obj;
 
-		if (powwowParticipantId == powwowParticipantCacheModel.powwowParticipantId) {
+		if (powwowParticipantId ==
+				powwowParticipantCacheModel.powwowParticipantId) {
+
 			return true;
 		}
 
@@ -100,7 +102,8 @@ public class PowwowParticipantCacheModel implements CacheModel<PowwowParticipant
 
 	@Override
 	public PowwowParticipant toEntityModel() {
-		PowwowParticipantImpl powwowParticipantImpl = new PowwowParticipantImpl();
+		PowwowParticipantImpl powwowParticipantImpl =
+			new PowwowParticipantImpl();
 
 		powwowParticipantImpl.setPowwowParticipantId(powwowParticipantId);
 		powwowParticipantImpl.setGroupId(groupId);
@@ -179,8 +182,7 @@ public class PowwowParticipantCacheModel implements CacheModel<PowwowParticipant
 	}
 
 	@Override
-	public void writeExternal(ObjectOutput objectOutput)
-		throws IOException {
+	public void writeExternal(ObjectOutput objectOutput) throws IOException {
 		objectOutput.writeLong(powwowParticipantId);
 
 		objectOutput.writeLong(groupId);
@@ -235,4 +237,5 @@ public class PowwowParticipantCacheModel implements CacheModel<PowwowParticipant
 	public String emailAddress;
 	public int type;
 	public int status;
+
 }

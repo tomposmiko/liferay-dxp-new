@@ -19,5 +19,7 @@ package com.liferay.contacts.uad.constants;
  * @generated
  */
 public class ContactsUADConstants {
-	public static final String[] USER_ID_FIELD_NAMES_ENTRY = { "userId" };
+
+	public static final String[] USER_ID_FIELD_NAMES_ENTRY = {"userId"};
+
 }

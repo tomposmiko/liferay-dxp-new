@@ -78,8 +78,11 @@ public class Encryptor {
 
 		String algorithm = key.getAlgorithm();
 
-		String cacheKey = algorithm.concat(StringPool.POUND).concat(
-			key.toString());
+		String cacheKey = algorithm.concat(
+			StringPool.POUND
+		).concat(
+			key.toString()
+		);
 
 		Cipher cipher = _decryptCipherMap.get(cacheKey);
 
@@ -161,8 +164,11 @@ public class Encryptor {
 
 		String algorithm = key.getAlgorithm();
 
-		String cacheKey = algorithm.concat(StringPool.POUND).concat(
-			key.toString());
+		String cacheKey = algorithm.concat(
+			StringPool.POUND
+		).concat(
+			key.toString()
+		);
 
 		Cipher cipher = _encryptCipherMap.get(cacheKey);
 
@@ -207,9 +213,7 @@ public class Encryptor {
 
 			keyGenerator.init(KEY_SIZE, new SecureRandom());
 
-			Key key = keyGenerator.generateKey();
-
-			return key;
+			return keyGenerator.generateKey();
 		}
 		catch (Exception e) {
 			throw new EncryptorException(e);

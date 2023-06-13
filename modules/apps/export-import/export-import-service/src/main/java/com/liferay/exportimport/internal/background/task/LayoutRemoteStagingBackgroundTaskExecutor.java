@@ -51,7 +51,7 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * @author Mate Thurzo
+ * @author Máté Thurzó
  */
 public class LayoutRemoteStagingBackgroundTaskExecutor
 	extends BaseStagingBackgroundTaskExecutor {
@@ -302,11 +302,10 @@ public class LayoutRemoteStagingBackgroundTaskExecutor
 
 				break;
 			}
-			else {
-				missingRemoteParentLayouts.add(parentLayout);
 
-				parentLayoutId = parentLayout.getParentLayoutId();
-			}
+			missingRemoteParentLayouts.add(parentLayout);
+
+			parentLayoutId = parentLayout.getParentLayoutId();
 		}
 
 		return missingRemoteParentLayouts;

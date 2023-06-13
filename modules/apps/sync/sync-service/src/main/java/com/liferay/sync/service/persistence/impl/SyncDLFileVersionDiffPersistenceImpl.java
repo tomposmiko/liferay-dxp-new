@@ -31,7 +31,6 @@ import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.spring.extender.service.ServiceReference;
-
 import com.liferay.sync.exception.NoSuchDLFileVersionDiffException;
 import com.liferay.sync.model.SyncDLFileVersionDiff;
 import com.liferay.sync.model.impl.SyncDLFileVersionDiffImpl;
@@ -62,56 +61,33 @@ import java.util.Set;
  * </p>
  *
  * @author Brian Wing Shun Chan
- * @see SyncDLFileVersionDiffPersistence
- * @see com.liferay.sync.service.persistence.SyncDLFileVersionDiffUtil
  * @generated
  */
 @ProviderType
-public class SyncDLFileVersionDiffPersistenceImpl extends BasePersistenceImpl<SyncDLFileVersionDiff>
+public class SyncDLFileVersionDiffPersistenceImpl
+	extends BasePersistenceImpl<SyncDLFileVersionDiff>
 	implements SyncDLFileVersionDiffPersistence {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
-	 * Never modify or reference this class directly. Always use {@link SyncDLFileVersionDiffUtil} to access the sync dl file version diff persistence. Modify <code>service.xml</code> and rerun ServiceBuilder to regenerate this class.
+	 * Never modify or reference this class directly. Always use <code>SyncDLFileVersionDiffUtil</code> to access the sync dl file version diff persistence. Modify <code>service.xml</code> and rerun ServiceBuilder to regenerate this class.
 	 */
-	public static final String FINDER_CLASS_NAME_ENTITY = SyncDLFileVersionDiffImpl.class.getName();
-	public static final String FINDER_CLASS_NAME_LIST_WITH_PAGINATION = FINDER_CLASS_NAME_ENTITY +
-		".List1";
-	public static final String FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION = FINDER_CLASS_NAME_ENTITY +
-		".List2";
-	public static final FinderPath FINDER_PATH_WITH_PAGINATION_FIND_ALL = new FinderPath(SyncDLFileVersionDiffModelImpl.ENTITY_CACHE_ENABLED,
-			SyncDLFileVersionDiffModelImpl.FINDER_CACHE_ENABLED,
-			SyncDLFileVersionDiffImpl.class,
-			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findAll", new String[0]);
-	public static final FinderPath FINDER_PATH_WITHOUT_PAGINATION_FIND_ALL = new FinderPath(SyncDLFileVersionDiffModelImpl.ENTITY_CACHE_ENABLED,
-			SyncDLFileVersionDiffModelImpl.FINDER_CACHE_ENABLED,
-			SyncDLFileVersionDiffImpl.class,
-			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findAll", new String[0]);
-	public static final FinderPath FINDER_PATH_COUNT_ALL = new FinderPath(SyncDLFileVersionDiffModelImpl.ENTITY_CACHE_ENABLED,
-			SyncDLFileVersionDiffModelImpl.FINDER_CACHE_ENABLED, Long.class,
-			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countAll", new String[0]);
-	public static final FinderPath FINDER_PATH_WITH_PAGINATION_FIND_BY_FILEENTRYID =
-		new FinderPath(SyncDLFileVersionDiffModelImpl.ENTITY_CACHE_ENABLED,
-			SyncDLFileVersionDiffModelImpl.FINDER_CACHE_ENABLED,
-			SyncDLFileVersionDiffImpl.class,
-			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByFileEntryId",
-			new String[] {
-				Long.class.getName(),
-				
-			Integer.class.getName(), Integer.class.getName(),
-				OrderByComparator.class.getName()
-			});
-	public static final FinderPath FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_FILEENTRYID =
-		new FinderPath(SyncDLFileVersionDiffModelImpl.ENTITY_CACHE_ENABLED,
-			SyncDLFileVersionDiffModelImpl.FINDER_CACHE_ENABLED,
-			SyncDLFileVersionDiffImpl.class,
-			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByFileEntryId",
-			new String[] { Long.class.getName() },
-			SyncDLFileVersionDiffModelImpl.FILEENTRYID_COLUMN_BITMASK);
-	public static final FinderPath FINDER_PATH_COUNT_BY_FILEENTRYID = new FinderPath(SyncDLFileVersionDiffModelImpl.ENTITY_CACHE_ENABLED,
-			SyncDLFileVersionDiffModelImpl.FINDER_CACHE_ENABLED, Long.class,
-			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByFileEntryId",
-			new String[] { Long.class.getName() });
+	public static final String FINDER_CLASS_NAME_ENTITY =
+		SyncDLFileVersionDiffImpl.class.getName();
+
+	public static final String FINDER_CLASS_NAME_LIST_WITH_PAGINATION =
+		FINDER_CLASS_NAME_ENTITY + ".List1";
+
+	public static final String FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION =
+		FINDER_CLASS_NAME_ENTITY + ".List2";
+
+	private FinderPath _finderPathWithPaginationFindAll;
+	private FinderPath _finderPathWithoutPaginationFindAll;
+	private FinderPath _finderPathCountAll;
+	private FinderPath _finderPathWithPaginationFindByFileEntryId;
+	private FinderPath _finderPathWithoutPaginationFindByFileEntryId;
+	private FinderPath _finderPathCountByFileEntryId;
 
 	/**
 	 * Returns all the sync dl file version diffs where fileEntryId = &#63;.
@@ -121,15 +97,15 @@ public class SyncDLFileVersionDiffPersistenceImpl extends BasePersistenceImpl<Sy
 	 */
 	@Override
 	public List<SyncDLFileVersionDiff> findByFileEntryId(long fileEntryId) {
-		return findByFileEntryId(fileEntryId, QueryUtil.ALL_POS,
-			QueryUtil.ALL_POS, null);
+		return findByFileEntryId(
+			fileEntryId, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
 	}
 
 	/**
 	 * Returns a range of all the sync dl file version diffs where fileEntryId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link SyncDLFileVersionDiffModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>SyncDLFileVersionDiffModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param fileEntryId the file entry ID
@@ -138,8 +114,9 @@ public class SyncDLFileVersionDiffPersistenceImpl extends BasePersistenceImpl<Sy
 	 * @return the range of matching sync dl file version diffs
 	 */
 	@Override
-	public List<SyncDLFileVersionDiff> findByFileEntryId(long fileEntryId,
-		int start, int end) {
+	public List<SyncDLFileVersionDiff> findByFileEntryId(
+		long fileEntryId, int start, int end) {
+
 		return findByFileEntryId(fileEntryId, start, end, null);
 	}
 
@@ -147,7 +124,7 @@ public class SyncDLFileVersionDiffPersistenceImpl extends BasePersistenceImpl<Sy
 	 * Returns an ordered range of all the sync dl file version diffs where fileEntryId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link SyncDLFileVersionDiffModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>SyncDLFileVersionDiffModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param fileEntryId the file entry ID
@@ -157,18 +134,19 @@ public class SyncDLFileVersionDiffPersistenceImpl extends BasePersistenceImpl<Sy
 	 * @return the ordered range of matching sync dl file version diffs
 	 */
 	@Override
-	public List<SyncDLFileVersionDiff> findByFileEntryId(long fileEntryId,
-		int start, int end,
+	public List<SyncDLFileVersionDiff> findByFileEntryId(
+		long fileEntryId, int start, int end,
 		OrderByComparator<SyncDLFileVersionDiff> orderByComparator) {
-		return findByFileEntryId(fileEntryId, start, end, orderByComparator,
-			true);
+
+		return findByFileEntryId(
+			fileEntryId, start, end, orderByComparator, true);
 	}
 
 	/**
 	 * Returns an ordered range of all the sync dl file version diffs where fileEntryId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link SyncDLFileVersionDiffModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>SyncDLFileVersionDiffModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param fileEntryId the file entry ID
@@ -179,34 +157,40 @@ public class SyncDLFileVersionDiffPersistenceImpl extends BasePersistenceImpl<Sy
 	 * @return the ordered range of matching sync dl file version diffs
 	 */
 	@Override
-	public List<SyncDLFileVersionDiff> findByFileEntryId(long fileEntryId,
-		int start, int end,
+	public List<SyncDLFileVersionDiff> findByFileEntryId(
+		long fileEntryId, int start, int end,
 		OrderByComparator<SyncDLFileVersionDiff> orderByComparator,
 		boolean retrieveFromCache) {
+
 		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
-				(orderByComparator == null)) {
+			(orderByComparator == null)) {
+
 			pagination = false;
-			finderPath = FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_FILEENTRYID;
-			finderArgs = new Object[] { fileEntryId };
+			finderPath = _finderPathWithoutPaginationFindByFileEntryId;
+			finderArgs = new Object[] {fileEntryId};
 		}
 		else {
-			finderPath = FINDER_PATH_WITH_PAGINATION_FIND_BY_FILEENTRYID;
-			finderArgs = new Object[] { fileEntryId, start, end, orderByComparator };
+			finderPath = _finderPathWithPaginationFindByFileEntryId;
+			finderArgs = new Object[] {
+				fileEntryId, start, end, orderByComparator
+			};
 		}
 
 		List<SyncDLFileVersionDiff> list = null;
 
 		if (retrieveFromCache) {
-			list = (List<SyncDLFileVersionDiff>)finderCache.getResult(finderPath,
-					finderArgs, this);
+			list = (List<SyncDLFileVersionDiff>)finderCache.getResult(
+				finderPath, finderArgs, this);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (SyncDLFileVersionDiff syncDLFileVersionDiff : list) {
-					if ((fileEntryId != syncDLFileVersionDiff.getFileEntryId())) {
+					if ((fileEntryId !=
+							syncDLFileVersionDiff.getFileEntryId())) {
+
 						list = null;
 
 						break;
@@ -219,8 +203,8 @@ public class SyncDLFileVersionDiffPersistenceImpl extends BasePersistenceImpl<Sy
 			StringBundler query = null;
 
 			if (orderByComparator != null) {
-				query = new StringBundler(3 +
-						(orderByComparator.getOrderByFields().length * 2));
+				query = new StringBundler(
+					3 + (orderByComparator.getOrderByFields().length * 2));
 			}
 			else {
 				query = new StringBundler(3);
@@ -231,11 +215,10 @@ public class SyncDLFileVersionDiffPersistenceImpl extends BasePersistenceImpl<Sy
 			query.append(_FINDER_COLUMN_FILEENTRYID_FILEENTRYID_2);
 
 			if (orderByComparator != null) {
-				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
-					orderByComparator);
+				appendOrderByComparator(
+					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
 			}
-			else
-			 if (pagination) {
+			else if (pagination) {
 				query.append(SyncDLFileVersionDiffModelImpl.ORDER_BY_JPQL);
 			}
 
@@ -253,16 +236,16 @@ public class SyncDLFileVersionDiffPersistenceImpl extends BasePersistenceImpl<Sy
 				qPos.add(fileEntryId);
 
 				if (!pagination) {
-					list = (List<SyncDLFileVersionDiff>)QueryUtil.list(q,
-							getDialect(), start, end, false);
+					list = (List<SyncDLFileVersionDiff>)QueryUtil.list(
+						q, getDialect(), start, end, false);
 
 					Collections.sort(list);
 
 					list = Collections.unmodifiableList(list);
 				}
 				else {
-					list = (List<SyncDLFileVersionDiff>)QueryUtil.list(q,
-							getDialect(), start, end);
+					list = (List<SyncDLFileVersionDiff>)QueryUtil.list(
+						q, getDialect(), start, end);
 				}
 
 				cacheResult(list);
@@ -291,11 +274,13 @@ public class SyncDLFileVersionDiffPersistenceImpl extends BasePersistenceImpl<Sy
 	 * @throws NoSuchDLFileVersionDiffException if a matching sync dl file version diff could not be found
 	 */
 	@Override
-	public SyncDLFileVersionDiff findByFileEntryId_First(long fileEntryId,
-		OrderByComparator<SyncDLFileVersionDiff> orderByComparator)
+	public SyncDLFileVersionDiff findByFileEntryId_First(
+			long fileEntryId,
+			OrderByComparator<SyncDLFileVersionDiff> orderByComparator)
 		throws NoSuchDLFileVersionDiffException {
-		SyncDLFileVersionDiff syncDLFileVersionDiff = fetchByFileEntryId_First(fileEntryId,
-				orderByComparator);
+
+		SyncDLFileVersionDiff syncDLFileVersionDiff = fetchByFileEntryId_First(
+			fileEntryId, orderByComparator);
 
 		if (syncDLFileVersionDiff != null) {
 			return syncDLFileVersionDiff;
@@ -321,10 +306,12 @@ public class SyncDLFileVersionDiffPersistenceImpl extends BasePersistenceImpl<Sy
 	 * @return the first matching sync dl file version diff, or <code>null</code> if a matching sync dl file version diff could not be found
 	 */
 	@Override
-	public SyncDLFileVersionDiff fetchByFileEntryId_First(long fileEntryId,
+	public SyncDLFileVersionDiff fetchByFileEntryId_First(
+		long fileEntryId,
 		OrderByComparator<SyncDLFileVersionDiff> orderByComparator) {
-		List<SyncDLFileVersionDiff> list = findByFileEntryId(fileEntryId, 0, 1,
-				orderByComparator);
+
+		List<SyncDLFileVersionDiff> list = findByFileEntryId(
+			fileEntryId, 0, 1, orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -342,11 +329,13 @@ public class SyncDLFileVersionDiffPersistenceImpl extends BasePersistenceImpl<Sy
 	 * @throws NoSuchDLFileVersionDiffException if a matching sync dl file version diff could not be found
 	 */
 	@Override
-	public SyncDLFileVersionDiff findByFileEntryId_Last(long fileEntryId,
-		OrderByComparator<SyncDLFileVersionDiff> orderByComparator)
+	public SyncDLFileVersionDiff findByFileEntryId_Last(
+			long fileEntryId,
+			OrderByComparator<SyncDLFileVersionDiff> orderByComparator)
 		throws NoSuchDLFileVersionDiffException {
-		SyncDLFileVersionDiff syncDLFileVersionDiff = fetchByFileEntryId_Last(fileEntryId,
-				orderByComparator);
+
+		SyncDLFileVersionDiff syncDLFileVersionDiff = fetchByFileEntryId_Last(
+			fileEntryId, orderByComparator);
 
 		if (syncDLFileVersionDiff != null) {
 			return syncDLFileVersionDiff;
@@ -372,16 +361,18 @@ public class SyncDLFileVersionDiffPersistenceImpl extends BasePersistenceImpl<Sy
 	 * @return the last matching sync dl file version diff, or <code>null</code> if a matching sync dl file version diff could not be found
 	 */
 	@Override
-	public SyncDLFileVersionDiff fetchByFileEntryId_Last(long fileEntryId,
+	public SyncDLFileVersionDiff fetchByFileEntryId_Last(
+		long fileEntryId,
 		OrderByComparator<SyncDLFileVersionDiff> orderByComparator) {
+
 		int count = countByFileEntryId(fileEntryId);
 
 		if (count == 0) {
 			return null;
 		}
 
-		List<SyncDLFileVersionDiff> list = findByFileEntryId(fileEntryId,
-				count - 1, count, orderByComparator);
+		List<SyncDLFileVersionDiff> list = findByFileEntryId(
+			fileEntryId, count - 1, count, orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -401,10 +392,12 @@ public class SyncDLFileVersionDiffPersistenceImpl extends BasePersistenceImpl<Sy
 	 */
 	@Override
 	public SyncDLFileVersionDiff[] findByFileEntryId_PrevAndNext(
-		long syncDLFileVersionDiffId, long fileEntryId,
-		OrderByComparator<SyncDLFileVersionDiff> orderByComparator)
+			long syncDLFileVersionDiffId, long fileEntryId,
+			OrderByComparator<SyncDLFileVersionDiff> orderByComparator)
 		throws NoSuchDLFileVersionDiffException {
-		SyncDLFileVersionDiff syncDLFileVersionDiff = findByPrimaryKey(syncDLFileVersionDiffId);
+
+		SyncDLFileVersionDiff syncDLFileVersionDiff = findByPrimaryKey(
+			syncDLFileVersionDiffId);
 
 		Session session = null;
 
@@ -413,13 +406,15 @@ public class SyncDLFileVersionDiffPersistenceImpl extends BasePersistenceImpl<Sy
 
 			SyncDLFileVersionDiff[] array = new SyncDLFileVersionDiffImpl[3];
 
-			array[0] = getByFileEntryId_PrevAndNext(session,
-					syncDLFileVersionDiff, fileEntryId, orderByComparator, true);
+			array[0] = getByFileEntryId_PrevAndNext(
+				session, syncDLFileVersionDiff, fileEntryId, orderByComparator,
+				true);
 
 			array[1] = syncDLFileVersionDiff;
 
-			array[2] = getByFileEntryId_PrevAndNext(session,
-					syncDLFileVersionDiff, fileEntryId, orderByComparator, false);
+			array[2] = getByFileEntryId_PrevAndNext(
+				session, syncDLFileVersionDiff, fileEntryId, orderByComparator,
+				false);
 
 			return array;
 		}
@@ -436,11 +431,12 @@ public class SyncDLFileVersionDiffPersistenceImpl extends BasePersistenceImpl<Sy
 		long fileEntryId,
 		OrderByComparator<SyncDLFileVersionDiff> orderByComparator,
 		boolean previous) {
+
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(4 +
-					(orderByComparator.getOrderByConditionFields().length * 3) +
+			query = new StringBundler(
+				4 + (orderByComparator.getOrderByConditionFields().length * 3) +
 					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
@@ -452,7 +448,8 @@ public class SyncDLFileVersionDiffPersistenceImpl extends BasePersistenceImpl<Sy
 		query.append(_FINDER_COLUMN_FILEENTRYID_FILEENTRYID_2);
 
 		if (orderByComparator != null) {
-			String[] orderByConditionFields = orderByComparator.getOrderByConditionFields();
+			String[] orderByConditionFields =
+				orderByComparator.getOrderByConditionFields();
 
 			if (orderByConditionFields.length > 0) {
 				query.append(WHERE_AND);
@@ -522,10 +519,11 @@ public class SyncDLFileVersionDiffPersistenceImpl extends BasePersistenceImpl<Sy
 		qPos.add(fileEntryId);
 
 		if (orderByComparator != null) {
-			Object[] values = orderByComparator.getOrderByConditionValues(syncDLFileVersionDiff);
+			for (Object orderByConditionValue :
+					orderByComparator.getOrderByConditionValues(
+						syncDLFileVersionDiff)) {
 
-			for (Object value : values) {
-				qPos.add(value);
+				qPos.add(orderByConditionValue);
 			}
 		}
 
@@ -546,8 +544,10 @@ public class SyncDLFileVersionDiffPersistenceImpl extends BasePersistenceImpl<Sy
 	 */
 	@Override
 	public void removeByFileEntryId(long fileEntryId) {
-		for (SyncDLFileVersionDiff syncDLFileVersionDiff : findByFileEntryId(
-				fileEntryId, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null)) {
+		for (SyncDLFileVersionDiff syncDLFileVersionDiff :
+				findByFileEntryId(
+					fileEntryId, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null)) {
+
 			remove(syncDLFileVersionDiff);
 		}
 	}
@@ -560,9 +560,9 @@ public class SyncDLFileVersionDiffPersistenceImpl extends BasePersistenceImpl<Sy
 	 */
 	@Override
 	public int countByFileEntryId(long fileEntryId) {
-		FinderPath finderPath = FINDER_PATH_COUNT_BY_FILEENTRYID;
+		FinderPath finderPath = _finderPathCountByFileEntryId;
 
-		Object[] finderArgs = new Object[] { fileEntryId };
+		Object[] finderArgs = new Object[] {fileEntryId};
 
 		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
 
@@ -603,23 +603,11 @@ public class SyncDLFileVersionDiffPersistenceImpl extends BasePersistenceImpl<Sy
 		return count.intValue();
 	}
 
-	private static final String _FINDER_COLUMN_FILEENTRYID_FILEENTRYID_2 = "syncDLFileVersionDiff.fileEntryId = ?";
-	public static final FinderPath FINDER_PATH_WITH_PAGINATION_FIND_BY_EXPIRATIONDATE =
-		new FinderPath(SyncDLFileVersionDiffModelImpl.ENTITY_CACHE_ENABLED,
-			SyncDLFileVersionDiffModelImpl.FINDER_CACHE_ENABLED,
-			SyncDLFileVersionDiffImpl.class,
-			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByExpirationDate",
-			new String[] {
-				Date.class.getName(),
-				
-			Integer.class.getName(), Integer.class.getName(),
-				OrderByComparator.class.getName()
-			});
-	public static final FinderPath FINDER_PATH_WITH_PAGINATION_COUNT_BY_EXPIRATIONDATE =
-		new FinderPath(SyncDLFileVersionDiffModelImpl.ENTITY_CACHE_ENABLED,
-			SyncDLFileVersionDiffModelImpl.FINDER_CACHE_ENABLED, Long.class,
-			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "countByExpirationDate",
-			new String[] { Date.class.getName() });
+	private static final String _FINDER_COLUMN_FILEENTRYID_FILEENTRYID_2 =
+		"syncDLFileVersionDiff.fileEntryId = ?";
+
+	private FinderPath _finderPathWithPaginationFindByExpirationDate;
+	private FinderPath _finderPathWithPaginationCountByExpirationDate;
 
 	/**
 	 * Returns all the sync dl file version diffs where expirationDate &lt; &#63;.
@@ -628,16 +616,18 @@ public class SyncDLFileVersionDiffPersistenceImpl extends BasePersistenceImpl<Sy
 	 * @return the matching sync dl file version diffs
 	 */
 	@Override
-	public List<SyncDLFileVersionDiff> findByExpirationDate(Date expirationDate) {
-		return findByExpirationDate(expirationDate, QueryUtil.ALL_POS,
-			QueryUtil.ALL_POS, null);
+	public List<SyncDLFileVersionDiff> findByExpirationDate(
+		Date expirationDate) {
+
+		return findByExpirationDate(
+			expirationDate, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
 	}
 
 	/**
 	 * Returns a range of all the sync dl file version diffs where expirationDate &lt; &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link SyncDLFileVersionDiffModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>SyncDLFileVersionDiffModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param expirationDate the expiration date
@@ -648,6 +638,7 @@ public class SyncDLFileVersionDiffPersistenceImpl extends BasePersistenceImpl<Sy
 	@Override
 	public List<SyncDLFileVersionDiff> findByExpirationDate(
 		Date expirationDate, int start, int end) {
+
 		return findByExpirationDate(expirationDate, start, end, null);
 	}
 
@@ -655,7 +646,7 @@ public class SyncDLFileVersionDiffPersistenceImpl extends BasePersistenceImpl<Sy
 	 * Returns an ordered range of all the sync dl file version diffs where expirationDate &lt; &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link SyncDLFileVersionDiffModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>SyncDLFileVersionDiffModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param expirationDate the expiration date
@@ -668,15 +659,16 @@ public class SyncDLFileVersionDiffPersistenceImpl extends BasePersistenceImpl<Sy
 	public List<SyncDLFileVersionDiff> findByExpirationDate(
 		Date expirationDate, int start, int end,
 		OrderByComparator<SyncDLFileVersionDiff> orderByComparator) {
-		return findByExpirationDate(expirationDate, start, end,
-			orderByComparator, true);
+
+		return findByExpirationDate(
+			expirationDate, start, end, orderByComparator, true);
 	}
 
 	/**
 	 * Returns an ordered range of all the sync dl file version diffs where expirationDate &lt; &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link SyncDLFileVersionDiffModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>SyncDLFileVersionDiffModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param expirationDate the expiration date
@@ -691,27 +683,28 @@ public class SyncDLFileVersionDiffPersistenceImpl extends BasePersistenceImpl<Sy
 		Date expirationDate, int start, int end,
 		OrderByComparator<SyncDLFileVersionDiff> orderByComparator,
 		boolean retrieveFromCache) {
+
 		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
-		finderPath = FINDER_PATH_WITH_PAGINATION_FIND_BY_EXPIRATIONDATE;
+		finderPath = _finderPathWithPaginationFindByExpirationDate;
 		finderArgs = new Object[] {
-				_getTime(expirationDate),
-				
-				start, end, orderByComparator
-			};
+			_getTime(expirationDate), start, end, orderByComparator
+		};
 
 		List<SyncDLFileVersionDiff> list = null;
 
 		if (retrieveFromCache) {
-			list = (List<SyncDLFileVersionDiff>)finderCache.getResult(finderPath,
-					finderArgs, this);
+			list = (List<SyncDLFileVersionDiff>)finderCache.getResult(
+				finderPath, finderArgs, this);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (SyncDLFileVersionDiff syncDLFileVersionDiff : list) {
-					if ((expirationDate.getTime() <= syncDLFileVersionDiff.getExpirationDate()
-																			  .getTime())) {
+					if ((expirationDate.getTime() <=
+							syncDLFileVersionDiff.
+								getExpirationDate().getTime())) {
+
 						list = null;
 
 						break;
@@ -724,8 +717,8 @@ public class SyncDLFileVersionDiffPersistenceImpl extends BasePersistenceImpl<Sy
 			StringBundler query = null;
 
 			if (orderByComparator != null) {
-				query = new StringBundler(3 +
-						(orderByComparator.getOrderByFields().length * 2));
+				query = new StringBundler(
+					3 + (orderByComparator.getOrderByFields().length * 2));
 			}
 			else {
 				query = new StringBundler(3);
@@ -745,11 +738,10 @@ public class SyncDLFileVersionDiffPersistenceImpl extends BasePersistenceImpl<Sy
 			}
 
 			if (orderByComparator != null) {
-				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
-					orderByComparator);
+				appendOrderByComparator(
+					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
 			}
-			else
-			 if (pagination) {
+			else if (pagination) {
 				query.append(SyncDLFileVersionDiffModelImpl.ORDER_BY_JPQL);
 			}
 
@@ -769,16 +761,16 @@ public class SyncDLFileVersionDiffPersistenceImpl extends BasePersistenceImpl<Sy
 				}
 
 				if (!pagination) {
-					list = (List<SyncDLFileVersionDiff>)QueryUtil.list(q,
-							getDialect(), start, end, false);
+					list = (List<SyncDLFileVersionDiff>)QueryUtil.list(
+						q, getDialect(), start, end, false);
 
 					Collections.sort(list);
 
 					list = Collections.unmodifiableList(list);
 				}
 				else {
-					list = (List<SyncDLFileVersionDiff>)QueryUtil.list(q,
-							getDialect(), start, end);
+					list = (List<SyncDLFileVersionDiff>)QueryUtil.list(
+						q, getDialect(), start, end);
 				}
 
 				cacheResult(list);
@@ -808,11 +800,12 @@ public class SyncDLFileVersionDiffPersistenceImpl extends BasePersistenceImpl<Sy
 	 */
 	@Override
 	public SyncDLFileVersionDiff findByExpirationDate_First(
-		Date expirationDate,
-		OrderByComparator<SyncDLFileVersionDiff> orderByComparator)
+			Date expirationDate,
+			OrderByComparator<SyncDLFileVersionDiff> orderByComparator)
 		throws NoSuchDLFileVersionDiffException {
-		SyncDLFileVersionDiff syncDLFileVersionDiff = fetchByExpirationDate_First(expirationDate,
-				orderByComparator);
+
+		SyncDLFileVersionDiff syncDLFileVersionDiff =
+			fetchByExpirationDate_First(expirationDate, orderByComparator);
 
 		if (syncDLFileVersionDiff != null) {
 			return syncDLFileVersionDiff;
@@ -841,8 +834,9 @@ public class SyncDLFileVersionDiffPersistenceImpl extends BasePersistenceImpl<Sy
 	public SyncDLFileVersionDiff fetchByExpirationDate_First(
 		Date expirationDate,
 		OrderByComparator<SyncDLFileVersionDiff> orderByComparator) {
-		List<SyncDLFileVersionDiff> list = findByExpirationDate(expirationDate,
-				0, 1, orderByComparator);
+
+		List<SyncDLFileVersionDiff> list = findByExpirationDate(
+			expirationDate, 0, 1, orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -861,11 +855,12 @@ public class SyncDLFileVersionDiffPersistenceImpl extends BasePersistenceImpl<Sy
 	 */
 	@Override
 	public SyncDLFileVersionDiff findByExpirationDate_Last(
-		Date expirationDate,
-		OrderByComparator<SyncDLFileVersionDiff> orderByComparator)
+			Date expirationDate,
+			OrderByComparator<SyncDLFileVersionDiff> orderByComparator)
 		throws NoSuchDLFileVersionDiffException {
-		SyncDLFileVersionDiff syncDLFileVersionDiff = fetchByExpirationDate_Last(expirationDate,
-				orderByComparator);
+
+		SyncDLFileVersionDiff syncDLFileVersionDiff =
+			fetchByExpirationDate_Last(expirationDate, orderByComparator);
 
 		if (syncDLFileVersionDiff != null) {
 			return syncDLFileVersionDiff;
@@ -894,14 +889,15 @@ public class SyncDLFileVersionDiffPersistenceImpl extends BasePersistenceImpl<Sy
 	public SyncDLFileVersionDiff fetchByExpirationDate_Last(
 		Date expirationDate,
 		OrderByComparator<SyncDLFileVersionDiff> orderByComparator) {
+
 		int count = countByExpirationDate(expirationDate);
 
 		if (count == 0) {
 			return null;
 		}
 
-		List<SyncDLFileVersionDiff> list = findByExpirationDate(expirationDate,
-				count - 1, count, orderByComparator);
+		List<SyncDLFileVersionDiff> list = findByExpirationDate(
+			expirationDate, count - 1, count, orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -921,10 +917,12 @@ public class SyncDLFileVersionDiffPersistenceImpl extends BasePersistenceImpl<Sy
 	 */
 	@Override
 	public SyncDLFileVersionDiff[] findByExpirationDate_PrevAndNext(
-		long syncDLFileVersionDiffId, Date expirationDate,
-		OrderByComparator<SyncDLFileVersionDiff> orderByComparator)
+			long syncDLFileVersionDiffId, Date expirationDate,
+			OrderByComparator<SyncDLFileVersionDiff> orderByComparator)
 		throws NoSuchDLFileVersionDiffException {
-		SyncDLFileVersionDiff syncDLFileVersionDiff = findByPrimaryKey(syncDLFileVersionDiffId);
+
+		SyncDLFileVersionDiff syncDLFileVersionDiff = findByPrimaryKey(
+			syncDLFileVersionDiffId);
 
 		Session session = null;
 
@@ -933,15 +931,15 @@ public class SyncDLFileVersionDiffPersistenceImpl extends BasePersistenceImpl<Sy
 
 			SyncDLFileVersionDiff[] array = new SyncDLFileVersionDiffImpl[3];
 
-			array[0] = getByExpirationDate_PrevAndNext(session,
-					syncDLFileVersionDiff, expirationDate, orderByComparator,
-					true);
+			array[0] = getByExpirationDate_PrevAndNext(
+				session, syncDLFileVersionDiff, expirationDate,
+				orderByComparator, true);
 
 			array[1] = syncDLFileVersionDiff;
 
-			array[2] = getByExpirationDate_PrevAndNext(session,
-					syncDLFileVersionDiff, expirationDate, orderByComparator,
-					false);
+			array[2] = getByExpirationDate_PrevAndNext(
+				session, syncDLFileVersionDiff, expirationDate,
+				orderByComparator, false);
 
 			return array;
 		}
@@ -958,11 +956,12 @@ public class SyncDLFileVersionDiffPersistenceImpl extends BasePersistenceImpl<Sy
 		Date expirationDate,
 		OrderByComparator<SyncDLFileVersionDiff> orderByComparator,
 		boolean previous) {
+
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(4 +
-					(orderByComparator.getOrderByConditionFields().length * 3) +
+			query = new StringBundler(
+				4 + (orderByComparator.getOrderByConditionFields().length * 3) +
 					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
@@ -983,7 +982,8 @@ public class SyncDLFileVersionDiffPersistenceImpl extends BasePersistenceImpl<Sy
 		}
 
 		if (orderByComparator != null) {
-			String[] orderByConditionFields = orderByComparator.getOrderByConditionFields();
+			String[] orderByConditionFields =
+				orderByComparator.getOrderByConditionFields();
 
 			if (orderByConditionFields.length > 0) {
 				query.append(WHERE_AND);
@@ -1055,10 +1055,11 @@ public class SyncDLFileVersionDiffPersistenceImpl extends BasePersistenceImpl<Sy
 		}
 
 		if (orderByComparator != null) {
-			Object[] values = orderByComparator.getOrderByConditionValues(syncDLFileVersionDiff);
+			for (Object orderByConditionValue :
+					orderByComparator.getOrderByConditionValues(
+						syncDLFileVersionDiff)) {
 
-			for (Object value : values) {
-				qPos.add(value);
+				qPos.add(orderByConditionValue);
 			}
 		}
 
@@ -1079,8 +1080,11 @@ public class SyncDLFileVersionDiffPersistenceImpl extends BasePersistenceImpl<Sy
 	 */
 	@Override
 	public void removeByExpirationDate(Date expirationDate) {
-		for (SyncDLFileVersionDiff syncDLFileVersionDiff : findByExpirationDate(
-				expirationDate, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null)) {
+		for (SyncDLFileVersionDiff syncDLFileVersionDiff :
+				findByExpirationDate(
+					expirationDate, QueryUtil.ALL_POS, QueryUtil.ALL_POS,
+					null)) {
+
 			remove(syncDLFileVersionDiff);
 		}
 	}
@@ -1093,9 +1097,9 @@ public class SyncDLFileVersionDiffPersistenceImpl extends BasePersistenceImpl<Sy
 	 */
 	@Override
 	public int countByExpirationDate(Date expirationDate) {
-		FinderPath finderPath = FINDER_PATH_WITH_PAGINATION_COUNT_BY_EXPIRATIONDATE;
+		FinderPath finderPath = _finderPathWithPaginationCountByExpirationDate;
 
-		Object[] finderArgs = new Object[] { _getTime(expirationDate) };
+		Object[] finderArgs = new Object[] {_getTime(expirationDate)};
 
 		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
 
@@ -1147,27 +1151,17 @@ public class SyncDLFileVersionDiffPersistenceImpl extends BasePersistenceImpl<Sy
 		return count.intValue();
 	}
 
-	private static final String _FINDER_COLUMN_EXPIRATIONDATE_EXPIRATIONDATE_1 = "syncDLFileVersionDiff.expirationDate IS NULL";
-	private static final String _FINDER_COLUMN_EXPIRATIONDATE_EXPIRATIONDATE_2 = "syncDLFileVersionDiff.expirationDate < ?";
-	public static final FinderPath FINDER_PATH_FETCH_BY_F_S_T = new FinderPath(SyncDLFileVersionDiffModelImpl.ENTITY_CACHE_ENABLED,
-			SyncDLFileVersionDiffModelImpl.FINDER_CACHE_ENABLED,
-			SyncDLFileVersionDiffImpl.class, FINDER_CLASS_NAME_ENTITY,
-			"fetchByF_S_T",
-			new String[] {
-				Long.class.getName(), Long.class.getName(), Long.class.getName()
-			},
-			SyncDLFileVersionDiffModelImpl.FILEENTRYID_COLUMN_BITMASK |
-			SyncDLFileVersionDiffModelImpl.SOURCEFILEVERSIONID_COLUMN_BITMASK |
-			SyncDLFileVersionDiffModelImpl.TARGETFILEVERSIONID_COLUMN_BITMASK);
-	public static final FinderPath FINDER_PATH_COUNT_BY_F_S_T = new FinderPath(SyncDLFileVersionDiffModelImpl.ENTITY_CACHE_ENABLED,
-			SyncDLFileVersionDiffModelImpl.FINDER_CACHE_ENABLED, Long.class,
-			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByF_S_T",
-			new String[] {
-				Long.class.getName(), Long.class.getName(), Long.class.getName()
-			});
+	private static final String _FINDER_COLUMN_EXPIRATIONDATE_EXPIRATIONDATE_1 =
+		"syncDLFileVersionDiff.expirationDate IS NULL";
+
+	private static final String _FINDER_COLUMN_EXPIRATIONDATE_EXPIRATIONDATE_2 =
+		"syncDLFileVersionDiff.expirationDate < ?";
+
+	private FinderPath _finderPathFetchByF_S_T;
+	private FinderPath _finderPathCountByF_S_T;
 
 	/**
-	 * Returns the sync dl file version diff where fileEntryId = &#63; and sourceFileVersionId = &#63; and targetFileVersionId = &#63; or throws a {@link NoSuchDLFileVersionDiffException} if it could not be found.
+	 * Returns the sync dl file version diff where fileEntryId = &#63; and sourceFileVersionId = &#63; and targetFileVersionId = &#63; or throws a <code>NoSuchDLFileVersionDiffException</code> if it could not be found.
 	 *
 	 * @param fileEntryId the file entry ID
 	 * @param sourceFileVersionId the source file version ID
@@ -1176,11 +1170,13 @@ public class SyncDLFileVersionDiffPersistenceImpl extends BasePersistenceImpl<Sy
 	 * @throws NoSuchDLFileVersionDiffException if a matching sync dl file version diff could not be found
 	 */
 	@Override
-	public SyncDLFileVersionDiff findByF_S_T(long fileEntryId,
-		long sourceFileVersionId, long targetFileVersionId)
+	public SyncDLFileVersionDiff findByF_S_T(
+			long fileEntryId, long sourceFileVersionId,
+			long targetFileVersionId)
 		throws NoSuchDLFileVersionDiffException {
-		SyncDLFileVersionDiff syncDLFileVersionDiff = fetchByF_S_T(fileEntryId,
-				sourceFileVersionId, targetFileVersionId);
+
+		SyncDLFileVersionDiff syncDLFileVersionDiff = fetchByF_S_T(
+			fileEntryId, sourceFileVersionId, targetFileVersionId);
 
 		if (syncDLFileVersionDiff == null) {
 			StringBundler msg = new StringBundler(8);
@@ -1217,10 +1213,11 @@ public class SyncDLFileVersionDiffPersistenceImpl extends BasePersistenceImpl<Sy
 	 * @return the matching sync dl file version diff, or <code>null</code> if a matching sync dl file version diff could not be found
 	 */
 	@Override
-	public SyncDLFileVersionDiff fetchByF_S_T(long fileEntryId,
-		long sourceFileVersionId, long targetFileVersionId) {
-		return fetchByF_S_T(fileEntryId, sourceFileVersionId,
-			targetFileVersionId, true);
+	public SyncDLFileVersionDiff fetchByF_S_T(
+		long fileEntryId, long sourceFileVersionId, long targetFileVersionId) {
+
+		return fetchByF_S_T(
+			fileEntryId, sourceFileVersionId, targetFileVersionId, true);
 	}
 
 	/**
@@ -1233,26 +1230,31 @@ public class SyncDLFileVersionDiffPersistenceImpl extends BasePersistenceImpl<Sy
 	 * @return the matching sync dl file version diff, or <code>null</code> if a matching sync dl file version diff could not be found
 	 */
 	@Override
-	public SyncDLFileVersionDiff fetchByF_S_T(long fileEntryId,
-		long sourceFileVersionId, long targetFileVersionId,
+	public SyncDLFileVersionDiff fetchByF_S_T(
+		long fileEntryId, long sourceFileVersionId, long targetFileVersionId,
 		boolean retrieveFromCache) {
+
 		Object[] finderArgs = new Object[] {
-				fileEntryId, sourceFileVersionId, targetFileVersionId
-			};
+			fileEntryId, sourceFileVersionId, targetFileVersionId
+		};
 
 		Object result = null;
 
 		if (retrieveFromCache) {
-			result = finderCache.getResult(FINDER_PATH_FETCH_BY_F_S_T,
-					finderArgs, this);
+			result = finderCache.getResult(
+				_finderPathFetchByF_S_T, finderArgs, this);
 		}
 
 		if (result instanceof SyncDLFileVersionDiff) {
-			SyncDLFileVersionDiff syncDLFileVersionDiff = (SyncDLFileVersionDiff)result;
+			SyncDLFileVersionDiff syncDLFileVersionDiff =
+				(SyncDLFileVersionDiff)result;
 
 			if ((fileEntryId != syncDLFileVersionDiff.getFileEntryId()) ||
-					(sourceFileVersionId != syncDLFileVersionDiff.getSourceFileVersionId()) ||
-					(targetFileVersionId != syncDLFileVersionDiff.getTargetFileVersionId())) {
+				(sourceFileVersionId !=
+					syncDLFileVersionDiff.getSourceFileVersionId()) ||
+				(targetFileVersionId !=
+					syncDLFileVersionDiff.getTargetFileVersionId())) {
+
 				result = null;
 			}
 		}
@@ -1288,8 +1290,8 @@ public class SyncDLFileVersionDiffPersistenceImpl extends BasePersistenceImpl<Sy
 				List<SyncDLFileVersionDiff> list = q.list();
 
 				if (list.isEmpty()) {
-					finderCache.putResult(FINDER_PATH_FETCH_BY_F_S_T,
-						finderArgs, list);
+					finderCache.putResult(
+						_finderPathFetchByF_S_T, finderArgs, list);
 				}
 				else {
 					SyncDLFileVersionDiff syncDLFileVersionDiff = list.get(0);
@@ -1300,7 +1302,7 @@ public class SyncDLFileVersionDiffPersistenceImpl extends BasePersistenceImpl<Sy
 				}
 			}
 			catch (Exception e) {
-				finderCache.removeResult(FINDER_PATH_FETCH_BY_F_S_T, finderArgs);
+				finderCache.removeResult(_finderPathFetchByF_S_T, finderArgs);
 
 				throw processException(e);
 			}
@@ -1326,11 +1328,13 @@ public class SyncDLFileVersionDiffPersistenceImpl extends BasePersistenceImpl<Sy
 	 * @return the sync dl file version diff that was removed
 	 */
 	@Override
-	public SyncDLFileVersionDiff removeByF_S_T(long fileEntryId,
-		long sourceFileVersionId, long targetFileVersionId)
+	public SyncDLFileVersionDiff removeByF_S_T(
+			long fileEntryId, long sourceFileVersionId,
+			long targetFileVersionId)
 		throws NoSuchDLFileVersionDiffException {
-		SyncDLFileVersionDiff syncDLFileVersionDiff = findByF_S_T(fileEntryId,
-				sourceFileVersionId, targetFileVersionId);
+
+		SyncDLFileVersionDiff syncDLFileVersionDiff = findByF_S_T(
+			fileEntryId, sourceFileVersionId, targetFileVersionId);
 
 		return remove(syncDLFileVersionDiff);
 	}
@@ -1344,13 +1348,14 @@ public class SyncDLFileVersionDiffPersistenceImpl extends BasePersistenceImpl<Sy
 	 * @return the number of matching sync dl file version diffs
 	 */
 	@Override
-	public int countByF_S_T(long fileEntryId, long sourceFileVersionId,
-		long targetFileVersionId) {
-		FinderPath finderPath = FINDER_PATH_COUNT_BY_F_S_T;
+	public int countByF_S_T(
+		long fileEntryId, long sourceFileVersionId, long targetFileVersionId) {
+
+		FinderPath finderPath = _finderPathCountByF_S_T;
 
 		Object[] finderArgs = new Object[] {
-				fileEntryId, sourceFileVersionId, targetFileVersionId
-			};
+			fileEntryId, sourceFileVersionId, targetFileVersionId
+		};
 
 		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
 
@@ -1399,22 +1404,27 @@ public class SyncDLFileVersionDiffPersistenceImpl extends BasePersistenceImpl<Sy
 		return count.intValue();
 	}
 
-	private static final String _FINDER_COLUMN_F_S_T_FILEENTRYID_2 = "syncDLFileVersionDiff.fileEntryId = ? AND ";
-	private static final String _FINDER_COLUMN_F_S_T_SOURCEFILEVERSIONID_2 = "syncDLFileVersionDiff.sourceFileVersionId = ? AND ";
-	private static final String _FINDER_COLUMN_F_S_T_TARGETFILEVERSIONID_2 = "syncDLFileVersionDiff.targetFileVersionId = ?";
+	private static final String _FINDER_COLUMN_F_S_T_FILEENTRYID_2 =
+		"syncDLFileVersionDiff.fileEntryId = ? AND ";
+
+	private static final String _FINDER_COLUMN_F_S_T_SOURCEFILEVERSIONID_2 =
+		"syncDLFileVersionDiff.sourceFileVersionId = ? AND ";
+
+	private static final String _FINDER_COLUMN_F_S_T_TARGETFILEVERSIONID_2 =
+		"syncDLFileVersionDiff.targetFileVersionId = ?";
 
 	public SyncDLFileVersionDiffPersistenceImpl() {
 		setModelClass(SyncDLFileVersionDiff.class);
 
+		Map<String, String> dbColumnNames = new HashMap<String, String>();
+
+		dbColumnNames.put("size", "size_");
+
 		try {
 			Field field = BasePersistenceImpl.class.getDeclaredField(
-					"_dbColumnNames");
+				"_dbColumnNames");
 
 			field.setAccessible(true);
-
-			Map<String, String> dbColumnNames = new HashMap<String, String>();
-
-			dbColumnNames.put("size", "size_");
 
 			field.set(this, dbColumnNames);
 		}
@@ -1432,16 +1442,19 @@ public class SyncDLFileVersionDiffPersistenceImpl extends BasePersistenceImpl<Sy
 	 */
 	@Override
 	public void cacheResult(SyncDLFileVersionDiff syncDLFileVersionDiff) {
-		entityCache.putResult(SyncDLFileVersionDiffModelImpl.ENTITY_CACHE_ENABLED,
+		entityCache.putResult(
+			SyncDLFileVersionDiffModelImpl.ENTITY_CACHE_ENABLED,
 			SyncDLFileVersionDiffImpl.class,
 			syncDLFileVersionDiff.getPrimaryKey(), syncDLFileVersionDiff);
 
-		finderCache.putResult(FINDER_PATH_FETCH_BY_F_S_T,
+		finderCache.putResult(
+			_finderPathFetchByF_S_T,
 			new Object[] {
 				syncDLFileVersionDiff.getFileEntryId(),
 				syncDLFileVersionDiff.getSourceFileVersionId(),
 				syncDLFileVersionDiff.getTargetFileVersionId()
-			}, syncDLFileVersionDiff);
+			},
+			syncDLFileVersionDiff);
 
 		syncDLFileVersionDiff.resetOriginalValues();
 	}
@@ -1452,12 +1465,17 @@ public class SyncDLFileVersionDiffPersistenceImpl extends BasePersistenceImpl<Sy
 	 * @param syncDLFileVersionDiffs the sync dl file version diffs
 	 */
 	@Override
-	public void cacheResult(List<SyncDLFileVersionDiff> syncDLFileVersionDiffs) {
-		for (SyncDLFileVersionDiff syncDLFileVersionDiff : syncDLFileVersionDiffs) {
+	public void cacheResult(
+		List<SyncDLFileVersionDiff> syncDLFileVersionDiffs) {
+
+		for (SyncDLFileVersionDiff syncDLFileVersionDiff :
+				syncDLFileVersionDiffs) {
+
 			if (entityCache.getResult(
-						SyncDLFileVersionDiffModelImpl.ENTITY_CACHE_ENABLED,
-						SyncDLFileVersionDiffImpl.class,
-						syncDLFileVersionDiff.getPrimaryKey()) == null) {
+					SyncDLFileVersionDiffModelImpl.ENTITY_CACHE_ENABLED,
+					SyncDLFileVersionDiffImpl.class,
+					syncDLFileVersionDiff.getPrimaryKey()) == null) {
+
 				cacheResult(syncDLFileVersionDiff);
 			}
 			else {
@@ -1470,7 +1488,7 @@ public class SyncDLFileVersionDiffPersistenceImpl extends BasePersistenceImpl<Sy
 	 * Clears the cache for all sync dl file version diffs.
 	 *
 	 * <p>
-	 * The {@link EntityCache} and {@link FinderCache} are both cleared by this method.
+	 * The <code>EntityCache</code> and <code>FinderCache</code> are both cleared by this method.
 	 * </p>
 	 */
 	@Override
@@ -1486,20 +1504,21 @@ public class SyncDLFileVersionDiffPersistenceImpl extends BasePersistenceImpl<Sy
 	 * Clears the cache for the sync dl file version diff.
 	 *
 	 * <p>
-	 * The {@link EntityCache} and {@link FinderCache} are both cleared by this method.
+	 * The <code>EntityCache</code> and <code>FinderCache</code> are both cleared by this method.
 	 * </p>
 	 */
 	@Override
 	public void clearCache(SyncDLFileVersionDiff syncDLFileVersionDiff) {
-		entityCache.removeResult(SyncDLFileVersionDiffModelImpl.ENTITY_CACHE_ENABLED,
+		entityCache.removeResult(
+			SyncDLFileVersionDiffModelImpl.ENTITY_CACHE_ENABLED,
 			SyncDLFileVersionDiffImpl.class,
 			syncDLFileVersionDiff.getPrimaryKey());
 
 		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
 		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
 
-		clearUniqueFindersCache((SyncDLFileVersionDiffModelImpl)syncDLFileVersionDiff,
-			true);
+		clearUniqueFindersCache(
+			(SyncDLFileVersionDiffModelImpl)syncDLFileVersionDiff, true);
 	}
 
 	@Override
@@ -1507,54 +1526,61 @@ public class SyncDLFileVersionDiffPersistenceImpl extends BasePersistenceImpl<Sy
 		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
 		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
 
-		for (SyncDLFileVersionDiff syncDLFileVersionDiff : syncDLFileVersionDiffs) {
-			entityCache.removeResult(SyncDLFileVersionDiffModelImpl.ENTITY_CACHE_ENABLED,
+		for (SyncDLFileVersionDiff syncDLFileVersionDiff :
+				syncDLFileVersionDiffs) {
+
+			entityCache.removeResult(
+				SyncDLFileVersionDiffModelImpl.ENTITY_CACHE_ENABLED,
 				SyncDLFileVersionDiffImpl.class,
 				syncDLFileVersionDiff.getPrimaryKey());
 
-			clearUniqueFindersCache((SyncDLFileVersionDiffModelImpl)syncDLFileVersionDiff,
-				true);
+			clearUniqueFindersCache(
+				(SyncDLFileVersionDiffModelImpl)syncDLFileVersionDiff, true);
 		}
 	}
 
 	protected void cacheUniqueFindersCache(
 		SyncDLFileVersionDiffModelImpl syncDLFileVersionDiffModelImpl) {
-		Object[] args = new Object[] {
-				syncDLFileVersionDiffModelImpl.getFileEntryId(),
-				syncDLFileVersionDiffModelImpl.getSourceFileVersionId(),
-				syncDLFileVersionDiffModelImpl.getTargetFileVersionId()
-			};
 
-		finderCache.putResult(FINDER_PATH_COUNT_BY_F_S_T, args,
-			Long.valueOf(1), false);
-		finderCache.putResult(FINDER_PATH_FETCH_BY_F_S_T, args,
-			syncDLFileVersionDiffModelImpl, false);
+		Object[] args = new Object[] {
+			syncDLFileVersionDiffModelImpl.getFileEntryId(),
+			syncDLFileVersionDiffModelImpl.getSourceFileVersionId(),
+			syncDLFileVersionDiffModelImpl.getTargetFileVersionId()
+		};
+
+		finderCache.putResult(
+			_finderPathCountByF_S_T, args, Long.valueOf(1), false);
+		finderCache.putResult(
+			_finderPathFetchByF_S_T, args, syncDLFileVersionDiffModelImpl,
+			false);
 	}
 
 	protected void clearUniqueFindersCache(
 		SyncDLFileVersionDiffModelImpl syncDLFileVersionDiffModelImpl,
 		boolean clearCurrent) {
+
 		if (clearCurrent) {
 			Object[] args = new Object[] {
-					syncDLFileVersionDiffModelImpl.getFileEntryId(),
-					syncDLFileVersionDiffModelImpl.getSourceFileVersionId(),
-					syncDLFileVersionDiffModelImpl.getTargetFileVersionId()
-				};
+				syncDLFileVersionDiffModelImpl.getFileEntryId(),
+				syncDLFileVersionDiffModelImpl.getSourceFileVersionId(),
+				syncDLFileVersionDiffModelImpl.getTargetFileVersionId()
+			};
 
-			finderCache.removeResult(FINDER_PATH_COUNT_BY_F_S_T, args);
-			finderCache.removeResult(FINDER_PATH_FETCH_BY_F_S_T, args);
+			finderCache.removeResult(_finderPathCountByF_S_T, args);
+			finderCache.removeResult(_finderPathFetchByF_S_T, args);
 		}
 
 		if ((syncDLFileVersionDiffModelImpl.getColumnBitmask() &
-				FINDER_PATH_FETCH_BY_F_S_T.getColumnBitmask()) != 0) {
-			Object[] args = new Object[] {
-					syncDLFileVersionDiffModelImpl.getOriginalFileEntryId(),
-					syncDLFileVersionDiffModelImpl.getOriginalSourceFileVersionId(),
-					syncDLFileVersionDiffModelImpl.getOriginalTargetFileVersionId()
-				};
+			 _finderPathFetchByF_S_T.getColumnBitmask()) != 0) {
 
-			finderCache.removeResult(FINDER_PATH_COUNT_BY_F_S_T, args);
-			finderCache.removeResult(FINDER_PATH_FETCH_BY_F_S_T, args);
+			Object[] args = new Object[] {
+				syncDLFileVersionDiffModelImpl.getOriginalFileEntryId(),
+				syncDLFileVersionDiffModelImpl.getOriginalSourceFileVersionId(),
+				syncDLFileVersionDiffModelImpl.getOriginalTargetFileVersionId()
+			};
+
+			finderCache.removeResult(_finderPathCountByF_S_T, args);
+			finderCache.removeResult(_finderPathFetchByF_S_T, args);
 		}
 	}
 
@@ -1566,7 +1592,8 @@ public class SyncDLFileVersionDiffPersistenceImpl extends BasePersistenceImpl<Sy
 	 */
 	@Override
 	public SyncDLFileVersionDiff create(long syncDLFileVersionDiffId) {
-		SyncDLFileVersionDiff syncDLFileVersionDiff = new SyncDLFileVersionDiffImpl();
+		SyncDLFileVersionDiff syncDLFileVersionDiff =
+			new SyncDLFileVersionDiffImpl();
 
 		syncDLFileVersionDiff.setNew(true);
 		syncDLFileVersionDiff.setPrimaryKey(syncDLFileVersionDiffId);
@@ -1584,6 +1611,7 @@ public class SyncDLFileVersionDiffPersistenceImpl extends BasePersistenceImpl<Sy
 	@Override
 	public SyncDLFileVersionDiff remove(long syncDLFileVersionDiffId)
 		throws NoSuchDLFileVersionDiffException {
+
 		return remove((Serializable)syncDLFileVersionDiffId);
 	}
 
@@ -1597,21 +1625,23 @@ public class SyncDLFileVersionDiffPersistenceImpl extends BasePersistenceImpl<Sy
 	@Override
 	public SyncDLFileVersionDiff remove(Serializable primaryKey)
 		throws NoSuchDLFileVersionDiffException {
+
 		Session session = null;
 
 		try {
 			session = openSession();
 
-			SyncDLFileVersionDiff syncDLFileVersionDiff = (SyncDLFileVersionDiff)session.get(SyncDLFileVersionDiffImpl.class,
-					primaryKey);
+			SyncDLFileVersionDiff syncDLFileVersionDiff =
+				(SyncDLFileVersionDiff)session.get(
+					SyncDLFileVersionDiffImpl.class, primaryKey);
 
 			if (syncDLFileVersionDiff == null) {
 				if (_log.isDebugEnabled()) {
 					_log.debug(_NO_SUCH_ENTITY_WITH_PRIMARY_KEY + primaryKey);
 				}
 
-				throw new NoSuchDLFileVersionDiffException(_NO_SUCH_ENTITY_WITH_PRIMARY_KEY +
-					primaryKey);
+				throw new NoSuchDLFileVersionDiffException(
+					_NO_SUCH_ENTITY_WITH_PRIMARY_KEY + primaryKey);
 			}
 
 			return remove(syncDLFileVersionDiff);
@@ -1630,14 +1660,16 @@ public class SyncDLFileVersionDiffPersistenceImpl extends BasePersistenceImpl<Sy
 	@Override
 	protected SyncDLFileVersionDiff removeImpl(
 		SyncDLFileVersionDiff syncDLFileVersionDiff) {
+
 		Session session = null;
 
 		try {
 			session = openSession();
 
 			if (!session.contains(syncDLFileVersionDiff)) {
-				syncDLFileVersionDiff = (SyncDLFileVersionDiff)session.get(SyncDLFileVersionDiffImpl.class,
-						syncDLFileVersionDiff.getPrimaryKeyObj());
+				syncDLFileVersionDiff = (SyncDLFileVersionDiff)session.get(
+					SyncDLFileVersionDiffImpl.class,
+					syncDLFileVersionDiff.getPrimaryKeyObj());
 			}
 
 			if (syncDLFileVersionDiff != null) {
@@ -1661,25 +1693,30 @@ public class SyncDLFileVersionDiffPersistenceImpl extends BasePersistenceImpl<Sy
 	@Override
 	public SyncDLFileVersionDiff updateImpl(
 		SyncDLFileVersionDiff syncDLFileVersionDiff) {
+
 		boolean isNew = syncDLFileVersionDiff.isNew();
 
-		if (!(syncDLFileVersionDiff instanceof SyncDLFileVersionDiffModelImpl)) {
+		if (!(syncDLFileVersionDiff instanceof
+				SyncDLFileVersionDiffModelImpl)) {
+
 			InvocationHandler invocationHandler = null;
 
 			if (ProxyUtil.isProxyClass(syncDLFileVersionDiff.getClass())) {
-				invocationHandler = ProxyUtil.getInvocationHandler(syncDLFileVersionDiff);
+				invocationHandler = ProxyUtil.getInvocationHandler(
+					syncDLFileVersionDiff);
 
 				throw new IllegalArgumentException(
 					"Implement ModelWrapper in syncDLFileVersionDiff proxy " +
-					invocationHandler.getClass());
+						invocationHandler.getClass());
 			}
 
 			throw new IllegalArgumentException(
 				"Implement ModelWrapper in custom SyncDLFileVersionDiff implementation " +
-				syncDLFileVersionDiff.getClass());
+					syncDLFileVersionDiff.getClass());
 		}
 
-		SyncDLFileVersionDiffModelImpl syncDLFileVersionDiffModelImpl = (SyncDLFileVersionDiffModelImpl)syncDLFileVersionDiff;
+		SyncDLFileVersionDiffModelImpl syncDLFileVersionDiffModelImpl =
+			(SyncDLFileVersionDiffModelImpl)syncDLFileVersionDiff;
 
 		Session session = null;
 
@@ -1692,7 +1729,8 @@ public class SyncDLFileVersionDiffPersistenceImpl extends BasePersistenceImpl<Sy
 				syncDLFileVersionDiff.setNew(false);
 			}
 			else {
-				syncDLFileVersionDiff = (SyncDLFileVersionDiff)session.merge(syncDLFileVersionDiff);
+				syncDLFileVersionDiff = (SyncDLFileVersionDiff)session.merge(
+					syncDLFileVersionDiff);
 			}
 		}
 		catch (Exception e) {
@@ -1707,45 +1745,47 @@ public class SyncDLFileVersionDiffPersistenceImpl extends BasePersistenceImpl<Sy
 		if (!SyncDLFileVersionDiffModelImpl.COLUMN_BITMASK_ENABLED) {
 			finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
 		}
-		else
-		 if (isNew) {
+		else if (isNew) {
 			Object[] args = new Object[] {
+				syncDLFileVersionDiffModelImpl.getFileEntryId()
+			};
+
+			finderCache.removeResult(_finderPathCountByFileEntryId, args);
+			finderCache.removeResult(
+				_finderPathWithoutPaginationFindByFileEntryId, args);
+
+			finderCache.removeResult(_finderPathCountAll, FINDER_ARGS_EMPTY);
+			finderCache.removeResult(
+				_finderPathWithoutPaginationFindAll, FINDER_ARGS_EMPTY);
+		}
+		else {
+			if ((syncDLFileVersionDiffModelImpl.getColumnBitmask() &
+				 _finderPathWithoutPaginationFindByFileEntryId.
+					 getColumnBitmask()) != 0) {
+
+				Object[] args = new Object[] {
+					syncDLFileVersionDiffModelImpl.getOriginalFileEntryId()
+				};
+
+				finderCache.removeResult(_finderPathCountByFileEntryId, args);
+				finderCache.removeResult(
+					_finderPathWithoutPaginationFindByFileEntryId, args);
+
+				args = new Object[] {
 					syncDLFileVersionDiffModelImpl.getFileEntryId()
 				};
 
-			finderCache.removeResult(FINDER_PATH_COUNT_BY_FILEENTRYID, args);
-			finderCache.removeResult(FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_FILEENTRYID,
-				args);
-
-			finderCache.removeResult(FINDER_PATH_COUNT_ALL, FINDER_ARGS_EMPTY);
-			finderCache.removeResult(FINDER_PATH_WITHOUT_PAGINATION_FIND_ALL,
-				FINDER_ARGS_EMPTY);
-		}
-
-		else {
-			if ((syncDLFileVersionDiffModelImpl.getColumnBitmask() &
-					FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_FILEENTRYID.getColumnBitmask()) != 0) {
-				Object[] args = new Object[] {
-						syncDLFileVersionDiffModelImpl.getOriginalFileEntryId()
-					};
-
-				finderCache.removeResult(FINDER_PATH_COUNT_BY_FILEENTRYID, args);
-				finderCache.removeResult(FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_FILEENTRYID,
-					args);
-
-				args = new Object[] {
-						syncDLFileVersionDiffModelImpl.getFileEntryId()
-					};
-
-				finderCache.removeResult(FINDER_PATH_COUNT_BY_FILEENTRYID, args);
-				finderCache.removeResult(FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_FILEENTRYID,
-					args);
+				finderCache.removeResult(_finderPathCountByFileEntryId, args);
+				finderCache.removeResult(
+					_finderPathWithoutPaginationFindByFileEntryId, args);
 			}
 		}
 
-		entityCache.putResult(SyncDLFileVersionDiffModelImpl.ENTITY_CACHE_ENABLED,
+		entityCache.putResult(
+			SyncDLFileVersionDiffModelImpl.ENTITY_CACHE_ENABLED,
 			SyncDLFileVersionDiffImpl.class,
-			syncDLFileVersionDiff.getPrimaryKey(), syncDLFileVersionDiff, false);
+			syncDLFileVersionDiff.getPrimaryKey(), syncDLFileVersionDiff,
+			false);
 
 		clearUniqueFindersCache(syncDLFileVersionDiffModelImpl, false);
 		cacheUniqueFindersCache(syncDLFileVersionDiffModelImpl);
@@ -1756,7 +1796,7 @@ public class SyncDLFileVersionDiffPersistenceImpl extends BasePersistenceImpl<Sy
 	}
 
 	/**
-	 * Returns the sync dl file version diff with the primary key or throws a {@link com.liferay.portal.kernel.exception.NoSuchModelException} if it could not be found.
+	 * Returns the sync dl file version diff with the primary key or throws a <code>com.liferay.portal.kernel.exception.NoSuchModelException</code> if it could not be found.
 	 *
 	 * @param primaryKey the primary key of the sync dl file version diff
 	 * @return the sync dl file version diff
@@ -1765,22 +1805,24 @@ public class SyncDLFileVersionDiffPersistenceImpl extends BasePersistenceImpl<Sy
 	@Override
 	public SyncDLFileVersionDiff findByPrimaryKey(Serializable primaryKey)
 		throws NoSuchDLFileVersionDiffException {
-		SyncDLFileVersionDiff syncDLFileVersionDiff = fetchByPrimaryKey(primaryKey);
+
+		SyncDLFileVersionDiff syncDLFileVersionDiff = fetchByPrimaryKey(
+			primaryKey);
 
 		if (syncDLFileVersionDiff == null) {
 			if (_log.isDebugEnabled()) {
 				_log.debug(_NO_SUCH_ENTITY_WITH_PRIMARY_KEY + primaryKey);
 			}
 
-			throw new NoSuchDLFileVersionDiffException(_NO_SUCH_ENTITY_WITH_PRIMARY_KEY +
-				primaryKey);
+			throw new NoSuchDLFileVersionDiffException(
+				_NO_SUCH_ENTITY_WITH_PRIMARY_KEY + primaryKey);
 		}
 
 		return syncDLFileVersionDiff;
 	}
 
 	/**
-	 * Returns the sync dl file version diff with the primary key or throws a {@link NoSuchDLFileVersionDiffException} if it could not be found.
+	 * Returns the sync dl file version diff with the primary key or throws a <code>NoSuchDLFileVersionDiffException</code> if it could not be found.
 	 *
 	 * @param syncDLFileVersionDiffId the primary key of the sync dl file version diff
 	 * @return the sync dl file version diff
@@ -1789,6 +1831,7 @@ public class SyncDLFileVersionDiffPersistenceImpl extends BasePersistenceImpl<Sy
 	@Override
 	public SyncDLFileVersionDiff findByPrimaryKey(long syncDLFileVersionDiffId)
 		throws NoSuchDLFileVersionDiffException {
+
 		return findByPrimaryKey((Serializable)syncDLFileVersionDiffId);
 	}
 
@@ -1800,14 +1843,16 @@ public class SyncDLFileVersionDiffPersistenceImpl extends BasePersistenceImpl<Sy
 	 */
 	@Override
 	public SyncDLFileVersionDiff fetchByPrimaryKey(Serializable primaryKey) {
-		Serializable serializable = entityCache.getResult(SyncDLFileVersionDiffModelImpl.ENTITY_CACHE_ENABLED,
-				SyncDLFileVersionDiffImpl.class, primaryKey);
+		Serializable serializable = entityCache.getResult(
+			SyncDLFileVersionDiffModelImpl.ENTITY_CACHE_ENABLED,
+			SyncDLFileVersionDiffImpl.class, primaryKey);
 
 		if (serializable == nullModel) {
 			return null;
 		}
 
-		SyncDLFileVersionDiff syncDLFileVersionDiff = (SyncDLFileVersionDiff)serializable;
+		SyncDLFileVersionDiff syncDLFileVersionDiff =
+			(SyncDLFileVersionDiff)serializable;
 
 		if (syncDLFileVersionDiff == null) {
 			Session session = null;
@@ -1815,19 +1860,21 @@ public class SyncDLFileVersionDiffPersistenceImpl extends BasePersistenceImpl<Sy
 			try {
 				session = openSession();
 
-				syncDLFileVersionDiff = (SyncDLFileVersionDiff)session.get(SyncDLFileVersionDiffImpl.class,
-						primaryKey);
+				syncDLFileVersionDiff = (SyncDLFileVersionDiff)session.get(
+					SyncDLFileVersionDiffImpl.class, primaryKey);
 
 				if (syncDLFileVersionDiff != null) {
 					cacheResult(syncDLFileVersionDiff);
 				}
 				else {
-					entityCache.putResult(SyncDLFileVersionDiffModelImpl.ENTITY_CACHE_ENABLED,
+					entityCache.putResult(
+						SyncDLFileVersionDiffModelImpl.ENTITY_CACHE_ENABLED,
 						SyncDLFileVersionDiffImpl.class, primaryKey, nullModel);
 				}
 			}
 			catch (Exception e) {
-				entityCache.removeResult(SyncDLFileVersionDiffModelImpl.ENTITY_CACHE_ENABLED,
+				entityCache.removeResult(
+					SyncDLFileVersionDiffModelImpl.ENTITY_CACHE_ENABLED,
 					SyncDLFileVersionDiffImpl.class, primaryKey);
 
 				throw processException(e);
@@ -1847,25 +1894,30 @@ public class SyncDLFileVersionDiffPersistenceImpl extends BasePersistenceImpl<Sy
 	 * @return the sync dl file version diff, or <code>null</code> if a sync dl file version diff with the primary key could not be found
 	 */
 	@Override
-	public SyncDLFileVersionDiff fetchByPrimaryKey(long syncDLFileVersionDiffId) {
+	public SyncDLFileVersionDiff fetchByPrimaryKey(
+		long syncDLFileVersionDiffId) {
+
 		return fetchByPrimaryKey((Serializable)syncDLFileVersionDiffId);
 	}
 
 	@Override
 	public Map<Serializable, SyncDLFileVersionDiff> fetchByPrimaryKeys(
 		Set<Serializable> primaryKeys) {
+
 		if (primaryKeys.isEmpty()) {
 			return Collections.emptyMap();
 		}
 
-		Map<Serializable, SyncDLFileVersionDiff> map = new HashMap<Serializable, SyncDLFileVersionDiff>();
+		Map<Serializable, SyncDLFileVersionDiff> map =
+			new HashMap<Serializable, SyncDLFileVersionDiff>();
 
 		if (primaryKeys.size() == 1) {
 			Iterator<Serializable> iterator = primaryKeys.iterator();
 
 			Serializable primaryKey = iterator.next();
 
-			SyncDLFileVersionDiff syncDLFileVersionDiff = fetchByPrimaryKey(primaryKey);
+			SyncDLFileVersionDiff syncDLFileVersionDiff = fetchByPrimaryKey(
+				primaryKey);
 
 			if (syncDLFileVersionDiff != null) {
 				map.put(primaryKey, syncDLFileVersionDiff);
@@ -1877,8 +1929,9 @@ public class SyncDLFileVersionDiffPersistenceImpl extends BasePersistenceImpl<Sy
 		Set<Serializable> uncachedPrimaryKeys = null;
 
 		for (Serializable primaryKey : primaryKeys) {
-			Serializable serializable = entityCache.getResult(SyncDLFileVersionDiffModelImpl.ENTITY_CACHE_ENABLED,
-					SyncDLFileVersionDiffImpl.class, primaryKey);
+			Serializable serializable = entityCache.getResult(
+				SyncDLFileVersionDiffModelImpl.ENTITY_CACHE_ENABLED,
+				SyncDLFileVersionDiffImpl.class, primaryKey);
 
 			if (serializable != nullModel) {
 				if (serializable == null) {
@@ -1898,8 +1951,8 @@ public class SyncDLFileVersionDiffPersistenceImpl extends BasePersistenceImpl<Sy
 			return map;
 		}
 
-		StringBundler query = new StringBundler((uncachedPrimaryKeys.size() * 2) +
-				1);
+		StringBundler query = new StringBundler(
+			uncachedPrimaryKeys.size() * 2 + 1);
 
 		query.append(_SQL_SELECT_SYNCDLFILEVERSIONDIFF_WHERE_PKS_IN);
 
@@ -1922,17 +1975,22 @@ public class SyncDLFileVersionDiffPersistenceImpl extends BasePersistenceImpl<Sy
 
 			Query q = session.createQuery(sql);
 
-			for (SyncDLFileVersionDiff syncDLFileVersionDiff : (List<SyncDLFileVersionDiff>)q.list()) {
-				map.put(syncDLFileVersionDiff.getPrimaryKeyObj(),
+			for (SyncDLFileVersionDiff syncDLFileVersionDiff :
+					(List<SyncDLFileVersionDiff>)q.list()) {
+
+				map.put(
+					syncDLFileVersionDiff.getPrimaryKeyObj(),
 					syncDLFileVersionDiff);
 
 				cacheResult(syncDLFileVersionDiff);
 
-				uncachedPrimaryKeys.remove(syncDLFileVersionDiff.getPrimaryKeyObj());
+				uncachedPrimaryKeys.remove(
+					syncDLFileVersionDiff.getPrimaryKeyObj());
 			}
 
 			for (Serializable primaryKey : uncachedPrimaryKeys) {
-				entityCache.putResult(SyncDLFileVersionDiffModelImpl.ENTITY_CACHE_ENABLED,
+				entityCache.putResult(
+					SyncDLFileVersionDiffModelImpl.ENTITY_CACHE_ENABLED,
 					SyncDLFileVersionDiffImpl.class, primaryKey, nullModel);
 			}
 		}
@@ -1960,7 +2018,7 @@ public class SyncDLFileVersionDiffPersistenceImpl extends BasePersistenceImpl<Sy
 	 * Returns a range of all the sync dl file version diffs.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link SyncDLFileVersionDiffModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>SyncDLFileVersionDiffModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param start the lower bound of the range of sync dl file version diffs
@@ -1976,7 +2034,7 @@ public class SyncDLFileVersionDiffPersistenceImpl extends BasePersistenceImpl<Sy
 	 * Returns an ordered range of all the sync dl file version diffs.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link SyncDLFileVersionDiffModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>SyncDLFileVersionDiffModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param start the lower bound of the range of sync dl file version diffs
@@ -1985,8 +2043,10 @@ public class SyncDLFileVersionDiffPersistenceImpl extends BasePersistenceImpl<Sy
 	 * @return the ordered range of sync dl file version diffs
 	 */
 	@Override
-	public List<SyncDLFileVersionDiff> findAll(int start, int end,
+	public List<SyncDLFileVersionDiff> findAll(
+		int start, int end,
 		OrderByComparator<SyncDLFileVersionDiff> orderByComparator) {
+
 		return findAll(start, end, orderByComparator, true);
 	}
 
@@ -1994,7 +2054,7 @@ public class SyncDLFileVersionDiffPersistenceImpl extends BasePersistenceImpl<Sy
 	 * Returns an ordered range of all the sync dl file version diffs.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link SyncDLFileVersionDiffModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>SyncDLFileVersionDiffModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param start the lower bound of the range of sync dl file version diffs
@@ -2004,29 +2064,32 @@ public class SyncDLFileVersionDiffPersistenceImpl extends BasePersistenceImpl<Sy
 	 * @return the ordered range of sync dl file version diffs
 	 */
 	@Override
-	public List<SyncDLFileVersionDiff> findAll(int start, int end,
+	public List<SyncDLFileVersionDiff> findAll(
+		int start, int end,
 		OrderByComparator<SyncDLFileVersionDiff> orderByComparator,
 		boolean retrieveFromCache) {
+
 		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
-				(orderByComparator == null)) {
+			(orderByComparator == null)) {
+
 			pagination = false;
-			finderPath = FINDER_PATH_WITHOUT_PAGINATION_FIND_ALL;
+			finderPath = _finderPathWithoutPaginationFindAll;
 			finderArgs = FINDER_ARGS_EMPTY;
 		}
 		else {
-			finderPath = FINDER_PATH_WITH_PAGINATION_FIND_ALL;
-			finderArgs = new Object[] { start, end, orderByComparator };
+			finderPath = _finderPathWithPaginationFindAll;
+			finderArgs = new Object[] {start, end, orderByComparator};
 		}
 
 		List<SyncDLFileVersionDiff> list = null;
 
 		if (retrieveFromCache) {
-			list = (List<SyncDLFileVersionDiff>)finderCache.getResult(finderPath,
-					finderArgs, this);
+			list = (List<SyncDLFileVersionDiff>)finderCache.getResult(
+				finderPath, finderArgs, this);
 		}
 
 		if (list == null) {
@@ -2034,13 +2097,13 @@ public class SyncDLFileVersionDiffPersistenceImpl extends BasePersistenceImpl<Sy
 			String sql = null;
 
 			if (orderByComparator != null) {
-				query = new StringBundler(2 +
-						(orderByComparator.getOrderByFields().length * 2));
+				query = new StringBundler(
+					2 + (orderByComparator.getOrderByFields().length * 2));
 
 				query.append(_SQL_SELECT_SYNCDLFILEVERSIONDIFF);
 
-				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
-					orderByComparator);
+				appendOrderByComparator(
+					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
 
 				sql = query.toString();
 			}
@@ -2048,7 +2111,8 @@ public class SyncDLFileVersionDiffPersistenceImpl extends BasePersistenceImpl<Sy
 				sql = _SQL_SELECT_SYNCDLFILEVERSIONDIFF;
 
 				if (pagination) {
-					sql = sql.concat(SyncDLFileVersionDiffModelImpl.ORDER_BY_JPQL);
+					sql = sql.concat(
+						SyncDLFileVersionDiffModelImpl.ORDER_BY_JPQL);
 				}
 			}
 
@@ -2060,16 +2124,16 @@ public class SyncDLFileVersionDiffPersistenceImpl extends BasePersistenceImpl<Sy
 				Query q = session.createQuery(sql);
 
 				if (!pagination) {
-					list = (List<SyncDLFileVersionDiff>)QueryUtil.list(q,
-							getDialect(), start, end, false);
+					list = (List<SyncDLFileVersionDiff>)QueryUtil.list(
+						q, getDialect(), start, end, false);
 
 					Collections.sort(list);
 
 					list = Collections.unmodifiableList(list);
 				}
 				else {
-					list = (List<SyncDLFileVersionDiff>)QueryUtil.list(q,
-							getDialect(), start, end);
+					list = (List<SyncDLFileVersionDiff>)QueryUtil.list(
+						q, getDialect(), start, end);
 				}
 
 				cacheResult(list);
@@ -2107,8 +2171,8 @@ public class SyncDLFileVersionDiffPersistenceImpl extends BasePersistenceImpl<Sy
 	 */
 	@Override
 	public int countAll() {
-		Long count = (Long)finderCache.getResult(FINDER_PATH_COUNT_ALL,
-				FINDER_ARGS_EMPTY, this);
+		Long count = (Long)finderCache.getResult(
+			_finderPathCountAll, FINDER_ARGS_EMPTY, this);
 
 		if (count == null) {
 			Session session = null;
@@ -2120,12 +2184,12 @@ public class SyncDLFileVersionDiffPersistenceImpl extends BasePersistenceImpl<Sy
 
 				count = (Long)q.uniqueResult();
 
-				finderCache.putResult(FINDER_PATH_COUNT_ALL, FINDER_ARGS_EMPTY,
-					count);
+				finderCache.putResult(
+					_finderPathCountAll, FINDER_ARGS_EMPTY, count);
 			}
 			catch (Exception e) {
-				finderCache.removeResult(FINDER_PATH_COUNT_ALL,
-					FINDER_ARGS_EMPTY);
+				finderCache.removeResult(
+					_finderPathCountAll, FINDER_ARGS_EMPTY);
 
 				throw processException(e);
 			}
@@ -2151,6 +2215,84 @@ public class SyncDLFileVersionDiffPersistenceImpl extends BasePersistenceImpl<Sy
 	 * Initializes the sync dl file version diff persistence.
 	 */
 	public void afterPropertiesSet() {
+		_finderPathWithPaginationFindAll = new FinderPath(
+			SyncDLFileVersionDiffModelImpl.ENTITY_CACHE_ENABLED,
+			SyncDLFileVersionDiffModelImpl.FINDER_CACHE_ENABLED,
+			SyncDLFileVersionDiffImpl.class,
+			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findAll", new String[0]);
+
+		_finderPathWithoutPaginationFindAll = new FinderPath(
+			SyncDLFileVersionDiffModelImpl.ENTITY_CACHE_ENABLED,
+			SyncDLFileVersionDiffModelImpl.FINDER_CACHE_ENABLED,
+			SyncDLFileVersionDiffImpl.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findAll",
+			new String[0]);
+
+		_finderPathCountAll = new FinderPath(
+			SyncDLFileVersionDiffModelImpl.ENTITY_CACHE_ENABLED,
+			SyncDLFileVersionDiffModelImpl.FINDER_CACHE_ENABLED, Long.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countAll",
+			new String[0]);
+
+		_finderPathWithPaginationFindByFileEntryId = new FinderPath(
+			SyncDLFileVersionDiffModelImpl.ENTITY_CACHE_ENABLED,
+			SyncDLFileVersionDiffModelImpl.FINDER_CACHE_ENABLED,
+			SyncDLFileVersionDiffImpl.class,
+			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByFileEntryId",
+			new String[] {
+				Long.class.getName(), Integer.class.getName(),
+				Integer.class.getName(), OrderByComparator.class.getName()
+			});
+
+		_finderPathWithoutPaginationFindByFileEntryId = new FinderPath(
+			SyncDLFileVersionDiffModelImpl.ENTITY_CACHE_ENABLED,
+			SyncDLFileVersionDiffModelImpl.FINDER_CACHE_ENABLED,
+			SyncDLFileVersionDiffImpl.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByFileEntryId",
+			new String[] {Long.class.getName()},
+			SyncDLFileVersionDiffModelImpl.FILEENTRYID_COLUMN_BITMASK);
+
+		_finderPathCountByFileEntryId = new FinderPath(
+			SyncDLFileVersionDiffModelImpl.ENTITY_CACHE_ENABLED,
+			SyncDLFileVersionDiffModelImpl.FINDER_CACHE_ENABLED, Long.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByFileEntryId",
+			new String[] {Long.class.getName()});
+
+		_finderPathWithPaginationFindByExpirationDate = new FinderPath(
+			SyncDLFileVersionDiffModelImpl.ENTITY_CACHE_ENABLED,
+			SyncDLFileVersionDiffModelImpl.FINDER_CACHE_ENABLED,
+			SyncDLFileVersionDiffImpl.class,
+			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByExpirationDate",
+			new String[] {
+				Date.class.getName(), Integer.class.getName(),
+				Integer.class.getName(), OrderByComparator.class.getName()
+			});
+
+		_finderPathWithPaginationCountByExpirationDate = new FinderPath(
+			SyncDLFileVersionDiffModelImpl.ENTITY_CACHE_ENABLED,
+			SyncDLFileVersionDiffModelImpl.FINDER_CACHE_ENABLED, Long.class,
+			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "countByExpirationDate",
+			new String[] {Date.class.getName()});
+
+		_finderPathFetchByF_S_T = new FinderPath(
+			SyncDLFileVersionDiffModelImpl.ENTITY_CACHE_ENABLED,
+			SyncDLFileVersionDiffModelImpl.FINDER_CACHE_ENABLED,
+			SyncDLFileVersionDiffImpl.class, FINDER_CLASS_NAME_ENTITY,
+			"fetchByF_S_T",
+			new String[] {
+				Long.class.getName(), Long.class.getName(), Long.class.getName()
+			},
+			SyncDLFileVersionDiffModelImpl.FILEENTRYID_COLUMN_BITMASK |
+			SyncDLFileVersionDiffModelImpl.SOURCEFILEVERSIONID_COLUMN_BITMASK |
+			SyncDLFileVersionDiffModelImpl.TARGETFILEVERSIONID_COLUMN_BITMASK);
+
+		_finderPathCountByF_S_T = new FinderPath(
+			SyncDLFileVersionDiffModelImpl.ENTITY_CACHE_ENABLED,
+			SyncDLFileVersionDiffModelImpl.FINDER_CACHE_ENABLED, Long.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByF_S_T",
+			new String[] {
+				Long.class.getName(), Long.class.getName(), Long.class.getName()
+			});
 	}
 
 	public void destroy() {
@@ -2162,6 +2304,7 @@ public class SyncDLFileVersionDiffPersistenceImpl extends BasePersistenceImpl<Sy
 
 	@ServiceReference(type = EntityCache.class)
 	protected EntityCache entityCache;
+
 	@ServiceReference(type = FinderCache.class)
 	protected FinderCache finderCache;
 
@@ -2173,16 +2316,34 @@ public class SyncDLFileVersionDiffPersistenceImpl extends BasePersistenceImpl<Sy
 		return date.getTime();
 	}
 
-	private static final String _SQL_SELECT_SYNCDLFILEVERSIONDIFF = "SELECT syncDLFileVersionDiff FROM SyncDLFileVersionDiff syncDLFileVersionDiff";
-	private static final String _SQL_SELECT_SYNCDLFILEVERSIONDIFF_WHERE_PKS_IN = "SELECT syncDLFileVersionDiff FROM SyncDLFileVersionDiff syncDLFileVersionDiff WHERE syncDLFileVersionDiffId IN (";
-	private static final String _SQL_SELECT_SYNCDLFILEVERSIONDIFF_WHERE = "SELECT syncDLFileVersionDiff FROM SyncDLFileVersionDiff syncDLFileVersionDiff WHERE ";
-	private static final String _SQL_COUNT_SYNCDLFILEVERSIONDIFF = "SELECT COUNT(syncDLFileVersionDiff) FROM SyncDLFileVersionDiff syncDLFileVersionDiff";
-	private static final String _SQL_COUNT_SYNCDLFILEVERSIONDIFF_WHERE = "SELECT COUNT(syncDLFileVersionDiff) FROM SyncDLFileVersionDiff syncDLFileVersionDiff WHERE ";
-	private static final String _ORDER_BY_ENTITY_ALIAS = "syncDLFileVersionDiff.";
-	private static final String _NO_SUCH_ENTITY_WITH_PRIMARY_KEY = "No SyncDLFileVersionDiff exists with the primary key ";
-	private static final String _NO_SUCH_ENTITY_WITH_KEY = "No SyncDLFileVersionDiff exists with the key {";
-	private static final Log _log = LogFactoryUtil.getLog(SyncDLFileVersionDiffPersistenceImpl.class);
-	private static final Set<String> _badColumnNames = SetUtil.fromArray(new String[] {
-				"size"
-			});
+	private static final String _SQL_SELECT_SYNCDLFILEVERSIONDIFF =
+		"SELECT syncDLFileVersionDiff FROM SyncDLFileVersionDiff syncDLFileVersionDiff";
+
+	private static final String _SQL_SELECT_SYNCDLFILEVERSIONDIFF_WHERE_PKS_IN =
+		"SELECT syncDLFileVersionDiff FROM SyncDLFileVersionDiff syncDLFileVersionDiff WHERE syncDLFileVersionDiffId IN (";
+
+	private static final String _SQL_SELECT_SYNCDLFILEVERSIONDIFF_WHERE =
+		"SELECT syncDLFileVersionDiff FROM SyncDLFileVersionDiff syncDLFileVersionDiff WHERE ";
+
+	private static final String _SQL_COUNT_SYNCDLFILEVERSIONDIFF =
+		"SELECT COUNT(syncDLFileVersionDiff) FROM SyncDLFileVersionDiff syncDLFileVersionDiff";
+
+	private static final String _SQL_COUNT_SYNCDLFILEVERSIONDIFF_WHERE =
+		"SELECT COUNT(syncDLFileVersionDiff) FROM SyncDLFileVersionDiff syncDLFileVersionDiff WHERE ";
+
+	private static final String _ORDER_BY_ENTITY_ALIAS =
+		"syncDLFileVersionDiff.";
+
+	private static final String _NO_SUCH_ENTITY_WITH_PRIMARY_KEY =
+		"No SyncDLFileVersionDiff exists with the primary key ";
+
+	private static final String _NO_SUCH_ENTITY_WITH_KEY =
+		"No SyncDLFileVersionDiff exists with the key {";
+
+	private static final Log _log = LogFactoryUtil.getLog(
+		SyncDLFileVersionDiffPersistenceImpl.class);
+
+	private static final Set<String> _badColumnNames = SetUtil.fromArray(
+		new String[] {"size"});
+
 }

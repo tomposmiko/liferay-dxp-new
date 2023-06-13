@@ -32,12 +32,13 @@ import com.liferay.document.library.file.rank.service.DLFileRankLocalServiceUtil
  * @generated
  */
 @ProviderType
-public abstract class DLFileRankBaseImpl extends DLFileRankModelImpl
-	implements DLFileRank {
+public abstract class DLFileRankBaseImpl
+	extends DLFileRankModelImpl implements DLFileRank {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
-	 * Never modify or reference this class directly. All methods that expect a document library file rank model instance should use the {@link DLFileRank} interface instead.
+	 * Never modify or reference this class directly. All methods that expect a document library file rank model instance should use the <code>DLFileRank</code> interface instead.
 	 */
 	@Override
 	public void persist() {
@@ -48,4 +49,5 @@ public abstract class DLFileRankBaseImpl extends DLFileRankModelImpl
 			DLFileRankLocalServiceUtil.updateDLFileRank(this);
 		}
 	}
+
 }

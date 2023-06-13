@@ -17,9 +17,7 @@ package com.liferay.message.boards.model;
 import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.expando.kernel.model.ExpandoBridge;
-
 import com.liferay.exportimport.kernel.lar.StagedModelType;
-
 import com.liferay.portal.kernel.model.ModelWrapper;
 import com.liferay.portal.kernel.service.ServiceContext;
 
@@ -41,6 +39,7 @@ import java.util.Objects;
  */
 @ProviderType
 public class MBBanWrapper implements MBBan, ModelWrapper<MBBan> {
+
 	public MBBanWrapper(MBBan mbBan) {
 		_mbBan = mbBan;
 	}
@@ -147,50 +146,50 @@ public class MBBanWrapper implements MBBan, ModelWrapper<MBBan> {
 	}
 
 	/**
-	* Returns the ban ID of this message boards ban.
-	*
-	* @return the ban ID of this message boards ban
-	*/
+	 * Returns the ban ID of this message boards ban.
+	 *
+	 * @return the ban ID of this message boards ban
+	 */
 	@Override
 	public long getBanId() {
 		return _mbBan.getBanId();
 	}
 
 	/**
-	* Returns the ban user ID of this message boards ban.
-	*
-	* @return the ban user ID of this message boards ban
-	*/
+	 * Returns the ban user ID of this message boards ban.
+	 *
+	 * @return the ban user ID of this message boards ban
+	 */
 	@Override
 	public long getBanUserId() {
 		return _mbBan.getBanUserId();
 	}
 
 	/**
-	* Returns the ban user uuid of this message boards ban.
-	*
-	* @return the ban user uuid of this message boards ban
-	*/
+	 * Returns the ban user uuid of this message boards ban.
+	 *
+	 * @return the ban user uuid of this message boards ban
+	 */
 	@Override
 	public String getBanUserUuid() {
 		return _mbBan.getBanUserUuid();
 	}
 
 	/**
-	* Returns the company ID of this message boards ban.
-	*
-	* @return the company ID of this message boards ban
-	*/
+	 * Returns the company ID of this message boards ban.
+	 *
+	 * @return the company ID of this message boards ban
+	 */
 	@Override
 	public long getCompanyId() {
 		return _mbBan.getCompanyId();
 	}
 
 	/**
-	* Returns the create date of this message boards ban.
-	*
-	* @return the create date of this message boards ban
-	*/
+	 * Returns the create date of this message boards ban.
+	 *
+	 * @return the create date of this message boards ban
+	 */
 	@Override
 	public Date getCreateDate() {
 		return _mbBan.getCreateDate();
@@ -202,40 +201,40 @@ public class MBBanWrapper implements MBBan, ModelWrapper<MBBan> {
 	}
 
 	/**
-	* Returns the group ID of this message boards ban.
-	*
-	* @return the group ID of this message boards ban
-	*/
+	 * Returns the group ID of this message boards ban.
+	 *
+	 * @return the group ID of this message boards ban
+	 */
 	@Override
 	public long getGroupId() {
 		return _mbBan.getGroupId();
 	}
 
 	/**
-	* Returns the last publish date of this message boards ban.
-	*
-	* @return the last publish date of this message boards ban
-	*/
+	 * Returns the last publish date of this message boards ban.
+	 *
+	 * @return the last publish date of this message boards ban
+	 */
 	@Override
 	public Date getLastPublishDate() {
 		return _mbBan.getLastPublishDate();
 	}
 
 	/**
-	* Returns the modified date of this message boards ban.
-	*
-	* @return the modified date of this message boards ban
-	*/
+	 * Returns the modified date of this message boards ban.
+	 *
+	 * @return the modified date of this message boards ban
+	 */
 	@Override
 	public Date getModifiedDate() {
 		return _mbBan.getModifiedDate();
 	}
 
 	/**
-	* Returns the primary key of this message boards ban.
-	*
-	* @return the primary key of this message boards ban
-	*/
+	 * Returns the primary key of this message boards ban.
+	 *
+	 * @return the primary key of this message boards ban
+	 */
 	@Override
 	public long getPrimaryKey() {
 		return _mbBan.getPrimaryKey();
@@ -247,40 +246,40 @@ public class MBBanWrapper implements MBBan, ModelWrapper<MBBan> {
 	}
 
 	/**
-	* Returns the user ID of this message boards ban.
-	*
-	* @return the user ID of this message boards ban
-	*/
+	 * Returns the user ID of this message boards ban.
+	 *
+	 * @return the user ID of this message boards ban
+	 */
 	@Override
 	public long getUserId() {
 		return _mbBan.getUserId();
 	}
 
 	/**
-	* Returns the user name of this message boards ban.
-	*
-	* @return the user name of this message boards ban
-	*/
+	 * Returns the user name of this message boards ban.
+	 *
+	 * @return the user name of this message boards ban
+	 */
 	@Override
 	public String getUserName() {
 		return _mbBan.getUserName();
 	}
 
 	/**
-	* Returns the user uuid of this message boards ban.
-	*
-	* @return the user uuid of this message boards ban
-	*/
+	 * Returns the user uuid of this message boards ban.
+	 *
+	 * @return the user uuid of this message boards ban
+	 */
 	@Override
 	public String getUserUuid() {
 		return _mbBan.getUserUuid();
 	}
 
 	/**
-	* Returns the uuid of this message boards ban.
-	*
-	* @return the uuid of this message boards ban
-	*/
+	 * Returns the uuid of this message boards ban.
+	 *
+	 * @return the uuid of this message boards ban
+	 */
 	@Override
 	public String getUuid() {
 		return _mbBan.getUuid();
@@ -312,30 +311,30 @@ public class MBBanWrapper implements MBBan, ModelWrapper<MBBan> {
 	}
 
 	/**
-	* Sets the ban ID of this message boards ban.
-	*
-	* @param banId the ban ID of this message boards ban
-	*/
+	 * Sets the ban ID of this message boards ban.
+	 *
+	 * @param banId the ban ID of this message boards ban
+	 */
 	@Override
 	public void setBanId(long banId) {
 		_mbBan.setBanId(banId);
 	}
 
 	/**
-	* Sets the ban user ID of this message boards ban.
-	*
-	* @param banUserId the ban user ID of this message boards ban
-	*/
+	 * Sets the ban user ID of this message boards ban.
+	 *
+	 * @param banUserId the ban user ID of this message boards ban
+	 */
 	@Override
 	public void setBanUserId(long banUserId) {
 		_mbBan.setBanUserId(banUserId);
 	}
 
 	/**
-	* Sets the ban user uuid of this message boards ban.
-	*
-	* @param banUserUuid the ban user uuid of this message boards ban
-	*/
+	 * Sets the ban user uuid of this message boards ban.
+	 *
+	 * @param banUserUuid the ban user uuid of this message boards ban
+	 */
 	@Override
 	public void setBanUserUuid(String banUserUuid) {
 		_mbBan.setBanUserUuid(banUserUuid);
@@ -347,20 +346,20 @@ public class MBBanWrapper implements MBBan, ModelWrapper<MBBan> {
 	}
 
 	/**
-	* Sets the company ID of this message boards ban.
-	*
-	* @param companyId the company ID of this message boards ban
-	*/
+	 * Sets the company ID of this message boards ban.
+	 *
+	 * @param companyId the company ID of this message boards ban
+	 */
 	@Override
 	public void setCompanyId(long companyId) {
 		_mbBan.setCompanyId(companyId);
 	}
 
 	/**
-	* Sets the create date of this message boards ban.
-	*
-	* @param createDate the create date of this message boards ban
-	*/
+	 * Sets the create date of this message boards ban.
+	 *
+	 * @param createDate the create date of this message boards ban
+	 */
 	@Override
 	public void setCreateDate(Date createDate) {
 		_mbBan.setCreateDate(createDate);
@@ -369,6 +368,7 @@ public class MBBanWrapper implements MBBan, ModelWrapper<MBBan> {
 	@Override
 	public void setExpandoBridgeAttributes(
 		com.liferay.portal.kernel.model.BaseModel<?> baseModel) {
+
 		_mbBan.setExpandoBridgeAttributes(baseModel);
 	}
 
@@ -383,30 +383,30 @@ public class MBBanWrapper implements MBBan, ModelWrapper<MBBan> {
 	}
 
 	/**
-	* Sets the group ID of this message boards ban.
-	*
-	* @param groupId the group ID of this message boards ban
-	*/
+	 * Sets the group ID of this message boards ban.
+	 *
+	 * @param groupId the group ID of this message boards ban
+	 */
 	@Override
 	public void setGroupId(long groupId) {
 		_mbBan.setGroupId(groupId);
 	}
 
 	/**
-	* Sets the last publish date of this message boards ban.
-	*
-	* @param lastPublishDate the last publish date of this message boards ban
-	*/
+	 * Sets the last publish date of this message boards ban.
+	 *
+	 * @param lastPublishDate the last publish date of this message boards ban
+	 */
 	@Override
 	public void setLastPublishDate(Date lastPublishDate) {
 		_mbBan.setLastPublishDate(lastPublishDate);
 	}
 
 	/**
-	* Sets the modified date of this message boards ban.
-	*
-	* @param modifiedDate the modified date of this message boards ban
-	*/
+	 * Sets the modified date of this message boards ban.
+	 *
+	 * @param modifiedDate the modified date of this message boards ban
+	 */
 	@Override
 	public void setModifiedDate(Date modifiedDate) {
 		_mbBan.setModifiedDate(modifiedDate);
@@ -418,10 +418,10 @@ public class MBBanWrapper implements MBBan, ModelWrapper<MBBan> {
 	}
 
 	/**
-	* Sets the primary key of this message boards ban.
-	*
-	* @param primaryKey the primary key of this message boards ban
-	*/
+	 * Sets the primary key of this message boards ban.
+	 *
+	 * @param primaryKey the primary key of this message boards ban
+	 */
 	@Override
 	public void setPrimaryKey(long primaryKey) {
 		_mbBan.setPrimaryKey(primaryKey);
@@ -433,40 +433,40 @@ public class MBBanWrapper implements MBBan, ModelWrapper<MBBan> {
 	}
 
 	/**
-	* Sets the user ID of this message boards ban.
-	*
-	* @param userId the user ID of this message boards ban
-	*/
+	 * Sets the user ID of this message boards ban.
+	 *
+	 * @param userId the user ID of this message boards ban
+	 */
 	@Override
 	public void setUserId(long userId) {
 		_mbBan.setUserId(userId);
 	}
 
 	/**
-	* Sets the user name of this message boards ban.
-	*
-	* @param userName the user name of this message boards ban
-	*/
+	 * Sets the user name of this message boards ban.
+	 *
+	 * @param userName the user name of this message boards ban
+	 */
 	@Override
 	public void setUserName(String userName) {
 		_mbBan.setUserName(userName);
 	}
 
 	/**
-	* Sets the user uuid of this message boards ban.
-	*
-	* @param userUuid the user uuid of this message boards ban
-	*/
+	 * Sets the user uuid of this message boards ban.
+	 *
+	 * @param userUuid the user uuid of this message boards ban
+	 */
 	@Override
 	public void setUserUuid(String userUuid) {
 		_mbBan.setUserUuid(userUuid);
 	}
 
 	/**
-	* Sets the uuid of this message boards ban.
-	*
-	* @param uuid the uuid of this message boards ban
-	*/
+	 * Sets the uuid of this message boards ban.
+	 *
+	 * @param uuid the uuid of this message boards ban
+	 */
 	@Override
 	public void setUuid(String uuid) {
 		_mbBan.setUuid(uuid);
@@ -542,4 +542,5 @@ public class MBBanWrapper implements MBBan, ModelWrapper<MBBan> {
 	}
 
 	private final MBBan _mbBan;
+
 }

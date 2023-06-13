@@ -2262,6 +2262,12 @@
 			<finder-column name="scope" />
 			<finder-column name="primKey" />
 		</finder>
+		<finder name="C_N_S_R" return-type="Collection">
+			<finder-column name="companyId" />
+			<finder-column name="name" />
+			<finder-column name="scope" />
+			<finder-column name="roleId" />
+		</finder>
 		<finder name="C_N_S_P_R" return-type="Collection" unique="true">
 			<finder-column name="companyId" />
 			<finder-column name="name" />
@@ -2592,6 +2598,7 @@
 
 		<!-- References -->
 
+		<reference entity="Group" package-path="com.liferay.portal" />
 		<reference entity="Resource" package-path="com.liferay.portal" />
 		<reference entity="Role" package-path="com.liferay.portal" />
 		<reference entity="User" package-path="com.liferay.portal" />
@@ -3333,6 +3340,12 @@
 			<finder-column name="companyId" />
 			<finder-column name="workflowDefinitionName" />
 			<finder-column name="workflowDefinitionVersion" />
+		</finder>
+		<finder name="G_C_C_C" return-type="Collection">
+			<finder-column name="groupId" />
+			<finder-column name="companyId" />
+			<finder-column name="classNameId" />
+			<finder-column name="classPK" />
 		</finder>
 		<finder name="G_C_C_C_T" return-type="WorkflowDefinitionLink">
 			<finder-column name="groupId" />

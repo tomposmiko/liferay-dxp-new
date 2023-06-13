@@ -43,11 +43,9 @@ definition {
 		var key_assetTitle = "${assetTitle}";
 
 		Click(
-			locator1 = "AssetRelatedAssets#ASSET_TABLE_CHECKBOX",
+			locator1 = "AssetRelatedAssets#ASSET_TABLE_CHOOSE",
 			key_assetTitle = "${assetTitle}"
 		);
-
-		AssertClick(locator1 = "Button#ADD", value1 = "Add");
 
 		SelectFrame(value1 = "relative=top");
 	}
@@ -55,7 +53,7 @@ definition {
 	macro viewDefaultPG {
 		var key_portletName = "Related Assets";
 
-		AssertTextEquals.assertTextCaseInsensitive(
+		AssertTextEquals(
 			locator1 = "Portlet#TITLE",
 			value1 = "Related Assets"
 		);

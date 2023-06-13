@@ -143,6 +143,7 @@ public class DDMFormAdminPortlet extends MVCPortlet {
 		ddmFormRenderingContext.setLocale(themeDisplay.getLocale());
 		ddmFormRenderingContext.setPortletNamespace(
 			renderResponse.getNamespace());
+		ddmFormRenderingContext.setViewMode(true);
 
 		return ddmFormRenderingContext;
 	}
@@ -191,10 +192,24 @@ public class DDMFormAdminPortlet extends MVCPortlet {
 			RenderRequest renderRequest, RenderResponse renderResponse)
 		throws PortalException {
 
+		ThemeDisplay themeDisplay = (ThemeDisplay)renderRequest.getAttribute(
+			WebKeys.THEME_DISPLAY);
+
 		String currentTab = ParamUtil.getString(
 			renderRequest, "currentTab", "forms");
 
 		if (currentTab.equals("element-set")) {
+			DDMForm ddmForm = createSettingsDDMForm(0L, themeDisplay);
+
+			DDMFormRenderingContext ddmFormRenderingContext =
+				createDDMFormRenderingContext(renderRequest, renderResponse);
+
+			String ddmFormHTML = _ddmFormRenderer.render(
+				ddmForm, ddmFormRenderingContext);
+
+			renderRequest.setAttribute(
+				DDMWebKeys.DYNAMIC_DATA_MAPPING_FORM_HTML, ddmFormHTML);
+
 			renderRequest.setAttribute(
 				WebKeys.PORTLET_DISPLAY_CONTEXT,
 				new DDMFormAdminFieldSetDisplayContext(
@@ -212,9 +227,6 @@ public class DDMFormAdminPortlet extends MVCPortlet {
 					_jsonFactory, _storageEngine));
 		}
 		else {
-			ThemeDisplay themeDisplay =
-				(ThemeDisplay)renderRequest.getAttribute(WebKeys.THEME_DISPLAY);
-
 			long formInstanceId = ParamUtil.getLong(
 				renderRequest, "formInstanceId");
 

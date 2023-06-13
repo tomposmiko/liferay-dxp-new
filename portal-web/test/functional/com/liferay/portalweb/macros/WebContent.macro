@@ -94,6 +94,12 @@ definition {
 
 		SelectFrame(locator1 = "AssetRelatedAssets#SELECT_ASSET_IFRAME");
 
+		if (isSet(scopeSite)) {
+			Click(locator1 = "Dropdown#FILTER_AND_ORDER");
+
+			MenuItem.click(menuItem = "${scopeSite}");
+		}
+
 		Search.searchCP(searchTerm = "${assetTitle}");
 
 		var key_assetTitle = "${assetTitle}";
@@ -286,6 +292,18 @@ definition {
 		Panel.expandPanel(panel = "Metadata");
 
 		Type(locator1 = "WC#PRIORITY", value1 = "${priority}");
+	}
+
+	macro addSmallImageViaURL {
+		Panel.expandPanel(panel = "Small Image");
+
+		Check(locator1 = "WCEditWebContent#USE_SMALL_IMAGE_CHECKBOX");
+		Click(locator1 = "WCEditWebContent#SMALL_IMAGE_URL");
+
+		Type(
+			locator1 = "WCEditWebContent#SMALL_IMAGE_URL_INPUT",
+			value1 = "${imageSourceURL}"
+		);
 	}
 
 	macro addStructuredPGViaWCD {
@@ -780,11 +798,7 @@ definition {
 			webContentTitleEscapeCharacter = "${webContentTitleEscapeCharacter}"
 		);
 
-		ProductMenu.gotoPortlet(
-			category = "Recycle Bin",
-			panel = "Site Administration",
-			portlet = "Recycle Bin"
-		);
+		RecycleBin.openRecycleBinAdmin(siteURLKey = "${siteURLKey}");
 
 		RecycleBin.emptyCP();
 
@@ -1699,6 +1713,29 @@ definition {
 		);
 	}
 
+	macro viewFieldRepeated {
+		AssertTextEquals(
+			locator1 = "xpath=(//div[@data-fieldname='${fieldName}'][1]//a[contains(@class,'ddm-repeatable-add-button')]/../div//input)",
+			value1 = "${ddlRecordFieldData}"
+		);
+
+		AssertTextEquals(
+			locator1 = "xpath=(//div[@data-fieldname='${fieldName}'][2]//a[contains(@class,'ddm-repeatable-add-button')]/../div//input)",
+			value1 = "${ddlRecordFieldData} 2"
+		);
+
+		var i = "3";
+
+		while (IsElementPresent(locator1 = "xpath=(//div[@data-fieldname='${fieldName}'])[${i}]")) {
+			AssertTextEquals(
+				locator1 = "xpath=(//div[@data-fieldname='${fieldName}'][${i}]//a[contains(@class,'ddm-repeatable-add-button')]/../div//input)",
+				value1 = "${ddlRecordFieldData} ${i}"
+			);
+
+			var i = MathUtil.sum("${i}", "1");
+		}
+	}
+
 	macro viewLinkedAssetPGViaAP {
 		AssertClick.assertPartialTextClickAt(
 			locator1 = "APAsset#ASSET_TITLE",
@@ -1754,6 +1791,28 @@ definition {
 				key_documentType = "${documentTypeUppercase}"
 			);
 		}
+	}
+
+	macro viewNoEditWCViaAP {
+		AssertElementPresent(locator1 = "APAsset#ASSET_TITLE", key_assetTitle = "${assetTitle}");
+
+		AssertElementNotPresent(
+			locator1 = "AP#ASSET_ELLIPSIS_ICON",
+			key_assetTitle = "${assetTitle}"
+		);
+	}
+
+	macro viewNoEditWCCP {
+		var key_webContentTitle = "${webContentTitle}";
+
+		LexiconEntry.changeDisplayStyle(displayStyle = "list");
+
+		Click(locator1 = "WC#ENTRY_LIST_MENULIST_ICON");
+
+		AssertElementNotPresent(
+			locator1 = "MenuItem#ANY_MENU_ITEM",
+			key_menuItem = "Edit"
+		);
 	}
 
 	macro viewNoEditWCViaWCD {

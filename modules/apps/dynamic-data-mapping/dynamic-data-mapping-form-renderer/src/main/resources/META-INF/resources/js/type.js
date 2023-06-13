@@ -29,6 +29,6 @@ AUI.add(
 	},
 	'',
 	{
-		requires: ['aui-form-builder-field-type']
+		requires: ['aui-component', 'aui-form-builder-field-type']
 	}
 );

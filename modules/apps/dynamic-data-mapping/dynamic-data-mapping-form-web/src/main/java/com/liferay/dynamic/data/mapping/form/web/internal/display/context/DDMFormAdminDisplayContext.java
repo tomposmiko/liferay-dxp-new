@@ -777,6 +777,10 @@ public class DDMFormAdminDisplayContext {
 		return formInstanceSettings.published();
 	}
 
+	public boolean isShowPublishAlert() {
+		return ParamUtil.getBoolean(_renderRequest, "showPublishAlert");
+	}
+
 	protected DDMForm getDDMForm() throws PortalException {
 		DDMStructure structure = getDDMStructure();
 
@@ -824,11 +828,8 @@ public class DDMFormAdminDisplayContext {
 		HttpServletRequest httpServletRequest =
 			formAdminRequestHelper.getRequest();
 
-		DDMFormInstanceRecord formInstanceRecord =
-			(DDMFormInstanceRecord)httpServletRequest.getAttribute(
-				DDMFormWebKeys.DYNAMIC_DATA_MAPPING_FORM_INSTANCE_RECORD);
-
-		return formInstanceRecord;
+		return (DDMFormInstanceRecord)httpServletRequest.getAttribute(
+			DDMFormWebKeys.DYNAMIC_DATA_MAPPING_FORM_INSTANCE_RECORD);
 	}
 
 	protected String getDisplayStyle(

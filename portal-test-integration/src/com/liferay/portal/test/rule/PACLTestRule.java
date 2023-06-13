@@ -446,8 +446,11 @@ public class PACLTestRule implements TestRule {
 					newName = StringPool.SLASH.concat(newName);
 				}
 
-				newName = RESOURCE_PATH.concat("/WEB-INF/classes").concat(
-					newName);
+				newName = RESOURCE_PATH.concat(
+					"/WEB-INF/classes"
+				).concat(
+					newName
+				);
 
 				resource = super.findResource(newName);
 			}

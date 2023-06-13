@@ -15,7 +15,6 @@
 package com.liferay.portal.workflow.kaleo.service.persistence.test;
 
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
-
 import com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQueryFactoryUtil;
@@ -39,15 +38,6 @@ import com.liferay.portal.workflow.kaleo.service.KaleoTransitionLocalServiceUtil
 import com.liferay.portal.workflow.kaleo.service.persistence.KaleoTransitionPersistence;
 import com.liferay.portal.workflow.kaleo.service.persistence.KaleoTransitionUtil;
 
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.ClassRule;
-import org.junit.Rule;
-import org.junit.Test;
-
-import org.junit.runner.RunWith;
-
 import java.io.Serializable;
 
 import java.util.ArrayList;
@@ -58,16 +48,27 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
+import org.junit.After;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.ClassRule;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+
 /**
  * @generated
  */
 @RunWith(Arquillian.class)
 public class KaleoTransitionPersistenceTest {
+
 	@ClassRule
 	@Rule
-	public static final AggregateTestRule aggregateTestRule = new AggregateTestRule(new LiferayIntegrationTestRule(),
-			PersistenceTestRule.INSTANCE,
-			new TransactionalTestRule(Propagation.REQUIRED,
+	public static final AggregateTestRule aggregateTestRule =
+		new AggregateTestRule(
+			new LiferayIntegrationTestRule(), PersistenceTestRule.INSTANCE,
+			new TransactionalTestRule(
+				Propagation.REQUIRED,
 				"com.liferay.portal.workflow.kaleo.service"));
 
 	@Before
@@ -107,7 +108,8 @@ public class KaleoTransitionPersistenceTest {
 
 		_persistence.remove(newKaleoTransition);
 
-		KaleoTransition existingKaleoTransition = _persistence.fetchByPrimaryKey(newKaleoTransition.getPrimaryKey());
+		KaleoTransition existingKaleoTransition =
+			_persistence.fetchByPrimaryKey(newKaleoTransition.getPrimaryKey());
 
 		Assert.assertNull(existingKaleoTransition);
 	}
@@ -135,7 +137,8 @@ public class KaleoTransitionPersistenceTest {
 
 		newKaleoTransition.setModifiedDate(RandomTestUtil.nextDate());
 
-		newKaleoTransition.setKaleoDefinitionVersionId(RandomTestUtil.nextLong());
+		newKaleoTransition.setKaleoDefinitionVersionId(
+			RandomTestUtil.nextLong());
 
 		newKaleoTransition.setKaleoNodeId(RandomTestUtil.nextLong());
 
@@ -145,51 +148,67 @@ public class KaleoTransitionPersistenceTest {
 
 		newKaleoTransition.setSourceKaleoNodeId(RandomTestUtil.nextLong());
 
-		newKaleoTransition.setSourceKaleoNodeName(RandomTestUtil.randomString());
+		newKaleoTransition.setSourceKaleoNodeName(
+			RandomTestUtil.randomString());
 
 		newKaleoTransition.setTargetKaleoNodeId(RandomTestUtil.nextLong());
 
-		newKaleoTransition.setTargetKaleoNodeName(RandomTestUtil.randomString());
+		newKaleoTransition.setTargetKaleoNodeName(
+			RandomTestUtil.randomString());
 
 		newKaleoTransition.setDefaultTransition(RandomTestUtil.randomBoolean());
 
 		_kaleoTransitions.add(_persistence.update(newKaleoTransition));
 
-		KaleoTransition existingKaleoTransition = _persistence.findByPrimaryKey(newKaleoTransition.getPrimaryKey());
+		KaleoTransition existingKaleoTransition = _persistence.findByPrimaryKey(
+			newKaleoTransition.getPrimaryKey());
 
-		Assert.assertEquals(existingKaleoTransition.getKaleoTransitionId(),
+		Assert.assertEquals(
+			existingKaleoTransition.getKaleoTransitionId(),
 			newKaleoTransition.getKaleoTransitionId());
-		Assert.assertEquals(existingKaleoTransition.getGroupId(),
+		Assert.assertEquals(
+			existingKaleoTransition.getGroupId(),
 			newKaleoTransition.getGroupId());
-		Assert.assertEquals(existingKaleoTransition.getCompanyId(),
+		Assert.assertEquals(
+			existingKaleoTransition.getCompanyId(),
 			newKaleoTransition.getCompanyId());
-		Assert.assertEquals(existingKaleoTransition.getUserId(),
+		Assert.assertEquals(
+			existingKaleoTransition.getUserId(),
 			newKaleoTransition.getUserId());
-		Assert.assertEquals(existingKaleoTransition.getUserName(),
+		Assert.assertEquals(
+			existingKaleoTransition.getUserName(),
 			newKaleoTransition.getUserName());
-		Assert.assertEquals(Time.getShortTimestamp(
-				existingKaleoTransition.getCreateDate()),
+		Assert.assertEquals(
+			Time.getShortTimestamp(existingKaleoTransition.getCreateDate()),
 			Time.getShortTimestamp(newKaleoTransition.getCreateDate()));
-		Assert.assertEquals(Time.getShortTimestamp(
-				existingKaleoTransition.getModifiedDate()),
+		Assert.assertEquals(
+			Time.getShortTimestamp(existingKaleoTransition.getModifiedDate()),
 			Time.getShortTimestamp(newKaleoTransition.getModifiedDate()));
-		Assert.assertEquals(existingKaleoTransition.getKaleoDefinitionVersionId(),
+		Assert.assertEquals(
+			existingKaleoTransition.getKaleoDefinitionVersionId(),
 			newKaleoTransition.getKaleoDefinitionVersionId());
-		Assert.assertEquals(existingKaleoTransition.getKaleoNodeId(),
+		Assert.assertEquals(
+			existingKaleoTransition.getKaleoNodeId(),
 			newKaleoTransition.getKaleoNodeId());
-		Assert.assertEquals(existingKaleoTransition.getName(),
-			newKaleoTransition.getName());
-		Assert.assertEquals(existingKaleoTransition.getDescription(),
+		Assert.assertEquals(
+			existingKaleoTransition.getName(), newKaleoTransition.getName());
+		Assert.assertEquals(
+			existingKaleoTransition.getDescription(),
 			newKaleoTransition.getDescription());
-		Assert.assertEquals(existingKaleoTransition.getSourceKaleoNodeId(),
+		Assert.assertEquals(
+			existingKaleoTransition.getSourceKaleoNodeId(),
 			newKaleoTransition.getSourceKaleoNodeId());
-		Assert.assertEquals(existingKaleoTransition.getSourceKaleoNodeName(),
+		Assert.assertEquals(
+			existingKaleoTransition.getSourceKaleoNodeName(),
 			newKaleoTransition.getSourceKaleoNodeName());
-		Assert.assertEquals(existingKaleoTransition.getTargetKaleoNodeId(),
+		Assert.assertEquals(
+			existingKaleoTransition.getTargetKaleoNodeId(),
 			newKaleoTransition.getTargetKaleoNodeId());
-		Assert.assertEquals(existingKaleoTransition.getTargetKaleoNodeName(),
+		Assert.assertEquals(
+			existingKaleoTransition.getTargetKaleoNodeName(),
 			newKaleoTransition.getTargetKaleoNodeName());
-		Assert.assertEquals(existingKaleoTransition.isDefaultTransition(),
+		Assert.assertEquals(
+			existingKaleoTransition.isDefaultTransition(),
 			newKaleoTransition.isDefaultTransition());
 	}
 
@@ -225,8 +244,8 @@ public class KaleoTransitionPersistenceTest {
 
 	@Test
 	public void testCountByKNI_DT() throws Exception {
-		_persistence.countByKNI_DT(RandomTestUtil.nextLong(),
-			RandomTestUtil.randomBoolean());
+		_persistence.countByKNI_DT(
+			RandomTestUtil.nextLong(), RandomTestUtil.randomBoolean());
 
 		_persistence.countByKNI_DT(0L, RandomTestUtil.randomBoolean());
 	}
@@ -235,7 +254,8 @@ public class KaleoTransitionPersistenceTest {
 	public void testFindByPrimaryKeyExisting() throws Exception {
 		KaleoTransition newKaleoTransition = addKaleoTransition();
 
-		KaleoTransition existingKaleoTransition = _persistence.findByPrimaryKey(newKaleoTransition.getPrimaryKey());
+		KaleoTransition existingKaleoTransition = _persistence.findByPrimaryKey(
+			newKaleoTransition.getPrimaryKey());
 
 		Assert.assertEquals(existingKaleoTransition, newKaleoTransition);
 	}
@@ -249,15 +269,15 @@ public class KaleoTransitionPersistenceTest {
 
 	@Test
 	public void testFindAll() throws Exception {
-		_persistence.findAll(QueryUtil.ALL_POS, QueryUtil.ALL_POS,
-			getOrderByComparator());
+		_persistence.findAll(
+			QueryUtil.ALL_POS, QueryUtil.ALL_POS, getOrderByComparator());
 	}
 
 	protected OrderByComparator<KaleoTransition> getOrderByComparator() {
-		return OrderByComparatorFactoryUtil.create("KaleoTransition",
-			"kaleoTransitionId", true, "groupId", true, "companyId", true,
-			"userId", true, "userName", true, "createDate", true,
-			"modifiedDate", true, "kaleoDefinitionVersionId", true,
+		return OrderByComparatorFactoryUtil.create(
+			"KaleoTransition", "kaleoTransitionId", true, "groupId", true,
+			"companyId", true, "userId", true, "userName", true, "createDate",
+			true, "modifiedDate", true, "kaleoDefinitionVersionId", true,
 			"kaleoNodeId", true, "name", true, "description", true,
 			"sourceKaleoNodeId", true, "sourceKaleoNodeName", true,
 			"targetKaleoNodeId", true, "targetKaleoNodeName", true,
@@ -268,7 +288,8 @@ public class KaleoTransitionPersistenceTest {
 	public void testFetchByPrimaryKeyExisting() throws Exception {
 		KaleoTransition newKaleoTransition = addKaleoTransition();
 
-		KaleoTransition existingKaleoTransition = _persistence.fetchByPrimaryKey(newKaleoTransition.getPrimaryKey());
+		KaleoTransition existingKaleoTransition =
+			_persistence.fetchByPrimaryKey(newKaleoTransition.getPrimaryKey());
 
 		Assert.assertEquals(existingKaleoTransition, newKaleoTransition);
 	}
@@ -277,7 +298,8 @@ public class KaleoTransitionPersistenceTest {
 	public void testFetchByPrimaryKeyMissing() throws Exception {
 		long pk = RandomTestUtil.nextLong();
 
-		KaleoTransition missingKaleoTransition = _persistence.fetchByPrimaryKey(pk);
+		KaleoTransition missingKaleoTransition = _persistence.fetchByPrimaryKey(
+			pk);
 
 		Assert.assertNull(missingKaleoTransition);
 	}
@@ -285,6 +307,7 @@ public class KaleoTransitionPersistenceTest {
 	@Test
 	public void testFetchByPrimaryKeysWithMultiplePrimaryKeysWhereAllPrimaryKeysExist()
 		throws Exception {
+
 		KaleoTransition newKaleoTransition1 = addKaleoTransition();
 		KaleoTransition newKaleoTransition2 = addKaleoTransition();
 
@@ -293,18 +316,22 @@ public class KaleoTransitionPersistenceTest {
 		primaryKeys.add(newKaleoTransition1.getPrimaryKey());
 		primaryKeys.add(newKaleoTransition2.getPrimaryKey());
 
-		Map<Serializable, KaleoTransition> kaleoTransitions = _persistence.fetchByPrimaryKeys(primaryKeys);
+		Map<Serializable, KaleoTransition> kaleoTransitions =
+			_persistence.fetchByPrimaryKeys(primaryKeys);
 
 		Assert.assertEquals(2, kaleoTransitions.size());
-		Assert.assertEquals(newKaleoTransition1,
+		Assert.assertEquals(
+			newKaleoTransition1,
 			kaleoTransitions.get(newKaleoTransition1.getPrimaryKey()));
-		Assert.assertEquals(newKaleoTransition2,
+		Assert.assertEquals(
+			newKaleoTransition2,
 			kaleoTransitions.get(newKaleoTransition2.getPrimaryKey()));
 	}
 
 	@Test
 	public void testFetchByPrimaryKeysWithMultiplePrimaryKeysWhereNoPrimaryKeysExist()
 		throws Exception {
+
 		long pk1 = RandomTestUtil.nextLong();
 
 		long pk2 = RandomTestUtil.nextLong();
@@ -314,7 +341,8 @@ public class KaleoTransitionPersistenceTest {
 		primaryKeys.add(pk1);
 		primaryKeys.add(pk2);
 
-		Map<Serializable, KaleoTransition> kaleoTransitions = _persistence.fetchByPrimaryKeys(primaryKeys);
+		Map<Serializable, KaleoTransition> kaleoTransitions =
+			_persistence.fetchByPrimaryKeys(primaryKeys);
 
 		Assert.assertTrue(kaleoTransitions.isEmpty());
 	}
@@ -322,6 +350,7 @@ public class KaleoTransitionPersistenceTest {
 	@Test
 	public void testFetchByPrimaryKeysWithMultiplePrimaryKeysWhereSomePrimaryKeysExist()
 		throws Exception {
+
 		KaleoTransition newKaleoTransition = addKaleoTransition();
 
 		long pk = RandomTestUtil.nextLong();
@@ -331,36 +360,39 @@ public class KaleoTransitionPersistenceTest {
 		primaryKeys.add(newKaleoTransition.getPrimaryKey());
 		primaryKeys.add(pk);
 
-		Map<Serializable, KaleoTransition> kaleoTransitions = _persistence.fetchByPrimaryKeys(primaryKeys);
+		Map<Serializable, KaleoTransition> kaleoTransitions =
+			_persistence.fetchByPrimaryKeys(primaryKeys);
 
 		Assert.assertEquals(1, kaleoTransitions.size());
-		Assert.assertEquals(newKaleoTransition,
+		Assert.assertEquals(
+			newKaleoTransition,
 			kaleoTransitions.get(newKaleoTransition.getPrimaryKey()));
 	}
 
 	@Test
-	public void testFetchByPrimaryKeysWithNoPrimaryKeys()
-		throws Exception {
+	public void testFetchByPrimaryKeysWithNoPrimaryKeys() throws Exception {
 		Set<Serializable> primaryKeys = new HashSet<Serializable>();
 
-		Map<Serializable, KaleoTransition> kaleoTransitions = _persistence.fetchByPrimaryKeys(primaryKeys);
+		Map<Serializable, KaleoTransition> kaleoTransitions =
+			_persistence.fetchByPrimaryKeys(primaryKeys);
 
 		Assert.assertTrue(kaleoTransitions.isEmpty());
 	}
 
 	@Test
-	public void testFetchByPrimaryKeysWithOnePrimaryKey()
-		throws Exception {
+	public void testFetchByPrimaryKeysWithOnePrimaryKey() throws Exception {
 		KaleoTransition newKaleoTransition = addKaleoTransition();
 
 		Set<Serializable> primaryKeys = new HashSet<Serializable>();
 
 		primaryKeys.add(newKaleoTransition.getPrimaryKey());
 
-		Map<Serializable, KaleoTransition> kaleoTransitions = _persistence.fetchByPrimaryKeys(primaryKeys);
+		Map<Serializable, KaleoTransition> kaleoTransitions =
+			_persistence.fetchByPrimaryKeys(primaryKeys);
 
 		Assert.assertEquals(1, kaleoTransitions.size());
-		Assert.assertEquals(newKaleoTransition,
+		Assert.assertEquals(
+			newKaleoTransition,
 			kaleoTransitions.get(newKaleoTransition.getPrimaryKey()));
 	}
 
@@ -368,15 +400,19 @@ public class KaleoTransitionPersistenceTest {
 	public void testActionableDynamicQuery() throws Exception {
 		final IntegerWrapper count = new IntegerWrapper();
 
-		ActionableDynamicQuery actionableDynamicQuery = KaleoTransitionLocalServiceUtil.getActionableDynamicQuery();
+		ActionableDynamicQuery actionableDynamicQuery =
+			KaleoTransitionLocalServiceUtil.getActionableDynamicQuery();
 
-		actionableDynamicQuery.setPerformActionMethod(new ActionableDynamicQuery.PerformActionMethod<KaleoTransition>() {
+		actionableDynamicQuery.setPerformActionMethod(
+			new ActionableDynamicQuery.PerformActionMethod<KaleoTransition>() {
+
 				@Override
 				public void performAction(KaleoTransition kaleoTransition) {
 					Assert.assertNotNull(kaleoTransition);
 
 					count.increment();
 				}
+
 			});
 
 		actionableDynamicQuery.performActions();
@@ -385,17 +421,19 @@ public class KaleoTransitionPersistenceTest {
 	}
 
 	@Test
-	public void testDynamicQueryByPrimaryKeyExisting()
-		throws Exception {
+	public void testDynamicQueryByPrimaryKeyExisting() throws Exception {
 		KaleoTransition newKaleoTransition = addKaleoTransition();
 
-		DynamicQuery dynamicQuery = DynamicQueryFactoryUtil.forClass(KaleoTransition.class,
-				_dynamicQueryClassLoader);
+		DynamicQuery dynamicQuery = DynamicQueryFactoryUtil.forClass(
+			KaleoTransition.class, _dynamicQueryClassLoader);
 
-		dynamicQuery.add(RestrictionsFactoryUtil.eq("kaleoTransitionId",
+		dynamicQuery.add(
+			RestrictionsFactoryUtil.eq(
+				"kaleoTransitionId",
 				newKaleoTransition.getKaleoTransitionId()));
 
-		List<KaleoTransition> result = _persistence.findWithDynamicQuery(dynamicQuery);
+		List<KaleoTransition> result = _persistence.findWithDynamicQuery(
+			dynamicQuery);
 
 		Assert.assertEquals(1, result.size());
 
@@ -406,32 +444,34 @@ public class KaleoTransitionPersistenceTest {
 
 	@Test
 	public void testDynamicQueryByPrimaryKeyMissing() throws Exception {
-		DynamicQuery dynamicQuery = DynamicQueryFactoryUtil.forClass(KaleoTransition.class,
-				_dynamicQueryClassLoader);
+		DynamicQuery dynamicQuery = DynamicQueryFactoryUtil.forClass(
+			KaleoTransition.class, _dynamicQueryClassLoader);
 
-		dynamicQuery.add(RestrictionsFactoryUtil.eq("kaleoTransitionId",
-				RandomTestUtil.nextLong()));
+		dynamicQuery.add(
+			RestrictionsFactoryUtil.eq(
+				"kaleoTransitionId", RandomTestUtil.nextLong()));
 
-		List<KaleoTransition> result = _persistence.findWithDynamicQuery(dynamicQuery);
+		List<KaleoTransition> result = _persistence.findWithDynamicQuery(
+			dynamicQuery);
 
 		Assert.assertEquals(0, result.size());
 	}
 
 	@Test
-	public void testDynamicQueryByProjectionExisting()
-		throws Exception {
+	public void testDynamicQueryByProjectionExisting() throws Exception {
 		KaleoTransition newKaleoTransition = addKaleoTransition();
 
-		DynamicQuery dynamicQuery = DynamicQueryFactoryUtil.forClass(KaleoTransition.class,
-				_dynamicQueryClassLoader);
+		DynamicQuery dynamicQuery = DynamicQueryFactoryUtil.forClass(
+			KaleoTransition.class, _dynamicQueryClassLoader);
 
-		dynamicQuery.setProjection(ProjectionFactoryUtil.property(
-				"kaleoTransitionId"));
+		dynamicQuery.setProjection(
+			ProjectionFactoryUtil.property("kaleoTransitionId"));
 
 		Object newKaleoTransitionId = newKaleoTransition.getKaleoTransitionId();
 
-		dynamicQuery.add(RestrictionsFactoryUtil.in("kaleoTransitionId",
-				new Object[] { newKaleoTransitionId }));
+		dynamicQuery.add(
+			RestrictionsFactoryUtil.in(
+				"kaleoTransitionId", new Object[] {newKaleoTransitionId}));
 
 		List<Object> result = _persistence.findWithDynamicQuery(dynamicQuery);
 
@@ -444,14 +484,15 @@ public class KaleoTransitionPersistenceTest {
 
 	@Test
 	public void testDynamicQueryByProjectionMissing() throws Exception {
-		DynamicQuery dynamicQuery = DynamicQueryFactoryUtil.forClass(KaleoTransition.class,
-				_dynamicQueryClassLoader);
+		DynamicQuery dynamicQuery = DynamicQueryFactoryUtil.forClass(
+			KaleoTransition.class, _dynamicQueryClassLoader);
 
-		dynamicQuery.setProjection(ProjectionFactoryUtil.property(
-				"kaleoTransitionId"));
+		dynamicQuery.setProjection(
+			ProjectionFactoryUtil.property("kaleoTransitionId"));
 
-		dynamicQuery.add(RestrictionsFactoryUtil.in("kaleoTransitionId",
-				new Object[] { RandomTestUtil.nextLong() }));
+		dynamicQuery.add(
+			RestrictionsFactoryUtil.in(
+				"kaleoTransitionId", new Object[] {RandomTestUtil.nextLong()}));
 
 		List<Object> result = _persistence.findWithDynamicQuery(dynamicQuery);
 
@@ -464,24 +505,31 @@ public class KaleoTransitionPersistenceTest {
 
 		_persistence.clearCache();
 
-		KaleoTransition existingKaleoTransition = _persistence.findByPrimaryKey(newKaleoTransition.getPrimaryKey());
+		KaleoTransition existingKaleoTransition = _persistence.findByPrimaryKey(
+			newKaleoTransition.getPrimaryKey());
 
-		Assert.assertEquals(Long.valueOf(
-				existingKaleoTransition.getKaleoNodeId()),
-			ReflectionTestUtil.<Long>invoke(existingKaleoTransition,
-				"getOriginalKaleoNodeId", new Class<?>[0]));
-		Assert.assertTrue(Objects.equals(existingKaleoTransition.getName(),
-				ReflectionTestUtil.invoke(existingKaleoTransition,
-					"getOriginalName", new Class<?>[0])));
+		Assert.assertEquals(
+			Long.valueOf(existingKaleoTransition.getKaleoNodeId()),
+			ReflectionTestUtil.<Long>invoke(
+				existingKaleoTransition, "getOriginalKaleoNodeId",
+				new Class<?>[0]));
+		Assert.assertTrue(
+			Objects.equals(
+				existingKaleoTransition.getName(),
+				ReflectionTestUtil.invoke(
+					existingKaleoTransition, "getOriginalName",
+					new Class<?>[0])));
 
-		Assert.assertEquals(Long.valueOf(
-				existingKaleoTransition.getKaleoNodeId()),
-			ReflectionTestUtil.<Long>invoke(existingKaleoTransition,
-				"getOriginalKaleoNodeId", new Class<?>[0]));
-		Assert.assertEquals(Boolean.valueOf(
-				existingKaleoTransition.getDefaultTransition()),
-			ReflectionTestUtil.<Boolean>invoke(existingKaleoTransition,
-				"getOriginalDefaultTransition", new Class<?>[0]));
+		Assert.assertEquals(
+			Long.valueOf(existingKaleoTransition.getKaleoNodeId()),
+			ReflectionTestUtil.<Long>invoke(
+				existingKaleoTransition, "getOriginalKaleoNodeId",
+				new Class<?>[0]));
+		Assert.assertEquals(
+			Boolean.valueOf(existingKaleoTransition.getDefaultTransition()),
+			ReflectionTestUtil.<Boolean>invoke(
+				existingKaleoTransition, "getOriginalDefaultTransition",
+				new Class<?>[0]));
 	}
 
 	protected KaleoTransition addKaleoTransition() throws Exception {
@@ -524,7 +572,9 @@ public class KaleoTransitionPersistenceTest {
 		return kaleoTransition;
 	}
 
-	private List<KaleoTransition> _kaleoTransitions = new ArrayList<KaleoTransition>();
+	private List<KaleoTransition> _kaleoTransitions =
+		new ArrayList<KaleoTransition>();
 	private KaleoTransitionPersistence _persistence;
 	private ClassLoader _dynamicQueryClassLoader;
+
 }

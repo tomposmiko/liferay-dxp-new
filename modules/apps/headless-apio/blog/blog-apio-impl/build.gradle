@@ -1,11 +1,11 @@
 dependencies {
 	compileOnly group: "com.liferay", name: "com.liferay.aggregate.rating.apio.api", version: "1.0.0"
 	compileOnly group: "com.liferay", name: "com.liferay.apio.architect.api", version: "1.6.0"
-	compileOnly group: "com.liferay", name: "com.liferay.blog.apio.api", version: "1.0.0"
+	compileOnly group: "com.liferay", name: "com.liferay.blog.apio.api", version: "1.1.0"
 	compileOnly group: "com.liferay", name: "com.liferay.blogs.api", version: "4.0.0"
 	compileOnly group: "com.liferay", name: "com.liferay.category.apio.api", version: "1.0.0"
 	compileOnly group: "com.liferay", name: "com.liferay.comment.apio.api", version: "1.0.0"
-	compileOnly group: "com.liferay", name: "com.liferay.content.space.apio.api", version: "1.0.0"
+	compileOnly group: "com.liferay", name: "com.liferay.content.space.apio.api", version: "1.2.0"
 	compileOnly group: "com.liferay", name: "com.liferay.friendly.url.api", version: "1.0.0"
 	compileOnly group: "com.liferay", name: "com.liferay.media.object.apio.api", version: "1.0.0"
 	compileOnly group: "com.liferay", name: "com.liferay.person.apio.api", version: "1.0.0"

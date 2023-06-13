@@ -26,20 +26,21 @@ import com.liferay.portal.kernel.util.Accessor;
  *
  * @author Brian Wing Shun Chan
  * @see SyncDLObjectModel
- * @see com.liferay.sync.model.impl.SyncDLObjectImpl
- * @see com.liferay.sync.model.impl.SyncDLObjectModelImpl
  * @generated
  */
 @ImplementationClassName("com.liferay.sync.model.impl.SyncDLObjectImpl")
 @ProviderType
-public interface SyncDLObject extends SyncDLObjectModel, PersistedModel,
-	TreeModel {
+public interface SyncDLObject
+	extends PersistedModel, SyncDLObjectModel, TreeModel {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
-	 * Never modify this interface directly. Add methods to {@link com.liferay.sync.model.impl.SyncDLObjectImpl} and rerun ServiceBuilder to automatically copy the method declarations to this interface.
+	 * Never modify this interface directly. Add methods to <code>com.liferay.sync.model.impl.SyncDLObjectImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
 	 */
-	public static final Accessor<SyncDLObject, Long> SYNC_DL_OBJECT_ID_ACCESSOR = new Accessor<SyncDLObject, Long>() {
+	public static final Accessor<SyncDLObject, Long>
+		SYNC_DL_OBJECT_ID_ACCESSOR = new Accessor<SyncDLObject, Long>() {
+
 			@Override
 			public Long get(SyncDLObject syncDLObject) {
 				return syncDLObject.getSyncDLObjectId();
@@ -54,6 +55,7 @@ public interface SyncDLObject extends SyncDLObjectModel, PersistedModel,
 			public Class<SyncDLObject> getTypeClass() {
 				return SyncDLObject.class;
 			}
+
 		};
 
 	@Override
@@ -62,4 +64,5 @@ public interface SyncDLObject extends SyncDLObjectModel, PersistedModel,
 	public void setCreateDate(java.util.Date createDate);
 
 	public void setModifiedDate(java.util.Date modifiedDate);
+
 }

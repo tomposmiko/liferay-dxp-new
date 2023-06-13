@@ -25,20 +25,22 @@ import com.liferay.portal.kernel.util.Accessor;
  *
  * @author Brian Wing Shun Chan
  * @see KaleoInstanceModel
- * @see com.liferay.portal.workflow.kaleo.model.impl.KaleoInstanceImpl
- * @see com.liferay.portal.workflow.kaleo.model.impl.KaleoInstanceModelImpl
  * @generated
  */
-@ImplementationClassName("com.liferay.portal.workflow.kaleo.model.impl.KaleoInstanceImpl")
+@ImplementationClassName(
+	"com.liferay.portal.workflow.kaleo.model.impl.KaleoInstanceImpl"
+)
 @ProviderType
 public interface KaleoInstance extends KaleoInstanceModel, PersistedModel {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
-	 * Never modify this interface directly. Add methods to {@link com.liferay.portal.workflow.kaleo.model.impl.KaleoInstanceImpl} and rerun ServiceBuilder to automatically copy the method declarations to this interface.
+	 * Never modify this interface directly. Add methods to <code>com.liferay.portal.workflow.kaleo.model.impl.KaleoInstanceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
 	 */
-	public static final Accessor<KaleoInstance, Long> KALEO_INSTANCE_ID_ACCESSOR =
-		new Accessor<KaleoInstance, Long>() {
+	public static final Accessor<KaleoInstance, Long>
+		KALEO_INSTANCE_ID_ACCESSOR = new Accessor<KaleoInstance, Long>() {
+
 			@Override
 			public Long get(KaleoInstance kaleoInstance) {
 				return kaleoInstance.getKaleoInstanceId();
@@ -53,14 +55,16 @@ public interface KaleoInstance extends KaleoInstanceModel, PersistedModel {
 			public Class<KaleoInstance> getTypeClass() {
 				return KaleoInstance.class;
 			}
+
 		};
 
 	public KaleoInstanceToken getRootKaleoInstanceToken(
-		java.util.Map<String, java.io.Serializable> workflowContext,
-		com.liferay.portal.kernel.service.ServiceContext serviceContext)
+			java.util.Map<String, java.io.Serializable> workflowContext,
+			com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException;
 
 	public KaleoInstanceToken getRootKaleoInstanceToken(
-		com.liferay.portal.kernel.service.ServiceContext serviceContext)
+			com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException;
+
 }

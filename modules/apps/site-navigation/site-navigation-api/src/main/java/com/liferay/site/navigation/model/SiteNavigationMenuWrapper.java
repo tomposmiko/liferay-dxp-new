@@ -17,9 +17,7 @@ package com.liferay.site.navigation.model;
 import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.expando.kernel.model.ExpandoBridge;
-
 import com.liferay.exportimport.kernel.lar.StagedModelType;
-
 import com.liferay.portal.kernel.model.ModelWrapper;
 import com.liferay.portal.kernel.service.ServiceContext;
 
@@ -40,8 +38,9 @@ import java.util.Objects;
  * @generated
  */
 @ProviderType
-public class SiteNavigationMenuWrapper implements SiteNavigationMenu,
-	ModelWrapper<SiteNavigationMenu> {
+public class SiteNavigationMenuWrapper
+	implements SiteNavigationMenu, ModelWrapper<SiteNavigationMenu> {
+
 	public SiteNavigationMenuWrapper(SiteNavigationMenu siteNavigationMenu) {
 		_siteNavigationMenu = siteNavigationMenu;
 	}
@@ -84,7 +83,8 @@ public class SiteNavigationMenuWrapper implements SiteNavigationMenu,
 			setUuid(uuid);
 		}
 
-		Long siteNavigationMenuId = (Long)attributes.get("siteNavigationMenuId");
+		Long siteNavigationMenuId = (Long)attributes.get(
+			"siteNavigationMenuId");
 
 		if (siteNavigationMenuId != null) {
 			setSiteNavigationMenuId(siteNavigationMenuId);
@@ -153,7 +153,8 @@ public class SiteNavigationMenuWrapper implements SiteNavigationMenu,
 
 	@Override
 	public Object clone() {
-		return new SiteNavigationMenuWrapper((SiteNavigationMenu)_siteNavigationMenu.clone());
+		return new SiteNavigationMenuWrapper(
+			(SiteNavigationMenu)_siteNavigationMenu.clone());
 	}
 
 	@Override
@@ -162,30 +163,30 @@ public class SiteNavigationMenuWrapper implements SiteNavigationMenu,
 	}
 
 	/**
-	* Returns the auto of this site navigation menu.
-	*
-	* @return the auto of this site navigation menu
-	*/
+	 * Returns the auto of this site navigation menu.
+	 *
+	 * @return the auto of this site navigation menu
+	 */
 	@Override
 	public boolean getAuto() {
 		return _siteNavigationMenu.getAuto();
 	}
 
 	/**
-	* Returns the company ID of this site navigation menu.
-	*
-	* @return the company ID of this site navigation menu
-	*/
+	 * Returns the company ID of this site navigation menu.
+	 *
+	 * @return the company ID of this site navigation menu
+	 */
 	@Override
 	public long getCompanyId() {
 		return _siteNavigationMenu.getCompanyId();
 	}
 
 	/**
-	* Returns the create date of this site navigation menu.
-	*
-	* @return the create date of this site navigation menu
-	*/
+	 * Returns the create date of this site navigation menu.
+	 *
+	 * @return the create date of this site navigation menu
+	 */
 	@Override
 	public Date getCreateDate() {
 		return _siteNavigationMenu.getCreateDate();
@@ -197,50 +198,50 @@ public class SiteNavigationMenuWrapper implements SiteNavigationMenu,
 	}
 
 	/**
-	* Returns the group ID of this site navigation menu.
-	*
-	* @return the group ID of this site navigation menu
-	*/
+	 * Returns the group ID of this site navigation menu.
+	 *
+	 * @return the group ID of this site navigation menu
+	 */
 	@Override
 	public long getGroupId() {
 		return _siteNavigationMenu.getGroupId();
 	}
 
 	/**
-	* Returns the last publish date of this site navigation menu.
-	*
-	* @return the last publish date of this site navigation menu
-	*/
+	 * Returns the last publish date of this site navigation menu.
+	 *
+	 * @return the last publish date of this site navigation menu
+	 */
 	@Override
 	public Date getLastPublishDate() {
 		return _siteNavigationMenu.getLastPublishDate();
 	}
 
 	/**
-	* Returns the modified date of this site navigation menu.
-	*
-	* @return the modified date of this site navigation menu
-	*/
+	 * Returns the modified date of this site navigation menu.
+	 *
+	 * @return the modified date of this site navigation menu
+	 */
 	@Override
 	public Date getModifiedDate() {
 		return _siteNavigationMenu.getModifiedDate();
 	}
 
 	/**
-	* Returns the name of this site navigation menu.
-	*
-	* @return the name of this site navigation menu
-	*/
+	 * Returns the name of this site navigation menu.
+	 *
+	 * @return the name of this site navigation menu
+	 */
 	@Override
 	public String getName() {
 		return _siteNavigationMenu.getName();
 	}
 
 	/**
-	* Returns the primary key of this site navigation menu.
-	*
-	* @return the primary key of this site navigation menu
-	*/
+	 * Returns the primary key of this site navigation menu.
+	 *
+	 * @return the primary key of this site navigation menu
+	 */
 	@Override
 	public long getPrimaryKey() {
 		return _siteNavigationMenu.getPrimaryKey();
@@ -252,20 +253,20 @@ public class SiteNavigationMenuWrapper implements SiteNavigationMenu,
 	}
 
 	/**
-	* Returns the site navigation menu ID of this site navigation menu.
-	*
-	* @return the site navigation menu ID of this site navigation menu
-	*/
+	 * Returns the site navigation menu ID of this site navigation menu.
+	 *
+	 * @return the site navigation menu ID of this site navigation menu
+	 */
 	@Override
 	public long getSiteNavigationMenuId() {
 		return _siteNavigationMenu.getSiteNavigationMenuId();
 	}
 
 	/**
-	* Returns the type of this site navigation menu.
-	*
-	* @return the type of this site navigation menu
-	*/
+	 * Returns the type of this site navigation menu.
+	 *
+	 * @return the type of this site navigation menu
+	 */
 	@Override
 	public int getType() {
 		return _siteNavigationMenu.getType();
@@ -277,40 +278,40 @@ public class SiteNavigationMenuWrapper implements SiteNavigationMenu,
 	}
 
 	/**
-	* Returns the user ID of this site navigation menu.
-	*
-	* @return the user ID of this site navigation menu
-	*/
+	 * Returns the user ID of this site navigation menu.
+	 *
+	 * @return the user ID of this site navigation menu
+	 */
 	@Override
 	public long getUserId() {
 		return _siteNavigationMenu.getUserId();
 	}
 
 	/**
-	* Returns the user name of this site navigation menu.
-	*
-	* @return the user name of this site navigation menu
-	*/
+	 * Returns the user name of this site navigation menu.
+	 *
+	 * @return the user name of this site navigation menu
+	 */
 	@Override
 	public String getUserName() {
 		return _siteNavigationMenu.getUserName();
 	}
 
 	/**
-	* Returns the user uuid of this site navigation menu.
-	*
-	* @return the user uuid of this site navigation menu
-	*/
+	 * Returns the user uuid of this site navigation menu.
+	 *
+	 * @return the user uuid of this site navigation menu
+	 */
 	@Override
 	public String getUserUuid() {
 		return _siteNavigationMenu.getUserUuid();
 	}
 
 	/**
-	* Returns the uuid of this site navigation menu.
-	*
-	* @return the uuid of this site navigation menu
-	*/
+	 * Returns the uuid of this site navigation menu.
+	 *
+	 * @return the uuid of this site navigation menu
+	 */
 	@Override
 	public String getUuid() {
 		return _siteNavigationMenu.getUuid();
@@ -322,10 +323,10 @@ public class SiteNavigationMenuWrapper implements SiteNavigationMenu,
 	}
 
 	/**
-	* Returns <code>true</code> if this site navigation menu is auto.
-	*
-	* @return <code>true</code> if this site navigation menu is auto; <code>false</code> otherwise
-	*/
+	 * Returns <code>true</code> if this site navigation menu is auto.
+	 *
+	 * @return <code>true</code> if this site navigation menu is auto; <code>false</code> otherwise
+	 */
 	@Override
 	public boolean isAuto() {
 		return _siteNavigationMenu.isAuto();
@@ -357,10 +358,10 @@ public class SiteNavigationMenuWrapper implements SiteNavigationMenu,
 	}
 
 	/**
-	* Sets whether this site navigation menu is auto.
-	*
-	* @param auto the auto of this site navigation menu
-	*/
+	 * Sets whether this site navigation menu is auto.
+	 *
+	 * @param auto the auto of this site navigation menu
+	 */
 	@Override
 	public void setAuto(boolean auto) {
 		_siteNavigationMenu.setAuto(auto);
@@ -372,20 +373,20 @@ public class SiteNavigationMenuWrapper implements SiteNavigationMenu,
 	}
 
 	/**
-	* Sets the company ID of this site navigation menu.
-	*
-	* @param companyId the company ID of this site navigation menu
-	*/
+	 * Sets the company ID of this site navigation menu.
+	 *
+	 * @param companyId the company ID of this site navigation menu
+	 */
 	@Override
 	public void setCompanyId(long companyId) {
 		_siteNavigationMenu.setCompanyId(companyId);
 	}
 
 	/**
-	* Sets the create date of this site navigation menu.
-	*
-	* @param createDate the create date of this site navigation menu
-	*/
+	 * Sets the create date of this site navigation menu.
+	 *
+	 * @param createDate the create date of this site navigation menu
+	 */
 	@Override
 	public void setCreateDate(Date createDate) {
 		_siteNavigationMenu.setCreateDate(createDate);
@@ -394,6 +395,7 @@ public class SiteNavigationMenuWrapper implements SiteNavigationMenu,
 	@Override
 	public void setExpandoBridgeAttributes(
 		com.liferay.portal.kernel.model.BaseModel<?> baseModel) {
+
 		_siteNavigationMenu.setExpandoBridgeAttributes(baseModel);
 	}
 
@@ -408,40 +410,40 @@ public class SiteNavigationMenuWrapper implements SiteNavigationMenu,
 	}
 
 	/**
-	* Sets the group ID of this site navigation menu.
-	*
-	* @param groupId the group ID of this site navigation menu
-	*/
+	 * Sets the group ID of this site navigation menu.
+	 *
+	 * @param groupId the group ID of this site navigation menu
+	 */
 	@Override
 	public void setGroupId(long groupId) {
 		_siteNavigationMenu.setGroupId(groupId);
 	}
 
 	/**
-	* Sets the last publish date of this site navigation menu.
-	*
-	* @param lastPublishDate the last publish date of this site navigation menu
-	*/
+	 * Sets the last publish date of this site navigation menu.
+	 *
+	 * @param lastPublishDate the last publish date of this site navigation menu
+	 */
 	@Override
 	public void setLastPublishDate(Date lastPublishDate) {
 		_siteNavigationMenu.setLastPublishDate(lastPublishDate);
 	}
 
 	/**
-	* Sets the modified date of this site navigation menu.
-	*
-	* @param modifiedDate the modified date of this site navigation menu
-	*/
+	 * Sets the modified date of this site navigation menu.
+	 *
+	 * @param modifiedDate the modified date of this site navigation menu
+	 */
 	@Override
 	public void setModifiedDate(Date modifiedDate) {
 		_siteNavigationMenu.setModifiedDate(modifiedDate);
 	}
 
 	/**
-	* Sets the name of this site navigation menu.
-	*
-	* @param name the name of this site navigation menu
-	*/
+	 * Sets the name of this site navigation menu.
+	 *
+	 * @param name the name of this site navigation menu
+	 */
 	@Override
 	public void setName(String name) {
 		_siteNavigationMenu.setName(name);
@@ -453,10 +455,10 @@ public class SiteNavigationMenuWrapper implements SiteNavigationMenu,
 	}
 
 	/**
-	* Sets the primary key of this site navigation menu.
-	*
-	* @param primaryKey the primary key of this site navigation menu
-	*/
+	 * Sets the primary key of this site navigation menu.
+	 *
+	 * @param primaryKey the primary key of this site navigation menu
+	 */
 	@Override
 	public void setPrimaryKey(long primaryKey) {
 		_siteNavigationMenu.setPrimaryKey(primaryKey);
@@ -468,73 +470,76 @@ public class SiteNavigationMenuWrapper implements SiteNavigationMenu,
 	}
 
 	/**
-	* Sets the site navigation menu ID of this site navigation menu.
-	*
-	* @param siteNavigationMenuId the site navigation menu ID of this site navigation menu
-	*/
+	 * Sets the site navigation menu ID of this site navigation menu.
+	 *
+	 * @param siteNavigationMenuId the site navigation menu ID of this site navigation menu
+	 */
 	@Override
 	public void setSiteNavigationMenuId(long siteNavigationMenuId) {
 		_siteNavigationMenu.setSiteNavigationMenuId(siteNavigationMenuId);
 	}
 
 	/**
-	* Sets the type of this site navigation menu.
-	*
-	* @param type the type of this site navigation menu
-	*/
+	 * Sets the type of this site navigation menu.
+	 *
+	 * @param type the type of this site navigation menu
+	 */
 	@Override
 	public void setType(int type) {
 		_siteNavigationMenu.setType(type);
 	}
 
 	/**
-	* Sets the user ID of this site navigation menu.
-	*
-	* @param userId the user ID of this site navigation menu
-	*/
+	 * Sets the user ID of this site navigation menu.
+	 *
+	 * @param userId the user ID of this site navigation menu
+	 */
 	@Override
 	public void setUserId(long userId) {
 		_siteNavigationMenu.setUserId(userId);
 	}
 
 	/**
-	* Sets the user name of this site navigation menu.
-	*
-	* @param userName the user name of this site navigation menu
-	*/
+	 * Sets the user name of this site navigation menu.
+	 *
+	 * @param userName the user name of this site navigation menu
+	 */
 	@Override
 	public void setUserName(String userName) {
 		_siteNavigationMenu.setUserName(userName);
 	}
 
 	/**
-	* Sets the user uuid of this site navigation menu.
-	*
-	* @param userUuid the user uuid of this site navigation menu
-	*/
+	 * Sets the user uuid of this site navigation menu.
+	 *
+	 * @param userUuid the user uuid of this site navigation menu
+	 */
 	@Override
 	public void setUserUuid(String userUuid) {
 		_siteNavigationMenu.setUserUuid(userUuid);
 	}
 
 	/**
-	* Sets the uuid of this site navigation menu.
-	*
-	* @param uuid the uuid of this site navigation menu
-	*/
+	 * Sets the uuid of this site navigation menu.
+	 *
+	 * @param uuid the uuid of this site navigation menu
+	 */
 	@Override
 	public void setUuid(String uuid) {
 		_siteNavigationMenu.setUuid(uuid);
 	}
 
 	@Override
-	public com.liferay.portal.kernel.model.CacheModel<SiteNavigationMenu> toCacheModel() {
+	public com.liferay.portal.kernel.model.CacheModel<SiteNavigationMenu>
+		toCacheModel() {
+
 		return _siteNavigationMenu.toCacheModel();
 	}
 
 	@Override
 	public SiteNavigationMenu toEscapedModel() {
-		return new SiteNavigationMenuWrapper(_siteNavigationMenu.toEscapedModel());
+		return new SiteNavigationMenuWrapper(
+			_siteNavigationMenu.toEscapedModel());
 	}
 
 	@Override
@@ -544,7 +549,8 @@ public class SiteNavigationMenuWrapper implements SiteNavigationMenu,
 
 	@Override
 	public SiteNavigationMenu toUnescapedModel() {
-		return new SiteNavigationMenuWrapper(_siteNavigationMenu.toUnescapedModel());
+		return new SiteNavigationMenuWrapper(
+			_siteNavigationMenu.toUnescapedModel());
 	}
 
 	@Override
@@ -562,10 +568,13 @@ public class SiteNavigationMenuWrapper implements SiteNavigationMenu,
 			return false;
 		}
 
-		SiteNavigationMenuWrapper siteNavigationMenuWrapper = (SiteNavigationMenuWrapper)obj;
+		SiteNavigationMenuWrapper siteNavigationMenuWrapper =
+			(SiteNavigationMenuWrapper)obj;
 
-		if (Objects.equals(_siteNavigationMenu,
-					siteNavigationMenuWrapper._siteNavigationMenu)) {
+		if (Objects.equals(
+				_siteNavigationMenu,
+				siteNavigationMenuWrapper._siteNavigationMenu)) {
+
 			return true;
 		}
 
@@ -598,4 +607,5 @@ public class SiteNavigationMenuWrapper implements SiteNavigationMenu,
 	}
 
 	private final SiteNavigationMenu _siteNavigationMenu;
+
 }

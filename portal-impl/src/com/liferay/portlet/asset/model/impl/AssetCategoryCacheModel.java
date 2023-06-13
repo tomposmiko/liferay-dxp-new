@@ -17,7 +17,6 @@ package com.liferay.portlet.asset.model.impl;
 import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.asset.kernel.model.AssetCategory;
-
 import com.liferay.portal.kernel.model.CacheModel;
 import com.liferay.portal.kernel.util.HashUtil;
 import com.liferay.portal.kernel.util.StringBundler;
@@ -33,12 +32,12 @@ import java.util.Date;
  * The cache model class for representing AssetCategory in entity cache.
  *
  * @author Brian Wing Shun Chan
- * @see AssetCategory
  * @generated
  */
 @ProviderType
-public class AssetCategoryCacheModel implements CacheModel<AssetCategory>,
-	Externalizable {
+public class AssetCategoryCacheModel
+	implements CacheModel<AssetCategory>, Externalizable {
+
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj) {
@@ -49,7 +48,8 @@ public class AssetCategoryCacheModel implements CacheModel<AssetCategory>,
 			return false;
 		}
 
-		AssetCategoryCacheModel assetCategoryCacheModel = (AssetCategoryCacheModel)obj;
+		AssetCategoryCacheModel assetCategoryCacheModel =
+			(AssetCategoryCacheModel)obj;
 
 		if (categoryId == assetCategoryCacheModel.categoryId) {
 			return true;
@@ -219,8 +219,7 @@ public class AssetCategoryCacheModel implements CacheModel<AssetCategory>,
 	}
 
 	@Override
-	public void writeExternal(ObjectOutput objectOutput)
-		throws IOException {
+	public void writeExternal(ObjectOutput objectOutput) throws IOException {
 		if (uuid == null) {
 			objectOutput.writeUTF("");
 		}
@@ -301,4 +300,5 @@ public class AssetCategoryCacheModel implements CacheModel<AssetCategory>,
 	public String description;
 	public long vocabularyId;
 	public long lastPublishDate;
+
 }

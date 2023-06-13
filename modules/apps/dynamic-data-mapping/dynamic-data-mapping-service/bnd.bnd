@@ -1,7 +1,7 @@
 Bundle-Name: Liferay Dynamic Data Mapping Service
 Bundle-SymbolicName: com.liferay.dynamic.data.mapping.service
-Bundle-Version: 3.0.47
-Liferay-Require-SchemaVersion: 2.0.3
+Bundle-Version: 3.0.64
+Liferay-Require-SchemaVersion: 2.0.4
 Liferay-Service: true
 Provide-Capability:\
 	liferay.resource.bundle;\

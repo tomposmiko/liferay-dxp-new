@@ -17,7 +17,6 @@ package com.liferay.opensocial.model.impl;
 import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.opensocial.model.OAuthConsumer;
-
 import com.liferay.portal.kernel.model.CacheModel;
 import com.liferay.portal.kernel.util.HashUtil;
 import com.liferay.portal.kernel.util.StringBundler;
@@ -33,12 +32,12 @@ import java.util.Date;
  * The cache model class for representing OAuthConsumer in entity cache.
  *
  * @author Brian Wing Shun Chan
- * @see OAuthConsumer
  * @generated
  */
 @ProviderType
-public class OAuthConsumerCacheModel implements CacheModel<OAuthConsumer>,
-	Externalizable {
+public class OAuthConsumerCacheModel
+	implements CacheModel<OAuthConsumer>, Externalizable {
+
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj) {
@@ -49,7 +48,8 @@ public class OAuthConsumerCacheModel implements CacheModel<OAuthConsumer>,
 			return false;
 		}
 
-		OAuthConsumerCacheModel oAuthConsumerCacheModel = (OAuthConsumerCacheModel)obj;
+		OAuthConsumerCacheModel oAuthConsumerCacheModel =
+			(OAuthConsumerCacheModel)obj;
 
 		if (oAuthConsumerId == oAuthConsumerCacheModel.oAuthConsumerId) {
 			return true;
@@ -166,8 +166,7 @@ public class OAuthConsumerCacheModel implements CacheModel<OAuthConsumer>,
 	}
 
 	@Override
-	public void writeExternal(ObjectOutput objectOutput)
-		throws IOException {
+	public void writeExternal(ObjectOutput objectOutput) throws IOException {
 		objectOutput.writeLong(oAuthConsumerId);
 
 		objectOutput.writeLong(companyId);
@@ -219,4 +218,5 @@ public class OAuthConsumerCacheModel implements CacheModel<OAuthConsumer>,
 	public String consumerKey;
 	public String consumerSecret;
 	public String keyType;
+
 }

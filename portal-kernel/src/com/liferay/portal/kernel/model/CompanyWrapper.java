@@ -17,7 +17,6 @@ package com.liferay.portal.kernel.model;
 import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.expando.kernel.model.ExpandoBridge;
-
 import com.liferay.portal.kernel.service.ServiceContext;
 
 import java.io.Serializable;
@@ -37,6 +36,7 @@ import java.util.Objects;
  */
 @ProviderType
 public class CompanyWrapper implements Company, ModelWrapper<Company> {
+
 	public CompanyWrapper(Company company) {
 		_company = company;
 	}
@@ -152,24 +152,25 @@ public class CompanyWrapper implements Company, ModelWrapper<Company> {
 	@Override
 	public Account getAccount()
 		throws com.liferay.portal.kernel.exception.PortalException {
+
 		return _company.getAccount();
 	}
 
 	/**
-	* Returns the account ID of this company.
-	*
-	* @return the account ID of this company
-	*/
+	 * Returns the account ID of this company.
+	 *
+	 * @return the account ID of this company
+	 */
 	@Override
 	public long getAccountId() {
 		return _company.getAccountId();
 	}
 
 	/**
-	* Returns the active of this company.
-	*
-	* @return the active of this company
-	*/
+	 * Returns the active of this company.
+	 *
+	 * @return the active of this company
+	 */
 	@Override
 	public boolean getActive() {
 		return _company.getActive();
@@ -186,10 +187,10 @@ public class CompanyWrapper implements Company, ModelWrapper<Company> {
 	}
 
 	/**
-	* Returns the company ID of this company.
-	*
-	* @return the company ID of this company
-	*/
+	 * Returns the company ID of this company.
+	 *
+	 * @return the company ID of this company
+	 */
 	@Override
 	public long getCompanyId() {
 		return _company.getCompanyId();
@@ -198,6 +199,7 @@ public class CompanyWrapper implements Company, ModelWrapper<Company> {
 	@Override
 	public User getDefaultUser()
 		throws com.liferay.portal.kernel.exception.PortalException {
+
 		return _company.getDefaultUser();
 	}
 
@@ -219,30 +221,32 @@ public class CompanyWrapper implements Company, ModelWrapper<Company> {
 	@Override
 	public Group getGroup()
 		throws com.liferay.portal.kernel.exception.PortalException {
+
 		return _company.getGroup();
 	}
 
 	@Override
 	public long getGroupId()
 		throws com.liferay.portal.kernel.exception.PortalException {
+
 		return _company.getGroupId();
 	}
 
 	/**
-	* Returns the home url of this company.
-	*
-	* @return the home url of this company
-	*/
+	 * Returns the home url of this company.
+	 *
+	 * @return the home url of this company
+	 */
 	@Override
 	public String getHomeURL() {
 		return _company.getHomeURL();
 	}
 
 	/**
-	* Returns the key of this company.
-	*
-	* @return the key of this company
-	*/
+	 * Returns the key of this company.
+	 *
+	 * @return the key of this company
+	 */
 	@Override
 	public String getKey() {
 		return _company.getKey();
@@ -256,44 +260,45 @@ public class CompanyWrapper implements Company, ModelWrapper<Company> {
 	@Override
 	public java.util.Locale getLocale()
 		throws com.liferay.portal.kernel.exception.PortalException {
+
 		return _company.getLocale();
 	}
 
 	/**
-	* Returns the logo ID of this company.
-	*
-	* @return the logo ID of this company
-	*/
+	 * Returns the logo ID of this company.
+	 *
+	 * @return the logo ID of this company
+	 */
 	@Override
 	public long getLogoId() {
 		return _company.getLogoId();
 	}
 
 	/**
-	* Returns the max users of this company.
-	*
-	* @return the max users of this company
-	*/
+	 * Returns the max users of this company.
+	 *
+	 * @return the max users of this company
+	 */
 	@Override
 	public int getMaxUsers() {
 		return _company.getMaxUsers();
 	}
 
 	/**
-	* Returns the mvcc version of this company.
-	*
-	* @return the mvcc version of this company
-	*/
+	 * Returns the mvcc version of this company.
+	 *
+	 * @return the mvcc version of this company
+	 */
 	@Override
 	public long getMvccVersion() {
 		return _company.getMvccVersion();
 	}
 
 	/**
-	* Returns the mx of this company.
-	*
-	* @return the mx of this company
-	*/
+	 * Returns the mx of this company.
+	 *
+	 * @return the mx of this company
+	 */
 	@Override
 	public String getMx() {
 		return _company.getMx();
@@ -302,20 +307,22 @@ public class CompanyWrapper implements Company, ModelWrapper<Company> {
 	@Override
 	public String getName()
 		throws com.liferay.portal.kernel.exception.PortalException {
+
 		return _company.getName();
 	}
 
 	@Override
 	public String getPortalURL(long groupId)
 		throws com.liferay.portal.kernel.exception.PortalException {
+
 		return _company.getPortalURL(groupId);
 	}
 
 	/**
-	* Returns the primary key of this company.
-	*
-	* @return the primary key of this company
-	*/
+	 * Returns the primary key of this company.
+	 *
+	 * @return the primary key of this company
+	 */
 	@Override
 	public long getPrimaryKey() {
 		return _company.getPrimaryKey();
@@ -329,14 +336,15 @@ public class CompanyWrapper implements Company, ModelWrapper<Company> {
 	@Override
 	public String getShortName()
 		throws com.liferay.portal.kernel.exception.PortalException {
+
 		return _company.getShortName();
 	}
 
 	/**
-	* Returns the system of this company.
-	*
-	* @return the system of this company
-	*/
+	 * Returns the system of this company.
+	 *
+	 * @return the system of this company
+	 */
 	@Override
 	public boolean getSystem() {
 		return _company.getSystem();
@@ -345,6 +353,7 @@ public class CompanyWrapper implements Company, ModelWrapper<Company> {
 	@Override
 	public java.util.TimeZone getTimeZone()
 		throws com.liferay.portal.kernel.exception.PortalException {
+
 		return _company.getTimeZone();
 	}
 
@@ -354,10 +363,10 @@ public class CompanyWrapper implements Company, ModelWrapper<Company> {
 	}
 
 	/**
-	* Returns the web ID of this company.
-	*
-	* @return the web ID of this company
-	*/
+	 * Returns the web ID of this company.
+	 *
+	 * @return the web ID of this company
+	 */
 	@Override
 	public String getWebId() {
 		return _company.getWebId();
@@ -374,10 +383,10 @@ public class CompanyWrapper implements Company, ModelWrapper<Company> {
 	}
 
 	/**
-	* Returns <code>true</code> if this company is active.
-	*
-	* @return <code>true</code> if this company is active; <code>false</code> otherwise
-	*/
+	 * Returns <code>true</code> if this company is active.
+	 *
+	 * @return <code>true</code> if this company is active; <code>false</code> otherwise
+	 */
 	@Override
 	public boolean isActive() {
 		return _company.isActive();
@@ -434,10 +443,10 @@ public class CompanyWrapper implements Company, ModelWrapper<Company> {
 	}
 
 	/**
-	* Returns <code>true</code> if this company is system.
-	*
-	* @return <code>true</code> if this company is system; <code>false</code> otherwise
-	*/
+	 * Returns <code>true</code> if this company is system.
+	 *
+	 * @return <code>true</code> if this company is system; <code>false</code> otherwise
+	 */
 	@Override
 	public boolean isSystem() {
 		return _company.isSystem();
@@ -449,20 +458,20 @@ public class CompanyWrapper implements Company, ModelWrapper<Company> {
 	}
 
 	/**
-	* Sets the account ID of this company.
-	*
-	* @param accountId the account ID of this company
-	*/
+	 * Sets the account ID of this company.
+	 *
+	 * @param accountId the account ID of this company
+	 */
 	@Override
 	public void setAccountId(long accountId) {
 		_company.setAccountId(accountId);
 	}
 
 	/**
-	* Sets whether this company is active.
-	*
-	* @param active the active of this company
-	*/
+	 * Sets whether this company is active.
+	 *
+	 * @param active the active of this company
+	 */
 	@Override
 	public void setActive(boolean active) {
 		_company.setActive(active);
@@ -474,10 +483,10 @@ public class CompanyWrapper implements Company, ModelWrapper<Company> {
 	}
 
 	/**
-	* Sets the company ID of this company.
-	*
-	* @param companyId the company ID of this company
-	*/
+	 * Sets the company ID of this company.
+	 *
+	 * @param companyId the company ID of this company
+	 */
 	@Override
 	public void setCompanyId(long companyId) {
 		_company.setCompanyId(companyId);
@@ -499,20 +508,20 @@ public class CompanyWrapper implements Company, ModelWrapper<Company> {
 	}
 
 	/**
-	* Sets the home url of this company.
-	*
-	* @param homeURL the home url of this company
-	*/
+	 * Sets the home url of this company.
+	 *
+	 * @param homeURL the home url of this company
+	 */
 	@Override
 	public void setHomeURL(String homeURL) {
 		_company.setHomeURL(homeURL);
 	}
 
 	/**
-	* Sets the key of this company.
-	*
-	* @param key the key of this company
-	*/
+	 * Sets the key of this company.
+	 *
+	 * @param key the key of this company
+	 */
 	@Override
 	public void setKey(String key) {
 		_company.setKey(key);
@@ -524,40 +533,40 @@ public class CompanyWrapper implements Company, ModelWrapper<Company> {
 	}
 
 	/**
-	* Sets the logo ID of this company.
-	*
-	* @param logoId the logo ID of this company
-	*/
+	 * Sets the logo ID of this company.
+	 *
+	 * @param logoId the logo ID of this company
+	 */
 	@Override
 	public void setLogoId(long logoId) {
 		_company.setLogoId(logoId);
 	}
 
 	/**
-	* Sets the max users of this company.
-	*
-	* @param maxUsers the max users of this company
-	*/
+	 * Sets the max users of this company.
+	 *
+	 * @param maxUsers the max users of this company
+	 */
 	@Override
 	public void setMaxUsers(int maxUsers) {
 		_company.setMaxUsers(maxUsers);
 	}
 
 	/**
-	* Sets the mvcc version of this company.
-	*
-	* @param mvccVersion the mvcc version of this company
-	*/
+	 * Sets the mvcc version of this company.
+	 *
+	 * @param mvccVersion the mvcc version of this company
+	 */
 	@Override
 	public void setMvccVersion(long mvccVersion) {
 		_company.setMvccVersion(mvccVersion);
 	}
 
 	/**
-	* Sets the mx of this company.
-	*
-	* @param mx the mx of this company
-	*/
+	 * Sets the mx of this company.
+	 *
+	 * @param mx the mx of this company
+	 */
 	@Override
 	public void setMx(String mx) {
 		_company.setMx(mx);
@@ -569,10 +578,10 @@ public class CompanyWrapper implements Company, ModelWrapper<Company> {
 	}
 
 	/**
-	* Sets the primary key of this company.
-	*
-	* @param primaryKey the primary key of this company
-	*/
+	 * Sets the primary key of this company.
+	 *
+	 * @param primaryKey the primary key of this company
+	 */
 	@Override
 	public void setPrimaryKey(long primaryKey) {
 		_company.setPrimaryKey(primaryKey);
@@ -584,10 +593,10 @@ public class CompanyWrapper implements Company, ModelWrapper<Company> {
 	}
 
 	/**
-	* Sets whether this company is system.
-	*
-	* @param system the system of this company
-	*/
+	 * Sets whether this company is system.
+	 *
+	 * @param system the system of this company
+	 */
 	@Override
 	public void setSystem(boolean system) {
 		_company.setSystem(system);
@@ -599,10 +608,10 @@ public class CompanyWrapper implements Company, ModelWrapper<Company> {
 	}
 
 	/**
-	* Sets the web ID of this company.
-	*
-	* @param webId the web ID of this company
-	*/
+	 * Sets the web ID of this company.
+	 *
+	 * @param webId the web ID of this company
+	 */
 	@Override
 	public void setWebId(String webId) {
 		_company.setWebId(webId);
@@ -673,4 +682,5 @@ public class CompanyWrapper implements Company, ModelWrapper<Company> {
 	}
 
 	private final Company _company;
+
 }

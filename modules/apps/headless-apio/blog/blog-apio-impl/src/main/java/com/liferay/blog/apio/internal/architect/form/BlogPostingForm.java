@@ -15,30 +15,21 @@
 package com.liferay.blog.apio.internal.architect.form;
 
 import com.liferay.apio.architect.form.Form;
-import com.liferay.apio.architect.function.throwable.ThrowableFunction;
-import com.liferay.apio.architect.functional.Try;
+import com.liferay.blog.apio.architect.model.BlogPosting;
 import com.liferay.category.apio.architect.identifier.CategoryIdentifier;
 import com.liferay.media.object.apio.architect.identifier.MediaObjectIdentifier;
 import com.liferay.person.apio.architect.identifier.PersonIdentifier;
-import com.liferay.portal.kernel.repository.model.FileEntry;
-import com.liferay.portal.kernel.service.ServiceContext;
-import com.liferay.portal.kernel.servlet.taglib.ui.ImageSelector;
-import com.liferay.portal.kernel.util.ArrayUtil;
-import com.liferay.portal.kernel.util.FileUtil;
-import com.liferay.portal.kernel.util.ListUtil;
 
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
-
-import javax.ws.rs.BadRequestException;
 
 /**
  * Represents the values extracted from a blog posting form.
  *
  * @author Alejandro Hernández
  */
-public class BlogPostingForm {
+public class BlogPostingForm implements BlogPosting {
 
 	/**
 	 * Builds a {@code Form} that generates a {@code BlogPostingForm} that
@@ -57,11 +48,11 @@ public class BlogPostingForm {
 		).constructor(
 			BlogPostingForm::new
 		).addOptionalDate(
-			"dateDisplayed", BlogPostingForm::setDisplayDate
-		).addOptionalDate(
 			"dateCreated", BlogPostingForm::setCreateDate
 		).addOptionalDate(
 			"dateModified", BlogPostingForm::setModifiedDate
+		).addOptionalDate(
+			"datePublished", BlogPostingForm::setPublishedDate
 		).addOptionalLinkedModel(
 			"creator", PersonIdentifier.class, BlogPostingForm::setCreatorId
 		).addOptionalLinkedModel(
@@ -109,18 +100,41 @@ public class BlogPostingForm {
 	}
 
 	/**
+	 * Returns the blog post's image caption, if present; otherwise, returns an
+	 * empty string.
+	 *
+	 * @return the image caption, if present; an empty string otherwise
+	 */
+	public String getCaption() {
+		return Optional.ofNullable(
+			_imageCaption
+		).orElse(
+			""
+		);
+	}
+
+	@Override
+	public List<Long> getCategories() {
+		return _categories;
+	}
+
+	@Override
+	public Date getCreatedDate() {
+		return Optional.ofNullable(
+			_createDate
+		).orElseGet(
+			Date::new
+		);
+	}
+
+	/**
 	 * Returns the blog post's creator ID, if present; otherwise, returns the
 	 * provided default ID.
 	 *
-	 * @param  defaultCreatorId the default creator ID
 	 * @return the creator ID, if present; the default ID otherwise
 	 */
-	public long getCreatorId(long defaultCreatorId) {
-		return Optional.ofNullable(
-			_creatorId
-		).orElse(
-			defaultCreatorId
-		);
+	public Long getCreatorId() {
+		return _creatorId;
 	}
 
 	/**
@@ -134,20 +148,6 @@ public class BlogPostingForm {
 			_description
 		).orElse(
 			""
-		);
-	}
-
-	/**
-	 * Returns the blog post's display date, if present; otherwise, returns
-	 * today's date.
-	 *
-	 * @return the display date, if present; today's date otherwise
-	 */
-	public Date getDisplayDate() {
-		return Optional.ofNullable(
-			_displayDate
-		).orElseGet(
-			Date::new
 		);
 	}
 
@@ -174,80 +174,38 @@ public class BlogPostingForm {
 		return _headline;
 	}
 
-	/**
-	 * Returns the blog post's image caption, if present; otherwise, returns an
-	 * empty string.
-	 *
-	 * @return the image caption, if present; an empty string otherwise
-	 */
-	public String getImageCaption() {
+	@Override
+	public Long getImageId() {
+		return _imageId;
+	}
+
+	@Override
+	public List<String> getKeywords() {
+		return _keywords;
+	}
+
+	@Override
+	public Date getModifiedDate() {
 		return Optional.ofNullable(
-			_imageCaption
-		).orElse(
-			""
+			_modifiedDate
+		).orElseGet(
+			Date::new
 		);
 	}
 
 	/**
-	 * Returns the {@code ImageSelector} for the blog post's image, if an image
-	 * ID is present; otherwise, returns {@code null}.
+	 * Returns the blog post's display date, if present; otherwise, returns
+	 * today's date.
 	 *
-	 * @param  function a function that transforms a file entry ID into a {@code
-	 *         FileEntry}
-	 * @return the {@code ImageSelector}, if an image ID is present; {@code
-	 *         null} otherwise
+	 * @return the display date, if present; today's date otherwise
 	 */
-	public ImageSelector getImageSelector(
-		ThrowableFunction<Long, FileEntry> function) {
-
-		if (_imageId == null) {
-			return null;
-		}
-
-		return Try.fromFallible(
-			() -> function.apply(_imageId)
-		).map(
-			fileEntry -> new ImageSelector(
-				FileUtil.getBytes(fileEntry.getContentStream()),
-				fileEntry.getFileName(), fileEntry.getMimeType(),
-				"{\"height\": 0,\"width\": 0,\"x\": 0,\"y\": 0}")
-		).orElseThrow(
-			() -> new BadRequestException(
-				"Unable to find file entry with id " + _imageId)
+	@Override
+	public Date getPublishedDate() {
+		return Optional.ofNullable(
+			_publishedDate
+		).orElseGet(
+			Date::new
 		);
-	}
-
-	/**
-	 * Returns the service context related to this form.
-	 *
-	 * @param  groupId the group ID
-	 * @return the service context
-	 */
-	public ServiceContext getServiceContext(long groupId) {
-		ServiceContext serviceContext = new ServiceContext();
-
-		serviceContext.setAddGroupPermissions(true);
-		serviceContext.setAddGuestPermissions(true);
-		serviceContext.setScopeGroupId(groupId);
-
-		if (_createDate != null) {
-			serviceContext.setCreateDate(_createDate);
-		}
-
-		if (_modifiedDate != null) {
-			serviceContext.setModifiedDate(_modifiedDate);
-		}
-
-		if (ListUtil.isNotEmpty(_keywords)) {
-			serviceContext.setAssetTagNames(ArrayUtil.toStringArray(_keywords));
-		}
-
-		if (ListUtil.isNotEmpty(_categories)) {
-			serviceContext.setAssetCategoryIds(
-				ArrayUtil.toLongArray(_categories));
-		}
-
-		return serviceContext;
 	}
 
 	public void setAlternativeHeadline(String alternativeHeadline) {
@@ -274,10 +232,6 @@ public class BlogPostingForm {
 		_description = description;
 	}
 
-	public void setDisplayDate(Date displayDate) {
-		_displayDate = displayDate;
-	}
-
 	public void setFriendlyURLPath(String friendlyURLPath) {
 		_friendlyURLPath = friendlyURLPath;
 	}
@@ -302,18 +256,22 @@ public class BlogPostingForm {
 		_modifiedDate = modifiedDate;
 	}
 
+	public void setPublishedDate(Date publishedDate) {
+		_publishedDate = publishedDate;
+	}
+
 	private String _alternativeHeadline;
 	private String _articleBody;
 	private List<Long> _categories;
 	private Date _createDate;
 	private Long _creatorId;
 	private String _description;
-	private Date _displayDate;
 	private String _friendlyURLPath;
 	private String _headline;
 	private String _imageCaption;
 	private Long _imageId;
 	private List<String> _keywords;
 	private Date _modifiedDate;
+	private Date _publishedDate;
 
 }

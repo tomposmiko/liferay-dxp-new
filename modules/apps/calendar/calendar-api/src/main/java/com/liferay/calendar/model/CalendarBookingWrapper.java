@@ -17,9 +17,7 @@ package com.liferay.calendar.model;
 import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.expando.kernel.model.ExpandoBridge;
-
 import com.liferay.exportimport.kernel.lar.StagedModelType;
-
 import com.liferay.portal.kernel.model.ModelWrapper;
 import com.liferay.portal.kernel.service.ServiceContext;
 
@@ -40,8 +38,9 @@ import java.util.Objects;
  * @generated
  */
 @ProviderType
-public class CalendarBookingWrapper implements CalendarBooking,
-	ModelWrapper<CalendarBooking> {
+public class CalendarBookingWrapper
+	implements CalendarBooking, ModelWrapper<CalendarBooking> {
+
 	public CalendarBookingWrapper(CalendarBooking calendarBooking) {
 		_calendarBooking = calendarBooking;
 	}
@@ -71,8 +70,8 @@ public class CalendarBookingWrapper implements CalendarBooking,
 		attributes.put("calendarId", getCalendarId());
 		attributes.put("calendarResourceId", getCalendarResourceId());
 		attributes.put("parentCalendarBookingId", getParentCalendarBookingId());
-		attributes.put("recurringCalendarBookingId",
-			getRecurringCalendarBookingId());
+		attributes.put(
+			"recurringCalendarBookingId", getRecurringCalendarBookingId());
 		attributes.put("vEventUid", getVEventUid());
 		attributes.put("title", getTitle());
 		attributes.put("description", getDescription());
@@ -157,14 +156,14 @@ public class CalendarBookingWrapper implements CalendarBooking,
 		}
 
 		Long parentCalendarBookingId = (Long)attributes.get(
-				"parentCalendarBookingId");
+			"parentCalendarBookingId");
 
 		if (parentCalendarBookingId != null) {
 			setParentCalendarBookingId(parentCalendarBookingId);
 		}
 
 		Long recurringCalendarBookingId = (Long)attributes.get(
-				"recurringCalendarBookingId");
+			"recurringCalendarBookingId");
 
 		if (recurringCalendarBookingId != null) {
 			setRecurringCalendarBookingId(recurringCalendarBookingId);
@@ -236,7 +235,8 @@ public class CalendarBookingWrapper implements CalendarBooking,
 			setSecondReminder(secondReminder);
 		}
 
-		String secondReminderType = (String)attributes.get("secondReminderType");
+		String secondReminderType = (String)attributes.get(
+			"secondReminderType");
 
 		if (secondReminderType != null) {
 			setSecondReminderType(secondReminderType);
@@ -275,7 +275,8 @@ public class CalendarBookingWrapper implements CalendarBooking,
 
 	@Override
 	public Object clone() {
-		return new CalendarBookingWrapper((CalendarBooking)_calendarBooking.clone());
+		return new CalendarBookingWrapper(
+			(CalendarBooking)_calendarBooking.clone());
 	}
 
 	@Override
@@ -284,10 +285,10 @@ public class CalendarBookingWrapper implements CalendarBooking,
 	}
 
 	/**
-	* Returns the all day of this calendar booking.
-	*
-	* @return the all day of this calendar booking
-	*/
+	 * Returns the all day of this calendar booking.
+	 *
+	 * @return the all day of this calendar booking
+	 */
 	@Override
 	public boolean getAllDay() {
 		return _calendarBooking.getAllDay();
@@ -301,24 +302,25 @@ public class CalendarBookingWrapper implements CalendarBooking,
 	@Override
 	public Calendar getCalendar()
 		throws com.liferay.portal.kernel.exception.PortalException {
+
 		return _calendarBooking.getCalendar();
 	}
 
 	/**
-	* Returns the calendar booking ID of this calendar booking.
-	*
-	* @return the calendar booking ID of this calendar booking
-	*/
+	 * Returns the calendar booking ID of this calendar booking.
+	 *
+	 * @return the calendar booking ID of this calendar booking
+	 */
 	@Override
 	public long getCalendarBookingId() {
 		return _calendarBooking.getCalendarBookingId();
 	}
 
 	/**
-	* Returns the calendar ID of this calendar booking.
-	*
-	* @return the calendar ID of this calendar booking
-	*/
+	 * Returns the calendar ID of this calendar booking.
+	 *
+	 * @return the calendar ID of this calendar booking
+	 */
 	@Override
 	public long getCalendarId() {
 		return _calendarBooking.getCalendarId();
@@ -327,14 +329,15 @@ public class CalendarBookingWrapper implements CalendarBooking,
 	@Override
 	public CalendarResource getCalendarResource()
 		throws com.liferay.portal.kernel.exception.PortalException {
+
 		return _calendarBooking.getCalendarResource();
 	}
 
 	/**
-	* Returns the calendar resource ID of this calendar booking.
-	*
-	* @return the calendar resource ID of this calendar booking
-	*/
+	 * Returns the calendar resource ID of this calendar booking.
+	 *
+	 * @return the calendar resource ID of this calendar booking
+	 */
 	@Override
 	public long getCalendarResourceId() {
 		return _calendarBooking.getCalendarResourceId();
@@ -346,20 +349,20 @@ public class CalendarBookingWrapper implements CalendarBooking,
 	}
 
 	/**
-	* Returns the company ID of this calendar booking.
-	*
-	* @return the company ID of this calendar booking
-	*/
+	 * Returns the company ID of this calendar booking.
+	 *
+	 * @return the company ID of this calendar booking
+	 */
 	@Override
 	public long getCompanyId() {
 		return _calendarBooking.getCompanyId();
 	}
 
 	/**
-	* Returns the create date of this calendar booking.
-	*
-	* @return the create date of this calendar booking
-	*/
+	 * Returns the create date of this calendar booking.
+	 *
+	 * @return the create date of this calendar booking
+	 */
 	@Override
 	public Date getCreateDate() {
 		return _calendarBooking.getCreateDate();
@@ -371,56 +374,56 @@ public class CalendarBookingWrapper implements CalendarBooking,
 	}
 
 	/**
-	* Returns the description of this calendar booking.
-	*
-	* @return the description of this calendar booking
-	*/
+	 * Returns the description of this calendar booking.
+	 *
+	 * @return the description of this calendar booking
+	 */
 	@Override
 	public String getDescription() {
 		return _calendarBooking.getDescription();
 	}
 
 	/**
-	* Returns the localized description of this calendar booking in the language. Uses the default language if no localization exists for the requested language.
-	*
-	* @param locale the locale of the language
-	* @return the localized description of this calendar booking
-	*/
+	 * Returns the localized description of this calendar booking in the language. Uses the default language if no localization exists for the requested language.
+	 *
+	 * @param locale the locale of the language
+	 * @return the localized description of this calendar booking
+	 */
 	@Override
 	public String getDescription(java.util.Locale locale) {
 		return _calendarBooking.getDescription(locale);
 	}
 
 	/**
-	* Returns the localized description of this calendar booking in the language, optionally using the default language if no localization exists for the requested language.
-	*
-	* @param locale the local of the language
-	* @param useDefault whether to use the default language if no localization exists for the requested language
-	* @return the localized description of this calendar booking. If <code>useDefault</code> is <code>false</code> and no localization exists for the requested language, an empty string will be returned.
-	*/
+	 * Returns the localized description of this calendar booking in the language, optionally using the default language if no localization exists for the requested language.
+	 *
+	 * @param locale the local of the language
+	 * @param useDefault whether to use the default language if no localization exists for the requested language
+	 * @return the localized description of this calendar booking. If <code>useDefault</code> is <code>false</code> and no localization exists for the requested language, an empty string will be returned.
+	 */
 	@Override
 	public String getDescription(java.util.Locale locale, boolean useDefault) {
 		return _calendarBooking.getDescription(locale, useDefault);
 	}
 
 	/**
-	* Returns the localized description of this calendar booking in the language. Uses the default language if no localization exists for the requested language.
-	*
-	* @param languageId the ID of the language
-	* @return the localized description of this calendar booking
-	*/
+	 * Returns the localized description of this calendar booking in the language. Uses the default language if no localization exists for the requested language.
+	 *
+	 * @param languageId the ID of the language
+	 * @return the localized description of this calendar booking
+	 */
 	@Override
 	public String getDescription(String languageId) {
 		return _calendarBooking.getDescription(languageId);
 	}
 
 	/**
-	* Returns the localized description of this calendar booking in the language, optionally using the default language if no localization exists for the requested language.
-	*
-	* @param languageId the ID of the language
-	* @param useDefault whether to use the default language if no localization exists for the requested language
-	* @return the localized description of this calendar booking
-	*/
+	 * Returns the localized description of this calendar booking in the language, optionally using the default language if no localization exists for the requested language.
+	 *
+	 * @param languageId the ID of the language
+	 * @param useDefault whether to use the default language if no localization exists for the requested language
+	 * @return the localized description of this calendar booking
+	 */
 	@Override
 	public String getDescription(String languageId, boolean useDefault) {
 		return _calendarBooking.getDescription(languageId, useDefault);
@@ -437,10 +440,10 @@ public class CalendarBookingWrapper implements CalendarBooking,
 	}
 
 	/**
-	* Returns a map of the locales and localized descriptions of this calendar booking.
-	*
-	* @return the locales and localized descriptions of this calendar booking
-	*/
+	 * Returns a map of the locales and localized descriptions of this calendar booking.
+	 *
+	 * @return the locales and localized descriptions of this calendar booking
+	 */
 	@Override
 	public Map<java.util.Locale, String> getDescriptionMap() {
 		return _calendarBooking.getDescriptionMap();
@@ -452,10 +455,10 @@ public class CalendarBookingWrapper implements CalendarBooking,
 	}
 
 	/**
-	* Returns the end time of this calendar booking.
-	*
-	* @return the end time of this calendar booking
-	*/
+	 * Returns the end time of this calendar booking.
+	 *
+	 * @return the end time of this calendar booking
+	 */
 	@Override
 	public long getEndTime() {
 		return _calendarBooking.getEndTime();
@@ -467,35 +470,37 @@ public class CalendarBookingWrapper implements CalendarBooking,
 	}
 
 	/**
-	* Returns the first reminder of this calendar booking.
-	*
-	* @return the first reminder of this calendar booking
-	*/
+	 * Returns the first reminder of this calendar booking.
+	 *
+	 * @return the first reminder of this calendar booking
+	 */
 	@Override
 	public long getFirstReminder() {
 		return _calendarBooking.getFirstReminder();
 	}
 
 	@Override
-	public com.liferay.calendar.notification.NotificationType getFirstReminderNotificationType() {
+	public com.liferay.calendar.notification.NotificationType
+		getFirstReminderNotificationType() {
+
 		return _calendarBooking.getFirstReminderNotificationType();
 	}
 
 	/**
-	* Returns the first reminder type of this calendar booking.
-	*
-	* @return the first reminder type of this calendar booking
-	*/
+	 * Returns the first reminder type of this calendar booking.
+	 *
+	 * @return the first reminder type of this calendar booking
+	 */
 	@Override
 	public String getFirstReminderType() {
 		return _calendarBooking.getFirstReminderType();
 	}
 
 	/**
-	* Returns the group ID of this calendar booking.
-	*
-	* @return the group ID of this calendar booking
-	*/
+	 * Returns the group ID of this calendar booking.
+	 *
+	 * @return the group ID of this calendar booking
+	 */
 	@Override
 	public long getGroupId() {
 		return _calendarBooking.getGroupId();
@@ -507,30 +512,30 @@ public class CalendarBookingWrapper implements CalendarBooking,
 	}
 
 	/**
-	* Returns the last publish date of this calendar booking.
-	*
-	* @return the last publish date of this calendar booking
-	*/
+	 * Returns the last publish date of this calendar booking.
+	 *
+	 * @return the last publish date of this calendar booking
+	 */
 	@Override
 	public Date getLastPublishDate() {
 		return _calendarBooking.getLastPublishDate();
 	}
 
 	/**
-	* Returns the location of this calendar booking.
-	*
-	* @return the location of this calendar booking
-	*/
+	 * Returns the location of this calendar booking.
+	 *
+	 * @return the location of this calendar booking
+	 */
 	@Override
 	public String getLocation() {
 		return _calendarBooking.getLocation();
 	}
 
 	/**
-	* Returns the modified date of this calendar booking.
-	*
-	* @return the modified date of this calendar booking
-	*/
+	 * Returns the modified date of this calendar booking.
+	 *
+	 * @return the modified date of this calendar booking
+	 */
 	@Override
 	public Date getModifiedDate() {
 		return _calendarBooking.getModifiedDate();
@@ -539,24 +544,25 @@ public class CalendarBookingWrapper implements CalendarBooking,
 	@Override
 	public CalendarBooking getParentCalendarBooking()
 		throws com.liferay.portal.kernel.exception.PortalException {
+
 		return _calendarBooking.getParentCalendarBooking();
 	}
 
 	/**
-	* Returns the parent calendar booking ID of this calendar booking.
-	*
-	* @return the parent calendar booking ID of this calendar booking
-	*/
+	 * Returns the parent calendar booking ID of this calendar booking.
+	 *
+	 * @return the parent calendar booking ID of this calendar booking
+	 */
 	@Override
 	public long getParentCalendarBookingId() {
 		return _calendarBooking.getParentCalendarBookingId();
 	}
 
 	/**
-	* Returns the primary key of this calendar booking.
-	*
-	* @return the primary key of this calendar booking
-	*/
+	 * Returns the primary key of this calendar booking.
+	 *
+	 * @return the primary key of this calendar booking
+	 */
 	@Override
 	public long getPrimaryKey() {
 		return _calendarBooking.getPrimaryKey();
@@ -568,10 +574,10 @@ public class CalendarBookingWrapper implements CalendarBooking,
 	}
 
 	/**
-	* Returns the recurrence of this calendar booking.
-	*
-	* @return the recurrence of this calendar booking
-	*/
+	 * Returns the recurrence of this calendar booking.
+	 *
+	 * @return the recurrence of this calendar booking
+	 */
 	@Override
 	public String getRecurrence() {
 		return _calendarBooking.getRecurrence();
@@ -583,95 +589,97 @@ public class CalendarBookingWrapper implements CalendarBooking,
 	}
 
 	/**
-	* Returns the recurring calendar booking ID of this calendar booking.
-	*
-	* @return the recurring calendar booking ID of this calendar booking
-	*/
+	 * Returns the recurring calendar booking ID of this calendar booking.
+	 *
+	 * @return the recurring calendar booking ID of this calendar booking
+	 */
 	@Override
 	public long getRecurringCalendarBookingId() {
 		return _calendarBooking.getRecurringCalendarBookingId();
 	}
 
 	/**
-	* Returns the second reminder of this calendar booking.
-	*
-	* @return the second reminder of this calendar booking
-	*/
+	 * Returns the second reminder of this calendar booking.
+	 *
+	 * @return the second reminder of this calendar booking
+	 */
 	@Override
 	public long getSecondReminder() {
 		return _calendarBooking.getSecondReminder();
 	}
 
 	@Override
-	public com.liferay.calendar.notification.NotificationType getSecondReminderNotificationType() {
+	public com.liferay.calendar.notification.NotificationType
+		getSecondReminderNotificationType() {
+
 		return _calendarBooking.getSecondReminderNotificationType();
 	}
 
 	/**
-	* Returns the second reminder type of this calendar booking.
-	*
-	* @return the second reminder type of this calendar booking
-	*/
+	 * Returns the second reminder type of this calendar booking.
+	 *
+	 * @return the second reminder type of this calendar booking
+	 */
 	@Override
 	public String getSecondReminderType() {
 		return _calendarBooking.getSecondReminderType();
 	}
 
 	/**
-	* Returns the start time of this calendar booking.
-	*
-	* @return the start time of this calendar booking
-	*/
+	 * Returns the start time of this calendar booking.
+	 *
+	 * @return the start time of this calendar booking
+	 */
 	@Override
 	public long getStartTime() {
 		return _calendarBooking.getStartTime();
 	}
 
 	/**
-	* Returns the status of this calendar booking.
-	*
-	* @return the status of this calendar booking
-	*/
+	 * Returns the status of this calendar booking.
+	 *
+	 * @return the status of this calendar booking
+	 */
 	@Override
 	public int getStatus() {
 		return _calendarBooking.getStatus();
 	}
 
 	/**
-	* Returns the status by user ID of this calendar booking.
-	*
-	* @return the status by user ID of this calendar booking
-	*/
+	 * Returns the status by user ID of this calendar booking.
+	 *
+	 * @return the status by user ID of this calendar booking
+	 */
 	@Override
 	public long getStatusByUserId() {
 		return _calendarBooking.getStatusByUserId();
 	}
 
 	/**
-	* Returns the status by user name of this calendar booking.
-	*
-	* @return the status by user name of this calendar booking
-	*/
+	 * Returns the status by user name of this calendar booking.
+	 *
+	 * @return the status by user name of this calendar booking
+	 */
 	@Override
 	public String getStatusByUserName() {
 		return _calendarBooking.getStatusByUserName();
 	}
 
 	/**
-	* Returns the status by user uuid of this calendar booking.
-	*
-	* @return the status by user uuid of this calendar booking
-	*/
+	 * Returns the status by user uuid of this calendar booking.
+	 *
+	 * @return the status by user uuid of this calendar booking
+	 */
 	@Override
 	public String getStatusByUserUuid() {
 		return _calendarBooking.getStatusByUserUuid();
 	}
 
 	/**
-	* Returns the status date of this calendar booking.
-	*
-	* @return the status date of this calendar booking
-	*/
+	 * Returns the status date of this calendar booking.
+	 *
+	 * @return the status date of this calendar booking
+	 */
 	@Override
 	public Date getStatusDate() {
 		return _calendarBooking.getStatusDate();
@@ -683,56 +691,56 @@ public class CalendarBookingWrapper implements CalendarBooking,
 	}
 
 	/**
-	* Returns the title of this calendar booking.
-	*
-	* @return the title of this calendar booking
-	*/
+	 * Returns the title of this calendar booking.
+	 *
+	 * @return the title of this calendar booking
+	 */
 	@Override
 	public String getTitle() {
 		return _calendarBooking.getTitle();
 	}
 
 	/**
-	* Returns the localized title of this calendar booking in the language. Uses the default language if no localization exists for the requested language.
-	*
-	* @param locale the locale of the language
-	* @return the localized title of this calendar booking
-	*/
+	 * Returns the localized title of this calendar booking in the language. Uses the default language if no localization exists for the requested language.
+	 *
+	 * @param locale the locale of the language
+	 * @return the localized title of this calendar booking
+	 */
 	@Override
 	public String getTitle(java.util.Locale locale) {
 		return _calendarBooking.getTitle(locale);
 	}
 
 	/**
-	* Returns the localized title of this calendar booking in the language, optionally using the default language if no localization exists for the requested language.
-	*
-	* @param locale the local of the language
-	* @param useDefault whether to use the default language if no localization exists for the requested language
-	* @return the localized title of this calendar booking. If <code>useDefault</code> is <code>false</code> and no localization exists for the requested language, an empty string will be returned.
-	*/
+	 * Returns the localized title of this calendar booking in the language, optionally using the default language if no localization exists for the requested language.
+	 *
+	 * @param locale the local of the language
+	 * @param useDefault whether to use the default language if no localization exists for the requested language
+	 * @return the localized title of this calendar booking. If <code>useDefault</code> is <code>false</code> and no localization exists for the requested language, an empty string will be returned.
+	 */
 	@Override
 	public String getTitle(java.util.Locale locale, boolean useDefault) {
 		return _calendarBooking.getTitle(locale, useDefault);
 	}
 
 	/**
-	* Returns the localized title of this calendar booking in the language. Uses the default language if no localization exists for the requested language.
-	*
-	* @param languageId the ID of the language
-	* @return the localized title of this calendar booking
-	*/
+	 * Returns the localized title of this calendar booking in the language. Uses the default language if no localization exists for the requested language.
+	 *
+	 * @param languageId the ID of the language
+	 * @return the localized title of this calendar booking
+	 */
 	@Override
 	public String getTitle(String languageId) {
 		return _calendarBooking.getTitle(languageId);
 	}
 
 	/**
-	* Returns the localized title of this calendar booking in the language, optionally using the default language if no localization exists for the requested language.
-	*
-	* @param languageId the ID of the language
-	* @param useDefault whether to use the default language if no localization exists for the requested language
-	* @return the localized title of this calendar booking
-	*/
+	 * Returns the localized title of this calendar booking in the language, optionally using the default language if no localization exists for the requested language.
+	 *
+	 * @param languageId the ID of the language
+	 * @param useDefault whether to use the default language if no localization exists for the requested language
+	 * @return the localized title of this calendar booking
+	 */
 	@Override
 	public String getTitle(String languageId, boolean useDefault) {
 		return _calendarBooking.getTitle(languageId, useDefault);
@@ -749,42 +757,43 @@ public class CalendarBookingWrapper implements CalendarBooking,
 	}
 
 	/**
-	* Returns a map of the locales and localized titles of this calendar booking.
-	*
-	* @return the locales and localized titles of this calendar booking
-	*/
+	 * Returns a map of the locales and localized titles of this calendar booking.
+	 *
+	 * @return the locales and localized titles of this calendar booking
+	 */
 	@Override
 	public Map<java.util.Locale, String> getTitleMap() {
 		return _calendarBooking.getTitleMap();
 	}
 
 	/**
-	* Returns the trash entry created when this calendar booking was moved to the Recycle Bin. The trash entry may belong to one of the ancestors of this calendar booking.
-	*
-	* @return the trash entry created when this calendar booking was moved to the Recycle Bin
-	*/
+	 * Returns the trash entry created when this calendar booking was moved to the Recycle Bin. The trash entry may belong to one of the ancestors of this calendar booking.
+	 *
+	 * @return the trash entry created when this calendar booking was moved to the Recycle Bin
+	 */
 	@Override
 	public com.liferay.trash.kernel.model.TrashEntry getTrashEntry()
 		throws com.liferay.portal.kernel.exception.PortalException {
+
 		return _calendarBooking.getTrashEntry();
 	}
 
 	/**
-	* Returns the class primary key of the trash entry for this calendar booking.
-	*
-	* @return the class primary key of the trash entry for this calendar booking
-	*/
+	 * Returns the class primary key of the trash entry for this calendar booking.
+	 *
+	 * @return the class primary key of the trash entry for this calendar booking
+	 */
 	@Override
 	public long getTrashEntryClassPK() {
 		return _calendarBooking.getTrashEntryClassPK();
 	}
 
 	/**
-	* Returns the trash handler for this calendar booking.
-	*
-	* @return the trash handler for this calendar booking
-	* @deprecated As of Judson (7.1.x), with no direct replacement
-	*/
+	 * Returns the trash handler for this calendar booking.
+	 *
+	 * @return the trash handler for this calendar booking
+	 * @deprecated As of Judson (7.1.x), with no direct replacement
+	 */
 	@Deprecated
 	@Override
 	public com.liferay.portal.kernel.trash.TrashHandler getTrashHandler() {
@@ -792,50 +801,50 @@ public class CalendarBookingWrapper implements CalendarBooking,
 	}
 
 	/**
-	* Returns the user ID of this calendar booking.
-	*
-	* @return the user ID of this calendar booking
-	*/
+	 * Returns the user ID of this calendar booking.
+	 *
+	 * @return the user ID of this calendar booking
+	 */
 	@Override
 	public long getUserId() {
 		return _calendarBooking.getUserId();
 	}
 
 	/**
-	* Returns the user name of this calendar booking.
-	*
-	* @return the user name of this calendar booking
-	*/
+	 * Returns the user name of this calendar booking.
+	 *
+	 * @return the user name of this calendar booking
+	 */
 	@Override
 	public String getUserName() {
 		return _calendarBooking.getUserName();
 	}
 
 	/**
-	* Returns the user uuid of this calendar booking.
-	*
-	* @return the user uuid of this calendar booking
-	*/
+	 * Returns the user uuid of this calendar booking.
+	 *
+	 * @return the user uuid of this calendar booking
+	 */
 	@Override
 	public String getUserUuid() {
 		return _calendarBooking.getUserUuid();
 	}
 
 	/**
-	* Returns the uuid of this calendar booking.
-	*
-	* @return the uuid of this calendar booking
-	*/
+	 * Returns the uuid of this calendar booking.
+	 *
+	 * @return the uuid of this calendar booking
+	 */
 	@Override
 	public String getUuid() {
 		return _calendarBooking.getUuid();
 	}
 
 	/**
-	* Returns the v event uid of this calendar booking.
-	*
-	* @return the v event uid of this calendar booking
-	*/
+	 * Returns the v event uid of this calendar booking.
+	 *
+	 * @return the v event uid of this calendar booking
+	 */
 	@Override
 	public String getVEventUid() {
 		return _calendarBooking.getVEventUid();
@@ -847,20 +856,20 @@ public class CalendarBookingWrapper implements CalendarBooking,
 	}
 
 	/**
-	* Returns <code>true</code> if this calendar booking is all day.
-	*
-	* @return <code>true</code> if this calendar booking is all day; <code>false</code> otherwise
-	*/
+	 * Returns <code>true</code> if this calendar booking is all day.
+	 *
+	 * @return <code>true</code> if this calendar booking is all day; <code>false</code> otherwise
+	 */
 	@Override
 	public boolean isAllDay() {
 		return _calendarBooking.isAllDay();
 	}
 
 	/**
-	* Returns <code>true</code> if this calendar booking is approved.
-	*
-	* @return <code>true</code> if this calendar booking is approved; <code>false</code> otherwise
-	*/
+	 * Returns <code>true</code> if this calendar booking is approved.
+	 *
+	 * @return <code>true</code> if this calendar booking is approved; <code>false</code> otherwise
+	 */
 	@Override
 	public boolean isApproved() {
 		return _calendarBooking.isApproved();
@@ -872,20 +881,20 @@ public class CalendarBookingWrapper implements CalendarBooking,
 	}
 
 	/**
-	* Returns <code>true</code> if this calendar booking is denied.
-	*
-	* @return <code>true</code> if this calendar booking is denied; <code>false</code> otherwise
-	*/
+	 * Returns <code>true</code> if this calendar booking is denied.
+	 *
+	 * @return <code>true</code> if this calendar booking is denied; <code>false</code> otherwise
+	 */
 	@Override
 	public boolean isDenied() {
 		return _calendarBooking.isDenied();
 	}
 
 	/**
-	* Returns <code>true</code> if this calendar booking is a draft.
-	*
-	* @return <code>true</code> if this calendar booking is a draft; <code>false</code> otherwise
-	*/
+	 * Returns <code>true</code> if this calendar booking is a draft.
+	 *
+	 * @return <code>true</code> if this calendar booking is a draft; <code>false</code> otherwise
+	 */
 	@Override
 	public boolean isDraft() {
 		return _calendarBooking.isDraft();
@@ -897,50 +906,50 @@ public class CalendarBookingWrapper implements CalendarBooking,
 	}
 
 	/**
-	* Returns <code>true</code> if this calendar booking is expired.
-	*
-	* @return <code>true</code> if this calendar booking is expired; <code>false</code> otherwise
-	*/
+	 * Returns <code>true</code> if this calendar booking is expired.
+	 *
+	 * @return <code>true</code> if this calendar booking is expired; <code>false</code> otherwise
+	 */
 	@Override
 	public boolean isExpired() {
 		return _calendarBooking.isExpired();
 	}
 
 	/**
-	* Returns <code>true</code> if this calendar booking is inactive.
-	*
-	* @return <code>true</code> if this calendar booking is inactive; <code>false</code> otherwise
-	*/
+	 * Returns <code>true</code> if this calendar booking is inactive.
+	 *
+	 * @return <code>true</code> if this calendar booking is inactive; <code>false</code> otherwise
+	 */
 	@Override
 	public boolean isInactive() {
 		return _calendarBooking.isInactive();
 	}
 
 	/**
-	* Returns <code>true</code> if this calendar booking is incomplete.
-	*
-	* @return <code>true</code> if this calendar booking is incomplete; <code>false</code> otherwise
-	*/
+	 * Returns <code>true</code> if this calendar booking is incomplete.
+	 *
+	 * @return <code>true</code> if this calendar booking is incomplete; <code>false</code> otherwise
+	 */
 	@Override
 	public boolean isIncomplete() {
 		return _calendarBooking.isIncomplete();
 	}
 
 	/**
-	* Returns <code>true</code> if this calendar booking is in the Recycle Bin.
-	*
-	* @return <code>true</code> if this calendar booking is in the Recycle Bin; <code>false</code> otherwise
-	*/
+	 * Returns <code>true</code> if this calendar booking is in the Recycle Bin.
+	 *
+	 * @return <code>true</code> if this calendar booking is in the Recycle Bin; <code>false</code> otherwise
+	 */
 	@Override
 	public boolean isInTrash() {
 		return _calendarBooking.isInTrash();
 	}
 
 	/**
-	* Returns <code>true</code> if the parent of this calendar booking is in the Recycle Bin.
-	*
-	* @return <code>true</code> if the parent of this calendar booking is in the Recycle Bin; <code>false</code> otherwise
-	*/
+	 * Returns <code>true</code> if the parent of this calendar booking is in the Recycle Bin.
+	 *
+	 * @return <code>true</code> if the parent of this calendar booking is in the Recycle Bin; <code>false</code> otherwise
+	 */
 	@Override
 	public boolean isInTrashContainer() {
 		return _calendarBooking.isInTrashContainer();
@@ -972,10 +981,10 @@ public class CalendarBookingWrapper implements CalendarBooking,
 	}
 
 	/**
-	* Returns <code>true</code> if this calendar booking is pending.
-	*
-	* @return <code>true</code> if this calendar booking is pending; <code>false</code> otherwise
-	*/
+	 * Returns <code>true</code> if this calendar booking is pending.
+	 *
+	 * @return <code>true</code> if this calendar booking is pending; <code>false</code> otherwise
+	 */
 	@Override
 	public boolean isPending() {
 		return _calendarBooking.isPending();
@@ -987,10 +996,10 @@ public class CalendarBookingWrapper implements CalendarBooking,
 	}
 
 	/**
-	* Returns <code>true</code> if this calendar booking is scheduled.
-	*
-	* @return <code>true</code> if this calendar booking is scheduled; <code>false</code> otherwise
-	*/
+	 * Returns <code>true</code> if this calendar booking is scheduled.
+	 *
+	 * @return <code>true</code> if this calendar booking is scheduled; <code>false</code> otherwise
+	 */
 	@Override
 	public boolean isScheduled() {
 		return _calendarBooking.isScheduled();
@@ -1004,21 +1013,23 @@ public class CalendarBookingWrapper implements CalendarBooking,
 	@Override
 	public void prepareLocalizedFieldsForImport()
 		throws com.liferay.portal.kernel.exception.LocaleException {
+
 		_calendarBooking.prepareLocalizedFieldsForImport();
 	}
 
 	@Override
 	public void prepareLocalizedFieldsForImport(
-		java.util.Locale defaultImportLocale)
+			java.util.Locale defaultImportLocale)
 		throws com.liferay.portal.kernel.exception.LocaleException {
+
 		_calendarBooking.prepareLocalizedFieldsForImport(defaultImportLocale);
 	}
 
 	/**
-	* Sets whether this calendar booking is all day.
-	*
-	* @param allDay the all day of this calendar booking
-	*/
+	 * Sets whether this calendar booking is all day.
+	 *
+	 * @param allDay the all day of this calendar booking
+	 */
 	@Override
 	public void setAllDay(boolean allDay) {
 		_calendarBooking.setAllDay(allDay);
@@ -1030,86 +1041,88 @@ public class CalendarBookingWrapper implements CalendarBooking,
 	}
 
 	/**
-	* Sets the calendar booking ID of this calendar booking.
-	*
-	* @param calendarBookingId the calendar booking ID of this calendar booking
-	*/
+	 * Sets the calendar booking ID of this calendar booking.
+	 *
+	 * @param calendarBookingId the calendar booking ID of this calendar booking
+	 */
 	@Override
 	public void setCalendarBookingId(long calendarBookingId) {
 		_calendarBooking.setCalendarBookingId(calendarBookingId);
 	}
 
 	/**
-	* Sets the calendar ID of this calendar booking.
-	*
-	* @param calendarId the calendar ID of this calendar booking
-	*/
+	 * Sets the calendar ID of this calendar booking.
+	 *
+	 * @param calendarId the calendar ID of this calendar booking
+	 */
 	@Override
 	public void setCalendarId(long calendarId) {
 		_calendarBooking.setCalendarId(calendarId);
 	}
 
 	/**
-	* Sets the calendar resource ID of this calendar booking.
-	*
-	* @param calendarResourceId the calendar resource ID of this calendar booking
-	*/
+	 * Sets the calendar resource ID of this calendar booking.
+	 *
+	 * @param calendarResourceId the calendar resource ID of this calendar booking
+	 */
 	@Override
 	public void setCalendarResourceId(long calendarResourceId) {
 		_calendarBooking.setCalendarResourceId(calendarResourceId);
 	}
 
 	/**
-	* Sets the company ID of this calendar booking.
-	*
-	* @param companyId the company ID of this calendar booking
-	*/
+	 * Sets the company ID of this calendar booking.
+	 *
+	 * @param companyId the company ID of this calendar booking
+	 */
 	@Override
 	public void setCompanyId(long companyId) {
 		_calendarBooking.setCompanyId(companyId);
 	}
 
 	/**
-	* Sets the create date of this calendar booking.
-	*
-	* @param createDate the create date of this calendar booking
-	*/
+	 * Sets the create date of this calendar booking.
+	 *
+	 * @param createDate the create date of this calendar booking
+	 */
 	@Override
 	public void setCreateDate(Date createDate) {
 		_calendarBooking.setCreateDate(createDate);
 	}
 
 	/**
-	* Sets the description of this calendar booking.
-	*
-	* @param description the description of this calendar booking
-	*/
+	 * Sets the description of this calendar booking.
+	 *
+	 * @param description the description of this calendar booking
+	 */
 	@Override
 	public void setDescription(String description) {
 		_calendarBooking.setDescription(description);
 	}
 
 	/**
-	* Sets the localized description of this calendar booking in the language.
-	*
-	* @param description the localized description of this calendar booking
-	* @param locale the locale of the language
-	*/
+	 * Sets the localized description of this calendar booking in the language.
+	 *
+	 * @param description the localized description of this calendar booking
+	 * @param locale the locale of the language
+	 */
 	@Override
 	public void setDescription(String description, java.util.Locale locale) {
 		_calendarBooking.setDescription(description, locale);
 	}
 
 	/**
-	* Sets the localized description of this calendar booking in the language, and sets the default locale.
-	*
-	* @param description the localized description of this calendar booking
-	* @param locale the locale of the language
-	* @param defaultLocale the default locale
-	*/
+	 * Sets the localized description of this calendar booking in the language, and sets the default locale.
+	 *
+	 * @param description the localized description of this calendar booking
+	 * @param locale the locale of the language
+	 * @param defaultLocale the default locale
+	 */
 	@Override
-	public void setDescription(String description, java.util.Locale locale,
+	public void setDescription(
+		String description, java.util.Locale locale,
 		java.util.Locale defaultLocale) {
+
 		_calendarBooking.setDescription(description, locale, defaultLocale);
 	}
 
@@ -1119,33 +1132,36 @@ public class CalendarBookingWrapper implements CalendarBooking,
 	}
 
 	/**
-	* Sets the localized descriptions of this calendar booking from the map of locales and localized descriptions.
-	*
-	* @param descriptionMap the locales and localized descriptions of this calendar booking
-	*/
+	 * Sets the localized descriptions of this calendar booking from the map of locales and localized descriptions.
+	 *
+	 * @param descriptionMap the locales and localized descriptions of this calendar booking
+	 */
 	@Override
-	public void setDescriptionMap(Map<java.util.Locale, String> descriptionMap) {
+	public void setDescriptionMap(
+		Map<java.util.Locale, String> descriptionMap) {
+
 		_calendarBooking.setDescriptionMap(descriptionMap);
 	}
 
 	/**
-	* Sets the localized descriptions of this calendar booking from the map of locales and localized descriptions, and sets the default locale.
-	*
-	* @param descriptionMap the locales and localized descriptions of this calendar booking
-	* @param defaultLocale the default locale
-	*/
+	 * Sets the localized descriptions of this calendar booking from the map of locales and localized descriptions, and sets the default locale.
+	 *
+	 * @param descriptionMap the locales and localized descriptions of this calendar booking
+	 * @param defaultLocale the default locale
+	 */
 	@Override
 	public void setDescriptionMap(
 		Map<java.util.Locale, String> descriptionMap,
 		java.util.Locale defaultLocale) {
+
 		_calendarBooking.setDescriptionMap(descriptionMap, defaultLocale);
 	}
 
 	/**
-	* Sets the end time of this calendar booking.
-	*
-	* @param endTime the end time of this calendar booking
-	*/
+	 * Sets the end time of this calendar booking.
+	 *
+	 * @param endTime the end time of this calendar booking
+	 */
 	@Override
 	public void setEndTime(long endTime) {
 		_calendarBooking.setEndTime(endTime);
@@ -1154,6 +1170,7 @@ public class CalendarBookingWrapper implements CalendarBooking,
 	@Override
 	public void setExpandoBridgeAttributes(
 		com.liferay.portal.kernel.model.BaseModel<?> baseModel) {
+
 		_calendarBooking.setExpandoBridgeAttributes(baseModel);
 	}
 
@@ -1168,30 +1185,30 @@ public class CalendarBookingWrapper implements CalendarBooking,
 	}
 
 	/**
-	* Sets the first reminder of this calendar booking.
-	*
-	* @param firstReminder the first reminder of this calendar booking
-	*/
+	 * Sets the first reminder of this calendar booking.
+	 *
+	 * @param firstReminder the first reminder of this calendar booking
+	 */
 	@Override
 	public void setFirstReminder(long firstReminder) {
 		_calendarBooking.setFirstReminder(firstReminder);
 	}
 
 	/**
-	* Sets the first reminder type of this calendar booking.
-	*
-	* @param firstReminderType the first reminder type of this calendar booking
-	*/
+	 * Sets the first reminder type of this calendar booking.
+	 *
+	 * @param firstReminderType the first reminder type of this calendar booking
+	 */
 	@Override
 	public void setFirstReminderType(String firstReminderType) {
 		_calendarBooking.setFirstReminderType(firstReminderType);
 	}
 
 	/**
-	* Sets the group ID of this calendar booking.
-	*
-	* @param groupId the group ID of this calendar booking
-	*/
+	 * Sets the group ID of this calendar booking.
+	 *
+	 * @param groupId the group ID of this calendar booking
+	 */
 	@Override
 	public void setGroupId(long groupId) {
 		_calendarBooking.setGroupId(groupId);
@@ -1203,30 +1220,30 @@ public class CalendarBookingWrapper implements CalendarBooking,
 	}
 
 	/**
-	* Sets the last publish date of this calendar booking.
-	*
-	* @param lastPublishDate the last publish date of this calendar booking
-	*/
+	 * Sets the last publish date of this calendar booking.
+	 *
+	 * @param lastPublishDate the last publish date of this calendar booking
+	 */
 	@Override
 	public void setLastPublishDate(Date lastPublishDate) {
 		_calendarBooking.setLastPublishDate(lastPublishDate);
 	}
 
 	/**
-	* Sets the location of this calendar booking.
-	*
-	* @param location the location of this calendar booking
-	*/
+	 * Sets the location of this calendar booking.
+	 *
+	 * @param location the location of this calendar booking
+	 */
 	@Override
 	public void setLocation(String location) {
 		_calendarBooking.setLocation(location);
 	}
 
 	/**
-	* Sets the modified date of this calendar booking.
-	*
-	* @param modifiedDate the modified date of this calendar booking
-	*/
+	 * Sets the modified date of this calendar booking.
+	 *
+	 * @param modifiedDate the modified date of this calendar booking
+	 */
 	@Override
 	public void setModifiedDate(Date modifiedDate) {
 		_calendarBooking.setModifiedDate(modifiedDate);
@@ -1238,20 +1255,20 @@ public class CalendarBookingWrapper implements CalendarBooking,
 	}
 
 	/**
-	* Sets the parent calendar booking ID of this calendar booking.
-	*
-	* @param parentCalendarBookingId the parent calendar booking ID of this calendar booking
-	*/
+	 * Sets the parent calendar booking ID of this calendar booking.
+	 *
+	 * @param parentCalendarBookingId the parent calendar booking ID of this calendar booking
+	 */
 	@Override
 	public void setParentCalendarBookingId(long parentCalendarBookingId) {
 		_calendarBooking.setParentCalendarBookingId(parentCalendarBookingId);
 	}
 
 	/**
-	* Sets the primary key of this calendar booking.
-	*
-	* @param primaryKey the primary key of this calendar booking
-	*/
+	 * Sets the primary key of this calendar booking.
+	 *
+	 * @param primaryKey the primary key of this calendar booking
+	 */
 	@Override
 	public void setPrimaryKey(long primaryKey) {
 		_calendarBooking.setPrimaryKey(primaryKey);
@@ -1263,136 +1280,138 @@ public class CalendarBookingWrapper implements CalendarBooking,
 	}
 
 	/**
-	* Sets the recurrence of this calendar booking.
-	*
-	* @param recurrence the recurrence of this calendar booking
-	*/
+	 * Sets the recurrence of this calendar booking.
+	 *
+	 * @param recurrence the recurrence of this calendar booking
+	 */
 	@Override
 	public void setRecurrence(String recurrence) {
 		_calendarBooking.setRecurrence(recurrence);
 	}
 
 	/**
-	* Sets the recurring calendar booking ID of this calendar booking.
-	*
-	* @param recurringCalendarBookingId the recurring calendar booking ID of this calendar booking
-	*/
+	 * Sets the recurring calendar booking ID of this calendar booking.
+	 *
+	 * @param recurringCalendarBookingId the recurring calendar booking ID of this calendar booking
+	 */
 	@Override
 	public void setRecurringCalendarBookingId(long recurringCalendarBookingId) {
-		_calendarBooking.setRecurringCalendarBookingId(recurringCalendarBookingId);
+		_calendarBooking.setRecurringCalendarBookingId(
+			recurringCalendarBookingId);
 	}
 
 	/**
-	* Sets the second reminder of this calendar booking.
-	*
-	* @param secondReminder the second reminder of this calendar booking
-	*/
+	 * Sets the second reminder of this calendar booking.
+	 *
+	 * @param secondReminder the second reminder of this calendar booking
+	 */
 	@Override
 	public void setSecondReminder(long secondReminder) {
 		_calendarBooking.setSecondReminder(secondReminder);
 	}
 
 	/**
-	* Sets the second reminder type of this calendar booking.
-	*
-	* @param secondReminderType the second reminder type of this calendar booking
-	*/
+	 * Sets the second reminder type of this calendar booking.
+	 *
+	 * @param secondReminderType the second reminder type of this calendar booking
+	 */
 	@Override
 	public void setSecondReminderType(String secondReminderType) {
 		_calendarBooking.setSecondReminderType(secondReminderType);
 	}
 
 	/**
-	* Sets the start time of this calendar booking.
-	*
-	* @param startTime the start time of this calendar booking
-	*/
+	 * Sets the start time of this calendar booking.
+	 *
+	 * @param startTime the start time of this calendar booking
+	 */
 	@Override
 	public void setStartTime(long startTime) {
 		_calendarBooking.setStartTime(startTime);
 	}
 
 	/**
-	* Sets the status of this calendar booking.
-	*
-	* @param status the status of this calendar booking
-	*/
+	 * Sets the status of this calendar booking.
+	 *
+	 * @param status the status of this calendar booking
+	 */
 	@Override
 	public void setStatus(int status) {
 		_calendarBooking.setStatus(status);
 	}
 
 	/**
-	* Sets the status by user ID of this calendar booking.
-	*
-	* @param statusByUserId the status by user ID of this calendar booking
-	*/
+	 * Sets the status by user ID of this calendar booking.
+	 *
+	 * @param statusByUserId the status by user ID of this calendar booking
+	 */
 	@Override
 	public void setStatusByUserId(long statusByUserId) {
 		_calendarBooking.setStatusByUserId(statusByUserId);
 	}
 
 	/**
-	* Sets the status by user name of this calendar booking.
-	*
-	* @param statusByUserName the status by user name of this calendar booking
-	*/
+	 * Sets the status by user name of this calendar booking.
+	 *
+	 * @param statusByUserName the status by user name of this calendar booking
+	 */
 	@Override
 	public void setStatusByUserName(String statusByUserName) {
 		_calendarBooking.setStatusByUserName(statusByUserName);
 	}
 
 	/**
-	* Sets the status by user uuid of this calendar booking.
-	*
-	* @param statusByUserUuid the status by user uuid of this calendar booking
-	*/
+	 * Sets the status by user uuid of this calendar booking.
+	 *
+	 * @param statusByUserUuid the status by user uuid of this calendar booking
+	 */
 	@Override
 	public void setStatusByUserUuid(String statusByUserUuid) {
 		_calendarBooking.setStatusByUserUuid(statusByUserUuid);
 	}
 
 	/**
-	* Sets the status date of this calendar booking.
-	*
-	* @param statusDate the status date of this calendar booking
-	*/
+	 * Sets the status date of this calendar booking.
+	 *
+	 * @param statusDate the status date of this calendar booking
+	 */
 	@Override
 	public void setStatusDate(Date statusDate) {
 		_calendarBooking.setStatusDate(statusDate);
 	}
 
 	/**
-	* Sets the title of this calendar booking.
-	*
-	* @param title the title of this calendar booking
-	*/
+	 * Sets the title of this calendar booking.
+	 *
+	 * @param title the title of this calendar booking
+	 */
 	@Override
 	public void setTitle(String title) {
 		_calendarBooking.setTitle(title);
 	}
 
 	/**
-	* Sets the localized title of this calendar booking in the language.
-	*
-	* @param title the localized title of this calendar booking
-	* @param locale the locale of the language
-	*/
+	 * Sets the localized title of this calendar booking in the language.
+	 *
+	 * @param title the localized title of this calendar booking
+	 * @param locale the locale of the language
+	 */
 	@Override
 	public void setTitle(String title, java.util.Locale locale) {
 		_calendarBooking.setTitle(title, locale);
 	}
 
 	/**
-	* Sets the localized title of this calendar booking in the language, and sets the default locale.
-	*
-	* @param title the localized title of this calendar booking
-	* @param locale the locale of the language
-	* @param defaultLocale the default locale
-	*/
+	 * Sets the localized title of this calendar booking in the language, and sets the default locale.
+	 *
+	 * @param title the localized title of this calendar booking
+	 * @param locale the locale of the language
+	 * @param defaultLocale the default locale
+	 */
 	@Override
-	public void setTitle(String title, java.util.Locale locale,
-		java.util.Locale defaultLocale) {
+	public void setTitle(
+		String title, java.util.Locale locale, java.util.Locale defaultLocale) {
+
 		_calendarBooking.setTitle(title, locale, defaultLocale);
 	}
 
@@ -1402,79 +1421,83 @@ public class CalendarBookingWrapper implements CalendarBooking,
 	}
 
 	/**
-	* Sets the localized titles of this calendar booking from the map of locales and localized titles.
-	*
-	* @param titleMap the locales and localized titles of this calendar booking
-	*/
+	 * Sets the localized titles of this calendar booking from the map of locales and localized titles.
+	 *
+	 * @param titleMap the locales and localized titles of this calendar booking
+	 */
 	@Override
 	public void setTitleMap(Map<java.util.Locale, String> titleMap) {
 		_calendarBooking.setTitleMap(titleMap);
 	}
 
 	/**
-	* Sets the localized titles of this calendar booking from the map of locales and localized titles, and sets the default locale.
-	*
-	* @param titleMap the locales and localized titles of this calendar booking
-	* @param defaultLocale the default locale
-	*/
+	 * Sets the localized titles of this calendar booking from the map of locales and localized titles, and sets the default locale.
+	 *
+	 * @param titleMap the locales and localized titles of this calendar booking
+	 * @param defaultLocale the default locale
+	 */
 	@Override
-	public void setTitleMap(Map<java.util.Locale, String> titleMap,
+	public void setTitleMap(
+		Map<java.util.Locale, String> titleMap,
 		java.util.Locale defaultLocale) {
+
 		_calendarBooking.setTitleMap(titleMap, defaultLocale);
 	}
 
 	/**
-	* Sets the user ID of this calendar booking.
-	*
-	* @param userId the user ID of this calendar booking
-	*/
+	 * Sets the user ID of this calendar booking.
+	 *
+	 * @param userId the user ID of this calendar booking
+	 */
 	@Override
 	public void setUserId(long userId) {
 		_calendarBooking.setUserId(userId);
 	}
 
 	/**
-	* Sets the user name of this calendar booking.
-	*
-	* @param userName the user name of this calendar booking
-	*/
+	 * Sets the user name of this calendar booking.
+	 *
+	 * @param userName the user name of this calendar booking
+	 */
 	@Override
 	public void setUserName(String userName) {
 		_calendarBooking.setUserName(userName);
 	}
 
 	/**
-	* Sets the user uuid of this calendar booking.
-	*
-	* @param userUuid the user uuid of this calendar booking
-	*/
+	 * Sets the user uuid of this calendar booking.
+	 *
+	 * @param userUuid the user uuid of this calendar booking
+	 */
 	@Override
 	public void setUserUuid(String userUuid) {
 		_calendarBooking.setUserUuid(userUuid);
 	}
 
 	/**
-	* Sets the uuid of this calendar booking.
-	*
-	* @param uuid the uuid of this calendar booking
-	*/
+	 * Sets the uuid of this calendar booking.
+	 *
+	 * @param uuid the uuid of this calendar booking
+	 */
 	@Override
 	public void setUuid(String uuid) {
 		_calendarBooking.setUuid(uuid);
 	}
 
 	/**
-	* Sets the v event uid of this calendar booking.
-	*
-	* @param vEventUid the v event uid of this calendar booking
-	*/
+	 * Sets the v event uid of this calendar booking.
+	 *
+	 * @param vEventUid the v event uid of this calendar booking
+	 */
 	@Override
 	public void setVEventUid(String vEventUid) {
 		_calendarBooking.setVEventUid(vEventUid);
 	}
 
 	@Override
-	public com.liferay.portal.kernel.model.CacheModel<CalendarBooking> toCacheModel() {
+	public com.liferay.portal.kernel.model.CacheModel<CalendarBooking>
+		toCacheModel() {
+
 		return _calendarBooking.toCacheModel();
 	}
 
@@ -1508,10 +1531,12 @@ public class CalendarBookingWrapper implements CalendarBooking,
 			return false;
 		}
 
-		CalendarBookingWrapper calendarBookingWrapper = (CalendarBookingWrapper)obj;
+		CalendarBookingWrapper calendarBookingWrapper =
+			(CalendarBookingWrapper)obj;
 
-		if (Objects.equals(_calendarBooking,
-					calendarBookingWrapper._calendarBooking)) {
+		if (Objects.equals(
+				_calendarBooking, calendarBookingWrapper._calendarBooking)) {
+
 			return true;
 		}
 
@@ -1544,4 +1569,5 @@ public class CalendarBookingWrapper implements CalendarBooking,
 	}
 
 	private final CalendarBooking _calendarBooking;
+
 }

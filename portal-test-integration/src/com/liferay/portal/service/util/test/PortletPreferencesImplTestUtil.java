@@ -38,11 +38,8 @@ public class PortletPreferencesImplTestUtil {
 	public static PortletPreferencesImpl toPortletPreferencesImpl(String xml)
 		throws Exception {
 
-		PortletPreferencesImpl portletPreferencesImpl =
-			(PortletPreferencesImpl)
-				PortletPreferencesFactoryUtil.fromDefaultXML(xml);
-
-		return portletPreferencesImpl;
+		return (PortletPreferencesImpl)
+			PortletPreferencesFactoryUtil.fromDefaultXML(xml);
 	}
 
 }

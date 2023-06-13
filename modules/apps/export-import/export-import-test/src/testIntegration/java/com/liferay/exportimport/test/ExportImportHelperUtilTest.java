@@ -67,7 +67,7 @@ import org.junit.runner.RunWith;
 
 /**
  * @author Zsolt Berentey
- * @author Peter Borkuti
+ * @author Péter Borkuti
  */
 @RunWith(Arquillian.class)
 public class ExportImportHelperUtilTest {

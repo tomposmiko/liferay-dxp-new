@@ -34,18 +34,22 @@ import com.liferay.portal.kernel.service.RecentLayoutSetBranchLocalServiceUtil;
 @ProviderType
 public abstract class RecentLayoutSetBranchBaseImpl
 	extends RecentLayoutSetBranchModelImpl implements RecentLayoutSetBranch {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
-	 * Never modify or reference this class directly. All methods that expect a recent layout set branch model instance should use the {@link RecentLayoutSetBranch} interface instead.
+	 * Never modify or reference this class directly. All methods that expect a recent layout set branch model instance should use the <code>RecentLayoutSetBranch</code> interface instead.
 	 */
 	@Override
 	public void persist() {
 		if (this.isNew()) {
-			RecentLayoutSetBranchLocalServiceUtil.addRecentLayoutSetBranch(this);
+			RecentLayoutSetBranchLocalServiceUtil.addRecentLayoutSetBranch(
+				this);
 		}
 		else {
-			RecentLayoutSetBranchLocalServiceUtil.updateRecentLayoutSetBranch(this);
+			RecentLayoutSetBranchLocalServiceUtil.updateRecentLayoutSetBranch(
+				this);
 		}
 	}
+
 }

@@ -66,7 +66,11 @@ public class HelloWorldPortlet extends MVCPortlet {
 		PrintWriter printWriter = renderResponse.getWriter();
 
 		printWriter.print(
-			"Welcome to ".concat(ReleaseInfo.getReleaseInfo()).concat("."));
+			"Welcome to ".concat(
+				ReleaseInfo.getReleaseInfo()
+			).concat(
+				"."
+			));
 	}
 
 }

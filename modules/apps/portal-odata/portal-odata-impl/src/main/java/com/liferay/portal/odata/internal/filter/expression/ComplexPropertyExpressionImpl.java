@@ -20,7 +20,7 @@ import com.liferay.portal.odata.filter.expression.ExpressionVisitor;
 import com.liferay.portal.odata.filter.expression.PropertyExpression;
 
 /**
- * @author Ruben Pulido
+ * @author Rubén Pulido
  */
 public class ComplexPropertyExpressionImpl
 	implements ComplexPropertyExpression {
@@ -51,7 +51,11 @@ public class ComplexPropertyExpressionImpl
 
 	@Override
 	public String toString() {
-		return _name.concat("/").concat(_propertyExpression.toString());
+		return _name.concat(
+			"/"
+		).concat(
+			_propertyExpression.toString()
+		);
 	}
 
 	private final String _name;

@@ -64,7 +64,7 @@ import org.springframework.mock.web.MockHttpServletRequest;
  * Tests whether the friendly URL resolves for existent, nonexistent or expired
  * web content articles in the Asset Publisher.
  *
- * @author Eduardo Garcia
+ * @author Eduardo García
  * @author Roberto Díaz
  */
 @RunWith(Arquillian.class)
@@ -212,7 +212,7 @@ public class DisplayPageFriendlyURLResolverTest {
 			StringBundler.concat(
 				"No JournalArticle exists with the key {groupId=",
 				_group.getGroupId(), ", urlTitle=", urlTitle, ", status=",
-				WorkflowConstants.STATUS_APPROVED, "}"),
+				WorkflowConstants.STATUS_PENDING, "}"),
 			cause.getMessage());
 	}
 

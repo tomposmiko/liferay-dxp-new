@@ -51,7 +51,7 @@ import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
 /**
- * @author Mate Thurzo
+ * @author Máté Thurzó
  * @author Akos Thurzo
  */
 @Component(immediate = true, service = Indexer.class)
@@ -148,10 +148,7 @@ public class ExportImportConfigurationIndexer
 			PortletRequest portletRequest, PortletResponse portletResponse)
 		throws Exception {
 
-		Summary summary = createSummary(
-			document, Field.TITLE, Field.DESCRIPTION);
-
-		return summary;
+		return createSummary(document, Field.TITLE, Field.DESCRIPTION);
 	}
 
 	@Override

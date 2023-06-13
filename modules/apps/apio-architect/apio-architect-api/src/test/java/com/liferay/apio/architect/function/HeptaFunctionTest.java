@@ -30,9 +30,9 @@ public class HeptaFunctionTest {
 	public void testOnInvokingAndThenShouldExecuteBothFunctions() {
 		HeptaFunction
 			<String, String, String, String, String, String, String, String>
-				firstFunction = (
-					string1, string2, string3, string4, string5, string6,
-					string7) ->
+				firstFunction =
+					(string1, string2, string3, string4, string5, string6,
+					 string7) ->
 						string1 + string2 + string3 + string4 + string5 +
 							string6 + string7;
 
@@ -51,9 +51,9 @@ public class HeptaFunctionTest {
 	public void testOnInvokingAndThenWithNullAfterFunctionThrowsException() {
 		HeptaFunction
 			<String, String, String, String, String, String, String, String>
-				firstFunction = (
-					string1, string2, string3, string4, string5,
-					string6, string7) ->
+				firstFunction =
+					(string1, string2, string3, string4, string5, string6,
+					 string7) ->
 						string1 + string2 + string3 + string4 + string5 +
 							string6 + string7;
 

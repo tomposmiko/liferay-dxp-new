@@ -17,7 +17,6 @@ package com.liferay.portal.kernel.model;
 import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.expando.kernel.model.ExpandoBridge;
-
 import com.liferay.portal.kernel.service.ServiceContext;
 
 import java.io.Serializable;
@@ -36,8 +35,9 @@ import java.util.Objects;
  * @generated
  */
 @ProviderType
-public class LayoutBranchWrapper implements LayoutBranch,
-	ModelWrapper<LayoutBranch> {
+public class LayoutBranchWrapper
+	implements LayoutBranch, ModelWrapper<LayoutBranch> {
+
 	public LayoutBranchWrapper(LayoutBranch layoutBranch) {
 		_layoutBranch = layoutBranch;
 	}
@@ -151,20 +151,20 @@ public class LayoutBranchWrapper implements LayoutBranch,
 	}
 
 	/**
-	* Returns the company ID of this layout branch.
-	*
-	* @return the company ID of this layout branch
-	*/
+	 * Returns the company ID of this layout branch.
+	 *
+	 * @return the company ID of this layout branch
+	 */
 	@Override
 	public long getCompanyId() {
 		return _layoutBranch.getCompanyId();
 	}
 
 	/**
-	* Returns the description of this layout branch.
-	*
-	* @return the description of this layout branch
-	*/
+	 * Returns the description of this layout branch.
+	 *
+	 * @return the description of this layout branch
+	 */
 	@Override
 	public String getDescription() {
 		return _layoutBranch.getDescription();
@@ -176,80 +176,80 @@ public class LayoutBranchWrapper implements LayoutBranch,
 	}
 
 	/**
-	* Returns the group ID of this layout branch.
-	*
-	* @return the group ID of this layout branch
-	*/
+	 * Returns the group ID of this layout branch.
+	 *
+	 * @return the group ID of this layout branch
+	 */
 	@Override
 	public long getGroupId() {
 		return _layoutBranch.getGroupId();
 	}
 
 	/**
-	* Returns the layout branch ID of this layout branch.
-	*
-	* @return the layout branch ID of this layout branch
-	*/
+	 * Returns the layout branch ID of this layout branch.
+	 *
+	 * @return the layout branch ID of this layout branch
+	 */
 	@Override
 	public long getLayoutBranchId() {
 		return _layoutBranch.getLayoutBranchId();
 	}
 
 	/**
-	* Returns the layout set branch ID of this layout branch.
-	*
-	* @return the layout set branch ID of this layout branch
-	*/
+	 * Returns the layout set branch ID of this layout branch.
+	 *
+	 * @return the layout set branch ID of this layout branch
+	 */
 	@Override
 	public long getLayoutSetBranchId() {
 		return _layoutBranch.getLayoutSetBranchId();
 	}
 
 	/**
-	* Returns the master of this layout branch.
-	*
-	* @return the master of this layout branch
-	*/
+	 * Returns the master of this layout branch.
+	 *
+	 * @return the master of this layout branch
+	 */
 	@Override
 	public boolean getMaster() {
 		return _layoutBranch.getMaster();
 	}
 
 	/**
-	* Returns the mvcc version of this layout branch.
-	*
-	* @return the mvcc version of this layout branch
-	*/
+	 * Returns the mvcc version of this layout branch.
+	 *
+	 * @return the mvcc version of this layout branch
+	 */
 	@Override
 	public long getMvccVersion() {
 		return _layoutBranch.getMvccVersion();
 	}
 
 	/**
-	* Returns the name of this layout branch.
-	*
-	* @return the name of this layout branch
-	*/
+	 * Returns the name of this layout branch.
+	 *
+	 * @return the name of this layout branch
+	 */
 	@Override
 	public String getName() {
 		return _layoutBranch.getName();
 	}
 
 	/**
-	* Returns the plid of this layout branch.
-	*
-	* @return the plid of this layout branch
-	*/
+	 * Returns the plid of this layout branch.
+	 *
+	 * @return the plid of this layout branch
+	 */
 	@Override
 	public long getPlid() {
 		return _layoutBranch.getPlid();
 	}
 
 	/**
-	* Returns the primary key of this layout branch.
-	*
-	* @return the primary key of this layout branch
-	*/
+	 * Returns the primary key of this layout branch.
+	 *
+	 * @return the primary key of this layout branch
+	 */
 	@Override
 	public long getPrimaryKey() {
 		return _layoutBranch.getPrimaryKey();
@@ -261,30 +261,30 @@ public class LayoutBranchWrapper implements LayoutBranch,
 	}
 
 	/**
-	* Returns the user ID of this layout branch.
-	*
-	* @return the user ID of this layout branch
-	*/
+	 * Returns the user ID of this layout branch.
+	 *
+	 * @return the user ID of this layout branch
+	 */
 	@Override
 	public long getUserId() {
 		return _layoutBranch.getUserId();
 	}
 
 	/**
-	* Returns the user name of this layout branch.
-	*
-	* @return the user name of this layout branch
-	*/
+	 * Returns the user name of this layout branch.
+	 *
+	 * @return the user name of this layout branch
+	 */
 	@Override
 	public String getUserName() {
 		return _layoutBranch.getUserName();
 	}
 
 	/**
-	* Returns the user uuid of this layout branch.
-	*
-	* @return the user uuid of this layout branch
-	*/
+	 * Returns the user uuid of this layout branch.
+	 *
+	 * @return the user uuid of this layout branch
+	 */
 	@Override
 	public String getUserUuid() {
 		return _layoutBranch.getUserUuid();
@@ -306,10 +306,10 @@ public class LayoutBranchWrapper implements LayoutBranch,
 	}
 
 	/**
-	* Returns <code>true</code> if this layout branch is master.
-	*
-	* @return <code>true</code> if this layout branch is master; <code>false</code> otherwise
-	*/
+	 * Returns <code>true</code> if this layout branch is master.
+	 *
+	 * @return <code>true</code> if this layout branch is master; <code>false</code> otherwise
+	 */
 	@Override
 	public boolean isMaster() {
 		return _layoutBranch.isMaster();
@@ -331,20 +331,20 @@ public class LayoutBranchWrapper implements LayoutBranch,
 	}
 
 	/**
-	* Sets the company ID of this layout branch.
-	*
-	* @param companyId the company ID of this layout branch
-	*/
+	 * Sets the company ID of this layout branch.
+	 *
+	 * @param companyId the company ID of this layout branch
+	 */
 	@Override
 	public void setCompanyId(long companyId) {
 		_layoutBranch.setCompanyId(companyId);
 	}
 
 	/**
-	* Sets the description of this layout branch.
-	*
-	* @param description the description of this layout branch
-	*/
+	 * Sets the description of this layout branch.
+	 *
+	 * @param description the description of this layout branch
+	 */
 	@Override
 	public void setDescription(String description) {
 		_layoutBranch.setDescription(description);
@@ -366,60 +366,60 @@ public class LayoutBranchWrapper implements LayoutBranch,
 	}
 
 	/**
-	* Sets the group ID of this layout branch.
-	*
-	* @param groupId the group ID of this layout branch
-	*/
+	 * Sets the group ID of this layout branch.
+	 *
+	 * @param groupId the group ID of this layout branch
+	 */
 	@Override
 	public void setGroupId(long groupId) {
 		_layoutBranch.setGroupId(groupId);
 	}
 
 	/**
-	* Sets the layout branch ID of this layout branch.
-	*
-	* @param layoutBranchId the layout branch ID of this layout branch
-	*/
+	 * Sets the layout branch ID of this layout branch.
+	 *
+	 * @param layoutBranchId the layout branch ID of this layout branch
+	 */
 	@Override
 	public void setLayoutBranchId(long layoutBranchId) {
 		_layoutBranch.setLayoutBranchId(layoutBranchId);
 	}
 
 	/**
-	* Sets the layout set branch ID of this layout branch.
-	*
-	* @param layoutSetBranchId the layout set branch ID of this layout branch
-	*/
+	 * Sets the layout set branch ID of this layout branch.
+	 *
+	 * @param layoutSetBranchId the layout set branch ID of this layout branch
+	 */
 	@Override
 	public void setLayoutSetBranchId(long layoutSetBranchId) {
 		_layoutBranch.setLayoutSetBranchId(layoutSetBranchId);
 	}
 
 	/**
-	* Sets whether this layout branch is master.
-	*
-	* @param master the master of this layout branch
-	*/
+	 * Sets whether this layout branch is master.
+	 *
+	 * @param master the master of this layout branch
+	 */
 	@Override
 	public void setMaster(boolean master) {
 		_layoutBranch.setMaster(master);
 	}
 
 	/**
-	* Sets the mvcc version of this layout branch.
-	*
-	* @param mvccVersion the mvcc version of this layout branch
-	*/
+	 * Sets the mvcc version of this layout branch.
+	 *
+	 * @param mvccVersion the mvcc version of this layout branch
+	 */
 	@Override
 	public void setMvccVersion(long mvccVersion) {
 		_layoutBranch.setMvccVersion(mvccVersion);
 	}
 
 	/**
-	* Sets the name of this layout branch.
-	*
-	* @param name the name of this layout branch
-	*/
+	 * Sets the name of this layout branch.
+	 *
+	 * @param name the name of this layout branch
+	 */
 	@Override
 	public void setName(String name) {
 		_layoutBranch.setName(name);
@@ -431,20 +431,20 @@ public class LayoutBranchWrapper implements LayoutBranch,
 	}
 
 	/**
-	* Sets the plid of this layout branch.
-	*
-	* @param plid the plid of this layout branch
-	*/
+	 * Sets the plid of this layout branch.
+	 *
+	 * @param plid the plid of this layout branch
+	 */
 	@Override
 	public void setPlid(long plid) {
 		_layoutBranch.setPlid(plid);
 	}
 
 	/**
-	* Sets the primary key of this layout branch.
-	*
-	* @param primaryKey the primary key of this layout branch
-	*/
+	 * Sets the primary key of this layout branch.
+	 *
+	 * @param primaryKey the primary key of this layout branch
+	 */
 	@Override
 	public void setPrimaryKey(long primaryKey) {
 		_layoutBranch.setPrimaryKey(primaryKey);
@@ -456,30 +456,30 @@ public class LayoutBranchWrapper implements LayoutBranch,
 	}
 
 	/**
-	* Sets the user ID of this layout branch.
-	*
-	* @param userId the user ID of this layout branch
-	*/
+	 * Sets the user ID of this layout branch.
+	 *
+	 * @param userId the user ID of this layout branch
+	 */
 	@Override
 	public void setUserId(long userId) {
 		_layoutBranch.setUserId(userId);
 	}
 
 	/**
-	* Sets the user name of this layout branch.
-	*
-	* @param userName the user name of this layout branch
-	*/
+	 * Sets the user name of this layout branch.
+	 *
+	 * @param userName the user name of this layout branch
+	 */
 	@Override
 	public void setUserName(String userName) {
 		_layoutBranch.setUserName(userName);
 	}
 
 	/**
-	* Sets the user uuid of this layout branch.
-	*
-	* @param userUuid the user uuid of this layout branch
-	*/
+	 * Sets the user uuid of this layout branch.
+	 *
+	 * @param userUuid the user uuid of this layout branch
+	 */
 	@Override
 	public void setUserUuid(String userUuid) {
 		_layoutBranch.setUserUuid(userUuid);
@@ -550,4 +550,5 @@ public class LayoutBranchWrapper implements LayoutBranch,
 	}
 
 	private final LayoutBranch _layoutBranch;
+
 }

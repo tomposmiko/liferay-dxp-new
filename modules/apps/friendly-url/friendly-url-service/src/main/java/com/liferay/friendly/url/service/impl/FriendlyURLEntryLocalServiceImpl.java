@@ -349,10 +349,8 @@ public class FriendlyURLEntryLocalServiceImpl
 				Math.min(
 					maxLength - suffix.length(), normalizedUrlTitle.length()));
 
-			String decodedUrlTitle = HttpUtil.decodePath(prefix + suffix);
-
 			curUrlTitle = FriendlyURLNormalizerUtil.normalizeWithEncoding(
-				decodedUrlTitle);
+				HttpUtil.decodePath(prefix + suffix));
 		}
 
 		return curUrlTitle;
@@ -451,8 +449,9 @@ public class FriendlyURLEntryLocalServiceImpl
 		int maxLength = ModelHintsUtil.getMaxLength(
 			FriendlyURLEntryLocalization.class.getName(), "urlTitle");
 
-		String normalizedUrlTitle = FriendlyURLNormalizerUtil.normalize(
-			urlTitle);
+		String normalizedUrlTitle =
+			FriendlyURLNormalizerUtil.normalizeWithEncoding(
+				HttpUtil.decodePath(urlTitle));
 
 		if (normalizedUrlTitle.length() > maxLength) {
 			throw new FriendlyURLLengthException(
@@ -531,6 +530,23 @@ public class FriendlyURLEntryLocalServiceImpl
 			if ((existingFriendlyURLEntryLocalization != null) &&
 				(existingFriendlyURLEntryLocalization.getClassPK() ==
 					classPK)) {
+
+				String existingLanguageId =
+					existingFriendlyURLEntryLocalization.getLanguageId();
+
+				if (!existingLanguageId.equals(entry.getKey())) {
+					String existingUrlTitle =
+						existingFriendlyURLEntryLocalization.getUrlTitle();
+
+					if (existingUrlTitle.equals(
+							urlTitleMap.get(existingLanguageId))) {
+
+						continue;
+					}
+
+					existingFriendlyURLEntryLocalization.setLanguageId(
+						entry.getKey());
+				}
 
 				existingFriendlyURLEntryLocalization.setFriendlyURLEntryId(
 					friendlyURLEntryId);

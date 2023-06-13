@@ -24,6 +24,7 @@ import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.model.LayoutPrototype;
+import com.liferay.portal.kernel.model.Portlet;
 import com.liferay.portal.kernel.service.CompanyLocalServiceUtil;
 import com.liferay.portal.kernel.service.LayoutLocalServiceUtil;
 import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
@@ -38,6 +39,7 @@ import com.liferay.portal.util.test.LayoutTestUtil;
 
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.portlet.PortletPreferences;
@@ -48,7 +50,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 /**
- * @author Eduardo Garcia
+ * @author Eduardo García
  */
 @RunWith(Arquillian.class)
 public abstract class BasePrototypePropagationTestCase {
@@ -138,7 +140,9 @@ public abstract class BasePrototypePropagationTestCase {
 
 		setLinkEnabled(linkEnabled);
 
-		int initialPortletCount = LayoutTestUtil.getPortlets(layout).size();
+		List<Portlet> portlets = LayoutTestUtil.getPortlets(layout);
+
+		int initialPortletCount = portlets.size();
 
 		prototypeLayout = LayoutTestUtil.updateLayoutTemplateId(
 			prototypeLayout, "1_column");
@@ -158,8 +162,10 @@ public abstract class BasePrototypePropagationTestCase {
 			Assert.assertFalse(
 				LayoutTestUtil.isLayoutColumnCustomizable(layout, "column-1"));
 
+			portlets = LayoutTestUtil.getPortlets(layout);
+
 			Assert.assertEquals(
-				initialPortletCount, LayoutTestUtil.getPortlets(layout).size());
+				portlets.toString(), initialPortletCount, portlets.size());
 		}
 
 		prototypeLayout = updateModifiedDate(
@@ -175,9 +181,10 @@ public abstract class BasePrototypePropagationTestCase {
 			Assert.assertTrue(
 				LayoutTestUtil.isLayoutColumnCustomizable(layout, "column-1"));
 
+			portlets = LayoutTestUtil.getPortlets(layout);
+
 			Assert.assertEquals(
-				initialPortletCount + 1,
-				LayoutTestUtil.getPortlets(layout).size());
+				portlets.toString(), initialPortletCount + 1, portlets.size());
 		}
 		else {
 			Assert.assertEquals(
@@ -187,8 +194,10 @@ public abstract class BasePrototypePropagationTestCase {
 			Assert.assertFalse(
 				LayoutTestUtil.isLayoutColumnCustomizable(layout, "column-1"));
 
+			portlets = LayoutTestUtil.getPortlets(layout);
+
 			Assert.assertEquals(
-				initialPortletCount, LayoutTestUtil.getPortlets(layout).size());
+				portlets.toString(), initialPortletCount, portlets.size());
 		}
 	}
 

@@ -263,6 +263,16 @@ schema=schema.xml</echo>
 		</sequential>
 	</macrodef>
 
+	<target name="delete-commerce-modules">
+		<delete>
+			<fileset
+				dir="${liferay.home}/osgi"
+			>
+				<include name="*/*commerce*" />
+			</fileset>
+		</delete>
+	</target>
+
 	<target name="deploy-solr">
 		<gradle-execute dir="modules/apps/portal-search-solr7" task="deploy">
 			<arg value="clean" />
@@ -289,6 +299,8 @@ schema=schema.xml</echo>
 	</target>
 
 	<target name="start-solr">
+		<antcall target="delete-commerce-modules" />
+
 		<unzip-solr />
 
 		<prepare-solr-configurations />

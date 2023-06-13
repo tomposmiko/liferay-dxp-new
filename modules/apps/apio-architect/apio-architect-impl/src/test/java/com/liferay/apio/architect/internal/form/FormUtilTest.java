@@ -175,6 +175,7 @@ public class FormUtilTest {
 		fieldFormBiConsumer.accept("list", dateList -> dateList::addAll);
 	}
 
+	@SuppressWarnings("Convert2MethodRef")
 	@Test
 	public void testGetOptionalDoesNotFailIfNotPresent() {
 		_validateOptionalValueMethod(
@@ -300,10 +301,10 @@ public class FormUtilTest {
 	public void testGetOptionalLinkedModelExtractsLinkedModel() {
 		List<String> list = new ArrayList<>();
 
-		BiConsumer<String, Function<List<String>, Consumer<?>>>
+		BiConsumer<String, Function<List<String>, Consumer<Object>>>
 			fieldFormBiConsumer = getOptionalLinkedModel(
-				_valueBody("https://localhost:8080/p/string/1"), list,
-				__ -> "Apio");
+				_valueBody("https://localhost:8080/string/1"), list,
+				__ -> "Apio", __ -> Optional.of("string"));
 
 		fieldFormBiConsumer.accept(
 			"Apio", __ -> string -> list.add(String.valueOf(string)));
@@ -318,9 +319,9 @@ public class FormUtilTest {
 		BiConsumer<String, Function<List<String>, Consumer<List<?>>>>
 			fieldFormBiConsumer = getOptionalLinkedModelList(
 				_valueListBody(
-					"https://localhost:8080/p/string/1",
-					"https://localhost:8080/p/string/2"),
-				list, __ -> "Apio");
+					"https://localhost:8080/string/1",
+					"https://localhost:8080/string/2"),
+				list, __ -> "Apio", __ -> Optional.of("string"));
 
 		fieldFormBiConsumer.accept(
 			"Apio", __ -> objects -> list.addAll((List<String>)objects));
@@ -636,9 +637,10 @@ public class FormUtilTest {
 	public void testGetRequiredLinkedModelFailsIfNotPresent() {
 		List<String> list = new ArrayList<>();
 
-		BiConsumer<String, Function<List<String>, Consumer<?>>>
+		BiConsumer<String, Function<List<String>, Consumer<Object>>>
 			requiredLinkedModel = getRequiredLinkedModel(
-				__ -> Optional.empty(), list, path -> "");
+				__ -> Optional.empty(), list, path -> "",
+				__ -> Optional.of("name"));
 
 		requiredLinkedModel.accept(
 			"linkedModel", strings -> o -> list.addAll(strings));
@@ -650,7 +652,8 @@ public class FormUtilTest {
 
 		BiConsumer<String, Function<List<String>, Consumer<List<?>>>>
 			requiredLinkedModelList = getRequiredLinkedModelList(
-				__ -> Optional.empty(), list, path -> "");
+				__ -> Optional.empty(), list, path -> "",
+				__ -> Optional.of("name"));
 
 		requiredLinkedModelList.accept(
 			"linkedModel", strings -> o -> list.addAll(strings));
@@ -786,9 +789,10 @@ public class FormUtilTest {
 
 	private String _readBinaryFile(BinaryFile binaryFile) {
 		return Try.fromFallibleWithResources(
-			() -> new BufferedReader(new InputStreamReader(
-				binaryFile.getInputStream())),
-			BufferedReader::readLine).getUnchecked();
+			() -> new BufferedReader(
+				new InputStreamReader(binaryFile.getInputStream())),
+			BufferedReader::readLine
+		).getUnchecked();
 	}
 
 	private void _validateBooleanList(List<Boolean> list) {
@@ -834,8 +838,8 @@ public class FormUtilTest {
 	}
 
 	private <T> void _validateOptionalListMethod(
-		BiFunction
-			<Body, List<T>, FieldFormBiConsumer<List<T>, List<T>>> biFunction) {
+		BiFunction<Body, List<T>, FieldFormBiConsumer<List<T>, List<T>>>
+			biFunction) {
 
 		List<T> list = new ArrayList<>();
 

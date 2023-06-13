@@ -17,7 +17,6 @@ package com.liferay.portal.kernel.model;
 import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.expando.kernel.model.ExpandoBridge;
-
 import com.liferay.portal.kernel.service.ServiceContext;
 
 import java.io.Serializable;
@@ -38,10 +37,12 @@ import java.util.Objects;
  */
 @Deprecated
 @ProviderType
-public class ResourceTypePermissionWrapper implements ResourceTypePermission,
-	ModelWrapper<ResourceTypePermission> {
+public class ResourceTypePermissionWrapper
+	implements ResourceTypePermission, ModelWrapper<ResourceTypePermission> {
+
 	public ResourceTypePermissionWrapper(
 		ResourceTypePermission resourceTypePermission) {
+
 		_resourceTypePermission = resourceTypePermission;
 	}
 
@@ -60,7 +61,8 @@ public class ResourceTypePermissionWrapper implements ResourceTypePermission,
 		Map<String, Object> attributes = new HashMap<String, Object>();
 
 		attributes.put("mvccVersion", getMvccVersion());
-		attributes.put("resourceTypePermissionId", getResourceTypePermissionId());
+		attributes.put(
+			"resourceTypePermissionId", getResourceTypePermissionId());
 		attributes.put("companyId", getCompanyId());
 		attributes.put("groupId", getGroupId());
 		attributes.put("name", getName());
@@ -79,7 +81,7 @@ public class ResourceTypePermissionWrapper implements ResourceTypePermission,
 		}
 
 		Long resourceTypePermissionId = (Long)attributes.get(
-				"resourceTypePermissionId");
+			"resourceTypePermissionId");
 
 		if (resourceTypePermissionId != null) {
 			setResourceTypePermissionId(resourceTypePermissionId);
@@ -118,7 +120,8 @@ public class ResourceTypePermissionWrapper implements ResourceTypePermission,
 
 	@Override
 	public Object clone() {
-		return new ResourceTypePermissionWrapper((ResourceTypePermission)_resourceTypePermission.clone());
+		return new ResourceTypePermissionWrapper(
+			(ResourceTypePermission)_resourceTypePermission.clone());
 	}
 
 	@Override
@@ -127,20 +130,20 @@ public class ResourceTypePermissionWrapper implements ResourceTypePermission,
 	}
 
 	/**
-	* Returns the action IDs of this resource type permission.
-	*
-	* @return the action IDs of this resource type permission
-	*/
+	 * Returns the action IDs of this resource type permission.
+	 *
+	 * @return the action IDs of this resource type permission
+	 */
 	@Override
 	public long getActionIds() {
 		return _resourceTypePermission.getActionIds();
 	}
 
 	/**
-	* Returns the company ID of this resource type permission.
-	*
-	* @return the company ID of this resource type permission
-	*/
+	 * Returns the company ID of this resource type permission.
+	 *
+	 * @return the company ID of this resource type permission
+	 */
 	@Override
 	public long getCompanyId() {
 		return _resourceTypePermission.getCompanyId();
@@ -152,40 +155,40 @@ public class ResourceTypePermissionWrapper implements ResourceTypePermission,
 	}
 
 	/**
-	* Returns the group ID of this resource type permission.
-	*
-	* @return the group ID of this resource type permission
-	*/
+	 * Returns the group ID of this resource type permission.
+	 *
+	 * @return the group ID of this resource type permission
+	 */
 	@Override
 	public long getGroupId() {
 		return _resourceTypePermission.getGroupId();
 	}
 
 	/**
-	* Returns the mvcc version of this resource type permission.
-	*
-	* @return the mvcc version of this resource type permission
-	*/
+	 * Returns the mvcc version of this resource type permission.
+	 *
+	 * @return the mvcc version of this resource type permission
+	 */
 	@Override
 	public long getMvccVersion() {
 		return _resourceTypePermission.getMvccVersion();
 	}
 
 	/**
-	* Returns the name of this resource type permission.
-	*
-	* @return the name of this resource type permission
-	*/
+	 * Returns the name of this resource type permission.
+	 *
+	 * @return the name of this resource type permission
+	 */
 	@Override
 	public String getName() {
 		return _resourceTypePermission.getName();
 	}
 
 	/**
-	* Returns the primary key of this resource type permission.
-	*
-	* @return the primary key of this resource type permission
-	*/
+	 * Returns the primary key of this resource type permission.
+	 *
+	 * @return the primary key of this resource type permission
+	 */
 	@Override
 	public long getPrimaryKey() {
 		return _resourceTypePermission.getPrimaryKey();
@@ -197,20 +200,20 @@ public class ResourceTypePermissionWrapper implements ResourceTypePermission,
 	}
 
 	/**
-	* Returns the resource type permission ID of this resource type permission.
-	*
-	* @return the resource type permission ID of this resource type permission
-	*/
+	 * Returns the resource type permission ID of this resource type permission.
+	 *
+	 * @return the resource type permission ID of this resource type permission
+	 */
 	@Override
 	public long getResourceTypePermissionId() {
 		return _resourceTypePermission.getResourceTypePermissionId();
 	}
 
 	/**
-	* Returns the role ID of this resource type permission.
-	*
-	* @return the role ID of this resource type permission
-	*/
+	 * Returns the role ID of this resource type permission.
+	 *
+	 * @return the role ID of this resource type permission
+	 */
 	@Override
 	public long getRoleId() {
 		return _resourceTypePermission.getRoleId();
@@ -257,10 +260,10 @@ public class ResourceTypePermissionWrapper implements ResourceTypePermission,
 	}
 
 	/**
-	* Sets the action IDs of this resource type permission.
-	*
-	* @param actionIds the action IDs of this resource type permission
-	*/
+	 * Sets the action IDs of this resource type permission.
+	 *
+	 * @param actionIds the action IDs of this resource type permission
+	 */
 	@Override
 	public void setActionIds(long actionIds) {
 		_resourceTypePermission.setActionIds(actionIds);
@@ -272,10 +275,10 @@ public class ResourceTypePermissionWrapper implements ResourceTypePermission,
 	}
 
 	/**
-	* Sets the company ID of this resource type permission.
-	*
-	* @param companyId the company ID of this resource type permission
-	*/
+	 * Sets the company ID of this resource type permission.
+	 *
+	 * @param companyId the company ID of this resource type permission
+	 */
 	@Override
 	public void setCompanyId(long companyId) {
 		_resourceTypePermission.setCompanyId(companyId);
@@ -297,30 +300,30 @@ public class ResourceTypePermissionWrapper implements ResourceTypePermission,
 	}
 
 	/**
-	* Sets the group ID of this resource type permission.
-	*
-	* @param groupId the group ID of this resource type permission
-	*/
+	 * Sets the group ID of this resource type permission.
+	 *
+	 * @param groupId the group ID of this resource type permission
+	 */
 	@Override
 	public void setGroupId(long groupId) {
 		_resourceTypePermission.setGroupId(groupId);
 	}
 
 	/**
-	* Sets the mvcc version of this resource type permission.
-	*
-	* @param mvccVersion the mvcc version of this resource type permission
-	*/
+	 * Sets the mvcc version of this resource type permission.
+	 *
+	 * @param mvccVersion the mvcc version of this resource type permission
+	 */
 	@Override
 	public void setMvccVersion(long mvccVersion) {
 		_resourceTypePermission.setMvccVersion(mvccVersion);
 	}
 
 	/**
-	* Sets the name of this resource type permission.
-	*
-	* @param name the name of this resource type permission
-	*/
+	 * Sets the name of this resource type permission.
+	 *
+	 * @param name the name of this resource type permission
+	 */
 	@Override
 	public void setName(String name) {
 		_resourceTypePermission.setName(name);
@@ -332,10 +335,10 @@ public class ResourceTypePermissionWrapper implements ResourceTypePermission,
 	}
 
 	/**
-	* Sets the primary key of this resource type permission.
-	*
-	* @param primaryKey the primary key of this resource type permission
-	*/
+	 * Sets the primary key of this resource type permission.
+	 *
+	 * @param primaryKey the primary key of this resource type permission
+	 */
 	@Override
 	public void setPrimaryKey(long primaryKey) {
 		_resourceTypePermission.setPrimaryKey(primaryKey);
@@ -347,20 +350,21 @@ public class ResourceTypePermissionWrapper implements ResourceTypePermission,
 	}
 
 	/**
-	* Sets the resource type permission ID of this resource type permission.
-	*
-	* @param resourceTypePermissionId the resource type permission ID of this resource type permission
-	*/
+	 * Sets the resource type permission ID of this resource type permission.
+	 *
+	 * @param resourceTypePermissionId the resource type permission ID of this resource type permission
+	 */
 	@Override
 	public void setResourceTypePermissionId(long resourceTypePermissionId) {
-		_resourceTypePermission.setResourceTypePermissionId(resourceTypePermissionId);
+		_resourceTypePermission.setResourceTypePermissionId(
+			resourceTypePermissionId);
 	}
 
 	/**
-	* Sets the role ID of this resource type permission.
-	*
-	* @param roleId the role ID of this resource type permission
-	*/
+	 * Sets the role ID of this resource type permission.
+	 *
+	 * @param roleId the role ID of this resource type permission
+	 */
 	@Override
 	public void setRoleId(long roleId) {
 		_resourceTypePermission.setRoleId(roleId);
@@ -373,7 +377,8 @@ public class ResourceTypePermissionWrapper implements ResourceTypePermission,
 
 	@Override
 	public ResourceTypePermission toEscapedModel() {
-		return new ResourceTypePermissionWrapper(_resourceTypePermission.toEscapedModel());
+		return new ResourceTypePermissionWrapper(
+			_resourceTypePermission.toEscapedModel());
 	}
 
 	@Override
@@ -383,7 +388,8 @@ public class ResourceTypePermissionWrapper implements ResourceTypePermission,
 
 	@Override
 	public ResourceTypePermission toUnescapedModel() {
-		return new ResourceTypePermissionWrapper(_resourceTypePermission.toUnescapedModel());
+		return new ResourceTypePermissionWrapper(
+			_resourceTypePermission.toUnescapedModel());
 	}
 
 	@Override
@@ -401,10 +407,13 @@ public class ResourceTypePermissionWrapper implements ResourceTypePermission,
 			return false;
 		}
 
-		ResourceTypePermissionWrapper resourceTypePermissionWrapper = (ResourceTypePermissionWrapper)obj;
+		ResourceTypePermissionWrapper resourceTypePermissionWrapper =
+			(ResourceTypePermissionWrapper)obj;
 
-		if (Objects.equals(_resourceTypePermission,
-					resourceTypePermissionWrapper._resourceTypePermission)) {
+		if (Objects.equals(
+				_resourceTypePermission,
+				resourceTypePermissionWrapper._resourceTypePermission)) {
+
 			return true;
 		}
 
@@ -432,4 +441,5 @@ public class ResourceTypePermissionWrapper implements ResourceTypePermission,
 	}
 
 	private final ResourceTypePermission _resourceTypePermission;
+
 }

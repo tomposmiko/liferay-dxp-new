@@ -34,10 +34,11 @@ import com.liferay.fragment.service.FragmentCollectionLocalServiceUtil;
 @ProviderType
 public abstract class FragmentCollectionBaseImpl
 	extends FragmentCollectionModelImpl implements FragmentCollection {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
-	 * Never modify or reference this class directly. All methods that expect a fragment collection model instance should use the {@link FragmentCollection} interface instead.
+	 * Never modify or reference this class directly. All methods that expect a fragment collection model instance should use the <code>FragmentCollection</code> interface instead.
 	 */
 	@Override
 	public void persist() {
@@ -48,4 +49,5 @@ public abstract class FragmentCollectionBaseImpl
 			FragmentCollectionLocalServiceUtil.updateFragmentCollection(this);
 		}
 	}
+
 }

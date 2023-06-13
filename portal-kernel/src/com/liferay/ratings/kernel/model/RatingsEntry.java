@@ -25,19 +25,22 @@ import com.liferay.portal.kernel.util.Accessor;
  *
  * @author Brian Wing Shun Chan
  * @see RatingsEntryModel
- * @see com.liferay.portlet.ratings.model.impl.RatingsEntryImpl
- * @see com.liferay.portlet.ratings.model.impl.RatingsEntryModelImpl
  * @generated
  */
-@ImplementationClassName("com.liferay.portlet.ratings.model.impl.RatingsEntryImpl")
+@ImplementationClassName(
+	"com.liferay.portlet.ratings.model.impl.RatingsEntryImpl"
+)
 @ProviderType
-public interface RatingsEntry extends RatingsEntryModel, PersistedModel {
+public interface RatingsEntry extends PersistedModel, RatingsEntryModel {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
-	 * Never modify this interface directly. Add methods to {@link com.liferay.portlet.ratings.model.impl.RatingsEntryImpl} and rerun ServiceBuilder to automatically copy the method declarations to this interface.
+	 * Never modify this interface directly. Add methods to <code>com.liferay.portlet.ratings.model.impl.RatingsEntryImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
 	 */
-	public static final Accessor<RatingsEntry, Long> ENTRY_ID_ACCESSOR = new Accessor<RatingsEntry, Long>() {
+	public static final Accessor<RatingsEntry, Long> ENTRY_ID_ACCESSOR =
+		new Accessor<RatingsEntry, Long>() {
+
 			@Override
 			public Long get(RatingsEntry ratingsEntry) {
 				return ratingsEntry.getEntryId();
@@ -52,5 +55,7 @@ public interface RatingsEntry extends RatingsEntryModel, PersistedModel {
 			public Class<RatingsEntry> getTypeClass() {
 				return RatingsEntry.class;
 			}
+
 		};
+
 }

@@ -28,19 +28,20 @@ import java.util.Map;
 
 /**
  * Provides the SOAP utility for the
- * {@link SAPEntryServiceUtil} service utility. The
- * static methods of this class calls the same methods of the service utility.
- * However, the signatures are different because it is difficult for SOAP to
- * support certain types.
+ * <code>SAPEntryServiceUtil</code> service
+ * utility. The static methods of this class call the same methods of the
+ * service utility. However, the signatures are different because it is
+ * difficult for SOAP to support certain types.
  *
  * <p>
  * ServiceBuilder follows certain rules in translating the methods. For example,
- * if the method in the service utility returns a {@link java.util.List}, that
- * is translated to an array of {@link com.liferay.portal.security.service.access.policy.model.SAPEntrySoap}.
- * If the method in the service utility returns a
- * {@link com.liferay.portal.security.service.access.policy.model.SAPEntry}, that is translated to a
- * {@link com.liferay.portal.security.service.access.policy.model.SAPEntrySoap}. Methods that SOAP cannot
- * safely wire are skipped.
+ * if the method in the service utility returns a <code>java.util.List</code>,
+ * that is translated to an array of
+ * <code>com.liferay.portal.security.service.access.policy.model.SAPEntrySoap</code>. If the method in the
+ * service utility returns a
+ * <code>com.liferay.portal.security.service.access.policy.model.SAPEntry</code>, that is translated to a
+ * <code>com.liferay.portal.security.service.access.policy.model.SAPEntrySoap</code>. Methods that SOAP
+ * cannot safely wire are skipped.
  * </p>
  *
  * <p>
@@ -62,27 +63,32 @@ import java.util.Map;
  *
  * @author Brian Wing Shun Chan
  * @see SAPEntryServiceHttp
- * @see com.liferay.portal.security.service.access.policy.model.SAPEntrySoap
- * @see SAPEntryServiceUtil
  * @generated
  */
 @ProviderType
 public class SAPEntryServiceSoap {
-	public static com.liferay.portal.security.service.access.policy.model.SAPEntrySoap addSAPEntry(
-		String allowedServiceSignatures, boolean defaultSAPEntry,
-		boolean enabled, String name, String[] titleMapLanguageIds,
-		String[] titleMapValues,
-		com.liferay.portal.kernel.service.ServiceContext serviceContext)
-		throws RemoteException {
+
+	public static
+		com.liferay.portal.security.service.access.policy.model.SAPEntrySoap
+				addSAPEntry(
+					String allowedServiceSignatures, boolean defaultSAPEntry,
+					boolean enabled, String name, String[] titleMapLanguageIds,
+					String[] titleMapValues,
+					com.liferay.portal.kernel.service.ServiceContext
+						serviceContext)
+			throws RemoteException {
+
 		try {
-			Map<Locale, String> titleMap = LocalizationUtil.getLocalizationMap(titleMapLanguageIds,
-					titleMapValues);
+			Map<Locale, String> titleMap = LocalizationUtil.getLocalizationMap(
+				titleMapLanguageIds, titleMapValues);
 
-			com.liferay.portal.security.service.access.policy.model.SAPEntry returnValue =
-				SAPEntryServiceUtil.addSAPEntry(allowedServiceSignatures,
-					defaultSAPEntry, enabled, name, titleMap, serviceContext);
+			com.liferay.portal.security.service.access.policy.model.SAPEntry
+				returnValue = SAPEntryServiceUtil.addSAPEntry(
+					allowedServiceSignatures, defaultSAPEntry, enabled, name,
+					titleMap, serviceContext);
 
-			return com.liferay.portal.security.service.access.policy.model.SAPEntrySoap.toSoapModel(returnValue);
+			return com.liferay.portal.security.service.access.policy.model.
+				SAPEntrySoap.toSoapModel(returnValue);
 		}
 		catch (Exception e) {
 			_log.error(e, e);
@@ -91,13 +97,17 @@ public class SAPEntryServiceSoap {
 		}
 	}
 
-	public static com.liferay.portal.security.service.access.policy.model.SAPEntrySoap deleteSAPEntry(
-		long sapEntryId) throws RemoteException {
-		try {
-			com.liferay.portal.security.service.access.policy.model.SAPEntry returnValue =
-				SAPEntryServiceUtil.deleteSAPEntry(sapEntryId);
+	public static
+		com.liferay.portal.security.service.access.policy.model.SAPEntrySoap
+				deleteSAPEntry(long sapEntryId)
+			throws RemoteException {
 
-			return com.liferay.portal.security.service.access.policy.model.SAPEntrySoap.toSoapModel(returnValue);
+		try {
+			com.liferay.portal.security.service.access.policy.model.SAPEntry
+				returnValue = SAPEntryServiceUtil.deleteSAPEntry(sapEntryId);
+
+			return com.liferay.portal.security.service.access.policy.model.
+				SAPEntrySoap.toSoapModel(returnValue);
 		}
 		catch (Exception e) {
 			_log.error(e, e);
@@ -106,15 +116,21 @@ public class SAPEntryServiceSoap {
 		}
 	}
 
-	public static com.liferay.portal.security.service.access.policy.model.SAPEntrySoap deleteSAPEntry(
-		com.liferay.portal.security.service.access.policy.model.SAPEntrySoap sapEntry)
-		throws RemoteException {
-		try {
-			com.liferay.portal.security.service.access.policy.model.SAPEntry returnValue =
-				SAPEntryServiceUtil.deleteSAPEntry(com.liferay.portal.security.service.access.policy.model.impl.SAPEntryModelImpl.toModel(
-						sapEntry));
+	public static
+		com.liferay.portal.security.service.access.policy.model.SAPEntrySoap
+				deleteSAPEntry(
+					com.liferay.portal.security.service.access.policy.model.
+						SAPEntrySoap sapEntry)
+			throws RemoteException {
 
-			return com.liferay.portal.security.service.access.policy.model.SAPEntrySoap.toSoapModel(returnValue);
+		try {
+			com.liferay.portal.security.service.access.policy.model.SAPEntry
+				returnValue = SAPEntryServiceUtil.deleteSAPEntry(
+					com.liferay.portal.security.service.access.policy.model.
+						impl.SAPEntryModelImpl.toModel(sapEntry));
+
+			return com.liferay.portal.security.service.access.policy.model.
+				SAPEntrySoap.toSoapModel(returnValue);
 		}
 		catch (Exception e) {
 			_log.error(e, e);
@@ -123,13 +139,18 @@ public class SAPEntryServiceSoap {
 		}
 	}
 
-	public static com.liferay.portal.security.service.access.policy.model.SAPEntrySoap fetchSAPEntry(
-		long companyId, String name) throws RemoteException {
-		try {
-			com.liferay.portal.security.service.access.policy.model.SAPEntry returnValue =
-				SAPEntryServiceUtil.fetchSAPEntry(companyId, name);
+	public static
+		com.liferay.portal.security.service.access.policy.model.SAPEntrySoap
+				fetchSAPEntry(long companyId, String name)
+			throws RemoteException {
 
-			return com.liferay.portal.security.service.access.policy.model.SAPEntrySoap.toSoapModel(returnValue);
+		try {
+			com.liferay.portal.security.service.access.policy.model.SAPEntry
+				returnValue = SAPEntryServiceUtil.fetchSAPEntry(
+					companyId, name);
+
+			return com.liferay.portal.security.service.access.policy.model.
+				SAPEntrySoap.toSoapModel(returnValue);
 		}
 		catch (Exception e) {
 			_log.error(e, e);
@@ -138,13 +159,20 @@ public class SAPEntryServiceSoap {
 		}
 	}
 
-	public static com.liferay.portal.security.service.access.policy.model.SAPEntrySoap[] getCompanySAPEntries(
-		long companyId, int start, int end) throws RemoteException {
-		try {
-			java.util.List<com.liferay.portal.security.service.access.policy.model.SAPEntry> returnValue =
-				SAPEntryServiceUtil.getCompanySAPEntries(companyId, start, end);
+	public static
+		com.liferay.portal.security.service.access.policy.model.SAPEntrySoap[]
+				getCompanySAPEntries(long companyId, int start, int end)
+			throws RemoteException {
 
-			return com.liferay.portal.security.service.access.policy.model.SAPEntrySoap.toSoapModels(returnValue);
+		try {
+			java.util.List
+				<com.liferay.portal.security.service.access.policy.model.
+					SAPEntry> returnValue =
+						SAPEntryServiceUtil.getCompanySAPEntries(
+							companyId, start, end);
+
+			return com.liferay.portal.security.service.access.policy.model.
+				SAPEntrySoap.toSoapModels(returnValue);
 		}
 		catch (Exception e) {
 			_log.error(e, e);
@@ -153,16 +181,24 @@ public class SAPEntryServiceSoap {
 		}
 	}
 
-	public static com.liferay.portal.security.service.access.policy.model.SAPEntrySoap[] getCompanySAPEntries(
-		long companyId, int start, int end,
-		com.liferay.portal.kernel.util.OrderByComparator<com.liferay.portal.security.service.access.policy.model.SAPEntry> obc)
-		throws RemoteException {
-		try {
-			java.util.List<com.liferay.portal.security.service.access.policy.model.SAPEntry> returnValue =
-				SAPEntryServiceUtil.getCompanySAPEntries(companyId, start, end,
-					obc);
+	public static
+		com.liferay.portal.security.service.access.policy.model.SAPEntrySoap[]
+				getCompanySAPEntries(
+					long companyId, int start, int end,
+					com.liferay.portal.kernel.util.OrderByComparator
+						<com.liferay.portal.security.service.access.policy.
+							model.SAPEntry> obc)
+			throws RemoteException {
 
-			return com.liferay.portal.security.service.access.policy.model.SAPEntrySoap.toSoapModels(returnValue);
+		try {
+			java.util.List
+				<com.liferay.portal.security.service.access.policy.model.
+					SAPEntry> returnValue =
+						SAPEntryServiceUtil.getCompanySAPEntries(
+							companyId, start, end, obc);
+
+			return com.liferay.portal.security.service.access.policy.model.
+				SAPEntrySoap.toSoapModels(returnValue);
 		}
 		catch (Exception e) {
 			_log.error(e, e);
@@ -173,8 +209,10 @@ public class SAPEntryServiceSoap {
 
 	public static int getCompanySAPEntriesCount(long companyId)
 		throws RemoteException {
+
 		try {
-			int returnValue = SAPEntryServiceUtil.getCompanySAPEntriesCount(companyId);
+			int returnValue = SAPEntryServiceUtil.getCompanySAPEntriesCount(
+				companyId);
 
 			return returnValue;
 		}
@@ -185,13 +223,17 @@ public class SAPEntryServiceSoap {
 		}
 	}
 
-	public static com.liferay.portal.security.service.access.policy.model.SAPEntrySoap getSAPEntry(
-		long sapEntryId) throws RemoteException {
-		try {
-			com.liferay.portal.security.service.access.policy.model.SAPEntry returnValue =
-				SAPEntryServiceUtil.getSAPEntry(sapEntryId);
+	public static
+		com.liferay.portal.security.service.access.policy.model.SAPEntrySoap
+				getSAPEntry(long sapEntryId)
+			throws RemoteException {
 
-			return com.liferay.portal.security.service.access.policy.model.SAPEntrySoap.toSoapModel(returnValue);
+		try {
+			com.liferay.portal.security.service.access.policy.model.SAPEntry
+				returnValue = SAPEntryServiceUtil.getSAPEntry(sapEntryId);
+
+			return com.liferay.portal.security.service.access.policy.model.
+				SAPEntrySoap.toSoapModel(returnValue);
 		}
 		catch (Exception e) {
 			_log.error(e, e);
@@ -200,13 +242,17 @@ public class SAPEntryServiceSoap {
 		}
 	}
 
-	public static com.liferay.portal.security.service.access.policy.model.SAPEntrySoap getSAPEntry(
-		long companyId, String name) throws RemoteException {
-		try {
-			com.liferay.portal.security.service.access.policy.model.SAPEntry returnValue =
-				SAPEntryServiceUtil.getSAPEntry(companyId, name);
+	public static
+		com.liferay.portal.security.service.access.policy.model.SAPEntrySoap
+				getSAPEntry(long companyId, String name)
+			throws RemoteException {
 
-			return com.liferay.portal.security.service.access.policy.model.SAPEntrySoap.toSoapModel(returnValue);
+		try {
+			com.liferay.portal.security.service.access.policy.model.SAPEntry
+				returnValue = SAPEntryServiceUtil.getSAPEntry(companyId, name);
+
+			return com.liferay.portal.security.service.access.policy.model.
+				SAPEntrySoap.toSoapModel(returnValue);
 		}
 		catch (Exception e) {
 			_log.error(e, e);
@@ -215,22 +261,27 @@ public class SAPEntryServiceSoap {
 		}
 	}
 
-	public static com.liferay.portal.security.service.access.policy.model.SAPEntrySoap updateSAPEntry(
-		long sapEntryId, String allowedServiceSignatures,
-		boolean defaultSAPEntry, boolean enabled, String name,
-		String[] titleMapLanguageIds, String[] titleMapValues,
-		com.liferay.portal.kernel.service.ServiceContext serviceContext)
-		throws RemoteException {
+	public static
+		com.liferay.portal.security.service.access.policy.model.SAPEntrySoap
+				updateSAPEntry(
+					long sapEntryId, String allowedServiceSignatures,
+					boolean defaultSAPEntry, boolean enabled, String name,
+					String[] titleMapLanguageIds, String[] titleMapValues,
+					com.liferay.portal.kernel.service.ServiceContext
+						serviceContext)
+			throws RemoteException {
+
 		try {
-			Map<Locale, String> titleMap = LocalizationUtil.getLocalizationMap(titleMapLanguageIds,
-					titleMapValues);
+			Map<Locale, String> titleMap = LocalizationUtil.getLocalizationMap(
+				titleMapLanguageIds, titleMapValues);
 
-			com.liferay.portal.security.service.access.policy.model.SAPEntry returnValue =
-				SAPEntryServiceUtil.updateSAPEntry(sapEntryId,
-					allowedServiceSignatures, defaultSAPEntry, enabled, name,
-					titleMap, serviceContext);
+			com.liferay.portal.security.service.access.policy.model.SAPEntry
+				returnValue = SAPEntryServiceUtil.updateSAPEntry(
+					sapEntryId, allowedServiceSignatures, defaultSAPEntry,
+					enabled, name, titleMap, serviceContext);
 
-			return com.liferay.portal.security.service.access.policy.model.SAPEntrySoap.toSoapModel(returnValue);
+			return com.liferay.portal.security.service.access.policy.model.
+				SAPEntrySoap.toSoapModel(returnValue);
 		}
 		catch (Exception e) {
 			_log.error(e, e);
@@ -240,4 +291,5 @@ public class SAPEntryServiceSoap {
 	}
 
 	private static Log _log = LogFactoryUtil.getLog(SAPEntryServiceSoap.class);
+
 }

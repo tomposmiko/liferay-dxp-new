@@ -21,7 +21,7 @@ import com.liferay.portal.odata.filter.expression.LambdaFunctionExpression;
 import com.liferay.portal.odata.filter.expression.PropertyExpression;
 
 /**
- * @author Ruben Pulido
+ * @author Rubén Pulido
  */
 public class CollectionPropertyExpressionImpl
 	implements CollectionPropertyExpression {
@@ -60,7 +60,11 @@ public class CollectionPropertyExpressionImpl
 	public String toString() {
 		String string = _propertyExpression.toString();
 
-		return string.concat("/").concat(_lambdaFunctionExpression.toString());
+		return string.concat(
+			"/"
+		).concat(
+			_lambdaFunctionExpression.toString()
+		);
 	}
 
 	private final LambdaFunctionExpression _lambdaFunctionExpression;

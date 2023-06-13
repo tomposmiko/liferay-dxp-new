@@ -22,7 +22,6 @@ import com.liferay.dynamic.data.mapping.annotations.DDMFormLayoutPage;
 import com.liferay.dynamic.data.mapping.annotations.DDMFormLayoutRow;
 import com.liferay.dynamic.data.mapping.model.DDMFormFieldValidation;
 import com.liferay.dynamic.data.mapping.model.LocalizedValue;
-import com.liferay.petra.string.StringPool;
 
 /**
  * @author Marcellus Tavares
@@ -38,8 +37,9 @@ import com.liferay.petra.string.StringPool;
 					{
 						@DDMFormLayoutColumn(
 							size = 12,
-							value =
-								{"label", "predefinedValue", "required", "tip"}
+							value = {
+								"label", "predefinedValue", "required", "tip"
+							}
 						)
 					}
 				)
@@ -70,13 +70,9 @@ public interface DefaultDDMFormFieldTypeSettings
 	public String fieldNamespace();
 
 	@DDMFormField(
-		label = "%indexable",
-		optionLabels = {
-			"%not-indexable", "%indexable-keyword", "%indexable-text"
-		},
-		optionValues = {StringPool.BLANK, "keyword", "text"},
-		predefinedValue = "keyword", type = "radio",
-		visibilityExpression = "FALSE"
+		label = "%searchable", optionLabels = {"%disable", "%keyword"},
+		optionValues = {"none", "keyword"}, predefinedValue = "keyword",
+		type = "radio"
 	)
 	public String indexType();
 

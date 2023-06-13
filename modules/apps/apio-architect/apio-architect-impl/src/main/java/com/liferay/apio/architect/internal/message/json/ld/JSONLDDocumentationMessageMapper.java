@@ -14,16 +14,31 @@
 
 package com.liferay.apio.architect.internal.message.json.ld;
 
-import static com.liferay.apio.architect.internal.message.json.ld.JSONLDMessageMapperUtil.getOperationTypes;
-import static com.liferay.apio.architect.operation.HTTPMethod.DELETE;
-import static com.liferay.apio.architect.operation.HTTPMethod.GET;
+import static com.liferay.apio.architect.internal.message.json.ld.JSONLDMessageMapperUtil.getActionTypes;
+import static com.liferay.apio.architect.internal.wiring.osgi.manager.message.json.DocumentationField.FieldType.BOOLEAN;
+import static com.liferay.apio.architect.internal.wiring.osgi.manager.message.json.DocumentationField.FieldType.BOOLEAN_LIST;
+import static com.liferay.apio.architect.internal.wiring.osgi.manager.message.json.DocumentationField.FieldType.DATE;
+import static com.liferay.apio.architect.internal.wiring.osgi.manager.message.json.DocumentationField.FieldType.DATE_LIST;
+import static com.liferay.apio.architect.internal.wiring.osgi.manager.message.json.DocumentationField.FieldType.FILE;
+import static com.liferay.apio.architect.internal.wiring.osgi.manager.message.json.DocumentationField.FieldType.LINKED_MODEL;
+import static com.liferay.apio.architect.internal.wiring.osgi.manager.message.json.DocumentationField.FieldType.NESTED_MODEL_LIST;
+import static com.liferay.apio.architect.internal.wiring.osgi.manager.message.json.DocumentationField.FieldType.NUMBER;
+import static com.liferay.apio.architect.internal.wiring.osgi.manager.message.json.DocumentationField.FieldType.NUMBER_LIST;
+import static com.liferay.apio.architect.internal.wiring.osgi.manager.message.json.DocumentationField.FieldType.RELATED_COLLECTION;
+import static com.liferay.apio.architect.internal.wiring.osgi.manager.message.json.DocumentationField.FieldType.STRING;
+import static com.liferay.apio.architect.internal.wiring.osgi.manager.message.json.DocumentationField.FieldType.STRING_LIST;
 
+import static java.lang.String.join;
+
+import com.liferay.apio.architect.internal.action.ActionSemantics;
 import com.liferay.apio.architect.internal.documentation.Documentation;
 import com.liferay.apio.architect.internal.message.json.DocumentationMessageMapper;
 import com.liferay.apio.architect.internal.message.json.JSONObjectBuilder;
-import com.liferay.apio.architect.operation.HTTPMethod;
-import com.liferay.apio.architect.operation.Operation;
+import com.liferay.apio.architect.internal.wiring.osgi.manager.message.json.DocumentationField;
+import com.liferay.apio.architect.internal.wiring.osgi.manager.message.json.DocumentationField.FieldType;
+import com.liferay.apio.architect.pagination.Page;
 
+import java.util.Optional;
 import java.util.stream.Stream;
 
 import org.osgi.service.component.annotations.Component;
@@ -50,6 +65,39 @@ public class JSONLDDocumentationMessageMapper
 	}
 
 	@Override
+	public void mapAction(
+		JSONObjectBuilder jsonObjectBuilder, String resourceName, String type,
+		ActionSemantics actionSemantics, String description) {
+
+		jsonObjectBuilder.field(
+			"@id"
+		).stringValue(
+			"_:" + join("/", resourceName, actionSemantics.getActionName())
+		);
+
+		jsonObjectBuilder.field(
+			"@type"
+		).arrayValue(
+		).addAllStrings(
+			getActionTypes(actionSemantics.getActionName())
+		);
+
+		jsonObjectBuilder.field(
+			"method"
+		).stringValue(
+			actionSemantics.getHTTPMethod()
+		);
+
+		jsonObjectBuilder.field(
+			"returns"
+		).stringValue(
+			_getReturnValue(type, actionSemantics)
+		);
+
+		_addDescription(jsonObjectBuilder, description);
+	}
+
+	@Override
 	public void mapDescription(
 		JSONObjectBuilder jsonObjectBuilder, String description) {
 
@@ -72,44 +120,9 @@ public class JSONLDDocumentationMessageMapper
 	}
 
 	@Override
-	public void mapOperation(
-		JSONObjectBuilder jsonObjectBuilder, String resourceName, String type,
-		Operation operation, String description) {
-
-		jsonObjectBuilder.field(
-			"@id"
-		).stringValue(
-			"_:" + operation.getName()
-		);
-
-		jsonObjectBuilder.field(
-			"@type"
-		).arrayValue(
-		).addAllStrings(
-			getOperationTypes(operation)
-		);
-
-		HTTPMethod httpMethod = operation.getHttpMethod();
-
-		jsonObjectBuilder.field(
-			"method"
-		).stringValue(
-			httpMethod.toString()
-		);
-
-		jsonObjectBuilder.field(
-			"returns"
-		).stringValue(
-			_getReturnValue(type, operation)
-		);
-
-		_addDescription(jsonObjectBuilder, description);
-	}
-
-	@Override
 	public void mapProperty(
-		JSONObjectBuilder jsonObjectBuilder, String fieldName,
-		String description) {
+		JSONObjectBuilder jsonObjectBuilder,
+		DocumentationField documentationField, String description) {
 
 		jsonObjectBuilder.field(
 			"@type"
@@ -120,9 +133,10 @@ public class JSONLDDocumentationMessageMapper
 		jsonObjectBuilder.field(
 			"property"
 		).stringValue(
-			fieldName
+			documentationField.getName()
 		);
 
+		_addType(jsonObjectBuilder, documentationField);
 		_addDescription(jsonObjectBuilder, description);
 	}
 
@@ -194,7 +208,19 @@ public class JSONLDDocumentationMessageMapper
 				JSONObjectBuilder propertyJsonObjectBuilder =
 					new JSONObjectBuilder();
 
-				mapProperty(propertyJsonObjectBuilder, fieldName, description);
+				DocumentationField documentationField;
+
+				if (fieldName.equals("member")) {
+					documentationField = DocumentationField.of(
+						fieldName, NESTED_MODEL_LIST);
+				}
+				else {
+					documentationField = DocumentationField.of(
+						fieldName, NUMBER);
+				}
+
+				mapProperty(
+					propertyJsonObjectBuilder, documentationField, description);
 
 				onFinishProperty(
 					jsonObjectBuilder, propertyJsonObjectBuilder, fieldName);
@@ -225,8 +251,7 @@ public class JSONLDDocumentationMessageMapper
 					"@vocab"
 				).stringValue(
 					"http://schema.org/"
-				)
-			),
+				)),
 			arrayBuilder -> arrayBuilder.addString(
 				"https://www.w3.org/ns/hydra/core#"),
 			arrayBuilder -> arrayBuilder.add(
@@ -257,8 +282,7 @@ public class JSONLDDocumentationMessageMapper
 					).stringValue(
 						"@id"
 					)
-				)
-			)
+				))
 		);
 
 		jsonObjectBuilder.field(
@@ -275,9 +299,10 @@ public class JSONLDDocumentationMessageMapper
 	}
 
 	@Override
-	public void onFinishOperation(
+	public void onFinishAction(
 		JSONObjectBuilder documentationJsonObjectBuilder,
-		JSONObjectBuilder operationJsonObjectBuilder, Operation operation) {
+		JSONObjectBuilder operationJsonObjectBuilder,
+		ActionSemantics actionSemantics) {
 
 		documentationJsonObjectBuilder.field(
 			"supportedOperation"
@@ -325,22 +350,101 @@ public class JSONLDDocumentationMessageMapper
 		}
 	}
 
-	private String _getReturnValue(String type, Operation operation) {
-		String value = null;
+	private void _addExtraType(
+		JSONObjectBuilder jsonObjectBuilder, String collectionType) {
 
-		HTTPMethod httpMethod = operation.getHttpMethod();
+		jsonObjectBuilder.nestedField(
+			"manages", "property"
+		).stringValue(
+			"rdf:type"
+		);
 
-		if (DELETE.equals(httpMethod)) {
-			value = "http://www.w3.org/2002/07/owl#Nothing";
-		}
-		else if (operation.isCollection() && httpMethod.equals(GET)) {
-			value = "Collection";
-		}
-		else {
-			value = type;
-		}
-
-		return value;
+		jsonObjectBuilder.nestedField(
+			"manages", "object"
+		).stringValue(
+			collectionType
+		);
 	}
+
+	private void _addType(
+		JSONObjectBuilder jsonObjectBuilder,
+		DocumentationField documentationField) {
+
+		FieldType type = documentationField.getType();
+		String typeString = null;
+
+		if (BOOLEAN.equals(type)) {
+			typeString = "boolean";
+		}
+		else if (BOOLEAN_LIST.equals(type)) {
+			typeString = "collection";
+			_addExtraType(jsonObjectBuilder, "boolean");
+		}
+		else if (DATE.equals(type)) {
+			typeString = "date";
+		}
+		else if (DATE_LIST.equals(type)) {
+			typeString = "collection";
+			_addExtraType(jsonObjectBuilder, "date");
+		}
+		else if (FILE.equals(type)) {
+			typeString = "file";
+		}
+		else if (LINKED_MODEL.equals(type)) {
+			Optional<String> extraType = documentationField.getExtraType();
+
+			typeString = extraType.orElse(null);
+		}
+		else if (NUMBER.equals(type)) {
+			typeString = "number";
+		}
+		else if (NUMBER_LIST.equals(type)) {
+			typeString = "collection";
+			_addExtraType(jsonObjectBuilder, "number");
+		}
+		else if (RELATED_COLLECTION.equals(type)) {
+			typeString = "collection";
+
+			Optional<String> extraTypeOptional =
+				documentationField.getExtraType();
+
+			extraTypeOptional.ifPresent(
+				extraType -> _addExtraType(jsonObjectBuilder, extraType));
+		}
+		else if (STRING.equals(type)) {
+			typeString = "string";
+		}
+		else if (STRING_LIST.equals(type)) {
+			typeString = "collection";
+			_addExtraType(jsonObjectBuilder, "string");
+		}
+
+		if (typeString != null) {
+			jsonObjectBuilder.field(
+				"rdf:type"
+			).stringValue(
+				typeString
+			);
+		}
+	}
+
+	private String _getReturnValue(
+		String type, ActionSemantics actionSemantics) {
+
+		Class<?> returnClass = actionSemantics.getReturnClass();
+
+		if (Void.class.equals(returnClass)) {
+			return _NOTHING;
+		}
+
+		if (Page.class.equals(returnClass)) {
+			return "Collection";
+		}
+
+		return type;
+	}
+
+	private static final String _NOTHING =
+		"http://www.w3.org/2002/07/owl#Nothing";
 
 }

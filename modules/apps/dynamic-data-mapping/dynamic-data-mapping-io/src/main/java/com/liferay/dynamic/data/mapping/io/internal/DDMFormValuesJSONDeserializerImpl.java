@@ -23,15 +23,17 @@ import com.liferay.dynamic.data.mapping.model.UnlocalizedValue;
 import com.liferay.dynamic.data.mapping.model.Value;
 import com.liferay.dynamic.data.mapping.storage.DDMFormFieldValue;
 import com.liferay.dynamic.data.mapping.storage.DDMFormValues;
-import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSONArray;
-import com.liferay.portal.kernel.json.JSONException;
 import com.liferay.portal.kernel.json.JSONFactory;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.language.LanguageUtil;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.Validator;
+import com.liferay.portal.util.PropsValues;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -58,14 +60,13 @@ public class DDMFormValuesJSONDeserializerImpl
 
 	@Override
 	public DDMFormValues deserialize(
-			DDMForm ddmForm, String serializedDDMFormValues)
-		throws PortalException {
+		DDMForm ddmForm, String serializedDDMFormValues) {
+
+		DDMFormValues ddmFormValues = new DDMFormValues(ddmForm);
 
 		try {
 			JSONObject jsonObject = _jsonFactory.createJSONObject(
 				serializedDDMFormValues);
-
-			DDMFormValues ddmFormValues = new DDMFormValues(ddmForm);
 
 			setDDMFormValuesAvailableLocales(
 				jsonObject.getJSONArray("availableLanguageIds"), ddmFormValues);
@@ -73,13 +74,16 @@ public class DDMFormValuesJSONDeserializerImpl
 				jsonObject.getString("defaultLanguageId"), ddmFormValues);
 			setDDMFormFieldValues(
 				jsonObject.getJSONArray("fieldValues"), ddmForm, ddmFormValues);
-			setDDMFormLocalizedValuesDefaultLocale(ddmFormValues);
 
-			return ddmFormValues;
+			setDDMFormLocalizedValuesDefaultLocale(ddmFormValues);
 		}
-		catch (JSONException jsone) {
-			throw new PortalException(jsone);
+		catch (Exception e) {
+			if (_log.isWarnEnabled()) {
+				_log.warn(e, e);
+			}
 		}
+
+		return ddmFormValues;
 	}
 
 	@Reference(
@@ -170,9 +174,11 @@ public class DDMFormValuesJSONDeserializerImpl
 		while (itr.hasNext()) {
 			String languageId = itr.next();
 
-			localizedValue.addString(
-				LocaleUtil.fromLanguageId(languageId),
-				jsonObject.getString(languageId));
+			if (LanguageUtil.isAvailableLocale(languageId)) {
+				localizedValue.addString(
+					LocaleUtil.fromLanguageId(languageId),
+					jsonObject.getString(languageId));
+			}
 		}
 
 		return localizedValue;
@@ -206,7 +212,7 @@ public class DDMFormValuesJSONDeserializerImpl
 		while (keys.hasNext()) {
 			String key = keys.next();
 
-			if (!LanguageUtil.isAvailableLocale(key)) {
+			if (!ArrayUtil.contains(PropsValues.LOCALES, key)) {
 				return false;
 			}
 		}
@@ -317,6 +323,9 @@ public class DDMFormValuesJSONDeserializerImpl
 
 		ddmFormFieldValue.setNestedDDMFormFields(nestedDDMFormFieldValues);
 	}
+
+	private static final Log _log = LogFactoryUtil.getLog(
+		DDMFormValuesJSONDeserializerImpl.class);
 
 	private final Map<String, DDMFormFieldValueJSONDeserializer>
 		_ddmFormFieldValueJSONDeserializers = new ConcurrentHashMap<>();

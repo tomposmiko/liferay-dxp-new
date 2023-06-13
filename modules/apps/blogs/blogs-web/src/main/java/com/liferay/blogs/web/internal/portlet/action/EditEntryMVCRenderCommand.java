@@ -21,7 +21,10 @@ import com.liferay.blogs.web.constants.BlogsWebKeys;
 import com.liferay.blogs.web.internal.BlogsItemSelectorHelper;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCRenderCommand;
 import com.liferay.portal.kernel.security.auth.PrincipalException;
+import com.liferay.portal.kernel.security.permission.ActionKeys;
+import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermission;
 import com.liferay.portal.kernel.servlet.SessionErrors;
+import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.WebKeys;
 
@@ -58,6 +61,16 @@ public class EditEntryMVCRenderCommand implements MVCRenderCommand {
 		try {
 			BlogsEntry entry = ActionUtil.getEntry(renderRequest);
 
+			if (entry != null) {
+				ThemeDisplay themeDisplay =
+					(ThemeDisplay)renderRequest.getAttribute(
+						WebKeys.THEME_DISPLAY);
+
+				_blogsEntryModelResourcePermission.check(
+					themeDisplay.getPermissionChecker(), entry,
+					ActionKeys.UPDATE);
+			}
+
 			HttpServletRequest request = _portal.getHttpServletRequest(
 				renderRequest);
 
@@ -75,9 +88,8 @@ public class EditEntryMVCRenderCommand implements MVCRenderCommand {
 
 				return "/blogs/error.jsp";
 			}
-			else {
-				throw new PortletException(e);
-			}
+
+			throw new PortletException(e);
 		}
 
 		return "/blogs/edit_entry.jsp";
@@ -89,6 +101,10 @@ public class EditEntryMVCRenderCommand implements MVCRenderCommand {
 
 		_blogsItemSelectorHelper = blogsItemSelectorHelper;
 	}
+
+	@Reference(target = "(model.class.name=com.liferay.blogs.model.BlogsEntry)")
+	private volatile ModelResourcePermission<BlogsEntry>
+		_blogsEntryModelResourcePermission;
 
 	private BlogsItemSelectorHelper _blogsItemSelectorHelper;
 

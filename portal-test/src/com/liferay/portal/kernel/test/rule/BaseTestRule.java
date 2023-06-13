@@ -14,14 +14,8 @@
 
 package com.liferay.portal.kernel.test.rule;
 
-import com.liferay.petra.concurrent.ConcurrentReferenceKeyHashMap;
-import com.liferay.petra.memory.FinalizeManager;
 import com.liferay.portal.kernel.test.ReflectionTestUtil;
 import com.liferay.portal.kernel.test.rule.callback.TestCallback;
-
-import java.util.Deque;
-import java.util.LinkedList;
-import java.util.Map;
 
 import org.junit.internal.runners.statements.ExpectException;
 import org.junit.internal.runners.statements.FailOnTimeout;
@@ -68,58 +62,17 @@ public class BaseTestRule<C, M>
 			};
 		}
 
-		boolean arquillianTest = ArquillianUtil.isArquillianTest(description);
-
-		if (!arquillianTest) {
-			return new StatementWrapper(statement) {
-
-				@Override
-				public void evaluate() throws Throwable {
-					C c = _testCallback.beforeClass(description);
-
-					try {
-						statement.evaluate();
-					}
-					finally {
-						_testCallback.afterClass(description, c);
-					}
-				}
-
-			};
-		}
-
 		return new StatementWrapper(statement) {
 
 			@Override
 			public void evaluate() throws Throwable {
-				Class<?> clazz = description.getTestClass();
-
-				if (_handleBeforeClassThreadLocal.get()) {
-					Deque<Object> deque = _classCarryOnMap.get(clazz);
-
-					if (deque == null) {
-						deque = new LinkedList<>();
-
-						_classCarryOnMap.put(clazz, deque);
-					}
-
-					deque.addLast(_testCallback.beforeClass(description));
-				}
+				C c = _testCallback.beforeClass(description);
 
 				try {
 					statement.evaluate();
 				}
 				finally {
-					if (_handleAfterClassThreadLocal.get()) {
-						Deque<Object> deque = _classCarryOnMap.get(clazz);
-
-						_testCallback.afterClass(
-							description, (C)deque.removeLast());
-
-						if (deque.isEmpty()) {
-							_classCarryOnMap.remove(clazz);
-						}
-					}
+					_testCallback.afterClass(description, c);
 				}
 			}
 
@@ -128,12 +81,10 @@ public class BaseTestRule<C, M>
 
 	@Override
 	public void handleAfterClass(boolean enable) {
-		_handleAfterClassThreadLocal.set(enable);
 	}
 
 	@Override
 	public void handleBeforeClass(boolean enable) {
-		_handleBeforeClassThreadLocal.set(enable);
 	}
 
 	public abstract static class StatementWrapper extends Statement {
@@ -174,30 +125,6 @@ public class BaseTestRule<C, M>
 
 		throw new IllegalStateException("Unknow statement " + statement);
 	}
-
-	private static final Map<Class<?>, Deque<Object>> _classCarryOnMap =
-		new ConcurrentReferenceKeyHashMap<>(
-			FinalizeManager.WEAK_REFERENCE_FACTORY);
-
-	private final ThreadLocal<Boolean> _handleAfterClassThreadLocal =
-		new ThreadLocal<Boolean>() {
-
-			@Override
-			protected Boolean initialValue() {
-				return Boolean.FALSE;
-			}
-
-		};
-
-	private final ThreadLocal<Boolean> _handleBeforeClassThreadLocal =
-		new ThreadLocal<Boolean>() {
-
-			@Override
-			protected Boolean initialValue() {
-				return Boolean.FALSE;
-			}
-
-		};
 
 	private final TestCallback<C, M> _testCallback;
 

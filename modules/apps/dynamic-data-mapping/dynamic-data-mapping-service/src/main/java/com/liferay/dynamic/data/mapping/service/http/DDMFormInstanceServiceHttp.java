@@ -17,7 +17,6 @@ package com.liferay.dynamic.data.mapping.service.http;
 import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.dynamic.data.mapping.service.DDMFormInstanceServiceUtil;
-
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.security.auth.HttpPrincipal;
@@ -27,10 +26,11 @@ import com.liferay.portal.kernel.util.MethodKey;
 
 /**
  * Provides the HTTP utility for the
- * {@link DDMFormInstanceServiceUtil} service utility. The
+ * <code>DDMFormInstanceServiceUtil</code> service
+ * utility. The
  * static methods of this class calls the same methods of the service utility.
  * However, the signatures are different because it requires an additional
- * {@link HttpPrincipal} parameter.
+ * <code>HttpPrincipal</code> parameter.
  *
  * <p>
  * The benefits of using the HTTP utility is that it is fast and allows for
@@ -49,26 +49,29 @@ import com.liferay.portal.kernel.util.MethodKey;
  *
  * @author Brian Wing Shun Chan
  * @see DDMFormInstanceServiceSoap
- * @see HttpPrincipal
- * @see DDMFormInstanceServiceUtil
  * @generated
  */
 @ProviderType
 public class DDMFormInstanceServiceHttp {
-	public static com.liferay.dynamic.data.mapping.model.DDMFormInstance addFormInstance(
-		HttpPrincipal httpPrincipal, long groupId, long ddmStructureId,
-		java.util.Map<java.util.Locale, String> nameMap,
-		java.util.Map<java.util.Locale, String> descriptionMap,
-		com.liferay.dynamic.data.mapping.storage.DDMFormValues settingsDDMFormValues,
-		com.liferay.portal.kernel.service.ServiceContext serviceContext)
-		throws com.liferay.portal.kernel.exception.PortalException {
-		try {
-			MethodKey methodKey = new MethodKey(DDMFormInstanceServiceUtil.class,
-					"addFormInstance", _addFormInstanceParameterTypes0);
 
-			MethodHandler methodHandler = new MethodHandler(methodKey, groupId,
-					ddmStructureId, nameMap, descriptionMap,
-					settingsDDMFormValues, serviceContext);
+	public static com.liferay.dynamic.data.mapping.model.DDMFormInstance
+			addFormInstance(
+				HttpPrincipal httpPrincipal, long groupId, long ddmStructureId,
+				java.util.Map<java.util.Locale, String> nameMap,
+				java.util.Map<java.util.Locale, String> descriptionMap,
+				com.liferay.dynamic.data.mapping.storage.DDMFormValues
+					settingsDDMFormValues,
+				com.liferay.portal.kernel.service.ServiceContext serviceContext)
+		throws com.liferay.portal.kernel.exception.PortalException {
+
+		try {
+			MethodKey methodKey = new MethodKey(
+				DDMFormInstanceServiceUtil.class, "addFormInstance",
+				_addFormInstanceParameterTypes0);
+
+			MethodHandler methodHandler = new MethodHandler(
+				methodKey, groupId, ddmStructureId, nameMap, descriptionMap,
+				settingsDDMFormValues, serviceContext);
 
 			Object returnObj = null;
 
@@ -76,14 +79,19 @@ public class DDMFormInstanceServiceHttp {
 				returnObj = TunnelUtil.invoke(httpPrincipal, methodHandler);
 			}
 			catch (Exception e) {
-				if (e instanceof com.liferay.portal.kernel.exception.PortalException) {
-					throw (com.liferay.portal.kernel.exception.PortalException)e;
+				if (e instanceof
+						com.liferay.portal.kernel.exception.PortalException) {
+
+					throw (com.liferay.portal.kernel.exception.PortalException)
+						e;
 				}
 
-				throw new com.liferay.portal.kernel.exception.SystemException(e);
+				throw new com.liferay.portal.kernel.exception.SystemException(
+					e);
 			}
 
-			return (com.liferay.dynamic.data.mapping.model.DDMFormInstance)returnObj;
+			return (com.liferay.dynamic.data.mapping.model.DDMFormInstance)
+				returnObj;
 		}
 		catch (com.liferay.portal.kernel.exception.SystemException se) {
 			_log.error(se, se);
@@ -92,22 +100,27 @@ public class DDMFormInstanceServiceHttp {
 		}
 	}
 
-	public static com.liferay.dynamic.data.mapping.model.DDMFormInstance addFormInstance(
-		HttpPrincipal httpPrincipal, long groupId,
-		java.util.Map<java.util.Locale, String> nameMap,
-		java.util.Map<java.util.Locale, String> descriptionMap,
-		com.liferay.dynamic.data.mapping.model.DDMForm ddmForm,
-		com.liferay.dynamic.data.mapping.model.DDMFormLayout ddmFormLayout,
-		com.liferay.dynamic.data.mapping.storage.DDMFormValues settingsDDMFormValues,
-		com.liferay.portal.kernel.service.ServiceContext serviceContext)
+	public static com.liferay.dynamic.data.mapping.model.DDMFormInstance
+			addFormInstance(
+				HttpPrincipal httpPrincipal, long groupId,
+				java.util.Map<java.util.Locale, String> nameMap,
+				java.util.Map<java.util.Locale, String> descriptionMap,
+				com.liferay.dynamic.data.mapping.model.DDMForm ddmForm,
+				com.liferay.dynamic.data.mapping.model.DDMFormLayout
+					ddmFormLayout,
+				com.liferay.dynamic.data.mapping.storage.DDMFormValues
+					settingsDDMFormValues,
+				com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
-		try {
-			MethodKey methodKey = new MethodKey(DDMFormInstanceServiceUtil.class,
-					"addFormInstance", _addFormInstanceParameterTypes1);
 
-			MethodHandler methodHandler = new MethodHandler(methodKey, groupId,
-					nameMap, descriptionMap, ddmForm, ddmFormLayout,
-					settingsDDMFormValues, serviceContext);
+		try {
+			MethodKey methodKey = new MethodKey(
+				DDMFormInstanceServiceUtil.class, "addFormInstance",
+				_addFormInstanceParameterTypes1);
+
+			MethodHandler methodHandler = new MethodHandler(
+				methodKey, groupId, nameMap, descriptionMap, ddmForm,
+				ddmFormLayout, settingsDDMFormValues, serviceContext);
 
 			Object returnObj = null;
 
@@ -115,14 +128,19 @@ public class DDMFormInstanceServiceHttp {
 				returnObj = TunnelUtil.invoke(httpPrincipal, methodHandler);
 			}
 			catch (Exception e) {
-				if (e instanceof com.liferay.portal.kernel.exception.PortalException) {
-					throw (com.liferay.portal.kernel.exception.PortalException)e;
+				if (e instanceof
+						com.liferay.portal.kernel.exception.PortalException) {
+
+					throw (com.liferay.portal.kernel.exception.PortalException)
+						e;
 				}
 
-				throw new com.liferay.portal.kernel.exception.SystemException(e);
+				throw new com.liferay.portal.kernel.exception.SystemException(
+					e);
 			}
 
-			return (com.liferay.dynamic.data.mapping.model.DDMFormInstance)returnObj;
+			return (com.liferay.dynamic.data.mapping.model.DDMFormInstance)
+				returnObj;
 		}
 		catch (com.liferay.portal.kernel.exception.SystemException se) {
 			_log.error(se, se);
@@ -131,25 +149,31 @@ public class DDMFormInstanceServiceHttp {
 		}
 	}
 
-	public static void deleteFormInstance(HttpPrincipal httpPrincipal,
-		long ddmFormInstanceId)
+	public static void deleteFormInstance(
+			HttpPrincipal httpPrincipal, long ddmFormInstanceId)
 		throws com.liferay.portal.kernel.exception.PortalException {
-		try {
-			MethodKey methodKey = new MethodKey(DDMFormInstanceServiceUtil.class,
-					"deleteFormInstance", _deleteFormInstanceParameterTypes2);
 
-			MethodHandler methodHandler = new MethodHandler(methodKey,
-					ddmFormInstanceId);
+		try {
+			MethodKey methodKey = new MethodKey(
+				DDMFormInstanceServiceUtil.class, "deleteFormInstance",
+				_deleteFormInstanceParameterTypes2);
+
+			MethodHandler methodHandler = new MethodHandler(
+				methodKey, ddmFormInstanceId);
 
 			try {
 				TunnelUtil.invoke(httpPrincipal, methodHandler);
 			}
 			catch (Exception e) {
-				if (e instanceof com.liferay.portal.kernel.exception.PortalException) {
-					throw (com.liferay.portal.kernel.exception.PortalException)e;
+				if (e instanceof
+						com.liferay.portal.kernel.exception.PortalException) {
+
+					throw (com.liferay.portal.kernel.exception.PortalException)
+						e;
 				}
 
-				throw new com.liferay.portal.kernel.exception.SystemException(e);
+				throw new com.liferay.portal.kernel.exception.SystemException(
+					e);
 			}
 		}
 		catch (com.liferay.portal.kernel.exception.SystemException se) {
@@ -159,15 +183,18 @@ public class DDMFormInstanceServiceHttp {
 		}
 	}
 
-	public static com.liferay.dynamic.data.mapping.model.DDMFormInstance fetchFormInstance(
-		HttpPrincipal httpPrincipal, long ddmFormInstanceId)
+	public static com.liferay.dynamic.data.mapping.model.DDMFormInstance
+			fetchFormInstance(
+				HttpPrincipal httpPrincipal, long ddmFormInstanceId)
 		throws com.liferay.portal.kernel.exception.PortalException {
-		try {
-			MethodKey methodKey = new MethodKey(DDMFormInstanceServiceUtil.class,
-					"fetchFormInstance", _fetchFormInstanceParameterTypes3);
 
-			MethodHandler methodHandler = new MethodHandler(methodKey,
-					ddmFormInstanceId);
+		try {
+			MethodKey methodKey = new MethodKey(
+				DDMFormInstanceServiceUtil.class, "fetchFormInstance",
+				_fetchFormInstanceParameterTypes3);
+
+			MethodHandler methodHandler = new MethodHandler(
+				methodKey, ddmFormInstanceId);
 
 			Object returnObj = null;
 
@@ -175,14 +202,19 @@ public class DDMFormInstanceServiceHttp {
 				returnObj = TunnelUtil.invoke(httpPrincipal, methodHandler);
 			}
 			catch (Exception e) {
-				if (e instanceof com.liferay.portal.kernel.exception.PortalException) {
-					throw (com.liferay.portal.kernel.exception.PortalException)e;
+				if (e instanceof
+						com.liferay.portal.kernel.exception.PortalException) {
+
+					throw (com.liferay.portal.kernel.exception.PortalException)
+						e;
 				}
 
-				throw new com.liferay.portal.kernel.exception.SystemException(e);
+				throw new com.liferay.portal.kernel.exception.SystemException(
+					e);
 			}
 
-			return (com.liferay.dynamic.data.mapping.model.DDMFormInstance)returnObj;
+			return (com.liferay.dynamic.data.mapping.model.DDMFormInstance)
+				returnObj;
 		}
 		catch (com.liferay.portal.kernel.exception.SystemException se) {
 			_log.error(se, se);
@@ -191,15 +223,17 @@ public class DDMFormInstanceServiceHttp {
 		}
 	}
 
-	public static com.liferay.dynamic.data.mapping.model.DDMFormInstance getFormInstance(
-		HttpPrincipal httpPrincipal, long ddmFormInstanceId)
+	public static com.liferay.dynamic.data.mapping.model.DDMFormInstance
+			getFormInstance(HttpPrincipal httpPrincipal, long ddmFormInstanceId)
 		throws com.liferay.portal.kernel.exception.PortalException {
-		try {
-			MethodKey methodKey = new MethodKey(DDMFormInstanceServiceUtil.class,
-					"getFormInstance", _getFormInstanceParameterTypes4);
 
-			MethodHandler methodHandler = new MethodHandler(methodKey,
-					ddmFormInstanceId);
+		try {
+			MethodKey methodKey = new MethodKey(
+				DDMFormInstanceServiceUtil.class, "getFormInstance",
+				_getFormInstanceParameterTypes4);
+
+			MethodHandler methodHandler = new MethodHandler(
+				methodKey, ddmFormInstanceId);
 
 			Object returnObj = null;
 
@@ -207,14 +241,19 @@ public class DDMFormInstanceServiceHttp {
 				returnObj = TunnelUtil.invoke(httpPrincipal, methodHandler);
 			}
 			catch (Exception e) {
-				if (e instanceof com.liferay.portal.kernel.exception.PortalException) {
-					throw (com.liferay.portal.kernel.exception.PortalException)e;
+				if (e instanceof
+						com.liferay.portal.kernel.exception.PortalException) {
+
+					throw (com.liferay.portal.kernel.exception.PortalException)
+						e;
 				}
 
-				throw new com.liferay.portal.kernel.exception.SystemException(e);
+				throw new com.liferay.portal.kernel.exception.SystemException(
+					e);
 			}
 
-			return (com.liferay.dynamic.data.mapping.model.DDMFormInstance)returnObj;
+			return (com.liferay.dynamic.data.mapping.model.DDMFormInstance)
+				returnObj;
 		}
 		catch (com.liferay.portal.kernel.exception.SystemException se) {
 			_log.error(se, se);
@@ -223,15 +262,19 @@ public class DDMFormInstanceServiceHttp {
 		}
 	}
 
-	public static java.util.List<com.liferay.dynamic.data.mapping.model.DDMFormInstance> getFormInstances(
-		HttpPrincipal httpPrincipal, long companyId, long groupId, int start,
-		int end) {
-		try {
-			MethodKey methodKey = new MethodKey(DDMFormInstanceServiceUtil.class,
-					"getFormInstances", _getFormInstancesParameterTypes5);
+	public static java.util.List
+		<com.liferay.dynamic.data.mapping.model.DDMFormInstance>
+			getFormInstances(
+				HttpPrincipal httpPrincipal, long companyId, long groupId,
+				int start, int end) {
 
-			MethodHandler methodHandler = new MethodHandler(methodKey,
-					companyId, groupId, start, end);
+		try {
+			MethodKey methodKey = new MethodKey(
+				DDMFormInstanceServiceUtil.class, "getFormInstances",
+				_getFormInstancesParameterTypes5);
+
+			MethodHandler methodHandler = new MethodHandler(
+				methodKey, companyId, groupId, start, end);
 
 			Object returnObj = null;
 
@@ -239,10 +282,13 @@ public class DDMFormInstanceServiceHttp {
 				returnObj = TunnelUtil.invoke(httpPrincipal, methodHandler);
 			}
 			catch (Exception e) {
-				throw new com.liferay.portal.kernel.exception.SystemException(e);
+				throw new com.liferay.portal.kernel.exception.SystemException(
+					e);
 			}
 
-			return (java.util.List<com.liferay.dynamic.data.mapping.model.DDMFormInstance>)returnObj;
+			return (java.util.List
+				<com.liferay.dynamic.data.mapping.model.DDMFormInstance>)
+					returnObj;
 		}
 		catch (com.liferay.portal.kernel.exception.SystemException se) {
 			_log.error(se, se);
@@ -251,15 +297,16 @@ public class DDMFormInstanceServiceHttp {
 		}
 	}
 
-	public static int getFormInstancesCount(HttpPrincipal httpPrincipal,
-		long companyId, long groupId) {
-		try {
-			MethodKey methodKey = new MethodKey(DDMFormInstanceServiceUtil.class,
-					"getFormInstancesCount",
-					_getFormInstancesCountParameterTypes6);
+	public static int getFormInstancesCount(
+		HttpPrincipal httpPrincipal, long companyId, long groupId) {
 
-			MethodHandler methodHandler = new MethodHandler(methodKey,
-					companyId, groupId);
+		try {
+			MethodKey methodKey = new MethodKey(
+				DDMFormInstanceServiceUtil.class, "getFormInstancesCount",
+				_getFormInstancesCountParameterTypes6);
+
+			MethodHandler methodHandler = new MethodHandler(
+				methodKey, companyId, groupId);
 
 			Object returnObj = null;
 
@@ -267,7 +314,8 @@ public class DDMFormInstanceServiceHttp {
 				returnObj = TunnelUtil.invoke(httpPrincipal, methodHandler);
 			}
 			catch (Exception e) {
-				throw new com.liferay.portal.kernel.exception.SystemException(e);
+				throw new com.liferay.portal.kernel.exception.SystemException(
+					e);
 			}
 
 			return ((Integer)returnObj).intValue();
@@ -279,16 +327,94 @@ public class DDMFormInstanceServiceHttp {
 		}
 	}
 
-	public static java.util.List<com.liferay.dynamic.data.mapping.model.DDMFormInstance> search(
+	public static java.util.List
+		<com.liferay.dynamic.data.mapping.model.DDMFormInstance> search(
+			HttpPrincipal httpPrincipal, long companyId, long groupId,
+			String keywords, int start, int end,
+			com.liferay.portal.kernel.util.OrderByComparator
+				<com.liferay.dynamic.data.mapping.model.DDMFormInstance>
+					orderByComparator) {
+
+		try {
+			MethodKey methodKey = new MethodKey(
+				DDMFormInstanceServiceUtil.class, "search",
+				_searchParameterTypes7);
+
+			MethodHandler methodHandler = new MethodHandler(
+				methodKey, companyId, groupId, keywords, start, end,
+				orderByComparator);
+
+			Object returnObj = null;
+
+			try {
+				returnObj = TunnelUtil.invoke(httpPrincipal, methodHandler);
+			}
+			catch (Exception e) {
+				throw new com.liferay.portal.kernel.exception.SystemException(
+					e);
+			}
+
+			return (java.util.List
+				<com.liferay.dynamic.data.mapping.model.DDMFormInstance>)
+					returnObj;
+		}
+		catch (com.liferay.portal.kernel.exception.SystemException se) {
+			_log.error(se, se);
+
+			throw se;
+		}
+	}
+
+	public static java.util.List
+		<com.liferay.dynamic.data.mapping.model.DDMFormInstance> search(
+			HttpPrincipal httpPrincipal, long companyId, long groupId,
+			String[] names, String[] descriptions, boolean andOperator,
+			int start, int end,
+			com.liferay.portal.kernel.util.OrderByComparator
+				<com.liferay.dynamic.data.mapping.model.DDMFormInstance>
+					orderByComparator) {
+
+		try {
+			MethodKey methodKey = new MethodKey(
+				DDMFormInstanceServiceUtil.class, "search",
+				_searchParameterTypes8);
+
+			MethodHandler methodHandler = new MethodHandler(
+				methodKey, companyId, groupId, names, descriptions, andOperator,
+				start, end, orderByComparator);
+
+			Object returnObj = null;
+
+			try {
+				returnObj = TunnelUtil.invoke(httpPrincipal, methodHandler);
+			}
+			catch (Exception e) {
+				throw new com.liferay.portal.kernel.exception.SystemException(
+					e);
+			}
+
+			return (java.util.List
+				<com.liferay.dynamic.data.mapping.model.DDMFormInstance>)
+					returnObj;
+		}
+		catch (com.liferay.portal.kernel.exception.SystemException se) {
+			_log.error(se, se);
+
+			throw se;
+		}
+	}
+
+	public static int searchCount(
 		HttpPrincipal httpPrincipal, long companyId, long groupId,
-		String keywords, int start, int end,
-		com.liferay.portal.kernel.util.OrderByComparator<com.liferay.dynamic.data.mapping.model.DDMFormInstance> orderByComparator) {
-		try {
-			MethodKey methodKey = new MethodKey(DDMFormInstanceServiceUtil.class,
-					"search", _searchParameterTypes7);
+		String keywords) {
 
-			MethodHandler methodHandler = new MethodHandler(methodKey,
-					companyId, groupId, keywords, start, end, orderByComparator);
+		try {
+			MethodKey methodKey = new MethodKey(
+				DDMFormInstanceServiceUtil.class, "searchCount",
+				_searchCountParameterTypes9);
+
+			MethodHandler methodHandler = new MethodHandler(
+				methodKey, companyId, groupId, keywords);
 
 			Object returnObj = null;
 
@@ -296,10 +422,11 @@ public class DDMFormInstanceServiceHttp {
 				returnObj = TunnelUtil.invoke(httpPrincipal, methodHandler);
 			}
 			catch (Exception e) {
-				throw new com.liferay.portal.kernel.exception.SystemException(e);
+				throw new com.liferay.portal.kernel.exception.SystemException(
+					e);
 			}
 
-			return (java.util.List<com.liferay.dynamic.data.mapping.model.DDMFormInstance>)returnObj;
+			return ((Integer)returnObj).intValue();
 		}
 		catch (com.liferay.portal.kernel.exception.SystemException se) {
 			_log.error(se, se);
@@ -308,18 +435,18 @@ public class DDMFormInstanceServiceHttp {
 		}
 	}
 
-	public static java.util.List<com.liferay.dynamic.data.mapping.model.DDMFormInstance> search(
+	public static int searchCount(
 		HttpPrincipal httpPrincipal, long companyId, long groupId,
-		String[] names, String[] descriptions, boolean andOperator, int start,
-		int end,
-		com.liferay.portal.kernel.util.OrderByComparator<com.liferay.dynamic.data.mapping.model.DDMFormInstance> orderByComparator) {
-		try {
-			MethodKey methodKey = new MethodKey(DDMFormInstanceServiceUtil.class,
-					"search", _searchParameterTypes8);
+		String[] names, String[] descriptions, boolean andOperator) {
 
-			MethodHandler methodHandler = new MethodHandler(methodKey,
-					companyId, groupId, names, descriptions, andOperator,
-					start, end, orderByComparator);
+		try {
+			MethodKey methodKey = new MethodKey(
+				DDMFormInstanceServiceUtil.class, "searchCount",
+				_searchCountParameterTypes10);
+
+			MethodHandler methodHandler = new MethodHandler(
+				methodKey, companyId, groupId, names, descriptions,
+				andOperator);
 
 			Object returnObj = null;
 
@@ -327,34 +454,8 @@ public class DDMFormInstanceServiceHttp {
 				returnObj = TunnelUtil.invoke(httpPrincipal, methodHandler);
 			}
 			catch (Exception e) {
-				throw new com.liferay.portal.kernel.exception.SystemException(e);
-			}
-
-			return (java.util.List<com.liferay.dynamic.data.mapping.model.DDMFormInstance>)returnObj;
-		}
-		catch (com.liferay.portal.kernel.exception.SystemException se) {
-			_log.error(se, se);
-
-			throw se;
-		}
-	}
-
-	public static int searchCount(HttpPrincipal httpPrincipal, long companyId,
-		long groupId, String keywords) {
-		try {
-			MethodKey methodKey = new MethodKey(DDMFormInstanceServiceUtil.class,
-					"searchCount", _searchCountParameterTypes9);
-
-			MethodHandler methodHandler = new MethodHandler(methodKey,
-					companyId, groupId, keywords);
-
-			Object returnObj = null;
-
-			try {
-				returnObj = TunnelUtil.invoke(httpPrincipal, methodHandler);
-			}
-			catch (Exception e) {
-				throw new com.liferay.portal.kernel.exception.SystemException(e);
+				throw new com.liferay.portal.kernel.exception.SystemException(
+					e);
 			}
 
 			return ((Integer)returnObj).intValue();
@@ -366,43 +467,20 @@ public class DDMFormInstanceServiceHttp {
 		}
 	}
 
-	public static int searchCount(HttpPrincipal httpPrincipal, long companyId,
-		long groupId, String[] names, String[] descriptions, boolean andOperator) {
-		try {
-			MethodKey methodKey = new MethodKey(DDMFormInstanceServiceUtil.class,
-					"searchCount", _searchCountParameterTypes10);
-
-			MethodHandler methodHandler = new MethodHandler(methodKey,
-					companyId, groupId, names, descriptions, andOperator);
-
-			Object returnObj = null;
-
-			try {
-				returnObj = TunnelUtil.invoke(httpPrincipal, methodHandler);
-			}
-			catch (Exception e) {
-				throw new com.liferay.portal.kernel.exception.SystemException(e);
-			}
-
-			return ((Integer)returnObj).intValue();
-		}
-		catch (com.liferay.portal.kernel.exception.SystemException se) {
-			_log.error(se, se);
-
-			throw se;
-		}
-	}
-
-	public static com.liferay.dynamic.data.mapping.model.DDMFormInstance updateFormInstance(
-		HttpPrincipal httpPrincipal, long formInstanceId,
-		com.liferay.dynamic.data.mapping.storage.DDMFormValues settingsDDMFormValues)
+	public static com.liferay.dynamic.data.mapping.model.DDMFormInstance
+			updateFormInstance(
+				HttpPrincipal httpPrincipal, long formInstanceId,
+				com.liferay.dynamic.data.mapping.storage.DDMFormValues
+					settingsDDMFormValues)
 		throws com.liferay.portal.kernel.exception.PortalException {
-		try {
-			MethodKey methodKey = new MethodKey(DDMFormInstanceServiceUtil.class,
-					"updateFormInstance", _updateFormInstanceParameterTypes11);
 
-			MethodHandler methodHandler = new MethodHandler(methodKey,
-					formInstanceId, settingsDDMFormValues);
+		try {
+			MethodKey methodKey = new MethodKey(
+				DDMFormInstanceServiceUtil.class, "updateFormInstance",
+				_updateFormInstanceParameterTypes11);
+
+			MethodHandler methodHandler = new MethodHandler(
+				methodKey, formInstanceId, settingsDDMFormValues);
 
 			Object returnObj = null;
 
@@ -410,14 +488,19 @@ public class DDMFormInstanceServiceHttp {
 				returnObj = TunnelUtil.invoke(httpPrincipal, methodHandler);
 			}
 			catch (Exception e) {
-				if (e instanceof com.liferay.portal.kernel.exception.PortalException) {
-					throw (com.liferay.portal.kernel.exception.PortalException)e;
+				if (e instanceof
+						com.liferay.portal.kernel.exception.PortalException) {
+
+					throw (com.liferay.portal.kernel.exception.PortalException)
+						e;
 				}
 
-				throw new com.liferay.portal.kernel.exception.SystemException(e);
+				throw new com.liferay.portal.kernel.exception.SystemException(
+					e);
 			}
 
-			return (com.liferay.dynamic.data.mapping.model.DDMFormInstance)returnObj;
+			return (com.liferay.dynamic.data.mapping.model.DDMFormInstance)
+				returnObj;
 		}
 		catch (com.liferay.portal.kernel.exception.SystemException se) {
 			_log.error(se, se);
@@ -426,22 +509,27 @@ public class DDMFormInstanceServiceHttp {
 		}
 	}
 
-	public static com.liferay.dynamic.data.mapping.model.DDMFormInstance updateFormInstance(
-		HttpPrincipal httpPrincipal, long ddmFormInstanceId,
-		java.util.Map<java.util.Locale, String> nameMap,
-		java.util.Map<java.util.Locale, String> descriptionMap,
-		com.liferay.dynamic.data.mapping.model.DDMForm ddmForm,
-		com.liferay.dynamic.data.mapping.model.DDMFormLayout ddmFormLayout,
-		com.liferay.dynamic.data.mapping.storage.DDMFormValues settingsDDMFormValues,
-		com.liferay.portal.kernel.service.ServiceContext serviceContext)
+	public static com.liferay.dynamic.data.mapping.model.DDMFormInstance
+			updateFormInstance(
+				HttpPrincipal httpPrincipal, long ddmFormInstanceId,
+				java.util.Map<java.util.Locale, String> nameMap,
+				java.util.Map<java.util.Locale, String> descriptionMap,
+				com.liferay.dynamic.data.mapping.model.DDMForm ddmForm,
+				com.liferay.dynamic.data.mapping.model.DDMFormLayout
+					ddmFormLayout,
+				com.liferay.dynamic.data.mapping.storage.DDMFormValues
+					settingsDDMFormValues,
+				com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
-		try {
-			MethodKey methodKey = new MethodKey(DDMFormInstanceServiceUtil.class,
-					"updateFormInstance", _updateFormInstanceParameterTypes12);
 
-			MethodHandler methodHandler = new MethodHandler(methodKey,
-					ddmFormInstanceId, nameMap, descriptionMap, ddmForm,
-					ddmFormLayout, settingsDDMFormValues, serviceContext);
+		try {
+			MethodKey methodKey = new MethodKey(
+				DDMFormInstanceServiceUtil.class, "updateFormInstance",
+				_updateFormInstanceParameterTypes12);
+
+			MethodHandler methodHandler = new MethodHandler(
+				methodKey, ddmFormInstanceId, nameMap, descriptionMap, ddmForm,
+				ddmFormLayout, settingsDDMFormValues, serviceContext);
 
 			Object returnObj = null;
 
@@ -449,14 +537,19 @@ public class DDMFormInstanceServiceHttp {
 				returnObj = TunnelUtil.invoke(httpPrincipal, methodHandler);
 			}
 			catch (Exception e) {
-				if (e instanceof com.liferay.portal.kernel.exception.PortalException) {
-					throw (com.liferay.portal.kernel.exception.PortalException)e;
+				if (e instanceof
+						com.liferay.portal.kernel.exception.PortalException) {
+
+					throw (com.liferay.portal.kernel.exception.PortalException)
+						e;
 				}
 
-				throw new com.liferay.portal.kernel.exception.SystemException(e);
+				throw new com.liferay.portal.kernel.exception.SystemException(
+					e);
 			}
 
-			return (com.liferay.dynamic.data.mapping.model.DDMFormInstance)returnObj;
+			return (com.liferay.dynamic.data.mapping.model.DDMFormInstance)
+				returnObj;
 		}
 		catch (com.liferay.portal.kernel.exception.SystemException se) {
 			_log.error(se, se);
@@ -465,59 +558,60 @@ public class DDMFormInstanceServiceHttp {
 		}
 	}
 
-	private static Log _log = LogFactoryUtil.getLog(DDMFormInstanceServiceHttp.class);
-	private static final Class<?>[] _addFormInstanceParameterTypes0 = new Class[] {
+	private static Log _log = LogFactoryUtil.getLog(
+		DDMFormInstanceServiceHttp.class);
+
+	private static final Class<?>[] _addFormInstanceParameterTypes0 =
+		new Class[] {
 			long.class, long.class, java.util.Map.class, java.util.Map.class,
 			com.liferay.dynamic.data.mapping.storage.DDMFormValues.class,
 			com.liferay.portal.kernel.service.ServiceContext.class
 		};
-	private static final Class<?>[] _addFormInstanceParameterTypes1 = new Class[] {
+	private static final Class<?>[] _addFormInstanceParameterTypes1 =
+		new Class[] {
 			long.class, java.util.Map.class, java.util.Map.class,
 			com.liferay.dynamic.data.mapping.model.DDMForm.class,
 			com.liferay.dynamic.data.mapping.model.DDMFormLayout.class,
 			com.liferay.dynamic.data.mapping.storage.DDMFormValues.class,
 			com.liferay.portal.kernel.service.ServiceContext.class
 		};
-	private static final Class<?>[] _deleteFormInstanceParameterTypes2 = new Class[] {
-			long.class
-		};
-	private static final Class<?>[] _fetchFormInstanceParameterTypes3 = new Class[] {
-			long.class
-		};
-	private static final Class<?>[] _getFormInstanceParameterTypes4 = new Class[] {
-			long.class
-		};
-	private static final Class<?>[] _getFormInstancesParameterTypes5 = new Class[] {
-			long.class, long.class, int.class, int.class
-		};
-	private static final Class<?>[] _getFormInstancesCountParameterTypes6 = new Class[] {
-			long.class, long.class
-		};
+	private static final Class<?>[] _deleteFormInstanceParameterTypes2 =
+		new Class[] {long.class};
+	private static final Class<?>[] _fetchFormInstanceParameterTypes3 =
+		new Class[] {long.class};
+	private static final Class<?>[] _getFormInstanceParameterTypes4 =
+		new Class[] {long.class};
+	private static final Class<?>[] _getFormInstancesParameterTypes5 =
+		new Class[] {long.class, long.class, int.class, int.class};
+	private static final Class<?>[] _getFormInstancesCountParameterTypes6 =
+		new Class[] {long.class, long.class};
 	private static final Class<?>[] _searchParameterTypes7 = new Class[] {
-			long.class, long.class, String.class, int.class, int.class,
-			com.liferay.portal.kernel.util.OrderByComparator.class
-		};
+		long.class, long.class, String.class, int.class, int.class,
+		com.liferay.portal.kernel.util.OrderByComparator.class
+	};
 	private static final Class<?>[] _searchParameterTypes8 = new Class[] {
-			long.class, long.class, String[].class, String[].class,
-			boolean.class, int.class, int.class,
-			com.liferay.portal.kernel.util.OrderByComparator.class
-		};
+		long.class, long.class, String[].class, String[].class, boolean.class,
+		int.class, int.class,
+		com.liferay.portal.kernel.util.OrderByComparator.class
+	};
 	private static final Class<?>[] _searchCountParameterTypes9 = new Class[] {
-			long.class, long.class, String.class
-		};
+		long.class, long.class, String.class
+	};
 	private static final Class<?>[] _searchCountParameterTypes10 = new Class[] {
-			long.class, long.class, String[].class, String[].class,
-			boolean.class
-		};
-	private static final Class<?>[] _updateFormInstanceParameterTypes11 = new Class[] {
+		long.class, long.class, String[].class, String[].class, boolean.class
+	};
+	private static final Class<?>[] _updateFormInstanceParameterTypes11 =
+		new Class[] {
 			long.class,
 			com.liferay.dynamic.data.mapping.storage.DDMFormValues.class
 		};
-	private static final Class<?>[] _updateFormInstanceParameterTypes12 = new Class[] {
+	private static final Class<?>[] _updateFormInstanceParameterTypes12 =
+		new Class[] {
 			long.class, java.util.Map.class, java.util.Map.class,
 			com.liferay.dynamic.data.mapping.model.DDMForm.class,
 			com.liferay.dynamic.data.mapping.model.DDMFormLayout.class,
 			com.liferay.dynamic.data.mapping.storage.DDMFormValues.class,
 			com.liferay.portal.kernel.service.ServiceContext.class
 		};
+
 }

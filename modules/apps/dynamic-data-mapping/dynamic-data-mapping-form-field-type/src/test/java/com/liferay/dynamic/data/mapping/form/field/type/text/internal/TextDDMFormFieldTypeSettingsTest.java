@@ -17,19 +17,31 @@ package com.liferay.dynamic.data.mapping.form.field.type.text.internal;
 import com.liferay.dynamic.data.mapping.form.field.type.BaseDDMFormFieldTypeSettingsTestCase;
 import com.liferay.dynamic.data.mapping.model.DDMForm;
 import com.liferay.dynamic.data.mapping.model.DDMFormField;
+import com.liferay.dynamic.data.mapping.model.DDMFormFieldOptions;
 import com.liferay.dynamic.data.mapping.model.DDMFormRule;
 import com.liferay.dynamic.data.mapping.util.DDMFormFactory;
 import com.liferay.petra.string.StringBundler;
+import com.liferay.portal.kernel.language.Language;
+import com.liferay.portal.kernel.language.LanguageUtil;
+import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.PortalClassLoaderUtil;
+import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.ResourceBundleUtil;
 
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
+import java.util.ResourceBundle;
+import java.util.Set;
 
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import org.mockito.Matchers;
+
+import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
@@ -40,6 +52,13 @@ import org.powermock.modules.junit4.PowerMockRunner;
 @RunWith(PowerMockRunner.class)
 public class TextDDMFormFieldTypeSettingsTest
 	extends BaseDDMFormFieldTypeSettingsTestCase {
+
+	@Before
+	public void setUp() {
+		setUpLanguageUtil();
+		setUpPortalUtil();
+		setUpResourceBundleUtil();
+	}
 
 	@Test
 	public void testCreateTextDDMFormFieldTypeSettingsDDMForm() {
@@ -82,6 +101,19 @@ public class TextDDMFormFieldTypeSettingsTest
 		Assert.assertEquals(
 			"true", displayStyleDDMFormField.getProperty("inline"));
 		Assert.assertEquals("radio", displayStyleDDMFormField.getType());
+
+		DDMFormField indexTypeDDMFormField = ddmFormFieldsMap.get("indexType");
+
+		DDMFormFieldOptions indexTypeDDMFormFieldOptions =
+			indexTypeDDMFormField.getDDMFormFieldOptions();
+
+		Set<String> indexTypeDDMFormFieldOptionsValue =
+			indexTypeDDMFormFieldOptions.getOptionsValues();
+
+		Assert.assertNotNull(indexTypeDDMFormField);
+		Assert.assertNotNull(indexTypeDDMFormField.getLabel());
+		Assert.assertEquals("radio", indexTypeDDMFormField.getType());
+		Assert.assertTrue(indexTypeDDMFormFieldOptionsValue.contains("text"));
 
 		DDMFormField optionsDDMFormField = ddmFormFieldsMap.get("options");
 
@@ -174,6 +206,42 @@ public class TextDDMFormFieldTypeSettingsTest
 			actions.contains(
 				"setVisible('options', equals(getValue('dataSourceType'), " +
 					"\"manual\") and getValue('autocomplete'))"));
+	}
+
+	protected void setUpLanguageUtil() {
+		LanguageUtil languageUtil = new LanguageUtil();
+
+		Language language = PowerMockito.mock(Language.class);
+
+		languageUtil.setLanguage(language);
+	}
+
+	protected void setUpPortalUtil() {
+		PortalUtil portalUtil = new PortalUtil();
+
+		Portal portal = mock(Portal.class);
+
+		ResourceBundle resourceBundle = mock(ResourceBundle.class);
+
+		when(
+			portal.getResourceBundle(Matchers.any(Locale.class))
+		).thenReturn(
+			resourceBundle
+		);
+
+		portalUtil.setPortal(portal);
+	}
+
+	protected void setUpResourceBundleUtil() {
+		PowerMockito.mockStatic(ResourceBundleUtil.class);
+
+		PowerMockito.when(
+			ResourceBundleUtil.getBundle(
+				Matchers.anyString(), Matchers.any(Locale.class),
+				Matchers.any(ClassLoader.class))
+		).thenReturn(
+			ResourceBundleUtil.EMPTY_RESOURCE_BUNDLE
+		);
 	}
 
 }

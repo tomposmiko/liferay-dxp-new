@@ -129,10 +129,8 @@ public class CheckboxMultipleDDMFormFieldTemplateContextContributor
 			return null;
 		}
 
-		String predefinedValueString = predefinedValue.getString(
+		return predefinedValue.getString(
 			ddmFormFieldRenderingContext.getLocale());
-
-		return predefinedValueString;
 	}
 
 	protected List<String> getValue(String valueString) {

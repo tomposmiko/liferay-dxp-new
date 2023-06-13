@@ -341,12 +341,11 @@ public class RuntimePageImpl implements RuntimePage {
 					request, response, portletId, templateResource, langType,
 					false);
 			}
-			else {
-				doProcessCustomizationSettings(
-					request, response, templateResource, langType, false);
 
-				return null;
-			}
+			doProcessCustomizationSettings(
+				request, response, templateResource, langType, false);
+
+			return null;
 		}
 		finally {
 			if ((pluginClassLoader != null) &&
@@ -590,11 +589,9 @@ public class RuntimePageImpl implements RuntimePage {
 			_waitTime = PropsValues.LAYOUT_PARALLEL_RENDER_TIMEOUT;
 		}
 
-		StringBundler sb = StringUtil.replaceWithStringBundler(
+		return StringUtil.replaceWithStringBundler(
 			unsyncStringWriter.toString(), "[$TEMPLATE_PORTLET_", "$]",
 			contentsMap);
-
-		return sb;
 	}
 
 	protected LayoutTemplate getLayoutTemplate(String velocityTemplateId) {

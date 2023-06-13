@@ -25,36 +25,42 @@ import com.liferay.portal.kernel.util.Accessor;
  *
  * @author Brian Wing Shun Chan
  * @see FragmentEntryLinkModel
- * @see com.liferay.fragment.model.impl.FragmentEntryLinkImpl
- * @see com.liferay.fragment.model.impl.FragmentEntryLinkModelImpl
  * @generated
  */
-@ImplementationClassName("com.liferay.fragment.model.impl.FragmentEntryLinkImpl")
+@ImplementationClassName(
+	"com.liferay.fragment.model.impl.FragmentEntryLinkImpl"
+)
 @ProviderType
-public interface FragmentEntryLink extends FragmentEntryLinkModel, PersistedModel {
+public interface FragmentEntryLink
+	extends FragmentEntryLinkModel, PersistedModel {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
-	 * Never modify this interface directly. Add methods to {@link com.liferay.fragment.model.impl.FragmentEntryLinkImpl} and rerun ServiceBuilder to automatically copy the method declarations to this interface.
+	 * Never modify this interface directly. Add methods to <code>com.liferay.fragment.model.impl.FragmentEntryLinkImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
 	 */
-	public static final Accessor<FragmentEntryLink, Long> FRAGMENT_ENTRY_LINK_ID_ACCESSOR =
-		new Accessor<FragmentEntryLink, Long>() {
-			@Override
-			public Long get(FragmentEntryLink fragmentEntryLink) {
-				return fragmentEntryLink.getFragmentEntryLinkId();
-			}
+	public static final Accessor<FragmentEntryLink, Long>
+		FRAGMENT_ENTRY_LINK_ID_ACCESSOR =
+			new Accessor<FragmentEntryLink, Long>() {
 
-			@Override
-			public Class<Long> getAttributeClass() {
-				return Long.class;
-			}
+				@Override
+				public Long get(FragmentEntryLink fragmentEntryLink) {
+					return fragmentEntryLink.getFragmentEntryLinkId();
+				}
 
-			@Override
-			public Class<FragmentEntryLink> getTypeClass() {
-				return FragmentEntryLink.class;
-			}
-		};
+				@Override
+				public Class<Long> getAttributeClass() {
+					return Long.class;
+				}
+
+				@Override
+				public Class<FragmentEntryLink> getTypeClass() {
+					return FragmentEntryLink.class;
+				}
+
+			};
 
 	public boolean isLatestVersion()
 		throws com.liferay.portal.kernel.exception.PortalException;
+
 }

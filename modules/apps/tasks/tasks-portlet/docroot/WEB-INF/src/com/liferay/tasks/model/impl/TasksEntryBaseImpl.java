@@ -32,12 +32,13 @@ import com.liferay.tasks.service.TasksEntryLocalServiceUtil;
  * @generated
  */
 @ProviderType
-public abstract class TasksEntryBaseImpl extends TasksEntryModelImpl
-	implements TasksEntry {
+public abstract class TasksEntryBaseImpl
+	extends TasksEntryModelImpl implements TasksEntry {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
-	 * Never modify or reference this class directly. All methods that expect a tasks entry model instance should use the {@link TasksEntry} interface instead.
+	 * Never modify or reference this class directly. All methods that expect a tasks entry model instance should use the <code>TasksEntry</code> interface instead.
 	 */
 	@Override
 	public void persist() {
@@ -48,4 +49,5 @@ public abstract class TasksEntryBaseImpl extends TasksEntryModelImpl
 			TasksEntryLocalServiceUtil.updateTasksEntry(this);
 		}
 	}
+
 }

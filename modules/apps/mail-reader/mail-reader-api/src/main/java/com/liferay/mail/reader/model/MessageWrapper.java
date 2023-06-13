@@ -17,7 +17,6 @@ package com.liferay.mail.reader.model;
 import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.expando.kernel.model.ExpandoBridge;
-
 import com.liferay.portal.kernel.model.ModelWrapper;
 import com.liferay.portal.kernel.service.ServiceContext;
 
@@ -39,6 +38,7 @@ import java.util.Objects;
  */
 @ProviderType
 public class MessageWrapper implements Message, ModelWrapper<Message> {
+
 	public MessageWrapper(Message message) {
 		_message = message;
 	}
@@ -215,70 +215,70 @@ public class MessageWrapper implements Message, ModelWrapper<Message> {
 	}
 
 	/**
-	* Returns the account ID of this message.
-	*
-	* @return the account ID of this message
-	*/
+	 * Returns the account ID of this message.
+	 *
+	 * @return the account ID of this message
+	 */
 	@Override
 	public long getAccountId() {
 		return _message.getAccountId();
 	}
 
 	/**
-	* Returns the bcc of this message.
-	*
-	* @return the bcc of this message
-	*/
+	 * Returns the bcc of this message.
+	 *
+	 * @return the bcc of this message
+	 */
 	@Override
 	public String getBcc() {
 		return _message.getBcc();
 	}
 
 	/**
-	* Returns the body of this message.
-	*
-	* @return the body of this message
-	*/
+	 * Returns the body of this message.
+	 *
+	 * @return the body of this message
+	 */
 	@Override
 	public String getBody() {
 		return _message.getBody();
 	}
 
 	/**
-	* Returns the cc of this message.
-	*
-	* @return the cc of this message
-	*/
+	 * Returns the cc of this message.
+	 *
+	 * @return the cc of this message
+	 */
 	@Override
 	public String getCc() {
 		return _message.getCc();
 	}
 
 	/**
-	* Returns the company ID of this message.
-	*
-	* @return the company ID of this message
-	*/
+	 * Returns the company ID of this message.
+	 *
+	 * @return the company ID of this message
+	 */
 	@Override
 	public long getCompanyId() {
 		return _message.getCompanyId();
 	}
 
 	/**
-	* Returns the content type of this message.
-	*
-	* @return the content type of this message
-	*/
+	 * Returns the content type of this message.
+	 *
+	 * @return the content type of this message
+	 */
 	@Override
 	public String getContentType() {
 		return _message.getContentType();
 	}
 
 	/**
-	* Returns the create date of this message.
-	*
-	* @return the create date of this message
-	*/
+	 * Returns the create date of this message.
+	 *
+	 * @return the create date of this message
+	 */
 	@Override
 	public Date getCreateDate() {
 		return _message.getCreateDate();
@@ -290,20 +290,20 @@ public class MessageWrapper implements Message, ModelWrapper<Message> {
 	}
 
 	/**
-	* Returns the flags of this message.
-	*
-	* @return the flags of this message
-	*/
+	 * Returns the flags of this message.
+	 *
+	 * @return the flags of this message
+	 */
 	@Override
 	public String getFlags() {
 		return _message.getFlags();
 	}
 
 	/**
-	* Returns the folder ID of this message.
-	*
-	* @return the folder ID of this message
-	*/
+	 * Returns the folder ID of this message.
+	 *
+	 * @return the folder ID of this message
+	 */
 	@Override
 	public long getFolderId() {
 		return _message.getFolderId();
@@ -312,44 +312,45 @@ public class MessageWrapper implements Message, ModelWrapper<Message> {
 	@Override
 	public long getGroupId()
 		throws com.liferay.portal.kernel.exception.PortalException {
+
 		return _message.getGroupId();
 	}
 
 	/**
-	* Returns the message ID of this message.
-	*
-	* @return the message ID of this message
-	*/
+	 * Returns the message ID of this message.
+	 *
+	 * @return the message ID of this message
+	 */
 	@Override
 	public long getMessageId() {
 		return _message.getMessageId();
 	}
 
 	/**
-	* Returns the modified date of this message.
-	*
-	* @return the modified date of this message
-	*/
+	 * Returns the modified date of this message.
+	 *
+	 * @return the modified date of this message
+	 */
 	@Override
 	public Date getModifiedDate() {
 		return _message.getModifiedDate();
 	}
 
 	/**
-	* Returns the preview of this message.
-	*
-	* @return the preview of this message
-	*/
+	 * Returns the preview of this message.
+	 *
+	 * @return the preview of this message
+	 */
 	@Override
 	public String getPreview() {
 		return _message.getPreview();
 	}
 
 	/**
-	* Returns the primary key of this message.
-	*
-	* @return the primary key of this message
-	*/
+	 * Returns the primary key of this message.
+	 *
+	 * @return the primary key of this message
+	 */
 	@Override
 	public long getPrimaryKey() {
 		return _message.getPrimaryKey();
@@ -361,90 +362,90 @@ public class MessageWrapper implements Message, ModelWrapper<Message> {
 	}
 
 	/**
-	* Returns the remote message ID of this message.
-	*
-	* @return the remote message ID of this message
-	*/
+	 * Returns the remote message ID of this message.
+	 *
+	 * @return the remote message ID of this message
+	 */
 	@Override
 	public long getRemoteMessageId() {
 		return _message.getRemoteMessageId();
 	}
 
 	/**
-	* Returns the sender of this message.
-	*
-	* @return the sender of this message
-	*/
+	 * Returns the sender of this message.
+	 *
+	 * @return the sender of this message
+	 */
 	@Override
 	public String getSender() {
 		return _message.getSender();
 	}
 
 	/**
-	* Returns the sent date of this message.
-	*
-	* @return the sent date of this message
-	*/
+	 * Returns the sent date of this message.
+	 *
+	 * @return the sent date of this message
+	 */
 	@Override
 	public Date getSentDate() {
 		return _message.getSentDate();
 	}
 
 	/**
-	* Returns the size of this message.
-	*
-	* @return the size of this message
-	*/
+	 * Returns the size of this message.
+	 *
+	 * @return the size of this message
+	 */
 	@Override
 	public long getSize() {
 		return _message.getSize();
 	}
 
 	/**
-	* Returns the subject of this message.
-	*
-	* @return the subject of this message
-	*/
+	 * Returns the subject of this message.
+	 *
+	 * @return the subject of this message
+	 */
 	@Override
 	public String getSubject() {
 		return _message.getSubject();
 	}
 
 	/**
-	* Returns the to of this message.
-	*
-	* @return the to of this message
-	*/
+	 * Returns the to of this message.
+	 *
+	 * @return the to of this message
+	 */
 	@Override
 	public String getTo() {
 		return _message.getTo();
 	}
 
 	/**
-	* Returns the user ID of this message.
-	*
-	* @return the user ID of this message
-	*/
+	 * Returns the user ID of this message.
+	 *
+	 * @return the user ID of this message
+	 */
 	@Override
 	public long getUserId() {
 		return _message.getUserId();
 	}
 
 	/**
-	* Returns the user name of this message.
-	*
-	* @return the user name of this message
-	*/
+	 * Returns the user name of this message.
+	 *
+	 * @return the user name of this message
+	 */
 	@Override
 	public String getUserName() {
 		return _message.getUserName();
 	}
 
 	/**
-	* Returns the user uuid of this message.
-	*
-	* @return the user uuid of this message
-	*/
+	 * Returns the user uuid of this message.
+	 *
+	 * @return the user uuid of this message
+	 */
 	@Override
 	public String getUserUuid() {
 		return _message.getUserUuid();
@@ -486,30 +487,30 @@ public class MessageWrapper implements Message, ModelWrapper<Message> {
 	}
 
 	/**
-	* Sets the account ID of this message.
-	*
-	* @param accountId the account ID of this message
-	*/
+	 * Sets the account ID of this message.
+	 *
+	 * @param accountId the account ID of this message
+	 */
 	@Override
 	public void setAccountId(long accountId) {
 		_message.setAccountId(accountId);
 	}
 
 	/**
-	* Sets the bcc of this message.
-	*
-	* @param bcc the bcc of this message
-	*/
+	 * Sets the bcc of this message.
+	 *
+	 * @param bcc the bcc of this message
+	 */
 	@Override
 	public void setBcc(String bcc) {
 		_message.setBcc(bcc);
 	}
 
 	/**
-	* Sets the body of this message.
-	*
-	* @param body the body of this message
-	*/
+	 * Sets the body of this message.
+	 *
+	 * @param body the body of this message
+	 */
 	@Override
 	public void setBody(String body) {
 		_message.setBody(body);
@@ -521,40 +522,40 @@ public class MessageWrapper implements Message, ModelWrapper<Message> {
 	}
 
 	/**
-	* Sets the cc of this message.
-	*
-	* @param cc the cc of this message
-	*/
+	 * Sets the cc of this message.
+	 *
+	 * @param cc the cc of this message
+	 */
 	@Override
 	public void setCc(String cc) {
 		_message.setCc(cc);
 	}
 
 	/**
-	* Sets the company ID of this message.
-	*
-	* @param companyId the company ID of this message
-	*/
+	 * Sets the company ID of this message.
+	 *
+	 * @param companyId the company ID of this message
+	 */
 	@Override
 	public void setCompanyId(long companyId) {
 		_message.setCompanyId(companyId);
 	}
 
 	/**
-	* Sets the content type of this message.
-	*
-	* @param contentType the content type of this message
-	*/
+	 * Sets the content type of this message.
+	 *
+	 * @param contentType the content type of this message
+	 */
 	@Override
 	public void setContentType(String contentType) {
 		_message.setContentType(contentType);
 	}
 
 	/**
-	* Sets the create date of this message.
-	*
-	* @param createDate the create date of this message
-	*/
+	 * Sets the create date of this message.
+	 *
+	 * @param createDate the create date of this message
+	 */
 	@Override
 	public void setCreateDate(Date createDate) {
 		_message.setCreateDate(createDate);
@@ -563,6 +564,7 @@ public class MessageWrapper implements Message, ModelWrapper<Message> {
 	@Override
 	public void setExpandoBridgeAttributes(
 		com.liferay.portal.kernel.model.BaseModel<?> baseModel) {
+
 		_message.setExpandoBridgeAttributes(baseModel);
 	}
 
@@ -577,40 +579,40 @@ public class MessageWrapper implements Message, ModelWrapper<Message> {
 	}
 
 	/**
-	* Sets the flags of this message.
-	*
-	* @param flags the flags of this message
-	*/
+	 * Sets the flags of this message.
+	 *
+	 * @param flags the flags of this message
+	 */
 	@Override
 	public void setFlags(String flags) {
 		_message.setFlags(flags);
 	}
 
 	/**
-	* Sets the folder ID of this message.
-	*
-	* @param folderId the folder ID of this message
-	*/
+	 * Sets the folder ID of this message.
+	 *
+	 * @param folderId the folder ID of this message
+	 */
 	@Override
 	public void setFolderId(long folderId) {
 		_message.setFolderId(folderId);
 	}
 
 	/**
-	* Sets the message ID of this message.
-	*
-	* @param messageId the message ID of this message
-	*/
+	 * Sets the message ID of this message.
+	 *
+	 * @param messageId the message ID of this message
+	 */
 	@Override
 	public void setMessageId(long messageId) {
 		_message.setMessageId(messageId);
 	}
 
 	/**
-	* Sets the modified date of this message.
-	*
-	* @param modifiedDate the modified date of this message
-	*/
+	 * Sets the modified date of this message.
+	 *
+	 * @param modifiedDate the modified date of this message
+	 */
 	@Override
 	public void setModifiedDate(Date modifiedDate) {
 		_message.setModifiedDate(modifiedDate);
@@ -622,20 +624,20 @@ public class MessageWrapper implements Message, ModelWrapper<Message> {
 	}
 
 	/**
-	* Sets the preview of this message.
-	*
-	* @param preview the preview of this message
-	*/
+	 * Sets the preview of this message.
+	 *
+	 * @param preview the preview of this message
+	 */
 	@Override
 	public void setPreview(String preview) {
 		_message.setPreview(preview);
 	}
 
 	/**
-	* Sets the primary key of this message.
-	*
-	* @param primaryKey the primary key of this message
-	*/
+	 * Sets the primary key of this message.
+	 *
+	 * @param primaryKey the primary key of this message
+	 */
 	@Override
 	public void setPrimaryKey(long primaryKey) {
 		_message.setPrimaryKey(primaryKey);
@@ -647,90 +649,90 @@ public class MessageWrapper implements Message, ModelWrapper<Message> {
 	}
 
 	/**
-	* Sets the remote message ID of this message.
-	*
-	* @param remoteMessageId the remote message ID of this message
-	*/
+	 * Sets the remote message ID of this message.
+	 *
+	 * @param remoteMessageId the remote message ID of this message
+	 */
 	@Override
 	public void setRemoteMessageId(long remoteMessageId) {
 		_message.setRemoteMessageId(remoteMessageId);
 	}
 
 	/**
-	* Sets the sender of this message.
-	*
-	* @param sender the sender of this message
-	*/
+	 * Sets the sender of this message.
+	 *
+	 * @param sender the sender of this message
+	 */
 	@Override
 	public void setSender(String sender) {
 		_message.setSender(sender);
 	}
 
 	/**
-	* Sets the sent date of this message.
-	*
-	* @param sentDate the sent date of this message
-	*/
+	 * Sets the sent date of this message.
+	 *
+	 * @param sentDate the sent date of this message
+	 */
 	@Override
 	public void setSentDate(Date sentDate) {
 		_message.setSentDate(sentDate);
 	}
 
 	/**
-	* Sets the size of this message.
-	*
-	* @param size the size of this message
-	*/
+	 * Sets the size of this message.
+	 *
+	 * @param size the size of this message
+	 */
 	@Override
 	public void setSize(long size) {
 		_message.setSize(size);
 	}
 
 	/**
-	* Sets the subject of this message.
-	*
-	* @param subject the subject of this message
-	*/
+	 * Sets the subject of this message.
+	 *
+	 * @param subject the subject of this message
+	 */
 	@Override
 	public void setSubject(String subject) {
 		_message.setSubject(subject);
 	}
 
 	/**
-	* Sets the to of this message.
-	*
-	* @param to the to of this message
-	*/
+	 * Sets the to of this message.
+	 *
+	 * @param to the to of this message
+	 */
 	@Override
 	public void setTo(String to) {
 		_message.setTo(to);
 	}
 
 	/**
-	* Sets the user ID of this message.
-	*
-	* @param userId the user ID of this message
-	*/
+	 * Sets the user ID of this message.
+	 *
+	 * @param userId the user ID of this message
+	 */
 	@Override
 	public void setUserId(long userId) {
 		_message.setUserId(userId);
 	}
 
 	/**
-	* Sets the user name of this message.
-	*
-	* @param userName the user name of this message
-	*/
+	 * Sets the user name of this message.
+	 *
+	 * @param userName the user name of this message
+	 */
 	@Override
 	public void setUserName(String userName) {
 		_message.setUserName(userName);
 	}
 
 	/**
-	* Sets the user uuid of this message.
-	*
-	* @param userUuid the user uuid of this message
-	*/
+	 * Sets the user uuid of this message.
+	 *
+	 * @param userUuid the user uuid of this message
+	 */
 	@Override
 	public void setUserUuid(String userUuid) {
 		_message.setUserUuid(userUuid);
@@ -801,4 +803,5 @@ public class MessageWrapper implements Message, ModelWrapper<Message> {
 	}
 
 	private final Message _message;
+
 }

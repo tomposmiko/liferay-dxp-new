@@ -60,26 +60,10 @@ public class AggregateTestRule implements ArquillianClassRuleHandler, TestRule {
 
 	@Override
 	public void handleAfterClass(boolean enable) {
-		for (TestRule testRule : _testRules) {
-			if (testRule instanceof ArquillianClassRuleHandler) {
-				ArquillianClassRuleHandler arquillianTestRuleHandler =
-					(ArquillianClassRuleHandler)testRule;
-
-				arquillianTestRuleHandler.handleAfterClass(enable);
-			}
-		}
 	}
 
 	@Override
 	public void handleBeforeClass(boolean enable) {
-		for (TestRule testRule : _testRules) {
-			if (testRule instanceof ArquillianClassRuleHandler) {
-				ArquillianClassRuleHandler arquillianTestRuleHandler =
-					(ArquillianClassRuleHandler)testRule;
-
-				arquillianTestRuleHandler.handleBeforeClass(enable);
-			}
-		}
 	}
 
 	private static final String[] _ORDERED_RULE_CLASS_NAMES = {

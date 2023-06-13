@@ -1,16 +1,16 @@
 {
 	"_links": {
 		"self": {
-			"href": "localhost/o/api"
+			"href": "/"
 		},
 		"type1": {
-			"href": "localhost/o/api/p/type1"
+			"href": "/type1"
 		},
 		"type2": {
-			"href": "localhost/o/api/p/type2"
+			"href": "/type2"
 		},
 		"type3": {
-			"href": "localhost/o/api/p/type3"
+			"href": "/type3"
 		}
 	}
 }

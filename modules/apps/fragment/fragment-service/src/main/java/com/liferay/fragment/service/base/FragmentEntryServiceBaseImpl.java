@@ -19,7 +19,6 @@ import com.liferay.fragment.service.FragmentEntryService;
 import com.liferay.fragment.service.persistence.FragmentEntryLinkFinder;
 import com.liferay.fragment.service.persistence.FragmentEntryLinkPersistence;
 import com.liferay.fragment.service.persistence.FragmentEntryPersistence;
-
 import com.liferay.portal.kernel.bean.BeanReference;
 import com.liferay.portal.kernel.dao.db.DB;
 import com.liferay.portal.kernel.dao.db.DBManagerUtil;
@@ -43,15 +42,16 @@ import javax.sql.DataSource;
  *
  * @author Brian Wing Shun Chan
  * @see com.liferay.fragment.service.impl.FragmentEntryServiceImpl
- * @see com.liferay.fragment.service.FragmentEntryServiceUtil
  * @generated
  */
-public abstract class FragmentEntryServiceBaseImpl extends BaseServiceImpl
+public abstract class FragmentEntryServiceBaseImpl
+	extends BaseServiceImpl
 	implements FragmentEntryService, IdentifiableOSGiService {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
-	 * Never modify or reference this class directly. Always use {@link com.liferay.fragment.service.FragmentEntryServiceUtil} to access the fragment entry remote service.
+	 * Never modify or reference this class directly. Use <code>FragmentEntryService</code> via injection or a <code>org.osgi.util.tracker.ServiceTracker</code> or use <code>com.liferay.fragment.service.FragmentEntryServiceUtil</code>.
 	 */
 
 	/**
@@ -59,7 +59,9 @@ public abstract class FragmentEntryServiceBaseImpl extends BaseServiceImpl
 	 *
 	 * @return the fragment entry local service
 	 */
-	public com.liferay.fragment.service.FragmentEntryLocalService getFragmentEntryLocalService() {
+	public com.liferay.fragment.service.FragmentEntryLocalService
+		getFragmentEntryLocalService() {
+
 		return fragmentEntryLocalService;
 	}
 
@@ -69,7 +71,9 @@ public abstract class FragmentEntryServiceBaseImpl extends BaseServiceImpl
 	 * @param fragmentEntryLocalService the fragment entry local service
 	 */
 	public void setFragmentEntryLocalService(
-		com.liferay.fragment.service.FragmentEntryLocalService fragmentEntryLocalService) {
+		com.liferay.fragment.service.FragmentEntryLocalService
+			fragmentEntryLocalService) {
+
 		this.fragmentEntryLocalService = fragmentEntryLocalService;
 	}
 
@@ -89,6 +93,7 @@ public abstract class FragmentEntryServiceBaseImpl extends BaseServiceImpl
 	 */
 	public void setFragmentEntryService(
 		FragmentEntryService fragmentEntryService) {
+
 		this.fragmentEntryService = fragmentEntryService;
 	}
 
@@ -108,6 +113,7 @@ public abstract class FragmentEntryServiceBaseImpl extends BaseServiceImpl
 	 */
 	public void setFragmentEntryPersistence(
 		FragmentEntryPersistence fragmentEntryPersistence) {
+
 		this.fragmentEntryPersistence = fragmentEntryPersistence;
 	}
 
@@ -116,7 +122,9 @@ public abstract class FragmentEntryServiceBaseImpl extends BaseServiceImpl
 	 *
 	 * @return the counter local service
 	 */
-	public com.liferay.counter.kernel.service.CounterLocalService getCounterLocalService() {
+	public com.liferay.counter.kernel.service.CounterLocalService
+		getCounterLocalService() {
+
 		return counterLocalService;
 	}
 
@@ -126,7 +134,9 @@ public abstract class FragmentEntryServiceBaseImpl extends BaseServiceImpl
 	 * @param counterLocalService the counter local service
 	 */
 	public void setCounterLocalService(
-		com.liferay.counter.kernel.service.CounterLocalService counterLocalService) {
+		com.liferay.counter.kernel.service.CounterLocalService
+			counterLocalService) {
+
 		this.counterLocalService = counterLocalService;
 	}
 
@@ -135,7 +145,9 @@ public abstract class FragmentEntryServiceBaseImpl extends BaseServiceImpl
 	 *
 	 * @return the user local service
 	 */
-	public com.liferay.portal.kernel.service.UserLocalService getUserLocalService() {
+	public com.liferay.portal.kernel.service.UserLocalService
+		getUserLocalService() {
+
 		return userLocalService;
 	}
 
@@ -146,6 +158,7 @@ public abstract class FragmentEntryServiceBaseImpl extends BaseServiceImpl
 	 */
 	public void setUserLocalService(
 		com.liferay.portal.kernel.service.UserLocalService userLocalService) {
+
 		this.userLocalService = userLocalService;
 	}
 
@@ -165,6 +178,7 @@ public abstract class FragmentEntryServiceBaseImpl extends BaseServiceImpl
 	 */
 	public void setUserService(
 		com.liferay.portal.kernel.service.UserService userService) {
+
 		this.userService = userService;
 	}
 
@@ -191,7 +205,9 @@ public abstract class FragmentEntryServiceBaseImpl extends BaseServiceImpl
 	 *
 	 * @return the fragment entry link local service
 	 */
-	public com.liferay.fragment.service.FragmentEntryLinkLocalService getFragmentEntryLinkLocalService() {
+	public com.liferay.fragment.service.FragmentEntryLinkLocalService
+		getFragmentEntryLinkLocalService() {
+
 		return fragmentEntryLinkLocalService;
 	}
 
@@ -201,7 +217,9 @@ public abstract class FragmentEntryServiceBaseImpl extends BaseServiceImpl
 	 * @param fragmentEntryLinkLocalService the fragment entry link local service
 	 */
 	public void setFragmentEntryLinkLocalService(
-		com.liferay.fragment.service.FragmentEntryLinkLocalService fragmentEntryLinkLocalService) {
+		com.liferay.fragment.service.FragmentEntryLinkLocalService
+			fragmentEntryLinkLocalService) {
+
 		this.fragmentEntryLinkLocalService = fragmentEntryLinkLocalService;
 	}
 
@@ -221,6 +239,7 @@ public abstract class FragmentEntryServiceBaseImpl extends BaseServiceImpl
 	 */
 	public void setFragmentEntryLinkPersistence(
 		FragmentEntryLinkPersistence fragmentEntryLinkPersistence) {
+
 		this.fragmentEntryLinkPersistence = fragmentEntryLinkPersistence;
 	}
 
@@ -240,6 +259,7 @@ public abstract class FragmentEntryServiceBaseImpl extends BaseServiceImpl
 	 */
 	public void setFragmentEntryLinkFinder(
 		FragmentEntryLinkFinder fragmentEntryLinkFinder) {
+
 		this.fragmentEntryLinkFinder = fragmentEntryLinkFinder;
 	}
 
@@ -281,8 +301,8 @@ public abstract class FragmentEntryServiceBaseImpl extends BaseServiceImpl
 			sql = db.buildSQL(sql);
 			sql = PortalUtil.transformSQL(sql);
 
-			SqlUpdate sqlUpdate = SqlUpdateFactoryUtil.getSqlUpdate(dataSource,
-					sql);
+			SqlUpdate sqlUpdate = SqlUpdateFactoryUtil.getSqlUpdate(
+				dataSource, sql);
 
 			sqlUpdate.update();
 		}
@@ -291,24 +311,48 @@ public abstract class FragmentEntryServiceBaseImpl extends BaseServiceImpl
 		}
 	}
 
-	@BeanReference(type = com.liferay.fragment.service.FragmentEntryLocalService.class)
-	protected com.liferay.fragment.service.FragmentEntryLocalService fragmentEntryLocalService;
+	@BeanReference(
+		type = com.liferay.fragment.service.FragmentEntryLocalService.class
+	)
+	protected com.liferay.fragment.service.FragmentEntryLocalService
+		fragmentEntryLocalService;
+
 	@BeanReference(type = FragmentEntryService.class)
 	protected FragmentEntryService fragmentEntryService;
+
 	@BeanReference(type = FragmentEntryPersistence.class)
 	protected FragmentEntryPersistence fragmentEntryPersistence;
-	@ServiceReference(type = com.liferay.counter.kernel.service.CounterLocalService.class)
-	protected com.liferay.counter.kernel.service.CounterLocalService counterLocalService;
-	@ServiceReference(type = com.liferay.portal.kernel.service.UserLocalService.class)
-	protected com.liferay.portal.kernel.service.UserLocalService userLocalService;
-	@ServiceReference(type = com.liferay.portal.kernel.service.UserService.class)
+
+	@ServiceReference(
+		type = com.liferay.counter.kernel.service.CounterLocalService.class
+	)
+	protected com.liferay.counter.kernel.service.CounterLocalService
+		counterLocalService;
+
+	@ServiceReference(
+		type = com.liferay.portal.kernel.service.UserLocalService.class
+	)
+	protected com.liferay.portal.kernel.service.UserLocalService
+		userLocalService;
+
+	@ServiceReference(
+		type = com.liferay.portal.kernel.service.UserService.class
+	)
 	protected com.liferay.portal.kernel.service.UserService userService;
+
 	@ServiceReference(type = UserPersistence.class)
 	protected UserPersistence userPersistence;
-	@BeanReference(type = com.liferay.fragment.service.FragmentEntryLinkLocalService.class)
-	protected com.liferay.fragment.service.FragmentEntryLinkLocalService fragmentEntryLinkLocalService;
+
+	@BeanReference(
+		type = com.liferay.fragment.service.FragmentEntryLinkLocalService.class
+	)
+	protected com.liferay.fragment.service.FragmentEntryLinkLocalService
+		fragmentEntryLinkLocalService;
+
 	@BeanReference(type = FragmentEntryLinkPersistence.class)
 	protected FragmentEntryLinkPersistence fragmentEntryLinkPersistence;
+
 	@BeanReference(type = FragmentEntryLinkFinder.class)
 	protected FragmentEntryLinkFinder fragmentEntryLinkFinder;
+
 }

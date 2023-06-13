@@ -17,7 +17,6 @@ package com.liferay.html.preview.model;
 import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.expando.kernel.model.ExpandoBridge;
-
 import com.liferay.portal.kernel.model.ModelWrapper;
 import com.liferay.portal.kernel.service.ServiceContext;
 
@@ -38,8 +37,9 @@ import java.util.Objects;
  * @generated
  */
 @ProviderType
-public class HtmlPreviewEntryWrapper implements HtmlPreviewEntry,
-	ModelWrapper<HtmlPreviewEntry> {
+public class HtmlPreviewEntryWrapper
+	implements HtmlPreviewEntry, ModelWrapper<HtmlPreviewEntry> {
+
 	public HtmlPreviewEntryWrapper(HtmlPreviewEntry htmlPreviewEntry) {
 		_htmlPreviewEntry = htmlPreviewEntry;
 	}
@@ -137,7 +137,8 @@ public class HtmlPreviewEntryWrapper implements HtmlPreviewEntry,
 
 	@Override
 	public Object clone() {
-		return new HtmlPreviewEntryWrapper((HtmlPreviewEntry)_htmlPreviewEntry.clone());
+		return new HtmlPreviewEntryWrapper(
+			(HtmlPreviewEntry)_htmlPreviewEntry.clone());
 	}
 
 	@Override
@@ -146,50 +147,50 @@ public class HtmlPreviewEntryWrapper implements HtmlPreviewEntry,
 	}
 
 	/**
-	* Returns the fully qualified class name of this html preview entry.
-	*
-	* @return the fully qualified class name of this html preview entry
-	*/
+	 * Returns the fully qualified class name of this html preview entry.
+	 *
+	 * @return the fully qualified class name of this html preview entry
+	 */
 	@Override
 	public String getClassName() {
 		return _htmlPreviewEntry.getClassName();
 	}
 
 	/**
-	* Returns the class name ID of this html preview entry.
-	*
-	* @return the class name ID of this html preview entry
-	*/
+	 * Returns the class name ID of this html preview entry.
+	 *
+	 * @return the class name ID of this html preview entry
+	 */
 	@Override
 	public long getClassNameId() {
 		return _htmlPreviewEntry.getClassNameId();
 	}
 
 	/**
-	* Returns the class pk of this html preview entry.
-	*
-	* @return the class pk of this html preview entry
-	*/
+	 * Returns the class pk of this html preview entry.
+	 *
+	 * @return the class pk of this html preview entry
+	 */
 	@Override
 	public long getClassPK() {
 		return _htmlPreviewEntry.getClassPK();
 	}
 
 	/**
-	* Returns the company ID of this html preview entry.
-	*
-	* @return the company ID of this html preview entry
-	*/
+	 * Returns the company ID of this html preview entry.
+	 *
+	 * @return the company ID of this html preview entry
+	 */
 	@Override
 	public long getCompanyId() {
 		return _htmlPreviewEntry.getCompanyId();
 	}
 
 	/**
-	* Returns the create date of this html preview entry.
-	*
-	* @return the create date of this html preview entry
-	*/
+	 * Returns the create date of this html preview entry.
+	 *
+	 * @return the create date of this html preview entry
+	 */
 	@Override
 	public Date getCreateDate() {
 		return _htmlPreviewEntry.getCreateDate();
@@ -201,30 +202,30 @@ public class HtmlPreviewEntryWrapper implements HtmlPreviewEntry,
 	}
 
 	/**
-	* Returns the file entry ID of this html preview entry.
-	*
-	* @return the file entry ID of this html preview entry
-	*/
+	 * Returns the file entry ID of this html preview entry.
+	 *
+	 * @return the file entry ID of this html preview entry
+	 */
 	@Override
 	public long getFileEntryId() {
 		return _htmlPreviewEntry.getFileEntryId();
 	}
 
 	/**
-	* Returns the group ID of this html preview entry.
-	*
-	* @return the group ID of this html preview entry
-	*/
+	 * Returns the group ID of this html preview entry.
+	 *
+	 * @return the group ID of this html preview entry
+	 */
 	@Override
 	public long getGroupId() {
 		return _htmlPreviewEntry.getGroupId();
 	}
 
 	/**
-	* Returns the html preview entry ID of this html preview entry.
-	*
-	* @return the html preview entry ID of this html preview entry
-	*/
+	 * Returns the html preview entry ID of this html preview entry.
+	 *
+	 * @return the html preview entry ID of this html preview entry
+	 */
 	@Override
 	public long getHtmlPreviewEntryId() {
 		return _htmlPreviewEntry.getHtmlPreviewEntryId();
@@ -233,24 +234,25 @@ public class HtmlPreviewEntryWrapper implements HtmlPreviewEntry,
 	@Override
 	public String getImagePreviewURL(
 		com.liferay.portal.kernel.theme.ThemeDisplay themeDisplay) {
+
 		return _htmlPreviewEntry.getImagePreviewURL(themeDisplay);
 	}
 
 	/**
-	* Returns the modified date of this html preview entry.
-	*
-	* @return the modified date of this html preview entry
-	*/
+	 * Returns the modified date of this html preview entry.
+	 *
+	 * @return the modified date of this html preview entry
+	 */
 	@Override
 	public Date getModifiedDate() {
 		return _htmlPreviewEntry.getModifiedDate();
 	}
 
 	/**
-	* Returns the primary key of this html preview entry.
-	*
-	* @return the primary key of this html preview entry
-	*/
+	 * Returns the primary key of this html preview entry.
+	 *
+	 * @return the primary key of this html preview entry
+	 */
 	@Override
 	public long getPrimaryKey() {
 		return _htmlPreviewEntry.getPrimaryKey();
@@ -262,30 +264,30 @@ public class HtmlPreviewEntryWrapper implements HtmlPreviewEntry,
 	}
 
 	/**
-	* Returns the user ID of this html preview entry.
-	*
-	* @return the user ID of this html preview entry
-	*/
+	 * Returns the user ID of this html preview entry.
+	 *
+	 * @return the user ID of this html preview entry
+	 */
 	@Override
 	public long getUserId() {
 		return _htmlPreviewEntry.getUserId();
 	}
 
 	/**
-	* Returns the user name of this html preview entry.
-	*
-	* @return the user name of this html preview entry
-	*/
+	 * Returns the user name of this html preview entry.
+	 *
+	 * @return the user name of this html preview entry
+	 */
 	@Override
 	public String getUserName() {
 		return _htmlPreviewEntry.getUserName();
 	}
 
 	/**
-	* Returns the user uuid of this html preview entry.
-	*
-	* @return the user uuid of this html preview entry
-	*/
+	 * Returns the user uuid of this html preview entry.
+	 *
+	 * @return the user uuid of this html preview entry
+	 */
 	@Override
 	public String getUserUuid() {
 		return _htmlPreviewEntry.getUserUuid();
@@ -327,40 +329,40 @@ public class HtmlPreviewEntryWrapper implements HtmlPreviewEntry,
 	}
 
 	/**
-	* Sets the class name ID of this html preview entry.
-	*
-	* @param classNameId the class name ID of this html preview entry
-	*/
+	 * Sets the class name ID of this html preview entry.
+	 *
+	 * @param classNameId the class name ID of this html preview entry
+	 */
 	@Override
 	public void setClassNameId(long classNameId) {
 		_htmlPreviewEntry.setClassNameId(classNameId);
 	}
 
 	/**
-	* Sets the class pk of this html preview entry.
-	*
-	* @param classPK the class pk of this html preview entry
-	*/
+	 * Sets the class pk of this html preview entry.
+	 *
+	 * @param classPK the class pk of this html preview entry
+	 */
 	@Override
 	public void setClassPK(long classPK) {
 		_htmlPreviewEntry.setClassPK(classPK);
 	}
 
 	/**
-	* Sets the company ID of this html preview entry.
-	*
-	* @param companyId the company ID of this html preview entry
-	*/
+	 * Sets the company ID of this html preview entry.
+	 *
+	 * @param companyId the company ID of this html preview entry
+	 */
 	@Override
 	public void setCompanyId(long companyId) {
 		_htmlPreviewEntry.setCompanyId(companyId);
 	}
 
 	/**
-	* Sets the create date of this html preview entry.
-	*
-	* @param createDate the create date of this html preview entry
-	*/
+	 * Sets the create date of this html preview entry.
+	 *
+	 * @param createDate the create date of this html preview entry
+	 */
 	@Override
 	public void setCreateDate(Date createDate) {
 		_htmlPreviewEntry.setCreateDate(createDate);
@@ -369,6 +371,7 @@ public class HtmlPreviewEntryWrapper implements HtmlPreviewEntry,
 	@Override
 	public void setExpandoBridgeAttributes(
 		com.liferay.portal.kernel.model.BaseModel<?> baseModel) {
+
 		_htmlPreviewEntry.setExpandoBridgeAttributes(baseModel);
 	}
 
@@ -383,40 +386,40 @@ public class HtmlPreviewEntryWrapper implements HtmlPreviewEntry,
 	}
 
 	/**
-	* Sets the file entry ID of this html preview entry.
-	*
-	* @param fileEntryId the file entry ID of this html preview entry
-	*/
+	 * Sets the file entry ID of this html preview entry.
+	 *
+	 * @param fileEntryId the file entry ID of this html preview entry
+	 */
 	@Override
 	public void setFileEntryId(long fileEntryId) {
 		_htmlPreviewEntry.setFileEntryId(fileEntryId);
 	}
 
 	/**
-	* Sets the group ID of this html preview entry.
-	*
-	* @param groupId the group ID of this html preview entry
-	*/
+	 * Sets the group ID of this html preview entry.
+	 *
+	 * @param groupId the group ID of this html preview entry
+	 */
 	@Override
 	public void setGroupId(long groupId) {
 		_htmlPreviewEntry.setGroupId(groupId);
 	}
 
 	/**
-	* Sets the html preview entry ID of this html preview entry.
-	*
-	* @param htmlPreviewEntryId the html preview entry ID of this html preview entry
-	*/
+	 * Sets the html preview entry ID of this html preview entry.
+	 *
+	 * @param htmlPreviewEntryId the html preview entry ID of this html preview entry
+	 */
 	@Override
 	public void setHtmlPreviewEntryId(long htmlPreviewEntryId) {
 		_htmlPreviewEntry.setHtmlPreviewEntryId(htmlPreviewEntryId);
 	}
 
 	/**
-	* Sets the modified date of this html preview entry.
-	*
-	* @param modifiedDate the modified date of this html preview entry
-	*/
+	 * Sets the modified date of this html preview entry.
+	 *
+	 * @param modifiedDate the modified date of this html preview entry
+	 */
 	@Override
 	public void setModifiedDate(Date modifiedDate) {
 		_htmlPreviewEntry.setModifiedDate(modifiedDate);
@@ -428,10 +431,10 @@ public class HtmlPreviewEntryWrapper implements HtmlPreviewEntry,
 	}
 
 	/**
-	* Sets the primary key of this html preview entry.
-	*
-	* @param primaryKey the primary key of this html preview entry
-	*/
+	 * Sets the primary key of this html preview entry.
+	 *
+	 * @param primaryKey the primary key of this html preview entry
+	 */
 	@Override
 	public void setPrimaryKey(long primaryKey) {
 		_htmlPreviewEntry.setPrimaryKey(primaryKey);
@@ -443,37 +446,39 @@ public class HtmlPreviewEntryWrapper implements HtmlPreviewEntry,
 	}
 
 	/**
-	* Sets the user ID of this html preview entry.
-	*
-	* @param userId the user ID of this html preview entry
-	*/
+	 * Sets the user ID of this html preview entry.
+	 *
+	 * @param userId the user ID of this html preview entry
+	 */
 	@Override
 	public void setUserId(long userId) {
 		_htmlPreviewEntry.setUserId(userId);
 	}
 
 	/**
-	* Sets the user name of this html preview entry.
-	*
-	* @param userName the user name of this html preview entry
-	*/
+	 * Sets the user name of this html preview entry.
+	 *
+	 * @param userName the user name of this html preview entry
+	 */
 	@Override
 	public void setUserName(String userName) {
 		_htmlPreviewEntry.setUserName(userName);
 	}
 
 	/**
-	* Sets the user uuid of this html preview entry.
-	*
-	* @param userUuid the user uuid of this html preview entry
-	*/
+	 * Sets the user uuid of this html preview entry.
+	 *
+	 * @param userUuid the user uuid of this html preview entry
+	 */
 	@Override
 	public void setUserUuid(String userUuid) {
 		_htmlPreviewEntry.setUserUuid(userUuid);
 	}
 
 	@Override
-	public com.liferay.portal.kernel.model.CacheModel<HtmlPreviewEntry> toCacheModel() {
+	public com.liferay.portal.kernel.model.CacheModel<HtmlPreviewEntry>
+		toCacheModel() {
+
 		return _htmlPreviewEntry.toCacheModel();
 	}
 
@@ -489,7 +494,8 @@ public class HtmlPreviewEntryWrapper implements HtmlPreviewEntry,
 
 	@Override
 	public HtmlPreviewEntry toUnescapedModel() {
-		return new HtmlPreviewEntryWrapper(_htmlPreviewEntry.toUnescapedModel());
+		return new HtmlPreviewEntryWrapper(
+			_htmlPreviewEntry.toUnescapedModel());
 	}
 
 	@Override
@@ -507,10 +513,12 @@ public class HtmlPreviewEntryWrapper implements HtmlPreviewEntry,
 			return false;
 		}
 
-		HtmlPreviewEntryWrapper htmlPreviewEntryWrapper = (HtmlPreviewEntryWrapper)obj;
+		HtmlPreviewEntryWrapper htmlPreviewEntryWrapper =
+			(HtmlPreviewEntryWrapper)obj;
 
-		if (Objects.equals(_htmlPreviewEntry,
-					htmlPreviewEntryWrapper._htmlPreviewEntry)) {
+		if (Objects.equals(
+				_htmlPreviewEntry, htmlPreviewEntryWrapper._htmlPreviewEntry)) {
+
 			return true;
 		}
 
@@ -538,4 +546,5 @@ public class HtmlPreviewEntryWrapper implements HtmlPreviewEntry,
 	}
 
 	private final HtmlPreviewEntry _htmlPreviewEntry;
+
 }

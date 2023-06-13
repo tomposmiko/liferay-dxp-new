@@ -554,7 +554,7 @@ public class ResourcePermissionLocalServiceImpl
 				resourcePermission.setRoleId((Long)resourcePermissionArray[4]);
 				resourcePermission.setActionIds(resourceActionBitwiseValue);
 				resourcePermission.setViewActionId(
-					resourceActionBitwiseValue % 2 == 1);
+					(resourceActionBitwiseValue % 2) == 1);
 
 				session.save(resourcePermission);
 
@@ -1024,11 +1024,11 @@ public class ResourcePermissionLocalServiceImpl
 
 		// See LPS-47464
 
-		if (resourcePermissionPersistence.countByC_N_S_P(
-				individualResource.getCompanyId(), individualResource.getName(),
-				individualResource.getScope(),
-				individualResource.getPrimKey()) < 1) {
+		int count = resourcePermissionPersistence.countByC_N_S_P(
+			individualResource.getCompanyId(), individualResource.getName(),
+			individualResource.getScope(), individualResource.getPrimKey());
 
+		if (count < 1) {
 			StringBundler sb = new StringBundler(9);
 
 			sb.append("{companyId=");
@@ -1247,7 +1247,8 @@ public class ResourcePermissionLocalServiceImpl
 			resourceActionLocalService.getResourceAction(name, actionId);
 
 		List<ResourcePermission> resourcePermissions =
-			resourcePermissionPersistence.findByC_N_S(companyId, name, scope);
+			resourcePermissionPersistence.findByC_N_S_R(
+				companyId, name, scope, roleId);
 
 		for (ResourcePermission resourcePermission : resourcePermissions) {
 			if (resourcePermission.hasAction(resourceAction)) {
@@ -1460,13 +1461,16 @@ public class ResourcePermissionLocalServiceImpl
 		throws PortalException {
 
 		List<ResourcePermission> resourcePermissions =
-			resourcePermissionPersistence.findByC_N_S(companyId, name, scope);
+			resourcePermissionPersistence.findByC_N_S_R(
+				companyId, name, scope, roleId);
+
+		String[] actionIds = {actionId};
 
 		for (ResourcePermission resourcePermission : resourcePermissions) {
-			updateResourcePermission(
-				companyId, name, scope, resourcePermission.getPrimKey(), roleId,
-				0, new String[] {actionId},
-				ResourcePermissionConstants.OPERATOR_REMOVE);
+			_updateResourcePermission(
+				companyId, name, scope, resourcePermission.getPrimKey(), 0,
+				roleId, actionIds, ResourcePermissionConstants.OPERATOR_REMOVE,
+				true, Collections.singletonMap(roleId, resourcePermission));
 		}
 	}
 
@@ -2114,7 +2118,7 @@ public class ResourcePermissionLocalServiceImpl
 			}
 			else {
 				actionIdsLong =
-					actionIdsLong & (~resourceAction.getBitwiseValue());
+					actionIdsLong & ~resourceAction.getBitwiseValue();
 			}
 		}
 
@@ -2122,7 +2126,7 @@ public class ResourcePermissionLocalServiceImpl
 			resourcePermission.isNew()) {
 
 			resourcePermission.setActionIds(actionIdsLong);
-			resourcePermission.setViewActionId(actionIdsLong % 2 == 1);
+			resourcePermission.setViewActionId((actionIdsLong % 2) == 1);
 
 			resourcePermissionPersistence.update(resourcePermission);
 

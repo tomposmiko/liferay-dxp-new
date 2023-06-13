@@ -118,6 +118,17 @@ public class ManagementToolbarTag extends BaseClayTag {
 
 		setShowInfoButton(showInfoButton);
 
+		if (Validator.isNotNull(context.get("searchValue"))) {
+			setShowResultsBar(true);
+		}
+		else {
+			List filterLabels = (List)context.get("filterLabels");
+
+			if ((filterLabels != null) && !filterLabels.isEmpty()) {
+				setShowResultsBar(true);
+			}
+		}
+
 		return super.doStartTag();
 	}
 
@@ -141,6 +152,10 @@ public class ManagementToolbarTag extends BaseClayTag {
 		putValue("actionItems", actionDropdownItems);
 	}
 
+	/**
+	 * @deprecated As of Judson (7.1.x), replaced by {@link #setDefaultEventHandler(String)}
+	 */
+	@Deprecated
 	public void setActionHandler(String actionHandler) {
 		putValue("actionHandler", actionHandler);
 	}
@@ -229,6 +244,10 @@ public class ManagementToolbarTag extends BaseClayTag {
 
 	public void setShowInfoButton(Boolean showInfoButton) {
 		putValue("showInfoButton", showInfoButton);
+	}
+
+	public void setShowResultsBar(Boolean showResultsBar) {
+		putValue("showResultsBar", showResultsBar);
 	}
 
 	public void setShowSearch(Boolean showSearch) {

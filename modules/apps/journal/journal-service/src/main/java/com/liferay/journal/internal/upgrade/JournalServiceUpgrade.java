@@ -14,6 +14,7 @@
 
 package com.liferay.journal.internal.upgrade;
 
+import com.liferay.asset.display.page.service.AssetDisplayPageEntryLocalService;
 import com.liferay.asset.kernel.service.AssetCategoryLocalService;
 import com.liferay.asset.kernel.service.AssetEntryLocalService;
 import com.liferay.asset.kernel.service.AssetVocabularyLocalService;
@@ -47,12 +48,14 @@ import com.liferay.journal.internal.upgrade.v1_1_2.UpgradeCheckIntervalConfigura
 import com.liferay.journal.internal.upgrade.v1_1_3.UpgradeResourcePermissions;
 import com.liferay.journal.internal.upgrade.v1_1_4.UpgradeUrlTitle;
 import com.liferay.journal.internal.upgrade.v1_1_5.UpgradeContentImages;
+import com.liferay.journal.internal.upgrade.v1_1_6.UpgradeAssetDisplayPageEntry;
 import com.liferay.portal.configuration.upgrade.PrefsPropsToConfigurationUpgradeHelper;
 import com.liferay.portal.kernel.dao.db.DB;
 import com.liferay.portal.kernel.dao.db.DBManagerUtil;
 import com.liferay.portal.kernel.dao.db.DBProcessContext;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.module.framework.ModuleServiceLifecycle;
 import com.liferay.portal.kernel.repository.capabilities.PortalCapabilityLocator;
 import com.liferay.portal.kernel.security.permission.ResourceActions;
 import com.liferay.portal.kernel.service.CompanyLocalService;
@@ -76,7 +79,7 @@ import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
 /**
- * @author Eduardo Garcia
+ * @author Eduardo García
  */
 @Component(immediate = true, service = UpgradeStepRegistrator.class)
 public class JournalServiceUpgrade implements UpgradeStepRegistrator {
@@ -171,6 +174,11 @@ public class JournalServiceUpgrade implements UpgradeStepRegistrator {
 		registry.register(
 			"1.1.4", "1.1.5",
 			new UpgradeContentImages(_journalArticleImageUpgradeUtil));
+
+		registry.register(
+			"1.1.5", "1.1.6",
+			new UpgradeAssetDisplayPageEntry(
+				_assetDisplayPageEntryLocalService, _companyLocalService));
 	}
 
 	protected void deleteTempImages() throws Exception {
@@ -308,6 +316,11 @@ public class JournalServiceUpgrade implements UpgradeStepRegistrator {
 		JournalServiceUpgrade.class);
 
 	private AssetCategoryLocalService _assetCategoryLocalService;
+
+	@Reference
+	private AssetDisplayPageEntryLocalService
+		_assetDisplayPageEntryLocalService;
+
 	private AssetEntryLocalService _assetEntryLocalService;
 	private AssetVocabularyLocalService _assetVocabularyLocalService;
 	private CompanyLocalService _companyLocalService;
@@ -323,6 +336,9 @@ public class JournalServiceUpgrade implements UpgradeStepRegistrator {
 	private JournalArticleImageUpgradeUtil _journalArticleImageUpgradeUtil;
 
 	private LayoutLocalService _layoutLocalService;
+
+	@Reference(target = ModuleServiceLifecycle.PORTAL_INITIALIZED, unbind = "-")
+	private ModuleServiceLifecycle _moduleServiceLifecycle;
 
 	@Reference
 	private PrefsPropsToConfigurationUpgradeHelper

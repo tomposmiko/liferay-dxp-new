@@ -17,9 +17,7 @@ package com.liferay.mobile.device.rules.model;
 import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.expando.kernel.model.ExpandoBridge;
-
 import com.liferay.exportimport.kernel.lar.StagedModelType;
-
 import com.liferay.portal.kernel.model.ModelWrapper;
 import com.liferay.portal.kernel.service.ServiceContext;
 
@@ -40,10 +38,12 @@ import java.util.Objects;
  * @generated
  */
 @ProviderType
-public class MDRRuleGroupInstanceWrapper implements MDRRuleGroupInstance,
-	ModelWrapper<MDRRuleGroupInstance> {
+public class MDRRuleGroupInstanceWrapper
+	implements MDRRuleGroupInstance, ModelWrapper<MDRRuleGroupInstance> {
+
 	public MDRRuleGroupInstanceWrapper(
 		MDRRuleGroupInstance mdrRuleGroupInstance) {
+
 		_mdrRuleGroupInstance = mdrRuleGroupInstance;
 	}
 
@@ -161,7 +161,8 @@ public class MDRRuleGroupInstanceWrapper implements MDRRuleGroupInstance,
 
 	@Override
 	public Object clone() {
-		return new MDRRuleGroupInstanceWrapper((MDRRuleGroupInstance)_mdrRuleGroupInstance.clone());
+		return new MDRRuleGroupInstanceWrapper(
+			(MDRRuleGroupInstance)_mdrRuleGroupInstance.clone());
 	}
 
 	@Override
@@ -175,50 +176,50 @@ public class MDRRuleGroupInstanceWrapper implements MDRRuleGroupInstance,
 	}
 
 	/**
-	* Returns the fully qualified class name of this mdr rule group instance.
-	*
-	* @return the fully qualified class name of this mdr rule group instance
-	*/
+	 * Returns the fully qualified class name of this mdr rule group instance.
+	 *
+	 * @return the fully qualified class name of this mdr rule group instance
+	 */
 	@Override
 	public String getClassName() {
 		return _mdrRuleGroupInstance.getClassName();
 	}
 
 	/**
-	* Returns the class name ID of this mdr rule group instance.
-	*
-	* @return the class name ID of this mdr rule group instance
-	*/
+	 * Returns the class name ID of this mdr rule group instance.
+	 *
+	 * @return the class name ID of this mdr rule group instance
+	 */
 	@Override
 	public long getClassNameId() {
 		return _mdrRuleGroupInstance.getClassNameId();
 	}
 
 	/**
-	* Returns the class pk of this mdr rule group instance.
-	*
-	* @return the class pk of this mdr rule group instance
-	*/
+	 * Returns the class pk of this mdr rule group instance.
+	 *
+	 * @return the class pk of this mdr rule group instance
+	 */
 	@Override
 	public long getClassPK() {
 		return _mdrRuleGroupInstance.getClassPK();
 	}
 
 	/**
-	* Returns the company ID of this mdr rule group instance.
-	*
-	* @return the company ID of this mdr rule group instance
-	*/
+	 * Returns the company ID of this mdr rule group instance.
+	 *
+	 * @return the company ID of this mdr rule group instance
+	 */
 	@Override
 	public long getCompanyId() {
 		return _mdrRuleGroupInstance.getCompanyId();
 	}
 
 	/**
-	* Returns the create date of this mdr rule group instance.
-	*
-	* @return the create date of this mdr rule group instance
-	*/
+	 * Returns the create date of this mdr rule group instance.
+	 *
+	 * @return the create date of this mdr rule group instance
+	 */
 	@Override
 	public Date getCreateDate() {
 		return _mdrRuleGroupInstance.getCreateDate();
@@ -230,40 +231,40 @@ public class MDRRuleGroupInstanceWrapper implements MDRRuleGroupInstance,
 	}
 
 	/**
-	* Returns the group ID of this mdr rule group instance.
-	*
-	* @return the group ID of this mdr rule group instance
-	*/
+	 * Returns the group ID of this mdr rule group instance.
+	 *
+	 * @return the group ID of this mdr rule group instance
+	 */
 	@Override
 	public long getGroupId() {
 		return _mdrRuleGroupInstance.getGroupId();
 	}
 
 	/**
-	* Returns the last publish date of this mdr rule group instance.
-	*
-	* @return the last publish date of this mdr rule group instance
-	*/
+	 * Returns the last publish date of this mdr rule group instance.
+	 *
+	 * @return the last publish date of this mdr rule group instance
+	 */
 	@Override
 	public Date getLastPublishDate() {
 		return _mdrRuleGroupInstance.getLastPublishDate();
 	}
 
 	/**
-	* Returns the modified date of this mdr rule group instance.
-	*
-	* @return the modified date of this mdr rule group instance
-	*/
+	 * Returns the modified date of this mdr rule group instance.
+	 *
+	 * @return the modified date of this mdr rule group instance
+	 */
 	@Override
 	public Date getModifiedDate() {
 		return _mdrRuleGroupInstance.getModifiedDate();
 	}
 
 	/**
-	* Returns the primary key of this mdr rule group instance.
-	*
-	* @return the primary key of this mdr rule group instance
-	*/
+	 * Returns the primary key of this mdr rule group instance.
+	 *
+	 * @return the primary key of this mdr rule group instance
+	 */
 	@Override
 	public long getPrimaryKey() {
 		return _mdrRuleGroupInstance.getPrimaryKey();
@@ -275,10 +276,10 @@ public class MDRRuleGroupInstanceWrapper implements MDRRuleGroupInstance,
 	}
 
 	/**
-	* Returns the priority of this mdr rule group instance.
-	*
-	* @return the priority of this mdr rule group instance
-	*/
+	 * Returns the priority of this mdr rule group instance.
+	 *
+	 * @return the priority of this mdr rule group instance
+	 */
 	@Override
 	public int getPriority() {
 		return _mdrRuleGroupInstance.getPriority();
@@ -287,64 +288,65 @@ public class MDRRuleGroupInstanceWrapper implements MDRRuleGroupInstance,
 	@Override
 	public MDRRuleGroup getRuleGroup()
 		throws com.liferay.portal.kernel.exception.PortalException {
+
 		return _mdrRuleGroupInstance.getRuleGroup();
 	}
 
 	/**
-	* Returns the rule group ID of this mdr rule group instance.
-	*
-	* @return the rule group ID of this mdr rule group instance
-	*/
+	 * Returns the rule group ID of this mdr rule group instance.
+	 *
+	 * @return the rule group ID of this mdr rule group instance
+	 */
 	@Override
 	public long getRuleGroupId() {
 		return _mdrRuleGroupInstance.getRuleGroupId();
 	}
 
 	/**
-	* Returns the rule group instance ID of this mdr rule group instance.
-	*
-	* @return the rule group instance ID of this mdr rule group instance
-	*/
+	 * Returns the rule group instance ID of this mdr rule group instance.
+	 *
+	 * @return the rule group instance ID of this mdr rule group instance
+	 */
 	@Override
 	public long getRuleGroupInstanceId() {
 		return _mdrRuleGroupInstance.getRuleGroupInstanceId();
 	}
 
 	/**
-	* Returns the user ID of this mdr rule group instance.
-	*
-	* @return the user ID of this mdr rule group instance
-	*/
+	 * Returns the user ID of this mdr rule group instance.
+	 *
+	 * @return the user ID of this mdr rule group instance
+	 */
 	@Override
 	public long getUserId() {
 		return _mdrRuleGroupInstance.getUserId();
 	}
 
 	/**
-	* Returns the user name of this mdr rule group instance.
-	*
-	* @return the user name of this mdr rule group instance
-	*/
+	 * Returns the user name of this mdr rule group instance.
+	 *
+	 * @return the user name of this mdr rule group instance
+	 */
 	@Override
 	public String getUserName() {
 		return _mdrRuleGroupInstance.getUserName();
 	}
 
 	/**
-	* Returns the user uuid of this mdr rule group instance.
-	*
-	* @return the user uuid of this mdr rule group instance
-	*/
+	 * Returns the user uuid of this mdr rule group instance.
+	 *
+	 * @return the user uuid of this mdr rule group instance
+	 */
 	@Override
 	public String getUserUuid() {
 		return _mdrRuleGroupInstance.getUserUuid();
 	}
 
 	/**
-	* Returns the uuid of this mdr rule group instance.
-	*
-	* @return the uuid of this mdr rule group instance
-	*/
+	 * Returns the uuid of this mdr rule group instance.
+	 *
+	 * @return the uuid of this mdr rule group instance
+	 */
 	@Override
 	public String getUuid() {
 		return _mdrRuleGroupInstance.getUuid();
@@ -386,40 +388,40 @@ public class MDRRuleGroupInstanceWrapper implements MDRRuleGroupInstance,
 	}
 
 	/**
-	* Sets the class name ID of this mdr rule group instance.
-	*
-	* @param classNameId the class name ID of this mdr rule group instance
-	*/
+	 * Sets the class name ID of this mdr rule group instance.
+	 *
+	 * @param classNameId the class name ID of this mdr rule group instance
+	 */
 	@Override
 	public void setClassNameId(long classNameId) {
 		_mdrRuleGroupInstance.setClassNameId(classNameId);
 	}
 
 	/**
-	* Sets the class pk of this mdr rule group instance.
-	*
-	* @param classPK the class pk of this mdr rule group instance
-	*/
+	 * Sets the class pk of this mdr rule group instance.
+	 *
+	 * @param classPK the class pk of this mdr rule group instance
+	 */
 	@Override
 	public void setClassPK(long classPK) {
 		_mdrRuleGroupInstance.setClassPK(classPK);
 	}
 
 	/**
-	* Sets the company ID of this mdr rule group instance.
-	*
-	* @param companyId the company ID of this mdr rule group instance
-	*/
+	 * Sets the company ID of this mdr rule group instance.
+	 *
+	 * @param companyId the company ID of this mdr rule group instance
+	 */
 	@Override
 	public void setCompanyId(long companyId) {
 		_mdrRuleGroupInstance.setCompanyId(companyId);
 	}
 
 	/**
-	* Sets the create date of this mdr rule group instance.
-	*
-	* @param createDate the create date of this mdr rule group instance
-	*/
+	 * Sets the create date of this mdr rule group instance.
+	 *
+	 * @param createDate the create date of this mdr rule group instance
+	 */
 	@Override
 	public void setCreateDate(Date createDate) {
 		_mdrRuleGroupInstance.setCreateDate(createDate);
@@ -428,6 +430,7 @@ public class MDRRuleGroupInstanceWrapper implements MDRRuleGroupInstance,
 	@Override
 	public void setExpandoBridgeAttributes(
 		com.liferay.portal.kernel.model.BaseModel<?> baseModel) {
+
 		_mdrRuleGroupInstance.setExpandoBridgeAttributes(baseModel);
 	}
 
@@ -442,30 +445,30 @@ public class MDRRuleGroupInstanceWrapper implements MDRRuleGroupInstance,
 	}
 
 	/**
-	* Sets the group ID of this mdr rule group instance.
-	*
-	* @param groupId the group ID of this mdr rule group instance
-	*/
+	 * Sets the group ID of this mdr rule group instance.
+	 *
+	 * @param groupId the group ID of this mdr rule group instance
+	 */
 	@Override
 	public void setGroupId(long groupId) {
 		_mdrRuleGroupInstance.setGroupId(groupId);
 	}
 
 	/**
-	* Sets the last publish date of this mdr rule group instance.
-	*
-	* @param lastPublishDate the last publish date of this mdr rule group instance
-	*/
+	 * Sets the last publish date of this mdr rule group instance.
+	 *
+	 * @param lastPublishDate the last publish date of this mdr rule group instance
+	 */
 	@Override
 	public void setLastPublishDate(Date lastPublishDate) {
 		_mdrRuleGroupInstance.setLastPublishDate(lastPublishDate);
 	}
 
 	/**
-	* Sets the modified date of this mdr rule group instance.
-	*
-	* @param modifiedDate the modified date of this mdr rule group instance
-	*/
+	 * Sets the modified date of this mdr rule group instance.
+	 *
+	 * @param modifiedDate the modified date of this mdr rule group instance
+	 */
 	@Override
 	public void setModifiedDate(Date modifiedDate) {
 		_mdrRuleGroupInstance.setModifiedDate(modifiedDate);
@@ -477,10 +480,10 @@ public class MDRRuleGroupInstanceWrapper implements MDRRuleGroupInstance,
 	}
 
 	/**
-	* Sets the primary key of this mdr rule group instance.
-	*
-	* @param primaryKey the primary key of this mdr rule group instance
-	*/
+	 * Sets the primary key of this mdr rule group instance.
+	 *
+	 * @param primaryKey the primary key of this mdr rule group instance
+	 */
 	@Override
 	public void setPrimaryKey(long primaryKey) {
 		_mdrRuleGroupInstance.setPrimaryKey(primaryKey);
@@ -492,83 +495,86 @@ public class MDRRuleGroupInstanceWrapper implements MDRRuleGroupInstance,
 	}
 
 	/**
-	* Sets the priority of this mdr rule group instance.
-	*
-	* @param priority the priority of this mdr rule group instance
-	*/
+	 * Sets the priority of this mdr rule group instance.
+	 *
+	 * @param priority the priority of this mdr rule group instance
+	 */
 	@Override
 	public void setPriority(int priority) {
 		_mdrRuleGroupInstance.setPriority(priority);
 	}
 
 	/**
-	* Sets the rule group ID of this mdr rule group instance.
-	*
-	* @param ruleGroupId the rule group ID of this mdr rule group instance
-	*/
+	 * Sets the rule group ID of this mdr rule group instance.
+	 *
+	 * @param ruleGroupId the rule group ID of this mdr rule group instance
+	 */
 	@Override
 	public void setRuleGroupId(long ruleGroupId) {
 		_mdrRuleGroupInstance.setRuleGroupId(ruleGroupId);
 	}
 
 	/**
-	* Sets the rule group instance ID of this mdr rule group instance.
-	*
-	* @param ruleGroupInstanceId the rule group instance ID of this mdr rule group instance
-	*/
+	 * Sets the rule group instance ID of this mdr rule group instance.
+	 *
+	 * @param ruleGroupInstanceId the rule group instance ID of this mdr rule group instance
+	 */
 	@Override
 	public void setRuleGroupInstanceId(long ruleGroupInstanceId) {
 		_mdrRuleGroupInstance.setRuleGroupInstanceId(ruleGroupInstanceId);
 	}
 
 	/**
-	* Sets the user ID of this mdr rule group instance.
-	*
-	* @param userId the user ID of this mdr rule group instance
-	*/
+	 * Sets the user ID of this mdr rule group instance.
+	 *
+	 * @param userId the user ID of this mdr rule group instance
+	 */
 	@Override
 	public void setUserId(long userId) {
 		_mdrRuleGroupInstance.setUserId(userId);
 	}
 
 	/**
-	* Sets the user name of this mdr rule group instance.
-	*
-	* @param userName the user name of this mdr rule group instance
-	*/
+	 * Sets the user name of this mdr rule group instance.
+	 *
+	 * @param userName the user name of this mdr rule group instance
+	 */
 	@Override
 	public void setUserName(String userName) {
 		_mdrRuleGroupInstance.setUserName(userName);
 	}
 
 	/**
-	* Sets the user uuid of this mdr rule group instance.
-	*
-	* @param userUuid the user uuid of this mdr rule group instance
-	*/
+	 * Sets the user uuid of this mdr rule group instance.
+	 *
+	 * @param userUuid the user uuid of this mdr rule group instance
+	 */
 	@Override
 	public void setUserUuid(String userUuid) {
 		_mdrRuleGroupInstance.setUserUuid(userUuid);
 	}
 
 	/**
-	* Sets the uuid of this mdr rule group instance.
-	*
-	* @param uuid the uuid of this mdr rule group instance
-	*/
+	 * Sets the uuid of this mdr rule group instance.
+	 *
+	 * @param uuid the uuid of this mdr rule group instance
+	 */
 	@Override
 	public void setUuid(String uuid) {
 		_mdrRuleGroupInstance.setUuid(uuid);
 	}
 
 	@Override
-	public com.liferay.portal.kernel.model.CacheModel<MDRRuleGroupInstance> toCacheModel() {
+	public com.liferay.portal.kernel.model.CacheModel<MDRRuleGroupInstance>
+		toCacheModel() {
+
 		return _mdrRuleGroupInstance.toCacheModel();
 	}
 
 	@Override
 	public MDRRuleGroupInstance toEscapedModel() {
-		return new MDRRuleGroupInstanceWrapper(_mdrRuleGroupInstance.toEscapedModel());
+		return new MDRRuleGroupInstanceWrapper(
+			_mdrRuleGroupInstance.toEscapedModel());
 	}
 
 	@Override
@@ -578,7 +584,8 @@ public class MDRRuleGroupInstanceWrapper implements MDRRuleGroupInstance,
 
 	@Override
 	public MDRRuleGroupInstance toUnescapedModel() {
-		return new MDRRuleGroupInstanceWrapper(_mdrRuleGroupInstance.toUnescapedModel());
+		return new MDRRuleGroupInstanceWrapper(
+			_mdrRuleGroupInstance.toUnescapedModel());
 	}
 
 	@Override
@@ -596,10 +603,13 @@ public class MDRRuleGroupInstanceWrapper implements MDRRuleGroupInstance,
 			return false;
 		}
 
-		MDRRuleGroupInstanceWrapper mdrRuleGroupInstanceWrapper = (MDRRuleGroupInstanceWrapper)obj;
+		MDRRuleGroupInstanceWrapper mdrRuleGroupInstanceWrapper =
+			(MDRRuleGroupInstanceWrapper)obj;
 
-		if (Objects.equals(_mdrRuleGroupInstance,
-					mdrRuleGroupInstanceWrapper._mdrRuleGroupInstance)) {
+		if (Objects.equals(
+				_mdrRuleGroupInstance,
+				mdrRuleGroupInstanceWrapper._mdrRuleGroupInstance)) {
+
 			return true;
 		}
 
@@ -632,4 +642,5 @@ public class MDRRuleGroupInstanceWrapper implements MDRRuleGroupInstance,
 	}
 
 	private final MDRRuleGroupInstance _mdrRuleGroupInstance;
+
 }

@@ -35,18 +35,22 @@ import com.liferay.portal.kernel.service.UserNotificationDeliveryLocalServiceUti
 public abstract class UserNotificationDeliveryBaseImpl
 	extends UserNotificationDeliveryModelImpl
 	implements UserNotificationDelivery {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
-	 * Never modify or reference this class directly. All methods that expect a user notification delivery model instance should use the {@link UserNotificationDelivery} interface instead.
+	 * Never modify or reference this class directly. All methods that expect a user notification delivery model instance should use the <code>UserNotificationDelivery</code> interface instead.
 	 */
 	@Override
 	public void persist() {
 		if (this.isNew()) {
-			UserNotificationDeliveryLocalServiceUtil.addUserNotificationDelivery(this);
+			UserNotificationDeliveryLocalServiceUtil.
+				addUserNotificationDelivery(this);
 		}
 		else {
-			UserNotificationDeliveryLocalServiceUtil.updateUserNotificationDelivery(this);
+			UserNotificationDeliveryLocalServiceUtil.
+				updateUserNotificationDelivery(this);
 		}
 	}
+
 }

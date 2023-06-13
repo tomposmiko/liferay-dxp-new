@@ -35,7 +35,7 @@
 
 	var select = $('#<portlet:namespace />languageId');
 
-	var userDetailsURL = Liferay.PortletURL.createURL('<%= themeDisplay.getURLCurrent() %>');
+	var userDetailsURL = Liferay.PortletURL.createURL('<%= HtmlUtil.escapeJS(themeDisplay.getURLCurrent()) %>');
 
 	var userNameFields = $('#<portlet:namespace />userNameFields');
 

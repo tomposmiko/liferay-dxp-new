@@ -17,7 +17,6 @@ package com.liferay.dynamic.data.mapping.model.impl;
 import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.dynamic.data.mapping.model.DDMTemplateLink;
-
 import com.liferay.portal.kernel.model.CacheModel;
 import com.liferay.portal.kernel.util.HashUtil;
 import com.liferay.portal.kernel.util.StringBundler;
@@ -31,12 +30,12 @@ import java.io.ObjectOutput;
  * The cache model class for representing DDMTemplateLink in entity cache.
  *
  * @author Brian Wing Shun Chan
- * @see DDMTemplateLink
  * @generated
  */
 @ProviderType
-public class DDMTemplateLinkCacheModel implements CacheModel<DDMTemplateLink>,
-	Externalizable {
+public class DDMTemplateLinkCacheModel
+	implements CacheModel<DDMTemplateLink>, Externalizable {
+
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj) {
@@ -47,7 +46,8 @@ public class DDMTemplateLinkCacheModel implements CacheModel<DDMTemplateLink>,
 			return false;
 		}
 
-		DDMTemplateLinkCacheModel ddmTemplateLinkCacheModel = (DDMTemplateLinkCacheModel)obj;
+		DDMTemplateLinkCacheModel ddmTemplateLinkCacheModel =
+			(DDMTemplateLinkCacheModel)obj;
 
 		if (templateLinkId == ddmTemplateLinkCacheModel.templateLinkId) {
 			return true;
@@ -109,8 +109,7 @@ public class DDMTemplateLinkCacheModel implements CacheModel<DDMTemplateLink>,
 	}
 
 	@Override
-	public void writeExternal(ObjectOutput objectOutput)
-		throws IOException {
+	public void writeExternal(ObjectOutput objectOutput) throws IOException {
 		objectOutput.writeLong(templateLinkId);
 
 		objectOutput.writeLong(companyId);
@@ -127,4 +126,5 @@ public class DDMTemplateLinkCacheModel implements CacheModel<DDMTemplateLink>,
 	public long classNameId;
 	public long classPK;
 	public long templateId;
+
 }

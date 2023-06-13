@@ -38,6 +38,30 @@ definition {
 		}
 
 		BlogsEntry.addContent(entryContent = "${entryContent}");
+
+		if (isSet(embedVideo)) {
+			AlloyEditor.clickContentField();
+
+			Click(locator1 = "AlloyEditor#CONTENT_ADD_BUTTON");
+
+			Click(locator1 = "AlloyEditor#CONTENT_ADD_MENUBAR_VIDEO");
+
+			Type(
+				locator1 = "AlloyEditor#TEXT_FORMATTING_LINK_INPUT",
+				value1 = "${embedVideo}"
+			);
+
+			Click(locator1 = "AlloyEditor#TEXT_FORMATTING_LINK_INPUT_CONFIRM");
+
+			SelectFrame(
+				locator1 = "BlogsEntry#CONTENT_VIDEO",
+				key_service = "${videoService}"
+			);
+
+			SelectFrameTop();
+
+			AssertTextEquals(locator1 = "BlogsEntry#VIDEO_EMBED_HELP_MESSAGE", value1 = "Video playback is disabled during edit mode");
+		}
 	}
 
 	macro addEntryExternalLinkViaBrowseButton {
@@ -61,19 +85,6 @@ definition {
 		);
 
 		PortletEntry.publish();
-	}
-
-	macro addEntryExternalURL {
-		SelectFieldText(locator1 = "AlloyEditor#EDITOR", key_editor = "content");
-
-		Click(locator1 = "AlloyEditor#TEXT_FORMATTING_LINK");
-
-		Type(
-			locator1 = "AlloyEditor#TEXT_FORMATTING_LINK_INPUT",
-			value1 = "${entryExternalURL}"
-		);
-
-		Click(locator1 = "AlloyEditor#TEXT_FORMATTING_LINK_INPUT_CONFIRM");
 	}
 
 	macro addRelatedAsset {
@@ -562,7 +573,7 @@ definition {
 	macro selectFormattingStyle {
 		SelectFieldText(locator1 = "AlloyEditor#EDITOR", key_editor = "content");
 
-		Click(locator1 = "AlloyEditor#TEXT_FORMATTING_STYLE");
+		Click.mouseMoveLeftClick(locator1 = "AlloyEditor#TEXT_FORMATTING_STYLE");
 
 		Click(
 			locator1 = "AlloyEditor#TEXT_FORMATTING_STYLE_DROPDOWN",
@@ -676,6 +687,13 @@ definition {
 			);
 		}
 
+		if (isSet(embedVideo)) {
+			AssertElementPresent(
+				locator1 = "BlogsEntry#CONTENT_VIDEO",
+				key_service = "youtube"
+			);
+		}
+
 		if (isSet(entryContent)) {
 			AssertTextEquals(locator1 = "BlogsEntry#CONTENT", value1 = "${entryContent}");
 		}
@@ -695,8 +713,8 @@ definition {
 		}
 
 		if (isSet(entryExternalURL)) {
-			AssertClick.assertTextClickAtNoJavaScript(
-				locator1 = "BlogsEntry#CONTENT",
+			AssertClick(
+				locator1 = "BlogsEntry#CONTENT_LINK",
 				value1 = "${entryContent}"
 			);
 
@@ -730,7 +748,7 @@ definition {
 		BlogsNavigator.gotoEditCP(entryTitle = "${entryTitle}");
 
 		DoubleClick(
-			locator1 = "BlogsEntry#CONTENT_LINK",
+			locator1 = "BlogsEntry#CONTENT_LINK_IN_EDIT",
 			key_entryContent = "${entryContent}"
 		);
 
@@ -937,7 +955,7 @@ definition {
 	macro viewRSS {
 		var key_text = "RSS";
 
-		AssertClick(locator1 = "Button#ANY", value1 = "rss-full RSS");
+		AssertClick(locator1 = "Button#ANY", value1 = "RSS");
 
 		Pause(locator1 = "3000");
 

@@ -17,15 +17,15 @@ package com.liferay.apio.architect.internal.writer;
 import static com.liferay.apio.architect.internal.unsafe.Unsafe.unsafeCast;
 import static com.liferay.apio.architect.internal.url.URLCreator.createAbsoluteURL;
 import static com.liferay.apio.architect.internal.url.URLCreator.createBinaryURL;
-import static com.liferay.apio.architect.internal.url.URLCreator.createNestedCollectionURL;
-import static com.liferay.apio.architect.internal.url.URLCreator.createSingleURL;
+import static com.liferay.apio.architect.internal.url.URLCreator.createGenericParentResourceURL;
+import static com.liferay.apio.architect.internal.url.URLCreator.createItemResourceURL;
+import static com.liferay.apio.architect.internal.url.URLCreator.createNestedResourceURL;
 
 import static org.slf4j.LoggerFactory.getLogger;
 
 import com.liferay.apio.architect.alias.representor.FieldFunction;
 import com.liferay.apio.architect.alias.representor.NestedListFieldFunction;
 import com.liferay.apio.architect.consumer.TriConsumer;
-import com.liferay.apio.architect.functional.Try;
 import com.liferay.apio.architect.identifier.Identifier;
 import com.liferay.apio.architect.internal.alias.BaseRepresentorFunction;
 import com.liferay.apio.architect.internal.alias.PathFunction;
@@ -38,10 +38,17 @@ import com.liferay.apio.architect.internal.unsafe.Unsafe;
 import com.liferay.apio.architect.related.RelatedCollection;
 import com.liferay.apio.architect.related.RelatedModel;
 import com.liferay.apio.architect.representor.BaseRepresentor;
+import com.liferay.apio.architect.representor.Representor;
+import com.liferay.apio.architect.resource.Resource.GenericParent;
+import com.liferay.apio.architect.resource.Resource.Id;
+import com.liferay.apio.architect.resource.Resource.Item;
+import com.liferay.apio.architect.resource.Resource.Nested;
 import com.liferay.apio.architect.single.model.SingleModel;
 import com.liferay.apio.architect.uri.Path;
 
-import java.util.Collections;
+import io.vavr.Tuple;
+import io.vavr.control.Try;
+
 import java.util.List;
 import java.util.Optional;
 import java.util.function.BiConsumer;
@@ -54,7 +61,7 @@ import java.util.stream.Stream;
 import org.slf4j.Logger;
 
 /**
- * Writes the different fields declared on a {@link Representor}.
+ * Writes the different fields declared on a {@code Representor}.
  *
  * @author Alejandro Hernández
  * @param  <T> the model's type
@@ -88,7 +95,7 @@ public class FieldsWriter<T> {
 		SingleModel<T> singleModel, RequestInfo requestInfo,
 		BaseRepresentor<T> baseRepresentor, Path path,
 		FunctionalList<String> embeddedPathElements,
-		SingleModelFunction singleModelFunction, PathFunction pathFunction) {
+		SingleModelFunction singleModelFunction) {
 
 		_singleModel = singleModel;
 		_requestInfo = requestInfo;
@@ -96,7 +103,6 @@ public class FieldsWriter<T> {
 		_path = path;
 		_embeddedPathElements = embeddedPathElements;
 		_singleModelFunction = singleModelFunction;
-		_pathFunction = pathFunction;
 	}
 
 	/**
@@ -111,6 +117,28 @@ public class FieldsWriter<T> {
 		Fields fields = _requestInfo.getFields();
 
 		return fields.apply(_baseRepresentor.getTypes());
+	}
+
+	/**
+	 * Calculate the {@link Item} managed by this writer and call the provided
+	 * consumer with the calculated instance.
+	 *
+	 * @review
+	 */
+	public void withItem(Consumer<Item> itemConsumer) {
+		if (!(_baseRepresentor instanceof Representor)) {
+			return;
+		}
+
+		Representor<T> representor = (Representor<T>)_baseRepresentor;
+
+		Object identifier = representor.getIdentifier(_singleModel.getModel());
+
+		Id id = Id.of(identifier, _path.getId());
+
+		Item item = Item.of(_singleModel.getResourceName(), id);
+
+		itemConsumer.accept(item);
 	}
 
 	/**
@@ -219,7 +247,7 @@ public class FieldsWriter<T> {
 	}
 
 	/**
-	 * Writes a {@code Map<String, S>} returned by a {@link Representor}
+	 * Writes a {@code Map<String, S>} returned by a {@code Representor}
 	 * function. This method uses a consumer so each caller can decide what to
 	 * do with each entry. Each member of the map is filtered using the {@link
 	 * Fields} predicate provided by {@link #getFieldsPredicate()}.
@@ -361,7 +389,7 @@ public class FieldsWriter<T> {
 						embeddedPathElements, nestedFieldFunction.getKey());
 
 				SingleModelImpl nestedSingleModel = new SingleModelImpl<>(
-					mappedModel, "", Collections.emptyList());
+					mappedModel, "");
 
 				BaseRepresentorFunction nestedRepresentorFunction =
 					__ -> Optional.of(
@@ -403,14 +431,15 @@ public class FieldsWriter<T> {
 	/**
 	 * Writes the related collection's URL, using a {@code BiConsumer}.
 	 *
+	 * @param pathFunction the function that returns the path of a resource
 	 * @param relatedCollection the related collection
 	 * @param parentEmbeddedPathElements the list of embedded path elements
 	 * @param biConsumer the {@code BiConsumer} that writes the related
 	 *        collection URL
 	 */
 	public <U extends Identifier> void writeRelatedCollection(
-		RelatedCollection<T, U> relatedCollection, String resourceName,
-		FunctionalList<String> parentEmbeddedPathElements,
+		PathFunction pathFunction, RelatedCollection<T, U> relatedCollection,
+		String resourceName, FunctionalList<String> parentEmbeddedPathElements,
 		BiConsumer<String, FunctionalList<String>> biConsumer) {
 
 		Predicate<String> fieldsPredicate = getFieldsPredicate();
@@ -421,40 +450,66 @@ public class FieldsWriter<T> {
 			return;
 		}
 
-		Path path = Try.fromFallible(
-			relatedCollection::getModelToIdentifierFunction
-		).map(
-			function -> function.apply(_singleModel.getModel())
-		).map(
-			model -> _pathFunction.apply(resourceName, model)
-		).map(
-			Optional::get
-		).orElse(
-			_path
-		);
+		Function<T, ?> modelToIdentifierFunction =
+			relatedCollection.getModelToIdentifierFunction();
 
-		_writeCollectionPath(
-			resourceName, parentEmbeddedPathElements, biConsumer, key, path);
+		if (modelToIdentifierFunction == null) {
+			withItem(
+				item -> {
+					Optional<String> optional = createNestedResourceURL(
+						_requestInfo.getApplicationURL(),
+						Nested.of(item, resourceName));
+
+					optional.ifPresent(
+						url -> _writeResourceURL(
+							url, parentEmbeddedPathElements, biConsumer, key));
+				});
+
+			return;
+		}
+
+		Try.of(
+			() -> modelToIdentifierFunction.apply(_singleModel.getModel())
+		).map(
+			model -> Tuple.of(pathFunction.apply(resourceName, model), model)
+		).filter(
+			tuple -> tuple._1.isPresent()
+		).map(
+			tuple -> tuple.map1(Optional::get)
+		).map(
+			tuple -> GenericParent.of(
+				tuple._1.getName(), Id.of(tuple._2, tuple._1.getId()),
+				resourceName)
+		).map(
+			genericParent -> createGenericParentResourceURL(
+				_requestInfo.getApplicationURL(), genericParent)
+		).toJavaOptional(
+		).flatMap(
+			Function.identity()
+		).ifPresent(
+			url -> _writeResourceURL(
+				url, parentEmbeddedPathElements, biConsumer, key)
+		);
 	}
 
 	/**
-	 * Writes the related collections contained in the {@link Representor} this
+	 * Writes the related collections contained in the {@code Representor} this
 	 * writer handles. This method uses a consumer so each {@code
 	 * javax.ws.rs.ext.MessageBodyWriter} can write the related model
 	 * differently.
 	 *
+	 * @param pathFunction the function that returns the path of a resource
 	 * @param nameFunction the function that gets a class's {@code
 	 *        com.liferay.apio.architect.resource.CollectionResource} name
 	 * @param biConsumer the consumer that writes a linked related model's URL
 	 */
 	public void writeRelatedCollections(
+		PathFunction pathFunction,
 		Function<String, Optional<String>> nameFunction,
 		BiConsumer<String, FunctionalList<String>> biConsumer) {
 
-		BaseRepresentor<T> representor = _baseRepresentor;
-
 		Stream<RelatedCollection<T, ?>> stream =
-			representor.getRelatedCollections();
+			_baseRepresentor.getRelatedCollections();
 
 		stream.forEach(
 			relatedCollection -> {
@@ -466,8 +521,8 @@ public class FieldsWriter<T> {
 
 				optional.ifPresent(
 					name -> writeRelatedCollection(
-						relatedCollection, name, _embeddedPathElements,
-						biConsumer));
+						pathFunction, relatedCollection, name,
+						_embeddedPathElements, biConsumer));
 			});
 	}
 
@@ -549,9 +604,6 @@ public class FieldsWriter<T> {
 			return;
 		}
 
-		FunctionalList<String> embeddedPathElements = new FunctionalList<>(
-			_embeddedPathElements, key);
-
 		Function<T, U> modelToIdentifierFunction =
 			relatedModel.getModelToIdentifierFunction();
 
@@ -562,10 +614,16 @@ public class FieldsWriter<T> {
 			return;
 		}
 
+		FunctionalList<String> embeddedPathElements = new FunctionalList<>(
+			_embeddedPathElements, key);
+
 		pathFunction.apply(
 			relatedModel.getIdentifierName(), relatedIdentifier
 		).map(
-			path -> createSingleURL(_requestInfo.getApplicationURL(), path)
+			path -> Item.of(path.getName(), Id.of("", path.getId()))
+		).flatMap(
+			item -> createItemResourceURL(
+				_requestInfo.getApplicationURL(), item)
 		).ifPresent(
 			url -> _tryToWriteField(
 				key, __ -> biConsumer.accept(url, embeddedPathElements))
@@ -573,7 +631,7 @@ public class FieldsWriter<T> {
 	}
 
 	/**
-	 * Writes the related models contained in the {@link Representor} this
+	 * Writes the related models contained in the {@code Representor} this
 	 * writer handles. This method uses three consumers: one that writes the
 	 * model's info, one that writes its URL if it's a linked related model, and
 	 * one that writes its URL if it's an embedded related model. Therefore,
@@ -626,9 +684,12 @@ public class FieldsWriter<T> {
 	 * @param urlConsumer the consumer that writes the URL
 	 */
 	public void writeSingleURL(Consumer<String> urlConsumer) {
-		String url = createSingleURL(_requestInfo.getApplicationURL(), _path);
+		Item item = Item.of(_path.getName(), Id.of("", _path.getId()));
 
-		urlConsumer.accept(url);
+		Optional<String> optional = createItemResourceURL(
+			_requestInfo.getApplicationURL(), item);
+
+		optional.ifPresent(urlConsumer);
 	}
 
 	/**
@@ -658,7 +719,7 @@ public class FieldsWriter<T> {
 	}
 
 	/**
-	 * Writes the model's types. This method uses a consumer so each {@link
+	 * Writes the model's types. This method uses a consumer so each {@code
 	 * javax.ws.rs.ext.MessageBodyWriter} can write the types differently.
 	 *
 	 * @param consumer the consumer that writes the types
@@ -678,13 +739,9 @@ public class FieldsWriter<T> {
 		}
 	}
 
-	private void _writeCollectionPath(
-		String resourceName, FunctionalList<String> parentEmbeddedPathElements,
-		BiConsumer<String, FunctionalList<String>> biConsumer, String key,
-		Path path) {
-
-		String url = createNestedCollectionURL(
-			_requestInfo.getApplicationURL(), path, resourceName);
+	private void _writeResourceURL(
+		String url, FunctionalList<String> parentEmbeddedPathElements,
+		BiConsumer<String, FunctionalList<String>> biConsumer, String key) {
 
 		FunctionalList<String> embeddedPathElements = new FunctionalList<>(
 			parentEmbeddedPathElements, key);
@@ -697,7 +754,6 @@ public class FieldsWriter<T> {
 	private final FunctionalList<String> _embeddedPathElements;
 	private final Logger _logger = getLogger(getClass());
 	private final Path _path;
-	private final PathFunction _pathFunction;
 	private final RequestInfo _requestInfo;
 	private final SingleModel<T> _singleModel;
 	private final SingleModelFunction _singleModelFunction;

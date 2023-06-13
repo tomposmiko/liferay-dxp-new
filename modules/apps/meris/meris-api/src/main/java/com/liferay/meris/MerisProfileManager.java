@@ -22,11 +22,11 @@ import java.util.List;
 /**
  * Represents a profile manager.
  *
- * @author Eduardo Garcia
+ * @author Eduardo García
  * @review
  */
 @ProviderType
-public interface MerisProfileManager <P extends MerisProfile> {
+public interface MerisProfileManager<P extends MerisProfile> {
 
 	/**
 	 * Returns a {@code MerisProfile}

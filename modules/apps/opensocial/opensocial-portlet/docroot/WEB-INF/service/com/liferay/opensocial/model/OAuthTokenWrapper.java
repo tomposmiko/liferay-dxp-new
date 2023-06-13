@@ -17,7 +17,6 @@ package com.liferay.opensocial.model;
 import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.expando.kernel.model.ExpandoBridge;
-
 import com.liferay.portal.kernel.model.ModelWrapper;
 import com.liferay.portal.kernel.service.ServiceContext;
 
@@ -39,6 +38,7 @@ import java.util.Objects;
  */
 @ProviderType
 public class OAuthTokenWrapper implements OAuthToken, ModelWrapper<OAuthToken> {
+
 	public OAuthTokenWrapper(OAuthToken oAuthToken) {
 		_oAuthToken = oAuthToken;
 	}
@@ -173,30 +173,30 @@ public class OAuthTokenWrapper implements OAuthToken, ModelWrapper<OAuthToken> {
 	}
 
 	/**
-	* Returns the access token of this o auth token.
-	*
-	* @return the access token of this o auth token
-	*/
+	 * Returns the access token of this o auth token.
+	 *
+	 * @return the access token of this o auth token
+	 */
 	@Override
 	public String getAccessToken() {
 		return _oAuthToken.getAccessToken();
 	}
 
 	/**
-	* Returns the company ID of this o auth token.
-	*
-	* @return the company ID of this o auth token
-	*/
+	 * Returns the company ID of this o auth token.
+	 *
+	 * @return the company ID of this o auth token
+	 */
 	@Override
 	public long getCompanyId() {
 		return _oAuthToken.getCompanyId();
 	}
 
 	/**
-	* Returns the create date of this o auth token.
-	*
-	* @return the create date of this o auth token
-	*/
+	 * Returns the create date of this o auth token.
+	 *
+	 * @return the create date of this o auth token
+	 */
 	@Override
 	public Date getCreateDate() {
 		return _oAuthToken.getCreateDate();
@@ -208,60 +208,60 @@ public class OAuthTokenWrapper implements OAuthToken, ModelWrapper<OAuthToken> {
 	}
 
 	/**
-	* Returns the expiration of this o auth token.
-	*
-	* @return the expiration of this o auth token
-	*/
+	 * Returns the expiration of this o auth token.
+	 *
+	 * @return the expiration of this o auth token
+	 */
 	@Override
 	public long getExpiration() {
 		return _oAuthToken.getExpiration();
 	}
 
 	/**
-	* Returns the gadget key of this o auth token.
-	*
-	* @return the gadget key of this o auth token
-	*/
+	 * Returns the gadget key of this o auth token.
+	 *
+	 * @return the gadget key of this o auth token
+	 */
 	@Override
 	public String getGadgetKey() {
 		return _oAuthToken.getGadgetKey();
 	}
 
 	/**
-	* Returns the modified date of this o auth token.
-	*
-	* @return the modified date of this o auth token
-	*/
+	 * Returns the modified date of this o auth token.
+	 *
+	 * @return the modified date of this o auth token
+	 */
 	@Override
 	public Date getModifiedDate() {
 		return _oAuthToken.getModifiedDate();
 	}
 
 	/**
-	* Returns the module ID of this o auth token.
-	*
-	* @return the module ID of this o auth token
-	*/
+	 * Returns the module ID of this o auth token.
+	 *
+	 * @return the module ID of this o auth token
+	 */
 	@Override
 	public long getModuleId() {
 		return _oAuthToken.getModuleId();
 	}
 
 	/**
-	* Returns the o auth token ID of this o auth token.
-	*
-	* @return the o auth token ID of this o auth token
-	*/
+	 * Returns the o auth token ID of this o auth token.
+	 *
+	 * @return the o auth token ID of this o auth token
+	 */
 	@Override
 	public long getOAuthTokenId() {
 		return _oAuthToken.getOAuthTokenId();
 	}
 
 	/**
-	* Returns the primary key of this o auth token.
-	*
-	* @return the primary key of this o auth token
-	*/
+	 * Returns the primary key of this o auth token.
+	 *
+	 * @return the primary key of this o auth token
+	 */
 	@Override
 	public long getPrimaryKey() {
 		return _oAuthToken.getPrimaryKey();
@@ -273,70 +273,70 @@ public class OAuthTokenWrapper implements OAuthToken, ModelWrapper<OAuthToken> {
 	}
 
 	/**
-	* Returns the service name of this o auth token.
-	*
-	* @return the service name of this o auth token
-	*/
+	 * Returns the service name of this o auth token.
+	 *
+	 * @return the service name of this o auth token
+	 */
 	@Override
 	public String getServiceName() {
 		return _oAuthToken.getServiceName();
 	}
 
 	/**
-	* Returns the session handle of this o auth token.
-	*
-	* @return the session handle of this o auth token
-	*/
+	 * Returns the session handle of this o auth token.
+	 *
+	 * @return the session handle of this o auth token
+	 */
 	@Override
 	public String getSessionHandle() {
 		return _oAuthToken.getSessionHandle();
 	}
 
 	/**
-	* Returns the token name of this o auth token.
-	*
-	* @return the token name of this o auth token
-	*/
+	 * Returns the token name of this o auth token.
+	 *
+	 * @return the token name of this o auth token
+	 */
 	@Override
 	public String getTokenName() {
 		return _oAuthToken.getTokenName();
 	}
 
 	/**
-	* Returns the token secret of this o auth token.
-	*
-	* @return the token secret of this o auth token
-	*/
+	 * Returns the token secret of this o auth token.
+	 *
+	 * @return the token secret of this o auth token
+	 */
 	@Override
 	public String getTokenSecret() {
 		return _oAuthToken.getTokenSecret();
 	}
 
 	/**
-	* Returns the user ID of this o auth token.
-	*
-	* @return the user ID of this o auth token
-	*/
+	 * Returns the user ID of this o auth token.
+	 *
+	 * @return the user ID of this o auth token
+	 */
 	@Override
 	public long getUserId() {
 		return _oAuthToken.getUserId();
 	}
 
 	/**
-	* Returns the user name of this o auth token.
-	*
-	* @return the user name of this o auth token
-	*/
+	 * Returns the user name of this o auth token.
+	 *
+	 * @return the user name of this o auth token
+	 */
 	@Override
 	public String getUserName() {
 		return _oAuthToken.getUserName();
 	}
 
 	/**
-	* Returns the user uuid of this o auth token.
-	*
-	* @return the user uuid of this o auth token
-	*/
+	 * Returns the user uuid of this o auth token.
+	 *
+	 * @return the user uuid of this o auth token
+	 */
 	@Override
 	public String getUserUuid() {
 		return _oAuthToken.getUserUuid();
@@ -368,10 +368,10 @@ public class OAuthTokenWrapper implements OAuthToken, ModelWrapper<OAuthToken> {
 	}
 
 	/**
-	* Sets the access token of this o auth token.
-	*
-	* @param accessToken the access token of this o auth token
-	*/
+	 * Sets the access token of this o auth token.
+	 *
+	 * @param accessToken the access token of this o auth token
+	 */
 	@Override
 	public void setAccessToken(String accessToken) {
 		_oAuthToken.setAccessToken(accessToken);
@@ -383,20 +383,20 @@ public class OAuthTokenWrapper implements OAuthToken, ModelWrapper<OAuthToken> {
 	}
 
 	/**
-	* Sets the company ID of this o auth token.
-	*
-	* @param companyId the company ID of this o auth token
-	*/
+	 * Sets the company ID of this o auth token.
+	 *
+	 * @param companyId the company ID of this o auth token
+	 */
 	@Override
 	public void setCompanyId(long companyId) {
 		_oAuthToken.setCompanyId(companyId);
 	}
 
 	/**
-	* Sets the create date of this o auth token.
-	*
-	* @param createDate the create date of this o auth token
-	*/
+	 * Sets the create date of this o auth token.
+	 *
+	 * @param createDate the create date of this o auth token
+	 */
 	@Override
 	public void setCreateDate(Date createDate) {
 		_oAuthToken.setCreateDate(createDate);
@@ -405,6 +405,7 @@ public class OAuthTokenWrapper implements OAuthToken, ModelWrapper<OAuthToken> {
 	@Override
 	public void setExpandoBridgeAttributes(
 		com.liferay.portal.kernel.model.BaseModel<?> baseModel) {
+
 		_oAuthToken.setExpandoBridgeAttributes(baseModel);
 	}
 
@@ -419,40 +420,40 @@ public class OAuthTokenWrapper implements OAuthToken, ModelWrapper<OAuthToken> {
 	}
 
 	/**
-	* Sets the expiration of this o auth token.
-	*
-	* @param expiration the expiration of this o auth token
-	*/
+	 * Sets the expiration of this o auth token.
+	 *
+	 * @param expiration the expiration of this o auth token
+	 */
 	@Override
 	public void setExpiration(long expiration) {
 		_oAuthToken.setExpiration(expiration);
 	}
 
 	/**
-	* Sets the gadget key of this o auth token.
-	*
-	* @param gadgetKey the gadget key of this o auth token
-	*/
+	 * Sets the gadget key of this o auth token.
+	 *
+	 * @param gadgetKey the gadget key of this o auth token
+	 */
 	@Override
 	public void setGadgetKey(String gadgetKey) {
 		_oAuthToken.setGadgetKey(gadgetKey);
 	}
 
 	/**
-	* Sets the modified date of this o auth token.
-	*
-	* @param modifiedDate the modified date of this o auth token
-	*/
+	 * Sets the modified date of this o auth token.
+	 *
+	 * @param modifiedDate the modified date of this o auth token
+	 */
 	@Override
 	public void setModifiedDate(Date modifiedDate) {
 		_oAuthToken.setModifiedDate(modifiedDate);
 	}
 
 	/**
-	* Sets the module ID of this o auth token.
-	*
-	* @param moduleId the module ID of this o auth token
-	*/
+	 * Sets the module ID of this o auth token.
+	 *
+	 * @param moduleId the module ID of this o auth token
+	 */
 	@Override
 	public void setModuleId(long moduleId) {
 		_oAuthToken.setModuleId(moduleId);
@@ -464,20 +465,20 @@ public class OAuthTokenWrapper implements OAuthToken, ModelWrapper<OAuthToken> {
 	}
 
 	/**
-	* Sets the o auth token ID of this o auth token.
-	*
-	* @param oAuthTokenId the o auth token ID of this o auth token
-	*/
+	 * Sets the o auth token ID of this o auth token.
+	 *
+	 * @param oAuthTokenId the o auth token ID of this o auth token
+	 */
 	@Override
 	public void setOAuthTokenId(long oAuthTokenId) {
 		_oAuthToken.setOAuthTokenId(oAuthTokenId);
 	}
 
 	/**
-	* Sets the primary key of this o auth token.
-	*
-	* @param primaryKey the primary key of this o auth token
-	*/
+	 * Sets the primary key of this o auth token.
+	 *
+	 * @param primaryKey the primary key of this o auth token
+	 */
 	@Override
 	public void setPrimaryKey(long primaryKey) {
 		_oAuthToken.setPrimaryKey(primaryKey);
@@ -489,77 +490,79 @@ public class OAuthTokenWrapper implements OAuthToken, ModelWrapper<OAuthToken> {
 	}
 
 	/**
-	* Sets the service name of this o auth token.
-	*
-	* @param serviceName the service name of this o auth token
-	*/
+	 * Sets the service name of this o auth token.
+	 *
+	 * @param serviceName the service name of this o auth token
+	 */
 	@Override
 	public void setServiceName(String serviceName) {
 		_oAuthToken.setServiceName(serviceName);
 	}
 
 	/**
-	* Sets the session handle of this o auth token.
-	*
-	* @param sessionHandle the session handle of this o auth token
-	*/
+	 * Sets the session handle of this o auth token.
+	 *
+	 * @param sessionHandle the session handle of this o auth token
+	 */
 	@Override
 	public void setSessionHandle(String sessionHandle) {
 		_oAuthToken.setSessionHandle(sessionHandle);
 	}
 
 	/**
-	* Sets the token name of this o auth token.
-	*
-	* @param tokenName the token name of this o auth token
-	*/
+	 * Sets the token name of this o auth token.
+	 *
+	 * @param tokenName the token name of this o auth token
+	 */
 	@Override
 	public void setTokenName(String tokenName) {
 		_oAuthToken.setTokenName(tokenName);
 	}
 
 	/**
-	* Sets the token secret of this o auth token.
-	*
-	* @param tokenSecret the token secret of this o auth token
-	*/
+	 * Sets the token secret of this o auth token.
+	 *
+	 * @param tokenSecret the token secret of this o auth token
+	 */
 	@Override
 	public void setTokenSecret(String tokenSecret) {
 		_oAuthToken.setTokenSecret(tokenSecret);
 	}
 
 	/**
-	* Sets the user ID of this o auth token.
-	*
-	* @param userId the user ID of this o auth token
-	*/
+	 * Sets the user ID of this o auth token.
+	 *
+	 * @param userId the user ID of this o auth token
+	 */
 	@Override
 	public void setUserId(long userId) {
 		_oAuthToken.setUserId(userId);
 	}
 
 	/**
-	* Sets the user name of this o auth token.
-	*
-	* @param userName the user name of this o auth token
-	*/
+	 * Sets the user name of this o auth token.
+	 *
+	 * @param userName the user name of this o auth token
+	 */
 	@Override
 	public void setUserName(String userName) {
 		_oAuthToken.setUserName(userName);
 	}
 
 	/**
-	* Sets the user uuid of this o auth token.
-	*
-	* @param userUuid the user uuid of this o auth token
-	*/
+	 * Sets the user uuid of this o auth token.
+	 *
+	 * @param userUuid the user uuid of this o auth token
+	 */
 	@Override
 	public void setUserUuid(String userUuid) {
 		_oAuthToken.setUserUuid(userUuid);
 	}
 
 	@Override
-	public com.liferay.portal.kernel.model.CacheModel<OAuthToken> toCacheModel() {
+	public com.liferay.portal.kernel.model.CacheModel<OAuthToken>
+		toCacheModel() {
+
 		return _oAuthToken.toCacheModel();
 	}
 
@@ -623,4 +626,5 @@ public class OAuthTokenWrapper implements OAuthToken, ModelWrapper<OAuthToken> {
 	}
 
 	private final OAuthToken _oAuthToken;
+
 }

@@ -25,19 +25,20 @@ import com.liferay.portal.kernel.util.Accessor;
  *
  * @author Brian Wing Shun Chan
  * @see AssetLinkModel
- * @see com.liferay.portlet.asset.model.impl.AssetLinkImpl
- * @see com.liferay.portlet.asset.model.impl.AssetLinkModelImpl
  * @generated
  */
 @ImplementationClassName("com.liferay.portlet.asset.model.impl.AssetLinkImpl")
 @ProviderType
 public interface AssetLink extends AssetLinkModel, PersistedModel {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
-	 * Never modify this interface directly. Add methods to {@link com.liferay.portlet.asset.model.impl.AssetLinkImpl} and rerun ServiceBuilder to automatically copy the method declarations to this interface.
+	 * Never modify this interface directly. Add methods to <code>com.liferay.portlet.asset.model.impl.AssetLinkImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
 	 */
-	public static final Accessor<AssetLink, Long> LINK_ID_ACCESSOR = new Accessor<AssetLink, Long>() {
+	public static final Accessor<AssetLink, Long> LINK_ID_ACCESSOR =
+		new Accessor<AssetLink, Long>() {
+
 			@Override
 			public Long get(AssetLink assetLink) {
 				return assetLink.getLinkId();
@@ -52,9 +53,11 @@ public interface AssetLink extends AssetLinkModel, PersistedModel {
 			public Class<AssetLink> getTypeClass() {
 				return AssetLink.class;
 			}
-		};
 
-	public static final Accessor<AssetLink, Long> ENTRY_ID2_ACCESSOR = new Accessor<AssetLink, Long>() {
+		};
+	public static final Accessor<AssetLink, Long> ENTRY_ID2_ACCESSOR =
+		new Accessor<AssetLink, Long>() {
+
 			@Override
 			public Long get(AssetLink assetLink) {
 				return assetLink.getEntryId2();
@@ -69,5 +72,7 @@ public interface AssetLink extends AssetLinkModel, PersistedModel {
 			public Class<AssetLink> getTypeClass() {
 				return AssetLink.class;
 			}
+
 		};
+
 }

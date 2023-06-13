@@ -19,7 +19,6 @@ import aQute.bnd.annotation.ProviderType;
 import com.liferay.portal.kernel.model.CacheModel;
 import com.liferay.portal.kernel.util.HashUtil;
 import com.liferay.portal.kernel.util.StringBundler;
-
 import com.liferay.wiki.model.WikiNode;
 
 import java.io.Externalizable;
@@ -33,11 +32,12 @@ import java.util.Date;
  * The cache model class for representing WikiNode in entity cache.
  *
  * @author Brian Wing Shun Chan
- * @see WikiNode
  * @generated
  */
 @ProviderType
-public class WikiNodeCacheModel implements CacheModel<WikiNode>, Externalizable {
+public class WikiNodeCacheModel
+	implements CacheModel<WikiNode>, Externalizable {
+
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj) {
@@ -217,8 +217,7 @@ public class WikiNodeCacheModel implements CacheModel<WikiNode>, Externalizable 
 	}
 
 	@Override
-	public void writeExternal(ObjectOutput objectOutput)
-		throws IOException {
+	public void writeExternal(ObjectOutput objectOutput) throws IOException {
 		if (uuid == null) {
 			objectOutput.writeUTF("");
 		}
@@ -291,4 +290,5 @@ public class WikiNodeCacheModel implements CacheModel<WikiNode>, Externalizable 
 	public long statusByUserId;
 	public String statusByUserName;
 	public long statusDate;
+
 }

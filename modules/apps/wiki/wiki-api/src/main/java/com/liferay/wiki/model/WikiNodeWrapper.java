@@ -17,9 +17,7 @@ package com.liferay.wiki.model;
 import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.expando.kernel.model.ExpandoBridge;
-
 import com.liferay.exportimport.kernel.lar.StagedModelType;
-
 import com.liferay.portal.kernel.model.ModelWrapper;
 import com.liferay.portal.kernel.service.ServiceContext;
 
@@ -41,6 +39,7 @@ import java.util.Objects;
  */
 @ProviderType
 public class WikiNodeWrapper implements WikiNode, ModelWrapper<WikiNode> {
+
 	public WikiNodeWrapper(WikiNode wikiNode) {
 		_wikiNode = wikiNode;
 	}
@@ -179,8 +178,10 @@ public class WikiNodeWrapper implements WikiNode, ModelWrapper<WikiNode> {
 	}
 
 	@Override
-	public com.liferay.portal.kernel.repository.model.Folder addAttachmentsFolder()
+	public com.liferay.portal.kernel.repository.model.Folder
+			addAttachmentsFolder()
 		throws com.liferay.portal.kernel.exception.PortalException {
+
 		return _wikiNode.addAttachmentsFolder();
 	}
 
@@ -200,56 +201,58 @@ public class WikiNodeWrapper implements WikiNode, ModelWrapper<WikiNode> {
 	}
 
 	/**
-	* Returns the company ID of this wiki node.
-	*
-	* @return the company ID of this wiki node
-	*/
+	 * Returns the company ID of this wiki node.
+	 *
+	 * @return the company ID of this wiki node
+	 */
 	@Override
 	public long getCompanyId() {
 		return _wikiNode.getCompanyId();
 	}
 
 	/**
-	* Returns the container model ID of this wiki node.
-	*
-	* @return the container model ID of this wiki node
-	*/
+	 * Returns the container model ID of this wiki node.
+	 *
+	 * @return the container model ID of this wiki node
+	 */
 	@Override
 	public long getContainerModelId() {
 		return _wikiNode.getContainerModelId();
 	}
 
 	/**
-	* Returns the container name of this wiki node.
-	*
-	* @return the container name of this wiki node
-	*/
+	 * Returns the container name of this wiki node.
+	 *
+	 * @return the container name of this wiki node
+	 */
 	@Override
 	public String getContainerModelName() {
 		return _wikiNode.getContainerModelName();
 	}
 
 	/**
-	* Returns the create date of this wiki node.
-	*
-	* @return the create date of this wiki node
-	*/
+	 * Returns the create date of this wiki node.
+	 *
+	 * @return the create date of this wiki node
+	 */
 	@Override
 	public Date getCreateDate() {
 		return _wikiNode.getCreateDate();
 	}
 
 	@Override
-	public java.util.List<com.liferay.portal.kernel.repository.model.FileEntry> getDeletedAttachmentsFiles()
+	public java.util.List<com.liferay.portal.kernel.repository.model.FileEntry>
+			getDeletedAttachmentsFiles()
 		throws com.liferay.portal.kernel.exception.PortalException {
+
 		return _wikiNode.getDeletedAttachmentsFiles();
 	}
 
 	/**
-	* Returns the description of this wiki node.
-	*
-	* @return the description of this wiki node
-	*/
+	 * Returns the description of this wiki node.
+	 *
+	 * @return the description of this wiki node
+	 */
 	@Override
 	public String getDescription() {
 		return _wikiNode.getDescription();
@@ -261,80 +264,80 @@ public class WikiNodeWrapper implements WikiNode, ModelWrapper<WikiNode> {
 	}
 
 	/**
-	* Returns the group ID of this wiki node.
-	*
-	* @return the group ID of this wiki node
-	*/
+	 * Returns the group ID of this wiki node.
+	 *
+	 * @return the group ID of this wiki node
+	 */
 	@Override
 	public long getGroupId() {
 		return _wikiNode.getGroupId();
 	}
 
 	/**
-	* Returns the last post date of this wiki node.
-	*
-	* @return the last post date of this wiki node
-	*/
+	 * Returns the last post date of this wiki node.
+	 *
+	 * @return the last post date of this wiki node
+	 */
 	@Override
 	public Date getLastPostDate() {
 		return _wikiNode.getLastPostDate();
 	}
 
 	/**
-	* Returns the last publish date of this wiki node.
-	*
-	* @return the last publish date of this wiki node
-	*/
+	 * Returns the last publish date of this wiki node.
+	 *
+	 * @return the last publish date of this wiki node
+	 */
 	@Override
 	public Date getLastPublishDate() {
 		return _wikiNode.getLastPublishDate();
 	}
 
 	/**
-	* Returns the modified date of this wiki node.
-	*
-	* @return the modified date of this wiki node
-	*/
+	 * Returns the modified date of this wiki node.
+	 *
+	 * @return the modified date of this wiki node
+	 */
 	@Override
 	public Date getModifiedDate() {
 		return _wikiNode.getModifiedDate();
 	}
 
 	/**
-	* Returns the name of this wiki node.
-	*
-	* @return the name of this wiki node
-	*/
+	 * Returns the name of this wiki node.
+	 *
+	 * @return the name of this wiki node
+	 */
 	@Override
 	public String getName() {
 		return _wikiNode.getName();
 	}
 
 	/**
-	* Returns the node ID of this wiki node.
-	*
-	* @return the node ID of this wiki node
-	*/
+	 * Returns the node ID of this wiki node.
+	 *
+	 * @return the node ID of this wiki node
+	 */
 	@Override
 	public long getNodeId() {
 		return _wikiNode.getNodeId();
 	}
 
 	/**
-	* Returns the parent container model ID of this wiki node.
-	*
-	* @return the parent container model ID of this wiki node
-	*/
+	 * Returns the parent container model ID of this wiki node.
+	 *
+	 * @return the parent container model ID of this wiki node
+	 */
 	@Override
 	public long getParentContainerModelId() {
 		return _wikiNode.getParentContainerModelId();
 	}
 
 	/**
-	* Returns the primary key of this wiki node.
-	*
-	* @return the primary key of this wiki node
-	*/
+	 * Returns the primary key of this wiki node.
+	 *
+	 * @return the primary key of this wiki node
+	 */
 	@Override
 	public long getPrimaryKey() {
 		return _wikiNode.getPrimaryKey();
@@ -346,82 +349,83 @@ public class WikiNodeWrapper implements WikiNode, ModelWrapper<WikiNode> {
 	}
 
 	/**
-	* Returns the status of this wiki node.
-	*
-	* @return the status of this wiki node
-	*/
+	 * Returns the status of this wiki node.
+	 *
+	 * @return the status of this wiki node
+	 */
 	@Override
 	public int getStatus() {
 		return _wikiNode.getStatus();
 	}
 
 	/**
-	* Returns the status by user ID of this wiki node.
-	*
-	* @return the status by user ID of this wiki node
-	*/
+	 * Returns the status by user ID of this wiki node.
+	 *
+	 * @return the status by user ID of this wiki node
+	 */
 	@Override
 	public long getStatusByUserId() {
 		return _wikiNode.getStatusByUserId();
 	}
 
 	/**
-	* Returns the status by user name of this wiki node.
-	*
-	* @return the status by user name of this wiki node
-	*/
+	 * Returns the status by user name of this wiki node.
+	 *
+	 * @return the status by user name of this wiki node
+	 */
 	@Override
 	public String getStatusByUserName() {
 		return _wikiNode.getStatusByUserName();
 	}
 
 	/**
-	* Returns the status by user uuid of this wiki node.
-	*
-	* @return the status by user uuid of this wiki node
-	*/
+	 * Returns the status by user uuid of this wiki node.
+	 *
+	 * @return the status by user uuid of this wiki node
+	 */
 	@Override
 	public String getStatusByUserUuid() {
 		return _wikiNode.getStatusByUserUuid();
 	}
 
 	/**
-	* Returns the status date of this wiki node.
-	*
-	* @return the status date of this wiki node
-	*/
+	 * Returns the status date of this wiki node.
+	 *
+	 * @return the status date of this wiki node
+	 */
 	@Override
 	public Date getStatusDate() {
 		return _wikiNode.getStatusDate();
 	}
 
 	/**
-	* Returns the trash entry created when this wiki node was moved to the Recycle Bin. The trash entry may belong to one of the ancestors of this wiki node.
-	*
-	* @return the trash entry created when this wiki node was moved to the Recycle Bin
-	*/
+	 * Returns the trash entry created when this wiki node was moved to the Recycle Bin. The trash entry may belong to one of the ancestors of this wiki node.
+	 *
+	 * @return the trash entry created when this wiki node was moved to the Recycle Bin
+	 */
 	@Override
 	public com.liferay.trash.kernel.model.TrashEntry getTrashEntry()
 		throws com.liferay.portal.kernel.exception.PortalException {
+
 		return _wikiNode.getTrashEntry();
 	}
 
 	/**
-	* Returns the class primary key of the trash entry for this wiki node.
-	*
-	* @return the class primary key of the trash entry for this wiki node
-	*/
+	 * Returns the class primary key of the trash entry for this wiki node.
+	 *
+	 * @return the class primary key of the trash entry for this wiki node
+	 */
 	@Override
 	public long getTrashEntryClassPK() {
 		return _wikiNode.getTrashEntryClassPK();
 	}
 
 	/**
-	* Returns the trash handler for this wiki node.
-	*
-	* @return the trash handler for this wiki node
-	* @deprecated As of Judson (7.1.x), with no direct replacement
-	*/
+	 * Returns the trash handler for this wiki node.
+	 *
+	 * @return the trash handler for this wiki node
+	 * @deprecated As of Judson (7.1.x), with no direct replacement
+	 */
 	@Deprecated
 	@Override
 	public com.liferay.portal.kernel.trash.TrashHandler getTrashHandler() {
@@ -429,40 +433,40 @@ public class WikiNodeWrapper implements WikiNode, ModelWrapper<WikiNode> {
 	}
 
 	/**
-	* Returns the user ID of this wiki node.
-	*
-	* @return the user ID of this wiki node
-	*/
+	 * Returns the user ID of this wiki node.
+	 *
+	 * @return the user ID of this wiki node
+	 */
 	@Override
 	public long getUserId() {
 		return _wikiNode.getUserId();
 	}
 
 	/**
-	* Returns the user name of this wiki node.
-	*
-	* @return the user name of this wiki node
-	*/
+	 * Returns the user name of this wiki node.
+	 *
+	 * @return the user name of this wiki node
+	 */
 	@Override
 	public String getUserName() {
 		return _wikiNode.getUserName();
 	}
 
 	/**
-	* Returns the user uuid of this wiki node.
-	*
-	* @return the user uuid of this wiki node
-	*/
+	 * Returns the user uuid of this wiki node.
+	 *
+	 * @return the user uuid of this wiki node
+	 */
 	@Override
 	public String getUserUuid() {
 		return _wikiNode.getUserUuid();
 	}
 
 	/**
-	* Returns the uuid of this wiki node.
-	*
-	* @return the uuid of this wiki node
-	*/
+	 * Returns the uuid of this wiki node.
+	 *
+	 * @return the uuid of this wiki node
+	 */
 	@Override
 	public String getUuid() {
 		return _wikiNode.getUuid();
@@ -474,10 +478,10 @@ public class WikiNodeWrapper implements WikiNode, ModelWrapper<WikiNode> {
 	}
 
 	/**
-	* Returns <code>true</code> if this wiki node is approved.
-	*
-	* @return <code>true</code> if this wiki node is approved; <code>false</code> otherwise
-	*/
+	 * Returns <code>true</code> if this wiki node is approved.
+	 *
+	 * @return <code>true</code> if this wiki node is approved; <code>false</code> otherwise
+	 */
 	@Override
 	public boolean isApproved() {
 		return _wikiNode.isApproved();
@@ -489,20 +493,20 @@ public class WikiNodeWrapper implements WikiNode, ModelWrapper<WikiNode> {
 	}
 
 	/**
-	* Returns <code>true</code> if this wiki node is denied.
-	*
-	* @return <code>true</code> if this wiki node is denied; <code>false</code> otherwise
-	*/
+	 * Returns <code>true</code> if this wiki node is denied.
+	 *
+	 * @return <code>true</code> if this wiki node is denied; <code>false</code> otherwise
+	 */
 	@Override
 	public boolean isDenied() {
 		return _wikiNode.isDenied();
 	}
 
 	/**
-	* Returns <code>true</code> if this wiki node is a draft.
-	*
-	* @return <code>true</code> if this wiki node is a draft; <code>false</code> otherwise
-	*/
+	 * Returns <code>true</code> if this wiki node is a draft.
+	 *
+	 * @return <code>true</code> if this wiki node is a draft; <code>false</code> otherwise
+	 */
 	@Override
 	public boolean isDraft() {
 		return _wikiNode.isDraft();
@@ -514,50 +518,50 @@ public class WikiNodeWrapper implements WikiNode, ModelWrapper<WikiNode> {
 	}
 
 	/**
-	* Returns <code>true</code> if this wiki node is expired.
-	*
-	* @return <code>true</code> if this wiki node is expired; <code>false</code> otherwise
-	*/
+	 * Returns <code>true</code> if this wiki node is expired.
+	 *
+	 * @return <code>true</code> if this wiki node is expired; <code>false</code> otherwise
+	 */
 	@Override
 	public boolean isExpired() {
 		return _wikiNode.isExpired();
 	}
 
 	/**
-	* Returns <code>true</code> if this wiki node is inactive.
-	*
-	* @return <code>true</code> if this wiki node is inactive; <code>false</code> otherwise
-	*/
+	 * Returns <code>true</code> if this wiki node is inactive.
+	 *
+	 * @return <code>true</code> if this wiki node is inactive; <code>false</code> otherwise
+	 */
 	@Override
 	public boolean isInactive() {
 		return _wikiNode.isInactive();
 	}
 
 	/**
-	* Returns <code>true</code> if this wiki node is incomplete.
-	*
-	* @return <code>true</code> if this wiki node is incomplete; <code>false</code> otherwise
-	*/
+	 * Returns <code>true</code> if this wiki node is incomplete.
+	 *
+	 * @return <code>true</code> if this wiki node is incomplete; <code>false</code> otherwise
+	 */
 	@Override
 	public boolean isIncomplete() {
 		return _wikiNode.isIncomplete();
 	}
 
 	/**
-	* Returns <code>true</code> if this wiki node is in the Recycle Bin.
-	*
-	* @return <code>true</code> if this wiki node is in the Recycle Bin; <code>false</code> otherwise
-	*/
+	 * Returns <code>true</code> if this wiki node is in the Recycle Bin.
+	 *
+	 * @return <code>true</code> if this wiki node is in the Recycle Bin; <code>false</code> otherwise
+	 */
 	@Override
 	public boolean isInTrash() {
 		return _wikiNode.isInTrash();
 	}
 
 	/**
-	* Returns <code>true</code> if the parent of this wiki node is in the Recycle Bin.
-	*
-	* @return <code>true</code> if the parent of this wiki node is in the Recycle Bin; <code>false</code> otherwise
-	*/
+	 * Returns <code>true</code> if the parent of this wiki node is in the Recycle Bin.
+	 *
+	 * @return <code>true</code> if the parent of this wiki node is in the Recycle Bin; <code>false</code> otherwise
+	 */
 	@Override
 	public boolean isInTrashContainer() {
 		return _wikiNode.isInTrashContainer();
@@ -579,20 +583,20 @@ public class WikiNodeWrapper implements WikiNode, ModelWrapper<WikiNode> {
 	}
 
 	/**
-	* Returns <code>true</code> if this wiki node is pending.
-	*
-	* @return <code>true</code> if this wiki node is pending; <code>false</code> otherwise
-	*/
+	 * Returns <code>true</code> if this wiki node is pending.
+	 *
+	 * @return <code>true</code> if this wiki node is pending; <code>false</code> otherwise
+	 */
 	@Override
 	public boolean isPending() {
 		return _wikiNode.isPending();
 	}
 
 	/**
-	* Returns <code>true</code> if this wiki node is scheduled.
-	*
-	* @return <code>true</code> if this wiki node is scheduled; <code>false</code> otherwise
-	*/
+	 * Returns <code>true</code> if this wiki node is scheduled.
+	 *
+	 * @return <code>true</code> if this wiki node is scheduled; <code>false</code> otherwise
+	 */
 	@Override
 	public boolean isScheduled() {
 		return _wikiNode.isScheduled();
@@ -609,40 +613,40 @@ public class WikiNodeWrapper implements WikiNode, ModelWrapper<WikiNode> {
 	}
 
 	/**
-	* Sets the company ID of this wiki node.
-	*
-	* @param companyId the company ID of this wiki node
-	*/
+	 * Sets the company ID of this wiki node.
+	 *
+	 * @param companyId the company ID of this wiki node
+	 */
 	@Override
 	public void setCompanyId(long companyId) {
 		_wikiNode.setCompanyId(companyId);
 	}
 
 	/**
-	* Sets the container model ID of this wiki node.
-	*
-	* @param containerModelId the container model ID of this wiki node
-	*/
+	 * Sets the container model ID of this wiki node.
+	 *
+	 * @param containerModelId the container model ID of this wiki node
+	 */
 	@Override
 	public void setContainerModelId(long containerModelId) {
 		_wikiNode.setContainerModelId(containerModelId);
 	}
 
 	/**
-	* Sets the create date of this wiki node.
-	*
-	* @param createDate the create date of this wiki node
-	*/
+	 * Sets the create date of this wiki node.
+	 *
+	 * @param createDate the create date of this wiki node
+	 */
 	@Override
 	public void setCreateDate(Date createDate) {
 		_wikiNode.setCreateDate(createDate);
 	}
 
 	/**
-	* Sets the description of this wiki node.
-	*
-	* @param description the description of this wiki node
-	*/
+	 * Sets the description of this wiki node.
+	 *
+	 * @param description the description of this wiki node
+	 */
 	@Override
 	public void setDescription(String description) {
 		_wikiNode.setDescription(description);
@@ -651,6 +655,7 @@ public class WikiNodeWrapper implements WikiNode, ModelWrapper<WikiNode> {
 	@Override
 	public void setExpandoBridgeAttributes(
 		com.liferay.portal.kernel.model.BaseModel<?> baseModel) {
+
 		_wikiNode.setExpandoBridgeAttributes(baseModel);
 	}
 
@@ -665,50 +670,50 @@ public class WikiNodeWrapper implements WikiNode, ModelWrapper<WikiNode> {
 	}
 
 	/**
-	* Sets the group ID of this wiki node.
-	*
-	* @param groupId the group ID of this wiki node
-	*/
+	 * Sets the group ID of this wiki node.
+	 *
+	 * @param groupId the group ID of this wiki node
+	 */
 	@Override
 	public void setGroupId(long groupId) {
 		_wikiNode.setGroupId(groupId);
 	}
 
 	/**
-	* Sets the last post date of this wiki node.
-	*
-	* @param lastPostDate the last post date of this wiki node
-	*/
+	 * Sets the last post date of this wiki node.
+	 *
+	 * @param lastPostDate the last post date of this wiki node
+	 */
 	@Override
 	public void setLastPostDate(Date lastPostDate) {
 		_wikiNode.setLastPostDate(lastPostDate);
 	}
 
 	/**
-	* Sets the last publish date of this wiki node.
-	*
-	* @param lastPublishDate the last publish date of this wiki node
-	*/
+	 * Sets the last publish date of this wiki node.
+	 *
+	 * @param lastPublishDate the last publish date of this wiki node
+	 */
 	@Override
 	public void setLastPublishDate(Date lastPublishDate) {
 		_wikiNode.setLastPublishDate(lastPublishDate);
 	}
 
 	/**
-	* Sets the modified date of this wiki node.
-	*
-	* @param modifiedDate the modified date of this wiki node
-	*/
+	 * Sets the modified date of this wiki node.
+	 *
+	 * @param modifiedDate the modified date of this wiki node
+	 */
 	@Override
 	public void setModifiedDate(Date modifiedDate) {
 		_wikiNode.setModifiedDate(modifiedDate);
 	}
 
 	/**
-	* Sets the name of this wiki node.
-	*
-	* @param name the name of this wiki node
-	*/
+	 * Sets the name of this wiki node.
+	 *
+	 * @param name the name of this wiki node
+	 */
 	@Override
 	public void setName(String name) {
 		_wikiNode.setName(name);
@@ -720,30 +725,30 @@ public class WikiNodeWrapper implements WikiNode, ModelWrapper<WikiNode> {
 	}
 
 	/**
-	* Sets the node ID of this wiki node.
-	*
-	* @param nodeId the node ID of this wiki node
-	*/
+	 * Sets the node ID of this wiki node.
+	 *
+	 * @param nodeId the node ID of this wiki node
+	 */
 	@Override
 	public void setNodeId(long nodeId) {
 		_wikiNode.setNodeId(nodeId);
 	}
 
 	/**
-	* Sets the parent container model ID of this wiki node.
-	*
-	* @param parentContainerModelId the parent container model ID of this wiki node
-	*/
+	 * Sets the parent container model ID of this wiki node.
+	 *
+	 * @param parentContainerModelId the parent container model ID of this wiki node
+	 */
 	@Override
 	public void setParentContainerModelId(long parentContainerModelId) {
 		_wikiNode.setParentContainerModelId(parentContainerModelId);
 	}
 
 	/**
-	* Sets the primary key of this wiki node.
-	*
-	* @param primaryKey the primary key of this wiki node
-	*/
+	 * Sets the primary key of this wiki node.
+	 *
+	 * @param primaryKey the primary key of this wiki node
+	 */
 	@Override
 	public void setPrimaryKey(long primaryKey) {
 		_wikiNode.setPrimaryKey(primaryKey);
@@ -755,90 +760,90 @@ public class WikiNodeWrapper implements WikiNode, ModelWrapper<WikiNode> {
 	}
 
 	/**
-	* Sets the status of this wiki node.
-	*
-	* @param status the status of this wiki node
-	*/
+	 * Sets the status of this wiki node.
+	 *
+	 * @param status the status of this wiki node
+	 */
 	@Override
 	public void setStatus(int status) {
 		_wikiNode.setStatus(status);
 	}
 
 	/**
-	* Sets the status by user ID of this wiki node.
-	*
-	* @param statusByUserId the status by user ID of this wiki node
-	*/
+	 * Sets the status by user ID of this wiki node.
+	 *
+	 * @param statusByUserId the status by user ID of this wiki node
+	 */
 	@Override
 	public void setStatusByUserId(long statusByUserId) {
 		_wikiNode.setStatusByUserId(statusByUserId);
 	}
 
 	/**
-	* Sets the status by user name of this wiki node.
-	*
-	* @param statusByUserName the status by user name of this wiki node
-	*/
+	 * Sets the status by user name of this wiki node.
+	 *
+	 * @param statusByUserName the status by user name of this wiki node
+	 */
 	@Override
 	public void setStatusByUserName(String statusByUserName) {
 		_wikiNode.setStatusByUserName(statusByUserName);
 	}
 
 	/**
-	* Sets the status by user uuid of this wiki node.
-	*
-	* @param statusByUserUuid the status by user uuid of this wiki node
-	*/
+	 * Sets the status by user uuid of this wiki node.
+	 *
+	 * @param statusByUserUuid the status by user uuid of this wiki node
+	 */
 	@Override
 	public void setStatusByUserUuid(String statusByUserUuid) {
 		_wikiNode.setStatusByUserUuid(statusByUserUuid);
 	}
 
 	/**
-	* Sets the status date of this wiki node.
-	*
-	* @param statusDate the status date of this wiki node
-	*/
+	 * Sets the status date of this wiki node.
+	 *
+	 * @param statusDate the status date of this wiki node
+	 */
 	@Override
 	public void setStatusDate(Date statusDate) {
 		_wikiNode.setStatusDate(statusDate);
 	}
 
 	/**
-	* Sets the user ID of this wiki node.
-	*
-	* @param userId the user ID of this wiki node
-	*/
+	 * Sets the user ID of this wiki node.
+	 *
+	 * @param userId the user ID of this wiki node
+	 */
 	@Override
 	public void setUserId(long userId) {
 		_wikiNode.setUserId(userId);
 	}
 
 	/**
-	* Sets the user name of this wiki node.
-	*
-	* @param userName the user name of this wiki node
-	*/
+	 * Sets the user name of this wiki node.
+	 *
+	 * @param userName the user name of this wiki node
+	 */
 	@Override
 	public void setUserName(String userName) {
 		_wikiNode.setUserName(userName);
 	}
 
 	/**
-	* Sets the user uuid of this wiki node.
-	*
-	* @param userUuid the user uuid of this wiki node
-	*/
+	 * Sets the user uuid of this wiki node.
+	 *
+	 * @param userUuid the user uuid of this wiki node
+	 */
 	@Override
 	public void setUserUuid(String userUuid) {
 		_wikiNode.setUserUuid(userUuid);
 	}
 
 	/**
-	* Sets the uuid of this wiki node.
-	*
-	* @param uuid the uuid of this wiki node
-	*/
+	 * Sets the uuid of this wiki node.
+	 *
+	 * @param uuid the uuid of this wiki node
+	 */
 	@Override
 	public void setUuid(String uuid) {
 		_wikiNode.setUuid(uuid);
@@ -914,4 +919,5 @@ public class WikiNodeWrapper implements WikiNode, ModelWrapper<WikiNode> {
 	}
 
 	private final WikiNode _wikiNode;
+
 }

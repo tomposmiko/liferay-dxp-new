@@ -17,10 +17,8 @@ package com.liferay.bookmarks.uad.exporter;
 import com.liferay.bookmarks.model.BookmarksFolder;
 import com.liferay.bookmarks.service.BookmarksFolderLocalService;
 import com.liferay.bookmarks.uad.constants.BookmarksUADConstants;
-
 import com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery;
 import com.liferay.portal.kernel.util.StringBundler;
-
 import com.liferay.user.associated.data.exporter.DynamicQueryUADExporter;
 
 import org.osgi.service.component.annotations.Reference;
@@ -39,6 +37,7 @@ import org.osgi.service.component.annotations.Reference;
  */
 public abstract class BaseBookmarksFolderUADExporter
 	extends DynamicQueryUADExporter<BookmarksFolder> {
+
 	@Override
 	public Class<BookmarksFolder> getTypeClass() {
 		return BookmarksFolder.class;
@@ -102,4 +101,5 @@ public abstract class BaseBookmarksFolderUADExporter
 
 	@Reference
 	protected BookmarksFolderLocalService bookmarksFolderLocalService;
+
 }

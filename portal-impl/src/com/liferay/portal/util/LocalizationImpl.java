@@ -597,7 +597,7 @@ public class LocalizationImpl implements Localization {
 		String parameter, String defaultValue) {
 
 		return getLocalizationXmlFromPreferences(
-			preferences, portletRequest, parameter, defaultValue, null);
+			preferences, portletRequest, parameter, null, defaultValue);
 	}
 
 	@Override
@@ -646,7 +646,11 @@ public class LocalizationImpl implements Localization {
 
 	@Override
 	public String getLocalizedName(String name, String languageId) {
-		return name.concat(StringPool.UNDERLINE).concat(languageId);
+		return name.concat(
+			StringPool.UNDERLINE
+		).concat(
+			languageId
+		);
 	}
 
 	@Override
@@ -923,6 +927,27 @@ public class LocalizationImpl implements Localization {
 		}
 
 		return StringPool.BLANK;
+	}
+
+	@Override
+	public Map<Locale, String> populateLocalizationMap(
+		Map<Locale, String> localizationMap, String defaultLanguageId,
+		long groupId) {
+
+		String defaultValue = localizationMap.get(
+			LocaleUtil.fromLanguageId(defaultLanguageId));
+
+		for (Locale availableLocale :
+				LanguageUtil.getAvailableLocales(groupId)) {
+
+			if (!localizationMap.containsKey(availableLocale) ||
+				Validator.isNull(localizationMap.get(availableLocale))) {
+
+				localizationMap.put(availableLocale, defaultValue);
+			}
+		}
+
+		return localizationMap;
 	}
 
 	@Override

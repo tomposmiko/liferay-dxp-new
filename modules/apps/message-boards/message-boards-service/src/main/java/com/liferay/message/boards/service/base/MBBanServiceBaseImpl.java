@@ -17,7 +17,6 @@ package com.liferay.message.boards.service.base;
 import com.liferay.message.boards.model.MBBan;
 import com.liferay.message.boards.service.MBBanService;
 import com.liferay.message.boards.service.persistence.MBBanPersistence;
-
 import com.liferay.portal.kernel.bean.BeanReference;
 import com.liferay.portal.kernel.dao.db.DB;
 import com.liferay.portal.kernel.dao.db.DBManagerUtil;
@@ -40,15 +39,15 @@ import javax.sql.DataSource;
  *
  * @author Brian Wing Shun Chan
  * @see com.liferay.message.boards.service.impl.MBBanServiceImpl
- * @see com.liferay.message.boards.service.MBBanServiceUtil
  * @generated
  */
-public abstract class MBBanServiceBaseImpl extends BaseServiceImpl
-	implements MBBanService, IdentifiableOSGiService {
+public abstract class MBBanServiceBaseImpl
+	extends BaseServiceImpl implements MBBanService, IdentifiableOSGiService {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
-	 * Never modify or reference this class directly. Always use {@link com.liferay.message.boards.service.MBBanServiceUtil} to access the message boards ban remote service.
+	 * Never modify or reference this class directly. Use <code>MBBanService</code> via injection or a <code>org.osgi.util.tracker.ServiceTracker</code> or use <code>com.liferay.message.boards.service.MBBanServiceUtil</code>.
 	 */
 
 	/**
@@ -56,7 +55,9 @@ public abstract class MBBanServiceBaseImpl extends BaseServiceImpl
 	 *
 	 * @return the message boards ban local service
 	 */
-	public com.liferay.message.boards.service.MBBanLocalService getMBBanLocalService() {
+	public com.liferay.message.boards.service.MBBanLocalService
+		getMBBanLocalService() {
+
 		return mbBanLocalService;
 	}
 
@@ -66,7 +67,9 @@ public abstract class MBBanServiceBaseImpl extends BaseServiceImpl
 	 * @param mbBanLocalService the message boards ban local service
 	 */
 	public void setMBBanLocalService(
-		com.liferay.message.boards.service.MBBanLocalService mbBanLocalService) {
+		com.liferay.message.boards.service.MBBanLocalService
+			mbBanLocalService) {
+
 		this.mbBanLocalService = mbBanLocalService;
 	}
 
@@ -111,7 +114,9 @@ public abstract class MBBanServiceBaseImpl extends BaseServiceImpl
 	 *
 	 * @return the counter local service
 	 */
-	public com.liferay.counter.kernel.service.CounterLocalService getCounterLocalService() {
+	public com.liferay.counter.kernel.service.CounterLocalService
+		getCounterLocalService() {
+
 		return counterLocalService;
 	}
 
@@ -121,7 +126,9 @@ public abstract class MBBanServiceBaseImpl extends BaseServiceImpl
 	 * @param counterLocalService the counter local service
 	 */
 	public void setCounterLocalService(
-		com.liferay.counter.kernel.service.CounterLocalService counterLocalService) {
+		com.liferay.counter.kernel.service.CounterLocalService
+			counterLocalService) {
+
 		this.counterLocalService = counterLocalService;
 	}
 
@@ -163,8 +170,8 @@ public abstract class MBBanServiceBaseImpl extends BaseServiceImpl
 			sql = db.buildSQL(sql);
 			sql = PortalUtil.transformSQL(sql);
 
-			SqlUpdate sqlUpdate = SqlUpdateFactoryUtil.getSqlUpdate(dataSource,
-					sql);
+			SqlUpdate sqlUpdate = SqlUpdateFactoryUtil.getSqlUpdate(
+				dataSource, sql);
 
 			sqlUpdate.update();
 		}
@@ -173,12 +180,22 @@ public abstract class MBBanServiceBaseImpl extends BaseServiceImpl
 		}
 	}
 
-	@BeanReference(type = com.liferay.message.boards.service.MBBanLocalService.class)
-	protected com.liferay.message.boards.service.MBBanLocalService mbBanLocalService;
+	@BeanReference(
+		type = com.liferay.message.boards.service.MBBanLocalService.class
+	)
+	protected com.liferay.message.boards.service.MBBanLocalService
+		mbBanLocalService;
+
 	@BeanReference(type = MBBanService.class)
 	protected MBBanService mbBanService;
+
 	@BeanReference(type = MBBanPersistence.class)
 	protected MBBanPersistence mbBanPersistence;
-	@ServiceReference(type = com.liferay.counter.kernel.service.CounterLocalService.class)
-	protected com.liferay.counter.kernel.service.CounterLocalService counterLocalService;
+
+	@ServiceReference(
+		type = com.liferay.counter.kernel.service.CounterLocalService.class
+	)
+	protected com.liferay.counter.kernel.service.CounterLocalService
+		counterLocalService;
+
 }

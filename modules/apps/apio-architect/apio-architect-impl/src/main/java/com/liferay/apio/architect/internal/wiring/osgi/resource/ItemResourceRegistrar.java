@@ -45,8 +45,9 @@ public class ItemResourceRegistrar {
 
 	@Activate
 	protected void activate(BundleContext bundleContext) {
-		String[] classes =
-			{ItemRouter.class.getName(), Representable.class.getName()};
+		String[] classes = {
+			ItemRouter.class.getName(), Representable.class.getName()
+		};
 
 		_serviceTracker = createServiceTracker(
 			bundleContext, ItemResource.class, classes,

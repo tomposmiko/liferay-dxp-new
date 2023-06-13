@@ -16,10 +16,10 @@
 		}
 	},
 	"dependencies": {
-		"clay": "2.4.1",
-		"clay-alert": "2.4.1",
+		"clay": "2.10.0",
+		"clay-alert": "2.10.0",
 		"jquery": "^3.3.1",
-		"liferay-amd-loader": "3.1.2",
+		"liferay-amd-loader": "4.0.0-alpha.5",
 		"lodash.escape": "4.0.1",
 		"lodash.groupby": "4.6.0",
 		"lodash.isequal": "4.5.0",
@@ -76,8 +76,9 @@
 	},
 	"name": "frontend-js-web",
 	"scripts": {
-		"build": "metalsoy && babel -d classes/META-INF/resources src/main/resources/META-INF/resources && liferay-npm-bundler && liferay-npm-bridge-generator",
+		"build": "metalsoy && babel -d classes/META-INF/resources src/main/resources/META-INF/resources && liferay-npm-bundler && liferay-npm-bridge-generator && npm run cleanSoy",
 		"checkFormat": "npm run csf",
+		"cleanSoy": "rimraf src/**/*.soy.js",
 		"csf": "csf src/**/liferay/**/*.js test/**/*.js test/**/**/*.js",
 		"format": "npm run csf -- -i",
 		"start": "webpack-dev-server --config webpack.dev.js",
@@ -85,5 +86,5 @@
 		"webpack": "webpack --config webpack.prod.js",
 		"webpack:dev": "webpack --config webpack.dev.js"
 	},
-	"version": "2.0.32"
+	"version": "2.0.43"
 }

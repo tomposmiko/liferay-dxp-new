@@ -2,7 +2,7 @@
 definition {
 	property osgi.app.includes = "portal-search-solr7";
 	property osgi.module.configuration.file.names = "com.liferay.portal.bundle.blacklist.internal.BundleBlacklistConfiguration.config";
-	property osgi.module.configurations = "blacklistBundleSymbolicNames=&quot;com.liferay.portal.mobile.device.detection.fiftyonedegrees.api,com.liferay.portal.mobile.device.detection.fiftyonedegrees.enterprise,com.liferay.portal.mobile.device.detection.fiftyonedegrees.enterprise.test.data,com.liferay.portal.mobile.device.detection.fiftyonedegrees,com.liferay.portal.search.elasticsearch6.api,com.liferay.portal.search.elasticsearch6.impl,com.liferay.portal.search.elasticsearch6.xpack.security.impl,com.liferay.portal.search.elasticsearch6.xpack.monitoring.web&quot;";
+	property osgi.module.configurations = "blacklistBundleSymbolicNames=&quot;com.liferay.portal.mobile.device.detection.fiftyonedegrees.api,com.liferay.portal.mobile.device.detection.fiftyonedegrees.enterprise,com.liferay.portal.mobile.device.detection.fiftyonedegrees.enterprise.test.data,com.liferay.portal.mobile.device.detection.fiftyonedegrees,com.liferay.portal.search.elasticsearch6.api,com.liferay.portal.search.elasticsearch6.impl,com.liferay.portal.search.elasticsearch6.xpack.security.impl,com.liferay.portal.search.elasticsearch6.xpack.monitoring.web,com.liferay.commerce.elasticsearch6&quot;";
 	property portal.release = "true";
 	property portal.suite.search.engine = "solr";
 	property portal.upstream = "true";
@@ -67,12 +67,6 @@ definition {
 
 		SearchPortlets.addWidgets(
 			searchPortletList = "Type Facet,Search Results,Search Bar"
-		);
-
-		Portlet.dragAndDropPortletToColumnPG(
-			columnNumberFrom = "1",
-			columnNumberTo = "2",
-			portletName = "Search Results"
 		);
 
 		SearchPortlets.configureWidgetParameterNames(
@@ -275,11 +269,8 @@ definition {
 		SearchResultPortlet.viewNoSearchResults(searchTerm = "Name1");
 	}
 
-	@ignore = "true"
 	@priority = "4"
 	test SearchBlogsEntryCategoryQuotes {
-		// Ignoring test until LPS-73326 is resolved
-
 		Navigator.openURL();
 
 		ProductMenu.gotoPortlet(
@@ -1488,6 +1479,46 @@ definition {
 		AssertHTMLSourceTextPresent(value1 = "${escapedScript}");
 	}
 
+	@description = "This is a use case for LPS-74299."
+	@priority = "3"
+	test ViewFacetPersistence {
+		ProductMenu.gotoPortlet(
+			category = "Build",
+			panel = "Site Administration",
+			portlet = "Pages"
+		);
+
+		SitePages.addPublicPage(pageName = "Search Page");
+
+		Navigator.gotoPage(pageName = "Search Page");
+
+		SearchPortlets.addWidgets(
+			searchPortletList = "Site Facet,Search Results,Search Bar"
+		);
+
+		SearchPortlets.configureWidgetScope(searchScope = "Everything");
+
+		SearchPortlets.searchWidget(searchTerm = "*");
+
+		SearchResultPortlet.viewSearchResults(
+			searchAssetTitle = "Test Test",
+			searchAssetType = "User"
+		);
+
+		var siteName = TestCase.getSiteName();
+
+		SearchFacetPortlet.checkFacet(facetValueName = "${siteName}");
+
+		SearchPortlets.searchWidget(searchTerm = "test");
+
+		SearchResultPortlet.viewSearchResults(
+			searchAssetTitle = "Test Test",
+			searchAssetType = "User"
+		);
+
+		AssertChecked(locator1 = "Checkbox#ANY_CHECKBOX", checkboxName = "${siteName}");
+	}
+
 	@priority = "5"
 	test ViewMultipleFacetURLs {
 		property osgi.app.includes = "bookmarks,portal-search-solr7";
@@ -1652,12 +1683,6 @@ definition {
 
 		SearchPortlets.addWidgets(
 			searchPortletList = "Search Options,Category Facet,Folder Facet,Site Facet,Tag Facet,Type Facet,User Facet,Search Results,Search Bar"
-		);
-
-		Portlet.dragAndDropPortletToColumnPG(
-			columnNumberFrom = "1",
-			columnNumberTo = "2",
-			portletName = "Search Results"
 		);
 
 		SearchPortlets.configureWidgetScope(searchScope = "Everything");

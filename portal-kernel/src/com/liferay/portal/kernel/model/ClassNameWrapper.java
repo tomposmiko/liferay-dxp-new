@@ -17,7 +17,6 @@ package com.liferay.portal.kernel.model;
 import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.expando.kernel.model.ExpandoBridge;
-
 import com.liferay.portal.kernel.service.ServiceContext;
 
 import java.io.Serializable;
@@ -37,6 +36,7 @@ import java.util.Objects;
  */
 @ProviderType
 public class ClassNameWrapper implements ClassName, ModelWrapper<ClassName> {
+
 	public ClassNameWrapper(ClassName className) {
 		_className = className;
 	}
@@ -94,20 +94,20 @@ public class ClassNameWrapper implements ClassName, ModelWrapper<ClassName> {
 	}
 
 	/**
-	* Returns the fully qualified class name of this class name.
-	*
-	* @return the fully qualified class name of this class name
-	*/
+	 * Returns the fully qualified class name of this class name.
+	 *
+	 * @return the fully qualified class name of this class name
+	 */
 	@Override
 	public String getClassName() {
 		return _className.getClassName();
 	}
 
 	/**
-	* Returns the class name ID of this class name.
-	*
-	* @return the class name ID of this class name
-	*/
+	 * Returns the class name ID of this class name.
+	 *
+	 * @return the class name ID of this class name
+	 */
 	@Override
 	public long getClassNameId() {
 		return _className.getClassNameId();
@@ -119,20 +119,20 @@ public class ClassNameWrapper implements ClassName, ModelWrapper<ClassName> {
 	}
 
 	/**
-	* Returns the mvcc version of this class name.
-	*
-	* @return the mvcc version of this class name
-	*/
+	 * Returns the mvcc version of this class name.
+	 *
+	 * @return the mvcc version of this class name
+	 */
 	@Override
 	public long getMvccVersion() {
 		return _className.getMvccVersion();
 	}
 
 	/**
-	* Returns the primary key of this class name.
-	*
-	* @return the primary key of this class name
-	*/
+	 * Returns the primary key of this class name.
+	 *
+	 * @return the primary key of this class name
+	 */
 	@Override
 	public long getPrimaryKey() {
 		return _className.getPrimaryKey();
@@ -144,10 +144,10 @@ public class ClassNameWrapper implements ClassName, ModelWrapper<ClassName> {
 	}
 
 	/**
-	* Returns the value of this class name.
-	*
-	* @return the value of this class name
-	*/
+	 * Returns the value of this class name.
+	 *
+	 * @return the value of this class name
+	 */
 	@Override
 	public String getValue() {
 		return _className.getValue();
@@ -189,10 +189,10 @@ public class ClassNameWrapper implements ClassName, ModelWrapper<ClassName> {
 	}
 
 	/**
-	* Sets the class name ID of this class name.
-	*
-	* @param classNameId the class name ID of this class name
-	*/
+	 * Sets the class name ID of this class name.
+	 *
+	 * @param classNameId the class name ID of this class name
+	 */
 	@Override
 	public void setClassNameId(long classNameId) {
 		_className.setClassNameId(classNameId);
@@ -214,10 +214,10 @@ public class ClassNameWrapper implements ClassName, ModelWrapper<ClassName> {
 	}
 
 	/**
-	* Sets the mvcc version of this class name.
-	*
-	* @param mvccVersion the mvcc version of this class name
-	*/
+	 * Sets the mvcc version of this class name.
+	 *
+	 * @param mvccVersion the mvcc version of this class name
+	 */
 	@Override
 	public void setMvccVersion(long mvccVersion) {
 		_className.setMvccVersion(mvccVersion);
@@ -229,10 +229,10 @@ public class ClassNameWrapper implements ClassName, ModelWrapper<ClassName> {
 	}
 
 	/**
-	* Sets the primary key of this class name.
-	*
-	* @param primaryKey the primary key of this class name
-	*/
+	 * Sets the primary key of this class name.
+	 *
+	 * @param primaryKey the primary key of this class name
+	 */
 	@Override
 	public void setPrimaryKey(long primaryKey) {
 		_className.setPrimaryKey(primaryKey);
@@ -244,10 +244,10 @@ public class ClassNameWrapper implements ClassName, ModelWrapper<ClassName> {
 	}
 
 	/**
-	* Sets the value of this class name.
-	*
-	* @param value the value of this class name
-	*/
+	 * Sets the value of this class name.
+	 *
+	 * @param value the value of this class name
+	 */
 	@Override
 	public void setValue(String value) {
 		_className.setValue(value);
@@ -318,4 +318,5 @@ public class ClassNameWrapper implements ClassName, ModelWrapper<ClassName> {
 	}
 
 	private final ClassName _className;
+
 }

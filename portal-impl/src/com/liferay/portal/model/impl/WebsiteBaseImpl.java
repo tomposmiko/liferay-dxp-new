@@ -32,12 +32,13 @@ import com.liferay.portal.kernel.service.WebsiteLocalServiceUtil;
  * @generated
  */
 @ProviderType
-public abstract class WebsiteBaseImpl extends WebsiteModelImpl
-	implements Website {
+public abstract class WebsiteBaseImpl
+	extends WebsiteModelImpl implements Website {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
-	 * Never modify or reference this class directly. All methods that expect a website model instance should use the {@link Website} interface instead.
+	 * Never modify or reference this class directly. All methods that expect a website model instance should use the <code>Website</code> interface instead.
 	 */
 	@Override
 	public void persist() {
@@ -48,4 +49,5 @@ public abstract class WebsiteBaseImpl extends WebsiteModelImpl
 			WebsiteLocalServiceUtil.updateWebsite(this);
 		}
 	}
+
 }

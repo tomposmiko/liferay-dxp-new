@@ -29,7 +29,6 @@
 	{@param context: ?}
 	{@param defaultLanguageId: string}
 	{@param evaluatorURL: string}
-	{@param fieldTypes: string}
 	{@param portletNamespace: string}
 	{@param readOnly: bool}
 	{@param viewMode: bool}
@@ -37,25 +36,29 @@
 	<script type="text/javascript">
 		AUI().use(
 			'liferay-ddm-form-renderer',
-			'liferay-ddm-form-renderer-field',
-			'liferay-ddm-soy-template-util',
 			function(A) {lb}
-				var SoyTemplateUtil = Liferay.DDM.SoyTemplateUtil;
+				var renderForm = function() {lb}
+					{call .render_form data="all" /}
+				{rb};
 
-				SoyTemplateUtil.loadModules(
-					function() {lb}
-						Liferay.DDM.Renderer.FieldTypes.register({$fieldTypes});
-
-						{call .render_form data="all" /}
-					{rb}
-				);
+				if (Liferay.DMMFieldTypesReady) {lb}
+					renderForm();
+				{rb}
+				else {lb}
+					Liferay.onceAfter(
+						'DMMFieldTypesReady',
+						function ()  {lb}
+							renderForm();
+						{rb}
+					);
+				{rb}
 
 				var destroyFormHandle = function(event) {lb}
 					var form = Liferay.component('{$containerId}DDMForm');
 
 					var portlet = event.portlet;
 
-					if (portlet && portlet.contains(form.get('container'))) {lb}
+					if (form && portlet && portlet.contains(form.get('container'))) {lb}
 						form.destroy();
 
 						Liferay.detach('destroyPortlet', destroyFormHandle);

@@ -93,7 +93,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Karthik Sudarshan
  * @author Zsigmond Rab
  * @author Douglas Wong
- * @author Mate Thurzo
+ * @author Máté Thurzó
  */
 @Component(
 	immediate = true,
@@ -337,6 +337,7 @@ public class LayoutExportController implements ExportController {
 		// Export other models
 
 		_portletExportController.exportAssetLinks(portletDataContext);
+		_portletExportController.exportExpandoTables(portletDataContext);
 		_portletExportController.exportLocks(portletDataContext);
 
 		portletDataContext.addDeletionSystemEventStagedModelTypes(

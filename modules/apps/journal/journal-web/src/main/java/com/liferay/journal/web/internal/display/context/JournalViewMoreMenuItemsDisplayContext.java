@@ -92,18 +92,24 @@ public class JournalViewMoreMenuItemsDisplayContext {
 			return _ddmStructuresSearchContainer;
 		}
 
-		_ddmStructuresSearchContainer = new SearchContainer(
+		SearchContainer searchContainer = new SearchContainer(
 			_renderRequest, getPortletURL(), null, "no-results-were-found");
 
-		_ddmStructuresSearchContainer.setOrderByCol(getOrderByCol());
-		_ddmStructuresSearchContainer.setOrderByComparator(
-			_getOrderByComparator());
-		_ddmStructuresSearchContainer.setOrderByType(getOrderByType());
+		searchContainer.setOrderByCol(getOrderByCol());
+		searchContainer.setOrderByComparator(_getOrderByComparator());
+		searchContainer.setOrderByType(getOrderByType());
 
 		List<DDMStructure> ddmStructures = getDDMStructures();
 
-		_ddmStructuresSearchContainer.setTotal(ddmStructures.size());
-		_ddmStructuresSearchContainer.setResults(ddmStructures);
+		searchContainer.setTotal(ddmStructures.size());
+
+		List<DDMStructure> results = ListUtil.subList(
+			ddmStructures, searchContainer.getStart(),
+			searchContainer.getEnd());
+
+		searchContainer.setResults(results);
+
+		_ddmStructuresSearchContainer = searchContainer;
 
 		return _ddmStructuresSearchContainer;
 	}

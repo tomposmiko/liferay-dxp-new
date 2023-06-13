@@ -32,12 +32,12 @@ import java.util.Date;
  * The cache model class for representing KaleoTaskAssignmentInstance in entity cache.
  *
  * @author Brian Wing Shun Chan
- * @see KaleoTaskAssignmentInstance
  * @generated
  */
 @ProviderType
-public class KaleoTaskAssignmentInstanceCacheModel implements CacheModel<KaleoTaskAssignmentInstance>,
-	Externalizable {
+public class KaleoTaskAssignmentInstanceCacheModel
+	implements CacheModel<KaleoTaskAssignmentInstance>, Externalizable {
+
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj) {
@@ -48,10 +48,14 @@ public class KaleoTaskAssignmentInstanceCacheModel implements CacheModel<KaleoTa
 			return false;
 		}
 
-		KaleoTaskAssignmentInstanceCacheModel kaleoTaskAssignmentInstanceCacheModel =
-			(KaleoTaskAssignmentInstanceCacheModel)obj;
+		KaleoTaskAssignmentInstanceCacheModel
+			kaleoTaskAssignmentInstanceCacheModel =
+				(KaleoTaskAssignmentInstanceCacheModel)obj;
 
-		if (kaleoTaskAssignmentInstanceId == kaleoTaskAssignmentInstanceCacheModel.kaleoTaskAssignmentInstanceId) {
+		if (kaleoTaskAssignmentInstanceId ==
+				kaleoTaskAssignmentInstanceCacheModel.
+					kaleoTaskAssignmentInstanceId) {
+
 			return true;
 		}
 
@@ -108,9 +112,11 @@ public class KaleoTaskAssignmentInstanceCacheModel implements CacheModel<KaleoTa
 
 	@Override
 	public KaleoTaskAssignmentInstance toEntityModel() {
-		KaleoTaskAssignmentInstanceImpl kaleoTaskAssignmentInstanceImpl = new KaleoTaskAssignmentInstanceImpl();
+		KaleoTaskAssignmentInstanceImpl kaleoTaskAssignmentInstanceImpl =
+			new KaleoTaskAssignmentInstanceImpl();
 
-		kaleoTaskAssignmentInstanceImpl.setKaleoTaskAssignmentInstanceId(kaleoTaskAssignmentInstanceId);
+		kaleoTaskAssignmentInstanceImpl.setKaleoTaskAssignmentInstanceId(
+			kaleoTaskAssignmentInstanceId);
 		kaleoTaskAssignmentInstanceImpl.setGroupId(groupId);
 		kaleoTaskAssignmentInstanceImpl.setCompanyId(companyId);
 		kaleoTaskAssignmentInstanceImpl.setUserId(userId);
@@ -133,14 +139,17 @@ public class KaleoTaskAssignmentInstanceCacheModel implements CacheModel<KaleoTa
 			kaleoTaskAssignmentInstanceImpl.setModifiedDate(null);
 		}
 		else {
-			kaleoTaskAssignmentInstanceImpl.setModifiedDate(new Date(
-					modifiedDate));
+			kaleoTaskAssignmentInstanceImpl.setModifiedDate(
+				new Date(modifiedDate));
 		}
 
-		kaleoTaskAssignmentInstanceImpl.setKaleoDefinitionVersionId(kaleoDefinitionVersionId);
+		kaleoTaskAssignmentInstanceImpl.setKaleoDefinitionVersionId(
+			kaleoDefinitionVersionId);
 		kaleoTaskAssignmentInstanceImpl.setKaleoInstanceId(kaleoInstanceId);
-		kaleoTaskAssignmentInstanceImpl.setKaleoInstanceTokenId(kaleoInstanceTokenId);
-		kaleoTaskAssignmentInstanceImpl.setKaleoTaskInstanceTokenId(kaleoTaskInstanceTokenId);
+		kaleoTaskAssignmentInstanceImpl.setKaleoInstanceTokenId(
+			kaleoInstanceTokenId);
+		kaleoTaskAssignmentInstanceImpl.setKaleoTaskInstanceTokenId(
+			kaleoTaskInstanceTokenId);
 		kaleoTaskAssignmentInstanceImpl.setKaleoTaskId(kaleoTaskId);
 
 		if (kaleoTaskName == null) {
@@ -154,7 +163,8 @@ public class KaleoTaskAssignmentInstanceCacheModel implements CacheModel<KaleoTa
 			kaleoTaskAssignmentInstanceImpl.setAssigneeClassName("");
 		}
 		else {
-			kaleoTaskAssignmentInstanceImpl.setAssigneeClassName(assigneeClassName);
+			kaleoTaskAssignmentInstanceImpl.setAssigneeClassName(
+				assigneeClassName);
 		}
 
 		kaleoTaskAssignmentInstanceImpl.setAssigneeClassPK(assigneeClassPK);
@@ -164,8 +174,8 @@ public class KaleoTaskAssignmentInstanceCacheModel implements CacheModel<KaleoTa
 			kaleoTaskAssignmentInstanceImpl.setCompletionDate(null);
 		}
 		else {
-			kaleoTaskAssignmentInstanceImpl.setCompletionDate(new Date(
-					completionDate));
+			kaleoTaskAssignmentInstanceImpl.setCompletionDate(
+				new Date(completionDate));
 		}
 
 		kaleoTaskAssignmentInstanceImpl.resetOriginalValues();
@@ -205,8 +215,7 @@ public class KaleoTaskAssignmentInstanceCacheModel implements CacheModel<KaleoTa
 	}
 
 	@Override
-	public void writeExternal(ObjectOutput objectOutput)
-		throws IOException {
+	public void writeExternal(ObjectOutput objectOutput) throws IOException {
 		objectOutput.writeLong(kaleoTaskAssignmentInstanceId);
 
 		objectOutput.writeLong(groupId);
@@ -272,4 +281,5 @@ public class KaleoTaskAssignmentInstanceCacheModel implements CacheModel<KaleoTa
 	public long assigneeClassPK;
 	public boolean completed;
 	public long completionDate;
+
 }

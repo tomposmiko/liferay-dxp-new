@@ -34,10 +34,11 @@ import com.liferay.portal.kernel.service.LayoutFriendlyURLLocalServiceUtil;
 @ProviderType
 public abstract class LayoutFriendlyURLBaseImpl
 	extends LayoutFriendlyURLModelImpl implements LayoutFriendlyURL {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
-	 * Never modify or reference this class directly. All methods that expect a layout friendly url model instance should use the {@link LayoutFriendlyURL} interface instead.
+	 * Never modify or reference this class directly. All methods that expect a layout friendly url model instance should use the <code>LayoutFriendlyURL</code> interface instead.
 	 */
 	@Override
 	public void persist() {
@@ -48,4 +49,5 @@ public abstract class LayoutFriendlyURLBaseImpl
 			LayoutFriendlyURLLocalServiceUtil.updateLayoutFriendlyURL(this);
 		}
 	}
+
 }

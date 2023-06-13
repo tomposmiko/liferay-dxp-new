@@ -126,7 +126,11 @@ public class ResourceActionsImpl implements ResourceActions {
 
 		if (!resourceActions.contains(actionId)) {
 			throw new NoSuchResourceActionException(
-				name.concat(StringPool.POUND).concat(actionId));
+				name.concat(
+					StringPool.POUND
+				).concat(
+					actionId
+				));
 		}
 	}
 
@@ -1269,7 +1273,10 @@ public class ResourceActionsImpl implements ResourceActions {
 
 			if (servletContextName != null) {
 				portletName = portletName.concat(
-					PortletConstants.WAR_SEPARATOR).concat(servletContextName);
+					PortletConstants.WAR_SEPARATOR
+				).concat(
+					servletContextName
+				);
 			}
 
 			portletName = JS.getSafeName(portletName);
@@ -1367,8 +1374,11 @@ public class ResourceActionsImpl implements ResourceActions {
 		String name = portletResourceElement.elementTextTrim("portlet-name");
 
 		if (servletContextName != null) {
-			name = name.concat(PortletConstants.WAR_SEPARATOR).concat(
-				servletContextName);
+			name = name.concat(
+				PortletConstants.WAR_SEPARATOR
+			).concat(
+				servletContextName
+			);
 		}
 
 		name = JS.getSafeName(name);

@@ -23,7 +23,6 @@ import com.liferay.calendar.service.persistence.CalendarNotificationTemplatePers
 import com.liferay.calendar.service.persistence.CalendarPersistence;
 import com.liferay.calendar.service.persistence.CalendarResourceFinder;
 import com.liferay.calendar.service.persistence.CalendarResourcePersistence;
-
 import com.liferay.portal.kernel.bean.BeanReference;
 import com.liferay.portal.kernel.dao.db.DB;
 import com.liferay.portal.kernel.dao.db.DBManagerUtil;
@@ -48,16 +47,16 @@ import javax.sql.DataSource;
  *
  * @author Eduardo Lundgren
  * @see com.liferay.calendar.service.impl.CalendarNotificationTemplateServiceImpl
- * @see com.liferay.calendar.service.CalendarNotificationTemplateServiceUtil
  * @generated
  */
 public abstract class CalendarNotificationTemplateServiceBaseImpl
-	extends BaseServiceImpl implements CalendarNotificationTemplateService,
-		IdentifiableOSGiService {
+	extends BaseServiceImpl
+	implements CalendarNotificationTemplateService, IdentifiableOSGiService {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
-	 * Never modify or reference this class directly. Always use {@link com.liferay.calendar.service.CalendarNotificationTemplateServiceUtil} to access the calendar notification template remote service.
+	 * Never modify or reference this class directly. Use <code>CalendarNotificationTemplateService</code> via injection or a <code>org.osgi.util.tracker.ServiceTracker</code> or use <code>com.liferay.calendar.service.CalendarNotificationTemplateServiceUtil</code>.
 	 */
 
 	/**
@@ -65,7 +64,9 @@ public abstract class CalendarNotificationTemplateServiceBaseImpl
 	 *
 	 * @return the calendar local service
 	 */
-	public com.liferay.calendar.service.CalendarLocalService getCalendarLocalService() {
+	public com.liferay.calendar.service.CalendarLocalService
+		getCalendarLocalService() {
+
 		return calendarLocalService;
 	}
 
@@ -75,7 +76,9 @@ public abstract class CalendarNotificationTemplateServiceBaseImpl
 	 * @param calendarLocalService the calendar local service
 	 */
 	public void setCalendarLocalService(
-		com.liferay.calendar.service.CalendarLocalService calendarLocalService) {
+		com.liferay.calendar.service.CalendarLocalService
+			calendarLocalService) {
+
 		this.calendarLocalService = calendarLocalService;
 	}
 
@@ -95,6 +98,7 @@ public abstract class CalendarNotificationTemplateServiceBaseImpl
 	 */
 	public void setCalendarService(
 		com.liferay.calendar.service.CalendarService calendarService) {
+
 		this.calendarService = calendarService;
 	}
 
@@ -112,7 +116,9 @@ public abstract class CalendarNotificationTemplateServiceBaseImpl
 	 *
 	 * @param calendarPersistence the calendar persistence
 	 */
-	public void setCalendarPersistence(CalendarPersistence calendarPersistence) {
+	public void setCalendarPersistence(
+		CalendarPersistence calendarPersistence) {
+
 		this.calendarPersistence = calendarPersistence;
 	}
 
@@ -139,7 +145,9 @@ public abstract class CalendarNotificationTemplateServiceBaseImpl
 	 *
 	 * @return the calendar booking local service
 	 */
-	public com.liferay.calendar.service.CalendarBookingLocalService getCalendarBookingLocalService() {
+	public com.liferay.calendar.service.CalendarBookingLocalService
+		getCalendarBookingLocalService() {
+
 		return calendarBookingLocalService;
 	}
 
@@ -149,7 +157,9 @@ public abstract class CalendarNotificationTemplateServiceBaseImpl
 	 * @param calendarBookingLocalService the calendar booking local service
 	 */
 	public void setCalendarBookingLocalService(
-		com.liferay.calendar.service.CalendarBookingLocalService calendarBookingLocalService) {
+		com.liferay.calendar.service.CalendarBookingLocalService
+			calendarBookingLocalService) {
+
 		this.calendarBookingLocalService = calendarBookingLocalService;
 	}
 
@@ -158,7 +168,9 @@ public abstract class CalendarNotificationTemplateServiceBaseImpl
 	 *
 	 * @return the calendar booking remote service
 	 */
-	public com.liferay.calendar.service.CalendarBookingService getCalendarBookingService() {
+	public com.liferay.calendar.service.CalendarBookingService
+		getCalendarBookingService() {
+
 		return calendarBookingService;
 	}
 
@@ -168,7 +180,9 @@ public abstract class CalendarNotificationTemplateServiceBaseImpl
 	 * @param calendarBookingService the calendar booking remote service
 	 */
 	public void setCalendarBookingService(
-		com.liferay.calendar.service.CalendarBookingService calendarBookingService) {
+		com.liferay.calendar.service.CalendarBookingService
+			calendarBookingService) {
+
 		this.calendarBookingService = calendarBookingService;
 	}
 
@@ -188,6 +202,7 @@ public abstract class CalendarNotificationTemplateServiceBaseImpl
 	 */
 	public void setCalendarBookingPersistence(
 		CalendarBookingPersistence calendarBookingPersistence) {
+
 		this.calendarBookingPersistence = calendarBookingPersistence;
 	}
 
@@ -207,6 +222,7 @@ public abstract class CalendarNotificationTemplateServiceBaseImpl
 	 */
 	public void setCalendarBookingFinder(
 		CalendarBookingFinder calendarBookingFinder) {
+
 		this.calendarBookingFinder = calendarBookingFinder;
 	}
 
@@ -215,7 +231,9 @@ public abstract class CalendarNotificationTemplateServiceBaseImpl
 	 *
 	 * @return the calendar notification template local service
 	 */
-	public com.liferay.calendar.service.CalendarNotificationTemplateLocalService getCalendarNotificationTemplateLocalService() {
+	public com.liferay.calendar.service.CalendarNotificationTemplateLocalService
+		getCalendarNotificationTemplateLocalService() {
+
 		return calendarNotificationTemplateLocalService;
 	}
 
@@ -225,8 +243,11 @@ public abstract class CalendarNotificationTemplateServiceBaseImpl
 	 * @param calendarNotificationTemplateLocalService the calendar notification template local service
 	 */
 	public void setCalendarNotificationTemplateLocalService(
-		com.liferay.calendar.service.CalendarNotificationTemplateLocalService calendarNotificationTemplateLocalService) {
-		this.calendarNotificationTemplateLocalService = calendarNotificationTemplateLocalService;
+		com.liferay.calendar.service.CalendarNotificationTemplateLocalService
+			calendarNotificationTemplateLocalService) {
+
+		this.calendarNotificationTemplateLocalService =
+			calendarNotificationTemplateLocalService;
 	}
 
 	/**
@@ -234,7 +255,9 @@ public abstract class CalendarNotificationTemplateServiceBaseImpl
 	 *
 	 * @return the calendar notification template remote service
 	 */
-	public CalendarNotificationTemplateService getCalendarNotificationTemplateService() {
+	public CalendarNotificationTemplateService
+		getCalendarNotificationTemplateService() {
+
 		return calendarNotificationTemplateService;
 	}
 
@@ -244,8 +267,11 @@ public abstract class CalendarNotificationTemplateServiceBaseImpl
 	 * @param calendarNotificationTemplateService the calendar notification template remote service
 	 */
 	public void setCalendarNotificationTemplateService(
-		CalendarNotificationTemplateService calendarNotificationTemplateService) {
-		this.calendarNotificationTemplateService = calendarNotificationTemplateService;
+		CalendarNotificationTemplateService
+			calendarNotificationTemplateService) {
+
+		this.calendarNotificationTemplateService =
+			calendarNotificationTemplateService;
 	}
 
 	/**
@@ -253,7 +279,9 @@ public abstract class CalendarNotificationTemplateServiceBaseImpl
 	 *
 	 * @return the calendar notification template persistence
 	 */
-	public CalendarNotificationTemplatePersistence getCalendarNotificationTemplatePersistence() {
+	public CalendarNotificationTemplatePersistence
+		getCalendarNotificationTemplatePersistence() {
+
 		return calendarNotificationTemplatePersistence;
 	}
 
@@ -263,8 +291,11 @@ public abstract class CalendarNotificationTemplateServiceBaseImpl
 	 * @param calendarNotificationTemplatePersistence the calendar notification template persistence
 	 */
 	public void setCalendarNotificationTemplatePersistence(
-		CalendarNotificationTemplatePersistence calendarNotificationTemplatePersistence) {
-		this.calendarNotificationTemplatePersistence = calendarNotificationTemplatePersistence;
+		CalendarNotificationTemplatePersistence
+			calendarNotificationTemplatePersistence) {
+
+		this.calendarNotificationTemplatePersistence =
+			calendarNotificationTemplatePersistence;
 	}
 
 	/**
@@ -272,7 +303,9 @@ public abstract class CalendarNotificationTemplateServiceBaseImpl
 	 *
 	 * @return the calendar resource local service
 	 */
-	public com.liferay.calendar.service.CalendarResourceLocalService getCalendarResourceLocalService() {
+	public com.liferay.calendar.service.CalendarResourceLocalService
+		getCalendarResourceLocalService() {
+
 		return calendarResourceLocalService;
 	}
 
@@ -282,7 +315,9 @@ public abstract class CalendarNotificationTemplateServiceBaseImpl
 	 * @param calendarResourceLocalService the calendar resource local service
 	 */
 	public void setCalendarResourceLocalService(
-		com.liferay.calendar.service.CalendarResourceLocalService calendarResourceLocalService) {
+		com.liferay.calendar.service.CalendarResourceLocalService
+			calendarResourceLocalService) {
+
 		this.calendarResourceLocalService = calendarResourceLocalService;
 	}
 
@@ -291,7 +326,9 @@ public abstract class CalendarNotificationTemplateServiceBaseImpl
 	 *
 	 * @return the calendar resource remote service
 	 */
-	public com.liferay.calendar.service.CalendarResourceService getCalendarResourceService() {
+	public com.liferay.calendar.service.CalendarResourceService
+		getCalendarResourceService() {
+
 		return calendarResourceService;
 	}
 
@@ -301,7 +338,9 @@ public abstract class CalendarNotificationTemplateServiceBaseImpl
 	 * @param calendarResourceService the calendar resource remote service
 	 */
 	public void setCalendarResourceService(
-		com.liferay.calendar.service.CalendarResourceService calendarResourceService) {
+		com.liferay.calendar.service.CalendarResourceService
+			calendarResourceService) {
+
 		this.calendarResourceService = calendarResourceService;
 	}
 
@@ -321,6 +360,7 @@ public abstract class CalendarNotificationTemplateServiceBaseImpl
 	 */
 	public void setCalendarResourcePersistence(
 		CalendarResourcePersistence calendarResourcePersistence) {
+
 		this.calendarResourcePersistence = calendarResourcePersistence;
 	}
 
@@ -340,6 +380,7 @@ public abstract class CalendarNotificationTemplateServiceBaseImpl
 	 */
 	public void setCalendarResourceFinder(
 		CalendarResourceFinder calendarResourceFinder) {
+
 		this.calendarResourceFinder = calendarResourceFinder;
 	}
 
@@ -348,7 +389,9 @@ public abstract class CalendarNotificationTemplateServiceBaseImpl
 	 *
 	 * @return the counter local service
 	 */
-	public com.liferay.counter.kernel.service.CounterLocalService getCounterLocalService() {
+	public com.liferay.counter.kernel.service.CounterLocalService
+		getCounterLocalService() {
+
 		return counterLocalService;
 	}
 
@@ -358,7 +401,9 @@ public abstract class CalendarNotificationTemplateServiceBaseImpl
 	 * @param counterLocalService the counter local service
 	 */
 	public void setCounterLocalService(
-		com.liferay.counter.kernel.service.CounterLocalService counterLocalService) {
+		com.liferay.counter.kernel.service.CounterLocalService
+			counterLocalService) {
+
 		this.counterLocalService = counterLocalService;
 	}
 
@@ -367,7 +412,9 @@ public abstract class CalendarNotificationTemplateServiceBaseImpl
 	 *
 	 * @return the class name local service
 	 */
-	public com.liferay.portal.kernel.service.ClassNameLocalService getClassNameLocalService() {
+	public com.liferay.portal.kernel.service.ClassNameLocalService
+		getClassNameLocalService() {
+
 		return classNameLocalService;
 	}
 
@@ -377,7 +424,9 @@ public abstract class CalendarNotificationTemplateServiceBaseImpl
 	 * @param classNameLocalService the class name local service
 	 */
 	public void setClassNameLocalService(
-		com.liferay.portal.kernel.service.ClassNameLocalService classNameLocalService) {
+		com.liferay.portal.kernel.service.ClassNameLocalService
+			classNameLocalService) {
+
 		this.classNameLocalService = classNameLocalService;
 	}
 
@@ -386,7 +435,9 @@ public abstract class CalendarNotificationTemplateServiceBaseImpl
 	 *
 	 * @return the class name remote service
 	 */
-	public com.liferay.portal.kernel.service.ClassNameService getClassNameService() {
+	public com.liferay.portal.kernel.service.ClassNameService
+		getClassNameService() {
+
 		return classNameService;
 	}
 
@@ -397,6 +448,7 @@ public abstract class CalendarNotificationTemplateServiceBaseImpl
 	 */
 	public void setClassNameService(
 		com.liferay.portal.kernel.service.ClassNameService classNameService) {
+
 		this.classNameService = classNameService;
 	}
 
@@ -416,6 +468,7 @@ public abstract class CalendarNotificationTemplateServiceBaseImpl
 	 */
 	public void setClassNamePersistence(
 		ClassNamePersistence classNamePersistence) {
+
 		this.classNamePersistence = classNamePersistence;
 	}
 
@@ -424,7 +477,9 @@ public abstract class CalendarNotificationTemplateServiceBaseImpl
 	 *
 	 * @return the resource local service
 	 */
-	public com.liferay.portal.kernel.service.ResourceLocalService getResourceLocalService() {
+	public com.liferay.portal.kernel.service.ResourceLocalService
+		getResourceLocalService() {
+
 		return resourceLocalService;
 	}
 
@@ -434,7 +489,9 @@ public abstract class CalendarNotificationTemplateServiceBaseImpl
 	 * @param resourceLocalService the resource local service
 	 */
 	public void setResourceLocalService(
-		com.liferay.portal.kernel.service.ResourceLocalService resourceLocalService) {
+		com.liferay.portal.kernel.service.ResourceLocalService
+			resourceLocalService) {
+
 		this.resourceLocalService = resourceLocalService;
 	}
 
@@ -443,7 +500,9 @@ public abstract class CalendarNotificationTemplateServiceBaseImpl
 	 *
 	 * @return the user local service
 	 */
-	public com.liferay.portal.kernel.service.UserLocalService getUserLocalService() {
+	public com.liferay.portal.kernel.service.UserLocalService
+		getUserLocalService() {
+
 		return userLocalService;
 	}
 
@@ -454,6 +513,7 @@ public abstract class CalendarNotificationTemplateServiceBaseImpl
 	 */
 	public void setUserLocalService(
 		com.liferay.portal.kernel.service.UserLocalService userLocalService) {
+
 		this.userLocalService = userLocalService;
 	}
 
@@ -473,6 +533,7 @@ public abstract class CalendarNotificationTemplateServiceBaseImpl
 	 */
 	public void setUserService(
 		com.liferay.portal.kernel.service.UserService userService) {
+
 		this.userService = userService;
 	}
 
@@ -525,15 +586,16 @@ public abstract class CalendarNotificationTemplateServiceBaseImpl
 	 */
 	protected void runSQL(String sql) {
 		try {
-			DataSource dataSource = calendarNotificationTemplatePersistence.getDataSource();
+			DataSource dataSource =
+				calendarNotificationTemplatePersistence.getDataSource();
 
 			DB db = DBManagerUtil.getDB();
 
 			sql = db.buildSQL(sql);
 			sql = PortalUtil.transformSQL(sql);
 
-			SqlUpdate sqlUpdate = SqlUpdateFactoryUtil.getSqlUpdate(dataSource,
-					sql);
+			SqlUpdate sqlUpdate = SqlUpdateFactoryUtil.getSqlUpdate(
+				dataSource, sql);
 
 			sqlUpdate.update();
 		}
@@ -542,50 +604,111 @@ public abstract class CalendarNotificationTemplateServiceBaseImpl
 		}
 	}
 
-	@BeanReference(type = com.liferay.calendar.service.CalendarLocalService.class)
-	protected com.liferay.calendar.service.CalendarLocalService calendarLocalService;
+	@BeanReference(
+		type = com.liferay.calendar.service.CalendarLocalService.class
+	)
+	protected com.liferay.calendar.service.CalendarLocalService
+		calendarLocalService;
+
 	@BeanReference(type = com.liferay.calendar.service.CalendarService.class)
 	protected com.liferay.calendar.service.CalendarService calendarService;
+
 	@BeanReference(type = CalendarPersistence.class)
 	protected CalendarPersistence calendarPersistence;
+
 	@BeanReference(type = CalendarFinder.class)
 	protected CalendarFinder calendarFinder;
-	@BeanReference(type = com.liferay.calendar.service.CalendarBookingLocalService.class)
-	protected com.liferay.calendar.service.CalendarBookingLocalService calendarBookingLocalService;
-	@BeanReference(type = com.liferay.calendar.service.CalendarBookingService.class)
-	protected com.liferay.calendar.service.CalendarBookingService calendarBookingService;
+
+	@BeanReference(
+		type = com.liferay.calendar.service.CalendarBookingLocalService.class
+	)
+	protected com.liferay.calendar.service.CalendarBookingLocalService
+		calendarBookingLocalService;
+
+	@BeanReference(
+		type = com.liferay.calendar.service.CalendarBookingService.class
+	)
+	protected com.liferay.calendar.service.CalendarBookingService
+		calendarBookingService;
+
 	@BeanReference(type = CalendarBookingPersistence.class)
 	protected CalendarBookingPersistence calendarBookingPersistence;
+
 	@BeanReference(type = CalendarBookingFinder.class)
 	protected CalendarBookingFinder calendarBookingFinder;
-	@BeanReference(type = com.liferay.calendar.service.CalendarNotificationTemplateLocalService.class)
-	protected com.liferay.calendar.service.CalendarNotificationTemplateLocalService calendarNotificationTemplateLocalService;
+
+	@BeanReference(
+		type = com.liferay.calendar.service.CalendarNotificationTemplateLocalService.class
+	)
+	protected
+		com.liferay.calendar.service.CalendarNotificationTemplateLocalService
+			calendarNotificationTemplateLocalService;
+
 	@BeanReference(type = CalendarNotificationTemplateService.class)
-	protected CalendarNotificationTemplateService calendarNotificationTemplateService;
+	protected CalendarNotificationTemplateService
+		calendarNotificationTemplateService;
+
 	@BeanReference(type = CalendarNotificationTemplatePersistence.class)
-	protected CalendarNotificationTemplatePersistence calendarNotificationTemplatePersistence;
-	@BeanReference(type = com.liferay.calendar.service.CalendarResourceLocalService.class)
-	protected com.liferay.calendar.service.CalendarResourceLocalService calendarResourceLocalService;
-	@BeanReference(type = com.liferay.calendar.service.CalendarResourceService.class)
-	protected com.liferay.calendar.service.CalendarResourceService calendarResourceService;
+	protected CalendarNotificationTemplatePersistence
+		calendarNotificationTemplatePersistence;
+
+	@BeanReference(
+		type = com.liferay.calendar.service.CalendarResourceLocalService.class
+	)
+	protected com.liferay.calendar.service.CalendarResourceLocalService
+		calendarResourceLocalService;
+
+	@BeanReference(
+		type = com.liferay.calendar.service.CalendarResourceService.class
+	)
+	protected com.liferay.calendar.service.CalendarResourceService
+		calendarResourceService;
+
 	@BeanReference(type = CalendarResourcePersistence.class)
 	protected CalendarResourcePersistence calendarResourcePersistence;
+
 	@BeanReference(type = CalendarResourceFinder.class)
 	protected CalendarResourceFinder calendarResourceFinder;
-	@ServiceReference(type = com.liferay.counter.kernel.service.CounterLocalService.class)
-	protected com.liferay.counter.kernel.service.CounterLocalService counterLocalService;
-	@ServiceReference(type = com.liferay.portal.kernel.service.ClassNameLocalService.class)
-	protected com.liferay.portal.kernel.service.ClassNameLocalService classNameLocalService;
-	@ServiceReference(type = com.liferay.portal.kernel.service.ClassNameService.class)
-	protected com.liferay.portal.kernel.service.ClassNameService classNameService;
+
+	@ServiceReference(
+		type = com.liferay.counter.kernel.service.CounterLocalService.class
+	)
+	protected com.liferay.counter.kernel.service.CounterLocalService
+		counterLocalService;
+
+	@ServiceReference(
+		type = com.liferay.portal.kernel.service.ClassNameLocalService.class
+	)
+	protected com.liferay.portal.kernel.service.ClassNameLocalService
+		classNameLocalService;
+
+	@ServiceReference(
+		type = com.liferay.portal.kernel.service.ClassNameService.class
+	)
+	protected com.liferay.portal.kernel.service.ClassNameService
+		classNameService;
+
 	@ServiceReference(type = ClassNamePersistence.class)
 	protected ClassNamePersistence classNamePersistence;
-	@ServiceReference(type = com.liferay.portal.kernel.service.ResourceLocalService.class)
-	protected com.liferay.portal.kernel.service.ResourceLocalService resourceLocalService;
-	@ServiceReference(type = com.liferay.portal.kernel.service.UserLocalService.class)
-	protected com.liferay.portal.kernel.service.UserLocalService userLocalService;
-	@ServiceReference(type = com.liferay.portal.kernel.service.UserService.class)
+
+	@ServiceReference(
+		type = com.liferay.portal.kernel.service.ResourceLocalService.class
+	)
+	protected com.liferay.portal.kernel.service.ResourceLocalService
+		resourceLocalService;
+
+	@ServiceReference(
+		type = com.liferay.portal.kernel.service.UserLocalService.class
+	)
+	protected com.liferay.portal.kernel.service.UserLocalService
+		userLocalService;
+
+	@ServiceReference(
+		type = com.liferay.portal.kernel.service.UserService.class
+	)
 	protected com.liferay.portal.kernel.service.UserService userService;
+
 	@ServiceReference(type = UserPersistence.class)
 	protected UserPersistence userPersistence;
+
 }

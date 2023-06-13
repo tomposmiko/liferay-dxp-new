@@ -24,34 +24,39 @@ import com.liferay.portal.kernel.util.Accessor;
  *
  * @author Brian Wing Shun Chan
  * @see RecentLayoutSetBranchModel
- * @see com.liferay.portal.model.impl.RecentLayoutSetBranchImpl
- * @see com.liferay.portal.model.impl.RecentLayoutSetBranchModelImpl
  * @generated
  */
-@ImplementationClassName("com.liferay.portal.model.impl.RecentLayoutSetBranchImpl")
+@ImplementationClassName(
+	"com.liferay.portal.model.impl.RecentLayoutSetBranchImpl"
+)
 @ProviderType
-public interface RecentLayoutSetBranch extends RecentLayoutSetBranchModel,
-	PersistedModel {
+public interface RecentLayoutSetBranch
+	extends PersistedModel, RecentLayoutSetBranchModel {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
-	 * Never modify this interface directly. Add methods to {@link com.liferay.portal.model.impl.RecentLayoutSetBranchImpl} and rerun ServiceBuilder to automatically copy the method declarations to this interface.
+	 * Never modify this interface directly. Add methods to <code>com.liferay.portal.model.impl.RecentLayoutSetBranchImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
 	 */
-	public static final Accessor<RecentLayoutSetBranch, Long> RECENT_LAYOUT_SET_BRANCH_ID_ACCESSOR =
-		new Accessor<RecentLayoutSetBranch, Long>() {
-			@Override
-			public Long get(RecentLayoutSetBranch recentLayoutSetBranch) {
-				return recentLayoutSetBranch.getRecentLayoutSetBranchId();
-			}
+	public static final Accessor<RecentLayoutSetBranch, Long>
+		RECENT_LAYOUT_SET_BRANCH_ID_ACCESSOR =
+			new Accessor<RecentLayoutSetBranch, Long>() {
 
-			@Override
-			public Class<Long> getAttributeClass() {
-				return Long.class;
-			}
+				@Override
+				public Long get(RecentLayoutSetBranch recentLayoutSetBranch) {
+					return recentLayoutSetBranch.getRecentLayoutSetBranchId();
+				}
 
-			@Override
-			public Class<RecentLayoutSetBranch> getTypeClass() {
-				return RecentLayoutSetBranch.class;
-			}
-		};
+				@Override
+				public Class<Long> getAttributeClass() {
+					return Long.class;
+				}
+
+				@Override
+				public Class<RecentLayoutSetBranch> getTypeClass() {
+					return RecentLayoutSetBranch.class;
+				}
+
+			};
+
 }

@@ -71,7 +71,6 @@ import com.liferay.apio.architect.form.FormField;
 import com.liferay.apio.architect.identifier.Identifier;
 import com.liferay.apio.architect.language.AcceptLanguage;
 
-import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -113,7 +112,7 @@ public class FormImpl<T> implements Form<T> {
 
 	@Override
 	public String getId() {
-		return _id;
+		return _uri;
 	}
 
 	@Override
@@ -137,25 +136,25 @@ public class FormImpl<T> implements Form<T> {
 		return _titleFunction.apply(acceptLanguage);
 	}
 
+	/**
+	 * Sets the form's URI. Accessible through {@link #getId()} method.
+	 *
+	 * @review
+	 */
+	public void setURI(String uri) {
+		_uri = uri;
+	}
+
 	public static class BuilderImpl<T>
 		implements Form.Builder<T>, Form.Builder.FieldStep<T>,
 				   Form.Builder.ConstructorStep<T>,
 				   Form.Builder.DescriptionStep<T> {
 
-		/**
-		 * Creates a new builder with empty paths.
-		 *
-		 * @return the new builder
-		 */
-		public static <T> BuilderImpl<T> empty() {
-			return new BuilderImpl<>(Collections.emptyList(), __ -> null);
-		}
-
 		public BuilderImpl(
-			List<String> paths,
-			IdentifierFunction<?> pathToIdentifierFunction) {
+			IdentifierFunction<?> pathToIdentifierFunction,
+			Function<String, Optional<String>> nameFunction) {
 
-			_form = new FormImpl<>(paths, pathToIdentifierFunction);
+			_form = new FormImpl<>(pathToIdentifierFunction, nameFunction);
 		}
 
 		@Override
@@ -239,23 +238,27 @@ public class FormImpl<T> implements Form<T> {
 		}
 
 		@Override
-		public <C> FieldStep<T> addOptionalLinkedModel(
-			String key, Class<? extends Identifier<C>> aClass,
-			BiConsumer<T, C> biConsumer) {
+		public <U> FieldStep<T> addOptionalLinkedModel(
+			String key, Class<? extends Identifier<U>> identifierClass,
+			BiConsumer<T, U> biConsumer) {
 
 			_form._optionalLinkedModel.put(
-				key, t -> c -> biConsumer.accept(t, (C)c));
+				key, t -> u -> biConsumer.accept(t, (U)u));
+
+			_form._identifiers.put(key, identifierClass.getName());
 
 			return this;
 		}
 
 		@Override
 		public <C> FieldStep<T> addOptionalLinkedModelList(
-			String key, Class<? extends Identifier<C>> aClass,
+			String key, Class<? extends Identifier<C>> identifierClass,
 			BiConsumer<T, List<C>> biConsumer) {
 
 			_form._optionalLinkedModelList.put(
-				key, t -> c -> biConsumer.accept(t, (List)c));
+				key, t -> list -> biConsumer.accept(t, (List<C>)list));
+
+			_form._identifiers.put(key, identifierClass.getName());
 
 			return this;
 		}
@@ -408,22 +411,26 @@ public class FormImpl<T> implements Form<T> {
 
 		@Override
 		public <C> FieldStep<T> addRequiredLinkedModel(
-			String key, Class<? extends Identifier<C>> aClass,
+			String key, Class<? extends Identifier<C>> identifierClass,
 			BiConsumer<T, C> biConsumer) {
 
 			_form._requiredLinkedModel.put(
 				key, t -> c -> biConsumer.accept(t, (C)c));
+
+			_form._identifiers.put(key, identifierClass.getName());
 
 			return this;
 		}
 
 		@Override
 		public <C> FieldStep<T> addRequiredLinkedModelList(
-			String key, Class<? extends Identifier<C>> aClass,
+			String key, Class<? extends Identifier<C>> identifierClass,
 			BiConsumer<T, List<C>> biConsumer) {
 
 			_form._requiredLinkedModelList.put(
 				key, t -> c -> biConsumer.accept(t, (List)c));
+
+			_form._identifiers.put(key, identifierClass.getName());
 
 			return this;
 		}
@@ -529,10 +536,16 @@ public class FormImpl<T> implements Form<T> {
 	}
 
 	private FormImpl(
-		List<String> paths, IdentifierFunction<?> pathToIdentifierFunction) {
+		IdentifierFunction<?> pathToIdentifierFunction,
+		Function<String, Optional<String>> nameFunction) {
 
-		_id = String.join("/", paths);
 		_pathToIdentifierFunction = pathToIdentifierFunction;
+		_nameFunction = nameFunction;
+		_keyToNameFunction = key -> Optional.ofNullable(
+			_identifiers.get(key)
+		).flatMap(
+			nameFunction
+		);
 	}
 
 	private List<FormField> _getFormFields(FormImpl<T> form) {
@@ -594,9 +607,11 @@ public class FormImpl<T> implements Form<T> {
 		formImpl._optionalFiles.forEach(getOptionalFile(body, u));
 		formImpl._optionalFileLists.forEach(getOptionalFileList(body, u));
 		formImpl._optionalLinkedModel.forEach(
-			getOptionalLinkedModel(body, u, _pathToIdentifierFunction));
+			getOptionalLinkedModel(
+				body, u, _pathToIdentifierFunction, _keyToNameFunction));
 		formImpl._optionalLinkedModelList.forEach(
-			getOptionalLinkedModelList(body, u, _pathToIdentifierFunction));
+			getOptionalLinkedModelList(
+				body, u, _pathToIdentifierFunction, _keyToNameFunction));
 		formImpl._optionalLongs.forEach(getOptionalLong(body, u));
 		formImpl._optionalLongLists.forEach(getOptionalLongList(body, u));
 		formImpl._optionalNestedModel.forEach(
@@ -614,9 +629,11 @@ public class FormImpl<T> implements Form<T> {
 		formImpl._requiredFiles.forEach(getRequiredFile(body, u));
 		formImpl._requiredFileLists.forEach(getRequiredFileList(body, u));
 		formImpl._requiredLinkedModel.forEach(
-			getRequiredLinkedModel(body, u, _pathToIdentifierFunction));
+			getRequiredLinkedModel(
+				body, u, _pathToIdentifierFunction, _keyToNameFunction));
 		formImpl._requiredLinkedModelList.forEach(
-			getRequiredLinkedModelList(body, u, _pathToIdentifierFunction));
+			getRequiredLinkedModelList(
+				body, u, _pathToIdentifierFunction, _keyToNameFunction));
 		formImpl._requiredLongs.forEach(getRequiredLong(body, u));
 		formImpl._requiredLongLists.forEach(getRequiredLongList(body, u));
 		formImpl._requiredNestedModel.forEach(
@@ -628,10 +645,8 @@ public class FormImpl<T> implements Form<T> {
 	}
 
 	private <V> FormImpl<V> _getNestedForm(String key) {
-		List<String> paths = Collections.singletonList(_id);
-
 		Builder<V> builder = new BuilderImpl<>(
-			paths, _pathToIdentifierFunction);
+			_pathToIdentifierFunction, _nameFunction);
 
 		FormBuilderFunction<V> formBuilderFunction =
 			(FormBuilderFunction<V>)_formBuilderFunctionsMap.get(key);
@@ -712,9 +727,8 @@ public class FormImpl<T> implements Form<T> {
 		}
 	}
 
-	private <U> BiConsumer
-		<String, Function<U, Consumer<Object>>> _getOptionalNestedModel(
-			Body body, U u) {
+	private <U> BiConsumer<String, Function<U, Consumer<Object>>>
+		_getOptionalNestedModel(Body body, U u) {
 
 		return (key, consumerFunction) -> _getNestedModel(
 			body, u, key, consumerFunction, false);
@@ -727,9 +741,8 @@ public class FormImpl<T> implements Form<T> {
 			body, u, key, consumerFunction, false);
 	}
 
-	private <U> BiConsumer
-		<String, Function<U, Consumer<Object>>> _getRequiredNestedModel(
-			Body body, U u) {
+	private <U> BiConsumer<String, Function<U, Consumer<Object>>>
+		_getRequiredNestedModel(Body body, U u) {
 
 		return (key, consumerFunction) -> _getNestedModel(
 			body, u, key, consumerFunction, true);
@@ -745,7 +758,9 @@ public class FormImpl<T> implements Form<T> {
 	private Function<AcceptLanguage, String> _descriptionFunction;
 	private final Map<String, FormBuilderFunction<?>> _formBuilderFunctionsMap =
 		new HashMap<>();
-	private final String _id;
+	private final Map<String, String> _identifiers = new HashMap<>();
+	private final Function<String, Optional<String>> _keyToNameFunction;
+	private final Function<String, Optional<String>> _nameFunction;
 	private final Map<String, Function<T, Consumer<List<Boolean>>>>
 		_optionalBooleanLists = new HashMap<>();
 	private final Map<String, Function<T, Consumer<Boolean>>>
@@ -762,8 +777,8 @@ public class FormImpl<T> implements Form<T> {
 		_optionalFileLists = new HashMap<>();
 	private final Map<String, Function<T, Consumer<BinaryFile>>>
 		_optionalFiles = new HashMap<>();
-	private final Map<String, Function<T, Consumer<?>>> _optionalLinkedModel =
-		new HashMap<>();
+	private final Map<String, Function<T, Consumer<Object>>>
+		_optionalLinkedModel = new HashMap<>();
 	private final Map<String, Function<T, Consumer<List<?>>>>
 		_optionalLinkedModelList = new HashMap<>();
 	private final Map<String, Function<T, Consumer<List<Long>>>>
@@ -795,8 +810,8 @@ public class FormImpl<T> implements Form<T> {
 		_requiredFileLists = new HashMap<>();
 	private final Map<String, Function<T, Consumer<BinaryFile>>>
 		_requiredFiles = new HashMap<>();
-	private final Map<String, Function<T, Consumer<?>>> _requiredLinkedModel =
-		new HashMap<>();
+	private final Map<String, Function<T, Consumer<Object>>>
+		_requiredLinkedModel = new HashMap<>();
 	private final Map<String, Function<T, Consumer<List<?>>>>
 		_requiredLinkedModelList = new HashMap<>();
 	private final Map<String, Function<T, Consumer<List<Long>>>>
@@ -813,5 +828,6 @@ public class FormImpl<T> implements Form<T> {
 		new HashMap<>();
 	private Supplier<T> _supplier;
 	private Function<AcceptLanguage, String> _titleFunction;
+	private String _uri;
 
 }

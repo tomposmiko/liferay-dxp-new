@@ -1246,9 +1246,21 @@ public class LayoutLocalServiceImpl extends LayoutLocalServiceBaseImpl {
 		return layoutPersistence.findByIconImageId(iconImageId);
 	}
 
+	/**
+	 * @deprecated As of Judson (7.1.x), replaced by {@link
+	 * 			   #getLayoutChildLayouts(List)}
+	 */
+	@Deprecated
 	@Override
 	public Map<Long, List<Layout>> getLayoutChildLayouts(
 		LayoutSet layoutSet, List<Layout> parentLayouts) {
+
+		return getLayoutChildLayouts(parentLayouts);
+	}
+
+	@Override
+	public Map<Long, List<Layout>> getLayoutChildLayouts(
+		List<Layout> parentLayouts) {
 
 		Map<LayoutSet, List<Layout>> layoutsMap = new HashMap<>();
 
@@ -1267,7 +1279,7 @@ public class LayoutLocalServiceImpl extends LayoutLocalServiceBaseImpl {
 			}
 			else {
 				List<Layout> layouts = layoutsMap.computeIfAbsent(
-					layoutSet, key -> new ArrayList<>());
+					parentLayout.getLayoutSet(), key -> new ArrayList<>());
 
 				layouts.add(parentLayout);
 			}
@@ -1286,12 +1298,22 @@ public class LayoutLocalServiceImpl extends LayoutLocalServiceBaseImpl {
 		Map<Long, List<Layout>> layoutChildLayoutsMap = new HashMap<>();
 
 		for (Layout childLayout : childLayouts) {
-			List<Layout> layoutChildLayouts =
-				layoutChildLayoutsMap.computeIfAbsent(
-					childLayout.getParentLayoutId(),
-					parentLayoutId -> new ArrayList<>());
+			try {
+				List<Layout> layoutChildLayouts =
+					layoutChildLayoutsMap.computeIfAbsent(
+						childLayout.getParentPlid(),
+						parentPlid -> new ArrayList<>());
 
-			layoutChildLayouts.add(childLayout);
+				layoutChildLayouts.add(childLayout);
+			}
+			catch (PortalException pe) {
+				if (_log.isWarnEnabled()) {
+					_log.warn(
+						"Unable to get parent plid for Layout with plid=" +
+							childLayout.getPlid(),
+						pe);
+				}
+			}
 		}
 
 		for (List<Layout> layoutChildLayouts : layoutChildLayoutsMap.values()) {

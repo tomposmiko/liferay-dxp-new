@@ -962,13 +962,22 @@ AUI.add(
 
 					_formatGridLayout: function() {
 						var instance = this;
-						var rows = instance.get('layouts')[instance._getActiveLayoutIndex()].get('rows');
 
 						instance.gridDOM = [];
 
+						var layouts = instance.get('layouts');
+
+						var activeLayoutIndex = instance._getActiveLayoutIndex();
+
+						var activeLayout = layouts[activeLayoutIndex];
+
+						var rows = activeLayout.get('rows');
+
 						rows.forEach(
 							function(row) {
-								instance.gridDOM.push(row.get('node').all('.col').get('nodes'));
+								var cols = row.get('cols');
+
+								instance.gridDOM.push(cols);
 							}
 						);
 					},
@@ -1169,7 +1178,7 @@ AUI.add(
 						if (listCols) {
 							listCols.get('node').forEach(
 								function(element) {
-									if (!element.ancestor('.col-empty') && !element.ancestor('.lfr-initial-col')) {
+									if (!element.ancestor('.col-empty') && !element.ancestor('.lfr-initial-col') && element.ancestor('.col')) {
 										element.ancestor('.col').addClass('col-empty');
 										element.ancestor('.col').empty();
 									}

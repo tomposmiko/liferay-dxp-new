@@ -32,12 +32,13 @@ import com.liferay.document.library.kernel.service.DLFileEntryLocalServiceUtil;
  * @generated
  */
 @ProviderType
-public abstract class DLFileEntryBaseImpl extends DLFileEntryModelImpl
-	implements DLFileEntry {
+public abstract class DLFileEntryBaseImpl
+	extends DLFileEntryModelImpl implements DLFileEntry {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
-	 * Never modify or reference this class directly. All methods that expect a document library file entry model instance should use the {@link DLFileEntry} interface instead.
+	 * Never modify or reference this class directly. All methods that expect a document library file entry model instance should use the <code>DLFileEntry</code> interface instead.
 	 */
 	@Override
 	public void persist() {
@@ -57,4 +58,5 @@ public abstract class DLFileEntryBaseImpl extends DLFileEntryModelImpl
 
 		DLFileEntryLocalServiceUtil.updateDLFileEntry(dlFileEntry);
 	}
+
 }

@@ -33,12 +33,12 @@ import java.util.Date;
  * The cache model class for representing LayoutSet in entity cache.
  *
  * @author Brian Wing Shun Chan
- * @see LayoutSet
  * @generated
  */
 @ProviderType
-public class LayoutSetCacheModel implements CacheModel<LayoutSet>,
-	Externalizable, MVCCModel {
+public class LayoutSetCacheModel
+	implements CacheModel<LayoutSet>, Externalizable, MVCCModel {
+
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj) {
@@ -52,7 +52,8 @@ public class LayoutSetCacheModel implements CacheModel<LayoutSet>,
 		LayoutSetCacheModel layoutSetCacheModel = (LayoutSetCacheModel)obj;
 
 		if ((layoutSetId == layoutSetCacheModel.layoutSetId) &&
-				(mvccVersion == layoutSetCacheModel.mvccVersion)) {
+			(mvccVersion == layoutSetCacheModel.mvccVersion)) {
+
 			return true;
 		}
 
@@ -178,11 +179,13 @@ public class LayoutSetCacheModel implements CacheModel<LayoutSet>,
 			layoutSetImpl.setLayoutSetPrototypeUuid(layoutSetPrototypeUuid);
 		}
 
-		layoutSetImpl.setLayoutSetPrototypeLinkEnabled(layoutSetPrototypeLinkEnabled);
+		layoutSetImpl.setLayoutSetPrototypeLinkEnabled(
+			layoutSetPrototypeLinkEnabled);
 
 		layoutSetImpl.resetOriginalValues();
 
-		layoutSetImpl.setCompanyFallbackVirtualHostname(_companyFallbackVirtualHostname);
+		layoutSetImpl.setCompanyFallbackVirtualHostname(
+			_companyFallbackVirtualHostname);
 
 		layoutSetImpl.setVirtualHostname(_virtualHostname);
 
@@ -192,6 +195,7 @@ public class LayoutSetCacheModel implements CacheModel<LayoutSet>,
 	@Override
 	public void readExternal(ObjectInput objectInput)
 		throws ClassNotFoundException, IOException {
+
 		mvccVersion = objectInput.readLong();
 
 		layoutSetId = objectInput.readLong();
@@ -220,8 +224,7 @@ public class LayoutSetCacheModel implements CacheModel<LayoutSet>,
 	}
 
 	@Override
-	public void writeExternal(ObjectOutput objectOutput)
-		throws IOException {
+	public void writeExternal(ObjectOutput objectOutput) throws IOException {
 		objectOutput.writeLong(mvccVersion);
 
 		objectOutput.writeLong(layoutSetId);
@@ -296,4 +299,5 @@ public class LayoutSetCacheModel implements CacheModel<LayoutSet>,
 	public boolean layoutSetPrototypeLinkEnabled;
 	public String _companyFallbackVirtualHostname;
 	public String _virtualHostname;
+
 }

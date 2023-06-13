@@ -32,12 +32,13 @@ import com.liferay.wiki.service.WikiPageResourceLocalServiceUtil;
  * @generated
  */
 @ProviderType
-public abstract class WikiPageResourceBaseImpl extends WikiPageResourceModelImpl
-	implements WikiPageResource {
+public abstract class WikiPageResourceBaseImpl
+	extends WikiPageResourceModelImpl implements WikiPageResource {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
-	 * Never modify or reference this class directly. All methods that expect a wiki page resource model instance should use the {@link WikiPageResource} interface instead.
+	 * Never modify or reference this class directly. All methods that expect a wiki page resource model instance should use the <code>WikiPageResource</code> interface instead.
 	 */
 	@Override
 	public void persist() {
@@ -48,4 +49,5 @@ public abstract class WikiPageResourceBaseImpl extends WikiPageResourceModelImpl
 			WikiPageResourceLocalServiceUtil.updateWikiPageResource(this);
 		}
 	}
+
 }

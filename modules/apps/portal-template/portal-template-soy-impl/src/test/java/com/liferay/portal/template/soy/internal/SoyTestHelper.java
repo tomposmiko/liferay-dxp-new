@@ -165,10 +165,7 @@ public class SoyTestHelper {
 						InvocationOnMock invocationOnMock)
 					throws Throwable {
 
-					List<HashSet<TemplateResource>> list = new ArrayList<>(
-						cache.keySet());
-
-					return list;
+					return new ArrayList<>(cache.keySet());
 				}
 
 			}

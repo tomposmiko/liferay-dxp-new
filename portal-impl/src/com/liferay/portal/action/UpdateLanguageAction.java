@@ -90,7 +90,8 @@ public class UpdateLanguageAction extends Action {
 
 		// Send redirect
 
-		String redirect = ParamUtil.getString(request, "redirect");
+		String redirect = PortalUtil.escapeRedirect(
+			ParamUtil.getString(request, "redirect"));
 
 		String layoutURL = StringPool.BLANK;
 		String queryString = StringPool.BLANK;
@@ -125,6 +126,11 @@ public class UpdateLanguageAction extends Action {
 				redirect = PortalUtil.getGroupFriendlyURL(
 					layout.getLayoutSet(), themeDisplay, locale);
 			}
+		}
+		else if (layout.isTypeControlPanel() && themeDisplay.isI18n()) {
+			String i18nPath = themeDisplay.getI18nPath();
+
+			redirect = redirect.substring(i18nPath.length());
 		}
 		else {
 			if (PropsValues.LOCALE_PREPEND_FRIENDLY_URL_STYLE == 0) {

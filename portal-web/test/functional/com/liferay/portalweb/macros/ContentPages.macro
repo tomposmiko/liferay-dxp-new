@@ -15,7 +15,9 @@ definition {
 			Card.clickSitePagesCardLink(cardName = "Content Page");
 		}
 
-		SelectFrame(locator1 = "IFrame#DIALOG");
+		if (IsElementPresent(locator1 = "IFrame#DIALOG")) {
+			SelectFrame(locator1 = "IFrame#DIALOG");
+		}
 
 		PortletEntry.inputName(name = "${pageName}");
 

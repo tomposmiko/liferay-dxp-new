@@ -24,19 +24,20 @@ import com.liferay.portal.kernel.util.Accessor;
  *
  * @author Brian Wing Shun Chan
  * @see UserIdMapperModel
- * @see com.liferay.portal.model.impl.UserIdMapperImpl
- * @see com.liferay.portal.model.impl.UserIdMapperModelImpl
  * @generated
  */
 @ImplementationClassName("com.liferay.portal.model.impl.UserIdMapperImpl")
 @ProviderType
-public interface UserIdMapper extends UserIdMapperModel, PersistedModel {
+public interface UserIdMapper extends PersistedModel, UserIdMapperModel {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
-	 * Never modify this interface directly. Add methods to {@link com.liferay.portal.model.impl.UserIdMapperImpl} and rerun ServiceBuilder to automatically copy the method declarations to this interface.
+	 * Never modify this interface directly. Add methods to <code>com.liferay.portal.model.impl.UserIdMapperImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
 	 */
-	public static final Accessor<UserIdMapper, Long> USER_ID_MAPPER_ID_ACCESSOR = new Accessor<UserIdMapper, Long>() {
+	public static final Accessor<UserIdMapper, Long>
+		USER_ID_MAPPER_ID_ACCESSOR = new Accessor<UserIdMapper, Long>() {
+
 			@Override
 			public Long get(UserIdMapper userIdMapper) {
 				return userIdMapper.getUserIdMapperId();
@@ -51,5 +52,7 @@ public interface UserIdMapper extends UserIdMapperModel, PersistedModel {
 			public Class<UserIdMapper> getTypeClass() {
 				return UserIdMapper.class;
 			}
+
 		};
+
 }

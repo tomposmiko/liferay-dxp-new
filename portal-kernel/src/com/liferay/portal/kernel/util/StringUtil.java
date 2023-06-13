@@ -293,7 +293,11 @@ public class StringUtil {
 			s = s.concat(delimiter);
 		}
 
-		String dtd = delimiter.concat(text).concat(delimiter);
+		String dtd = delimiter.concat(
+			text
+		).concat(
+			delimiter
+		);
 
 		int pos = s.indexOf(dtd);
 
@@ -405,7 +409,7 @@ public class StringUtil {
 
 		int pos = start;
 
-		while ((pos < end) && (pos = s.indexOf(text, pos)) != -1) {
+		while ((pos < end) && ((pos = s.indexOf(text, pos)) != -1)) {
 			if (pos < end) {
 				count++;
 			}
@@ -1168,7 +1172,11 @@ public class StringUtil {
 		String prefix = s.substring(0, offset);
 		String postfix = s.substring(offset);
 
-		return prefix.concat(insert).concat(postfix);
+		return prefix.concat(
+			insert
+		).concat(
+			postfix
+		);
 	}
 
 	/**
@@ -2163,7 +2171,11 @@ public class StringUtil {
 			return null;
 		}
 
-		return quote.concat(s).concat(quote);
+		return quote.concat(
+			s
+		).concat(
+			quote
+		);
 	}
 
 	/**
@@ -2280,9 +2292,7 @@ public class StringUtil {
 						String.valueOf(classLoader)));
 			}
 
-			String s = read(is);
-
-			return s;
+			return read(is);
 		}
 	}
 
@@ -2453,7 +2463,11 @@ public class StringUtil {
 			s += delimiter;
 		}
 
-		String drd = delimiter.concat(element).concat(delimiter);
+		String drd = delimiter.concat(
+			element
+		).concat(
+			delimiter
+		);
 
 		String rd = element.concat(delimiter);
 
@@ -2979,8 +2993,13 @@ public class StringUtil {
 		int y = s.indexOf(oldSub, fromIndex);
 
 		if (y >= 0) {
-			return s.substring(0, y).concat(newSub).concat(
-				s.substring(y + oldSub.length()));
+			return s.substring(
+				0, y
+			).concat(
+				newSub
+			).concat(
+				s.substring(y + oldSub.length())
+			);
 		}
 
 		return s;
@@ -3084,8 +3103,13 @@ public class StringUtil {
 		int y = s.lastIndexOf(oldSub);
 
 		if (y >= 0) {
-			return s.substring(0, y).concat(newSub).concat(
-				s.substring(y + oldSub.length()));
+			return s.substring(
+				0, y
+			).concat(
+				newSub
+			).concat(
+				s.substring(y + oldSub.length())
+			);
 		}
 
 		return s;
@@ -3186,21 +3210,20 @@ public class StringUtil {
 
 				break;
 			}
-			else {
-				sb.append(s.substring(pos, x));
 
-				String oldValue = s.substring(x + begin.length(), y);
+			sb.append(s.substring(pos, x));
 
-				String newValue = values.get(oldValue);
+			String oldValue = s.substring(x + begin.length(), y);
 
-				if (newValue == null) {
-					newValue = oldValue;
-				}
+			String newValue = values.get(oldValue);
 
-				sb.append(newValue);
-
-				pos = y + end.length();
+			if (newValue == null) {
+				newValue = oldValue;
 			}
+
+			sb.append(newValue);
+
+			pos = y + end.length();
 		}
 
 		return sb;
@@ -3253,22 +3276,21 @@ public class StringUtil {
 
 				break;
 			}
-			else {
-				sb.append(s.substring(pos, x));
 
-				String oldValue = s.substring(x + begin.length(), y);
+			sb.append(s.substring(pos, x));
 
-				StringBundler newValueSB = values.get(oldValue);
+			String oldValue = s.substring(x + begin.length(), y);
 
-				if (newValueSB == null) {
-					sb.append(oldValue);
-				}
-				else {
-					sb.append(newValueSB);
-				}
+			StringBundler newValueSB = values.get(oldValue);
 
-				pos = y + end.length();
+			if (newValueSB == null) {
+				sb.append(oldValue);
 			}
+			else {
+				sb.append(newValueSB);
+			}
+
+			pos = y + end.length();
 		}
 
 		return sb;
@@ -4115,11 +4137,10 @@ public class StringUtil {
 
 				break;
 			}
-			else {
-				sb.append(s.substring(pos, x));
 
-				pos = y + end.length();
-			}
+			sb.append(s.substring(pos, x));
+
+			pos = y + end.length();
 		}
 
 		return sb.toString();
@@ -4200,7 +4221,9 @@ public class StringUtil {
 			return s;
 		}
 
-		return s.substring(0, x - 1).concat(s.substring(y + 1));
+		String part = s.substring(0, x - 1);
+
+		return part.concat(s.substring(y + 1));
 	}
 
 	/**

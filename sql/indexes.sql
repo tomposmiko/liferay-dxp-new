@@ -321,6 +321,7 @@ create index IX_20A2E3D9 on ResourceBlockPermission (roleId);
 
 create unique index IX_8D83D0CE on ResourcePermission (companyId, name[$COLUMN_LENGTH:255$], scope, primKey[$COLUMN_LENGTH:255$], roleId);
 create index IX_49AEC6F3 on ResourcePermission (companyId, name[$COLUMN_LENGTH:255$], scope, primKeyId, roleId, viewActionId);
+create index IX_FD06D7C5 on ResourcePermission (companyId, name[$COLUMN_LENGTH:255$], scope, roleId);
 create index IX_26284944 on ResourcePermission (companyId, primKey[$COLUMN_LENGTH:255$]);
 create index IX_F6BAE86A on ResourcePermission (companyId, scope, primKey[$COLUMN_LENGTH:255$]);
 create index IX_D5F1E2A2 on ResourcePermission (name[$COLUMN_LENGTH:255$]);
@@ -400,7 +401,7 @@ create index IX_8BACD0AA on Ticket (companyId, classNameId, classPK, type_);
 create index IX_B2468446 on Ticket (key_[$COLUMN_LENGTH:75$]);
 
 create index IX_CB9015AF on UserGroup (companyId, externalReferenceCode[$COLUMN_LENGTH:75$]);
-create unique index IX_23EAD0D on UserGroup (companyId, name[$COLUMN_LENGTH:75$]);
+create unique index IX_23EAD0D on UserGroup (companyId, name[$COLUMN_LENGTH:255$]);
 create index IX_69771487 on UserGroup (companyId, parentUserGroupId);
 create index IX_72394F8E on UserGroup (uuid_[$COLUMN_LENGTH:75$], companyId);
 

@@ -70,14 +70,26 @@ public class IndexerPostProcessorRegistryTest {
 		IndexerPostProcessor[] mbMessageIndexerPostProcessors =
 			mbMessageIndexer.getIndexerPostProcessors();
 
-		Assert.assertEquals(
-			Arrays.toString(mbMessageIndexerPostProcessors), 1,
-			mbMessageIndexerPostProcessors.length);
+		Assert.assertTrue(
+			Arrays.toString(mbMessageIndexerPostProcessors),
+			mbMessageIndexerPostProcessors.length > 0);
 
-		IndexerPostProcessor mbMessageIndexerPostProcessor =
-			mbMessageIndexerPostProcessors[0];
+		IndexerPostProcessor testMBMessageIndexerPostProcessor = null;
 
-		Assert.assertNotNull(mbMessageIndexerPostProcessor);
+		for (IndexerPostProcessor mbMessageIndexerPostProcessor :
+				mbMessageIndexerPostProcessors) {
+
+			if (mbMessageIndexerPostProcessor instanceof
+					TestMultipleIndexerPostProcessor) {
+
+				testMBMessageIndexerPostProcessor =
+					mbMessageIndexerPostProcessor;
+
+				break;
+			}
+		}
+
+		Assert.assertNotNull(testMBMessageIndexerPostProcessor);
 
 		Indexer<MBThread> mbThreadIndexer = IndexerRegistryUtil.getIndexer(
 			MBThread.class.getName());
@@ -85,16 +97,28 @@ public class IndexerPostProcessorRegistryTest {
 		IndexerPostProcessor[] mbThreadIndexerPostProcessors =
 			mbThreadIndexer.getIndexerPostProcessors();
 
-		Assert.assertEquals(
-			Arrays.toString(mbThreadIndexerPostProcessors), 1,
-			mbThreadIndexerPostProcessors.length);
+		Assert.assertTrue(
+			Arrays.toString(mbThreadIndexerPostProcessors),
+			mbThreadIndexerPostProcessors.length > 0);
 
-		IndexerPostProcessor mbThreadIndexerPostProcessor =
-			mbThreadIndexerPostProcessors[0];
+		IndexerPostProcessor testMBThreadIndexerPostProcessor = null;
 
-		Assert.assertNotNull(mbThreadIndexerPostProcessor);
+		for (IndexerPostProcessor mbThreadIndexerPostProcessor :
+				mbThreadIndexerPostProcessors) {
+
+			if (mbThreadIndexerPostProcessor instanceof
+					TestMultipleIndexerPostProcessor) {
+
+				testMBThreadIndexerPostProcessor = mbThreadIndexerPostProcessor;
+
+				break;
+			}
+		}
+
+		Assert.assertNotNull(testMBThreadIndexerPostProcessor);
 		Assert.assertEquals(
-			mbMessageIndexerPostProcessor, mbThreadIndexerPostProcessor);
+			testMBMessageIndexerPostProcessor,
+			testMBThreadIndexerPostProcessor);
 	}
 
 	@Test
@@ -105,14 +129,25 @@ public class IndexerPostProcessorRegistryTest {
 		IndexerPostProcessor[] userIndexerPostProcessors =
 			userIndexer.getIndexerPostProcessors();
 
-		Assert.assertEquals(
-			Arrays.toString(userIndexerPostProcessors), 1,
-			userIndexerPostProcessors.length);
+		Assert.assertTrue(
+			Arrays.toString(userIndexerPostProcessors),
+			userIndexerPostProcessors.length > 0);
 
-		IndexerPostProcessor userIndexerPostProcessor =
-			userIndexerPostProcessors[0];
+		IndexerPostProcessor testUserIndexerPostProcessor = null;
 
-		Assert.assertNotNull(userIndexerPostProcessor);
+		for (IndexerPostProcessor userIndexerPostProcessor :
+				userIndexerPostProcessors) {
+
+			if (userIndexerPostProcessor instanceof
+					TestMultipleEntityIndexerPostProcessor) {
+
+				testUserIndexerPostProcessor = userIndexerPostProcessor;
+
+				break;
+			}
+		}
+
+		Assert.assertNotNull(testUserIndexerPostProcessor);
 
 		Indexer<UserGroup> userGroupIndexer = IndexerRegistryUtil.getIndexer(
 			UserGroup.class.getName());
@@ -120,16 +155,28 @@ public class IndexerPostProcessorRegistryTest {
 		IndexerPostProcessor[] userGroupIndexerPostProcessors =
 			userGroupIndexer.getIndexerPostProcessors();
 
-		Assert.assertEquals(
-			Arrays.toString(userGroupIndexerPostProcessors), 1,
-			userGroupIndexerPostProcessors.length);
+		Assert.assertTrue(
+			Arrays.toString(userGroupIndexerPostProcessors),
+			userGroupIndexerPostProcessors.length > 0);
 
-		IndexerPostProcessor userGroupIndexerPostProcessor =
-			userGroupIndexerPostProcessors[0];
+		IndexerPostProcessor testUserGroupIndexerPostProcessor = null;
 
-		Assert.assertNotNull(userGroupIndexerPostProcessor);
+		for (IndexerPostProcessor userGroupIndexerPostProcessor :
+				userGroupIndexerPostProcessors) {
+
+			if (userGroupIndexerPostProcessor instanceof
+					TestMultipleEntityIndexerPostProcessor) {
+
+				testUserGroupIndexerPostProcessor =
+					userGroupIndexerPostProcessor;
+
+				break;
+			}
+		}
+
+		Assert.assertNotNull(testUserGroupIndexerPostProcessor);
 		Assert.assertEquals(
-			userIndexerPostProcessor, userGroupIndexerPostProcessor);
+			testUserIndexerPostProcessor, testUserGroupIndexerPostProcessor);
 	}
 
 	@Test

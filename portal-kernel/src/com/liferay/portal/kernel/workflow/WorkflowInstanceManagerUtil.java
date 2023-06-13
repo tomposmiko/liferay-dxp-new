@@ -119,6 +119,12 @@ public class WorkflowInstanceManagerUtil {
 			completed, start, end, orderByComparator);
 	}
 
+	/**
+	 * @deprecated As of Mueller (7.2.x), replaced by {@link #search(long, Long,
+	 *             String, String, String, String, String, Boolean, int, int,
+	 *             OrderByComparator)}
+	 */
+	@Deprecated
 	public static List<WorkflowInstance> search(
 			long companyId, Long userId, String assetType, String nodeName,
 			String kaleoDefinitionName, Boolean completed, int start, int end,
@@ -130,6 +136,24 @@ public class WorkflowInstanceManagerUtil {
 			completed, start, end, orderByComparator);
 	}
 
+	public static List<WorkflowInstance> search(
+			long companyId, Long userId, String assetClassName,
+			String assetTitle, String assetDescription, String nodeName,
+			String kaleoDefinitionName, Boolean completed, int start, int end,
+			OrderByComparator<WorkflowInstance> orderByComparator)
+		throws WorkflowException {
+
+		return getWorkflowInstanceManager().search(
+			companyId, userId, assetClassName, assetTitle, assetDescription,
+			nodeName, kaleoDefinitionName, completed, start, end,
+			orderByComparator);
+	}
+
+	/**
+	 * @deprecated As of Mueller (7.2.x), replaced by {@link #searchCount(long,
+	 *             Long, String, String, String, String, String, Boolean)}
+	 */
+	@Deprecated
 	public static int searchCount(
 			long companyId, Long userId, String assetType, String nodeName,
 			String kaleoDefinitionName, Boolean completed)
@@ -138,6 +162,17 @@ public class WorkflowInstanceManagerUtil {
 		return getWorkflowInstanceManager().searchCount(
 			companyId, userId, assetType, nodeName, kaleoDefinitionName,
 			completed);
+	}
+
+	public static int searchCount(
+			long companyId, Long userId, String assetClassName,
+			String assetTitle, String assetDescription, String nodeName,
+			String kaleoDefinitionName, Boolean completed)
+		throws WorkflowException {
+
+		return getWorkflowInstanceManager().searchCount(
+			companyId, userId, assetClassName, assetTitle, assetDescription,
+			nodeName, kaleoDefinitionName, completed);
 	}
 
 	public static WorkflowInstance signalWorkflowInstance(

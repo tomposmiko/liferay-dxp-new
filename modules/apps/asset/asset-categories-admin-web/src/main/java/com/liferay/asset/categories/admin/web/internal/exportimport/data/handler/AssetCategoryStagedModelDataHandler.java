@@ -47,7 +47,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Zsolt Berentey
  * @author Gergely Mathe
- * @author Mate Thurzo
+ * @author Máté Thurzó
  */
 @Component(immediate = true, service = StagedModelDataHandler.class)
 public class AssetCategoryStagedModelDataHandler
@@ -230,8 +230,10 @@ public class AssetCategoryStagedModelDataHandler
 			String value = propertyElement.attributeValue("value");
 
 			properties[i] = key.concat(
-				AssetCategoryConstants.PROPERTY_KEY_VALUE_SEPARATOR).concat(
-					value);
+				AssetCategoryConstants.PROPERTY_KEY_VALUE_SEPARATOR
+			).concat(
+				value
+			);
 		}
 
 		ServiceContext serviceContext = createServiceContext(

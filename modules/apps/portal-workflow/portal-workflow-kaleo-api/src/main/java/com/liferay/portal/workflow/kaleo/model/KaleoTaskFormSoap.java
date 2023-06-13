@@ -30,6 +30,7 @@ import java.util.List;
  */
 @ProviderType
 public class KaleoTaskFormSoap implements Serializable {
+
 	public static KaleoTaskFormSoap toSoapModel(KaleoTaskForm model) {
 		KaleoTaskFormSoap soapModel = new KaleoTaskFormSoap();
 
@@ -40,7 +41,8 @@ public class KaleoTaskFormSoap implements Serializable {
 		soapModel.setUserName(model.getUserName());
 		soapModel.setCreateDate(model.getCreateDate());
 		soapModel.setModifiedDate(model.getModifiedDate());
-		soapModel.setKaleoDefinitionVersionId(model.getKaleoDefinitionVersionId());
+		soapModel.setKaleoDefinitionVersionId(
+			model.getKaleoDefinitionVersionId());
 		soapModel.setKaleoNodeId(model.getKaleoNodeId());
 		soapModel.setKaleoTaskId(model.getKaleoTaskId());
 		soapModel.setKaleoTaskName(model.getKaleoTaskName());
@@ -85,7 +87,8 @@ public class KaleoTaskFormSoap implements Serializable {
 	}
 
 	public static KaleoTaskFormSoap[] toSoapModels(List<KaleoTaskForm> models) {
-		List<KaleoTaskFormSoap> soapModels = new ArrayList<KaleoTaskFormSoap>(models.size());
+		List<KaleoTaskFormSoap> soapModels = new ArrayList<KaleoTaskFormSoap>(
+			models.size());
 
 		for (KaleoTaskForm model : models) {
 			soapModels.add(toSoapModel(model));
@@ -285,4 +288,5 @@ public class KaleoTaskFormSoap implements Serializable {
 	private String _formUuid;
 	private String _metadata;
 	private int _priority;
+
 }

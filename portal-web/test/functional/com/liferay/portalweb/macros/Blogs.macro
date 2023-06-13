@@ -27,9 +27,11 @@ definition {
 		BlogsNavigator.gotoAddEntry();
 
 		BlogsEntry.addEntryContent(
+			embedVideo = "${embedVideo}",
 			entryContent = "${entryContent}",
 			entrySubtitle = "${entrySubtitle}",
-			entryTitle = "${entryTitle}"
+			entryTitle = "${entryTitle}",
+			videoService = "${videoService}"
 		);
 
 		if (isSet(readingTime)) {
@@ -205,8 +207,6 @@ definition {
 	}
 
 	macro addViaAPSelectScope {
-		AssetPublisherPortlet.addAsset(assetType = "Blogs Entry");
-
 		MouseOver.mouseOverNotVisible(locator1 = "AP#ADD_ASSET_PLUS_ICON");
 
 		Click(locator1 = "AP#ADD_ASSET_PLUS_ICON");
@@ -414,6 +414,15 @@ definition {
 			entryTitleEdit = "${entryTitleEdit}"
 		);
 
+		if ("${sendEmailEntryUpdated}" == "true") {
+			Panel.expandPanel(panel = "Configuration");
+
+			Check.checkToggleSwitch(
+				locator1 = "ToggleSwitch#ANY_TOGGLE_SWITCH",
+				key_toggleSwitchLabel = "Send Email Entry Updated"
+			);
+		}
+
 		PortletEntry.publish();
 	}
 
@@ -523,7 +532,7 @@ definition {
 
 		var key_text = "RSS";
 
-		AssertTextEquals(locator1 = "Button#ANY", value1 = "rss-full RSS");
+		AssertTextEquals.assertPartialText(locator1 = "Button#ANY", value1 = "RSS");
 	}
 
 	macro viewNoEntryCP {

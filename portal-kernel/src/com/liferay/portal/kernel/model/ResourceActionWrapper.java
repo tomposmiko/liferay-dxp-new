@@ -17,7 +17,6 @@ package com.liferay.portal.kernel.model;
 import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.expando.kernel.model.ExpandoBridge;
-
 import com.liferay.portal.kernel.service.ServiceContext;
 
 import java.io.Serializable;
@@ -36,8 +35,9 @@ import java.util.Objects;
  * @generated
  */
 @ProviderType
-public class ResourceActionWrapper implements ResourceAction,
-	ModelWrapper<ResourceAction> {
+public class ResourceActionWrapper
+	implements ResourceAction, ModelWrapper<ResourceAction> {
+
 	public ResourceActionWrapper(ResourceAction resourceAction) {
 		_resourceAction = resourceAction;
 	}
@@ -100,7 +100,8 @@ public class ResourceActionWrapper implements ResourceAction,
 
 	@Override
 	public Object clone() {
-		return new ResourceActionWrapper((ResourceAction)_resourceAction.clone());
+		return new ResourceActionWrapper(
+			(ResourceAction)_resourceAction.clone());
 	}
 
 	@Override
@@ -109,20 +110,20 @@ public class ResourceActionWrapper implements ResourceAction,
 	}
 
 	/**
-	* Returns the action ID of this resource action.
-	*
-	* @return the action ID of this resource action
-	*/
+	 * Returns the action ID of this resource action.
+	 *
+	 * @return the action ID of this resource action
+	 */
 	@Override
 	public String getActionId() {
 		return _resourceAction.getActionId();
 	}
 
 	/**
-	* Returns the bitwise value of this resource action.
-	*
-	* @return the bitwise value of this resource action
-	*/
+	 * Returns the bitwise value of this resource action.
+	 *
+	 * @return the bitwise value of this resource action
+	 */
 	@Override
 	public long getBitwiseValue() {
 		return _resourceAction.getBitwiseValue();
@@ -134,30 +135,30 @@ public class ResourceActionWrapper implements ResourceAction,
 	}
 
 	/**
-	* Returns the mvcc version of this resource action.
-	*
-	* @return the mvcc version of this resource action
-	*/
+	 * Returns the mvcc version of this resource action.
+	 *
+	 * @return the mvcc version of this resource action
+	 */
 	@Override
 	public long getMvccVersion() {
 		return _resourceAction.getMvccVersion();
 	}
 
 	/**
-	* Returns the name of this resource action.
-	*
-	* @return the name of this resource action
-	*/
+	 * Returns the name of this resource action.
+	 *
+	 * @return the name of this resource action
+	 */
 	@Override
 	public String getName() {
 		return _resourceAction.getName();
 	}
 
 	/**
-	* Returns the primary key of this resource action.
-	*
-	* @return the primary key of this resource action
-	*/
+	 * Returns the primary key of this resource action.
+	 *
+	 * @return the primary key of this resource action
+	 */
 	@Override
 	public long getPrimaryKey() {
 		return _resourceAction.getPrimaryKey();
@@ -169,10 +170,10 @@ public class ResourceActionWrapper implements ResourceAction,
 	}
 
 	/**
-	* Returns the resource action ID of this resource action.
-	*
-	* @return the resource action ID of this resource action
-	*/
+	 * Returns the resource action ID of this resource action.
+	 *
+	 * @return the resource action ID of this resource action
+	 */
 	@Override
 	public long getResourceActionId() {
 		return _resourceAction.getResourceActionId();
@@ -204,20 +205,20 @@ public class ResourceActionWrapper implements ResourceAction,
 	}
 
 	/**
-	* Sets the action ID of this resource action.
-	*
-	* @param actionId the action ID of this resource action
-	*/
+	 * Sets the action ID of this resource action.
+	 *
+	 * @param actionId the action ID of this resource action
+	 */
 	@Override
 	public void setActionId(String actionId) {
 		_resourceAction.setActionId(actionId);
 	}
 
 	/**
-	* Sets the bitwise value of this resource action.
-	*
-	* @param bitwiseValue the bitwise value of this resource action
-	*/
+	 * Sets the bitwise value of this resource action.
+	 *
+	 * @param bitwiseValue the bitwise value of this resource action
+	 */
 	@Override
 	public void setBitwiseValue(long bitwiseValue) {
 		_resourceAction.setBitwiseValue(bitwiseValue);
@@ -244,20 +245,20 @@ public class ResourceActionWrapper implements ResourceAction,
 	}
 
 	/**
-	* Sets the mvcc version of this resource action.
-	*
-	* @param mvccVersion the mvcc version of this resource action
-	*/
+	 * Sets the mvcc version of this resource action.
+	 *
+	 * @param mvccVersion the mvcc version of this resource action
+	 */
 	@Override
 	public void setMvccVersion(long mvccVersion) {
 		_resourceAction.setMvccVersion(mvccVersion);
 	}
 
 	/**
-	* Sets the name of this resource action.
-	*
-	* @param name the name of this resource action
-	*/
+	 * Sets the name of this resource action.
+	 *
+	 * @param name the name of this resource action
+	 */
 	@Override
 	public void setName(String name) {
 		_resourceAction.setName(name);
@@ -269,10 +270,10 @@ public class ResourceActionWrapper implements ResourceAction,
 	}
 
 	/**
-	* Sets the primary key of this resource action.
-	*
-	* @param primaryKey the primary key of this resource action
-	*/
+	 * Sets the primary key of this resource action.
+	 *
+	 * @param primaryKey the primary key of this resource action
+	 */
 	@Override
 	public void setPrimaryKey(long primaryKey) {
 		_resourceAction.setPrimaryKey(primaryKey);
@@ -284,10 +285,10 @@ public class ResourceActionWrapper implements ResourceAction,
 	}
 
 	/**
-	* Sets the resource action ID of this resource action.
-	*
-	* @param resourceActionId the resource action ID of this resource action
-	*/
+	 * Sets the resource action ID of this resource action.
+	 *
+	 * @param resourceActionId the resource action ID of this resource action
+	 */
 	@Override
 	public void setResourceActionId(long resourceActionId) {
 		_resourceAction.setResourceActionId(resourceActionId);
@@ -328,10 +329,12 @@ public class ResourceActionWrapper implements ResourceAction,
 			return false;
 		}
 
-		ResourceActionWrapper resourceActionWrapper = (ResourceActionWrapper)obj;
+		ResourceActionWrapper resourceActionWrapper =
+			(ResourceActionWrapper)obj;
 
-		if (Objects.equals(_resourceAction,
-					resourceActionWrapper._resourceAction)) {
+		if (Objects.equals(
+				_resourceAction, resourceActionWrapper._resourceAction)) {
+
 			return true;
 		}
 
@@ -359,4 +362,5 @@ public class ResourceActionWrapper implements ResourceAction,
 	}
 
 	private final ResourceAction _resourceAction;
+
 }

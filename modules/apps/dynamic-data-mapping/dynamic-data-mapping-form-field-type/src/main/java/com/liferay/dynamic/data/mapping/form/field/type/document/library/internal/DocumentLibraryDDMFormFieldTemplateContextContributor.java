@@ -34,8 +34,6 @@ import com.liferay.portal.kernel.util.AggregateResourceBundle;
 import com.liferay.portal.kernel.util.Html;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.PortletKeys;
-import com.liferay.portal.kernel.util.ResourceBundleLoader;
-import com.liferay.portal.kernel.util.ResourceBundleLoaderUtil;
 import com.liferay.portal.kernel.util.ResourceBundleUtil;
 import com.liferay.portal.kernel.util.URLCodec;
 import com.liferay.portal.kernel.util.Validator;
@@ -186,12 +184,10 @@ public class DocumentLibraryDDMFormFieldTemplateContextContributor
 		}
 
 		try {
-			String itemSelectorAuthToken = AuthTokenUtil.getToken(
+			return AuthTokenUtil.getToken(
 				request,
 				portal.getControlPanelPlid(themeDisplay.getCompanyId()),
 				PortletKeys.ITEM_SELECTOR);
-
-			return itemSelectorAuthToken;
 		}
 		catch (PortalException pe) {
 			_log.error("Unable to generate item selector auth token ", pe);
@@ -214,11 +210,7 @@ public class DocumentLibraryDDMFormFieldTemplateContextContributor
 	}
 
 	protected ResourceBundle getResourceBundle(Locale locale) {
-		ResourceBundleLoader portalResourceBundleLoader =
-			ResourceBundleLoaderUtil.getPortalResourceBundleLoader();
-
-		ResourceBundle portalResourceBundle =
-			portalResourceBundleLoader.loadResourceBundle(locale);
+		ResourceBundle portalResourceBundle = portal.getResourceBundle(locale);
 
 		ResourceBundle moduleResourceBundle = ResourceBundleUtil.getBundle(
 			"content.Language", locale, getClass());

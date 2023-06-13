@@ -1,0 +1,183 @@
+definition {
+	macro commerceAdminSetUp {
+		ProductMenu.gotoPortlet(
+			category = "Configuration",
+			panel = "Control Panel",
+			portlet = "Search"
+		);
+
+		SearchAdministration.executeSearchActions(
+			actionsDescription = "Reindex all search indexes."
+		);
+	}
+
+	macro commerceAdminTearDown {
+		Navigator.openURL();
+
+		ProductMenu.gotoPortlet(
+			category = "Users",
+			panel = "Control Panel",
+			portlet = "Users and Organizations"
+		);
+
+		User.deactivateCP(deactivateType = "Actions", userFirstName = "Commerce");
+
+		User.deleteCP(userFirstName = "Commerce");
+
+		UsersAndOrganizationsNavigator.gotoOrganizations();
+
+		if (IsElementPresent(locator1 = "UsersAndOrganizations#ORGANIZATION_TABLE_NAME", key_orgName = "Commerce Organization")) {
+			Organization.deleteCP(orgName = "Commerce Organization");
+		}
+
+		ProductMenu.gotoPortlet(
+			category = "Users",
+			panel = "Control Panel",
+			portlet = "User Groups"
+		);
+
+		if (IsElementNotPresent(locator1 = "CommerceNavigation#EMPTY_SEARCH_CONTAINER")) {
+			UserGroup.deleteCP(userGroupName = "Commerce UserGroup");
+		}
+
+		ProductMenu.gotoPortlet(
+			category = "Commerce",
+			panel = "Site Administration",
+			portlet = "User Segments"
+		);
+
+		if (IsElementNotPresent(locator1 = "CommerceNavigation#EMPTY_SEARCH_CONTAINER")) {
+			CommerceProducts.deleteEntries(
+				deleteMessage = "Are you sure you want to delete the selected entries? They will be deleted immediately."
+			);
+		}
+
+		ProductMenu.gotoPortlet(
+			category = "Commerce",
+			panel = "Site Administration",
+			portlet = "Price Lists"
+		);
+
+		if (IsElementNotPresent(locator1 = "CommerceNavigation#EMPTY_SEARCH_CONTAINER")) {
+			CommerceProducts.deleteEntries(
+				deleteMessage = "Are you sure you want to delete the selected price lists?"
+			);
+		}
+
+		ProductMenu.gotoPortlet(
+			category = "Commerce",
+			panel = "Site Administration",
+			portlet = "Discounts"
+		);
+
+		if (IsElementNotPresent(locator1 = "CommerceNavigation#EMPTY_SEARCH_CONTAINER")) {
+			CommerceProducts.deleteEntries(
+				deleteMessage = "Are you sure you want to delete the selected discounts?"
+			);
+		}
+
+		ProductMenu.gotoPortlet(
+			category = "Commerce",
+			panel = "Site Administration",
+			portlet = "Catalog Rules"
+		);
+
+		if (IsElementNotPresent(locator1 = "CommerceNavigation#EMPTY_SEARCH_CONTAINER")) {
+			CommerceProducts.deleteEntries(
+				deleteMessage = "Are you sure you want to delete the selected catalog rules?"
+			);
+		}
+
+		User.logoutPG();
+	}
+
+	macro commerceSettingsTearDown {
+		Navigator.openURL();
+
+		ProductMenu.gotoPortlet(
+			category = "Commerce",
+			panel = "Site Administration",
+			portlet = "Settings"
+		);
+
+		CommerceNavigator.gotoCommercePortletNavItem(navItem = "Availability Estimates");
+
+		if (IsElementNotPresent(locator1 = "CommerceNavigation#EMPTY_SEARCH_CONTAINER")) {
+			PortletEntry.deleteViaMenuItem(rowEntry = "New Availability Estimate");
+		}
+
+		CommerceNavigator.gotoCommercePortletNavItem(navItem = "Countries");
+
+		if (IsElementNotPresent(locator1 = "CommerceNavigation#EMPTY_SEARCH_CONTAINER")) {
+			PortletEntry.deleteViaMenuItem(rowEntry = "New Country");
+		}
+
+		CommerceNavigator.gotoCommercePortletNavItem(navItem = "Currencies");
+
+		if (IsElementNotPresent(locator1 = "CommerceNavigation#EMPTY_SEARCH_CONTAINER")) {
+			PortletEntry.deleteViaMenuItem(rowEntry = "New Currency");
+		}
+
+		CommerceNavigator.gotoCommercePortletNavItem(navItem = "Measurement Units");
+
+		if (IsElementPresent(locator1 = "Icon#ROW_VERTICAL_ELLIPSIS", key_rowEntry = "New Dimension Unit")) {
+			PortletEntry.deleteViaMenuItem(rowEntry = "New Dimension Unit");
+		}
+
+		CommerceNavigator.gotoCommercePortletNavItem(navItem = "Weight");
+
+		if (IsElementPresent(locator1 = "Icon#ROW_VERTICAL_ELLIPSIS", key_rowEntry = "New Weight Unit")) {
+			PortletEntry.deleteViaMenuItem(rowEntry = "New Weight Unit");
+		}
+
+		CommerceNavigator.gotoCommercePortletNavItem(navItem = "Notifications");
+
+		CommerceNavigator.gotoCommercePortletNavItem(navItem = "Notification Templates");
+
+		if (IsElementNotPresent(locator1 = "CommerceNavigation#EMPTY_SEARCH_CONTAINER")) {
+			PortletEntry.deleteViaMenuItem(rowEntry = "New Notification Template");
+		}
+	}
+
+	macro commerceSetUp {
+		ProductMenu.gotoPortlet(
+			category = "Commerce",
+			panel = "Site Administration",
+			portlet = "Settings"
+		);
+
+		CommerceNavigator.gotoCommercePortletNavItem(navItem = "Health Check");
+
+		for (var buttonRowNumber : list "1,2,3,4,5,6,7,8,9,10") {
+			if (!(IsElementPresent(locator1 = "CommerceEntry#FIX_ISSUE_BUTTON", key_buttonStatus = "disabled"))) {
+				Click(
+					locator1 = "CommerceEntry#FIX_ISSUE_BUTTON",
+					key_buttonRowNumber = "${buttonRowNumber}",
+					key_buttonStatus = ""
+				);
+			}
+		}
+	}
+
+	macro commerceStoreFrontTearDown {
+		Navigator.openURL();
+
+		ProductMenu.gotoPortlet(
+			category = "Commerce",
+			panel = "Site Administration",
+			portlet = "Catalog"
+		);
+
+		if (IsElementNotPresent(locator1 = "CommerceNavigation#EMPTY_SEARCH_CONTAINER")) {
+			CommerceProducts.moveCatalogEntriesToRecycleBin();
+		}
+
+		CommerceNavigator.gotoCommercePortletNavItem(navItem = "Options");
+
+		Pause(locator1 = "3000");
+
+		CommerceOptions.deleteOptionsEntries();
+
+		User.logoutPG();
+	}
+}

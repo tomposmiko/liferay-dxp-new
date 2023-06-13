@@ -17,7 +17,6 @@ package com.liferay.knowledge.base.model.impl;
 import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.knowledge.base.model.KBComment;
-
 import com.liferay.portal.kernel.model.CacheModel;
 import com.liferay.portal.kernel.util.HashUtil;
 import com.liferay.portal.kernel.util.StringBundler;
@@ -33,12 +32,12 @@ import java.util.Date;
  * The cache model class for representing KBComment in entity cache.
  *
  * @author Brian Wing Shun Chan
- * @see KBComment
  * @generated
  */
 @ProviderType
-public class KBCommentCacheModel implements CacheModel<KBComment>,
-	Externalizable {
+public class KBCommentCacheModel
+	implements CacheModel<KBComment>, Externalizable {
+
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj) {
@@ -190,8 +189,7 @@ public class KBCommentCacheModel implements CacheModel<KBComment>,
 	}
 
 	@Override
-	public void writeExternal(ObjectOutput objectOutput)
-		throws IOException {
+	public void writeExternal(ObjectOutput objectOutput) throws IOException {
 		if (uuid == null) {
 			objectOutput.writeUTF("");
 		}
@@ -248,4 +246,5 @@ public class KBCommentCacheModel implements CacheModel<KBComment>,
 	public int userRating;
 	public long lastPublishDate;
 	public int status;
+
 }

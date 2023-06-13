@@ -30,7 +30,7 @@ import com.liferay.portal.kernel.util.Validator;
 import java.util.Map;
 
 /**
- * @author Eduardo Garcia
+ * @author Eduardo García
  * @author Marco Leo
  */
 @OSGiBeanProperties(service = FriendlyURLResolver.class)
@@ -135,11 +135,8 @@ public class VirtualLayoutFriendlyURLResolver implements FriendlyURLResolver {
 				companyId, groupId, privateLayout, friendlyURL, params,
 				requestContext);
 
-		LayoutFriendlyURLSeparatorComposite newLayoutFriendlyURLComposite =
-			new LayoutFriendlyURLSeparatorComposite(
-				layoutFriendlyURLComposite, Portal.FRIENDLY_URL_SEPARATOR);
-
-		return newLayoutFriendlyURLComposite;
+		return new LayoutFriendlyURLSeparatorComposite(
+			layoutFriendlyURLComposite, Portal.FRIENDLY_URL_SEPARATOR);
 	}
 
 	@Override

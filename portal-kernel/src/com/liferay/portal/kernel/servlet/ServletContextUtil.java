@@ -44,7 +44,7 @@ public class ServletContextUtil {
 	public static final String PATH_WEB_INF = "/WEB-INF";
 
 	public static final String URI_ATTRIBUTE =
-		ServletContextUtil.class.getName().concat(".rootURI");
+		ServletContextUtil.class.getName() + ".rootURI";
 
 	public static Set<String> getClassNames(ServletContext servletContext)
 		throws IOException {
@@ -75,7 +75,10 @@ public class ServletContextUtil {
 		if (cache) {
 			lastModifiedCacheKey = ServletContextUtil.class.getName();
 			lastModifiedCacheKey = lastModifiedCacheKey.concat(
-				StringPool.PERIOD).concat(path);
+				StringPool.PERIOD
+			).concat(
+				path
+			);
 
 			Long lastModified = (Long)servletContext.getAttribute(
 				lastModifiedCacheKey);

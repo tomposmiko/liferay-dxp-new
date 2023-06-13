@@ -70,6 +70,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
@@ -1415,7 +1416,9 @@ public class ClusterSchedulerEngineTest {
 				_MEMORY_CLUSTER_TEST_GROUP_NAME, StorageType.MEMORY_CLUSTERED);
 
 		for (SchedulerResponse curSchedulerResponse : schedulerResponses) {
-			if (curSchedulerResponse.getJobName().equals(_TEST_JOB_NAME_0)) {
+			if (Objects.equals(
+					curSchedulerResponse.getJobName(), _TEST_JOB_NAME_0)) {
+
 				assertTriggerState(
 					curSchedulerResponse, TriggerState.UNSCHEDULED);
 			}
@@ -1478,7 +1481,9 @@ public class ClusterSchedulerEngineTest {
 			_PERSISTENT_TEST_GROUP_NAME, StorageType.PERSISTED);
 
 		for (SchedulerResponse curSchedulerResponse : schedulerResponses) {
-			if (curSchedulerResponse.getJobName().equals(_TEST_JOB_NAME_0)) {
+			if (Objects.equals(
+					curSchedulerResponse.getJobName(), _TEST_JOB_NAME_0)) {
+
 				assertTriggerState(
 					curSchedulerResponse, TriggerState.UNSCHEDULED);
 			}
@@ -1798,7 +1803,11 @@ public class ClusterSchedulerEngineTest {
 
 		ObjectValuePair<SchedulerResponse, TriggerState> objectValuePair =
 			_memoryClusteredJobs.get(
-				groupName.concat(StringPool.PERIOD).concat(jobName));
+				groupName.concat(
+					StringPool.PERIOD
+				).concat(
+					jobName
+				));
 
 		if (objectValuePair == null) {
 			return null;

@@ -32,12 +32,12 @@ import java.util.Date;
  * The cache model class for representing KaleoTimerInstanceToken in entity cache.
  *
  * @author Brian Wing Shun Chan
- * @see KaleoTimerInstanceToken
  * @generated
  */
 @ProviderType
-public class KaleoTimerInstanceTokenCacheModel implements CacheModel<KaleoTimerInstanceToken>,
-	Externalizable {
+public class KaleoTimerInstanceTokenCacheModel
+	implements CacheModel<KaleoTimerInstanceToken>, Externalizable {
+
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj) {
@@ -48,9 +48,12 @@ public class KaleoTimerInstanceTokenCacheModel implements CacheModel<KaleoTimerI
 			return false;
 		}
 
-		KaleoTimerInstanceTokenCacheModel kaleoTimerInstanceTokenCacheModel = (KaleoTimerInstanceTokenCacheModel)obj;
+		KaleoTimerInstanceTokenCacheModel kaleoTimerInstanceTokenCacheModel =
+			(KaleoTimerInstanceTokenCacheModel)obj;
 
-		if (kaleoTimerInstanceTokenId == kaleoTimerInstanceTokenCacheModel.kaleoTimerInstanceTokenId) {
+		if (kaleoTimerInstanceTokenId ==
+				kaleoTimerInstanceTokenCacheModel.kaleoTimerInstanceTokenId) {
+
 			return true;
 		}
 
@@ -113,9 +116,11 @@ public class KaleoTimerInstanceTokenCacheModel implements CacheModel<KaleoTimerI
 
 	@Override
 	public KaleoTimerInstanceToken toEntityModel() {
-		KaleoTimerInstanceTokenImpl kaleoTimerInstanceTokenImpl = new KaleoTimerInstanceTokenImpl();
+		KaleoTimerInstanceTokenImpl kaleoTimerInstanceTokenImpl =
+			new KaleoTimerInstanceTokenImpl();
 
-		kaleoTimerInstanceTokenImpl.setKaleoTimerInstanceTokenId(kaleoTimerInstanceTokenId);
+		kaleoTimerInstanceTokenImpl.setKaleoTimerInstanceTokenId(
+			kaleoTimerInstanceTokenId);
 		kaleoTimerInstanceTokenImpl.setGroupId(groupId);
 		kaleoTimerInstanceTokenImpl.setCompanyId(companyId);
 		kaleoTimerInstanceTokenImpl.setUserId(userId);
@@ -149,10 +154,13 @@ public class KaleoTimerInstanceTokenCacheModel implements CacheModel<KaleoTimerI
 		}
 
 		kaleoTimerInstanceTokenImpl.setKaleoClassPK(kaleoClassPK);
-		kaleoTimerInstanceTokenImpl.setKaleoDefinitionVersionId(kaleoDefinitionVersionId);
+		kaleoTimerInstanceTokenImpl.setKaleoDefinitionVersionId(
+			kaleoDefinitionVersionId);
 		kaleoTimerInstanceTokenImpl.setKaleoInstanceId(kaleoInstanceId);
-		kaleoTimerInstanceTokenImpl.setKaleoInstanceTokenId(kaleoInstanceTokenId);
-		kaleoTimerInstanceTokenImpl.setKaleoTaskInstanceTokenId(kaleoTaskInstanceTokenId);
+		kaleoTimerInstanceTokenImpl.setKaleoInstanceTokenId(
+			kaleoInstanceTokenId);
+		kaleoTimerInstanceTokenImpl.setKaleoTaskInstanceTokenId(
+			kaleoTaskInstanceTokenId);
 		kaleoTimerInstanceTokenImpl.setKaleoTimerId(kaleoTimerId);
 
 		if (kaleoTimerName == null) {
@@ -170,8 +178,8 @@ public class KaleoTimerInstanceTokenCacheModel implements CacheModel<KaleoTimerI
 			kaleoTimerInstanceTokenImpl.setCompletionDate(null);
 		}
 		else {
-			kaleoTimerInstanceTokenImpl.setCompletionDate(new Date(
-					completionDate));
+			kaleoTimerInstanceTokenImpl.setCompletionDate(
+				new Date(completionDate));
 		}
 
 		if (workflowContext == null) {
@@ -223,8 +231,7 @@ public class KaleoTimerInstanceTokenCacheModel implements CacheModel<KaleoTimerI
 	}
 
 	@Override
-	public void writeExternal(ObjectOutput objectOutput)
-		throws IOException {
+	public void writeExternal(ObjectOutput objectOutput) throws IOException {
 		objectOutput.writeLong(kaleoTimerInstanceTokenId);
 
 		objectOutput.writeLong(groupId);
@@ -304,4 +311,5 @@ public class KaleoTimerInstanceTokenCacheModel implements CacheModel<KaleoTimerI
 	public boolean completed;
 	public long completionDate;
 	public String workflowContext;
+
 }

@@ -149,13 +149,11 @@ public class MailManager {
 	public Message addDraft(long accountId) throws PortalException {
 		Account account = AccountLocalServiceUtil.getAccount(accountId);
 
-		Message message = MessageLocalServiceUtil.addMessage(
+		return MessageLocalServiceUtil.addMessage(
 			_user.getUserId(), account.getDraftFolderId(), account.getAddress(),
 			StringPool.BLANK, StringPool.BLANK, StringPool.BLANK, new Date(),
 			StringPool.BLANK, StringPool.BLANK, StringPool.BLANK, 0,
 			ContentTypes.TEXT_HTML_UTF8);
-
-		return message;
 	}
 
 	public JSONObject addFolder(long accountId, String displayName)
@@ -295,17 +293,15 @@ public class MailManager {
 				return createJSONResult(
 					"success", "drafts-have-been-discarded");
 			}
-			else {
-				Mailbox mailbox = _getMailbox(
-					_user,
-					AccountLocalServiceUtil.getAccount(message.getAccountId()),
-					_passwordRetriever.getPassword(message.getAccountId()));
 
-				mailbox.deleteMessages(message.getFolderId(), messageIds);
+			Mailbox mailbox = _getMailbox(
+				_user,
+				AccountLocalServiceUtil.getAccount(message.getAccountId()),
+				_passwordRetriever.getPassword(message.getAccountId()));
 
-				return createJSONResult(
-					"success", "messages-have-been-deleted");
-			}
+			mailbox.deleteMessages(message.getFolderId(), messageIds);
+
+			return createJSONResult("success", "messages-have-been-deleted");
 		}
 		catch (MailException me) {
 			_log.error(me, me);
@@ -803,9 +799,8 @@ public class MailManager {
 				if (Validator.isNull(oldPassword)) {
 					throw new MailException("no password");
 				}
-				else {
-					password = oldPassword;
-				}
+
+				password = oldPassword;
 			}
 
 			Mailbox mailbox = _getMailbox(

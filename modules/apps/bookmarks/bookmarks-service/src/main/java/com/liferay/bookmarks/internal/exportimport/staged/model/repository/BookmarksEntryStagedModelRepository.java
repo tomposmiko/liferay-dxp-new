@@ -36,12 +36,14 @@ import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Daniel Kocsis
- * @author Mate Thurzo
+ * @author Máté Thurzó
  */
 @Component(
 	immediate = true,
 	property = "model.class.name=com.liferay.bookmarks.model.BookmarksEntry",
-	service = StagedModelRepository.class
+	service = {
+		BookmarksEntryStagedModelRepository.class, StagedModelRepository.class
+	}
 )
 public class BookmarksEntryStagedModelRepository
 	implements StagedModelRepository<BookmarksEntry> {
@@ -177,8 +179,14 @@ public class BookmarksEntryStagedModelRepository
 
 	@Override
 	public BookmarksEntry updateStagedModel(
+		PortletDataContext portletDataContext, BookmarksEntry bookmarksEntry) {
+
+		throw new UnsupportedOperationException();
+	}
+
+	public BookmarksEntry updateStagedModel(
 			PortletDataContext portletDataContext,
-			BookmarksEntry bookmarksEntry)
+			BookmarksEntry bookmarksEntry, long existingEntryId)
 		throws PortalException {
 
 		long userId = portletDataContext.getUserId(
@@ -188,7 +196,7 @@ public class BookmarksEntryStagedModelRepository
 			bookmarksEntry);
 
 		return _bookmarksEntryLocalService.updateEntry(
-			userId, bookmarksEntry.getEntryId(), bookmarksEntry.getGroupId(),
+			userId, existingEntryId, bookmarksEntry.getGroupId(),
 			bookmarksEntry.getFolderId(), bookmarksEntry.getName(),
 			bookmarksEntry.getUrl(), bookmarksEntry.getDescription(),
 			serviceContext);

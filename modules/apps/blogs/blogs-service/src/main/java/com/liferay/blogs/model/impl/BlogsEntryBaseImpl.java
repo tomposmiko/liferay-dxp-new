@@ -32,12 +32,13 @@ import com.liferay.blogs.service.BlogsEntryLocalServiceUtil;
  * @generated
  */
 @ProviderType
-public abstract class BlogsEntryBaseImpl extends BlogsEntryModelImpl
-	implements BlogsEntry {
+public abstract class BlogsEntryBaseImpl
+	extends BlogsEntryModelImpl implements BlogsEntry {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
-	 * Never modify or reference this class directly. All methods that expect a blogs entry model instance should use the {@link BlogsEntry} interface instead.
+	 * Never modify or reference this class directly. All methods that expect a blogs entry model instance should use the <code>BlogsEntry</code> interface instead.
 	 */
 	@Override
 	public void persist() {
@@ -48,4 +49,5 @@ public abstract class BlogsEntryBaseImpl extends BlogsEntryModelImpl
 			BlogsEntryLocalServiceUtil.updateBlogsEntry(this);
 		}
 	}
+
 }

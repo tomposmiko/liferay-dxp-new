@@ -37,6 +37,7 @@ import java.util.Objects;
  */
 @ProviderType
 public class ExpandoRowWrapper implements ExpandoRow, ModelWrapper<ExpandoRow> {
+
 	public ExpandoRowWrapper(ExpandoRow expandoRow) {
 		_expandoRow = expandoRow;
 	}
@@ -108,20 +109,20 @@ public class ExpandoRowWrapper implements ExpandoRow, ModelWrapper<ExpandoRow> {
 	}
 
 	/**
-	* Returns the class pk of this expando row.
-	*
-	* @return the class pk of this expando row
-	*/
+	 * Returns the class pk of this expando row.
+	 *
+	 * @return the class pk of this expando row
+	 */
 	@Override
 	public long getClassPK() {
 		return _expandoRow.getClassPK();
 	}
 
 	/**
-	* Returns the company ID of this expando row.
-	*
-	* @return the company ID of this expando row
-	*/
+	 * Returns the company ID of this expando row.
+	 *
+	 * @return the company ID of this expando row
+	 */
 	@Override
 	public long getCompanyId() {
 		return _expandoRow.getCompanyId();
@@ -133,20 +134,20 @@ public class ExpandoRowWrapper implements ExpandoRow, ModelWrapper<ExpandoRow> {
 	}
 
 	/**
-	* Returns the modified date of this expando row.
-	*
-	* @return the modified date of this expando row
-	*/
+	 * Returns the modified date of this expando row.
+	 *
+	 * @return the modified date of this expando row
+	 */
 	@Override
 	public Date getModifiedDate() {
 		return _expandoRow.getModifiedDate();
 	}
 
 	/**
-	* Returns the primary key of this expando row.
-	*
-	* @return the primary key of this expando row
-	*/
+	 * Returns the primary key of this expando row.
+	 *
+	 * @return the primary key of this expando row
+	 */
 	@Override
 	public long getPrimaryKey() {
 		return _expandoRow.getPrimaryKey();
@@ -158,20 +159,20 @@ public class ExpandoRowWrapper implements ExpandoRow, ModelWrapper<ExpandoRow> {
 	}
 
 	/**
-	* Returns the row ID of this expando row.
-	*
-	* @return the row ID of this expando row
-	*/
+	 * Returns the row ID of this expando row.
+	 *
+	 * @return the row ID of this expando row
+	 */
 	@Override
 	public long getRowId() {
 		return _expandoRow.getRowId();
 	}
 
 	/**
-	* Returns the table ID of this expando row.
-	*
-	* @return the table ID of this expando row
-	*/
+	 * Returns the table ID of this expando row.
+	 *
+	 * @return the table ID of this expando row
+	 */
 	@Override
 	public long getTableId() {
 		return _expandoRow.getTableId();
@@ -208,20 +209,20 @@ public class ExpandoRowWrapper implements ExpandoRow, ModelWrapper<ExpandoRow> {
 	}
 
 	/**
-	* Sets the class pk of this expando row.
-	*
-	* @param classPK the class pk of this expando row
-	*/
+	 * Sets the class pk of this expando row.
+	 *
+	 * @param classPK the class pk of this expando row
+	 */
 	@Override
 	public void setClassPK(long classPK) {
 		_expandoRow.setClassPK(classPK);
 	}
 
 	/**
-	* Sets the company ID of this expando row.
-	*
-	* @param companyId the company ID of this expando row
-	*/
+	 * Sets the company ID of this expando row.
+	 *
+	 * @param companyId the company ID of this expando row
+	 */
 	@Override
 	public void setCompanyId(long companyId) {
 		_expandoRow.setCompanyId(companyId);
@@ -230,6 +231,7 @@ public class ExpandoRowWrapper implements ExpandoRow, ModelWrapper<ExpandoRow> {
 	@Override
 	public void setExpandoBridgeAttributes(
 		com.liferay.portal.kernel.model.BaseModel<?> baseModel) {
+
 		_expandoRow.setExpandoBridgeAttributes(baseModel);
 	}
 
@@ -244,10 +246,10 @@ public class ExpandoRowWrapper implements ExpandoRow, ModelWrapper<ExpandoRow> {
 	}
 
 	/**
-	* Sets the modified date of this expando row.
-	*
-	* @param modifiedDate the modified date of this expando row
-	*/
+	 * Sets the modified date of this expando row.
+	 *
+	 * @param modifiedDate the modified date of this expando row
+	 */
 	@Override
 	public void setModifiedDate(Date modifiedDate) {
 		_expandoRow.setModifiedDate(modifiedDate);
@@ -259,10 +261,10 @@ public class ExpandoRowWrapper implements ExpandoRow, ModelWrapper<ExpandoRow> {
 	}
 
 	/**
-	* Sets the primary key of this expando row.
-	*
-	* @param primaryKey the primary key of this expando row
-	*/
+	 * Sets the primary key of this expando row.
+	 *
+	 * @param primaryKey the primary key of this expando row
+	 */
 	@Override
 	public void setPrimaryKey(long primaryKey) {
 		_expandoRow.setPrimaryKey(primaryKey);
@@ -274,27 +276,29 @@ public class ExpandoRowWrapper implements ExpandoRow, ModelWrapper<ExpandoRow> {
 	}
 
 	/**
-	* Sets the row ID of this expando row.
-	*
-	* @param rowId the row ID of this expando row
-	*/
+	 * Sets the row ID of this expando row.
+	 *
+	 * @param rowId the row ID of this expando row
+	 */
 	@Override
 	public void setRowId(long rowId) {
 		_expandoRow.setRowId(rowId);
 	}
 
 	/**
-	* Sets the table ID of this expando row.
-	*
-	* @param tableId the table ID of this expando row
-	*/
+	 * Sets the table ID of this expando row.
+	 *
+	 * @param tableId the table ID of this expando row
+	 */
 	@Override
 	public void setTableId(long tableId) {
 		_expandoRow.setTableId(tableId);
 	}
 
 	@Override
-	public com.liferay.portal.kernel.model.CacheModel<ExpandoRow> toCacheModel() {
+	public com.liferay.portal.kernel.model.CacheModel<ExpandoRow>
+		toCacheModel() {
+
 		return _expandoRow.toCacheModel();
 	}
 
@@ -358,4 +362,5 @@ public class ExpandoRowWrapper implements ExpandoRow, ModelWrapper<ExpandoRow> {
 	}
 
 	private final ExpandoRow _expandoRow;
+
 }

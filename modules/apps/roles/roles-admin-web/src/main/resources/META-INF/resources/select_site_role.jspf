@@ -28,13 +28,26 @@ long uniqueGroupId = 0;
 List<Group> groups = null;
 
 if (step == 1) {
-	groups = selUser.getGroups();
+	String keywords = ParamUtil.getString(request, "keywords");
+
+	if (Validator.isNull(keywords)) {
+		groups = selUser.getSiteGroups();
+	}
+	else {
+		LinkedHashMap<String, Object> groupParams = new LinkedHashMap<>();
+
+		groupParams.put("inherit", Boolean.FALSE);
+		groupParams.put("site", Boolean.TRUE);
+		groupParams.put("usersGroups", selUser.getUserId());
+
+		groups = GroupLocalServiceUtil.search(user.getCompanyId(), keywords, groupParams, QueryUtil.ALL_POS, QueryUtil.ALL_POS);
+	}
 
 	if (filterManageableGroups) {
 		groups = UsersAdminUtil.filterGroups(permissionChecker, groups);
 	}
 
-	if (groups.size() == 1) {
+	if (Validator.isNull(keywords) && (groups.size() == 1)) {
 		step = 2;
 
 		uniqueGroupId = groups.get(0).getGroupId();
@@ -47,10 +60,6 @@ PortletURL portletURL = SelectRoleManagementToolbarDisplayContext.getPortletURL(
 
 SearchContainer roleSearchContainer = SelectRoleManagementToolbarDisplayContext.getRoleSearchContainer(filterManageableRoles);
 %>
-
-<clay:navigation-bar
-	navigationItems='<%= roleDisplayContext.getSelectRoleNavigationItems("site-roles") %>'
-/>
 
 <clay:management-toolbar
 	clearResultsURL="<%= SelectRoleManagementToolbarDisplayContext.getClearResultsURL() %>"

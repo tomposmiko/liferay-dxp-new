@@ -85,7 +85,7 @@ import org.junit.Test;
 
 /**
  * @author     Daniel Kocsis
- * @author     Mate Thurzo
+ * @author     Máté Thurzó
  * @deprecated As of Judson (7.1.x), replaced by {@link
  *             com.liferay.exportimport.test.util.lar.BaseStagedModelDataHandlerTestCase}
  */
@@ -758,11 +758,8 @@ public abstract class BaseStagedModelDataHandlerTestCase {
 	protected StagedModel readExportedStagedModel(StagedModel stagedModel) {
 		String stagedModelPath = ExportImportPathUtil.getModelPath(stagedModel);
 
-		StagedModel exportedStagedModel =
-			(StagedModel)portletDataContext.getZipEntryAsObject(
-				stagedModelPath);
-
-		return exportedStagedModel;
+		return (StagedModel)portletDataContext.getZipEntryAsObject(
+			stagedModelPath);
 	}
 
 	protected boolean supportLastPublishDateUpdate() {

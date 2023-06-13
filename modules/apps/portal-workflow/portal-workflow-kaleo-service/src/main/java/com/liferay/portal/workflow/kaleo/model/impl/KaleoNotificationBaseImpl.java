@@ -34,10 +34,11 @@ import com.liferay.portal.workflow.kaleo.service.KaleoNotificationLocalServiceUt
 @ProviderType
 public abstract class KaleoNotificationBaseImpl
 	extends KaleoNotificationModelImpl implements KaleoNotification {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
-	 * Never modify or reference this class directly. All methods that expect a kaleo notification model instance should use the {@link KaleoNotification} interface instead.
+	 * Never modify or reference this class directly. All methods that expect a kaleo notification model instance should use the <code>KaleoNotification</code> interface instead.
 	 */
 	@Override
 	public void persist() {
@@ -48,4 +49,5 @@ public abstract class KaleoNotificationBaseImpl
 			KaleoNotificationLocalServiceUtil.updateKaleoNotification(this);
 		}
 	}
+
 }

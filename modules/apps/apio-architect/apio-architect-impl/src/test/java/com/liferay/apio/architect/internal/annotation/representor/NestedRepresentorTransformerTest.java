@@ -26,6 +26,8 @@ import static org.junit.Assert.assertThat;
 
 import com.liferay.apio.architect.alias.representor.NestedFieldFunction;
 import com.liferay.apio.architect.alias.representor.NestedListFieldFunction;
+import com.liferay.apio.architect.internal.annotation.representor.processor.ParsedType;
+import com.liferay.apio.architect.internal.annotation.representor.processor.TypeProcessor;
 import com.liferay.apio.architect.internal.annotation.representor.types.Dummy.IntegerIdentifier;
 import com.liferay.apio.architect.internal.annotation.representor.types.DummyWithNested;
 import com.liferay.apio.architect.internal.annotation.representor.types.DummyWithNested.NestedDummy;
@@ -42,8 +44,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.hamcrest.MatcherAssert;
-
 import org.junit.Before;
 import org.junit.Test;
 
@@ -54,8 +54,11 @@ public class NestedRepresentorTransformerTest {
 
 	@Before
 	public void setUp() {
+		ParsedType parsedType = TypeProcessor.processType(
+			DummyWithNested.class);
+
 		_representor = RepresentorTransformer.toRepresentor(
-			DummyWithNested.class, null, new HashMap<>());
+			parsedType, null, new HashMap<>());
 	}
 
 	@Test
@@ -68,16 +71,26 @@ public class NestedRepresentorTransformerTest {
 
 		List<NestedFieldFunction<DummyWithNested, ?>> nestedDummyList =
 			stream.filter(
-				nestedFieldFunction ->
-					nestedFieldFunction.getKey().equals("nestedDummy")
+				nestedFieldFunction -> {
+					String key = nestedFieldFunction.getKey();
+
+					if (key.equals("nestedDummy")) {
+						return true;
+					}
+
+					return false;
+				}
 			).collect(
 				Collectors.toList()
 			);
 
 		assertThat(nestedDummyList.size(), is(1));
 
+		NestedFieldFunction<DummyWithNested, ?> nestedDummy =
+			nestedDummyList.get(0);
+
 		NestedRepresentor<NestedDummy> nestedRepresentor = unsafeCast(
-			nestedDummyList.get(0).getNestedRepresentor());
+			nestedDummy.getNestedRepresentor());
 
 		_testRelatedModels(nestedRepresentor);
 
@@ -98,16 +111,26 @@ public class NestedRepresentorTransformerTest {
 
 		List<NestedListFieldFunction<DummyWithNested, ?>> nestedDummyList =
 			stream.filter(
-				nestedFieldFunction ->
-					nestedFieldFunction.getKey().equals("nestedDummyList")
+				nestedFieldFunction -> {
+					String key = nestedFieldFunction.getKey();
+
+					if (key.equals("nestedDummyList")) {
+						return true;
+					}
+
+					return false;
+				}
 			).collect(
 				Collectors.toList()
 			);
 
 		assertThat(nestedDummyList.size(), is(1));
 
+		NestedListFieldFunction<DummyWithNested, ?> nestedDummy =
+			nestedDummyList.get(0);
+
 		NestedRepresentor<NestedDummy> nestedRepresentor = unsafeCast(
-			nestedDummyList.get(0).getNestedRepresentor());
+			nestedDummy.getNestedRepresentor());
 
 		_testRelatedModels(nestedRepresentor);
 
@@ -141,13 +164,20 @@ public class NestedRepresentorTransformerTest {
 				relatedCollection.getIdentifierClass() ==
 					IntegerIdentifier.class
 		).filter(
-			relatedCollection ->
-				relatedCollection.getKey().equals("relatedCollection")
+			relatedCollection -> {
+				String key = relatedCollection.getKey();
+
+				if (key.equals("linkToChildCollection")) {
+					return true;
+				}
+
+				return false;
+			}
 		).collect(
 			Collectors.toList()
 		);
 
-		MatcherAssert.assertThat(list0, hasSize(1));
+		assertThat(list0, hasSize(1));
 	}
 
 	private void _testRelatedModels(
@@ -157,7 +187,7 @@ public class NestedRepresentorTransformerTest {
 			nestedRepresentor.getRelatedModels();
 
 		testRelatedModel(
-			relatedModels.get(0), _nestedDummy, "linkedModel",
+			relatedModels.get(0), _nestedDummy, "linkToSingle",
 			IntegerIdentifier.class, 1);
 	}
 

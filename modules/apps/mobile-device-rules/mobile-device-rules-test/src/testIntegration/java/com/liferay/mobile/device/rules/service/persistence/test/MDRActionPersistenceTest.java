@@ -15,13 +15,11 @@
 package com.liferay.mobile.device.rules.service.persistence.test;
 
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
-
 import com.liferay.mobile.device.rules.exception.NoSuchActionException;
 import com.liferay.mobile.device.rules.model.MDRAction;
 import com.liferay.mobile.device.rules.service.MDRActionLocalServiceUtil;
 import com.liferay.mobile.device.rules.service.persistence.MDRActionPersistence;
 import com.liferay.mobile.device.rules.service.persistence.MDRActionUtil;
-
 import com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQueryFactoryUtil;
@@ -40,15 +38,6 @@ import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import com.liferay.portal.test.rule.PersistenceTestRule;
 import com.liferay.portal.test.rule.TransactionalTestRule;
 
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.ClassRule;
-import org.junit.Rule;
-import org.junit.Test;
-
-import org.junit.runner.RunWith;
-
 import java.io.Serializable;
 
 import java.util.ArrayList;
@@ -59,16 +48,27 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
+import org.junit.After;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.ClassRule;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+
 /**
  * @generated
  */
 @RunWith(Arquillian.class)
 public class MDRActionPersistenceTest {
+
 	@ClassRule
 	@Rule
-	public static final AggregateTestRule aggregateTestRule = new AggregateTestRule(new LiferayIntegrationTestRule(),
-			PersistenceTestRule.INSTANCE,
-			new TransactionalTestRule(Propagation.REQUIRED,
+	public static final AggregateTestRule aggregateTestRule =
+		new AggregateTestRule(
+			new LiferayIntegrationTestRule(), PersistenceTestRule.INSTANCE,
+			new TransactionalTestRule(
+				Propagation.REQUIRED,
 				"com.liferay.mobile.device.rules.service"));
 
 	@Before
@@ -108,7 +108,8 @@ public class MDRActionPersistenceTest {
 
 		_persistence.remove(newMDRAction);
 
-		MDRAction existingMDRAction = _persistence.fetchByPrimaryKey(newMDRAction.getPrimaryKey());
+		MDRAction existingMDRAction = _persistence.fetchByPrimaryKey(
+			newMDRAction.getPrimaryKey());
 
 		Assert.assertNull(existingMDRAction);
 	}
@@ -156,39 +157,45 @@ public class MDRActionPersistenceTest {
 
 		_mdrActions.add(_persistence.update(newMDRAction));
 
-		MDRAction existingMDRAction = _persistence.findByPrimaryKey(newMDRAction.getPrimaryKey());
+		MDRAction existingMDRAction = _persistence.findByPrimaryKey(
+			newMDRAction.getPrimaryKey());
 
-		Assert.assertEquals(existingMDRAction.getUuid(), newMDRAction.getUuid());
-		Assert.assertEquals(existingMDRAction.getActionId(),
-			newMDRAction.getActionId());
-		Assert.assertEquals(existingMDRAction.getGroupId(),
-			newMDRAction.getGroupId());
-		Assert.assertEquals(existingMDRAction.getCompanyId(),
-			newMDRAction.getCompanyId());
-		Assert.assertEquals(existingMDRAction.getUserId(),
-			newMDRAction.getUserId());
-		Assert.assertEquals(existingMDRAction.getUserName(),
-			newMDRAction.getUserName());
-		Assert.assertEquals(Time.getShortTimestamp(
-				existingMDRAction.getCreateDate()),
+		Assert.assertEquals(
+			existingMDRAction.getUuid(), newMDRAction.getUuid());
+		Assert.assertEquals(
+			existingMDRAction.getActionId(), newMDRAction.getActionId());
+		Assert.assertEquals(
+			existingMDRAction.getGroupId(), newMDRAction.getGroupId());
+		Assert.assertEquals(
+			existingMDRAction.getCompanyId(), newMDRAction.getCompanyId());
+		Assert.assertEquals(
+			existingMDRAction.getUserId(), newMDRAction.getUserId());
+		Assert.assertEquals(
+			existingMDRAction.getUserName(), newMDRAction.getUserName());
+		Assert.assertEquals(
+			Time.getShortTimestamp(existingMDRAction.getCreateDate()),
 			Time.getShortTimestamp(newMDRAction.getCreateDate()));
-		Assert.assertEquals(Time.getShortTimestamp(
-				existingMDRAction.getModifiedDate()),
+		Assert.assertEquals(
+			Time.getShortTimestamp(existingMDRAction.getModifiedDate()),
 			Time.getShortTimestamp(newMDRAction.getModifiedDate()));
-		Assert.assertEquals(existingMDRAction.getClassNameId(),
-			newMDRAction.getClassNameId());
-		Assert.assertEquals(existingMDRAction.getClassPK(),
-			newMDRAction.getClassPK());
-		Assert.assertEquals(existingMDRAction.getRuleGroupInstanceId(),
+		Assert.assertEquals(
+			existingMDRAction.getClassNameId(), newMDRAction.getClassNameId());
+		Assert.assertEquals(
+			existingMDRAction.getClassPK(), newMDRAction.getClassPK());
+		Assert.assertEquals(
+			existingMDRAction.getRuleGroupInstanceId(),
 			newMDRAction.getRuleGroupInstanceId());
-		Assert.assertEquals(existingMDRAction.getName(), newMDRAction.getName());
-		Assert.assertEquals(existingMDRAction.getDescription(),
-			newMDRAction.getDescription());
-		Assert.assertEquals(existingMDRAction.getType(), newMDRAction.getType());
-		Assert.assertEquals(existingMDRAction.getTypeSettings(),
+		Assert.assertEquals(
+			existingMDRAction.getName(), newMDRAction.getName());
+		Assert.assertEquals(
+			existingMDRAction.getDescription(), newMDRAction.getDescription());
+		Assert.assertEquals(
+			existingMDRAction.getType(), newMDRAction.getType());
+		Assert.assertEquals(
+			existingMDRAction.getTypeSettings(),
 			newMDRAction.getTypeSettings());
-		Assert.assertEquals(Time.getShortTimestamp(
-				existingMDRAction.getLastPublishDate()),
+		Assert.assertEquals(
+			Time.getShortTimestamp(existingMDRAction.getLastPublishDate()),
 			Time.getShortTimestamp(newMDRAction.getLastPublishDate()));
 	}
 
@@ -230,7 +237,8 @@ public class MDRActionPersistenceTest {
 	public void testFindByPrimaryKeyExisting() throws Exception {
 		MDRAction newMDRAction = addMDRAction();
 
-		MDRAction existingMDRAction = _persistence.findByPrimaryKey(newMDRAction.getPrimaryKey());
+		MDRAction existingMDRAction = _persistence.findByPrimaryKey(
+			newMDRAction.getPrimaryKey());
 
 		Assert.assertEquals(existingMDRAction, newMDRAction);
 	}
@@ -244,24 +252,25 @@ public class MDRActionPersistenceTest {
 
 	@Test
 	public void testFindAll() throws Exception {
-		_persistence.findAll(QueryUtil.ALL_POS, QueryUtil.ALL_POS,
-			getOrderByComparator());
+		_persistence.findAll(
+			QueryUtil.ALL_POS, QueryUtil.ALL_POS, getOrderByComparator());
 	}
 
 	protected OrderByComparator<MDRAction> getOrderByComparator() {
-		return OrderByComparatorFactoryUtil.create("MDRAction", "uuid", true,
-			"actionId", true, "groupId", true, "companyId", true, "userId",
-			true, "userName", true, "createDate", true, "modifiedDate", true,
-			"classNameId", true, "classPK", true, "ruleGroupInstanceId", true,
-			"name", true, "description", true, "type", true, "lastPublishDate",
-			true);
+		return OrderByComparatorFactoryUtil.create(
+			"MDRAction", "uuid", true, "actionId", true, "groupId", true,
+			"companyId", true, "userId", true, "userName", true, "createDate",
+			true, "modifiedDate", true, "classNameId", true, "classPK", true,
+			"ruleGroupInstanceId", true, "name", true, "description", true,
+			"type", true, "lastPublishDate", true);
 	}
 
 	@Test
 	public void testFetchByPrimaryKeyExisting() throws Exception {
 		MDRAction newMDRAction = addMDRAction();
 
-		MDRAction existingMDRAction = _persistence.fetchByPrimaryKey(newMDRAction.getPrimaryKey());
+		MDRAction existingMDRAction = _persistence.fetchByPrimaryKey(
+			newMDRAction.getPrimaryKey());
 
 		Assert.assertEquals(existingMDRAction, newMDRAction);
 	}
@@ -278,6 +287,7 @@ public class MDRActionPersistenceTest {
 	@Test
 	public void testFetchByPrimaryKeysWithMultiplePrimaryKeysWhereAllPrimaryKeysExist()
 		throws Exception {
+
 		MDRAction newMDRAction1 = addMDRAction();
 		MDRAction newMDRAction2 = addMDRAction();
 
@@ -286,18 +296,20 @@ public class MDRActionPersistenceTest {
 		primaryKeys.add(newMDRAction1.getPrimaryKey());
 		primaryKeys.add(newMDRAction2.getPrimaryKey());
 
-		Map<Serializable, MDRAction> mdrActions = _persistence.fetchByPrimaryKeys(primaryKeys);
+		Map<Serializable, MDRAction> mdrActions =
+			_persistence.fetchByPrimaryKeys(primaryKeys);
 
 		Assert.assertEquals(2, mdrActions.size());
-		Assert.assertEquals(newMDRAction1,
-			mdrActions.get(newMDRAction1.getPrimaryKey()));
-		Assert.assertEquals(newMDRAction2,
-			mdrActions.get(newMDRAction2.getPrimaryKey()));
+		Assert.assertEquals(
+			newMDRAction1, mdrActions.get(newMDRAction1.getPrimaryKey()));
+		Assert.assertEquals(
+			newMDRAction2, mdrActions.get(newMDRAction2.getPrimaryKey()));
 	}
 
 	@Test
 	public void testFetchByPrimaryKeysWithMultiplePrimaryKeysWhereNoPrimaryKeysExist()
 		throws Exception {
+
 		long pk1 = RandomTestUtil.nextLong();
 
 		long pk2 = RandomTestUtil.nextLong();
@@ -307,7 +319,8 @@ public class MDRActionPersistenceTest {
 		primaryKeys.add(pk1);
 		primaryKeys.add(pk2);
 
-		Map<Serializable, MDRAction> mdrActions = _persistence.fetchByPrimaryKeys(primaryKeys);
+		Map<Serializable, MDRAction> mdrActions =
+			_persistence.fetchByPrimaryKeys(primaryKeys);
 
 		Assert.assertTrue(mdrActions.isEmpty());
 	}
@@ -315,6 +328,7 @@ public class MDRActionPersistenceTest {
 	@Test
 	public void testFetchByPrimaryKeysWithMultiplePrimaryKeysWhereSomePrimaryKeysExist()
 		throws Exception {
+
 		MDRAction newMDRAction = addMDRAction();
 
 		long pk = RandomTestUtil.nextLong();
@@ -324,52 +338,57 @@ public class MDRActionPersistenceTest {
 		primaryKeys.add(newMDRAction.getPrimaryKey());
 		primaryKeys.add(pk);
 
-		Map<Serializable, MDRAction> mdrActions = _persistence.fetchByPrimaryKeys(primaryKeys);
+		Map<Serializable, MDRAction> mdrActions =
+			_persistence.fetchByPrimaryKeys(primaryKeys);
 
 		Assert.assertEquals(1, mdrActions.size());
-		Assert.assertEquals(newMDRAction,
-			mdrActions.get(newMDRAction.getPrimaryKey()));
+		Assert.assertEquals(
+			newMDRAction, mdrActions.get(newMDRAction.getPrimaryKey()));
 	}
 
 	@Test
-	public void testFetchByPrimaryKeysWithNoPrimaryKeys()
-		throws Exception {
+	public void testFetchByPrimaryKeysWithNoPrimaryKeys() throws Exception {
 		Set<Serializable> primaryKeys = new HashSet<Serializable>();
 
-		Map<Serializable, MDRAction> mdrActions = _persistence.fetchByPrimaryKeys(primaryKeys);
+		Map<Serializable, MDRAction> mdrActions =
+			_persistence.fetchByPrimaryKeys(primaryKeys);
 
 		Assert.assertTrue(mdrActions.isEmpty());
 	}
 
 	@Test
-	public void testFetchByPrimaryKeysWithOnePrimaryKey()
-		throws Exception {
+	public void testFetchByPrimaryKeysWithOnePrimaryKey() throws Exception {
 		MDRAction newMDRAction = addMDRAction();
 
 		Set<Serializable> primaryKeys = new HashSet<Serializable>();
 
 		primaryKeys.add(newMDRAction.getPrimaryKey());
 
-		Map<Serializable, MDRAction> mdrActions = _persistence.fetchByPrimaryKeys(primaryKeys);
+		Map<Serializable, MDRAction> mdrActions =
+			_persistence.fetchByPrimaryKeys(primaryKeys);
 
 		Assert.assertEquals(1, mdrActions.size());
-		Assert.assertEquals(newMDRAction,
-			mdrActions.get(newMDRAction.getPrimaryKey()));
+		Assert.assertEquals(
+			newMDRAction, mdrActions.get(newMDRAction.getPrimaryKey()));
 	}
 
 	@Test
 	public void testActionableDynamicQuery() throws Exception {
 		final IntegerWrapper count = new IntegerWrapper();
 
-		ActionableDynamicQuery actionableDynamicQuery = MDRActionLocalServiceUtil.getActionableDynamicQuery();
+		ActionableDynamicQuery actionableDynamicQuery =
+			MDRActionLocalServiceUtil.getActionableDynamicQuery();
 
-		actionableDynamicQuery.setPerformActionMethod(new ActionableDynamicQuery.PerformActionMethod<MDRAction>() {
+		actionableDynamicQuery.setPerformActionMethod(
+			new ActionableDynamicQuery.PerformActionMethod<MDRAction>() {
+
 				@Override
 				public void performAction(MDRAction mdrAction) {
 					Assert.assertNotNull(mdrAction);
 
 					count.increment();
 				}
+
 			});
 
 		actionableDynamicQuery.performActions();
@@ -378,17 +397,17 @@ public class MDRActionPersistenceTest {
 	}
 
 	@Test
-	public void testDynamicQueryByPrimaryKeyExisting()
-		throws Exception {
+	public void testDynamicQueryByPrimaryKeyExisting() throws Exception {
 		MDRAction newMDRAction = addMDRAction();
 
-		DynamicQuery dynamicQuery = DynamicQueryFactoryUtil.forClass(MDRAction.class,
-				_dynamicQueryClassLoader);
+		DynamicQuery dynamicQuery = DynamicQueryFactoryUtil.forClass(
+			MDRAction.class, _dynamicQueryClassLoader);
 
-		dynamicQuery.add(RestrictionsFactoryUtil.eq("actionId",
-				newMDRAction.getActionId()));
+		dynamicQuery.add(
+			RestrictionsFactoryUtil.eq("actionId", newMDRAction.getActionId()));
 
-		List<MDRAction> result = _persistence.findWithDynamicQuery(dynamicQuery);
+		List<MDRAction> result = _persistence.findWithDynamicQuery(
+			dynamicQuery);
 
 		Assert.assertEquals(1, result.size());
 
@@ -399,31 +418,31 @@ public class MDRActionPersistenceTest {
 
 	@Test
 	public void testDynamicQueryByPrimaryKeyMissing() throws Exception {
-		DynamicQuery dynamicQuery = DynamicQueryFactoryUtil.forClass(MDRAction.class,
-				_dynamicQueryClassLoader);
+		DynamicQuery dynamicQuery = DynamicQueryFactoryUtil.forClass(
+			MDRAction.class, _dynamicQueryClassLoader);
 
-		dynamicQuery.add(RestrictionsFactoryUtil.eq("actionId",
-				RandomTestUtil.nextLong()));
+		dynamicQuery.add(
+			RestrictionsFactoryUtil.eq("actionId", RandomTestUtil.nextLong()));
 
-		List<MDRAction> result = _persistence.findWithDynamicQuery(dynamicQuery);
+		List<MDRAction> result = _persistence.findWithDynamicQuery(
+			dynamicQuery);
 
 		Assert.assertEquals(0, result.size());
 	}
 
 	@Test
-	public void testDynamicQueryByProjectionExisting()
-		throws Exception {
+	public void testDynamicQueryByProjectionExisting() throws Exception {
 		MDRAction newMDRAction = addMDRAction();
 
-		DynamicQuery dynamicQuery = DynamicQueryFactoryUtil.forClass(MDRAction.class,
-				_dynamicQueryClassLoader);
+		DynamicQuery dynamicQuery = DynamicQueryFactoryUtil.forClass(
+			MDRAction.class, _dynamicQueryClassLoader);
 
 		dynamicQuery.setProjection(ProjectionFactoryUtil.property("actionId"));
 
 		Object newActionId = newMDRAction.getActionId();
 
-		dynamicQuery.add(RestrictionsFactoryUtil.in("actionId",
-				new Object[] { newActionId }));
+		dynamicQuery.add(
+			RestrictionsFactoryUtil.in("actionId", new Object[] {newActionId}));
 
 		List<Object> result = _persistence.findWithDynamicQuery(dynamicQuery);
 
@@ -436,13 +455,14 @@ public class MDRActionPersistenceTest {
 
 	@Test
 	public void testDynamicQueryByProjectionMissing() throws Exception {
-		DynamicQuery dynamicQuery = DynamicQueryFactoryUtil.forClass(MDRAction.class,
-				_dynamicQueryClassLoader);
+		DynamicQuery dynamicQuery = DynamicQueryFactoryUtil.forClass(
+			MDRAction.class, _dynamicQueryClassLoader);
 
 		dynamicQuery.setProjection(ProjectionFactoryUtil.property("actionId"));
 
-		dynamicQuery.add(RestrictionsFactoryUtil.in("actionId",
-				new Object[] { RandomTestUtil.nextLong() }));
+		dynamicQuery.add(
+			RestrictionsFactoryUtil.in(
+				"actionId", new Object[] {RandomTestUtil.nextLong()}));
 
 		List<Object> result = _persistence.findWithDynamicQuery(dynamicQuery);
 
@@ -455,14 +475,18 @@ public class MDRActionPersistenceTest {
 
 		_persistence.clearCache();
 
-		MDRAction existingMDRAction = _persistence.findByPrimaryKey(newMDRAction.getPrimaryKey());
+		MDRAction existingMDRAction = _persistence.findByPrimaryKey(
+			newMDRAction.getPrimaryKey());
 
-		Assert.assertTrue(Objects.equals(existingMDRAction.getUuid(),
-				ReflectionTestUtil.invoke(existingMDRAction, "getOriginalUuid",
-					new Class<?>[0])));
-		Assert.assertEquals(Long.valueOf(existingMDRAction.getGroupId()),
-			ReflectionTestUtil.<Long>invoke(existingMDRAction,
-				"getOriginalGroupId", new Class<?>[0]));
+		Assert.assertTrue(
+			Objects.equals(
+				existingMDRAction.getUuid(),
+				ReflectionTestUtil.invoke(
+					existingMDRAction, "getOriginalUuid", new Class<?>[0])));
+		Assert.assertEquals(
+			Long.valueOf(existingMDRAction.getGroupId()),
+			ReflectionTestUtil.<Long>invoke(
+				existingMDRAction, "getOriginalGroupId", new Class<?>[0]));
 	}
 
 	protected MDRAction addMDRAction() throws Exception {
@@ -508,4 +532,5 @@ public class MDRActionPersistenceTest {
 	private List<MDRAction> _mdrActions = new ArrayList<MDRAction>();
 	private MDRActionPersistence _persistence;
 	private ClassLoader _dynamicQueryClassLoader;
+
 }

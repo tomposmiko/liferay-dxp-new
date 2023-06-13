@@ -14,12 +14,15 @@
 
 package com.liferay.apio.architect.sample.internal.type;
 
+import static com.liferay.apio.architect.annotation.Vocabulary.LinkTo.ResourceType.CHILD_COLLECTION;
+import static com.liferay.apio.architect.annotation.Vocabulary.LinkTo.ResourceType.GENERIC_PARENT_COLLECTION;
+
 import com.liferay.apio.architect.annotation.Id;
 import com.liferay.apio.architect.annotation.Vocabulary.Field;
-import com.liferay.apio.architect.annotation.Vocabulary.LinkedModel;
-import com.liferay.apio.architect.annotation.Vocabulary.RelatedCollection;
+import com.liferay.apio.architect.annotation.Vocabulary.LinkTo;
 import com.liferay.apio.architect.annotation.Vocabulary.Type;
 import com.liferay.apio.architect.identifier.Identifier;
+import com.liferay.apio.architect.sample.internal.identifier.ModelNameModelIdIdentifier;
 
 import java.util.Date;
 import java.util.List;
@@ -60,7 +63,7 @@ public interface BlogPosting extends Identifier<Long> {
 	 * @return the parent ID of the comments
 	 */
 	@Field("comment")
-	@RelatedCollection(Comment.class)
+	@LinkTo(resource = Comment.class, resourceType = CHILD_COLLECTION)
 	public default Long getCommentIds() {
 		return getId();
 	}
@@ -72,7 +75,7 @@ public interface BlogPosting extends Identifier<Long> {
 	 * @return the creator's ID
 	 */
 	@Field("creator")
-	@LinkedModel(Person.class)
+	@LinkTo(resource = Person.class)
 	public Long getCreatorId();
 
 	/**
@@ -121,6 +124,32 @@ public interface BlogPosting extends Identifier<Long> {
 	 */
 	@Id
 	public Long getId();
+
+	/**
+	 * Returns the ModelNameModelIdIdentifier for this blog.
+	 *
+	 * @return the ModelNameModelIdIdentifier for this blog
+	 * @review
+	 */
+	@Field("comment-for-this-blog")
+	@LinkTo(resource = Comment.class, resourceType = GENERIC_PARENT_COLLECTION)
+	public default ModelNameModelIdIdentifier getModelNameModelIdIdentifier() {
+		return new ModelNameModelIdIdentifier() {
+
+			@Override
+			public long getModelId() {
+				return getId();
+			}
+
+			@Override
+			public String getModelName() {
+				String simpleName = BlogPosting.class.getSimpleName();
+
+				return simpleName.toLowerCase();
+			}
+
+		};
+	}
 
 	/**
 	 * Returns the list of the blog posting's reviews. See <a

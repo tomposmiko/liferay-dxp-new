@@ -71,8 +71,8 @@ public interface ThrowableTetraConsumer<A, B, C, D> {
 	 *         after}
 	 */
 	public default ThrowableTetraConsumer<A, B, C, D> andThen(
-		ThrowableTetraConsumer
-			<? super A, ? super B, ? super C, ? super D> after) {
+		ThrowableTetraConsumer<? super A, ? super B, ? super C, ? super D>
+			after) {
 
 		Objects.requireNonNull(after);
 

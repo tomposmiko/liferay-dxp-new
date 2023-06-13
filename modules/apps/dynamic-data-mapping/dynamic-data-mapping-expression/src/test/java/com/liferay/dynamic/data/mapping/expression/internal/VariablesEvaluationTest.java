@@ -94,7 +94,9 @@ public class VariablesEvaluationTest {
 
 		int z = x - y;
 
-		Assert.assertEquals(x + y + z, ddmExpression.evaluate().intValue());
+		Number number = ddmExpression.evaluate();
+
+		Assert.assertEquals(x + y + z, number.intValue());
 	}
 
 	@Test
@@ -105,7 +107,9 @@ public class VariablesEvaluationTest {
 		ddmExpression.setNumberVariableValue("x", 1);
 		ddmExpression.setNumberVariableValue("y", 2);
 
-		Assert.assertEquals(3, ddmExpression.evaluate().intValue());
+		Number number = ddmExpression.evaluate();
+
+		Assert.assertEquals(3, number.intValue());
 	}
 
 	@Test

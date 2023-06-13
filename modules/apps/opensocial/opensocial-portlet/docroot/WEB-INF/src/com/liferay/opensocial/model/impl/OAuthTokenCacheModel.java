@@ -17,7 +17,6 @@ package com.liferay.opensocial.model.impl;
 import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.opensocial.model.OAuthToken;
-
 import com.liferay.portal.kernel.model.CacheModel;
 import com.liferay.portal.kernel.util.HashUtil;
 import com.liferay.portal.kernel.util.StringBundler;
@@ -33,12 +32,12 @@ import java.util.Date;
  * The cache model class for representing OAuthToken in entity cache.
  *
  * @author Brian Wing Shun Chan
- * @see OAuthToken
  * @generated
  */
 @ProviderType
-public class OAuthTokenCacheModel implements CacheModel<OAuthToken>,
-	Externalizable {
+public class OAuthTokenCacheModel
+	implements CacheModel<OAuthToken>, Externalizable {
+
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj) {
@@ -203,8 +202,7 @@ public class OAuthTokenCacheModel implements CacheModel<OAuthToken>,
 	}
 
 	@Override
-	public void writeExternal(ObjectOutput objectOutput)
-		throws IOException {
+	public void writeExternal(ObjectOutput objectOutput) throws IOException {
 		objectOutput.writeLong(oAuthTokenId);
 
 		objectOutput.writeLong(companyId);
@@ -282,4 +280,5 @@ public class OAuthTokenCacheModel implements CacheModel<OAuthToken>,
 	public String tokenSecret;
 	public String sessionHandle;
 	public long expiration;
+
 }

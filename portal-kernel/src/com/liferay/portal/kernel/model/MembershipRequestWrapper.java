@@ -17,7 +17,6 @@ package com.liferay.portal.kernel.model;
 import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.expando.kernel.model.ExpandoBridge;
-
 import com.liferay.portal.kernel.service.ServiceContext;
 
 import java.io.Serializable;
@@ -37,8 +36,9 @@ import java.util.Objects;
  * @generated
  */
 @ProviderType
-public class MembershipRequestWrapper implements MembershipRequest,
-	ModelWrapper<MembershipRequest> {
+public class MembershipRequestWrapper
+	implements MembershipRequest, ModelWrapper<MembershipRequest> {
+
 	public MembershipRequestWrapper(MembershipRequest membershipRequest) {
 		_membershipRequest = membershipRequest;
 	}
@@ -143,7 +143,8 @@ public class MembershipRequestWrapper implements MembershipRequest,
 
 	@Override
 	public Object clone() {
-		return new MembershipRequestWrapper((MembershipRequest)_membershipRequest.clone());
+		return new MembershipRequestWrapper(
+			(MembershipRequest)_membershipRequest.clone());
 	}
 
 	@Override
@@ -152,30 +153,30 @@ public class MembershipRequestWrapper implements MembershipRequest,
 	}
 
 	/**
-	* Returns the comments of this membership request.
-	*
-	* @return the comments of this membership request
-	*/
+	 * Returns the comments of this membership request.
+	 *
+	 * @return the comments of this membership request
+	 */
 	@Override
 	public String getComments() {
 		return _membershipRequest.getComments();
 	}
 
 	/**
-	* Returns the company ID of this membership request.
-	*
-	* @return the company ID of this membership request
-	*/
+	 * Returns the company ID of this membership request.
+	 *
+	 * @return the company ID of this membership request
+	 */
 	@Override
 	public long getCompanyId() {
 		return _membershipRequest.getCompanyId();
 	}
 
 	/**
-	* Returns the create date of this membership request.
-	*
-	* @return the create date of this membership request
-	*/
+	 * Returns the create date of this membership request.
+	 *
+	 * @return the create date of this membership request
+	 */
 	@Override
 	public Date getCreateDate() {
 		return _membershipRequest.getCreateDate();
@@ -187,40 +188,40 @@ public class MembershipRequestWrapper implements MembershipRequest,
 	}
 
 	/**
-	* Returns the group ID of this membership request.
-	*
-	* @return the group ID of this membership request
-	*/
+	 * Returns the group ID of this membership request.
+	 *
+	 * @return the group ID of this membership request
+	 */
 	@Override
 	public long getGroupId() {
 		return _membershipRequest.getGroupId();
 	}
 
 	/**
-	* Returns the membership request ID of this membership request.
-	*
-	* @return the membership request ID of this membership request
-	*/
+	 * Returns the membership request ID of this membership request.
+	 *
+	 * @return the membership request ID of this membership request
+	 */
 	@Override
 	public long getMembershipRequestId() {
 		return _membershipRequest.getMembershipRequestId();
 	}
 
 	/**
-	* Returns the mvcc version of this membership request.
-	*
-	* @return the mvcc version of this membership request
-	*/
+	 * Returns the mvcc version of this membership request.
+	 *
+	 * @return the mvcc version of this membership request
+	 */
 	@Override
 	public long getMvccVersion() {
 		return _membershipRequest.getMvccVersion();
 	}
 
 	/**
-	* Returns the primary key of this membership request.
-	*
-	* @return the primary key of this membership request
-	*/
+	 * Returns the primary key of this membership request.
+	 *
+	 * @return the primary key of this membership request
+	 */
 	@Override
 	public long getPrimaryKey() {
 		return _membershipRequest.getPrimaryKey();
@@ -232,70 +233,70 @@ public class MembershipRequestWrapper implements MembershipRequest,
 	}
 
 	/**
-	* Returns the replier user ID of this membership request.
-	*
-	* @return the replier user ID of this membership request
-	*/
+	 * Returns the replier user ID of this membership request.
+	 *
+	 * @return the replier user ID of this membership request
+	 */
 	@Override
 	public long getReplierUserId() {
 		return _membershipRequest.getReplierUserId();
 	}
 
 	/**
-	* Returns the replier user uuid of this membership request.
-	*
-	* @return the replier user uuid of this membership request
-	*/
+	 * Returns the replier user uuid of this membership request.
+	 *
+	 * @return the replier user uuid of this membership request
+	 */
 	@Override
 	public String getReplierUserUuid() {
 		return _membershipRequest.getReplierUserUuid();
 	}
 
 	/**
-	* Returns the reply comments of this membership request.
-	*
-	* @return the reply comments of this membership request
-	*/
+	 * Returns the reply comments of this membership request.
+	 *
+	 * @return the reply comments of this membership request
+	 */
 	@Override
 	public String getReplyComments() {
 		return _membershipRequest.getReplyComments();
 	}
 
 	/**
-	* Returns the reply date of this membership request.
-	*
-	* @return the reply date of this membership request
-	*/
+	 * Returns the reply date of this membership request.
+	 *
+	 * @return the reply date of this membership request
+	 */
 	@Override
 	public Date getReplyDate() {
 		return _membershipRequest.getReplyDate();
 	}
 
 	/**
-	* Returns the status ID of this membership request.
-	*
-	* @return the status ID of this membership request
-	*/
+	 * Returns the status ID of this membership request.
+	 *
+	 * @return the status ID of this membership request
+	 */
 	@Override
 	public long getStatusId() {
 		return _membershipRequest.getStatusId();
 	}
 
 	/**
-	* Returns the user ID of this membership request.
-	*
-	* @return the user ID of this membership request
-	*/
+	 * Returns the user ID of this membership request.
+	 *
+	 * @return the user ID of this membership request
+	 */
 	@Override
 	public long getUserId() {
 		return _membershipRequest.getUserId();
 	}
 
 	/**
-	* Returns the user uuid of this membership request.
-	*
-	* @return the user uuid of this membership request
-	*/
+	 * Returns the user uuid of this membership request.
+	 *
+	 * @return the user uuid of this membership request
+	 */
 	@Override
 	public String getUserUuid() {
 		return _membershipRequest.getUserUuid();
@@ -332,30 +333,30 @@ public class MembershipRequestWrapper implements MembershipRequest,
 	}
 
 	/**
-	* Sets the comments of this membership request.
-	*
-	* @param comments the comments of this membership request
-	*/
+	 * Sets the comments of this membership request.
+	 *
+	 * @param comments the comments of this membership request
+	 */
 	@Override
 	public void setComments(String comments) {
 		_membershipRequest.setComments(comments);
 	}
 
 	/**
-	* Sets the company ID of this membership request.
-	*
-	* @param companyId the company ID of this membership request
-	*/
+	 * Sets the company ID of this membership request.
+	 *
+	 * @param companyId the company ID of this membership request
+	 */
 	@Override
 	public void setCompanyId(long companyId) {
 		_membershipRequest.setCompanyId(companyId);
 	}
 
 	/**
-	* Sets the create date of this membership request.
-	*
-	* @param createDate the create date of this membership request
-	*/
+	 * Sets the create date of this membership request.
+	 *
+	 * @param createDate the create date of this membership request
+	 */
 	@Override
 	public void setCreateDate(Date createDate) {
 		_membershipRequest.setCreateDate(createDate);
@@ -377,30 +378,30 @@ public class MembershipRequestWrapper implements MembershipRequest,
 	}
 
 	/**
-	* Sets the group ID of this membership request.
-	*
-	* @param groupId the group ID of this membership request
-	*/
+	 * Sets the group ID of this membership request.
+	 *
+	 * @param groupId the group ID of this membership request
+	 */
 	@Override
 	public void setGroupId(long groupId) {
 		_membershipRequest.setGroupId(groupId);
 	}
 
 	/**
-	* Sets the membership request ID of this membership request.
-	*
-	* @param membershipRequestId the membership request ID of this membership request
-	*/
+	 * Sets the membership request ID of this membership request.
+	 *
+	 * @param membershipRequestId the membership request ID of this membership request
+	 */
 	@Override
 	public void setMembershipRequestId(long membershipRequestId) {
 		_membershipRequest.setMembershipRequestId(membershipRequestId);
 	}
 
 	/**
-	* Sets the mvcc version of this membership request.
-	*
-	* @param mvccVersion the mvcc version of this membership request
-	*/
+	 * Sets the mvcc version of this membership request.
+	 *
+	 * @param mvccVersion the mvcc version of this membership request
+	 */
 	@Override
 	public void setMvccVersion(long mvccVersion) {
 		_membershipRequest.setMvccVersion(mvccVersion);
@@ -412,10 +413,10 @@ public class MembershipRequestWrapper implements MembershipRequest,
 	}
 
 	/**
-	* Sets the primary key of this membership request.
-	*
-	* @param primaryKey the primary key of this membership request
-	*/
+	 * Sets the primary key of this membership request.
+	 *
+	 * @param primaryKey the primary key of this membership request
+	 */
 	@Override
 	public void setPrimaryKey(long primaryKey) {
 		_membershipRequest.setPrimaryKey(primaryKey);
@@ -427,70 +428,70 @@ public class MembershipRequestWrapper implements MembershipRequest,
 	}
 
 	/**
-	* Sets the replier user ID of this membership request.
-	*
-	* @param replierUserId the replier user ID of this membership request
-	*/
+	 * Sets the replier user ID of this membership request.
+	 *
+	 * @param replierUserId the replier user ID of this membership request
+	 */
 	@Override
 	public void setReplierUserId(long replierUserId) {
 		_membershipRequest.setReplierUserId(replierUserId);
 	}
 
 	/**
-	* Sets the replier user uuid of this membership request.
-	*
-	* @param replierUserUuid the replier user uuid of this membership request
-	*/
+	 * Sets the replier user uuid of this membership request.
+	 *
+	 * @param replierUserUuid the replier user uuid of this membership request
+	 */
 	@Override
 	public void setReplierUserUuid(String replierUserUuid) {
 		_membershipRequest.setReplierUserUuid(replierUserUuid);
 	}
 
 	/**
-	* Sets the reply comments of this membership request.
-	*
-	* @param replyComments the reply comments of this membership request
-	*/
+	 * Sets the reply comments of this membership request.
+	 *
+	 * @param replyComments the reply comments of this membership request
+	 */
 	@Override
 	public void setReplyComments(String replyComments) {
 		_membershipRequest.setReplyComments(replyComments);
 	}
 
 	/**
-	* Sets the reply date of this membership request.
-	*
-	* @param replyDate the reply date of this membership request
-	*/
+	 * Sets the reply date of this membership request.
+	 *
+	 * @param replyDate the reply date of this membership request
+	 */
 	@Override
 	public void setReplyDate(Date replyDate) {
 		_membershipRequest.setReplyDate(replyDate);
 	}
 
 	/**
-	* Sets the status ID of this membership request.
-	*
-	* @param statusId the status ID of this membership request
-	*/
+	 * Sets the status ID of this membership request.
+	 *
+	 * @param statusId the status ID of this membership request
+	 */
 	@Override
 	public void setStatusId(long statusId) {
 		_membershipRequest.setStatusId(statusId);
 	}
 
 	/**
-	* Sets the user ID of this membership request.
-	*
-	* @param userId the user ID of this membership request
-	*/
+	 * Sets the user ID of this membership request.
+	 *
+	 * @param userId the user ID of this membership request
+	 */
 	@Override
 	public void setUserId(long userId) {
 		_membershipRequest.setUserId(userId);
 	}
 
 	/**
-	* Sets the user uuid of this membership request.
-	*
-	* @param userUuid the user uuid of this membership request
-	*/
+	 * Sets the user uuid of this membership request.
+	 *
+	 * @param userUuid the user uuid of this membership request
+	 */
 	@Override
 	public void setUserUuid(String userUuid) {
 		_membershipRequest.setUserUuid(userUuid);
@@ -503,7 +504,8 @@ public class MembershipRequestWrapper implements MembershipRequest,
 
 	@Override
 	public MembershipRequest toEscapedModel() {
-		return new MembershipRequestWrapper(_membershipRequest.toEscapedModel());
+		return new MembershipRequestWrapper(
+			_membershipRequest.toEscapedModel());
 	}
 
 	@Override
@@ -513,7 +515,8 @@ public class MembershipRequestWrapper implements MembershipRequest,
 
 	@Override
 	public MembershipRequest toUnescapedModel() {
-		return new MembershipRequestWrapper(_membershipRequest.toUnescapedModel());
+		return new MembershipRequestWrapper(
+			_membershipRequest.toUnescapedModel());
 	}
 
 	@Override
@@ -531,10 +534,13 @@ public class MembershipRequestWrapper implements MembershipRequest,
 			return false;
 		}
 
-		MembershipRequestWrapper membershipRequestWrapper = (MembershipRequestWrapper)obj;
+		MembershipRequestWrapper membershipRequestWrapper =
+			(MembershipRequestWrapper)obj;
 
-		if (Objects.equals(_membershipRequest,
-					membershipRequestWrapper._membershipRequest)) {
+		if (Objects.equals(
+				_membershipRequest,
+				membershipRequestWrapper._membershipRequest)) {
+
 			return true;
 		}
 
@@ -562,4 +568,5 @@ public class MembershipRequestWrapper implements MembershipRequest,
 	}
 
 	private final MembershipRequest _membershipRequest;
+
 }

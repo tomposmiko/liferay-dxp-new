@@ -32,12 +32,13 @@ import com.liferay.portal.kernel.service.UserTrackerPathLocalServiceUtil;
  * @generated
  */
 @ProviderType
-public abstract class UserTrackerPathBaseImpl extends UserTrackerPathModelImpl
-	implements UserTrackerPath {
+public abstract class UserTrackerPathBaseImpl
+	extends UserTrackerPathModelImpl implements UserTrackerPath {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
-	 * Never modify or reference this class directly. All methods that expect a user tracker path model instance should use the {@link UserTrackerPath} interface instead.
+	 * Never modify or reference this class directly. All methods that expect a user tracker path model instance should use the <code>UserTrackerPath</code> interface instead.
 	 */
 	@Override
 	public void persist() {
@@ -48,4 +49,5 @@ public abstract class UserTrackerPathBaseImpl extends UserTrackerPathModelImpl
 			UserTrackerPathLocalServiceUtil.updateUserTrackerPath(this);
 		}
 	}
+
 }

@@ -17,7 +17,6 @@ package com.liferay.mail.reader.model.impl;
 import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.mail.reader.model.Attachment;
-
 import com.liferay.portal.kernel.model.CacheModel;
 import com.liferay.portal.kernel.util.HashUtil;
 import com.liferay.portal.kernel.util.StringBundler;
@@ -31,12 +30,12 @@ import java.io.ObjectOutput;
  * The cache model class for representing Attachment in entity cache.
  *
  * @author Brian Wing Shun Chan
- * @see Attachment
  * @generated
  */
 @ProviderType
-public class AttachmentCacheModel implements CacheModel<Attachment>,
-	Externalizable {
+public class AttachmentCacheModel
+	implements CacheModel<Attachment>, Externalizable {
+
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj) {
@@ -140,8 +139,7 @@ public class AttachmentCacheModel implements CacheModel<Attachment>,
 	}
 
 	@Override
-	public void writeExternal(ObjectOutput objectOutput)
-		throws IOException {
+	public void writeExternal(ObjectOutput objectOutput) throws IOException {
 		objectOutput.writeLong(attachmentId);
 
 		objectOutput.writeLong(companyId);
@@ -180,4 +178,5 @@ public class AttachmentCacheModel implements CacheModel<Attachment>,
 	public String contentPath;
 	public String fileName;
 	public long size;
+
 }

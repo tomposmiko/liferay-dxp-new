@@ -78,9 +78,8 @@ public class MBThreadIndexer extends BaseIndexer<MBThread> {
 
 	@Override
 	public boolean hasPermission(
-			PermissionChecker permissionChecker, String entryClassName,
-			long entryClassPK, String actionId)
-		throws Exception {
+		PermissionChecker permissionChecker, String entryClassName,
+		long entryClassPK, String actionId) {
 
 		return true;
 	}
@@ -126,7 +125,7 @@ public class MBThreadIndexer extends BaseIndexer<MBThread> {
 	}
 
 	@Override
-	protected Document doGetDocument(MBThread mbThread) throws Exception {
+	protected Document doGetDocument(MBThread mbThread) {
 		Document document = getBaseModelDocument(CLASS_NAME, mbThread);
 
 		MBDiscussion discussion =
@@ -191,24 +190,20 @@ public class MBThreadIndexer extends BaseIndexer<MBThread> {
 
 		actionableDynamicQuery.setCompanyId(companyId);
 		actionableDynamicQuery.setPerformActionMethod(
-			(MBCategory category) -> {
-				reindexThreads(
-					companyId, category.getGroupId(), category.getCategoryId());
-			});
+			(MBCategory category) -> reindexThreads(
+				companyId, category.getGroupId(), category.getCategoryId()));
 
 		actionableDynamicQuery.performActions();
 	}
 
-	protected void reindexDiscussions(final long companyId)
-		throws PortalException {
-
+	protected void reindexDiscussions(long companyId) throws PortalException {
 		DynamicQuery countDynamicQuery = _getDistinctGroupIdDynamicQuery(
 			companyId, MBCategoryConstants.DISCUSSION_CATEGORY_ID);
 
 		long distinctGroupIdsCount = mbThreadLocalService.dynamicQueryCount(
 			countDynamicQuery);
 
-		final IntervalActionProcessor<Void> intervalActionProcessor =
+		IntervalActionProcessor<Void> intervalActionProcessor =
 			new IntervalActionProcessor<>((int)distinctGroupIdsCount);
 
 		DynamicQuery dynamicQuery = _getDistinctGroupIdDynamicQuery(
@@ -225,20 +220,22 @@ public class MBThreadIndexer extends BaseIndexer<MBThread> {
 						MBCategoryConstants.DISCUSSION_CATEGORY_ID);
 				}
 
+				intervalActionProcessor.incrementStart(groupIds.size());
+
 				return null;
 			});
 
 		intervalActionProcessor.performIntervalActions();
 	}
 
-	protected void reindexRoot(final long companyId) throws PortalException {
+	protected void reindexRoot(long companyId) throws PortalException {
 		DynamicQuery countDynamicQuery = _getDistinctGroupIdDynamicQuery(
 			companyId, MBCategoryConstants.DEFAULT_PARENT_CATEGORY_ID);
 
 		long distinctGroupIdsCount = mbThreadLocalService.dynamicQueryCount(
 			countDynamicQuery);
 
-		final IntervalActionProcessor<Void> intervalActionProcessor =
+		IntervalActionProcessor<Void> intervalActionProcessor =
 			new IntervalActionProcessor<>((int)distinctGroupIdsCount);
 
 		DynamicQuery dynamicQuery = _getDistinctGroupIdDynamicQuery(
@@ -254,6 +251,8 @@ public class MBThreadIndexer extends BaseIndexer<MBThread> {
 						companyId, groupId,
 						MBCategoryConstants.DEFAULT_PARENT_CATEGORY_ID);
 				}
+
+				intervalActionProcessor.incrementStart(groupIds.size());
 
 				return null;
 			});
@@ -323,8 +322,7 @@ public class MBThreadIndexer extends BaseIndexer<MBThread> {
 	protected MBThreadLocalService mbThreadLocalService;
 
 	private DynamicQuery _getDistinctGroupIdDynamicQuery(
-			long companyId, long categoryId)
-		throws PortalException {
+		long companyId, long categoryId) {
 
 		DynamicQuery dynamicQuery = mbThreadLocalService.dynamicQuery();
 

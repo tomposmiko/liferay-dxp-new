@@ -21,7 +21,7 @@ import com.liferay.apio.architect.representor.Representor;
 import com.liferay.apio.architect.resource.CollectionResource;
 import com.liferay.apio.architect.routes.CollectionRoutes;
 import com.liferay.apio.architect.routes.ItemRoutes;
-import com.liferay.content.space.apio.architect.identifier.ContentSpaceIdentifier;
+import com.liferay.content.space.apio.architect.model.ContentSpace;
 import com.liferay.content.space.apio.architect.util.ContentSpaceUtil;
 import com.liferay.person.apio.architect.identifier.PersonIdentifier;
 import com.liferay.portal.kernel.exception.PortalException;
@@ -87,10 +87,10 @@ public class WebSiteCollectionResource
 		).identifier(
 			Group::getGroupId
 		).addBidirectionalModel(
+			"contentSpace", "webSite", ContentSpace.class, Group::getGroupId
+		).addBidirectionalModel(
 			"webSite", "webSites", WebSiteIdentifier.class,
 			this::_getParentGroupId
-		).addLinkedModel(
-			"contentSpace", ContentSpaceIdentifier.class, Group::getGroupId
 		).addLinkedModel(
 			"creator", PersonIdentifier.class, Group::getCreatorUserId
 		).addLocalizedStringByLocale(

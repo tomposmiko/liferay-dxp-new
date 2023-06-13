@@ -44,8 +44,8 @@ public interface ThrowableHexaConsumer<A, B, C, D, E, F> {
 	 * @return an empty {@code ThrowableHexaConsumer} that doesn't perform any
 	 *         operation
 	 */
-	public static <A, B, C, D, E, F>
-		ThrowableHexaConsumer<A, B, C, D, E, F> empty() {
+	public static <A, B, C, D, E, F> ThrowableHexaConsumer<A, B, C, D, E, F>
+		empty() {
 
 		return (a, b, c, d, e, f) -> {
 		};

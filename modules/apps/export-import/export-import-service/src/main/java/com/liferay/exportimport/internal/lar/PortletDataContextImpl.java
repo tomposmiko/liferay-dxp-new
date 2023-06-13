@@ -21,9 +21,9 @@ import com.liferay.asset.kernel.model.AssetLink;
 import com.liferay.asset.kernel.service.AssetEntryLocalServiceUtil;
 import com.liferay.asset.kernel.service.AssetLinkLocalServiceUtil;
 import com.liferay.asset.kernel.service.AssetTagLocalServiceUtil;
+import com.liferay.dynamic.data.mapping.model.DDMStructure;
 import com.liferay.expando.kernel.model.ExpandoBridge;
 import com.liferay.expando.kernel.model.ExpandoColumn;
-import com.liferay.expando.kernel.model.adapter.StagedExpandoColumn;
 import com.liferay.expando.kernel.service.ExpandoColumnLocalServiceUtil;
 import com.liferay.exportimport.internal.util.ExportImportPermissionUtil;
 import com.liferay.exportimport.internal.xstream.ConverterAdapter;
@@ -151,7 +151,7 @@ import jodd.bean.BeanUtil;
  * @author Raymond Augé
  * @author Bruno Farache
  * @author Alexander Chow
- * @author Mate Thurzo
+ * @author Máté Thurzó
  */
 @ProviderType
 public class PortletDataContextImpl implements PortletDataContext {
@@ -1580,8 +1580,8 @@ public class PortletDataContextImpl implements PortletDataContext {
 
 		newPrimaryKeysMap.put(primaryKeyObj, newPrimaryKeyObj);
 
-		if (classedModel instanceof StagedGroupedModel &&
-			newClassedModel instanceof StagedGroupedModel) {
+		if ((classedModel instanceof StagedGroupedModel) &&
+			(newClassedModel instanceof StagedGroupedModel)) {
 
 			Map<Long, Long> groupIds = (Map<Long, Long>)getNewPrimaryKeysMap(
 				Group.class);
@@ -1888,7 +1888,10 @@ public class PortletDataContextImpl implements PortletDataContext {
 	@Override
 	public boolean isModelCounted(String className, Serializable classPK) {
 		String modelCountedPrimaryKey = className.concat(
-			StringPool.POUND).concat(String.valueOf(classPK));
+			StringPool.POUND
+		).concat(
+			String.valueOf(classPK)
+		);
 
 		return addPrimaryKey(String.class, modelCountedPrimaryKey);
 	}
@@ -2216,17 +2219,6 @@ public class PortletDataContextImpl implements PortletDataContext {
 			}
 
 			_expandoColumnsMap.put(className, expandoColumns);
-
-			for (ExpandoColumn expandoColumn : expandoColumns) {
-				StagedExpandoColumn stagedExpandoColumn =
-					ModelAdapterUtil.adapt(
-						expandoColumn, ExpandoColumn.class,
-						StagedExpandoColumn.class);
-
-				addReferenceElement(
-					classedModel, element, stagedExpandoColumn,
-					REFERENCE_TYPE_DEPENDENCY, true);
-			}
 		}
 
 		ExpandoBridge expandoBridge = classedModel.getExpandoBridge();
@@ -2627,7 +2619,10 @@ public class PortletDataContextImpl implements PortletDataContext {
 		String className, Serializable primaryKey) {
 
 		return className.concat(
-			StringPool.POUND).concat(String.valueOf(primaryKey));
+			StringPool.POUND
+		).concat(
+			String.valueOf(primaryKey)
+		);
 	}
 
 	/**
@@ -2780,7 +2775,11 @@ public class PortletDataContextImpl implements PortletDataContext {
 	}
 
 	protected String getReferenceKey(String className, String classPK) {
-		return className.concat(StringPool.POUND).concat(classPK);
+		return className.concat(
+			StringPool.POUND
+		).concat(
+			classPK
+		);
 	}
 
 	protected long getUserId(AuditedModel auditedModel) {
@@ -2968,14 +2967,15 @@ public class PortletDataContextImpl implements PortletDataContext {
 			long classPK = ExportImportClassedModelUtil.getClassPK(
 				stagedGroupedModel);
 
-			WorkflowDefinitionLink workflowDefinitionLink =
+			List<WorkflowDefinitionLink> workflowDefinitionLinks =
 				WorkflowDefinitionLinkLocalServiceUtil.
-					fetchWorkflowDefinitionLink(
+					fetchWorkflowDefinitionLinks(
 						stagedGroupedModel.getCompanyId(),
-						stagedGroupedModel.getGroupId(), className, classPK,
-						-1);
+						stagedGroupedModel.getGroupId(), className, classPK);
 
-			if (workflowDefinitionLink != null) {
+			for (WorkflowDefinitionLink workflowDefinitionLink :
+					workflowDefinitionLinks) {
+
 				StagedGroupedWorkflowDefinitionLink
 					stagedGroupedWorkflowDefinitionLink =
 						ModelAdapterUtil.adapt(
@@ -3080,18 +3080,34 @@ public class PortletDataContextImpl implements PortletDataContext {
 				return;
 			}
 
-			WorkflowDefinitionLink workflowDefinitionLink =
-				WorkflowDefinitionLinkLocalServiceUtil.
-					fetchWorkflowDefinitionLink(
-						getCompanyId(), getScopeGroupId(), className,
-						newPrimaryKey, -1);
-
 			if ((workflowDefinition != null) &&
-				(workflowDefinitionLink == null)) {
+				!WorkflowDefinitionLinkLocalServiceUtil.
+					hasWorkflowDefinitionLink(
+						getCompanyId(), getScopeGroupId(), className,
+						newPrimaryKey)) {
 
 				try {
 					long importedClassPK = GetterUtil.getLong(
 						classedModel.getPrimaryKeyObj());
+
+					String referrerUuid =
+						stagedGroupedWorkflowDefinitionLinkElement.
+							attributeValue("uuid");
+
+					WorkflowDefinitionLink referrerWorkflowDefinitionLink =
+						WorkflowDefinitionLinkLocalServiceUtil.
+							getWorkflowDefinitionLink(
+								Long.valueOf(referrerUuid));
+
+					long typePK = referrerWorkflowDefinitionLink.getTypePK();
+
+					if (typePK != -1) {
+						Map<Long, Long> ddmPrimaryKeys =
+							(Map<Long, Long>)getNewPrimaryKeysMap(
+								DDMStructure.class.getName());
+
+						typePK = ddmPrimaryKeys.getOrDefault(typePK, typePK);
+					}
 
 					PermissionChecker permissionChecker =
 						PermissionThreadLocal.getPermissionChecker();
@@ -3099,8 +3115,8 @@ public class PortletDataContextImpl implements PortletDataContext {
 					WorkflowDefinitionLinkLocalServiceUtil.
 						addWorkflowDefinitionLink(
 							permissionChecker.getUserId(), getCompanyId(),
-							getScopeGroupId(), className, importedClassPK, -1,
-							workflowDefinition.getName(),
+							getScopeGroupId(), className, importedClassPK,
+							typePK, workflowDefinition.getName(),
 							workflowDefinition.getVersion());
 				}
 				catch (PortalException pe) {

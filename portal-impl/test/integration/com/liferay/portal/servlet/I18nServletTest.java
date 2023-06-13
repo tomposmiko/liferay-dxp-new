@@ -47,7 +47,7 @@ import org.junit.Test;
 import org.springframework.mock.web.MockHttpServletRequest;
 
 /**
- * @author Juan Gonzalez
+ * @author Juan González
  */
 public class I18nServletTest {
 
@@ -155,13 +155,13 @@ public class I18nServletTest {
 
 		mockHttpServletRequest.setPathInfo(StringPool.SLASH);
 		mockHttpServletRequest.setServletPath(
-			StringPool.SLASH + Locale.CANADA_FRENCH.toLanguageTag());
+			StringPool.SLASH + LocaleUtil.CANADA_FRENCH.toLanguageTag());
 
 		I18nServlet.I18nData actualI18nData = _i18nServlet.getI18nData(
 			mockHttpServletRequest);
 
 		I18nServlet.I18nData expectedI18nData = getI18nData(
-			Locale.CANADA_FRENCH);
+			LocaleUtil.CANADA_FRENCH);
 
 		Assert.assertEquals(expectedI18nData, actualI18nData);
 	}

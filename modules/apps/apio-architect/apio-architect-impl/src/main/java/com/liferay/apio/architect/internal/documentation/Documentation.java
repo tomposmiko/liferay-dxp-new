@@ -17,15 +17,16 @@ package com.liferay.apio.architect.internal.documentation;
 import com.liferay.apio.architect.documentation.APIDescription;
 import com.liferay.apio.architect.documentation.APITitle;
 import com.liferay.apio.architect.documentation.contributor.CustomDocumentation;
+import com.liferay.apio.architect.internal.action.ActionSemantics;
 import com.liferay.apio.architect.internal.url.ApplicationURL;
 import com.liferay.apio.architect.representor.Representor;
-import com.liferay.apio.architect.routes.CollectionRoutes;
-import com.liferay.apio.architect.routes.ItemRoutes;
-import com.liferay.apio.architect.routes.NestedCollectionRoutes;
+import com.liferay.apio.architect.resource.Resource;
 
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Function;
 import java.util.function.Supplier;
+import java.util.stream.Stream;
 
 /**
  * Represents the API's auto-documentation.
@@ -39,24 +40,23 @@ public class Documentation {
 		Supplier<Optional<APIDescription>> apiDescriptionSupplier,
 		Supplier<Optional<ApplicationURL>> entryPointSupplier,
 		Supplier<Map<String, Representor>> representorMapSupplier,
-		Supplier<Map<String, CollectionRoutes>> collectionRoutesMapSupplier,
-		Supplier<Map<String, ItemRoutes>> itemRoutesMapSupplier,
-		Supplier<Map<String, NestedCollectionRoutes>>
-			nestedCollectionRoutesMapSupplier,
-		Supplier<Map<String, NestedCollectionRoutes>>
-			reusableCollectionRoutesMapSupplier,
+		Stream<Resource> resourceStream,
+		Function<Resource, Stream<ActionSemantics>> actionSemanticsFunction,
 		Supplier<CustomDocumentation> customDocumentationSupplier) {
 
 		_apiTitleSupplier = apiTitleSupplier;
 		_apiDescriptionSupplier = apiDescriptionSupplier;
 		_entryPointSupplier = entryPointSupplier;
 		_representorMapSupplier = representorMapSupplier;
-		_routesMapSupplier = collectionRoutesMapSupplier;
-		_itemRoutesMapSupplier = itemRoutesMapSupplier;
-		_nestedCollectionRoutesMapSupplier = nestedCollectionRoutesMapSupplier;
-		_reusableCollectionRoutesMapSupplier =
-			reusableCollectionRoutesMapSupplier;
+		_resourceStream = resourceStream;
+		_actionSemanticsFunction = actionSemanticsFunction;
 		_customDocumentationSupplier = customDocumentationSupplier;
+	}
+
+	public Function<Resource, Stream<ActionSemantics>>
+		getActionSemanticsFunction() {
+
+		return _actionSemanticsFunction;
 	}
 
 	/**
@@ -84,16 +84,6 @@ public class Documentation {
 		return optional.map(APITitle::get);
 	}
 
-	/**
-	 * Returns a map that contains each resource's name and {@link
-	 * CollectionRoutes} as key-value pairs.
-	 *
-	 * @return the map
-	 */
-	public Map<String, CollectionRoutes> getCollectionRoutes() {
-		return _routesMapSupplier.get();
-	}
-
 	public CustomDocumentation getCustomDocumentation() {
 		return _customDocumentationSupplier.get();
 	}
@@ -102,26 +92,6 @@ public class Documentation {
 		Optional<ApplicationURL> optional = _entryPointSupplier.get();
 
 		return optional.map(ApplicationURL::get);
-	}
-
-	/**
-	 * Returns a map that contains each resource's name and {@link ItemRoutes}
-	 * as key-value pairs.
-	 *
-	 * @return the map
-	 */
-	public Map<String, ItemRoutes> getItemRoutes() {
-		return _itemRoutesMapSupplier.get();
-	}
-
-	/**
-	 * Returns a map that contains each resource's name and {@link
-	 * NestedCollectionRoutes} as key-value pairs.
-	 *
-	 * @return the map
-	 */
-	public Map<String, NestedCollectionRoutes> getNestedCollectionRoutes() {
-		return _nestedCollectionRoutesMapSupplier.get();
 	}
 
 	/**
@@ -134,16 +104,17 @@ public class Documentation {
 		return _representorMapSupplier.get();
 	}
 
+	public Stream<Resource> getResourceStream() {
+		return _resourceStream;
+	}
+
+	private final Function<Resource, Stream<ActionSemantics>>
+		_actionSemanticsFunction;
 	private final Supplier<Optional<APIDescription>> _apiDescriptionSupplier;
 	private final Supplier<Optional<APITitle>> _apiTitleSupplier;
 	private final Supplier<CustomDocumentation> _customDocumentationSupplier;
 	private final Supplier<Optional<ApplicationURL>> _entryPointSupplier;
-	private final Supplier<Map<String, ItemRoutes>> _itemRoutesMapSupplier;
-	private final Supplier<Map<String, NestedCollectionRoutes>>
-		_nestedCollectionRoutesMapSupplier;
 	private final Supplier<Map<String, Representor>> _representorMapSupplier;
-	private final Supplier<Map<String, NestedCollectionRoutes>>
-		_reusableCollectionRoutesMapSupplier;
-	private final Supplier<Map<String, CollectionRoutes>> _routesMapSupplier;
+	private final Stream<Resource> _resourceStream;
 
 }

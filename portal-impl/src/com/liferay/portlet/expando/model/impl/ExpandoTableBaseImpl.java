@@ -32,12 +32,13 @@ import com.liferay.expando.kernel.service.ExpandoTableLocalServiceUtil;
  * @generated
  */
 @ProviderType
-public abstract class ExpandoTableBaseImpl extends ExpandoTableModelImpl
-	implements ExpandoTable {
+public abstract class ExpandoTableBaseImpl
+	extends ExpandoTableModelImpl implements ExpandoTable {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
-	 * Never modify or reference this class directly. All methods that expect a expando table model instance should use the {@link ExpandoTable} interface instead.
+	 * Never modify or reference this class directly. All methods that expect a expando table model instance should use the <code>ExpandoTable</code> interface instead.
 	 */
 	@Override
 	public void persist() {
@@ -48,4 +49,5 @@ public abstract class ExpandoTableBaseImpl extends ExpandoTableModelImpl
 			ExpandoTableLocalServiceUtil.updateExpandoTable(this);
 		}
 	}
+
 }

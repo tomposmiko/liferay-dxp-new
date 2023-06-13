@@ -131,6 +131,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Provides the local service for accessing, adding, checking in/out, deleting,
@@ -165,7 +167,7 @@ public class DLFileEntryLocalServiceImpl
 		if (Validator.isNull(title)) {
 			throw new FileNameException(
 				StringBundler.concat(
-					"Cannot add file entry with file name ", sourceFileName,
+					"Unable to add file entry with file name ", sourceFileName,
 					" because title is null"));
 		}
 
@@ -399,90 +401,17 @@ public class DLFileEntryLocalServiceImpl
 			long expirationTime, ServiceContext serviceContext)
 		throws PortalException {
 
-		DLFileEntry dlFileEntry = dlFileEntryPersistence.findByPrimaryKey(
-			fileEntryId);
-
-		boolean hasLock = hasFileEntryLock(userId, fileEntryId);
-
-		if (!hasLock) {
-			if ((expirationTime <= 0) ||
-				(expirationTime > DLFileEntryImpl.LOCK_EXPIRATION_TIME)) {
-
-				expirationTime = DLFileEntryImpl.LOCK_EXPIRATION_TIME;
-			}
-
-			LockManagerUtil.lock(
-				userId, DLFileEntry.class.getName(), fileEntryId, owner, false,
-				expirationTime);
-		}
-
-		User user = userPersistence.findByPrimaryKey(userId);
-
-		serviceContext.setCompanyId(user.getCompanyId());
-
 		DLFileVersion dlFileVersion =
 			dlFileVersionLocalService.getLatestFileVersion(fileEntryId, false);
 
-		serviceContext.setUserId(userId);
+		String oldVersion = dlFileVersion.getVersion();
 
-		boolean manualCheckinRequired = GetterUtil.getBoolean(
-			serviceContext.getAttribute(DL.MANUAL_CHECK_IN_REQUIRED));
+		DLFileEntry dlFileEntry = _checkOutDLFileEntryModel(
+			userId, fileEntryId, fileEntryTypeId, owner, expirationTime,
+			serviceContext);
 
-		if (dlFileEntry.isManualCheckInRequired() ^ manualCheckinRequired) {
-			dlFileEntry.setManualCheckInRequired(manualCheckinRequired);
-
-			dlFileEntryPersistence.update(dlFileEntry);
-		}
-
-		String version = dlFileVersion.getVersion();
-
-		if (!version.equals(
+		if (!oldVersion.equals(
 				DLFileEntryConstants.PRIVATE_WORKING_COPY_VERSION)) {
-
-			DLFileVersion oldDLFileVersion = dlFileVersion;
-
-			long oldDLFileVersionId = dlFileVersion.getFileVersionId();
-
-			long existingDLFileVersionId = ParamUtil.getLong(
-				serviceContext, "existingDLFileVersionId");
-
-			if (existingDLFileVersionId > 0) {
-				DLFileVersion existingDLFileVersion =
-					dlFileVersionPersistence.findByPrimaryKey(
-						existingDLFileVersionId);
-
-				dlFileVersion = updateFileVersion(
-					user, existingDLFileVersion, null,
-					existingDLFileVersion.getFileName(),
-					existingDLFileVersion.getExtension(),
-					existingDLFileVersion.getMimeType(),
-					existingDLFileVersion.getTitle(),
-					existingDLFileVersion.getDescription(),
-					existingDLFileVersion.getChangeLog(),
-					existingDLFileVersion.getExtraSettings(),
-					existingDLFileVersion.getFileEntryTypeId(), null,
-					DLFileEntryConstants.PRIVATE_WORKING_COPY_VERSION,
-					existingDLFileVersion.getSize(),
-					WorkflowConstants.STATUS_DRAFT,
-					serviceContext.getModifiedDate(null), serviceContext);
-			}
-			else {
-				dlFileVersion = addFileVersion(
-					user, dlFileEntry, oldDLFileVersion.getFileName(),
-					oldDLFileVersion.getExtension(),
-					oldDLFileVersion.getMimeType(), oldDLFileVersion.getTitle(),
-					oldDLFileVersion.getDescription(),
-					oldDLFileVersion.getChangeLog(),
-					oldDLFileVersion.getExtraSettings(),
-					oldDLFileVersion.getFileEntryTypeId(), null,
-					DLFileEntryConstants.PRIVATE_WORKING_COPY_VERSION,
-					oldDLFileVersion.getSize(), WorkflowConstants.STATUS_DRAFT,
-					serviceContext);
-
-				copyExpandoRowModifiedDate(
-					dlFileEntry.getCompanyId(), oldDLFileVersionId,
-					dlFileVersion.getFileVersionId());
-			}
 
 			if (DLStoreUtil.hasFile(
 					dlFileEntry.getCompanyId(),
@@ -496,24 +425,9 @@ public class DLFileEntryLocalServiceImpl
 			}
 
 			DLStoreUtil.copyFileVersion(
-				user.getCompanyId(), dlFileEntry.getDataRepositoryId(),
-				dlFileEntry.getName(), version,
+				dlFileEntry.getCompanyId(), dlFileEntry.getDataRepositoryId(),
+				dlFileEntry.getName(), oldVersion,
 				DLFileEntryConstants.PRIVATE_WORKING_COPY_VERSION);
-
-			Serializable validateDDMFormValues = serviceContext.getAttribute(
-				"validateDDMFormValues");
-
-			serviceContext.setAttribute("validateDDMFormValues", Boolean.FALSE);
-
-			if (fileEntryTypeId == oldDLFileVersion.getFileEntryTypeId()) {
-				copyFileEntryMetadata(
-					dlFileEntry.getCompanyId(), fileEntryTypeId, fileEntryId,
-					oldDLFileVersionId, dlFileVersion.getFileVersionId(),
-					serviceContext);
-			}
-
-			serviceContext.setAttribute(
-				"validateDDMFormValues", validateDDMFormValues);
 		}
 
 		return dlFileEntry;
@@ -793,10 +707,12 @@ public class DLFileEntryLocalServiceImpl
 			long userId, long fileEntryId, String version)
 		throws PortalException {
 
-		if (Validator.isNull(version)) {
+		if (!_isValidFileVersionNumber(version)) {
 			throw new InvalidFileVersionException(
-				"Cannot delete version for file entry " + fileEntryId +
-					" because version is null");
+				StringBundler.concat(
+					"Unable to delete version for file entry ",
+					String.valueOf(fileEntryId), " because version number ",
+					version, " is invalid"));
 		}
 
 		if (version.equals(DLFileEntryConstants.PRIVATE_WORKING_COPY_VERSION)) {
@@ -821,20 +737,20 @@ public class DLFileEntryLocalServiceImpl
 			if (!dlFileVersion.isApproved()) {
 				throw new InvalidFileVersionException(
 					StringBundler.concat(
-						"Cannot delete the unapproved file version ", version,
-						" for file entry ", String.valueOf(fileEntryId)));
+						"Unable to delete the unapproved file version ",
+						version, " for file entry ",
+						String.valueOf(fileEntryId)));
 			}
-			else {
-				int count = dlFileVersionPersistence.countByF_S(
-					fileEntryId, WorkflowConstants.STATUS_APPROVED);
 
-				if (count <= 1) {
-					throw new InvalidFileVersionException(
-						StringBundler.concat(
-							"Cannot delete the only approved file version ",
-							version, " for file entry ",
-							String.valueOf(fileEntryId)));
-				}
+			int count = dlFileVersionPersistence.countByF_S(
+				fileEntryId, WorkflowConstants.STATUS_APPROVED);
+
+			if (count <= 1) {
+				throw new InvalidFileVersionException(
+					StringBundler.concat(
+						"Unable to delete the only approved file version ",
+						version, " for file entry ",
+						String.valueOf(fileEntryId)));
 			}
 
 			dlFileVersionPersistence.remove(dlFileVersion);
@@ -1523,8 +1439,8 @@ public class DLFileEntryLocalServiceImpl
 
 				return uniqueTitle;
 			}
-			catch (DuplicateFileEntryException |
-				   DuplicateFolderNameException e) {
+			catch (DuplicateFileEntryException | DuplicateFolderNameException
+						e) {
 
 				if (_log.isDebugEnabled()) {
 					_log.debug(e, e);
@@ -1687,8 +1603,11 @@ public class DLFileEntryLocalServiceImpl
 			ServiceContext serviceContext)
 		throws PortalException {
 
-		if (Validator.isNull(version)) {
-			throw new InvalidFileVersionException("Version is null");
+		if (!_isValidFileVersionNumber(version)) {
+			throw new InvalidFileVersionException(
+				StringBundler.concat(
+					"Unable to revert file entry ", String.valueOf(fileEntryId),
+					" to version ", version, " because it is invalid"));
 		}
 
 		if (version.equals(DLFileEntryConstants.PRIVATE_WORKING_COPY_VERSION)) {
@@ -2393,7 +2312,8 @@ public class DLFileEntryLocalServiceImpl
 	}
 
 	protected String getNextVersion(
-		DLFileEntry dlFileEntry, boolean majorVersion, int workflowAction) {
+			DLFileEntry dlFileEntry, boolean majorVersion, int workflowAction)
+		throws InvalidFileVersionException {
 
 		String version = dlFileEntry.getVersion();
 
@@ -2403,6 +2323,15 @@ public class DLFileEntryLocalServiceImpl
 
 		if (dlFileVersion != null) {
 			version = dlFileVersion.getVersion();
+		}
+
+		if (!_isValidFileVersionNumber(version)) {
+			throw new InvalidFileVersionException(
+				StringBundler.concat(
+					"Unable to increase version number for file entry ",
+					String.valueOf(dlFileEntry.getFileEntryId()),
+					" because original version number ", version,
+					" is invalid"));
 		}
 
 		if (workflowAction == WorkflowConstants.ACTION_SAVE_DRAFT) {
@@ -2557,8 +2486,14 @@ public class DLFileEntryLocalServiceImpl
 		}
 
 		if (autoCheckIn) {
-			dlFileEntry = checkOutFileEntry(
-				userId, fileEntryId, fileEntryTypeId, serviceContext);
+			if ((file != null) || (is != null)) {
+				dlFileEntry = _checkOutDLFileEntryModel(
+					userId, fileEntryId, fileEntryTypeId, serviceContext);
+			}
+			else {
+				dlFileEntry = checkOutFileEntry(
+					userId, fileEntryId, fileEntryTypeId, serviceContext);
+			}
 		}
 		else if (!checkedOut) {
 			lockFileEntry(userId, fileEntryId);
@@ -2795,7 +2730,147 @@ public class DLFileEntryLocalServiceImpl
 	@BeanReference(type = DLFileVersionPolicy.class)
 	protected DLFileVersionPolicy dlFileVersionPolicy;
 
+	private DLFileEntry _checkOutDLFileEntryModel(
+			long userId, long fileEntryId, long fileEntryTypeId,
+			ServiceContext serviceContext)
+		throws PortalException {
+
+		return _checkOutDLFileEntryModel(
+			userId, fileEntryId, fileEntryTypeId, StringPool.BLANK,
+			DLFileEntryImpl.LOCK_EXPIRATION_TIME, serviceContext);
+	}
+
+	private DLFileEntry _checkOutDLFileEntryModel(
+			long userId, long fileEntryId, long fileEntryTypeId, String owner,
+			long expirationTime, ServiceContext serviceContext)
+		throws PortalException {
+
+		DLFileEntry dlFileEntry = dlFileEntryPersistence.findByPrimaryKey(
+			fileEntryId);
+
+		boolean hasLock = hasFileEntryLock(userId, fileEntryId);
+
+		if (!hasLock) {
+			if ((expirationTime <= 0) ||
+				(expirationTime > DLFileEntryImpl.LOCK_EXPIRATION_TIME)) {
+
+				expirationTime = DLFileEntryImpl.LOCK_EXPIRATION_TIME;
+			}
+
+			LockManagerUtil.lock(
+				userId, DLFileEntry.class.getName(), fileEntryId, owner, false,
+				expirationTime);
+		}
+
+		User user = userPersistence.findByPrimaryKey(userId);
+
+		serviceContext.setCompanyId(user.getCompanyId());
+
+		DLFileVersion dlFileVersion =
+			dlFileVersionLocalService.getLatestFileVersion(fileEntryId, false);
+
+		serviceContext.setUserId(userId);
+
+		boolean manualCheckinRequired = GetterUtil.getBoolean(
+			serviceContext.getAttribute(DL.MANUAL_CHECK_IN_REQUIRED));
+
+		if (dlFileEntry.isManualCheckInRequired() ^ manualCheckinRequired) {
+			dlFileEntry.setManualCheckInRequired(manualCheckinRequired);
+
+			dlFileEntryPersistence.update(dlFileEntry);
+		}
+
+		String version = dlFileVersion.getVersion();
+
+		if (!version.equals(
+				DLFileEntryConstants.PRIVATE_WORKING_COPY_VERSION)) {
+
+			DLFileVersion oldDLFileVersion = dlFileVersion;
+
+			long oldDLFileVersionId = dlFileVersion.getFileVersionId();
+
+			long existingDLFileVersionId = ParamUtil.getLong(
+				serviceContext, "existingDLFileVersionId");
+
+			if (existingDLFileVersionId > 0) {
+				DLFileVersion existingDLFileVersion =
+					dlFileVersionPersistence.findByPrimaryKey(
+						existingDLFileVersionId);
+
+				dlFileVersion = updateFileVersion(
+					user, existingDLFileVersion, null,
+					existingDLFileVersion.getFileName(),
+					existingDLFileVersion.getExtension(),
+					existingDLFileVersion.getMimeType(),
+					existingDLFileVersion.getTitle(),
+					existingDLFileVersion.getDescription(),
+					existingDLFileVersion.getChangeLog(),
+					existingDLFileVersion.getExtraSettings(),
+					existingDLFileVersion.getFileEntryTypeId(), null,
+					DLFileEntryConstants.PRIVATE_WORKING_COPY_VERSION,
+					existingDLFileVersion.getSize(),
+					WorkflowConstants.STATUS_DRAFT,
+					serviceContext.getModifiedDate(null), serviceContext);
+			}
+			else {
+				dlFileVersion = addFileVersion(
+					user, dlFileEntry, oldDLFileVersion.getFileName(),
+					oldDLFileVersion.getExtension(),
+					oldDLFileVersion.getMimeType(), oldDLFileVersion.getTitle(),
+					oldDLFileVersion.getDescription(),
+					oldDLFileVersion.getChangeLog(),
+					oldDLFileVersion.getExtraSettings(),
+					oldDLFileVersion.getFileEntryTypeId(), null,
+					DLFileEntryConstants.PRIVATE_WORKING_COPY_VERSION,
+					oldDLFileVersion.getSize(), WorkflowConstants.STATUS_DRAFT,
+					serviceContext);
+
+				copyExpandoRowModifiedDate(
+					dlFileEntry.getCompanyId(), oldDLFileVersionId,
+					dlFileVersion.getFileVersionId());
+			}
+
+			Serializable validateDDMFormValues = serviceContext.getAttribute(
+				"validateDDMFormValues");
+
+			serviceContext.setAttribute("validateDDMFormValues", Boolean.FALSE);
+
+			if (fileEntryTypeId == oldDLFileVersion.getFileEntryTypeId()) {
+				copyFileEntryMetadata(
+					dlFileEntry.getCompanyId(), fileEntryTypeId, fileEntryId,
+					oldDLFileVersionId, dlFileVersion.getFileVersionId(),
+					serviceContext);
+			}
+
+			serviceContext.setAttribute(
+				"validateDDMFormValues", validateDDMFormValues);
+		}
+
+		return dlFileEntry;
+	}
+
+	private boolean _isValidFileVersionNumber(String version) {
+		if (Validator.isNull(version)) {
+			return false;
+		}
+
+		if (version.equals(DLFileEntryConstants.PRIVATE_WORKING_COPY_VERSION)) {
+			return true;
+		}
+
+		Matcher matcher = _fileVersionPattern.matcher(version);
+
+		if (matcher.matches()) {
+			return true;
+		}
+
+		return false;
+	}
+
 	private static final Log _log = LogFactoryUtil.getLog(
 		DLFileEntryLocalServiceImpl.class);
+
+	private static final Pattern _fileVersionPattern = Pattern.compile(
+		"\\d+\\.\\d+");
 
 }

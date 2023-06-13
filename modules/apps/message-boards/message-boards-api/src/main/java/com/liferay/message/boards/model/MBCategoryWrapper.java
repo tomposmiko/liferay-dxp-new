@@ -17,9 +17,7 @@ package com.liferay.message.boards.model;
 import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.expando.kernel.model.ExpandoBridge;
-
 import com.liferay.exportimport.kernel.lar.StagedModelType;
-
 import com.liferay.portal.kernel.model.ModelWrapper;
 import com.liferay.portal.kernel.service.ServiceContext;
 
@@ -41,6 +39,7 @@ import java.util.Objects;
  */
 @ProviderType
 public class MBCategoryWrapper implements MBCategory, ModelWrapper<MBCategory> {
+
 	public MBCategoryWrapper(MBCategory mbCategory) {
 		_mbCategory = mbCategory;
 	}
@@ -219,80 +218,82 @@ public class MBCategoryWrapper implements MBCategory, ModelWrapper<MBCategory> {
 	@Override
 	public java.util.List<Long> getAncestorCategoryIds()
 		throws com.liferay.portal.kernel.exception.PortalException {
+
 		return _mbCategory.getAncestorCategoryIds();
 	}
 
 	@Override
 	public java.util.List<MBCategory> getAncestors()
 		throws com.liferay.portal.kernel.exception.PortalException {
+
 		return _mbCategory.getAncestors();
 	}
 
 	/**
-	* Returns the category ID of this message boards category.
-	*
-	* @return the category ID of this message boards category
-	*/
+	 * Returns the category ID of this message boards category.
+	 *
+	 * @return the category ID of this message boards category
+	 */
 	@Override
 	public long getCategoryId() {
 		return _mbCategory.getCategoryId();
 	}
 
 	/**
-	* Returns the company ID of this message boards category.
-	*
-	* @return the company ID of this message boards category
-	*/
+	 * Returns the company ID of this message boards category.
+	 *
+	 * @return the company ID of this message boards category
+	 */
 	@Override
 	public long getCompanyId() {
 		return _mbCategory.getCompanyId();
 	}
 
 	/**
-	* Returns the container model ID of this message boards category.
-	*
-	* @return the container model ID of this message boards category
-	*/
+	 * Returns the container model ID of this message boards category.
+	 *
+	 * @return the container model ID of this message boards category
+	 */
 	@Override
 	public long getContainerModelId() {
 		return _mbCategory.getContainerModelId();
 	}
 
 	/**
-	* Returns the container name of this message boards category.
-	*
-	* @return the container name of this message boards category
-	*/
+	 * Returns the container name of this message boards category.
+	 *
+	 * @return the container name of this message boards category
+	 */
 	@Override
 	public String getContainerModelName() {
 		return _mbCategory.getContainerModelName();
 	}
 
 	/**
-	* Returns the create date of this message boards category.
-	*
-	* @return the create date of this message boards category
-	*/
+	 * Returns the create date of this message boards category.
+	 *
+	 * @return the create date of this message boards category
+	 */
 	@Override
 	public Date getCreateDate() {
 		return _mbCategory.getCreateDate();
 	}
 
 	/**
-	* Returns the description of this message boards category.
-	*
-	* @return the description of this message boards category
-	*/
+	 * Returns the description of this message boards category.
+	 *
+	 * @return the description of this message boards category
+	 */
 	@Override
 	public String getDescription() {
 		return _mbCategory.getDescription();
 	}
 
 	/**
-	* Returns the display style of this message boards category.
-	*
-	* @return the display style of this message boards category
-	*/
+	 * Returns the display style of this message boards category.
+	 *
+	 * @return the display style of this message boards category
+	 */
 	@Override
 	public String getDisplayStyle() {
 		return _mbCategory.getDisplayStyle();
@@ -304,60 +305,60 @@ public class MBCategoryWrapper implements MBCategory, ModelWrapper<MBCategory> {
 	}
 
 	/**
-	* Returns the group ID of this message boards category.
-	*
-	* @return the group ID of this message boards category
-	*/
+	 * Returns the group ID of this message boards category.
+	 *
+	 * @return the group ID of this message boards category
+	 */
 	@Override
 	public long getGroupId() {
 		return _mbCategory.getGroupId();
 	}
 
 	/**
-	* Returns the last post date of this message boards category.
-	*
-	* @return the last post date of this message boards category
-	*/
+	 * Returns the last post date of this message boards category.
+	 *
+	 * @return the last post date of this message boards category
+	 */
 	@Override
 	public Date getLastPostDate() {
 		return _mbCategory.getLastPostDate();
 	}
 
 	/**
-	* Returns the last publish date of this message boards category.
-	*
-	* @return the last publish date of this message boards category
-	*/
+	 * Returns the last publish date of this message boards category.
+	 *
+	 * @return the last publish date of this message boards category
+	 */
 	@Override
 	public Date getLastPublishDate() {
 		return _mbCategory.getLastPublishDate();
 	}
 
 	/**
-	* Returns the message count of this message boards category.
-	*
-	* @return the message count of this message boards category
-	*/
+	 * Returns the message count of this message boards category.
+	 *
+	 * @return the message count of this message boards category
+	 */
 	@Override
 	public int getMessageCount() {
 		return _mbCategory.getMessageCount();
 	}
 
 	/**
-	* Returns the modified date of this message boards category.
-	*
-	* @return the modified date of this message boards category
-	*/
+	 * Returns the modified date of this message boards category.
+	 *
+	 * @return the modified date of this message boards category
+	 */
 	@Override
 	public Date getModifiedDate() {
 		return _mbCategory.getModifiedDate();
 	}
 
 	/**
-	* Returns the name of this message boards category.
-	*
-	* @return the name of this message boards category
-	*/
+	 * Returns the name of this message boards category.
+	 *
+	 * @return the name of this message boards category
+	 */
 	@Override
 	public String getName() {
 		return _mbCategory.getName();
@@ -366,34 +367,35 @@ public class MBCategoryWrapper implements MBCategory, ModelWrapper<MBCategory> {
 	@Override
 	public MBCategory getParentCategory()
 		throws com.liferay.portal.kernel.exception.PortalException {
+
 		return _mbCategory.getParentCategory();
 	}
 
 	/**
-	* Returns the parent category ID of this message boards category.
-	*
-	* @return the parent category ID of this message boards category
-	*/
+	 * Returns the parent category ID of this message boards category.
+	 *
+	 * @return the parent category ID of this message boards category
+	 */
 	@Override
 	public long getParentCategoryId() {
 		return _mbCategory.getParentCategoryId();
 	}
 
 	/**
-	* Returns the parent container model ID of this message boards category.
-	*
-	* @return the parent container model ID of this message boards category
-	*/
+	 * Returns the parent container model ID of this message boards category.
+	 *
+	 * @return the parent container model ID of this message boards category
+	 */
 	@Override
 	public long getParentContainerModelId() {
 		return _mbCategory.getParentContainerModelId();
 	}
 
 	/**
-	* Returns the primary key of this message boards category.
-	*
-	* @return the primary key of this message boards category
-	*/
+	 * Returns the primary key of this message boards category.
+	 *
+	 * @return the primary key of this message boards category
+	 */
 	@Override
 	public long getPrimaryKey() {
 		return _mbCategory.getPrimaryKey();
@@ -405,92 +407,93 @@ public class MBCategoryWrapper implements MBCategory, ModelWrapper<MBCategory> {
 	}
 
 	/**
-	* Returns the status of this message boards category.
-	*
-	* @return the status of this message boards category
-	*/
+	 * Returns the status of this message boards category.
+	 *
+	 * @return the status of this message boards category
+	 */
 	@Override
 	public int getStatus() {
 		return _mbCategory.getStatus();
 	}
 
 	/**
-	* Returns the status by user ID of this message boards category.
-	*
-	* @return the status by user ID of this message boards category
-	*/
+	 * Returns the status by user ID of this message boards category.
+	 *
+	 * @return the status by user ID of this message boards category
+	 */
 	@Override
 	public long getStatusByUserId() {
 		return _mbCategory.getStatusByUserId();
 	}
 
 	/**
-	* Returns the status by user name of this message boards category.
-	*
-	* @return the status by user name of this message boards category
-	*/
+	 * Returns the status by user name of this message boards category.
+	 *
+	 * @return the status by user name of this message boards category
+	 */
 	@Override
 	public String getStatusByUserName() {
 		return _mbCategory.getStatusByUserName();
 	}
 
 	/**
-	* Returns the status by user uuid of this message boards category.
-	*
-	* @return the status by user uuid of this message boards category
-	*/
+	 * Returns the status by user uuid of this message boards category.
+	 *
+	 * @return the status by user uuid of this message boards category
+	 */
 	@Override
 	public String getStatusByUserUuid() {
 		return _mbCategory.getStatusByUserUuid();
 	}
 
 	/**
-	* Returns the status date of this message boards category.
-	*
-	* @return the status date of this message boards category
-	*/
+	 * Returns the status date of this message boards category.
+	 *
+	 * @return the status date of this message boards category
+	 */
 	@Override
 	public Date getStatusDate() {
 		return _mbCategory.getStatusDate();
 	}
 
 	/**
-	* Returns the thread count of this message boards category.
-	*
-	* @return the thread count of this message boards category
-	*/
+	 * Returns the thread count of this message boards category.
+	 *
+	 * @return the thread count of this message boards category
+	 */
 	@Override
 	public int getThreadCount() {
 		return _mbCategory.getThreadCount();
 	}
 
 	/**
-	* Returns the trash entry created when this message boards category was moved to the Recycle Bin. The trash entry may belong to one of the ancestors of this message boards category.
-	*
-	* @return the trash entry created when this message boards category was moved to the Recycle Bin
-	*/
+	 * Returns the trash entry created when this message boards category was moved to the Recycle Bin. The trash entry may belong to one of the ancestors of this message boards category.
+	 *
+	 * @return the trash entry created when this message boards category was moved to the Recycle Bin
+	 */
 	@Override
 	public com.liferay.trash.kernel.model.TrashEntry getTrashEntry()
 		throws com.liferay.portal.kernel.exception.PortalException {
+
 		return _mbCategory.getTrashEntry();
 	}
 
 	/**
-	* Returns the class primary key of the trash entry for this message boards category.
-	*
-	* @return the class primary key of the trash entry for this message boards category
-	*/
+	 * Returns the class primary key of the trash entry for this message boards category.
+	 *
+	 * @return the class primary key of the trash entry for this message boards category
+	 */
 	@Override
 	public long getTrashEntryClassPK() {
 		return _mbCategory.getTrashEntryClassPK();
 	}
 
 	/**
-	* Returns the trash handler for this message boards category.
-	*
-	* @return the trash handler for this message boards category
-	* @deprecated As of Judson (7.1.x), with no direct replacement
-	*/
+	 * Returns the trash handler for this message boards category.
+	 *
+	 * @return the trash handler for this message boards category
+	 * @deprecated As of Judson (7.1.x), with no direct replacement
+	 */
 	@Deprecated
 	@Override
 	public com.liferay.portal.kernel.trash.TrashHandler getTrashHandler() {
@@ -498,40 +501,40 @@ public class MBCategoryWrapper implements MBCategory, ModelWrapper<MBCategory> {
 	}
 
 	/**
-	* Returns the user ID of this message boards category.
-	*
-	* @return the user ID of this message boards category
-	*/
+	 * Returns the user ID of this message boards category.
+	 *
+	 * @return the user ID of this message boards category
+	 */
 	@Override
 	public long getUserId() {
 		return _mbCategory.getUserId();
 	}
 
 	/**
-	* Returns the user name of this message boards category.
-	*
-	* @return the user name of this message boards category
-	*/
+	 * Returns the user name of this message boards category.
+	 *
+	 * @return the user name of this message boards category
+	 */
 	@Override
 	public String getUserName() {
 		return _mbCategory.getUserName();
 	}
 
 	/**
-	* Returns the user uuid of this message boards category.
-	*
-	* @return the user uuid of this message boards category
-	*/
+	 * Returns the user uuid of this message boards category.
+	 *
+	 * @return the user uuid of this message boards category
+	 */
 	@Override
 	public String getUserUuid() {
 		return _mbCategory.getUserUuid();
 	}
 
 	/**
-	* Returns the uuid of this message boards category.
-	*
-	* @return the uuid of this message boards category
-	*/
+	 * Returns the uuid of this message boards category.
+	 *
+	 * @return the uuid of this message boards category
+	 */
 	@Override
 	public String getUuid() {
 		return _mbCategory.getUuid();
@@ -543,10 +546,10 @@ public class MBCategoryWrapper implements MBCategory, ModelWrapper<MBCategory> {
 	}
 
 	/**
-	* Returns <code>true</code> if this message boards category is approved.
-	*
-	* @return <code>true</code> if this message boards category is approved; <code>false</code> otherwise
-	*/
+	 * Returns <code>true</code> if this message boards category is approved.
+	 *
+	 * @return <code>true</code> if this message boards category is approved; <code>false</code> otherwise
+	 */
 	@Override
 	public boolean isApproved() {
 		return _mbCategory.isApproved();
@@ -558,20 +561,20 @@ public class MBCategoryWrapper implements MBCategory, ModelWrapper<MBCategory> {
 	}
 
 	/**
-	* Returns <code>true</code> if this message boards category is denied.
-	*
-	* @return <code>true</code> if this message boards category is denied; <code>false</code> otherwise
-	*/
+	 * Returns <code>true</code> if this message boards category is denied.
+	 *
+	 * @return <code>true</code> if this message boards category is denied; <code>false</code> otherwise
+	 */
 	@Override
 	public boolean isDenied() {
 		return _mbCategory.isDenied();
 	}
 
 	/**
-	* Returns <code>true</code> if this message boards category is a draft.
-	*
-	* @return <code>true</code> if this message boards category is a draft; <code>false</code> otherwise
-	*/
+	 * Returns <code>true</code> if this message boards category is a draft.
+	 *
+	 * @return <code>true</code> if this message boards category is a draft; <code>false</code> otherwise
+	 */
 	@Override
 	public boolean isDraft() {
 		return _mbCategory.isDraft();
@@ -583,50 +586,50 @@ public class MBCategoryWrapper implements MBCategory, ModelWrapper<MBCategory> {
 	}
 
 	/**
-	* Returns <code>true</code> if this message boards category is expired.
-	*
-	* @return <code>true</code> if this message boards category is expired; <code>false</code> otherwise
-	*/
+	 * Returns <code>true</code> if this message boards category is expired.
+	 *
+	 * @return <code>true</code> if this message boards category is expired; <code>false</code> otherwise
+	 */
 	@Override
 	public boolean isExpired() {
 		return _mbCategory.isExpired();
 	}
 
 	/**
-	* Returns <code>true</code> if this message boards category is inactive.
-	*
-	* @return <code>true</code> if this message boards category is inactive; <code>false</code> otherwise
-	*/
+	 * Returns <code>true</code> if this message boards category is inactive.
+	 *
+	 * @return <code>true</code> if this message boards category is inactive; <code>false</code> otherwise
+	 */
 	@Override
 	public boolean isInactive() {
 		return _mbCategory.isInactive();
 	}
 
 	/**
-	* Returns <code>true</code> if this message boards category is incomplete.
-	*
-	* @return <code>true</code> if this message boards category is incomplete; <code>false</code> otherwise
-	*/
+	 * Returns <code>true</code> if this message boards category is incomplete.
+	 *
+	 * @return <code>true</code> if this message boards category is incomplete; <code>false</code> otherwise
+	 */
 	@Override
 	public boolean isIncomplete() {
 		return _mbCategory.isIncomplete();
 	}
 
 	/**
-	* Returns <code>true</code> if this message boards category is in the Recycle Bin.
-	*
-	* @return <code>true</code> if this message boards category is in the Recycle Bin; <code>false</code> otherwise
-	*/
+	 * Returns <code>true</code> if this message boards category is in the Recycle Bin.
+	 *
+	 * @return <code>true</code> if this message boards category is in the Recycle Bin; <code>false</code> otherwise
+	 */
 	@Override
 	public boolean isInTrash() {
 		return _mbCategory.isInTrash();
 	}
 
 	/**
-	* Returns <code>true</code> if the parent of this message boards category is in the Recycle Bin.
-	*
-	* @return <code>true</code> if the parent of this message boards category is in the Recycle Bin; <code>false</code> otherwise
-	*/
+	 * Returns <code>true</code> if the parent of this message boards category is in the Recycle Bin.
+	 *
+	 * @return <code>true</code> if the parent of this message boards category is in the Recycle Bin; <code>false</code> otherwise
+	 */
 	@Override
 	public boolean isInTrashContainer() {
 		return _mbCategory.isInTrashContainer();
@@ -648,10 +651,10 @@ public class MBCategoryWrapper implements MBCategory, ModelWrapper<MBCategory> {
 	}
 
 	/**
-	* Returns <code>true</code> if this message boards category is pending.
-	*
-	* @return <code>true</code> if this message boards category is pending; <code>false</code> otherwise
-	*/
+	 * Returns <code>true</code> if this message boards category is pending.
+	 *
+	 * @return <code>true</code> if this message boards category is pending; <code>false</code> otherwise
+	 */
 	@Override
 	public boolean isPending() {
 		return _mbCategory.isPending();
@@ -663,10 +666,10 @@ public class MBCategoryWrapper implements MBCategory, ModelWrapper<MBCategory> {
 	}
 
 	/**
-	* Returns <code>true</code> if this message boards category is scheduled.
-	*
-	* @return <code>true</code> if this message boards category is scheduled; <code>false</code> otherwise
-	*/
+	 * Returns <code>true</code> if this message boards category is scheduled.
+	 *
+	 * @return <code>true</code> if this message boards category is scheduled; <code>false</code> otherwise
+	 */
 	@Override
 	public boolean isScheduled() {
 		return _mbCategory.isScheduled();
@@ -683,60 +686,60 @@ public class MBCategoryWrapper implements MBCategory, ModelWrapper<MBCategory> {
 	}
 
 	/**
-	* Sets the category ID of this message boards category.
-	*
-	* @param categoryId the category ID of this message boards category
-	*/
+	 * Sets the category ID of this message boards category.
+	 *
+	 * @param categoryId the category ID of this message boards category
+	 */
 	@Override
 	public void setCategoryId(long categoryId) {
 		_mbCategory.setCategoryId(categoryId);
 	}
 
 	/**
-	* Sets the company ID of this message boards category.
-	*
-	* @param companyId the company ID of this message boards category
-	*/
+	 * Sets the company ID of this message boards category.
+	 *
+	 * @param companyId the company ID of this message boards category
+	 */
 	@Override
 	public void setCompanyId(long companyId) {
 		_mbCategory.setCompanyId(companyId);
 	}
 
 	/**
-	* Sets the container model ID of this message boards category.
-	*
-	* @param containerModelId the container model ID of this message boards category
-	*/
+	 * Sets the container model ID of this message boards category.
+	 *
+	 * @param containerModelId the container model ID of this message boards category
+	 */
 	@Override
 	public void setContainerModelId(long containerModelId) {
 		_mbCategory.setContainerModelId(containerModelId);
 	}
 
 	/**
-	* Sets the create date of this message boards category.
-	*
-	* @param createDate the create date of this message boards category
-	*/
+	 * Sets the create date of this message boards category.
+	 *
+	 * @param createDate the create date of this message boards category
+	 */
 	@Override
 	public void setCreateDate(Date createDate) {
 		_mbCategory.setCreateDate(createDate);
 	}
 
 	/**
-	* Sets the description of this message boards category.
-	*
-	* @param description the description of this message boards category
-	*/
+	 * Sets the description of this message boards category.
+	 *
+	 * @param description the description of this message boards category
+	 */
 	@Override
 	public void setDescription(String description) {
 		_mbCategory.setDescription(description);
 	}
 
 	/**
-	* Sets the display style of this message boards category.
-	*
-	* @param displayStyle the display style of this message boards category
-	*/
+	 * Sets the display style of this message boards category.
+	 *
+	 * @param displayStyle the display style of this message boards category
+	 */
 	@Override
 	public void setDisplayStyle(String displayStyle) {
 		_mbCategory.setDisplayStyle(displayStyle);
@@ -745,6 +748,7 @@ public class MBCategoryWrapper implements MBCategory, ModelWrapper<MBCategory> {
 	@Override
 	public void setExpandoBridgeAttributes(
 		com.liferay.portal.kernel.model.BaseModel<?> baseModel) {
+
 		_mbCategory.setExpandoBridgeAttributes(baseModel);
 	}
 
@@ -759,60 +763,60 @@ public class MBCategoryWrapper implements MBCategory, ModelWrapper<MBCategory> {
 	}
 
 	/**
-	* Sets the group ID of this message boards category.
-	*
-	* @param groupId the group ID of this message boards category
-	*/
+	 * Sets the group ID of this message boards category.
+	 *
+	 * @param groupId the group ID of this message boards category
+	 */
 	@Override
 	public void setGroupId(long groupId) {
 		_mbCategory.setGroupId(groupId);
 	}
 
 	/**
-	* Sets the last post date of this message boards category.
-	*
-	* @param lastPostDate the last post date of this message boards category
-	*/
+	 * Sets the last post date of this message boards category.
+	 *
+	 * @param lastPostDate the last post date of this message boards category
+	 */
 	@Override
 	public void setLastPostDate(Date lastPostDate) {
 		_mbCategory.setLastPostDate(lastPostDate);
 	}
 
 	/**
-	* Sets the last publish date of this message boards category.
-	*
-	* @param lastPublishDate the last publish date of this message boards category
-	*/
+	 * Sets the last publish date of this message boards category.
+	 *
+	 * @param lastPublishDate the last publish date of this message boards category
+	 */
 	@Override
 	public void setLastPublishDate(Date lastPublishDate) {
 		_mbCategory.setLastPublishDate(lastPublishDate);
 	}
 
 	/**
-	* Sets the message count of this message boards category.
-	*
-	* @param messageCount the message count of this message boards category
-	*/
+	 * Sets the message count of this message boards category.
+	 *
+	 * @param messageCount the message count of this message boards category
+	 */
 	@Override
 	public void setMessageCount(int messageCount) {
 		_mbCategory.setMessageCount(messageCount);
 	}
 
 	/**
-	* Sets the modified date of this message boards category.
-	*
-	* @param modifiedDate the modified date of this message boards category
-	*/
+	 * Sets the modified date of this message boards category.
+	 *
+	 * @param modifiedDate the modified date of this message boards category
+	 */
 	@Override
 	public void setModifiedDate(Date modifiedDate) {
 		_mbCategory.setModifiedDate(modifiedDate);
 	}
 
 	/**
-	* Sets the name of this message boards category.
-	*
-	* @param name the name of this message boards category
-	*/
+	 * Sets the name of this message boards category.
+	 *
+	 * @param name the name of this message boards category
+	 */
 	@Override
 	public void setName(String name) {
 		_mbCategory.setName(name);
@@ -824,30 +828,30 @@ public class MBCategoryWrapper implements MBCategory, ModelWrapper<MBCategory> {
 	}
 
 	/**
-	* Sets the parent category ID of this message boards category.
-	*
-	* @param parentCategoryId the parent category ID of this message boards category
-	*/
+	 * Sets the parent category ID of this message boards category.
+	 *
+	 * @param parentCategoryId the parent category ID of this message boards category
+	 */
 	@Override
 	public void setParentCategoryId(long parentCategoryId) {
 		_mbCategory.setParentCategoryId(parentCategoryId);
 	}
 
 	/**
-	* Sets the parent container model ID of this message boards category.
-	*
-	* @param parentContainerModelId the parent container model ID of this message boards category
-	*/
+	 * Sets the parent container model ID of this message boards category.
+	 *
+	 * @param parentContainerModelId the parent container model ID of this message boards category
+	 */
 	@Override
 	public void setParentContainerModelId(long parentContainerModelId) {
 		_mbCategory.setParentContainerModelId(parentContainerModelId);
 	}
 
 	/**
-	* Sets the primary key of this message boards category.
-	*
-	* @param primaryKey the primary key of this message boards category
-	*/
+	 * Sets the primary key of this message boards category.
+	 *
+	 * @param primaryKey the primary key of this message boards category
+	 */
 	@Override
 	public void setPrimaryKey(long primaryKey) {
 		_mbCategory.setPrimaryKey(primaryKey);
@@ -859,107 +863,109 @@ public class MBCategoryWrapper implements MBCategory, ModelWrapper<MBCategory> {
 	}
 
 	/**
-	* Sets the status of this message boards category.
-	*
-	* @param status the status of this message boards category
-	*/
+	 * Sets the status of this message boards category.
+	 *
+	 * @param status the status of this message boards category
+	 */
 	@Override
 	public void setStatus(int status) {
 		_mbCategory.setStatus(status);
 	}
 
 	/**
-	* Sets the status by user ID of this message boards category.
-	*
-	* @param statusByUserId the status by user ID of this message boards category
-	*/
+	 * Sets the status by user ID of this message boards category.
+	 *
+	 * @param statusByUserId the status by user ID of this message boards category
+	 */
 	@Override
 	public void setStatusByUserId(long statusByUserId) {
 		_mbCategory.setStatusByUserId(statusByUserId);
 	}
 
 	/**
-	* Sets the status by user name of this message boards category.
-	*
-	* @param statusByUserName the status by user name of this message boards category
-	*/
+	 * Sets the status by user name of this message boards category.
+	 *
+	 * @param statusByUserName the status by user name of this message boards category
+	 */
 	@Override
 	public void setStatusByUserName(String statusByUserName) {
 		_mbCategory.setStatusByUserName(statusByUserName);
 	}
 
 	/**
-	* Sets the status by user uuid of this message boards category.
-	*
-	* @param statusByUserUuid the status by user uuid of this message boards category
-	*/
+	 * Sets the status by user uuid of this message boards category.
+	 *
+	 * @param statusByUserUuid the status by user uuid of this message boards category
+	 */
 	@Override
 	public void setStatusByUserUuid(String statusByUserUuid) {
 		_mbCategory.setStatusByUserUuid(statusByUserUuid);
 	}
 
 	/**
-	* Sets the status date of this message boards category.
-	*
-	* @param statusDate the status date of this message boards category
-	*/
+	 * Sets the status date of this message boards category.
+	 *
+	 * @param statusDate the status date of this message boards category
+	 */
 	@Override
 	public void setStatusDate(Date statusDate) {
 		_mbCategory.setStatusDate(statusDate);
 	}
 
 	/**
-	* Sets the thread count of this message boards category.
-	*
-	* @param threadCount the thread count of this message boards category
-	*/
+	 * Sets the thread count of this message boards category.
+	 *
+	 * @param threadCount the thread count of this message boards category
+	 */
 	@Override
 	public void setThreadCount(int threadCount) {
 		_mbCategory.setThreadCount(threadCount);
 	}
 
 	/**
-	* Sets the user ID of this message boards category.
-	*
-	* @param userId the user ID of this message boards category
-	*/
+	 * Sets the user ID of this message boards category.
+	 *
+	 * @param userId the user ID of this message boards category
+	 */
 	@Override
 	public void setUserId(long userId) {
 		_mbCategory.setUserId(userId);
 	}
 
 	/**
-	* Sets the user name of this message boards category.
-	*
-	* @param userName the user name of this message boards category
-	*/
+	 * Sets the user name of this message boards category.
+	 *
+	 * @param userName the user name of this message boards category
+	 */
 	@Override
 	public void setUserName(String userName) {
 		_mbCategory.setUserName(userName);
 	}
 
 	/**
-	* Sets the user uuid of this message boards category.
-	*
-	* @param userUuid the user uuid of this message boards category
-	*/
+	 * Sets the user uuid of this message boards category.
+	 *
+	 * @param userUuid the user uuid of this message boards category
+	 */
 	@Override
 	public void setUserUuid(String userUuid) {
 		_mbCategory.setUserUuid(userUuid);
 	}
 
 	/**
-	* Sets the uuid of this message boards category.
-	*
-	* @param uuid the uuid of this message boards category
-	*/
+	 * Sets the uuid of this message boards category.
+	 *
+	 * @param uuid the uuid of this message boards category
+	 */
 	@Override
 	public void setUuid(String uuid) {
 		_mbCategory.setUuid(uuid);
 	}
 
 	@Override
-	public com.liferay.portal.kernel.model.CacheModel<MBCategory> toCacheModel() {
+	public com.liferay.portal.kernel.model.CacheModel<MBCategory>
+		toCacheModel() {
+
 		return _mbCategory.toCacheModel();
 	}
 
@@ -1028,4 +1034,5 @@ public class MBCategoryWrapper implements MBCategory, ModelWrapper<MBCategory> {
 	}
 
 	private final MBCategory _mbCategory;
+
 }

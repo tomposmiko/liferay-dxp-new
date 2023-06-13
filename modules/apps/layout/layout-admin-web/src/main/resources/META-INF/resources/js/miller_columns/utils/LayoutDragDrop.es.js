@@ -26,12 +26,14 @@ const DROP_TARGET_TYPES = {
 /**
  * LayoutDragDrop
  */
+
 class LayoutDragDrop extends State {
 
 	/**
 	 * @inheritDoc
 	 * @review
 	 */
+
 	constructor(config, ...args) {
 		super(config, ...args);
 
@@ -42,6 +44,7 @@ class LayoutDragDrop extends State {
 	 * @inheritDoc
 	 * @review
 	 */
+
 	dispose() {
 		this._dragDrop.dispose();
 	}
@@ -51,6 +54,7 @@ class LayoutDragDrop extends State {
 	 * @param {!HTMLElement} target
 	 * @review
 	 */
+
 	addTarget(target) {
 		this._dragDrop.addTarget(target);
 	}
@@ -63,6 +67,7 @@ class LayoutDragDrop extends State {
 	 * @private
 	 * @review
 	 */
+
 	_handleDrag(data) {
 		const targetItem = data.target;
 
@@ -114,6 +119,7 @@ class LayoutDragDrop extends State {
 	 * @private
 	 * @review
 	 */
+
 	_handleDragEnd() {
 		this.emit('leaveLayoutColumnItem');
 	}
@@ -125,6 +131,7 @@ class LayoutDragDrop extends State {
 	 * @private
 	 * @review
 	 */
+
 	_handleDragStart(data, event) {
 		const sourceItemPlid = event.target.getActiveDrag().dataset.layoutColumnItemPlid;
 
@@ -145,6 +152,7 @@ class LayoutDragDrop extends State {
 	 * @private
 	 * @review
 	 */
+
 	_handleDrop(data, event) {
 		event.preventDefault();
 
@@ -178,6 +186,7 @@ class LayoutDragDrop extends State {
 	 * @private
 	 * @review
 	 */
+
 	_initializeDragAndDrop() {
 		if (this._dragDrop) {
 			this._dragDrop.dispose();

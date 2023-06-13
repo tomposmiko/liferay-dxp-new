@@ -25,20 +25,20 @@ import com.liferay.portal.kernel.util.Accessor;
  *
  * @author Brian Wing Shun Chan
  * @see ChangesetEntryModel
- * @see com.liferay.changeset.model.impl.ChangesetEntryImpl
- * @see com.liferay.changeset.model.impl.ChangesetEntryModelImpl
  * @generated
  */
 @ImplementationClassName("com.liferay.changeset.model.impl.ChangesetEntryImpl")
 @ProviderType
 public interface ChangesetEntry extends ChangesetEntryModel, PersistedModel {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
-	 * Never modify this interface directly. Add methods to {@link com.liferay.changeset.model.impl.ChangesetEntryImpl} and rerun ServiceBuilder to automatically copy the method declarations to this interface.
+	 * Never modify this interface directly. Add methods to <code>com.liferay.changeset.model.impl.ChangesetEntryImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
 	 */
-	public static final Accessor<ChangesetEntry, Long> CHANGESET_ENTRY_ID_ACCESSOR =
-		new Accessor<ChangesetEntry, Long>() {
+	public static final Accessor<ChangesetEntry, Long>
+		CHANGESET_ENTRY_ID_ACCESSOR = new Accessor<ChangesetEntry, Long>() {
+
 			@Override
 			public Long get(ChangesetEntry changesetEntry) {
 				return changesetEntry.getChangesetEntryId();
@@ -53,5 +53,7 @@ public interface ChangesetEntry extends ChangesetEntryModel, PersistedModel {
 			public Class<ChangesetEntry> getTypeClass() {
 				return ChangesetEntry.class;
 			}
+
 		};
+
 }

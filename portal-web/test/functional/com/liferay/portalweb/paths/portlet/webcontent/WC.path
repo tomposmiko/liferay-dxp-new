@@ -41,7 +41,7 @@
 <!--ENTRY_CARDS-->
 <tr>
 	<td>ENTRY_CARDS_THUMBNAIL</td>
-	<td>//li[contains(@data-title,'${key_webContentTitle}')]//div[contains(@class,'vertical-card-container')]</td>
+	<td>//li[contains(@data-title,'${key_webContentTitle}')]//div[contains(@class,'card')]//a[contains(.,'${key_webContentTitle}')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -62,7 +62,7 @@
 </tr>
 <tr>
 	<td>ENTRY_LIST_MENULIST_ICON</td>
-	<td>//li[contains(@data-title,'${key_webContentTitle}')]//a[contains(@class,'dropdown-toggle')]</td>
+	<td>//li[contains(@data-title,'${key_webContentTitle}')]//*[contains(@class,'dropdown-toggle')]</td>
 	<td></td>
 </tr>
 <tr>

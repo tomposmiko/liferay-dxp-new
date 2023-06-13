@@ -34,10 +34,11 @@ import com.liferay.portal.kernel.service.MembershipRequestLocalServiceUtil;
 @ProviderType
 public abstract class MembershipRequestBaseImpl
 	extends MembershipRequestModelImpl implements MembershipRequest {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
-	 * Never modify or reference this class directly. All methods that expect a membership request model instance should use the {@link MembershipRequest} interface instead.
+	 * Never modify or reference this class directly. All methods that expect a membership request model instance should use the <code>MembershipRequest</code> interface instead.
 	 */
 	@Override
 	public void persist() {
@@ -48,4 +49,5 @@ public abstract class MembershipRequestBaseImpl
 			MembershipRequestLocalServiceUtil.updateMembershipRequest(this);
 		}
 	}
+
 }

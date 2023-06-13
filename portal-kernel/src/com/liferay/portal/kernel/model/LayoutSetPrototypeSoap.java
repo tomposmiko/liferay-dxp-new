@@ -26,11 +26,11 @@ import java.util.List;
  * This class is used by SOAP remote services, specifically {@link com.liferay.portal.service.http.LayoutSetPrototypeServiceSoap}.
  *
  * @author Brian Wing Shun Chan
- * @see com.liferay.portal.service.http.LayoutSetPrototypeServiceSoap
  * @generated
  */
 @ProviderType
 public class LayoutSetPrototypeSoap implements Serializable {
+
 	public static LayoutSetPrototypeSoap toSoapModel(LayoutSetPrototype model) {
 		LayoutSetPrototypeSoap soapModel = new LayoutSetPrototypeSoap();
 
@@ -52,7 +52,9 @@ public class LayoutSetPrototypeSoap implements Serializable {
 
 	public static LayoutSetPrototypeSoap[] toSoapModels(
 		LayoutSetPrototype[] models) {
-		LayoutSetPrototypeSoap[] soapModels = new LayoutSetPrototypeSoap[models.length];
+
+		LayoutSetPrototypeSoap[] soapModels =
+			new LayoutSetPrototypeSoap[models.length];
 
 		for (int i = 0; i < models.length; i++) {
 			soapModels[i] = toSoapModel(models[i]);
@@ -63,10 +65,12 @@ public class LayoutSetPrototypeSoap implements Serializable {
 
 	public static LayoutSetPrototypeSoap[][] toSoapModels(
 		LayoutSetPrototype[][] models) {
+
 		LayoutSetPrototypeSoap[][] soapModels = null;
 
 		if (models.length > 0) {
-			soapModels = new LayoutSetPrototypeSoap[models.length][models[0].length];
+			soapModels =
+				new LayoutSetPrototypeSoap[models.length][models[0].length];
 		}
 		else {
 			soapModels = new LayoutSetPrototypeSoap[0][0];
@@ -81,13 +85,16 @@ public class LayoutSetPrototypeSoap implements Serializable {
 
 	public static LayoutSetPrototypeSoap[] toSoapModels(
 		List<LayoutSetPrototype> models) {
-		List<LayoutSetPrototypeSoap> soapModels = new ArrayList<LayoutSetPrototypeSoap>(models.size());
+
+		List<LayoutSetPrototypeSoap> soapModels =
+			new ArrayList<LayoutSetPrototypeSoap>(models.size());
 
 		for (LayoutSetPrototype model : models) {
 			soapModels.add(toSoapModel(model));
 		}
 
-		return soapModels.toArray(new LayoutSetPrototypeSoap[soapModels.size()]);
+		return soapModels.toArray(
+			new LayoutSetPrototypeSoap[soapModels.size()]);
 	}
 
 	public LayoutSetPrototypeSoap() {
@@ -213,4 +220,5 @@ public class LayoutSetPrototypeSoap implements Serializable {
 	private String _description;
 	private String _settings;
 	private boolean _active;
+
 }

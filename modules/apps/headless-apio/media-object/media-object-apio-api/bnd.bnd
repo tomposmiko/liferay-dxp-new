@@ -1,4 +1,6 @@
 Bundle-Name: Liferay Media Object Apio API
 Bundle-SymbolicName: com.liferay.media.object.apio.api
-Bundle-Version: 1.0.5
-Export-Package: com.liferay.media.object.apio.architect.identifier
+Bundle-Version: 1.1.1
+Export-Package:\
+	com.liferay.media.object.apio.architect.identifier,\
+	com.liferay.media.object.apio.architect.model

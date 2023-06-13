@@ -178,7 +178,7 @@ public class ScopeLocatorImplTest extends PowerMockito {
 	public void testScopeMapperByNameAndCompany() throws Exception {
 		String applicationName2 = "com.liferay.test2";
 
-		ScopeMapper defaultScopeMapper = ScopeMapper.PASSTHROUGH_SCOPEMAPPER;
+		ScopeMapper defaultScopeMapper = ScopeMapper.PASS_THROUGH_SCOPE_MAPPER;
 
 		ScopeFinder scopeFinder = () -> scopesSet1;
 
@@ -240,11 +240,21 @@ public class ScopeLocatorImplTest extends PowerMockito {
 		for (String scope : scopesSet1) {
 			Assert.assertThat(
 				application1ScopesAliases,
-				hasItems(appScopeMapper.map(scope).toArray(new String[0])));
+				hasItems(
+					appScopeMapper.map(
+						scope
+					).toArray(
+						new String[0]
+					)));
 
 			Assert.assertThat(
 				application2ScopesAliases,
-				hasItems(companyScopeMapper.map(scope).toArray(new String[0])));
+				hasItems(
+					companyScopeMapper.map(
+						scope
+					).toArray(
+						new String[0]
+					)));
 		}
 	}
 
@@ -301,7 +311,7 @@ public class ScopeLocatorImplTest extends PowerMockito {
 		Builder builder = new Builder();
 
 		ScopeLocatorImpl scopeLocatorImpl = builder.withPrefixHandlerFactories(
-			propertyAccessor -> PrefixHandler.PASSTHROUGH_PREFIXHANDLER,
+			propertyAccessor -> PrefixHandler.PASS_THROUGH_PREFIX_HANDLER,
 			registrator -> {
 				registrator.register(
 					_COMPANY_ID, _APPLICATION_NAME, testPrefixHandlerFactory);
@@ -361,7 +371,8 @@ public class ScopeLocatorImplTest extends PowerMockito {
 
 		return stream.flatMap(
 			liferayOAuth2Scope -> Collections.singleton(
-				liferayOAuth2Scope.getScope()).stream()
+				liferayOAuth2Scope.getScope()
+			).stream()
 		).collect(
 			Collectors.toSet()
 		);
@@ -383,14 +394,15 @@ public class ScopeLocatorImplTest extends PowerMockito {
 
 			if (!_prefixHandlerFactoriesInitialized) {
 				withPrefixHandlerFactories(
-					propertyAccessor -> PrefixHandler.PASSTHROUGH_PREFIXHANDLER,
+					propertyAccessor ->
+						PrefixHandler.PASS_THROUGH_PREFIX_HANDLER,
 					registrator -> {
 					});
 			}
 
 			if (!_scopeMappersInitialized) {
 				withScopeMappers(
-					ScopeMapper.PASSTHROUGH_SCOPEMAPPER,
+					ScopeMapper.PASS_THROUGH_SCOPE_MAPPER,
 					registrator -> {
 					});
 			}

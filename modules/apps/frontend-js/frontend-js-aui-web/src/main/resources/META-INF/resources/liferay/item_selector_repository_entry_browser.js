@@ -124,10 +124,10 @@ AUI.add(
 						instance._eventHandles = [
 							itemViewer.get(STR_LINKS).on('click', A.bind(STR_ITEM_SELECTED, instance, itemViewer)),
 							itemViewer.after('currentIndexChange', A.bind(STR_ITEM_SELECTED, instance, itemViewer)),
-							itemViewer.after(STR_VISIBLE_CHANGE, instance._afterVisibleChange, instance),
+							itemViewer.after(STR_VISIBLE_CHANGE, instance._afterVisibleChange, instance)
 						];
 
-						var uploadItemURL = instance.get('uploadItemURL')
+						var uploadItemURL = instance.get('uploadItemURL');
 
 						if (uploadItemURL) {
 							instance._eventHandles.push(
@@ -372,6 +372,8 @@ AUI.add(
 					_validateFile: function(file) {
 						var instance = this;
 
+						var errorMessage = '';
+
 						var fileExtension = file.name.split('.').pop().toLowerCase();
 
 						var validExtensions = instance.get('validExtensions');
@@ -383,15 +385,17 @@ AUI.add(
 								instance._previewFile(file);
 							}
 							else {
-								var message =  Lang.sub(Liferay.Language.get('please-enter-a-file-with-a-valid-file-size-no-larger-than-x'), [instance.formatStorage(instance.get('maxFileSize'))]);
-
-								instance._showError(message);
+								errorMessage = Lang.sub(Liferay.Language.get('please-enter-a-file-with-a-valid-file-size-no-larger-than-x'), [instance.formatStorage(instance.get('maxFileSize'))]);
 							}
 						}
 						else {
-							var message = Lang.sub(Liferay.Language.get('please-enter-a-file-with-a-valid-extension-x'), [validExtensions]);
+							errorMessage = Lang.sub(Liferay.Language.get('please-enter-a-file-with-a-valid-extension-x'), [validExtensions]);
+						}
 
-							instance._showError(message);
+						if (errorMessage) {
+							instance.one('input[type="file"]').val('');
+
+							instance._showError(errorMessage);
 						}
 					}
 				}

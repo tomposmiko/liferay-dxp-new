@@ -48,6 +48,7 @@ import com.liferay.portal.kernel.service.ClassNameLocalService;
 import com.liferay.portal.kernel.service.ResourceActionLocalService;
 import com.liferay.portal.kernel.service.ResourceLocalService;
 import com.liferay.portal.kernel.service.ResourcePermissionLocalService;
+import com.liferay.portal.kernel.upgrade.DummyUpgradeStep;
 import com.liferay.portal.upgrade.registry.UpgradeStepRegistrator;
 
 import org.osgi.service.component.annotations.Component;
@@ -90,7 +91,12 @@ public class DDMServiceUpgrade implements UpgradeStepRegistrator {
 			"1.0.1", "1.0.2", new UpgradeDDMTemplateSmallImageURL());
 
 		registry.register(
-			"1.0.2", "1.1.0",
+			"1.0.2", "1.0.3",
+			new com.liferay.dynamic.data.mapping.internal.upgrade.v1_0_3.
+				UpgradeDDMFormParagraphFields(_jsonFactory));
+
+		registry.register(
+			"1.0.3", "1.1.0",
 			new UpgradeCheckboxFieldToCheckboxMultipleField(
 				_ddmFormJSONDeserializer, _ddmFormValuesJSONDeserializer,
 				_ddmFormValuesJSONSerializer, _jsonFactory),
@@ -128,12 +134,7 @@ public class DDMServiceUpgrade implements UpgradeStepRegistrator {
 			new com.liferay.dynamic.data.mapping.internal.upgrade.v1_2_0.
 				UpgradeSchema());
 
-		registry.register(
-			"1.2.0", "1.2.1",
-			new com.liferay.dynamic.data.mapping.internal.upgrade.v1_2_0.
-				UpgradeDDMFormAdminPortletId(),
-			new com.liferay.dynamic.data.mapping.internal.upgrade.v1_2_0.
-				UpgradeDDMFormPortletId());
+		registry.register("1.2.0", "1.2.1", new DummyUpgradeStep());
 
 		registry.register(
 			"1.2.1", "2.0.0",
@@ -169,6 +170,11 @@ public class DDMServiceUpgrade implements UpgradeStepRegistrator {
 			new UpgradeDDMFormInstanceEntries(_jsonFactory),
 			new com.liferay.dynamic.data.mapping.internal.upgrade.v2_0_3.
 				UpgradeDDMFormInstanceSettings(_jsonFactory));
+
+		registry.register(
+			"2.0.3", "2.0.4",
+			new com.liferay.dynamic.data.mapping.internal.upgrade.v2_0_4.
+				UpgradeDDMFormParagraphFields(_jsonFactory));
 	}
 
 	@Reference

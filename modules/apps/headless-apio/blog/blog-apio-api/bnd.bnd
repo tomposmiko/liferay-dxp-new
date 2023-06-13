@@ -1,4 +1,6 @@
 Bundle-Name: Liferay Blog Apio API
 Bundle-SymbolicName: com.liferay.blog.apio.api
-Bundle-Version: 1.0.5
-Export-Package: com.liferay.blog.apio.architect.identifier
+Bundle-Version: 1.1.2
+Export-Package:\
+	com.liferay.blog.apio.architect.identifier,\
+	com.liferay.blog.apio.architect.model

@@ -14,8 +14,8 @@
 
 package com.liferay.apio.architect.internal.writer;
 
-import static com.liferay.apio.architect.test.util.list.FunctionalListMatchers.aFunctionalListThat;
-import static com.liferay.apio.architect.test.util.representor.MockRepresentorCreator.createRootModelRepresentor;
+import static com.liferay.apio.architect.internal.util.matcher.IsAFunctionalList.aFunctionalListThat;
+import static com.liferay.apio.architect.internal.util.representor.MockRepresentorCreator.createRootModelRepresentor;
 
 import static com.spotify.hamcrest.optional.OptionalMatchers.optionalWithValue;
 
@@ -30,21 +30,24 @@ import static org.hamcrest.collection.IsMapWithSize.aMapWithSize;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsEqual.equalTo;
 
+import static org.junit.Assert.assertEquals;
+
 import com.liferay.apio.architect.internal.alias.PathFunction;
 import com.liferay.apio.architect.internal.list.FunctionalList;
 import com.liferay.apio.architect.internal.related.RelatedModelImpl;
 import com.liferay.apio.architect.internal.request.RequestInfo;
 import com.liferay.apio.architect.internal.single.model.SingleModelImpl;
+import com.liferay.apio.architect.internal.util.identifier.FirstEmbeddedId;
+import com.liferay.apio.architect.internal.util.model.FirstEmbeddedModel;
+import com.liferay.apio.architect.internal.util.model.RootModel;
+import com.liferay.apio.architect.internal.util.writer.MockWriterUtil;
 import com.liferay.apio.architect.related.RelatedModel;
+import com.liferay.apio.architect.resource.Resource.Id;
+import com.liferay.apio.architect.resource.Resource.Item;
 import com.liferay.apio.architect.single.model.SingleModel;
-import com.liferay.apio.architect.test.util.identifier.FirstEmbeddedId;
-import com.liferay.apio.architect.test.util.model.FirstEmbeddedModel;
-import com.liferay.apio.architect.test.util.model.RootModel;
-import com.liferay.apio.architect.test.util.writer.MockWriterUtil;
 import com.liferay.apio.architect.uri.Path;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -98,17 +101,15 @@ public class FieldsWriterTest {
 		);
 
 		_fieldsWriter = new FieldsWriter<>(
-			new SingleModelImpl<>(
-				() -> "first", "root", Collections.emptyList()),
-			_requestInfo, createRootModelRepresentor(true),
-			new Path("name", "id"), new FunctionalList<>(null, "first"),
-			MockWriterUtil::getSingleModel, null);
+			new SingleModelImpl<>(() -> "first", "root"), _requestInfo,
+			createRootModelRepresentor(true), new Path("name", "id"),
+			new FunctionalList<>(null, "first"),
+			MockWriterUtil::getSingleModel);
 	}
 
 	@Test
 	public void testGetSingleModel() {
-		SingleModel<Integer> parentSingleModel = new SingleModelImpl<>(
-			3, "", Collections.emptyList());
+		SingleModel<Integer> parentSingleModel = new SingleModelImpl<>(3, "");
 
 		RelatedModel<Integer, String> relatedModel = new RelatedModelImpl<>(
 			"key", FirstEmbeddedId.class, String::valueOf, () -> null);
@@ -128,6 +129,25 @@ public class FieldsWriterTest {
 
 				assertThat(firstEmbeddedModel.getId(), is("3"));
 			});
+	}
+
+	@Test
+	public void testWithItem() {
+		List<Item> items = new ArrayList<>();
+
+		_fieldsWriter.withItem(items::add);
+
+		assertThat(items, hasSize(1));
+
+		Item item = items.get(0);
+
+		assertThat(item.getName(), is("root"));
+
+		Optional<Id> optional = item.getIdOptional();
+
+		assertThat(optional, is(optionalWithValue()));
+
+		optional.ifPresent(id -> assertEquals(id, Id.of("first", "id")));
 	}
 
 	@Test
@@ -168,11 +188,9 @@ public class FieldsWriterTest {
 
 		assertThat(binaries, is(aMapWithSize(2)));
 		assertThat(
-			binaries,
-			hasEntry("binary1", "www.liferay.com/o/b/name/id/binary1"));
+			binaries, hasEntry("binary1", "www.liferay.com/o/name/id/binary1"));
 		assertThat(
-			binaries,
-			hasEntry("binary2", "www.liferay.com/o/b/name/id/binary2"));
+			binaries, hasEntry("binary2", "www.liferay.com/o/name/id/binary2"));
 	}
 
 	@Test
@@ -189,8 +207,7 @@ public class FieldsWriterTest {
 
 		assertThat(binaries, is(aMapWithSize(1)));
 		assertThat(
-			binaries,
-			hasEntry("binary2", "www.liferay.com/o/b/name/id/binary2"));
+			binaries, hasEntry("binary2", "www.liferay.com/o/name/id/binary2"));
 	}
 
 	@Test
@@ -291,14 +308,12 @@ public class FieldsWriterTest {
 		assertThat(
 			linkedRelatedModelURLs,
 			contains(
-				"www.liferay.com/o/p/name1/id1",
-				"www.liferay.com/o/p/name3/id3",
-				"www.liferay.com/o/p/name4/id4"));
+				"www.liferay.com/o/name1/id1", "www.liferay.com/o/name3/id3",
+				"www.liferay.com/o/name4/id4"));
 
 		assertThat(embeddedRelatedModelURLs, hasSize(equalTo(1)));
 		assertThat(
-			embeddedRelatedModelURLs,
-			contains("www.liferay.com/o/p/name2/id2"));
+			embeddedRelatedModelURLs, contains("www.liferay.com/o/name2/id2"));
 
 		assertThat(firstEmbeddedPathElementsList, hasSize(equalTo(1)));
 		assertThat(
@@ -319,7 +334,6 @@ public class FieldsWriterTest {
 			contains(aFunctionalListThat(contains("first", "embedded2"))));
 	}
 
-	@SuppressWarnings("unchecked")
 	@Test
 	public void testWriteEmbeddedRelatedModelsWithFieldsFilter() {
 		Mockito.when(
@@ -341,8 +355,8 @@ public class FieldsWriterTest {
 
 		_fieldsWriter.writeRelatedModels(
 			pathFunction,
-			(singleModel, embeddedPathElements) ->
-				Assert.fail("Should not be embedded"),
+			(singleModel, embeddedPathElements) -> Assert.fail(
+				"Should not be embedded"),
 			(url, embeddedPathElements) -> {
 				linkedRelatedModelURLs.add(url);
 				linkedPathElementsList.add(embeddedPathElements);
@@ -352,7 +366,7 @@ public class FieldsWriterTest {
 
 		assertThat(linkedRelatedModelURLs, hasSize(equalTo(1)));
 		assertThat(
-			linkedRelatedModelURLs, contains("www.liferay.com/o/p/name2/id2"));
+			linkedRelatedModelURLs, contains("www.liferay.com/o/name2/id2"));
 
 		assertThat(
 			linkedPathElementsList,
@@ -379,8 +393,8 @@ public class FieldsWriterTest {
 
 		_fieldsWriter.writeRelatedModels(
 			pathFunction,
-			(singleModel, embeddedPathElements) ->
-				Assert.fail("Should not be embedded"),
+			(singleModel, embeddedPathElements) -> Assert.fail(
+				"Should not be embedded"),
 			(url, embeddedPathElements) -> {
 				linkedRelatedModelURLs.add(url);
 				embeddedPathElementsList.add(embeddedPathElements);
@@ -392,10 +406,8 @@ public class FieldsWriterTest {
 		assertThat(
 			linkedRelatedModelURLs,
 			contains(
-				"www.liferay.com/o/p/name1/id1",
-				"www.liferay.com/o/p/name2/id2",
-				"www.liferay.com/o/p/name3/id3",
-				"www.liferay.com/o/p/name4/id4"));
+				"www.liferay.com/o/name1/id1", "www.liferay.com/o/name2/id2",
+				"www.liferay.com/o/name3/id3", "www.liferay.com/o/name4/id4"));
 
 		assertThat(
 			embeddedPathElementsList,
@@ -439,10 +451,8 @@ public class FieldsWriterTest {
 		assertThat(
 			linkedRelatedModelsURLs,
 			contains(
-				"www.liferay.com/o/p/name1/id1",
-				"www.liferay.com/o/p/name2/id2",
-				"www.liferay.com/o/p/name3/id3",
-				"www.liferay.com/o/p/name4/id4"));
+				"www.liferay.com/o/name1/id1", "www.liferay.com/o/name2/id2",
+				"www.liferay.com/o/name3/id3", "www.liferay.com/o/name4/id4"));
 
 		assertThat(
 			embeddedPathElementsList,
@@ -453,7 +463,6 @@ public class FieldsWriterTest {
 				aFunctionalListThat(contains("first", "linked2"))));
 	}
 
-	@SuppressWarnings("unchecked")
 	@Test
 	public void testWriteLinkedRelatedModelsWithFieldsFilter() {
 		Mockito.when(
@@ -487,7 +496,7 @@ public class FieldsWriterTest {
 
 		assertThat(linkedRelatedModelsURLs, hasSize(equalTo(1)));
 		assertThat(
-			linkedRelatedModelsURLs, contains("www.liferay.com/o/p/name2/id2"));
+			linkedRelatedModelsURLs, contains("www.liferay.com/o/name2/id2"));
 
 		assertThat(
 			embeddedPathElementsList,
@@ -606,7 +615,7 @@ public class FieldsWriterTest {
 		);
 
 		_fieldsWriter.writeRelatedCollections(
-			nameFunction,
+			null, nameFunction,
 			(url, embeddedPathElements) -> {
 				relatedCollectionURLs.add(url);
 				embeddedPathElementsList.add(embeddedPathElements);
@@ -616,8 +625,8 @@ public class FieldsWriterTest {
 		assertThat(
 			relatedCollectionURLs,
 			contains(
-				"www.liferay.com/o/p/name/id/first",
-				"www.liferay.com/o/p/name/id/second"));
+				"www.liferay.com/o/root/id/first",
+				"www.liferay.com/o/root/id/second"));
 
 		assertThat(
 			embeddedPathElementsList,
@@ -649,7 +658,7 @@ public class FieldsWriterTest {
 		);
 
 		_fieldsWriter.writeRelatedCollections(
-			nameFunction,
+			null, nameFunction,
 			(url, embeddedPathElements) -> {
 				relatedCollectionURLs.add(url);
 				embeddedPathElementsList.add(embeddedPathElements);
@@ -658,7 +667,7 @@ public class FieldsWriterTest {
 		assertThat(relatedCollectionURLs, hasSize(equalTo(1)));
 		assertThat(
 			relatedCollectionURLs,
-			contains("www.liferay.com/o/p/name/id/second"));
+			contains("www.liferay.com/o/root/id/second"));
 
 		assertThat(
 			embeddedPathElementsList,
@@ -705,11 +714,10 @@ public class FieldsWriterTest {
 		assertThat(strings, hasEntry("relativeURL2", "localhost/second"));
 	}
 
-	@SuppressWarnings("unchecked")
 	@Test
 	public void testWriteSingleURL() {
 		_fieldsWriter.writeSingleURL(
-			url -> assertThat(url, is("www.liferay.com/o/p/name/id")));
+			url -> assertThat(url, is("www.liferay.com/o/name/id")));
 	}
 
 	@Test

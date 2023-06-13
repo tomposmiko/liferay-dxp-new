@@ -17,7 +17,6 @@ package com.liferay.dynamic.data.mapping.model.impl;
 import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.dynamic.data.mapping.model.DDMStructureVersion;
-
 import com.liferay.portal.kernel.model.CacheModel;
 import com.liferay.portal.kernel.util.HashUtil;
 import com.liferay.portal.kernel.util.StringBundler;
@@ -33,12 +32,12 @@ import java.util.Date;
  * The cache model class for representing DDMStructureVersion in entity cache.
  *
  * @author Brian Wing Shun Chan
- * @see DDMStructureVersion
  * @generated
  */
 @ProviderType
-public class DDMStructureVersionCacheModel implements CacheModel<DDMStructureVersion>,
-	Externalizable {
+public class DDMStructureVersionCacheModel
+	implements CacheModel<DDMStructureVersion>, Externalizable {
+
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj) {
@@ -49,9 +48,12 @@ public class DDMStructureVersionCacheModel implements CacheModel<DDMStructureVer
 			return false;
 		}
 
-		DDMStructureVersionCacheModel ddmStructureVersionCacheModel = (DDMStructureVersionCacheModel)obj;
+		DDMStructureVersionCacheModel ddmStructureVersionCacheModel =
+			(DDMStructureVersionCacheModel)obj;
 
-		if (structureVersionId == ddmStructureVersionCacheModel.structureVersionId) {
+		if (structureVersionId ==
+				ddmStructureVersionCacheModel.structureVersionId) {
+
 			return true;
 		}
 
@@ -110,7 +112,8 @@ public class DDMStructureVersionCacheModel implements CacheModel<DDMStructureVer
 
 	@Override
 	public DDMStructureVersion toEntityModel() {
-		DDMStructureVersionImpl ddmStructureVersionImpl = new DDMStructureVersionImpl();
+		DDMStructureVersionImpl ddmStructureVersionImpl =
+			new DDMStructureVersionImpl();
 
 		ddmStructureVersionImpl.setStructureVersionId(structureVersionId);
 		ddmStructureVersionImpl.setGroupId(groupId);
@@ -198,6 +201,7 @@ public class DDMStructureVersionCacheModel implements CacheModel<DDMStructureVer
 	@Override
 	public void readExternal(ObjectInput objectInput)
 		throws ClassNotFoundException, IOException {
+
 		structureVersionId = objectInput.readLong();
 
 		groupId = objectInput.readLong();
@@ -225,12 +229,13 @@ public class DDMStructureVersionCacheModel implements CacheModel<DDMStructureVer
 		statusByUserName = objectInput.readUTF();
 		statusDate = objectInput.readLong();
 
-		_ddmForm = (com.liferay.dynamic.data.mapping.model.DDMForm)objectInput.readObject();
+		_ddmForm =
+			(com.liferay.dynamic.data.mapping.model.DDMForm)
+				objectInput.readObject();
 	}
 
 	@Override
-	public void writeExternal(ObjectOutput objectOutput)
-		throws IOException {
+	public void writeExternal(ObjectOutput objectOutput) throws IOException {
 		objectOutput.writeLong(structureVersionId);
 
 		objectOutput.writeLong(groupId);
@@ -324,4 +329,5 @@ public class DDMStructureVersionCacheModel implements CacheModel<DDMStructureVer
 	public String statusByUserName;
 	public long statusDate;
 	public com.liferay.dynamic.data.mapping.model.DDMForm _ddmForm;
+
 }

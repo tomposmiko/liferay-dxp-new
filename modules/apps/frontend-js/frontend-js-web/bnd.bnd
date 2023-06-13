@@ -1,6 +1,6 @@
 Bundle-Name: Liferay Frontend JS Web
 Bundle-SymbolicName: com.liferay.frontend.js.web
-Bundle-Version: 2.0.32
+Bundle-Version: 2.0.43
 Liferay-JS-Resources-Top-Head-Authenticated:\
 	/aui/async-queue/async-queue.js,\
 	/aui/base-build/base-build.js,\
@@ -35,9 +35,6 @@ Liferay-JS-Resources-Top-Head:\
 	/clay/popper.js,\
 	\
 	/clay/bootstrap.js,\
-	\
-	/loader/config.js,\
-	/loader/loader.js,\
 	\
 	/aui/aui/aui.js,\
 	/aui/aui-base-html5-shiv/aui-base-html5-shiv.js,\

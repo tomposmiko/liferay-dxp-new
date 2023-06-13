@@ -1068,6 +1068,18 @@ public class LanguageImpl implements Language, Serializable {
 		return getLanguageId(request);
 	}
 
+	/**
+	 * Returns the last time in milliseconds when there was any change in the
+	 * languages list company or group
+	 *
+	 * @return the last moodified time in milliseconds
+	 * @review
+	 */
+	@Override
+	public long getLastModified() {
+		return _lastModified;
+	}
+
 	@Override
 	public Locale getLocale(long groupId, String languageCode) {
 		try {
@@ -1661,6 +1673,10 @@ public class LanguageImpl implements Language, Serializable {
 		return companyLocalesBag;
 	}
 
+	private static void _updateLastModified() {
+		_lastModified = System.currentTimeMillis();
+	}
+
 	private ObjectValuePair<HashMap<String, Locale>, HashMap<String, Locale>>
 		_createGroupLocales(long groupId) {
 
@@ -1714,6 +1730,8 @@ public class LanguageImpl implements Language, Serializable {
 		_groupLanguageCodeLocalesMapMap.put(
 			groupId, groupLanguageCodeLocalesMap);
 		_groupLanguageIdLocalesMap.put(groupId, groupLanguageIdLocalesMap);
+
+		_updateLastModified();
 
 		return new ObjectValuePair<>(
 			groupLanguageCodeLocalesMap, groupLanguageIdLocalesMap);
@@ -1902,10 +1920,14 @@ public class LanguageImpl implements Language, Serializable {
 
 	private void _resetAvailableGroupLocales(long groupId) {
 		_groupLocalesPortalCache.remove(groupId);
+
+		_updateLastModified();
 	}
 
 	private void _resetAvailableLocales(long companyId) {
 		_companyLocalesPortalCache.remove(companyId);
+
+		_updateLastModified();
 	}
 
 	private static final String _COMPANY_LOCALES_PORTAL_CACHE_NAME =
@@ -1920,6 +1942,7 @@ public class LanguageImpl implements Language, Serializable {
 		new ConcurrentHashMap<>();
 	private static PortalCache<Long, Serializable> _companyLocalesPortalCache;
 	private static PortalCache<Long, Serializable> _groupLocalesPortalCache;
+	private static volatile long _lastModified = System.currentTimeMillis();
 	private static final Pattern _pattern = Pattern.compile(
 		"Liferay\\.Language\\.get\\([\"']([^)]+)[\"']\\)");
 

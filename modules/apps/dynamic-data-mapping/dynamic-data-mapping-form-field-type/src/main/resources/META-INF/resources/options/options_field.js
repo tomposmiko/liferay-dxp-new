@@ -31,7 +31,7 @@ AUI.add(
 					},
 
 					sortableList: {
-						valueFn: '_valueSortableList'
+						valueFn: '_sortableListValueFn'
 					},
 
 					strings: {
@@ -730,9 +730,30 @@ AUI.add(
 
 						var editingLanguageId = instance._getCurrentEditingLanguageId();
 
+						var hasNewOption = value[editingLanguageId].length !== optionValues.length;
+
+						if (hasNewOption) {
+							instance._updateOtherLanguagesValues(editingLanguageId, optionValues[optionValues.length -1], value);
+						}
+
 						value[editingLanguageId] = optionValues;
 
 						instance.set('value', value);
+					},
+
+					_sortableListValueFn: function() {
+						var instance = this;
+
+						return new A.SortableList(
+							{
+								dd: {
+									handles: ['.drag-handle']
+								},
+								helper: A.Node.create(TPL_DRAG_HELPER),
+								placeholder: A.Node.create(TPL_DRAG_PLACEHOLDER),
+								sortCondition: A.bind('_canSortNode', instance)
+							}
+						);
 					},
 
 					_syncOptionsKeys: function(defaultLanguageOptions, editingLanguageOptions) {
@@ -771,19 +792,12 @@ AUI.add(
 						}
 					},
 
-					_valueSortableList: function() {
-						var instance = this;
-
-						return new A.SortableList(
-							{
-								dd: {
-									handles: ['.drag-handle']
-								},
-								helper: A.Node.create(TPL_DRAG_HELPER),
-								placeholder: A.Node.create(TPL_DRAG_PLACEHOLDER),
-								sortCondition: A.bind('_canSortNode', instance)
-							}
-						);
+					_updateOtherLanguagesValues: function(editingLanguageId, option, value) {
+						 AObject.keys(value).forEach(function(languageId) {
+							 if(languageId !== editingLanguageId) {
+								 value[languageId].push(option);
+							 }
+						 });
 					}
 				}
 			}

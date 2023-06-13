@@ -27,6 +27,7 @@ import com.liferay.portal.kernel.json.JSONFactory;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.kernel.util.KeyValuePair;
 
 import java.util.List;
@@ -112,7 +113,8 @@ public class DDMFormFieldOptionsFactoryImpl
 
 			ddmDataProviderRequest.queryString(
 				"filterParameterValue",
-				String.valueOf(ddmFormFieldRenderingContext.getValue()));
+				HtmlUtil.escapeURL(
+					String.valueOf(ddmFormFieldRenderingContext.getValue())));
 
 			DDMDataProviderResponse ddmDataProviderResponse =
 				ddmDataProviderInvoker.invoke(ddmDataProviderRequest);

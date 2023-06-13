@@ -21,8 +21,6 @@ definition {
 
 		SetupWizard.viewDefaultPortalNamePG();
 
-		SetupWizard.configureSampleDataPG(addSampleData = "false");
-
 		SetupWizard.configureAdministratorUserPG(
 			administratorEmail = "testsetupwizard@liferay.com",
 			administratorFirstName = "TestSetupWizardFN",
@@ -117,6 +115,7 @@ definition {
 
 	@priority = "5"
 	test MySQLtoMySQLLportal1SampleDataDisabled {
+		property custom.properties = "setup.wizard.add.sample.data=true";
 		property databases.size = "1";
 		property portal.acceptance = "true";
 		property test.name.skip.portal.instance = "SetupWizardMySQL#MySQLtoMySQLLportal1SampleDataDisabled";
@@ -133,17 +132,6 @@ definition {
 			jdbcDriverClassName = PropsUtil.get("database.mysql.driver"),
 			jdbcURL = PropsUtil.get("database.mysql.url")
 		);
-
-		Smoke.viewWelcomePage();
-
-		Smoke.runSmoke();
-	}
-
-	@priority = "4"
-	test MySQLtoMySQLSampleDataDisabled {
-		property test.name.skip.portal.instance = "SetupWizardMySQL#MySQLtoMySQLSampleDataDisabled";
-
-		SetupWizard.configureDefaultPG(addSampleData = "false");
 
 		Smoke.viewWelcomePage();
 

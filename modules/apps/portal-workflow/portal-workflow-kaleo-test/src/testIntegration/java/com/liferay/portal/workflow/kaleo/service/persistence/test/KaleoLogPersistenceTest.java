@@ -15,7 +15,6 @@
 package com.liferay.portal.workflow.kaleo.service.persistence.test;
 
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
-
 import com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQueryFactoryUtil;
@@ -38,15 +37,6 @@ import com.liferay.portal.workflow.kaleo.service.KaleoLogLocalServiceUtil;
 import com.liferay.portal.workflow.kaleo.service.persistence.KaleoLogPersistence;
 import com.liferay.portal.workflow.kaleo.service.persistence.KaleoLogUtil;
 
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.ClassRule;
-import org.junit.Rule;
-import org.junit.Test;
-
-import org.junit.runner.RunWith;
-
 import java.io.Serializable;
 
 import java.util.ArrayList;
@@ -56,16 +46,27 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.junit.After;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.ClassRule;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+
 /**
  * @generated
  */
 @RunWith(Arquillian.class)
 public class KaleoLogPersistenceTest {
+
 	@ClassRule
 	@Rule
-	public static final AggregateTestRule aggregateTestRule = new AggregateTestRule(new LiferayIntegrationTestRule(),
-			PersistenceTestRule.INSTANCE,
-			new TransactionalTestRule(Propagation.REQUIRED,
+	public static final AggregateTestRule aggregateTestRule =
+		new AggregateTestRule(
+			new LiferayIntegrationTestRule(), PersistenceTestRule.INSTANCE,
+			new TransactionalTestRule(
+				Propagation.REQUIRED,
 				"com.liferay.portal.workflow.kaleo.service"));
 
 	@Before
@@ -105,7 +106,8 @@ public class KaleoLogPersistenceTest {
 
 		_persistence.remove(newKaleoLog);
 
-		KaleoLog existingKaleoLog = _persistence.fetchByPrimaryKey(newKaleoLog.getPrimaryKey());
+		KaleoLog existingKaleoLog = _persistence.fetchByPrimaryKey(
+			newKaleoLog.getPrimaryKey());
 
 		Assert.assertNull(existingKaleoLog);
 	}
@@ -181,70 +183,88 @@ public class KaleoLogPersistenceTest {
 
 		_kaleoLogs.add(_persistence.update(newKaleoLog));
 
-		KaleoLog existingKaleoLog = _persistence.findByPrimaryKey(newKaleoLog.getPrimaryKey());
+		KaleoLog existingKaleoLog = _persistence.findByPrimaryKey(
+			newKaleoLog.getPrimaryKey());
 
-		Assert.assertEquals(existingKaleoLog.getKaleoLogId(),
-			newKaleoLog.getKaleoLogId());
-		Assert.assertEquals(existingKaleoLog.getGroupId(),
-			newKaleoLog.getGroupId());
-		Assert.assertEquals(existingKaleoLog.getCompanyId(),
-			newKaleoLog.getCompanyId());
-		Assert.assertEquals(existingKaleoLog.getUserId(),
-			newKaleoLog.getUserId());
-		Assert.assertEquals(existingKaleoLog.getUserName(),
-			newKaleoLog.getUserName());
-		Assert.assertEquals(Time.getShortTimestamp(
-				existingKaleoLog.getCreateDate()),
+		Assert.assertEquals(
+			existingKaleoLog.getKaleoLogId(), newKaleoLog.getKaleoLogId());
+		Assert.assertEquals(
+			existingKaleoLog.getGroupId(), newKaleoLog.getGroupId());
+		Assert.assertEquals(
+			existingKaleoLog.getCompanyId(), newKaleoLog.getCompanyId());
+		Assert.assertEquals(
+			existingKaleoLog.getUserId(), newKaleoLog.getUserId());
+		Assert.assertEquals(
+			existingKaleoLog.getUserName(), newKaleoLog.getUserName());
+		Assert.assertEquals(
+			Time.getShortTimestamp(existingKaleoLog.getCreateDate()),
 			Time.getShortTimestamp(newKaleoLog.getCreateDate()));
-		Assert.assertEquals(Time.getShortTimestamp(
-				existingKaleoLog.getModifiedDate()),
+		Assert.assertEquals(
+			Time.getShortTimestamp(existingKaleoLog.getModifiedDate()),
 			Time.getShortTimestamp(newKaleoLog.getModifiedDate()));
-		Assert.assertEquals(existingKaleoLog.getKaleoClassName(),
+		Assert.assertEquals(
+			existingKaleoLog.getKaleoClassName(),
 			newKaleoLog.getKaleoClassName());
-		Assert.assertEquals(existingKaleoLog.getKaleoClassPK(),
-			newKaleoLog.getKaleoClassPK());
-		Assert.assertEquals(existingKaleoLog.getKaleoDefinitionVersionId(),
+		Assert.assertEquals(
+			existingKaleoLog.getKaleoClassPK(), newKaleoLog.getKaleoClassPK());
+		Assert.assertEquals(
+			existingKaleoLog.getKaleoDefinitionVersionId(),
 			newKaleoLog.getKaleoDefinitionVersionId());
-		Assert.assertEquals(existingKaleoLog.getKaleoInstanceId(),
+		Assert.assertEquals(
+			existingKaleoLog.getKaleoInstanceId(),
 			newKaleoLog.getKaleoInstanceId());
-		Assert.assertEquals(existingKaleoLog.getKaleoInstanceTokenId(),
+		Assert.assertEquals(
+			existingKaleoLog.getKaleoInstanceTokenId(),
 			newKaleoLog.getKaleoInstanceTokenId());
-		Assert.assertEquals(existingKaleoLog.getKaleoTaskInstanceTokenId(),
+		Assert.assertEquals(
+			existingKaleoLog.getKaleoTaskInstanceTokenId(),
 			newKaleoLog.getKaleoTaskInstanceTokenId());
-		Assert.assertEquals(existingKaleoLog.getKaleoNodeName(),
+		Assert.assertEquals(
+			existingKaleoLog.getKaleoNodeName(),
 			newKaleoLog.getKaleoNodeName());
-		Assert.assertEquals(existingKaleoLog.isTerminalKaleoNode(),
+		Assert.assertEquals(
+			existingKaleoLog.isTerminalKaleoNode(),
 			newKaleoLog.isTerminalKaleoNode());
-		Assert.assertEquals(existingKaleoLog.getKaleoActionId(),
+		Assert.assertEquals(
+			existingKaleoLog.getKaleoActionId(),
 			newKaleoLog.getKaleoActionId());
-		Assert.assertEquals(existingKaleoLog.getKaleoActionName(),
+		Assert.assertEquals(
+			existingKaleoLog.getKaleoActionName(),
 			newKaleoLog.getKaleoActionName());
-		Assert.assertEquals(existingKaleoLog.getKaleoActionDescription(),
+		Assert.assertEquals(
+			existingKaleoLog.getKaleoActionDescription(),
 			newKaleoLog.getKaleoActionDescription());
-		Assert.assertEquals(existingKaleoLog.getPreviousKaleoNodeId(),
+		Assert.assertEquals(
+			existingKaleoLog.getPreviousKaleoNodeId(),
 			newKaleoLog.getPreviousKaleoNodeId());
-		Assert.assertEquals(existingKaleoLog.getPreviousKaleoNodeName(),
+		Assert.assertEquals(
+			existingKaleoLog.getPreviousKaleoNodeName(),
 			newKaleoLog.getPreviousKaleoNodeName());
-		Assert.assertEquals(existingKaleoLog.getPreviousAssigneeClassName(),
+		Assert.assertEquals(
+			existingKaleoLog.getPreviousAssigneeClassName(),
 			newKaleoLog.getPreviousAssigneeClassName());
-		Assert.assertEquals(existingKaleoLog.getPreviousAssigneeClassPK(),
+		Assert.assertEquals(
+			existingKaleoLog.getPreviousAssigneeClassPK(),
 			newKaleoLog.getPreviousAssigneeClassPK());
-		Assert.assertEquals(existingKaleoLog.getCurrentAssigneeClassName(),
+		Assert.assertEquals(
+			existingKaleoLog.getCurrentAssigneeClassName(),
 			newKaleoLog.getCurrentAssigneeClassName());
-		Assert.assertEquals(existingKaleoLog.getCurrentAssigneeClassPK(),
+		Assert.assertEquals(
+			existingKaleoLog.getCurrentAssigneeClassPK(),
 			newKaleoLog.getCurrentAssigneeClassPK());
 		Assert.assertEquals(existingKaleoLog.getType(), newKaleoLog.getType());
-		Assert.assertEquals(existingKaleoLog.getComment(),
-			newKaleoLog.getComment());
-		Assert.assertEquals(Time.getShortTimestamp(
-				existingKaleoLog.getStartDate()),
+		Assert.assertEquals(
+			existingKaleoLog.getComment(), newKaleoLog.getComment());
+		Assert.assertEquals(
+			Time.getShortTimestamp(existingKaleoLog.getStartDate()),
 			Time.getShortTimestamp(newKaleoLog.getStartDate()));
-		Assert.assertEquals(Time.getShortTimestamp(
-				existingKaleoLog.getEndDate()),
+		Assert.assertEquals(
+			Time.getShortTimestamp(existingKaleoLog.getEndDate()),
 			Time.getShortTimestamp(newKaleoLog.getEndDate()));
-		Assert.assertEquals(existingKaleoLog.getDuration(),
-			newKaleoLog.getDuration());
-		Assert.assertEquals(existingKaleoLog.getWorkflowContext(),
+		Assert.assertEquals(
+			existingKaleoLog.getDuration(), newKaleoLog.getDuration());
+		Assert.assertEquals(
+			existingKaleoLog.getWorkflowContext(),
 			newKaleoLog.getWorkflowContext());
 	}
 
@@ -287,8 +307,8 @@ public class KaleoLogPersistenceTest {
 
 	@Test
 	public void testCountByKCN_KCPK_KITI_T() throws Exception {
-		_persistence.countByKCN_KCPK_KITI_T("", RandomTestUtil.nextLong(),
-			RandomTestUtil.nextLong(), "");
+		_persistence.countByKCN_KCPK_KITI_T(
+			"", RandomTestUtil.nextLong(), RandomTestUtil.nextLong(), "");
 
 		_persistence.countByKCN_KCPK_KITI_T("null", 0L, 0L, "null");
 
@@ -299,7 +319,8 @@ public class KaleoLogPersistenceTest {
 	public void testFindByPrimaryKeyExisting() throws Exception {
 		KaleoLog newKaleoLog = addKaleoLog();
 
-		KaleoLog existingKaleoLog = _persistence.findByPrimaryKey(newKaleoLog.getPrimaryKey());
+		KaleoLog existingKaleoLog = _persistence.findByPrimaryKey(
+			newKaleoLog.getPrimaryKey());
 
 		Assert.assertEquals(existingKaleoLog, newKaleoLog);
 	}
@@ -313,15 +334,15 @@ public class KaleoLogPersistenceTest {
 
 	@Test
 	public void testFindAll() throws Exception {
-		_persistence.findAll(QueryUtil.ALL_POS, QueryUtil.ALL_POS,
-			getOrderByComparator());
+		_persistence.findAll(
+			QueryUtil.ALL_POS, QueryUtil.ALL_POS, getOrderByComparator());
 	}
 
 	protected OrderByComparator<KaleoLog> getOrderByComparator() {
-		return OrderByComparatorFactoryUtil.create("KaleoLog", "kaleoLogId",
-			true, "groupId", true, "companyId", true, "userId", true,
-			"userName", true, "createDate", true, "modifiedDate", true,
-			"kaleoClassName", true, "kaleoClassPK", true,
+		return OrderByComparatorFactoryUtil.create(
+			"KaleoLog", "kaleoLogId", true, "groupId", true, "companyId", true,
+			"userId", true, "userName", true, "createDate", true,
+			"modifiedDate", true, "kaleoClassName", true, "kaleoClassPK", true,
 			"kaleoDefinitionVersionId", true, "kaleoInstanceId", true,
 			"kaleoInstanceTokenId", true, "kaleoTaskInstanceTokenId", true,
 			"kaleoNodeName", true, "terminalKaleoNode", true, "kaleoActionId",
@@ -336,7 +357,8 @@ public class KaleoLogPersistenceTest {
 	public void testFetchByPrimaryKeyExisting() throws Exception {
 		KaleoLog newKaleoLog = addKaleoLog();
 
-		KaleoLog existingKaleoLog = _persistence.fetchByPrimaryKey(newKaleoLog.getPrimaryKey());
+		KaleoLog existingKaleoLog = _persistence.fetchByPrimaryKey(
+			newKaleoLog.getPrimaryKey());
 
 		Assert.assertEquals(existingKaleoLog, newKaleoLog);
 	}
@@ -353,6 +375,7 @@ public class KaleoLogPersistenceTest {
 	@Test
 	public void testFetchByPrimaryKeysWithMultiplePrimaryKeysWhereAllPrimaryKeysExist()
 		throws Exception {
+
 		KaleoLog newKaleoLog1 = addKaleoLog();
 		KaleoLog newKaleoLog2 = addKaleoLog();
 
@@ -361,18 +384,20 @@ public class KaleoLogPersistenceTest {
 		primaryKeys.add(newKaleoLog1.getPrimaryKey());
 		primaryKeys.add(newKaleoLog2.getPrimaryKey());
 
-		Map<Serializable, KaleoLog> kaleoLogs = _persistence.fetchByPrimaryKeys(primaryKeys);
+		Map<Serializable, KaleoLog> kaleoLogs = _persistence.fetchByPrimaryKeys(
+			primaryKeys);
 
 		Assert.assertEquals(2, kaleoLogs.size());
-		Assert.assertEquals(newKaleoLog1,
-			kaleoLogs.get(newKaleoLog1.getPrimaryKey()));
-		Assert.assertEquals(newKaleoLog2,
-			kaleoLogs.get(newKaleoLog2.getPrimaryKey()));
+		Assert.assertEquals(
+			newKaleoLog1, kaleoLogs.get(newKaleoLog1.getPrimaryKey()));
+		Assert.assertEquals(
+			newKaleoLog2, kaleoLogs.get(newKaleoLog2.getPrimaryKey()));
 	}
 
 	@Test
 	public void testFetchByPrimaryKeysWithMultiplePrimaryKeysWhereNoPrimaryKeysExist()
 		throws Exception {
+
 		long pk1 = RandomTestUtil.nextLong();
 
 		long pk2 = RandomTestUtil.nextLong();
@@ -382,7 +407,8 @@ public class KaleoLogPersistenceTest {
 		primaryKeys.add(pk1);
 		primaryKeys.add(pk2);
 
-		Map<Serializable, KaleoLog> kaleoLogs = _persistence.fetchByPrimaryKeys(primaryKeys);
+		Map<Serializable, KaleoLog> kaleoLogs = _persistence.fetchByPrimaryKeys(
+			primaryKeys);
 
 		Assert.assertTrue(kaleoLogs.isEmpty());
 	}
@@ -390,6 +416,7 @@ public class KaleoLogPersistenceTest {
 	@Test
 	public void testFetchByPrimaryKeysWithMultiplePrimaryKeysWhereSomePrimaryKeysExist()
 		throws Exception {
+
 		KaleoLog newKaleoLog = addKaleoLog();
 
 		long pk = RandomTestUtil.nextLong();
@@ -399,52 +426,57 @@ public class KaleoLogPersistenceTest {
 		primaryKeys.add(newKaleoLog.getPrimaryKey());
 		primaryKeys.add(pk);
 
-		Map<Serializable, KaleoLog> kaleoLogs = _persistence.fetchByPrimaryKeys(primaryKeys);
+		Map<Serializable, KaleoLog> kaleoLogs = _persistence.fetchByPrimaryKeys(
+			primaryKeys);
 
 		Assert.assertEquals(1, kaleoLogs.size());
-		Assert.assertEquals(newKaleoLog,
-			kaleoLogs.get(newKaleoLog.getPrimaryKey()));
+		Assert.assertEquals(
+			newKaleoLog, kaleoLogs.get(newKaleoLog.getPrimaryKey()));
 	}
 
 	@Test
-	public void testFetchByPrimaryKeysWithNoPrimaryKeys()
-		throws Exception {
+	public void testFetchByPrimaryKeysWithNoPrimaryKeys() throws Exception {
 		Set<Serializable> primaryKeys = new HashSet<Serializable>();
 
-		Map<Serializable, KaleoLog> kaleoLogs = _persistence.fetchByPrimaryKeys(primaryKeys);
+		Map<Serializable, KaleoLog> kaleoLogs = _persistence.fetchByPrimaryKeys(
+			primaryKeys);
 
 		Assert.assertTrue(kaleoLogs.isEmpty());
 	}
 
 	@Test
-	public void testFetchByPrimaryKeysWithOnePrimaryKey()
-		throws Exception {
+	public void testFetchByPrimaryKeysWithOnePrimaryKey() throws Exception {
 		KaleoLog newKaleoLog = addKaleoLog();
 
 		Set<Serializable> primaryKeys = new HashSet<Serializable>();
 
 		primaryKeys.add(newKaleoLog.getPrimaryKey());
 
-		Map<Serializable, KaleoLog> kaleoLogs = _persistence.fetchByPrimaryKeys(primaryKeys);
+		Map<Serializable, KaleoLog> kaleoLogs = _persistence.fetchByPrimaryKeys(
+			primaryKeys);
 
 		Assert.assertEquals(1, kaleoLogs.size());
-		Assert.assertEquals(newKaleoLog,
-			kaleoLogs.get(newKaleoLog.getPrimaryKey()));
+		Assert.assertEquals(
+			newKaleoLog, kaleoLogs.get(newKaleoLog.getPrimaryKey()));
 	}
 
 	@Test
 	public void testActionableDynamicQuery() throws Exception {
 		final IntegerWrapper count = new IntegerWrapper();
 
-		ActionableDynamicQuery actionableDynamicQuery = KaleoLogLocalServiceUtil.getActionableDynamicQuery();
+		ActionableDynamicQuery actionableDynamicQuery =
+			KaleoLogLocalServiceUtil.getActionableDynamicQuery();
 
-		actionableDynamicQuery.setPerformActionMethod(new ActionableDynamicQuery.PerformActionMethod<KaleoLog>() {
+		actionableDynamicQuery.setPerformActionMethod(
+			new ActionableDynamicQuery.PerformActionMethod<KaleoLog>() {
+
 				@Override
 				public void performAction(KaleoLog kaleoLog) {
 					Assert.assertNotNull(kaleoLog);
 
 					count.increment();
 				}
+
 			});
 
 		actionableDynamicQuery.performActions();
@@ -453,15 +485,15 @@ public class KaleoLogPersistenceTest {
 	}
 
 	@Test
-	public void testDynamicQueryByPrimaryKeyExisting()
-		throws Exception {
+	public void testDynamicQueryByPrimaryKeyExisting() throws Exception {
 		KaleoLog newKaleoLog = addKaleoLog();
 
-		DynamicQuery dynamicQuery = DynamicQueryFactoryUtil.forClass(KaleoLog.class,
-				_dynamicQueryClassLoader);
+		DynamicQuery dynamicQuery = DynamicQueryFactoryUtil.forClass(
+			KaleoLog.class, _dynamicQueryClassLoader);
 
-		dynamicQuery.add(RestrictionsFactoryUtil.eq("kaleoLogId",
-				newKaleoLog.getKaleoLogId()));
+		dynamicQuery.add(
+			RestrictionsFactoryUtil.eq(
+				"kaleoLogId", newKaleoLog.getKaleoLogId()));
 
 		List<KaleoLog> result = _persistence.findWithDynamicQuery(dynamicQuery);
 
@@ -474,11 +506,12 @@ public class KaleoLogPersistenceTest {
 
 	@Test
 	public void testDynamicQueryByPrimaryKeyMissing() throws Exception {
-		DynamicQuery dynamicQuery = DynamicQueryFactoryUtil.forClass(KaleoLog.class,
-				_dynamicQueryClassLoader);
+		DynamicQuery dynamicQuery = DynamicQueryFactoryUtil.forClass(
+			KaleoLog.class, _dynamicQueryClassLoader);
 
-		dynamicQuery.add(RestrictionsFactoryUtil.eq("kaleoLogId",
-				RandomTestUtil.nextLong()));
+		dynamicQuery.add(
+			RestrictionsFactoryUtil.eq(
+				"kaleoLogId", RandomTestUtil.nextLong()));
 
 		List<KaleoLog> result = _persistence.findWithDynamicQuery(dynamicQuery);
 
@@ -486,19 +519,20 @@ public class KaleoLogPersistenceTest {
 	}
 
 	@Test
-	public void testDynamicQueryByProjectionExisting()
-		throws Exception {
+	public void testDynamicQueryByProjectionExisting() throws Exception {
 		KaleoLog newKaleoLog = addKaleoLog();
 
-		DynamicQuery dynamicQuery = DynamicQueryFactoryUtil.forClass(KaleoLog.class,
-				_dynamicQueryClassLoader);
+		DynamicQuery dynamicQuery = DynamicQueryFactoryUtil.forClass(
+			KaleoLog.class, _dynamicQueryClassLoader);
 
-		dynamicQuery.setProjection(ProjectionFactoryUtil.property("kaleoLogId"));
+		dynamicQuery.setProjection(
+			ProjectionFactoryUtil.property("kaleoLogId"));
 
 		Object newKaleoLogId = newKaleoLog.getKaleoLogId();
 
-		dynamicQuery.add(RestrictionsFactoryUtil.in("kaleoLogId",
-				new Object[] { newKaleoLogId }));
+		dynamicQuery.add(
+			RestrictionsFactoryUtil.in(
+				"kaleoLogId", new Object[] {newKaleoLogId}));
 
 		List<Object> result = _persistence.findWithDynamicQuery(dynamicQuery);
 
@@ -511,13 +545,15 @@ public class KaleoLogPersistenceTest {
 
 	@Test
 	public void testDynamicQueryByProjectionMissing() throws Exception {
-		DynamicQuery dynamicQuery = DynamicQueryFactoryUtil.forClass(KaleoLog.class,
-				_dynamicQueryClassLoader);
+		DynamicQuery dynamicQuery = DynamicQueryFactoryUtil.forClass(
+			KaleoLog.class, _dynamicQueryClassLoader);
 
-		dynamicQuery.setProjection(ProjectionFactoryUtil.property("kaleoLogId"));
+		dynamicQuery.setProjection(
+			ProjectionFactoryUtil.property("kaleoLogId"));
 
-		dynamicQuery.add(RestrictionsFactoryUtil.in("kaleoLogId",
-				new Object[] { RandomTestUtil.nextLong() }));
+		dynamicQuery.add(
+			RestrictionsFactoryUtil.in(
+				"kaleoLogId", new Object[] {RandomTestUtil.nextLong()}));
 
 		List<Object> result = _persistence.findWithDynamicQuery(dynamicQuery);
 
@@ -595,4 +631,5 @@ public class KaleoLogPersistenceTest {
 	private List<KaleoLog> _kaleoLogs = new ArrayList<KaleoLog>();
 	private KaleoLogPersistence _persistence;
 	private ClassLoader _dynamicQueryClassLoader;
+
 }

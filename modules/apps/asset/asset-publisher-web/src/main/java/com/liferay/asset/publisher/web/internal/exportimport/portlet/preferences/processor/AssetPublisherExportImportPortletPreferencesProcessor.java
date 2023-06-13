@@ -108,7 +108,7 @@ import org.osgi.service.component.annotations.Reference;
  * and routines for processing portlet preferences while exporting or importing
  * Asset Publisher instances.
  *
- * @author Mate Thurzo
+ * @author Máté Thurzó
  */
 @Component(
 	configurationPid = "com.liferay.asset.publisher.web.configuration.AssetPublisherWebConfiguration",
@@ -153,14 +153,13 @@ public class AssetPublisherExportImportPortletPreferencesProcessor
 				portletPreferences);
 		}
 		catch (Exception e) {
-			if (_log.isDebugEnabled()) {
-				_log.debug(
-					"Unable to update portlet preferences while exporting " +
-						portletDataContext.getPortletId(),
-					e);
-			}
+			PortletDataException pde = new PortletDataException(
+				"Unable to update portlet preferences during export", e);
 
-			return portletPreferences;
+			pde.setPortletId(AssetPublisherPortletKeys.ASSET_PUBLISHER);
+			pde.setType(PortletDataException.EXPORT_PORTLET_DATA);
+
+			throw pde;
 		}
 	}
 
@@ -179,14 +178,13 @@ public class AssetPublisherExportImportPortletPreferencesProcessor
 				portletDataContext, portletPreferences);
 		}
 		catch (Exception e) {
-			if (_log.isDebugEnabled()) {
-				_log.debug(
-					"Unable to update portlet preferences while importing " +
-						portletDataContext.getPortletId(),
-					e);
-			}
+			PortletDataException pde = new PortletDataException(
+				"Unable to update portlet preferences during import", e);
 
-			return portletPreferences;
+			pde.setPortletId(AssetPublisherPortletKeys.ASSET_PUBLISHER);
+			pde.setType(PortletDataException.IMPORT_PORTLET_DATA);
+
+			throw pde;
 		}
 	}
 

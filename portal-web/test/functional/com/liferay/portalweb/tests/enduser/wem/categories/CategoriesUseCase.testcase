@@ -697,6 +697,20 @@ definition {
 			roleType = "site"
 		);
 
+		Permissions.definePermissionViaJSONAPI(
+			resourceAction = "VIEW",
+			resourceName = "com.liferay.asset.kernel.model.AssetCategory",
+			roleTitle = "Category Role Name",
+			roleType = "site"
+		);
+
+		Permissions.definePermissionViaJSONAPI(
+			resourceAction = "VIEW",
+			resourceName = "com.liferay.asset.kernel.model.AssetVocabulary",
+			roleTitle = "Category Role Name",
+			roleType = "site"
+		);
+
 		User.openUsersAdmin(siteURLKey = "test-site-name");
 
 		User.assignSiteRoleCP(
@@ -943,13 +957,7 @@ definition {
 			value1 = "Successful"
 		);
 
-		var valueName = selenium.getText("//ul/li/div/h5");
-
-		echo("value name ${valueName}");
-
-		var larFileName = RegexUtil.replace("${valueName}", "([a-zA-z0-9_.-]*)[(0-9KB)]*", "1");
-
-		echo("lar file name ${larFileName}");
+		var larFileName = LAR.getLarFileName();
 
 		LAR.downloadLar();
 

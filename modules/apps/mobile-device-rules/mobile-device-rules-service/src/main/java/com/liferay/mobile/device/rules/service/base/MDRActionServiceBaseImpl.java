@@ -18,7 +18,6 @@ import com.liferay.mobile.device.rules.model.MDRAction;
 import com.liferay.mobile.device.rules.service.MDRActionService;
 import com.liferay.mobile.device.rules.service.persistence.MDRActionPersistence;
 import com.liferay.mobile.device.rules.service.persistence.MDRRuleGroupInstancePersistence;
-
 import com.liferay.portal.kernel.bean.BeanReference;
 import com.liferay.portal.kernel.dao.db.DB;
 import com.liferay.portal.kernel.dao.db.DBManagerUtil;
@@ -42,15 +41,16 @@ import javax.sql.DataSource;
  *
  * @author Edward C. Han
  * @see com.liferay.mobile.device.rules.service.impl.MDRActionServiceImpl
- * @see com.liferay.mobile.device.rules.service.MDRActionServiceUtil
  * @generated
  */
-public abstract class MDRActionServiceBaseImpl extends BaseServiceImpl
+public abstract class MDRActionServiceBaseImpl
+	extends BaseServiceImpl
 	implements MDRActionService, IdentifiableOSGiService {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
-	 * Never modify or reference this class directly. Always use {@link com.liferay.mobile.device.rules.service.MDRActionServiceUtil} to access the mdr action remote service.
+	 * Never modify or reference this class directly. Use <code>MDRActionService</code> via injection or a <code>org.osgi.util.tracker.ServiceTracker</code> or use <code>com.liferay.mobile.device.rules.service.MDRActionServiceUtil</code>.
 	 */
 
 	/**
@@ -58,7 +58,9 @@ public abstract class MDRActionServiceBaseImpl extends BaseServiceImpl
 	 *
 	 * @return the mdr action local service
 	 */
-	public com.liferay.mobile.device.rules.service.MDRActionLocalService getMDRActionLocalService() {
+	public com.liferay.mobile.device.rules.service.MDRActionLocalService
+		getMDRActionLocalService() {
+
 		return mdrActionLocalService;
 	}
 
@@ -68,7 +70,9 @@ public abstract class MDRActionServiceBaseImpl extends BaseServiceImpl
 	 * @param mdrActionLocalService the mdr action local service
 	 */
 	public void setMDRActionLocalService(
-		com.liferay.mobile.device.rules.service.MDRActionLocalService mdrActionLocalService) {
+		com.liferay.mobile.device.rules.service.MDRActionLocalService
+			mdrActionLocalService) {
+
 		this.mdrActionLocalService = mdrActionLocalService;
 	}
 
@@ -106,6 +110,7 @@ public abstract class MDRActionServiceBaseImpl extends BaseServiceImpl
 	 */
 	public void setMDRActionPersistence(
 		MDRActionPersistence mdrActionPersistence) {
+
 		this.mdrActionPersistence = mdrActionPersistence;
 	}
 
@@ -114,7 +119,9 @@ public abstract class MDRActionServiceBaseImpl extends BaseServiceImpl
 	 *
 	 * @return the counter local service
 	 */
-	public com.liferay.counter.kernel.service.CounterLocalService getCounterLocalService() {
+	public com.liferay.counter.kernel.service.CounterLocalService
+		getCounterLocalService() {
+
 		return counterLocalService;
 	}
 
@@ -124,7 +131,9 @@ public abstract class MDRActionServiceBaseImpl extends BaseServiceImpl
 	 * @param counterLocalService the counter local service
 	 */
 	public void setCounterLocalService(
-		com.liferay.counter.kernel.service.CounterLocalService counterLocalService) {
+		com.liferay.counter.kernel.service.CounterLocalService
+			counterLocalService) {
+
 		this.counterLocalService = counterLocalService;
 	}
 
@@ -133,7 +142,9 @@ public abstract class MDRActionServiceBaseImpl extends BaseServiceImpl
 	 *
 	 * @return the user local service
 	 */
-	public com.liferay.portal.kernel.service.UserLocalService getUserLocalService() {
+	public com.liferay.portal.kernel.service.UserLocalService
+		getUserLocalService() {
+
 		return userLocalService;
 	}
 
@@ -144,6 +155,7 @@ public abstract class MDRActionServiceBaseImpl extends BaseServiceImpl
 	 */
 	public void setUserLocalService(
 		com.liferay.portal.kernel.service.UserLocalService userLocalService) {
+
 		this.userLocalService = userLocalService;
 	}
 
@@ -163,6 +175,7 @@ public abstract class MDRActionServiceBaseImpl extends BaseServiceImpl
 	 */
 	public void setUserService(
 		com.liferay.portal.kernel.service.UserService userService) {
+
 		this.userService = userService;
 	}
 
@@ -189,7 +202,10 @@ public abstract class MDRActionServiceBaseImpl extends BaseServiceImpl
 	 *
 	 * @return the mdr rule group instance local service
 	 */
-	public com.liferay.mobile.device.rules.service.MDRRuleGroupInstanceLocalService getMDRRuleGroupInstanceLocalService() {
+	public
+		com.liferay.mobile.device.rules.service.MDRRuleGroupInstanceLocalService
+			getMDRRuleGroupInstanceLocalService() {
+
 		return mdrRuleGroupInstanceLocalService;
 	}
 
@@ -199,8 +215,11 @@ public abstract class MDRActionServiceBaseImpl extends BaseServiceImpl
 	 * @param mdrRuleGroupInstanceLocalService the mdr rule group instance local service
 	 */
 	public void setMDRRuleGroupInstanceLocalService(
-		com.liferay.mobile.device.rules.service.MDRRuleGroupInstanceLocalService mdrRuleGroupInstanceLocalService) {
-		this.mdrRuleGroupInstanceLocalService = mdrRuleGroupInstanceLocalService;
+		com.liferay.mobile.device.rules.service.MDRRuleGroupInstanceLocalService
+			mdrRuleGroupInstanceLocalService) {
+
+		this.mdrRuleGroupInstanceLocalService =
+			mdrRuleGroupInstanceLocalService;
 	}
 
 	/**
@@ -208,7 +227,9 @@ public abstract class MDRActionServiceBaseImpl extends BaseServiceImpl
 	 *
 	 * @return the mdr rule group instance remote service
 	 */
-	public com.liferay.mobile.device.rules.service.MDRRuleGroupInstanceService getMDRRuleGroupInstanceService() {
+	public com.liferay.mobile.device.rules.service.MDRRuleGroupInstanceService
+		getMDRRuleGroupInstanceService() {
+
 		return mdrRuleGroupInstanceService;
 	}
 
@@ -218,7 +239,9 @@ public abstract class MDRActionServiceBaseImpl extends BaseServiceImpl
 	 * @param mdrRuleGroupInstanceService the mdr rule group instance remote service
 	 */
 	public void setMDRRuleGroupInstanceService(
-		com.liferay.mobile.device.rules.service.MDRRuleGroupInstanceService mdrRuleGroupInstanceService) {
+		com.liferay.mobile.device.rules.service.MDRRuleGroupInstanceService
+			mdrRuleGroupInstanceService) {
+
 		this.mdrRuleGroupInstanceService = mdrRuleGroupInstanceService;
 	}
 
@@ -227,7 +250,9 @@ public abstract class MDRActionServiceBaseImpl extends BaseServiceImpl
 	 *
 	 * @return the mdr rule group instance persistence
 	 */
-	public MDRRuleGroupInstancePersistence getMDRRuleGroupInstancePersistence() {
+	public MDRRuleGroupInstancePersistence
+		getMDRRuleGroupInstancePersistence() {
+
 		return mdrRuleGroupInstancePersistence;
 	}
 
@@ -238,6 +263,7 @@ public abstract class MDRActionServiceBaseImpl extends BaseServiceImpl
 	 */
 	public void setMDRRuleGroupInstancePersistence(
 		MDRRuleGroupInstancePersistence mdrRuleGroupInstancePersistence) {
+
 		this.mdrRuleGroupInstancePersistence = mdrRuleGroupInstancePersistence;
 	}
 
@@ -279,8 +305,8 @@ public abstract class MDRActionServiceBaseImpl extends BaseServiceImpl
 			sql = db.buildSQL(sql);
 			sql = PortalUtil.transformSQL(sql);
 
-			SqlUpdate sqlUpdate = SqlUpdateFactoryUtil.getSqlUpdate(dataSource,
-					sql);
+			SqlUpdate sqlUpdate = SqlUpdateFactoryUtil.getSqlUpdate(
+				dataSource, sql);
 
 			sqlUpdate.update();
 		}
@@ -289,24 +315,53 @@ public abstract class MDRActionServiceBaseImpl extends BaseServiceImpl
 		}
 	}
 
-	@BeanReference(type = com.liferay.mobile.device.rules.service.MDRActionLocalService.class)
-	protected com.liferay.mobile.device.rules.service.MDRActionLocalService mdrActionLocalService;
+	@BeanReference(
+		type = com.liferay.mobile.device.rules.service.MDRActionLocalService.class
+	)
+	protected com.liferay.mobile.device.rules.service.MDRActionLocalService
+		mdrActionLocalService;
+
 	@BeanReference(type = MDRActionService.class)
 	protected MDRActionService mdrActionService;
+
 	@BeanReference(type = MDRActionPersistence.class)
 	protected MDRActionPersistence mdrActionPersistence;
-	@ServiceReference(type = com.liferay.counter.kernel.service.CounterLocalService.class)
-	protected com.liferay.counter.kernel.service.CounterLocalService counterLocalService;
-	@ServiceReference(type = com.liferay.portal.kernel.service.UserLocalService.class)
-	protected com.liferay.portal.kernel.service.UserLocalService userLocalService;
-	@ServiceReference(type = com.liferay.portal.kernel.service.UserService.class)
+
+	@ServiceReference(
+		type = com.liferay.counter.kernel.service.CounterLocalService.class
+	)
+	protected com.liferay.counter.kernel.service.CounterLocalService
+		counterLocalService;
+
+	@ServiceReference(
+		type = com.liferay.portal.kernel.service.UserLocalService.class
+	)
+	protected com.liferay.portal.kernel.service.UserLocalService
+		userLocalService;
+
+	@ServiceReference(
+		type = com.liferay.portal.kernel.service.UserService.class
+	)
 	protected com.liferay.portal.kernel.service.UserService userService;
+
 	@ServiceReference(type = UserPersistence.class)
 	protected UserPersistence userPersistence;
-	@BeanReference(type = com.liferay.mobile.device.rules.service.MDRRuleGroupInstanceLocalService.class)
-	protected com.liferay.mobile.device.rules.service.MDRRuleGroupInstanceLocalService mdrRuleGroupInstanceLocalService;
-	@BeanReference(type = com.liferay.mobile.device.rules.service.MDRRuleGroupInstanceService.class)
-	protected com.liferay.mobile.device.rules.service.MDRRuleGroupInstanceService mdrRuleGroupInstanceService;
+
+	@BeanReference(
+		type = com.liferay.mobile.device.rules.service.MDRRuleGroupInstanceLocalService.class
+	)
+	protected
+		com.liferay.mobile.device.rules.service.MDRRuleGroupInstanceLocalService
+			mdrRuleGroupInstanceLocalService;
+
+	@BeanReference(
+		type = com.liferay.mobile.device.rules.service.MDRRuleGroupInstanceService.class
+	)
+	protected
+		com.liferay.mobile.device.rules.service.MDRRuleGroupInstanceService
+			mdrRuleGroupInstanceService;
+
 	@BeanReference(type = MDRRuleGroupInstancePersistence.class)
 	protected MDRRuleGroupInstancePersistence mdrRuleGroupInstancePersistence;
+
 }

@@ -31,14 +31,14 @@ import java.io.ObjectOutput;
  * The cache model class for representing ResourceTypePermission in entity cache.
  *
  * @author Brian Wing Shun Chan
- * @see ResourceTypePermission
  * @deprecated As of Judson (7.1.x), with no direct replacement
  * @generated
  */
 @Deprecated
 @ProviderType
-public class ResourceTypePermissionCacheModel implements CacheModel<ResourceTypePermission>,
-	Externalizable, MVCCModel {
+public class ResourceTypePermissionCacheModel
+	implements CacheModel<ResourceTypePermission>, Externalizable, MVCCModel {
+
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj) {
@@ -49,10 +49,13 @@ public class ResourceTypePermissionCacheModel implements CacheModel<ResourceType
 			return false;
 		}
 
-		ResourceTypePermissionCacheModel resourceTypePermissionCacheModel = (ResourceTypePermissionCacheModel)obj;
+		ResourceTypePermissionCacheModel resourceTypePermissionCacheModel =
+			(ResourceTypePermissionCacheModel)obj;
 
-		if ((resourceTypePermissionId == resourceTypePermissionCacheModel.resourceTypePermissionId) &&
-				(mvccVersion == resourceTypePermissionCacheModel.mvccVersion)) {
+		if ((resourceTypePermissionId ==
+				resourceTypePermissionCacheModel.resourceTypePermissionId) &&
+			(mvccVersion == resourceTypePermissionCacheModel.mvccVersion)) {
+
 			return true;
 		}
 
@@ -101,10 +104,12 @@ public class ResourceTypePermissionCacheModel implements CacheModel<ResourceType
 
 	@Override
 	public ResourceTypePermission toEntityModel() {
-		ResourceTypePermissionImpl resourceTypePermissionImpl = new ResourceTypePermissionImpl();
+		ResourceTypePermissionImpl resourceTypePermissionImpl =
+			new ResourceTypePermissionImpl();
 
 		resourceTypePermissionImpl.setMvccVersion(mvccVersion);
-		resourceTypePermissionImpl.setResourceTypePermissionId(resourceTypePermissionId);
+		resourceTypePermissionImpl.setResourceTypePermissionId(
+			resourceTypePermissionId);
 		resourceTypePermissionImpl.setCompanyId(companyId);
 		resourceTypePermissionImpl.setGroupId(groupId);
 
@@ -140,8 +145,7 @@ public class ResourceTypePermissionCacheModel implements CacheModel<ResourceType
 	}
 
 	@Override
-	public void writeExternal(ObjectOutput objectOutput)
-		throws IOException {
+	public void writeExternal(ObjectOutput objectOutput) throws IOException {
 		objectOutput.writeLong(mvccVersion);
 
 		objectOutput.writeLong(resourceTypePermissionId);
@@ -169,4 +173,5 @@ public class ResourceTypePermissionCacheModel implements CacheModel<ResourceType
 	public String name;
 	public long roleId;
 	public long actionIds;
+
 }

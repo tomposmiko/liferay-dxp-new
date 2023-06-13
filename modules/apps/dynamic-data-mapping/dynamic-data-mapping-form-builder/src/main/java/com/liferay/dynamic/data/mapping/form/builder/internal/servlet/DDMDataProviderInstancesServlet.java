@@ -24,11 +24,14 @@ import com.liferay.portal.kernel.json.JSONFactory;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.servlet.ServletResponseUtil;
+import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.ContentTypes;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Portal;
+import com.liferay.portal.kernel.util.WebKeys;
 
 import java.io.IOException;
 
@@ -82,12 +85,21 @@ public class DDMDataProviderInstancesServlet extends BaseDDMFormBuilderServlet {
 	protected JSONArray getDataProviderInstancesJSONArray(
 		HttpServletRequest request) {
 
+		ThemeDisplay themeDisplay = (ThemeDisplay)request.getAttribute(
+			WebKeys.THEME_DISPLAY);
+
 		try {
 			String languageId = ParamUtil.getString(request, "languageId");
 
 			Locale locale = LocaleUtil.fromLanguageId(languageId);
 
 			long scopeGroupId = ParamUtil.getLong(request, "scopeGroupId");
+
+			Group scopeGroup = themeDisplay.getScopeGroup();
+
+			if (scopeGroup.isStagingGroup()) {
+				scopeGroupId = scopeGroup.getLiveGroupId();
+			}
 
 			long[] groupIds = _portal.getCurrentAndAncestorSiteGroupIds(
 				scopeGroupId);

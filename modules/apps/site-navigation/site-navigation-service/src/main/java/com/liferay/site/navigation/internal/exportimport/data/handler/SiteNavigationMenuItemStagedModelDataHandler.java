@@ -74,8 +74,6 @@ public class SiteNavigationMenuItemStagedModelDataHandler
 				portletDataContext, siteNavigationMenuItemElement,
 				siteNavigationMenuItem)) {
 
-			siteNavigationMenuItemElement.detach();
-
 			return;
 		}
 
@@ -199,6 +197,13 @@ public class SiteNavigationMenuItemStagedModelDataHandler
 
 		portletDataContext.importClassedModel(
 			siteNavigationMenuItem, importedSiteNavigationMenuItem);
+	}
+
+	@Override
+	protected StagedModelRepository<SiteNavigationMenuItem>
+		getStagedModelRepository() {
+
+		return _stagedModelRepository;
 	}
 
 	@Reference

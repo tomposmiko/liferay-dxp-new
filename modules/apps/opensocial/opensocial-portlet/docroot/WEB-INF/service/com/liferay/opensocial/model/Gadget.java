@@ -25,19 +25,20 @@ import com.liferay.portal.kernel.util.Accessor;
  *
  * @author Brian Wing Shun Chan
  * @see GadgetModel
- * @see com.liferay.opensocial.model.impl.GadgetImpl
- * @see com.liferay.opensocial.model.impl.GadgetModelImpl
  * @generated
  */
 @ImplementationClassName("com.liferay.opensocial.model.impl.GadgetImpl")
 @ProviderType
 public interface Gadget extends GadgetModel, PersistedModel {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
-	 * Never modify this interface directly. Add methods to {@link com.liferay.opensocial.model.impl.GadgetImpl} and rerun ServiceBuilder to automatically copy the method declarations to this interface.
+	 * Never modify this interface directly. Add methods to <code>com.liferay.opensocial.model.impl.GadgetImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
 	 */
-	public static final Accessor<Gadget, Long> GADGET_ID_ACCESSOR = new Accessor<Gadget, Long>() {
+	public static final Accessor<Gadget, Long> GADGET_ID_ACCESSOR =
+		new Accessor<Gadget, Long>() {
+
 			@Override
 			public Long get(Gadget gadget) {
 				return gadget.getGadgetId();
@@ -52,5 +53,7 @@ public interface Gadget extends GadgetModel, PersistedModel {
 			public Class<Gadget> getTypeClass() {
 				return Gadget.class;
 			}
+
 		};
+
 }

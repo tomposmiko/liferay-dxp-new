@@ -25,34 +25,39 @@ import com.liferay.portal.kernel.util.Accessor;
  *
  * @author Brian Wing Shun Chan
  * @see KaleoTaskFormInstanceModel
- * @see com.liferay.portal.workflow.kaleo.model.impl.KaleoTaskFormInstanceImpl
- * @see com.liferay.portal.workflow.kaleo.model.impl.KaleoTaskFormInstanceModelImpl
  * @generated
  */
-@ImplementationClassName("com.liferay.portal.workflow.kaleo.model.impl.KaleoTaskFormInstanceImpl")
+@ImplementationClassName(
+	"com.liferay.portal.workflow.kaleo.model.impl.KaleoTaskFormInstanceImpl"
+)
 @ProviderType
-public interface KaleoTaskFormInstance extends KaleoTaskFormInstanceModel,
-	PersistedModel {
+public interface KaleoTaskFormInstance
+	extends KaleoTaskFormInstanceModel, PersistedModel {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
-	 * Never modify this interface directly. Add methods to {@link com.liferay.portal.workflow.kaleo.model.impl.KaleoTaskFormInstanceImpl} and rerun ServiceBuilder to automatically copy the method declarations to this interface.
+	 * Never modify this interface directly. Add methods to <code>com.liferay.portal.workflow.kaleo.model.impl.KaleoTaskFormInstanceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
 	 */
-	public static final Accessor<KaleoTaskFormInstance, Long> KALEO_TASK_FORM_INSTANCE_ID_ACCESSOR =
-		new Accessor<KaleoTaskFormInstance, Long>() {
-			@Override
-			public Long get(KaleoTaskFormInstance kaleoTaskFormInstance) {
-				return kaleoTaskFormInstance.getKaleoTaskFormInstanceId();
-			}
+	public static final Accessor<KaleoTaskFormInstance, Long>
+		KALEO_TASK_FORM_INSTANCE_ID_ACCESSOR =
+			new Accessor<KaleoTaskFormInstance, Long>() {
 
-			@Override
-			public Class<Long> getAttributeClass() {
-				return Long.class;
-			}
+				@Override
+				public Long get(KaleoTaskFormInstance kaleoTaskFormInstance) {
+					return kaleoTaskFormInstance.getKaleoTaskFormInstanceId();
+				}
 
-			@Override
-			public Class<KaleoTaskFormInstance> getTypeClass() {
-				return KaleoTaskFormInstance.class;
-			}
-		};
+				@Override
+				public Class<Long> getAttributeClass() {
+					return Long.class;
+				}
+
+				@Override
+				public Class<KaleoTaskFormInstance> getTypeClass() {
+					return KaleoTaskFormInstance.class;
+				}
+
+			};
+
 }

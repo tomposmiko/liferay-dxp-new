@@ -85,8 +85,9 @@ public class DDLRecordSetServiceTest {
 
 	@Before
 	public void setUp() throws Exception {
-		_availableLocales = DDMFormTestUtil.createAvailableLocales(Locale.US);
-		_defaultLocale = Locale.US;
+		_availableLocales = DDMFormTestUtil.createAvailableLocales(
+			LocaleUtil.US);
+		_defaultLocale = LocaleUtil.US;
 
 		_group = GroupTestUtil.addGroup();
 
@@ -320,13 +321,15 @@ public class DDLRecordSetServiceTest {
 		DDLRecordSet ddlRecordSet = addRecordSet(
 			ddmStructureDDMForm, FailStorageAdapter.STORAGE_TYPE);
 
-		String storageAdpater = ddlRecordSet.getDDMStructure().getStorageType();
+		DDMStructure ddmStructure = ddlRecordSet.getDDMStructure();
+
+		String storageAdpater = ddmStructure.getStorageType();
 
 		DDMFormTestUtil.addTextDDMFormFields(ddmStructureDDMForm, "Name");
 
 		ddlRecordSet = updateRecordSet(ddlRecordSet, ddmStructureDDMForm);
 
-		DDMStructure ddmStructure = ddlRecordSet.getDDMStructure();
+		ddmStructure = ddlRecordSet.getDDMStructure();
 
 		Assert.assertEquals(storageAdpater, ddmStructure.getStorageType());
 	}

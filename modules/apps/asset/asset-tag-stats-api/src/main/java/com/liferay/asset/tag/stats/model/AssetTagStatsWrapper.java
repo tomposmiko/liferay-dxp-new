@@ -17,7 +17,6 @@ package com.liferay.asset.tag.stats.model;
 import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.expando.kernel.model.ExpandoBridge;
-
 import com.liferay.portal.kernel.model.ModelWrapper;
 import com.liferay.portal.kernel.service.ServiceContext;
 
@@ -37,8 +36,9 @@ import java.util.Objects;
  * @generated
  */
 @ProviderType
-public class AssetTagStatsWrapper implements AssetTagStats,
-	ModelWrapper<AssetTagStats> {
+public class AssetTagStatsWrapper
+	implements AssetTagStats, ModelWrapper<AssetTagStats> {
+
 	public AssetTagStatsWrapper(AssetTagStats assetTagStats) {
 		_assetTagStats = assetTagStats;
 	}
@@ -110,40 +110,40 @@ public class AssetTagStatsWrapper implements AssetTagStats,
 	}
 
 	/**
-	* Returns the asset count of this asset tag stats.
-	*
-	* @return the asset count of this asset tag stats
-	*/
+	 * Returns the asset count of this asset tag stats.
+	 *
+	 * @return the asset count of this asset tag stats
+	 */
 	@Override
 	public int getAssetCount() {
 		return _assetTagStats.getAssetCount();
 	}
 
 	/**
-	* Returns the fully qualified class name of this asset tag stats.
-	*
-	* @return the fully qualified class name of this asset tag stats
-	*/
+	 * Returns the fully qualified class name of this asset tag stats.
+	 *
+	 * @return the fully qualified class name of this asset tag stats
+	 */
 	@Override
 	public String getClassName() {
 		return _assetTagStats.getClassName();
 	}
 
 	/**
-	* Returns the class name ID of this asset tag stats.
-	*
-	* @return the class name ID of this asset tag stats
-	*/
+	 * Returns the class name ID of this asset tag stats.
+	 *
+	 * @return the class name ID of this asset tag stats
+	 */
 	@Override
 	public long getClassNameId() {
 		return _assetTagStats.getClassNameId();
 	}
 
 	/**
-	* Returns the company ID of this asset tag stats.
-	*
-	* @return the company ID of this asset tag stats
-	*/
+	 * Returns the company ID of this asset tag stats.
+	 *
+	 * @return the company ID of this asset tag stats
+	 */
 	@Override
 	public long getCompanyId() {
 		return _assetTagStats.getCompanyId();
@@ -155,10 +155,10 @@ public class AssetTagStatsWrapper implements AssetTagStats,
 	}
 
 	/**
-	* Returns the primary key of this asset tag stats.
-	*
-	* @return the primary key of this asset tag stats
-	*/
+	 * Returns the primary key of this asset tag stats.
+	 *
+	 * @return the primary key of this asset tag stats
+	 */
 	@Override
 	public long getPrimaryKey() {
 		return _assetTagStats.getPrimaryKey();
@@ -170,20 +170,20 @@ public class AssetTagStatsWrapper implements AssetTagStats,
 	}
 
 	/**
-	* Returns the tag ID of this asset tag stats.
-	*
-	* @return the tag ID of this asset tag stats
-	*/
+	 * Returns the tag ID of this asset tag stats.
+	 *
+	 * @return the tag ID of this asset tag stats
+	 */
 	@Override
 	public long getTagId() {
 		return _assetTagStats.getTagId();
 	}
 
 	/**
-	* Returns the tag stats ID of this asset tag stats.
-	*
-	* @return the tag stats ID of this asset tag stats
-	*/
+	 * Returns the tag stats ID of this asset tag stats.
+	 *
+	 * @return the tag stats ID of this asset tag stats
+	 */
 	@Override
 	public long getTagStatsId() {
 		return _assetTagStats.getTagStatsId();
@@ -215,10 +215,10 @@ public class AssetTagStatsWrapper implements AssetTagStats,
 	}
 
 	/**
-	* Sets the asset count of this asset tag stats.
-	*
-	* @param assetCount the asset count of this asset tag stats
-	*/
+	 * Sets the asset count of this asset tag stats.
+	 *
+	 * @param assetCount the asset count of this asset tag stats
+	 */
 	@Override
 	public void setAssetCount(int assetCount) {
 		_assetTagStats.setAssetCount(assetCount);
@@ -235,20 +235,20 @@ public class AssetTagStatsWrapper implements AssetTagStats,
 	}
 
 	/**
-	* Sets the class name ID of this asset tag stats.
-	*
-	* @param classNameId the class name ID of this asset tag stats
-	*/
+	 * Sets the class name ID of this asset tag stats.
+	 *
+	 * @param classNameId the class name ID of this asset tag stats
+	 */
 	@Override
 	public void setClassNameId(long classNameId) {
 		_assetTagStats.setClassNameId(classNameId);
 	}
 
 	/**
-	* Sets the company ID of this asset tag stats.
-	*
-	* @param companyId the company ID of this asset tag stats
-	*/
+	 * Sets the company ID of this asset tag stats.
+	 *
+	 * @param companyId the company ID of this asset tag stats
+	 */
 	@Override
 	public void setCompanyId(long companyId) {
 		_assetTagStats.setCompanyId(companyId);
@@ -257,6 +257,7 @@ public class AssetTagStatsWrapper implements AssetTagStats,
 	@Override
 	public void setExpandoBridgeAttributes(
 		com.liferay.portal.kernel.model.BaseModel<?> baseModel) {
+
 		_assetTagStats.setExpandoBridgeAttributes(baseModel);
 	}
 
@@ -276,10 +277,10 @@ public class AssetTagStatsWrapper implements AssetTagStats,
 	}
 
 	/**
-	* Sets the primary key of this asset tag stats.
-	*
-	* @param primaryKey the primary key of this asset tag stats
-	*/
+	 * Sets the primary key of this asset tag stats.
+	 *
+	 * @param primaryKey the primary key of this asset tag stats
+	 */
 	@Override
 	public void setPrimaryKey(long primaryKey) {
 		_assetTagStats.setPrimaryKey(primaryKey);
@@ -291,27 +292,29 @@ public class AssetTagStatsWrapper implements AssetTagStats,
 	}
 
 	/**
-	* Sets the tag ID of this asset tag stats.
-	*
-	* @param tagId the tag ID of this asset tag stats
-	*/
+	 * Sets the tag ID of this asset tag stats.
+	 *
+	 * @param tagId the tag ID of this asset tag stats
+	 */
 	@Override
 	public void setTagId(long tagId) {
 		_assetTagStats.setTagId(tagId);
 	}
 
 	/**
-	* Sets the tag stats ID of this asset tag stats.
-	*
-	* @param tagStatsId the tag stats ID of this asset tag stats
-	*/
+	 * Sets the tag stats ID of this asset tag stats.
+	 *
+	 * @param tagStatsId the tag stats ID of this asset tag stats
+	 */
 	@Override
 	public void setTagStatsId(long tagStatsId) {
 		_assetTagStats.setTagStatsId(tagStatsId);
 	}
 
 	@Override
-	public com.liferay.portal.kernel.model.CacheModel<AssetTagStats> toCacheModel() {
+	public com.liferay.portal.kernel.model.CacheModel<AssetTagStats>
+		toCacheModel() {
+
 		return _assetTagStats.toCacheModel();
 	}
 
@@ -347,7 +350,9 @@ public class AssetTagStatsWrapper implements AssetTagStats,
 
 		AssetTagStatsWrapper assetTagStatsWrapper = (AssetTagStatsWrapper)obj;
 
-		if (Objects.equals(_assetTagStats, assetTagStatsWrapper._assetTagStats)) {
+		if (Objects.equals(
+				_assetTagStats, assetTagStatsWrapper._assetTagStats)) {
+
 			return true;
 		}
 
@@ -375,4 +380,5 @@ public class AssetTagStatsWrapper implements AssetTagStats,
 	}
 
 	private final AssetTagStats _assetTagStats;
+
 }

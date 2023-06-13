@@ -85,12 +85,6 @@ if (dlViewFileVersionDisplayContext.isVersionInfoVisible()) {
 
 					<%
 					User owner = UserLocalServiceUtil.fetchUser(fileEntry.getUserId());
-
-					String ownerURL = StringPool.BLANK;
-
-					if ((owner != null) && !owner.isDefaultUser()) {
-						ownerURL = owner.getDisplayURL(themeDisplay);
-					}
 					%>
 
 					<liferay-ui:user-portrait
@@ -103,7 +97,9 @@ if (dlViewFileVersionDisplayContext.isVersionInfoVisible()) {
 					<div class="autofit-row">
 						<div class="autofit-col autofit-col-expand">
 							<div class="component-title h4 username">
-								<a href="<%= ownerURL %>"><%= owner.getFullName() %></a>
+								<c:if test="<%= owner != null %>">
+									<a href="<%= owner.isDefaultUser() ? StringPool.BLANK : owner.getDisplayURL(themeDisplay) %>"><%= owner.getFullName() %></a>
+								</c:if>
 							</div>
 
 							<small class="text-muted">
@@ -276,7 +272,7 @@ if (dlViewFileVersionDisplayContext.isVersionInfoVisible()) {
 						<liferay-ui:message key="description" />
 					</dt>
 					<dd class="sidebar-dd">
-						<%= HtmlUtil.escape(fileEntry.getDescription()) %>
+						<%= HtmlUtil.replaceNewLine(HtmlUtil.escape(fileEntry.getDescription())) %>
 					</dd>
 				</c:if>
 

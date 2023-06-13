@@ -156,9 +156,10 @@ public class RepresentorTest {
 		testFields(
 			_dummy, _representor.getBinaryFunctions(),
 			binaryFile -> Try.fromFallibleWithResources(
-				() -> new BufferedReader(new InputStreamReader(
-					binaryFile.getInputStream())),
-				BufferedReader::readLine).getUnchecked(),
+				() -> new BufferedReader(
+					new InputStreamReader(binaryFile.getInputStream())),
+				BufferedReader::readLine
+			).getUnchecked(),
 			asList("binary1", "binary2"),
 			asList("Input Stream 1", "Input Stream 2"));
 	}
@@ -233,8 +234,15 @@ public class RepresentorTest {
 				relatedCollection.getIdentifierClass() ==
 					IntegerIdentifier.class
 		).filter(
-			relatedCollection ->
-				relatedCollection.getKey().equals("relatedCollection")
+			relatedCollection -> {
+				String key = relatedCollection.getKey();
+
+				if (key.equals("relatedCollection")) {
+					return true;
+				}
+
+				return false;
+			}
 		).collect(
 			Collectors.toList()
 		);

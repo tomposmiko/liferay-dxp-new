@@ -19,7 +19,6 @@ import com.liferay.portal.kernel.model.RepositoryEntry;
 import com.liferay.portal.kernel.service.RepositoryEntryLocalService;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.uad.constants.PortalUADConstants;
-
 import com.liferay.user.associated.data.exporter.DynamicQueryUADExporter;
 
 import org.osgi.service.component.annotations.Reference;
@@ -38,6 +37,7 @@ import org.osgi.service.component.annotations.Reference;
  */
 public abstract class BaseRepositoryEntryUADExporter
 	extends DynamicQueryUADExporter<RepositoryEntry> {
+
 	@Override
 	public Class<RepositoryEntry> getTypeClass() {
 		return RepositoryEntry.class;
@@ -81,4 +81,5 @@ public abstract class BaseRepositoryEntryUADExporter
 
 	@Reference
 	protected RepositoryEntryLocalService repositoryEntryLocalService;
+
 }

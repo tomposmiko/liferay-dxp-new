@@ -328,8 +328,8 @@ public interface BaseRepresentor<T> {
 		 */
 		public <V> U addNestedList(
 			String key, Function<T, List<V>> transformFunction,
-			Function
-				<NestedRepresentor.Builder<V>, NestedRepresentor<V>> function);
+			Function<NestedRepresentor.Builder<V>, NestedRepresentor<V>>
+				function);
 
 		/**
 		 * Adds information about a resource's number field.
@@ -356,7 +356,6 @@ public interface BaseRepresentor<T> {
 		 * @param  itemIdentifierClass the class of the collection items'
 		 *         identifier
 		 * @return the builder's step
-		 * @review
 		 */
 		public <V, S extends Identifier<?>> U addRelatedCollection(
 			String key, Class<S> itemIdentifierClass,

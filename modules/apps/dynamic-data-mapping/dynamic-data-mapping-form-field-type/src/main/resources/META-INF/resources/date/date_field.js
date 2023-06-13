@@ -11,7 +11,7 @@ AUI.add(
 					},
 
 					mask: {
-						value: Liferay.AUI.getDateFormat()
+						valueFn: '_maskValueFn'
 					},
 
 					predefinedValue: {
@@ -82,22 +82,26 @@ AUI.add(
 
 						var dateMask = [];
 
-						var items = mask.split('/');
+						var items = mask.split(instance._dateDelimiter);
 
 						items.forEach(
 							function(item, index) {
 								if (item == '%Y') {
 									dateMask.push(/\d/, /\d/, /\d/, /\d/);
 								}
-								else {
+								else if (item) {
 									dateMask.push(/\d/, /\d/);
 								}
 
-								if (index < (items.length - 1)) {
-									dateMask.push('/');
+								if (index < 2) {
+									dateMask.push(instance._dateDelimiter);
 								}
 							}
 						);
+
+						if (instance._endDelimiter) {
+							dateMask.push(instance._dateDelimiter);
+						}
 
 						return dateMask;
 					},
@@ -142,9 +146,7 @@ AUI.add(
 
 							var calendar = datePicker.getCalendar();
 
-							var popover = datePicker.getPopover();
-
-							if (calendar.get('boundingBox').contains(node) || popover.get('visible')) {
+							if (calendar.get('boundingBox').contains(node)) {
 								hasFocus = true;
 							}
 						}
@@ -242,10 +244,41 @@ AUI.add(
 						return placeholder;
 					},
 
+					_maskValueFn: function() {
+						var instance = this;
+
+						var dateFormat = Liferay.AUI.getDateFormat();
+						var languageId = Liferay.ThemeDisplay.getLanguageId().replace('_', '-');
+
+						var customDateFormat = A.Intl.get('datatype-date-format', 'x', languageId);
+
+						if (customDateFormat) {
+							dateFormat = customDateFormat;
+						}
+
+						instance._dateDelimiter = '/';
+						instance._endDelimiter = false;
+
+						if (dateFormat.indexOf('.') != -1) {
+							instance._dateDelimiter = '.';
+
+							if (dateFormat.lastIndexOf('.') == dateFormat.length - 1) {
+								instance._endDelimiter = true;
+							}
+						}
+
+						if (dateFormat.indexOf('-') != -1) {
+							instance._dateDelimiter = '-';
+						}
+
+						return dateFormat;
+					},
+
 					_onBlurInput: function() {
 						var instance = this;
 
 						if (!instance.hasFocus(document.activeElement)) {
+							instance.showErrorMessage();
 							instance._fireBlurEvent();
 						}
 					},

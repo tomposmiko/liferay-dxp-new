@@ -25,36 +25,41 @@ import com.liferay.portal.kernel.util.Accessor;
  *
  * @author Brian Wing Shun Chan
  * @see AssetCategoryPropertyModel
- * @see com.liferay.portlet.asset.model.impl.AssetCategoryPropertyImpl
- * @see com.liferay.portlet.asset.model.impl.AssetCategoryPropertyModelImpl
  * @deprecated
  * @generated
  */
 @Deprecated
-@ImplementationClassName("com.liferay.portlet.asset.model.impl.AssetCategoryPropertyImpl")
+@ImplementationClassName(
+	"com.liferay.portlet.asset.model.impl.AssetCategoryPropertyImpl"
+)
 @ProviderType
-public interface AssetCategoryProperty extends AssetCategoryPropertyModel,
-	PersistedModel {
+public interface AssetCategoryProperty
+	extends AssetCategoryPropertyModel, PersistedModel {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
-	 * Never modify this interface directly. Add methods to {@link com.liferay.portlet.asset.model.impl.AssetCategoryPropertyImpl} and rerun ServiceBuilder to automatically copy the method declarations to this interface.
+	 * Never modify this interface directly. Add methods to <code>com.liferay.portlet.asset.model.impl.AssetCategoryPropertyImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
 	 */
-	public static final Accessor<AssetCategoryProperty, Long> CATEGORY_PROPERTY_ID_ACCESSOR =
-		new Accessor<AssetCategoryProperty, Long>() {
-			@Override
-			public Long get(AssetCategoryProperty assetCategoryProperty) {
-				return assetCategoryProperty.getCategoryPropertyId();
-			}
+	public static final Accessor<AssetCategoryProperty, Long>
+		CATEGORY_PROPERTY_ID_ACCESSOR =
+			new Accessor<AssetCategoryProperty, Long>() {
 
-			@Override
-			public Class<Long> getAttributeClass() {
-				return Long.class;
-			}
+				@Override
+				public Long get(AssetCategoryProperty assetCategoryProperty) {
+					return assetCategoryProperty.getCategoryPropertyId();
+				}
 
-			@Override
-			public Class<AssetCategoryProperty> getTypeClass() {
-				return AssetCategoryProperty.class;
-			}
-		};
+				@Override
+				public Class<Long> getAttributeClass() {
+					return Long.class;
+				}
+
+				@Override
+				public Class<AssetCategoryProperty> getTypeClass() {
+					return AssetCategoryProperty.class;
+				}
+
+			};
+
 }

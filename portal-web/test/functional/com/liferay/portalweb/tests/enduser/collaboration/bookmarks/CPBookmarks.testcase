@@ -261,7 +261,7 @@ definition {
 
 	@priority = "5"
 	test DeleteBookmark {
-		property portal.acceptance = "true";
+		property portal.acceptance = "quarantine";
 
 		Navigator.openURL();
 

@@ -146,12 +146,13 @@ public class NestedPortletsPortlet extends MVCPortlet {
 
 			templateId = sb.toString();
 
-			content = processColumnMatcher.replaceAll("$1\\${$2}$3");
+			content = processColumnMatcher.replaceAll(
+				"$1" + renderResponse.getNamespace() + "_$2$3");
 
 			Matcher columnIdMatcher = _columnIdPattern.matcher(content);
 
 			templateContent = columnIdMatcher.replaceAll(
-				"$1" + renderResponse.getNamespace() + "$2$3");
+				"$1" + renderResponse.getNamespace() + "_$2$3");
 		}
 
 		checkLayout(themeDisplay.getLayout(), columnIds.values());
@@ -167,14 +168,13 @@ public class NestedPortletsPortlet extends MVCPortlet {
 
 		Map<String, Object> vmVariables =
 			(Map<String, Object>)renderRequest.getAttribute(
-				WebKeys.VM_VARIABLES + portletDisplay.getId());
+				WebKeys.FTL_VARIABLES);
 
 		if (vmVariables != null) {
 			vmVariables.putAll(columnIds);
 		}
 		else {
-			renderRequest.setAttribute(
-				WebKeys.VM_VARIABLES + portletDisplay.getId(), columnIds);
+			renderRequest.setAttribute(WebKeys.FTL_VARIABLES, columnIds);
 		}
 
 		super.include(viewTemplate, renderRequest, renderResponse);

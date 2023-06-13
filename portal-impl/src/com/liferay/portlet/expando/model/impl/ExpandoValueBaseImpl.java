@@ -32,12 +32,13 @@ import com.liferay.expando.kernel.service.ExpandoValueLocalServiceUtil;
  * @generated
  */
 @ProviderType
-public abstract class ExpandoValueBaseImpl extends ExpandoValueModelImpl
-	implements ExpandoValue {
+public abstract class ExpandoValueBaseImpl
+	extends ExpandoValueModelImpl implements ExpandoValue {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
-	 * Never modify or reference this class directly. All methods that expect a expando value model instance should use the {@link ExpandoValue} interface instead.
+	 * Never modify or reference this class directly. All methods that expect a expando value model instance should use the <code>ExpandoValue</code> interface instead.
 	 */
 	@Override
 	public void persist() {
@@ -48,4 +49,5 @@ public abstract class ExpandoValueBaseImpl extends ExpandoValueModelImpl
 			ExpandoValueLocalServiceUtil.updateExpandoValue(this);
 		}
 	}
+
 }

@@ -17,7 +17,6 @@ package com.liferay.portal.kernel.model;
 import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.expando.kernel.model.ExpandoBridge;
-
 import com.liferay.portal.kernel.service.ServiceContext;
 
 import java.io.Serializable;
@@ -36,8 +35,9 @@ import java.util.Objects;
  * @generated
  */
 @ProviderType
-public class VirtualHostWrapper implements VirtualHost,
-	ModelWrapper<VirtualHost> {
+public class VirtualHostWrapper
+	implements VirtualHost, ModelWrapper<VirtualHost> {
+
 	public VirtualHostWrapper(VirtualHost virtualHost) {
 		_virtualHost = virtualHost;
 	}
@@ -109,10 +109,10 @@ public class VirtualHostWrapper implements VirtualHost,
 	}
 
 	/**
-	* Returns the company ID of this virtual host.
-	*
-	* @return the company ID of this virtual host
-	*/
+	 * Returns the company ID of this virtual host.
+	 *
+	 * @return the company ID of this virtual host
+	 */
 	@Override
 	public long getCompanyId() {
 		return _virtualHost.getCompanyId();
@@ -124,40 +124,40 @@ public class VirtualHostWrapper implements VirtualHost,
 	}
 
 	/**
-	* Returns the hostname of this virtual host.
-	*
-	* @return the hostname of this virtual host
-	*/
+	 * Returns the hostname of this virtual host.
+	 *
+	 * @return the hostname of this virtual host
+	 */
 	@Override
 	public String getHostname() {
 		return _virtualHost.getHostname();
 	}
 
 	/**
-	* Returns the layout set ID of this virtual host.
-	*
-	* @return the layout set ID of this virtual host
-	*/
+	 * Returns the layout set ID of this virtual host.
+	 *
+	 * @return the layout set ID of this virtual host
+	 */
 	@Override
 	public long getLayoutSetId() {
 		return _virtualHost.getLayoutSetId();
 	}
 
 	/**
-	* Returns the mvcc version of this virtual host.
-	*
-	* @return the mvcc version of this virtual host
-	*/
+	 * Returns the mvcc version of this virtual host.
+	 *
+	 * @return the mvcc version of this virtual host
+	 */
 	@Override
 	public long getMvccVersion() {
 		return _virtualHost.getMvccVersion();
 	}
 
 	/**
-	* Returns the primary key of this virtual host.
-	*
-	* @return the primary key of this virtual host
-	*/
+	 * Returns the primary key of this virtual host.
+	 *
+	 * @return the primary key of this virtual host
+	 */
 	@Override
 	public long getPrimaryKey() {
 		return _virtualHost.getPrimaryKey();
@@ -169,10 +169,10 @@ public class VirtualHostWrapper implements VirtualHost,
 	}
 
 	/**
-	* Returns the virtual host ID of this virtual host.
-	*
-	* @return the virtual host ID of this virtual host
-	*/
+	 * Returns the virtual host ID of this virtual host.
+	 *
+	 * @return the virtual host ID of this virtual host
+	 */
 	@Override
 	public long getVirtualHostId() {
 		return _virtualHost.getVirtualHostId();
@@ -209,10 +209,10 @@ public class VirtualHostWrapper implements VirtualHost,
 	}
 
 	/**
-	* Sets the company ID of this virtual host.
-	*
-	* @param companyId the company ID of this virtual host
-	*/
+	 * Sets the company ID of this virtual host.
+	 *
+	 * @param companyId the company ID of this virtual host
+	 */
 	@Override
 	public void setCompanyId(long companyId) {
 		_virtualHost.setCompanyId(companyId);
@@ -234,30 +234,30 @@ public class VirtualHostWrapper implements VirtualHost,
 	}
 
 	/**
-	* Sets the hostname of this virtual host.
-	*
-	* @param hostname the hostname of this virtual host
-	*/
+	 * Sets the hostname of this virtual host.
+	 *
+	 * @param hostname the hostname of this virtual host
+	 */
 	@Override
 	public void setHostname(String hostname) {
 		_virtualHost.setHostname(hostname);
 	}
 
 	/**
-	* Sets the layout set ID of this virtual host.
-	*
-	* @param layoutSetId the layout set ID of this virtual host
-	*/
+	 * Sets the layout set ID of this virtual host.
+	 *
+	 * @param layoutSetId the layout set ID of this virtual host
+	 */
 	@Override
 	public void setLayoutSetId(long layoutSetId) {
 		_virtualHost.setLayoutSetId(layoutSetId);
 	}
 
 	/**
-	* Sets the mvcc version of this virtual host.
-	*
-	* @param mvccVersion the mvcc version of this virtual host
-	*/
+	 * Sets the mvcc version of this virtual host.
+	 *
+	 * @param mvccVersion the mvcc version of this virtual host
+	 */
 	@Override
 	public void setMvccVersion(long mvccVersion) {
 		_virtualHost.setMvccVersion(mvccVersion);
@@ -269,10 +269,10 @@ public class VirtualHostWrapper implements VirtualHost,
 	}
 
 	/**
-	* Sets the primary key of this virtual host.
-	*
-	* @param primaryKey the primary key of this virtual host
-	*/
+	 * Sets the primary key of this virtual host.
+	 *
+	 * @param primaryKey the primary key of this virtual host
+	 */
 	@Override
 	public void setPrimaryKey(long primaryKey) {
 		_virtualHost.setPrimaryKey(primaryKey);
@@ -284,10 +284,10 @@ public class VirtualHostWrapper implements VirtualHost,
 	}
 
 	/**
-	* Sets the virtual host ID of this virtual host.
-	*
-	* @param virtualHostId the virtual host ID of this virtual host
-	*/
+	 * Sets the virtual host ID of this virtual host.
+	 *
+	 * @param virtualHostId the virtual host ID of this virtual host
+	 */
 	@Override
 	public void setVirtualHostId(long virtualHostId) {
 		_virtualHost.setVirtualHostId(virtualHostId);
@@ -358,4 +358,5 @@ public class VirtualHostWrapper implements VirtualHost,
 	}
 
 	private final VirtualHost _virtualHost;
+
 }

@@ -17,7 +17,6 @@ package com.liferay.portlet.exportimport.service.http;
 import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.exportimport.kernel.service.StagingServiceUtil;
-
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 
@@ -25,10 +24,10 @@ import java.rmi.RemoteException;
 
 /**
  * Provides the SOAP utility for the
- * {@link StagingServiceUtil} service utility. The
- * static methods of this class calls the same methods of the service utility.
- * However, the signatures are different because it is difficult for SOAP to
- * support certain types.
+ * <code>StagingServiceUtil</code> service
+ * utility. The static methods of this class call the same methods of the
+ * service utility. However, the signatures are different because it is
+ * difficult for SOAP to support certain types.
  *
  * <p>
  * The benefits of using the SOAP utility is that it is cross platform
@@ -49,13 +48,14 @@ import java.rmi.RemoteException;
  *
  * @author Brian Wing Shun Chan
  * @see StagingServiceHttp
- * @see StagingServiceUtil
  * @generated
  */
 @ProviderType
 public class StagingServiceSoap {
+
 	public static void cleanUpStagingRequest(long stagingRequestId)
 		throws RemoteException {
+
 		try {
 			StagingServiceUtil.cleanUpStagingRequest(stagingRequestId);
 		}
@@ -68,9 +68,10 @@ public class StagingServiceSoap {
 
 	public static long createStagingRequest(long groupId, String checksum)
 		throws RemoteException {
+
 		try {
-			long returnValue = StagingServiceUtil.createStagingRequest(groupId,
-					checksum);
+			long returnValue = StagingServiceUtil.createStagingRequest(
+				groupId, checksum);
 
 			return returnValue;
 		}
@@ -81,44 +82,13 @@ public class StagingServiceSoap {
 		}
 	}
 
-	public static boolean hasRemoteLayout(String uuid, long groupId,
-		boolean privateLayout) throws RemoteException {
-		try {
-			boolean returnValue = StagingServiceUtil.hasRemoteLayout(uuid,
-					groupId, privateLayout);
-
-			return returnValue;
-		}
-		catch (Exception e) {
-			_log.error(e, e);
-
-			throw new RemoteException(e.getMessage());
-		}
-	}
-
-	public static void propagateExportImportLifecycleEvent(int code,
-		int processFlag, String processId,
-		java.util.List<java.io.Serializable> arguments)
+	public static boolean hasRemoteLayout(
+			String uuid, long groupId, boolean privateLayout)
 		throws RemoteException {
-		try {
-			StagingServiceUtil.propagateExportImportLifecycleEvent(code,
-				processFlag, processId, arguments);
-		}
-		catch (Exception e) {
-			_log.error(e, e);
 
-			throw new RemoteException(e.getMessage());
-		}
-	}
-
-	public static com.liferay.exportimport.kernel.lar.MissingReferences publishStagingRequest(
-		long stagingRequestId,
-		com.liferay.exportimport.kernel.model.ExportImportConfigurationSoap exportImportConfiguration)
-		throws RemoteException {
 		try {
-			com.liferay.exportimport.kernel.lar.MissingReferences returnValue = StagingServiceUtil.publishStagingRequest(stagingRequestId,
-					com.liferay.portlet.exportimport.model.impl.ExportImportConfigurationModelImpl.toModel(
-						exportImportConfiguration));
+			boolean returnValue = StagingServiceUtil.hasRemoteLayout(
+				uuid, groupId, privateLayout);
 
 			return returnValue;
 		}
@@ -129,11 +99,53 @@ public class StagingServiceSoap {
 		}
 	}
 
-	public static void updateStagingRequest(long stagingRequestId,
-		String fileName, byte[] bytes) throws RemoteException {
+	public static void propagateExportImportLifecycleEvent(
+			int code, int processFlag, String processId,
+			java.util.List<java.io.Serializable> arguments)
+		throws RemoteException {
+
 		try {
-			StagingServiceUtil.updateStagingRequest(stagingRequestId, fileName,
-				bytes);
+			StagingServiceUtil.propagateExportImportLifecycleEvent(
+				code, processFlag, processId, arguments);
+		}
+		catch (Exception e) {
+			_log.error(e, e);
+
+			throw new RemoteException(e.getMessage());
+		}
+	}
+
+	public static com.liferay.exportimport.kernel.lar.MissingReferences
+			publishStagingRequest(
+				long stagingRequestId,
+				com.liferay.exportimport.kernel.model.
+					ExportImportConfigurationSoap exportImportConfiguration)
+		throws RemoteException {
+
+		try {
+			com.liferay.exportimport.kernel.lar.MissingReferences returnValue =
+				StagingServiceUtil.publishStagingRequest(
+					stagingRequestId,
+					com.liferay.portlet.exportimport.model.impl.
+						ExportImportConfigurationModelImpl.toModel(
+							exportImportConfiguration));
+
+			return returnValue;
+		}
+		catch (Exception e) {
+			_log.error(e, e);
+
+			throw new RemoteException(e.getMessage());
+		}
+	}
+
+	public static void updateStagingRequest(
+			long stagingRequestId, String fileName, byte[] bytes)
+		throws RemoteException {
+
+		try {
+			StagingServiceUtil.updateStagingRequest(
+				stagingRequestId, fileName, bytes);
 		}
 		catch (Exception e) {
 			_log.error(e, e);
@@ -143,4 +155,5 @@ public class StagingServiceSoap {
 	}
 
 	private static Log _log = LogFactoryUtil.getLog(StagingServiceSoap.class);
+
 }

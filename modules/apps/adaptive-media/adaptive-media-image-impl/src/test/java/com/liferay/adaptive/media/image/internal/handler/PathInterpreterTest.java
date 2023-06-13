@@ -23,6 +23,7 @@ import com.liferay.document.library.kernel.service.DLAppService;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.repository.model.FileVersion;
+import com.liferay.portal.kernel.test.ReflectionTestUtil;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 
 import java.util.Map;
@@ -41,9 +42,11 @@ public class PathInterpreterTest {
 
 	@Before
 	public void setUp() {
-		_pathInterpreter.setAMImageConfigurationHelper(
+		ReflectionTestUtil.setFieldValue(
+			_pathInterpreter, "_amImageConfigurationHelper",
 			_amImageConfigurationHelper);
-		_pathInterpreter.setDLAppService(_dlAppService);
+		ReflectionTestUtil.setFieldValue(
+			_pathInterpreter, "_dlAppService", _dlAppService);
 	}
 
 	@Test
@@ -114,6 +117,48 @@ public class PathInterpreterTest {
 		);
 
 		_pathInterpreter.interpretPath("/image/0/x/foo.jpg");
+	}
+
+	@Test
+	public void testFileEntryPathWithTimestamp() throws Exception {
+		Mockito.when(
+			_dlAppService.getFileEntry(Mockito.anyLong())
+		).thenReturn(
+			_fileEntry
+		);
+
+		Mockito.when(
+			_fileEntry.getFileVersion()
+		).thenReturn(
+			_fileVersion
+		);
+
+		Mockito.when(
+			_amImageConfigurationHelper.getAMImageConfigurationEntry(
+				Mockito.anyLong(), Mockito.eq("x"))
+		).thenReturn(
+			Optional.of(_amImageConfigurationEntry)
+		);
+
+		_pathInterpreter.interpretPath("/image/0/x/foo.jpg?t=12345");
+
+		Mockito.verify(
+			_dlAppService
+		).getFileEntry(
+			0
+		);
+
+		Mockito.verify(
+			_fileVersion
+		).getCompanyId();
+
+		Mockito.verify(
+			_amImageConfigurationEntry
+		).getProperties();
+
+		Mockito.verify(
+			_amImageConfigurationEntry
+		).getUUID();
 	}
 
 	@Test

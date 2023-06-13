@@ -34,7 +34,6 @@ import static java.util.Arrays.asList;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.emptyString;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.hamcrest.collection.IsMapContaining.hasEntry;
 import static org.hamcrest.core.Is.is;
@@ -53,7 +52,6 @@ import java.io.ByteArrayInputStream;
 import java.io.InputStreamReader;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -72,19 +70,8 @@ import org.junit.Test;
 public class FormTest {
 
 	@Test
-	public void testEmptyCreatesEmptyPathBuilder() {
-		Builder<Object> builder = BuilderImpl.empty();
-
-		Form<Object> form = _getEmptyObjectForm(builder);
-
-		assertThat(form.getId(), is(emptyString()));
-	}
-
-	@Test
 	public void testFormCreatesValidForm() {
 		Form<Map<String, Object>> form = _getForm();
-
-		assertThat(form.getId(), is("1/2/3"));
 
 		AcceptLanguage acceptLanguage = Locale::getDefault;
 
@@ -356,7 +343,7 @@ public class FormTest {
 			 Builder.FieldStep<Map<String, Object>>> function) {
 
 		Builder<Map<String, Object>> builder = new BuilderImpl<>(
-			Collections.emptyList(), __ -> null);
+			__ -> null, __ -> Optional.empty());
 
 		return function.apply(
 			builder.title(
@@ -371,9 +358,10 @@ public class FormTest {
 
 	private static String _readBinaryFile(BinaryFile binaryFile) {
 		return Try.fromFallibleWithResources(
-			() -> new BufferedReader(new InputStreamReader(
-				binaryFile.getInputStream())),
-			BufferedReader::readLine).getUnchecked();
+			() -> new BufferedReader(
+				new InputStreamReader(binaryFile.getInputStream())),
+			BufferedReader::readLine
+		).getUnchecked();
 	}
 
 	private static void _testBody(Map<String, Object> map) {
@@ -404,19 +392,9 @@ public class FormTest {
 		assertThat(binaryFile2.getName(), is("fileName2"));
 	}
 
-	private Form<Object> _getEmptyObjectForm(Builder<Object> builder) {
-		return builder.title(
-			__ -> ""
-		).description(
-			__ -> ""
-		).constructor(
-			Object::new
-		).build();
-	}
-
 	private Form<Map<String, Object>> _getForm() {
 		Builder<Map<String, Object>> builder = new BuilderImpl<>(
-			asList("1", "2", "3"), __ -> null);
+			__ -> null, __ -> Optional.empty());
 
 		return builder.title(
 			__ -> "title"

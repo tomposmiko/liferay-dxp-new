@@ -1438,7 +1438,10 @@ definition {
 			portlet = "Web Content"
 		);
 
-		WebContent.deleteCP(webContentTitle = "WC WebContent Title");
+		WebContent.deleteCP(
+			siteURLKey = "guest",
+			webContentTitle = "WC WebContent Title"
+		);
 	}
 
 	@priority = "3"
@@ -1468,6 +1471,7 @@ definition {
 		);
 
 		WebContent.deleteCP(
+			siteURLKey = "guest",
 			webContentTitle = '''<!-- -->''',
 			webContentTitleEscapeCharacter = '''&lt;!-- --&gt;'''
 		);

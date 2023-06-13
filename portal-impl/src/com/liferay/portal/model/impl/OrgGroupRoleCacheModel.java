@@ -32,12 +32,12 @@ import java.io.ObjectOutput;
  * The cache model class for representing OrgGroupRole in entity cache.
  *
  * @author Brian Wing Shun Chan
- * @see OrgGroupRole
  * @generated
  */
 @ProviderType
-public class OrgGroupRoleCacheModel implements CacheModel<OrgGroupRole>,
-	Externalizable, MVCCModel {
+public class OrgGroupRoleCacheModel
+	implements CacheModel<OrgGroupRole>, Externalizable, MVCCModel {
+
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj) {
@@ -48,10 +48,12 @@ public class OrgGroupRoleCacheModel implements CacheModel<OrgGroupRole>,
 			return false;
 		}
 
-		OrgGroupRoleCacheModel orgGroupRoleCacheModel = (OrgGroupRoleCacheModel)obj;
+		OrgGroupRoleCacheModel orgGroupRoleCacheModel =
+			(OrgGroupRoleCacheModel)obj;
 
 		if (orgGroupRolePK.equals(orgGroupRoleCacheModel.orgGroupRolePK) &&
-				(mvccVersion == orgGroupRoleCacheModel.mvccVersion)) {
+			(mvccVersion == orgGroupRoleCacheModel.mvccVersion)) {
+
 			return true;
 		}
 
@@ -125,8 +127,7 @@ public class OrgGroupRoleCacheModel implements CacheModel<OrgGroupRole>,
 	}
 
 	@Override
-	public void writeExternal(ObjectOutput objectOutput)
-		throws IOException {
+	public void writeExternal(ObjectOutput objectOutput) throws IOException {
 		objectOutput.writeLong(mvccVersion);
 
 		objectOutput.writeLong(organizationId);
@@ -144,4 +145,5 @@ public class OrgGroupRoleCacheModel implements CacheModel<OrgGroupRole>,
 	public long roleId;
 	public long companyId;
 	public transient OrgGroupRolePK orgGroupRolePK;
+
 }

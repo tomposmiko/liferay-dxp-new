@@ -50,8 +50,6 @@ public class PersonCreatorForm {
 		).addOptionalDate(
 			"birthDate", PersonCreatorForm::setBirthDate
 		).addOptionalString(
-			"gender", PersonCreatorForm::setGender
-		).addOptionalString(
 			"honorificPrefix", PersonCreatorForm::setHonorificPrefix
 		).addOptionalString(
 			"honorificSuffix", PersonCreatorForm::setHonorificSuffix
@@ -169,19 +167,6 @@ public class PersonCreatorForm {
 	}
 
 	/**
-	 * Returns {@code true} if the person is male.
-	 *
-	 * @return {@code true} if the person is a male; {@code false} otherwise
-	 */
-	public boolean isMale() {
-		return Optional.ofNullable(
-			_male
-		).orElse(
-			true
-		);
-	}
-
-	/**
 	 * Returns {@code true} if the person has an alternate name.
 	 *
 	 * @return {@code true} if the person has an alternate name; {@code false}
@@ -211,10 +196,6 @@ public class PersonCreatorForm {
 
 	public void setFamilyName(String lastName) {
 		_familyName = lastName;
-	}
-
-	public void setGender(String gender) {
-		_male = "male".equals(gender);
 	}
 
 	public void setGivenName(String givenName) {
@@ -248,6 +229,5 @@ public class PersonCreatorForm {
 	private String _honorificSuffix;
 	private BinaryFile _imageBinaryFile;
 	private String _jobTitle;
-	private Boolean _male;
 
 }

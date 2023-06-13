@@ -17,7 +17,6 @@ package com.liferay.dynamic.data.lists.model.impl;
 import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.dynamic.data.lists.model.DDLRecord;
-
 import com.liferay.portal.kernel.model.CacheModel;
 import com.liferay.portal.kernel.util.HashUtil;
 import com.liferay.portal.kernel.util.StringBundler;
@@ -33,12 +32,12 @@ import java.util.Date;
  * The cache model class for representing DDLRecord in entity cache.
  *
  * @author Brian Wing Shun Chan
- * @see DDLRecord
  * @generated
  */
 @ProviderType
-public class DDLRecordCacheModel implements CacheModel<DDLRecord>,
-	Externalizable {
+public class DDLRecordCacheModel
+	implements CacheModel<DDLRecord>, Externalizable {
+
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj) {
@@ -210,8 +209,7 @@ public class DDLRecordCacheModel implements CacheModel<DDLRecord>,
 	}
 
 	@Override
-	public void writeExternal(ObjectOutput objectOutput)
-		throws IOException {
+	public void writeExternal(ObjectOutput objectOutput) throws IOException {
 		if (uuid == null) {
 			objectOutput.writeUTF("");
 		}
@@ -284,4 +282,5 @@ public class DDLRecordCacheModel implements CacheModel<DDLRecord>,
 	public String version;
 	public int displayIndex;
 	public long lastPublishDate;
+
 }

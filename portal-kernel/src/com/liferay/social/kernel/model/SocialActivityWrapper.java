@@ -17,7 +17,6 @@ package com.liferay.social.kernel.model;
 import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.expando.kernel.model.ExpandoBridge;
-
 import com.liferay.portal.kernel.model.ModelWrapper;
 import com.liferay.portal.kernel.service.ServiceContext;
 
@@ -37,8 +36,9 @@ import java.util.Objects;
  * @generated
  */
 @ProviderType
-public class SocialActivityWrapper implements SocialActivity,
-	ModelWrapper<SocialActivity> {
+public class SocialActivityWrapper
+	implements SocialActivity, ModelWrapper<SocialActivity> {
+
 	public SocialActivityWrapper(SocialActivity socialActivity) {
 		_socialActivity = socialActivity;
 	}
@@ -164,7 +164,8 @@ public class SocialActivityWrapper implements SocialActivity,
 
 	@Override
 	public Object clone() {
-		return new SocialActivityWrapper((SocialActivity)_socialActivity.clone());
+		return new SocialActivityWrapper(
+			(SocialActivity)_socialActivity.clone());
 	}
 
 	@Override
@@ -173,20 +174,20 @@ public class SocialActivityWrapper implements SocialActivity,
 	}
 
 	/**
-	* Returns the activity ID of this social activity.
-	*
-	* @return the activity ID of this social activity
-	*/
+	 * Returns the activity ID of this social activity.
+	 *
+	 * @return the activity ID of this social activity
+	 */
 	@Override
 	public long getActivityId() {
 		return _socialActivity.getActivityId();
 	}
 
 	/**
-	* Returns the activity set ID of this social activity.
-	*
-	* @return the activity set ID of this social activity
-	*/
+	 * Returns the activity set ID of this social activity.
+	 *
+	 * @return the activity set ID of this social activity
+	 */
 	@Override
 	public long getActivitySetId() {
 		return _socialActivity.getActivitySetId();
@@ -198,50 +199,50 @@ public class SocialActivityWrapper implements SocialActivity,
 	}
 
 	/**
-	* Returns the fully qualified class name of this social activity.
-	*
-	* @return the fully qualified class name of this social activity
-	*/
+	 * Returns the fully qualified class name of this social activity.
+	 *
+	 * @return the fully qualified class name of this social activity
+	 */
 	@Override
 	public String getClassName() {
 		return _socialActivity.getClassName();
 	}
 
 	/**
-	* Returns the class name ID of this social activity.
-	*
-	* @return the class name ID of this social activity
-	*/
+	 * Returns the class name ID of this social activity.
+	 *
+	 * @return the class name ID of this social activity
+	 */
 	@Override
 	public long getClassNameId() {
 		return _socialActivity.getClassNameId();
 	}
 
 	/**
-	* Returns the class pk of this social activity.
-	*
-	* @return the class pk of this social activity
-	*/
+	 * Returns the class pk of this social activity.
+	 *
+	 * @return the class pk of this social activity
+	 */
 	@Override
 	public long getClassPK() {
 		return _socialActivity.getClassPK();
 	}
 
 	/**
-	* Returns the company ID of this social activity.
-	*
-	* @return the company ID of this social activity
-	*/
+	 * Returns the company ID of this social activity.
+	 *
+	 * @return the company ID of this social activity
+	 */
 	@Override
 	public long getCompanyId() {
 		return _socialActivity.getCompanyId();
 	}
 
 	/**
-	* Returns the create date of this social activity.
-	*
-	* @return the create date of this social activity
-	*/
+	 * Returns the create date of this social activity.
+	 *
+	 * @return the create date of this social activity
+	 */
 	@Override
 	public long getCreateDate() {
 		return _socialActivity.getCreateDate();
@@ -253,10 +254,10 @@ public class SocialActivityWrapper implements SocialActivity,
 	}
 
 	/**
-	* Returns the extra data of this social activity.
-	*
-	* @return the extra data of this social activity
-	*/
+	 * Returns the extra data of this social activity.
+	 *
+	 * @return the extra data of this social activity
+	 */
 	@Override
 	public String getExtraData() {
 		return _socialActivity.getExtraData();
@@ -265,60 +266,62 @@ public class SocialActivityWrapper implements SocialActivity,
 	@Override
 	public String getExtraDataValue(String key)
 		throws com.liferay.portal.kernel.json.JSONException {
+
 		return _socialActivity.getExtraDataValue(key);
 	}
 
 	@Override
 	public String getExtraDataValue(String key, java.util.Locale locale)
 		throws com.liferay.portal.kernel.json.JSONException {
+
 		return _socialActivity.getExtraDataValue(key, locale);
 	}
 
 	/**
-	* Returns the group ID of this social activity.
-	*
-	* @return the group ID of this social activity
-	*/
+	 * Returns the group ID of this social activity.
+	 *
+	 * @return the group ID of this social activity
+	 */
 	@Override
 	public long getGroupId() {
 		return _socialActivity.getGroupId();
 	}
 
 	/**
-	* Returns the mirror activity ID of this social activity.
-	*
-	* @return the mirror activity ID of this social activity
-	*/
+	 * Returns the mirror activity ID of this social activity.
+	 *
+	 * @return the mirror activity ID of this social activity
+	 */
 	@Override
 	public long getMirrorActivityId() {
 		return _socialActivity.getMirrorActivityId();
 	}
 
 	/**
-	* Returns the parent class name ID of this social activity.
-	*
-	* @return the parent class name ID of this social activity
-	*/
+	 * Returns the parent class name ID of this social activity.
+	 *
+	 * @return the parent class name ID of this social activity
+	 */
 	@Override
 	public long getParentClassNameId() {
 		return _socialActivity.getParentClassNameId();
 	}
 
 	/**
-	* Returns the parent class pk of this social activity.
-	*
-	* @return the parent class pk of this social activity
-	*/
+	 * Returns the parent class pk of this social activity.
+	 *
+	 * @return the parent class pk of this social activity
+	 */
 	@Override
 	public long getParentClassPK() {
 		return _socialActivity.getParentClassPK();
 	}
 
 	/**
-	* Returns the primary key of this social activity.
-	*
-	* @return the primary key of this social activity
-	*/
+	 * Returns the primary key of this social activity.
+	 *
+	 * @return the primary key of this social activity
+	 */
 	@Override
 	public long getPrimaryKey() {
 		return _socialActivity.getPrimaryKey();
@@ -330,50 +333,50 @@ public class SocialActivityWrapper implements SocialActivity,
 	}
 
 	/**
-	* Returns the receiver user ID of this social activity.
-	*
-	* @return the receiver user ID of this social activity
-	*/
+	 * Returns the receiver user ID of this social activity.
+	 *
+	 * @return the receiver user ID of this social activity
+	 */
 	@Override
 	public long getReceiverUserId() {
 		return _socialActivity.getReceiverUserId();
 	}
 
 	/**
-	* Returns the receiver user uuid of this social activity.
-	*
-	* @return the receiver user uuid of this social activity
-	*/
+	 * Returns the receiver user uuid of this social activity.
+	 *
+	 * @return the receiver user uuid of this social activity
+	 */
 	@Override
 	public String getReceiverUserUuid() {
 		return _socialActivity.getReceiverUserUuid();
 	}
 
 	/**
-	* Returns the type of this social activity.
-	*
-	* @return the type of this social activity
-	*/
+	 * Returns the type of this social activity.
+	 *
+	 * @return the type of this social activity
+	 */
 	@Override
 	public int getType() {
 		return _socialActivity.getType();
 	}
 
 	/**
-	* Returns the user ID of this social activity.
-	*
-	* @return the user ID of this social activity
-	*/
+	 * Returns the user ID of this social activity.
+	 *
+	 * @return the user ID of this social activity
+	 */
 	@Override
 	public long getUserId() {
 		return _socialActivity.getUserId();
 	}
 
 	/**
-	* Returns the user uuid of this social activity.
-	*
-	* @return the user uuid of this social activity
-	*/
+	 * Returns the user uuid of this social activity.
+	 *
+	 * @return the user uuid of this social activity
+	 */
 	@Override
 	public String getUserUuid() {
 		return _socialActivity.getUserUuid();
@@ -410,20 +413,20 @@ public class SocialActivityWrapper implements SocialActivity,
 	}
 
 	/**
-	* Sets the activity ID of this social activity.
-	*
-	* @param activityId the activity ID of this social activity
-	*/
+	 * Sets the activity ID of this social activity.
+	 *
+	 * @param activityId the activity ID of this social activity
+	 */
 	@Override
 	public void setActivityId(long activityId) {
 		_socialActivity.setActivityId(activityId);
 	}
 
 	/**
-	* Sets the activity set ID of this social activity.
-	*
-	* @param activitySetId the activity set ID of this social activity
-	*/
+	 * Sets the activity set ID of this social activity.
+	 *
+	 * @param activitySetId the activity set ID of this social activity
+	 */
 	@Override
 	public void setActivitySetId(long activitySetId) {
 		_socialActivity.setActivitySetId(activitySetId);
@@ -432,6 +435,7 @@ public class SocialActivityWrapper implements SocialActivity,
 	@Override
 	public void setAssetEntry(
 		com.liferay.asset.kernel.model.AssetEntry assetEntry) {
+
 		_socialActivity.setAssetEntry(assetEntry);
 	}
 
@@ -446,40 +450,40 @@ public class SocialActivityWrapper implements SocialActivity,
 	}
 
 	/**
-	* Sets the class name ID of this social activity.
-	*
-	* @param classNameId the class name ID of this social activity
-	*/
+	 * Sets the class name ID of this social activity.
+	 *
+	 * @param classNameId the class name ID of this social activity
+	 */
 	@Override
 	public void setClassNameId(long classNameId) {
 		_socialActivity.setClassNameId(classNameId);
 	}
 
 	/**
-	* Sets the class pk of this social activity.
-	*
-	* @param classPK the class pk of this social activity
-	*/
+	 * Sets the class pk of this social activity.
+	 *
+	 * @param classPK the class pk of this social activity
+	 */
 	@Override
 	public void setClassPK(long classPK) {
 		_socialActivity.setClassPK(classPK);
 	}
 
 	/**
-	* Sets the company ID of this social activity.
-	*
-	* @param companyId the company ID of this social activity
-	*/
+	 * Sets the company ID of this social activity.
+	 *
+	 * @param companyId the company ID of this social activity
+	 */
 	@Override
 	public void setCompanyId(long companyId) {
 		_socialActivity.setCompanyId(companyId);
 	}
 
 	/**
-	* Sets the create date of this social activity.
-	*
-	* @param createDate the create date of this social activity
-	*/
+	 * Sets the create date of this social activity.
+	 *
+	 * @param createDate the create date of this social activity
+	 */
 	@Override
 	public void setCreateDate(long createDate) {
 		_socialActivity.setCreateDate(createDate);
@@ -488,6 +492,7 @@ public class SocialActivityWrapper implements SocialActivity,
 	@Override
 	public void setExpandoBridgeAttributes(
 		com.liferay.portal.kernel.model.BaseModel<?> baseModel) {
+
 		_socialActivity.setExpandoBridgeAttributes(baseModel);
 	}
 
@@ -502,10 +507,10 @@ public class SocialActivityWrapper implements SocialActivity,
 	}
 
 	/**
-	* Sets the extra data of this social activity.
-	*
-	* @param extraData the extra data of this social activity
-	*/
+	 * Sets the extra data of this social activity.
+	 *
+	 * @param extraData the extra data of this social activity
+	 */
 	@Override
 	public void setExtraData(String extraData) {
 		_socialActivity.setExtraData(extraData);
@@ -514,24 +519,25 @@ public class SocialActivityWrapper implements SocialActivity,
 	@Override
 	public void setExtraDataValue(String key, String value)
 		throws com.liferay.portal.kernel.json.JSONException {
+
 		_socialActivity.setExtraDataValue(key, value);
 	}
 
 	/**
-	* Sets the group ID of this social activity.
-	*
-	* @param groupId the group ID of this social activity
-	*/
+	 * Sets the group ID of this social activity.
+	 *
+	 * @param groupId the group ID of this social activity
+	 */
 	@Override
 	public void setGroupId(long groupId) {
 		_socialActivity.setGroupId(groupId);
 	}
 
 	/**
-	* Sets the mirror activity ID of this social activity.
-	*
-	* @param mirrorActivityId the mirror activity ID of this social activity
-	*/
+	 * Sets the mirror activity ID of this social activity.
+	 *
+	 * @param mirrorActivityId the mirror activity ID of this social activity
+	 */
 	@Override
 	public void setMirrorActivityId(long mirrorActivityId) {
 		_socialActivity.setMirrorActivityId(mirrorActivityId);
@@ -543,30 +549,30 @@ public class SocialActivityWrapper implements SocialActivity,
 	}
 
 	/**
-	* Sets the parent class name ID of this social activity.
-	*
-	* @param parentClassNameId the parent class name ID of this social activity
-	*/
+	 * Sets the parent class name ID of this social activity.
+	 *
+	 * @param parentClassNameId the parent class name ID of this social activity
+	 */
 	@Override
 	public void setParentClassNameId(long parentClassNameId) {
 		_socialActivity.setParentClassNameId(parentClassNameId);
 	}
 
 	/**
-	* Sets the parent class pk of this social activity.
-	*
-	* @param parentClassPK the parent class pk of this social activity
-	*/
+	 * Sets the parent class pk of this social activity.
+	 *
+	 * @param parentClassPK the parent class pk of this social activity
+	 */
 	@Override
 	public void setParentClassPK(long parentClassPK) {
 		_socialActivity.setParentClassPK(parentClassPK);
 	}
 
 	/**
-	* Sets the primary key of this social activity.
-	*
-	* @param primaryKey the primary key of this social activity
-	*/
+	 * Sets the primary key of this social activity.
+	 *
+	 * @param primaryKey the primary key of this social activity
+	 */
 	@Override
 	public void setPrimaryKey(long primaryKey) {
 		_socialActivity.setPrimaryKey(primaryKey);
@@ -578,57 +584,59 @@ public class SocialActivityWrapper implements SocialActivity,
 	}
 
 	/**
-	* Sets the receiver user ID of this social activity.
-	*
-	* @param receiverUserId the receiver user ID of this social activity
-	*/
+	 * Sets the receiver user ID of this social activity.
+	 *
+	 * @param receiverUserId the receiver user ID of this social activity
+	 */
 	@Override
 	public void setReceiverUserId(long receiverUserId) {
 		_socialActivity.setReceiverUserId(receiverUserId);
 	}
 
 	/**
-	* Sets the receiver user uuid of this social activity.
-	*
-	* @param receiverUserUuid the receiver user uuid of this social activity
-	*/
+	 * Sets the receiver user uuid of this social activity.
+	 *
+	 * @param receiverUserUuid the receiver user uuid of this social activity
+	 */
 	@Override
 	public void setReceiverUserUuid(String receiverUserUuid) {
 		_socialActivity.setReceiverUserUuid(receiverUserUuid);
 	}
 
 	/**
-	* Sets the type of this social activity.
-	*
-	* @param type the type of this social activity
-	*/
+	 * Sets the type of this social activity.
+	 *
+	 * @param type the type of this social activity
+	 */
 	@Override
 	public void setType(int type) {
 		_socialActivity.setType(type);
 	}
 
 	/**
-	* Sets the user ID of this social activity.
-	*
-	* @param userId the user ID of this social activity
-	*/
+	 * Sets the user ID of this social activity.
+	 *
+	 * @param userId the user ID of this social activity
+	 */
 	@Override
 	public void setUserId(long userId) {
 		_socialActivity.setUserId(userId);
 	}
 
 	/**
-	* Sets the user uuid of this social activity.
-	*
-	* @param userUuid the user uuid of this social activity
-	*/
+	 * Sets the user uuid of this social activity.
+	 *
+	 * @param userUuid the user uuid of this social activity
+	 */
 	@Override
 	public void setUserUuid(String userUuid) {
 		_socialActivity.setUserUuid(userUuid);
 	}
 
 	@Override
-	public com.liferay.portal.kernel.model.CacheModel<SocialActivity> toCacheModel() {
+	public com.liferay.portal.kernel.model.CacheModel<SocialActivity>
+		toCacheModel() {
+
 		return _socialActivity.toCacheModel();
 	}
 
@@ -662,10 +670,12 @@ public class SocialActivityWrapper implements SocialActivity,
 			return false;
 		}
 
-		SocialActivityWrapper socialActivityWrapper = (SocialActivityWrapper)obj;
+		SocialActivityWrapper socialActivityWrapper =
+			(SocialActivityWrapper)obj;
 
-		if (Objects.equals(_socialActivity,
-					socialActivityWrapper._socialActivity)) {
+		if (Objects.equals(
+				_socialActivity, socialActivityWrapper._socialActivity)) {
+
 			return true;
 		}
 
@@ -693,4 +703,5 @@ public class SocialActivityWrapper implements SocialActivity,
 	}
 
 	private final SocialActivity _socialActivity;
+
 }

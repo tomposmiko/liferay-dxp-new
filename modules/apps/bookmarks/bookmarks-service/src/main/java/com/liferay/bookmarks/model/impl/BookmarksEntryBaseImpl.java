@@ -32,12 +32,13 @@ import com.liferay.bookmarks.service.BookmarksEntryLocalServiceUtil;
  * @generated
  */
 @ProviderType
-public abstract class BookmarksEntryBaseImpl extends BookmarksEntryModelImpl
-	implements BookmarksEntry {
+public abstract class BookmarksEntryBaseImpl
+	extends BookmarksEntryModelImpl implements BookmarksEntry {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
-	 * Never modify or reference this class directly. All methods that expect a bookmarks entry model instance should use the {@link BookmarksEntry} interface instead.
+	 * Never modify or reference this class directly. All methods that expect a bookmarks entry model instance should use the <code>BookmarksEntry</code> interface instead.
 	 */
 	@Override
 	public void persist() {
@@ -57,4 +58,5 @@ public abstract class BookmarksEntryBaseImpl extends BookmarksEntryModelImpl
 
 		BookmarksEntryLocalServiceUtil.updateBookmarksEntry(bookmarksEntry);
 	}
+
 }

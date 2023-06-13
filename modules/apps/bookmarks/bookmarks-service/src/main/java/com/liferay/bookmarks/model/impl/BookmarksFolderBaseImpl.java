@@ -18,7 +18,6 @@ import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.bookmarks.model.BookmarksFolder;
 import com.liferay.bookmarks.service.BookmarksFolderLocalServiceUtil;
-
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.util.StringBundler;
 
@@ -38,12 +37,13 @@ import java.util.List;
  * @generated
  */
 @ProviderType
-public abstract class BookmarksFolderBaseImpl extends BookmarksFolderModelImpl
-	implements BookmarksFolder {
+public abstract class BookmarksFolderBaseImpl
+	extends BookmarksFolderModelImpl implements BookmarksFolder {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
-	 * Never modify or reference this class directly. All methods that expect a bookmarks folder model instance should use the {@link BookmarksFolder} interface instead.
+	 * Never modify or reference this class directly. All methods that expect a bookmarks folder model instance should use the <code>BookmarksFolder</code> interface instead.
 	 */
 	@Override
 	public void persist() {
@@ -58,17 +58,20 @@ public abstract class BookmarksFolderBaseImpl extends BookmarksFolderModelImpl
 	@Override
 	@SuppressWarnings("unused")
 	public String buildTreePath() throws PortalException {
-		List<BookmarksFolder> bookmarksFolders = new ArrayList<BookmarksFolder>();
+		List<BookmarksFolder> bookmarksFolders =
+			new ArrayList<BookmarksFolder>();
 
 		BookmarksFolder bookmarksFolder = this;
 
 		while (bookmarksFolder != null) {
 			bookmarksFolders.add(bookmarksFolder);
 
-			bookmarksFolder = BookmarksFolderLocalServiceUtil.fetchBookmarksFolder(bookmarksFolder.getParentFolderId());
+			bookmarksFolder =
+				BookmarksFolderLocalServiceUtil.fetchBookmarksFolder(
+					bookmarksFolder.getParentFolderId());
 		}
 
-		StringBundler sb = new StringBundler((bookmarksFolders.size() * 2) + 1);
+		StringBundler sb = new StringBundler(bookmarksFolders.size() * 2 + 1);
 
 		sb.append("/");
 
@@ -90,4 +93,5 @@ public abstract class BookmarksFolderBaseImpl extends BookmarksFolderModelImpl
 
 		BookmarksFolderLocalServiceUtil.updateBookmarksFolder(bookmarksFolder);
 	}
+
 }

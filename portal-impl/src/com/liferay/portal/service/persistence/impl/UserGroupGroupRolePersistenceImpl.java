@@ -58,56 +58,33 @@ import java.util.Set;
  * </p>
  *
  * @author Brian Wing Shun Chan
- * @see UserGroupGroupRolePersistence
- * @see com.liferay.portal.kernel.service.persistence.UserGroupGroupRoleUtil
  * @generated
  */
 @ProviderType
-public class UserGroupGroupRolePersistenceImpl extends BasePersistenceImpl<UserGroupGroupRole>
+public class UserGroupGroupRolePersistenceImpl
+	extends BasePersistenceImpl<UserGroupGroupRole>
 	implements UserGroupGroupRolePersistence {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
-	 * Never modify or reference this class directly. Always use {@link UserGroupGroupRoleUtil} to access the user group group role persistence. Modify <code>service.xml</code> and rerun ServiceBuilder to regenerate this class.
+	 * Never modify or reference this class directly. Always use <code>UserGroupGroupRoleUtil</code> to access the user group group role persistence. Modify <code>service.xml</code> and rerun ServiceBuilder to regenerate this class.
 	 */
-	public static final String FINDER_CLASS_NAME_ENTITY = UserGroupGroupRoleImpl.class.getName();
-	public static final String FINDER_CLASS_NAME_LIST_WITH_PAGINATION = FINDER_CLASS_NAME_ENTITY +
-		".List1";
-	public static final String FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION = FINDER_CLASS_NAME_ENTITY +
-		".List2";
-	public static final FinderPath FINDER_PATH_WITH_PAGINATION_FIND_ALL = new FinderPath(UserGroupGroupRoleModelImpl.ENTITY_CACHE_ENABLED,
-			UserGroupGroupRoleModelImpl.FINDER_CACHE_ENABLED,
-			UserGroupGroupRoleImpl.class,
-			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findAll", new String[0]);
-	public static final FinderPath FINDER_PATH_WITHOUT_PAGINATION_FIND_ALL = new FinderPath(UserGroupGroupRoleModelImpl.ENTITY_CACHE_ENABLED,
-			UserGroupGroupRoleModelImpl.FINDER_CACHE_ENABLED,
-			UserGroupGroupRoleImpl.class,
-			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findAll", new String[0]);
-	public static final FinderPath FINDER_PATH_COUNT_ALL = new FinderPath(UserGroupGroupRoleModelImpl.ENTITY_CACHE_ENABLED,
-			UserGroupGroupRoleModelImpl.FINDER_CACHE_ENABLED, Long.class,
-			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countAll", new String[0]);
-	public static final FinderPath FINDER_PATH_WITH_PAGINATION_FIND_BY_USERGROUPID =
-		new FinderPath(UserGroupGroupRoleModelImpl.ENTITY_CACHE_ENABLED,
-			UserGroupGroupRoleModelImpl.FINDER_CACHE_ENABLED,
-			UserGroupGroupRoleImpl.class,
-			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByUserGroupId",
-			new String[] {
-				Long.class.getName(),
-				
-			Integer.class.getName(), Integer.class.getName(),
-				OrderByComparator.class.getName()
-			});
-	public static final FinderPath FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_USERGROUPID =
-		new FinderPath(UserGroupGroupRoleModelImpl.ENTITY_CACHE_ENABLED,
-			UserGroupGroupRoleModelImpl.FINDER_CACHE_ENABLED,
-			UserGroupGroupRoleImpl.class,
-			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByUserGroupId",
-			new String[] { Long.class.getName() },
-			UserGroupGroupRoleModelImpl.USERGROUPID_COLUMN_BITMASK);
-	public static final FinderPath FINDER_PATH_COUNT_BY_USERGROUPID = new FinderPath(UserGroupGroupRoleModelImpl.ENTITY_CACHE_ENABLED,
-			UserGroupGroupRoleModelImpl.FINDER_CACHE_ENABLED, Long.class,
-			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByUserGroupId",
-			new String[] { Long.class.getName() });
+	public static final String FINDER_CLASS_NAME_ENTITY =
+		UserGroupGroupRoleImpl.class.getName();
+
+	public static final String FINDER_CLASS_NAME_LIST_WITH_PAGINATION =
+		FINDER_CLASS_NAME_ENTITY + ".List1";
+
+	public static final String FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION =
+		FINDER_CLASS_NAME_ENTITY + ".List2";
+
+	private FinderPath _finderPathWithPaginationFindAll;
+	private FinderPath _finderPathWithoutPaginationFindAll;
+	private FinderPath _finderPathCountAll;
+	private FinderPath _finderPathWithPaginationFindByUserGroupId;
+	private FinderPath _finderPathWithoutPaginationFindByUserGroupId;
+	private FinderPath _finderPathCountByUserGroupId;
 
 	/**
 	 * Returns all the user group group roles where userGroupId = &#63;.
@@ -117,15 +94,15 @@ public class UserGroupGroupRolePersistenceImpl extends BasePersistenceImpl<UserG
 	 */
 	@Override
 	public List<UserGroupGroupRole> findByUserGroupId(long userGroupId) {
-		return findByUserGroupId(userGroupId, QueryUtil.ALL_POS,
-			QueryUtil.ALL_POS, null);
+		return findByUserGroupId(
+			userGroupId, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
 	}
 
 	/**
 	 * Returns a range of all the user group group roles where userGroupId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link UserGroupGroupRoleModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>UserGroupGroupRoleModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param userGroupId the user group ID
@@ -134,8 +111,9 @@ public class UserGroupGroupRolePersistenceImpl extends BasePersistenceImpl<UserG
 	 * @return the range of matching user group group roles
 	 */
 	@Override
-	public List<UserGroupGroupRole> findByUserGroupId(long userGroupId,
-		int start, int end) {
+	public List<UserGroupGroupRole> findByUserGroupId(
+		long userGroupId, int start, int end) {
+
 		return findByUserGroupId(userGroupId, start, end, null);
 	}
 
@@ -143,7 +121,7 @@ public class UserGroupGroupRolePersistenceImpl extends BasePersistenceImpl<UserG
 	 * Returns an ordered range of all the user group group roles where userGroupId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link UserGroupGroupRoleModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>UserGroupGroupRoleModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param userGroupId the user group ID
@@ -153,18 +131,19 @@ public class UserGroupGroupRolePersistenceImpl extends BasePersistenceImpl<UserG
 	 * @return the ordered range of matching user group group roles
 	 */
 	@Override
-	public List<UserGroupGroupRole> findByUserGroupId(long userGroupId,
-		int start, int end,
+	public List<UserGroupGroupRole> findByUserGroupId(
+		long userGroupId, int start, int end,
 		OrderByComparator<UserGroupGroupRole> orderByComparator) {
-		return findByUserGroupId(userGroupId, start, end, orderByComparator,
-			true);
+
+		return findByUserGroupId(
+			userGroupId, start, end, orderByComparator, true);
 	}
 
 	/**
 	 * Returns an ordered range of all the user group group roles where userGroupId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link UserGroupGroupRoleModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>UserGroupGroupRoleModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param userGroupId the user group ID
@@ -175,30 +154,34 @@ public class UserGroupGroupRolePersistenceImpl extends BasePersistenceImpl<UserG
 	 * @return the ordered range of matching user group group roles
 	 */
 	@Override
-	public List<UserGroupGroupRole> findByUserGroupId(long userGroupId,
-		int start, int end,
+	public List<UserGroupGroupRole> findByUserGroupId(
+		long userGroupId, int start, int end,
 		OrderByComparator<UserGroupGroupRole> orderByComparator,
 		boolean retrieveFromCache) {
+
 		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
-				(orderByComparator == null)) {
+			(orderByComparator == null)) {
+
 			pagination = false;
-			finderPath = FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_USERGROUPID;
-			finderArgs = new Object[] { userGroupId };
+			finderPath = _finderPathWithoutPaginationFindByUserGroupId;
+			finderArgs = new Object[] {userGroupId};
 		}
 		else {
-			finderPath = FINDER_PATH_WITH_PAGINATION_FIND_BY_USERGROUPID;
-			finderArgs = new Object[] { userGroupId, start, end, orderByComparator };
+			finderPath = _finderPathWithPaginationFindByUserGroupId;
+			finderArgs = new Object[] {
+				userGroupId, start, end, orderByComparator
+			};
 		}
 
 		List<UserGroupGroupRole> list = null;
 
 		if (retrieveFromCache) {
-			list = (List<UserGroupGroupRole>)FinderCacheUtil.getResult(finderPath,
-					finderArgs, this);
+			list = (List<UserGroupGroupRole>)FinderCacheUtil.getResult(
+				finderPath, finderArgs, this);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (UserGroupGroupRole userGroupGroupRole : list) {
@@ -215,8 +198,8 @@ public class UserGroupGroupRolePersistenceImpl extends BasePersistenceImpl<UserG
 			StringBundler query = null;
 
 			if (orderByComparator != null) {
-				query = new StringBundler(3 +
-						(orderByComparator.getOrderByFields().length * 2));
+				query = new StringBundler(
+					3 + (orderByComparator.getOrderByFields().length * 2));
 			}
 			else {
 				query = new StringBundler(3);
@@ -227,11 +210,10 @@ public class UserGroupGroupRolePersistenceImpl extends BasePersistenceImpl<UserG
 			query.append(_FINDER_COLUMN_USERGROUPID_USERGROUPID_2);
 
 			if (orderByComparator != null) {
-				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
-					orderByComparator);
+				appendOrderByComparator(
+					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
 			}
-			else
-			 if (pagination) {
+			else if (pagination) {
 				query.append(UserGroupGroupRoleModelImpl.ORDER_BY_JPQL);
 			}
 
@@ -249,16 +231,16 @@ public class UserGroupGroupRolePersistenceImpl extends BasePersistenceImpl<UserG
 				qPos.add(userGroupId);
 
 				if (!pagination) {
-					list = (List<UserGroupGroupRole>)QueryUtil.list(q,
-							getDialect(), start, end, false);
+					list = (List<UserGroupGroupRole>)QueryUtil.list(
+						q, getDialect(), start, end, false);
 
 					Collections.sort(list);
 
 					list = Collections.unmodifiableList(list);
 				}
 				else {
-					list = (List<UserGroupGroupRole>)QueryUtil.list(q,
-							getDialect(), start, end);
+					list = (List<UserGroupGroupRole>)QueryUtil.list(
+						q, getDialect(), start, end);
 				}
 
 				cacheResult(list);
@@ -287,11 +269,13 @@ public class UserGroupGroupRolePersistenceImpl extends BasePersistenceImpl<UserG
 	 * @throws NoSuchUserGroupGroupRoleException if a matching user group group role could not be found
 	 */
 	@Override
-	public UserGroupGroupRole findByUserGroupId_First(long userGroupId,
-		OrderByComparator<UserGroupGroupRole> orderByComparator)
+	public UserGroupGroupRole findByUserGroupId_First(
+			long userGroupId,
+			OrderByComparator<UserGroupGroupRole> orderByComparator)
 		throws NoSuchUserGroupGroupRoleException {
-		UserGroupGroupRole userGroupGroupRole = fetchByUserGroupId_First(userGroupId,
-				orderByComparator);
+
+		UserGroupGroupRole userGroupGroupRole = fetchByUserGroupId_First(
+			userGroupId, orderByComparator);
 
 		if (userGroupGroupRole != null) {
 			return userGroupGroupRole;
@@ -317,10 +301,12 @@ public class UserGroupGroupRolePersistenceImpl extends BasePersistenceImpl<UserG
 	 * @return the first matching user group group role, or <code>null</code> if a matching user group group role could not be found
 	 */
 	@Override
-	public UserGroupGroupRole fetchByUserGroupId_First(long userGroupId,
+	public UserGroupGroupRole fetchByUserGroupId_First(
+		long userGroupId,
 		OrderByComparator<UserGroupGroupRole> orderByComparator) {
-		List<UserGroupGroupRole> list = findByUserGroupId(userGroupId, 0, 1,
-				orderByComparator);
+
+		List<UserGroupGroupRole> list = findByUserGroupId(
+			userGroupId, 0, 1, orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -338,11 +324,13 @@ public class UserGroupGroupRolePersistenceImpl extends BasePersistenceImpl<UserG
 	 * @throws NoSuchUserGroupGroupRoleException if a matching user group group role could not be found
 	 */
 	@Override
-	public UserGroupGroupRole findByUserGroupId_Last(long userGroupId,
-		OrderByComparator<UserGroupGroupRole> orderByComparator)
+	public UserGroupGroupRole findByUserGroupId_Last(
+			long userGroupId,
+			OrderByComparator<UserGroupGroupRole> orderByComparator)
 		throws NoSuchUserGroupGroupRoleException {
-		UserGroupGroupRole userGroupGroupRole = fetchByUserGroupId_Last(userGroupId,
-				orderByComparator);
+
+		UserGroupGroupRole userGroupGroupRole = fetchByUserGroupId_Last(
+			userGroupId, orderByComparator);
 
 		if (userGroupGroupRole != null) {
 			return userGroupGroupRole;
@@ -368,16 +356,18 @@ public class UserGroupGroupRolePersistenceImpl extends BasePersistenceImpl<UserG
 	 * @return the last matching user group group role, or <code>null</code> if a matching user group group role could not be found
 	 */
 	@Override
-	public UserGroupGroupRole fetchByUserGroupId_Last(long userGroupId,
+	public UserGroupGroupRole fetchByUserGroupId_Last(
+		long userGroupId,
 		OrderByComparator<UserGroupGroupRole> orderByComparator) {
+
 		int count = countByUserGroupId(userGroupId);
 
 		if (count == 0) {
 			return null;
 		}
 
-		List<UserGroupGroupRole> list = findByUserGroupId(userGroupId,
-				count - 1, count, orderByComparator);
+		List<UserGroupGroupRole> list = findByUserGroupId(
+			userGroupId, count - 1, count, orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -397,10 +387,12 @@ public class UserGroupGroupRolePersistenceImpl extends BasePersistenceImpl<UserG
 	 */
 	@Override
 	public UserGroupGroupRole[] findByUserGroupId_PrevAndNext(
-		UserGroupGroupRolePK userGroupGroupRolePK, long userGroupId,
-		OrderByComparator<UserGroupGroupRole> orderByComparator)
+			UserGroupGroupRolePK userGroupGroupRolePK, long userGroupId,
+			OrderByComparator<UserGroupGroupRole> orderByComparator)
 		throws NoSuchUserGroupGroupRoleException {
-		UserGroupGroupRole userGroupGroupRole = findByPrimaryKey(userGroupGroupRolePK);
+
+		UserGroupGroupRole userGroupGroupRole = findByPrimaryKey(
+			userGroupGroupRolePK);
 
 		Session session = null;
 
@@ -409,13 +401,15 @@ public class UserGroupGroupRolePersistenceImpl extends BasePersistenceImpl<UserG
 
 			UserGroupGroupRole[] array = new UserGroupGroupRoleImpl[3];
 
-			array[0] = getByUserGroupId_PrevAndNext(session,
-					userGroupGroupRole, userGroupId, orderByComparator, true);
+			array[0] = getByUserGroupId_PrevAndNext(
+				session, userGroupGroupRole, userGroupId, orderByComparator,
+				true);
 
 			array[1] = userGroupGroupRole;
 
-			array[2] = getByUserGroupId_PrevAndNext(session,
-					userGroupGroupRole, userGroupId, orderByComparator, false);
+			array[2] = getByUserGroupId_PrevAndNext(
+				session, userGroupGroupRole, userGroupId, orderByComparator,
+				false);
 
 			return array;
 		}
@@ -427,15 +421,17 @@ public class UserGroupGroupRolePersistenceImpl extends BasePersistenceImpl<UserG
 		}
 	}
 
-	protected UserGroupGroupRole getByUserGroupId_PrevAndNext(Session session,
-		UserGroupGroupRole userGroupGroupRole, long userGroupId,
+	protected UserGroupGroupRole getByUserGroupId_PrevAndNext(
+		Session session, UserGroupGroupRole userGroupGroupRole,
+		long userGroupId,
 		OrderByComparator<UserGroupGroupRole> orderByComparator,
 		boolean previous) {
+
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(4 +
-					(orderByComparator.getOrderByConditionFields().length * 3) +
+			query = new StringBundler(
+				4 + (orderByComparator.getOrderByConditionFields().length * 3) +
 					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
@@ -447,7 +443,8 @@ public class UserGroupGroupRolePersistenceImpl extends BasePersistenceImpl<UserG
 		query.append(_FINDER_COLUMN_USERGROUPID_USERGROUPID_2);
 
 		if (orderByComparator != null) {
-			String[] orderByConditionFields = orderByComparator.getOrderByConditionFields();
+			String[] orderByConditionFields =
+				orderByComparator.getOrderByConditionFields();
 
 			if (orderByConditionFields.length > 0) {
 				query.append(WHERE_AND);
@@ -517,10 +514,11 @@ public class UserGroupGroupRolePersistenceImpl extends BasePersistenceImpl<UserG
 		qPos.add(userGroupId);
 
 		if (orderByComparator != null) {
-			Object[] values = orderByComparator.getOrderByConditionValues(userGroupGroupRole);
+			for (Object orderByConditionValue :
+					orderByComparator.getOrderByConditionValues(
+						userGroupGroupRole)) {
 
-			for (Object value : values) {
-				qPos.add(value);
+				qPos.add(orderByConditionValue);
 			}
 		}
 
@@ -541,8 +539,10 @@ public class UserGroupGroupRolePersistenceImpl extends BasePersistenceImpl<UserG
 	 */
 	@Override
 	public void removeByUserGroupId(long userGroupId) {
-		for (UserGroupGroupRole userGroupGroupRole : findByUserGroupId(
-				userGroupId, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null)) {
+		for (UserGroupGroupRole userGroupGroupRole :
+				findByUserGroupId(
+					userGroupId, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null)) {
+
 			remove(userGroupGroupRole);
 		}
 	}
@@ -555,12 +555,12 @@ public class UserGroupGroupRolePersistenceImpl extends BasePersistenceImpl<UserG
 	 */
 	@Override
 	public int countByUserGroupId(long userGroupId) {
-		FinderPath finderPath = FINDER_PATH_COUNT_BY_USERGROUPID;
+		FinderPath finderPath = _finderPathCountByUserGroupId;
 
-		Object[] finderArgs = new Object[] { userGroupId };
+		Object[] finderArgs = new Object[] {userGroupId};
 
-		Long count = (Long)FinderCacheUtil.getResult(finderPath, finderArgs,
-				this);
+		Long count = (Long)FinderCacheUtil.getResult(
+			finderPath, finderArgs, this);
 
 		if (count == null) {
 			StringBundler query = new StringBundler(2);
@@ -599,28 +599,12 @@ public class UserGroupGroupRolePersistenceImpl extends BasePersistenceImpl<UserG
 		return count.intValue();
 	}
 
-	private static final String _FINDER_COLUMN_USERGROUPID_USERGROUPID_2 = "userGroupGroupRole.id.userGroupId = ?";
-	public static final FinderPath FINDER_PATH_WITH_PAGINATION_FIND_BY_GROUPID = new FinderPath(UserGroupGroupRoleModelImpl.ENTITY_CACHE_ENABLED,
-			UserGroupGroupRoleModelImpl.FINDER_CACHE_ENABLED,
-			UserGroupGroupRoleImpl.class,
-			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByGroupId",
-			new String[] {
-				Long.class.getName(),
-				
-			Integer.class.getName(), Integer.class.getName(),
-				OrderByComparator.class.getName()
-			});
-	public static final FinderPath FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_GROUPID =
-		new FinderPath(UserGroupGroupRoleModelImpl.ENTITY_CACHE_ENABLED,
-			UserGroupGroupRoleModelImpl.FINDER_CACHE_ENABLED,
-			UserGroupGroupRoleImpl.class,
-			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByGroupId",
-			new String[] { Long.class.getName() },
-			UserGroupGroupRoleModelImpl.GROUPID_COLUMN_BITMASK);
-	public static final FinderPath FINDER_PATH_COUNT_BY_GROUPID = new FinderPath(UserGroupGroupRoleModelImpl.ENTITY_CACHE_ENABLED,
-			UserGroupGroupRoleModelImpl.FINDER_CACHE_ENABLED, Long.class,
-			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByGroupId",
-			new String[] { Long.class.getName() });
+	private static final String _FINDER_COLUMN_USERGROUPID_USERGROUPID_2 =
+		"userGroupGroupRole.id.userGroupId = ?";
+
+	private FinderPath _finderPathWithPaginationFindByGroupId;
+	private FinderPath _finderPathWithoutPaginationFindByGroupId;
+	private FinderPath _finderPathCountByGroupId;
 
 	/**
 	 * Returns all the user group group roles where groupId = &#63;.
@@ -630,14 +614,15 @@ public class UserGroupGroupRolePersistenceImpl extends BasePersistenceImpl<UserG
 	 */
 	@Override
 	public List<UserGroupGroupRole> findByGroupId(long groupId) {
-		return findByGroupId(groupId, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
+		return findByGroupId(
+			groupId, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
 	}
 
 	/**
 	 * Returns a range of all the user group group roles where groupId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link UserGroupGroupRoleModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>UserGroupGroupRoleModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param groupId the group ID
@@ -646,8 +631,9 @@ public class UserGroupGroupRolePersistenceImpl extends BasePersistenceImpl<UserG
 	 * @return the range of matching user group group roles
 	 */
 	@Override
-	public List<UserGroupGroupRole> findByGroupId(long groupId, int start,
-		int end) {
+	public List<UserGroupGroupRole> findByGroupId(
+		long groupId, int start, int end) {
+
 		return findByGroupId(groupId, start, end, null);
 	}
 
@@ -655,7 +641,7 @@ public class UserGroupGroupRolePersistenceImpl extends BasePersistenceImpl<UserG
 	 * Returns an ordered range of all the user group group roles where groupId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link UserGroupGroupRoleModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>UserGroupGroupRoleModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param groupId the group ID
@@ -665,8 +651,10 @@ public class UserGroupGroupRolePersistenceImpl extends BasePersistenceImpl<UserG
 	 * @return the ordered range of matching user group group roles
 	 */
 	@Override
-	public List<UserGroupGroupRole> findByGroupId(long groupId, int start,
-		int end, OrderByComparator<UserGroupGroupRole> orderByComparator) {
+	public List<UserGroupGroupRole> findByGroupId(
+		long groupId, int start, int end,
+		OrderByComparator<UserGroupGroupRole> orderByComparator) {
+
 		return findByGroupId(groupId, start, end, orderByComparator, true);
 	}
 
@@ -674,7 +662,7 @@ public class UserGroupGroupRolePersistenceImpl extends BasePersistenceImpl<UserG
 	 * Returns an ordered range of all the user group group roles where groupId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link UserGroupGroupRoleModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>UserGroupGroupRoleModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param groupId the group ID
@@ -685,29 +673,32 @@ public class UserGroupGroupRolePersistenceImpl extends BasePersistenceImpl<UserG
 	 * @return the ordered range of matching user group group roles
 	 */
 	@Override
-	public List<UserGroupGroupRole> findByGroupId(long groupId, int start,
-		int end, OrderByComparator<UserGroupGroupRole> orderByComparator,
+	public List<UserGroupGroupRole> findByGroupId(
+		long groupId, int start, int end,
+		OrderByComparator<UserGroupGroupRole> orderByComparator,
 		boolean retrieveFromCache) {
+
 		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
-				(orderByComparator == null)) {
+			(orderByComparator == null)) {
+
 			pagination = false;
-			finderPath = FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_GROUPID;
-			finderArgs = new Object[] { groupId };
+			finderPath = _finderPathWithoutPaginationFindByGroupId;
+			finderArgs = new Object[] {groupId};
 		}
 		else {
-			finderPath = FINDER_PATH_WITH_PAGINATION_FIND_BY_GROUPID;
-			finderArgs = new Object[] { groupId, start, end, orderByComparator };
+			finderPath = _finderPathWithPaginationFindByGroupId;
+			finderArgs = new Object[] {groupId, start, end, orderByComparator};
 		}
 
 		List<UserGroupGroupRole> list = null;
 
 		if (retrieveFromCache) {
-			list = (List<UserGroupGroupRole>)FinderCacheUtil.getResult(finderPath,
-					finderArgs, this);
+			list = (List<UserGroupGroupRole>)FinderCacheUtil.getResult(
+				finderPath, finderArgs, this);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (UserGroupGroupRole userGroupGroupRole : list) {
@@ -724,8 +715,8 @@ public class UserGroupGroupRolePersistenceImpl extends BasePersistenceImpl<UserG
 			StringBundler query = null;
 
 			if (orderByComparator != null) {
-				query = new StringBundler(3 +
-						(orderByComparator.getOrderByFields().length * 2));
+				query = new StringBundler(
+					3 + (orderByComparator.getOrderByFields().length * 2));
 			}
 			else {
 				query = new StringBundler(3);
@@ -736,11 +727,10 @@ public class UserGroupGroupRolePersistenceImpl extends BasePersistenceImpl<UserG
 			query.append(_FINDER_COLUMN_GROUPID_GROUPID_2);
 
 			if (orderByComparator != null) {
-				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
-					orderByComparator);
+				appendOrderByComparator(
+					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
 			}
-			else
-			 if (pagination) {
+			else if (pagination) {
 				query.append(UserGroupGroupRoleModelImpl.ORDER_BY_JPQL);
 			}
 
@@ -758,16 +748,16 @@ public class UserGroupGroupRolePersistenceImpl extends BasePersistenceImpl<UserG
 				qPos.add(groupId);
 
 				if (!pagination) {
-					list = (List<UserGroupGroupRole>)QueryUtil.list(q,
-							getDialect(), start, end, false);
+					list = (List<UserGroupGroupRole>)QueryUtil.list(
+						q, getDialect(), start, end, false);
 
 					Collections.sort(list);
 
 					list = Collections.unmodifiableList(list);
 				}
 				else {
-					list = (List<UserGroupGroupRole>)QueryUtil.list(q,
-							getDialect(), start, end);
+					list = (List<UserGroupGroupRole>)QueryUtil.list(
+						q, getDialect(), start, end);
 				}
 
 				cacheResult(list);
@@ -796,11 +786,13 @@ public class UserGroupGroupRolePersistenceImpl extends BasePersistenceImpl<UserG
 	 * @throws NoSuchUserGroupGroupRoleException if a matching user group group role could not be found
 	 */
 	@Override
-	public UserGroupGroupRole findByGroupId_First(long groupId,
-		OrderByComparator<UserGroupGroupRole> orderByComparator)
+	public UserGroupGroupRole findByGroupId_First(
+			long groupId,
+			OrderByComparator<UserGroupGroupRole> orderByComparator)
 		throws NoSuchUserGroupGroupRoleException {
-		UserGroupGroupRole userGroupGroupRole = fetchByGroupId_First(groupId,
-				orderByComparator);
+
+		UserGroupGroupRole userGroupGroupRole = fetchByGroupId_First(
+			groupId, orderByComparator);
 
 		if (userGroupGroupRole != null) {
 			return userGroupGroupRole;
@@ -826,10 +818,11 @@ public class UserGroupGroupRolePersistenceImpl extends BasePersistenceImpl<UserG
 	 * @return the first matching user group group role, or <code>null</code> if a matching user group group role could not be found
 	 */
 	@Override
-	public UserGroupGroupRole fetchByGroupId_First(long groupId,
-		OrderByComparator<UserGroupGroupRole> orderByComparator) {
-		List<UserGroupGroupRole> list = findByGroupId(groupId, 0, 1,
-				orderByComparator);
+	public UserGroupGroupRole fetchByGroupId_First(
+		long groupId, OrderByComparator<UserGroupGroupRole> orderByComparator) {
+
+		List<UserGroupGroupRole> list = findByGroupId(
+			groupId, 0, 1, orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -847,11 +840,13 @@ public class UserGroupGroupRolePersistenceImpl extends BasePersistenceImpl<UserG
 	 * @throws NoSuchUserGroupGroupRoleException if a matching user group group role could not be found
 	 */
 	@Override
-	public UserGroupGroupRole findByGroupId_Last(long groupId,
-		OrderByComparator<UserGroupGroupRole> orderByComparator)
+	public UserGroupGroupRole findByGroupId_Last(
+			long groupId,
+			OrderByComparator<UserGroupGroupRole> orderByComparator)
 		throws NoSuchUserGroupGroupRoleException {
-		UserGroupGroupRole userGroupGroupRole = fetchByGroupId_Last(groupId,
-				orderByComparator);
+
+		UserGroupGroupRole userGroupGroupRole = fetchByGroupId_Last(
+			groupId, orderByComparator);
 
 		if (userGroupGroupRole != null) {
 			return userGroupGroupRole;
@@ -877,16 +872,17 @@ public class UserGroupGroupRolePersistenceImpl extends BasePersistenceImpl<UserG
 	 * @return the last matching user group group role, or <code>null</code> if a matching user group group role could not be found
 	 */
 	@Override
-	public UserGroupGroupRole fetchByGroupId_Last(long groupId,
-		OrderByComparator<UserGroupGroupRole> orderByComparator) {
+	public UserGroupGroupRole fetchByGroupId_Last(
+		long groupId, OrderByComparator<UserGroupGroupRole> orderByComparator) {
+
 		int count = countByGroupId(groupId);
 
 		if (count == 0) {
 			return null;
 		}
 
-		List<UserGroupGroupRole> list = findByGroupId(groupId, count - 1,
-				count, orderByComparator);
+		List<UserGroupGroupRole> list = findByGroupId(
+			groupId, count - 1, count, orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -906,10 +902,12 @@ public class UserGroupGroupRolePersistenceImpl extends BasePersistenceImpl<UserG
 	 */
 	@Override
 	public UserGroupGroupRole[] findByGroupId_PrevAndNext(
-		UserGroupGroupRolePK userGroupGroupRolePK, long groupId,
-		OrderByComparator<UserGroupGroupRole> orderByComparator)
+			UserGroupGroupRolePK userGroupGroupRolePK, long groupId,
+			OrderByComparator<UserGroupGroupRole> orderByComparator)
 		throws NoSuchUserGroupGroupRoleException {
-		UserGroupGroupRole userGroupGroupRole = findByPrimaryKey(userGroupGroupRolePK);
+
+		UserGroupGroupRole userGroupGroupRole = findByPrimaryKey(
+			userGroupGroupRolePK);
 
 		Session session = null;
 
@@ -918,13 +916,13 @@ public class UserGroupGroupRolePersistenceImpl extends BasePersistenceImpl<UserG
 
 			UserGroupGroupRole[] array = new UserGroupGroupRoleImpl[3];
 
-			array[0] = getByGroupId_PrevAndNext(session, userGroupGroupRole,
-					groupId, orderByComparator, true);
+			array[0] = getByGroupId_PrevAndNext(
+				session, userGroupGroupRole, groupId, orderByComparator, true);
 
 			array[1] = userGroupGroupRole;
 
-			array[2] = getByGroupId_PrevAndNext(session, userGroupGroupRole,
-					groupId, orderByComparator, false);
+			array[2] = getByGroupId_PrevAndNext(
+				session, userGroupGroupRole, groupId, orderByComparator, false);
 
 			return array;
 		}
@@ -936,15 +934,16 @@ public class UserGroupGroupRolePersistenceImpl extends BasePersistenceImpl<UserG
 		}
 	}
 
-	protected UserGroupGroupRole getByGroupId_PrevAndNext(Session session,
-		UserGroupGroupRole userGroupGroupRole, long groupId,
+	protected UserGroupGroupRole getByGroupId_PrevAndNext(
+		Session session, UserGroupGroupRole userGroupGroupRole, long groupId,
 		OrderByComparator<UserGroupGroupRole> orderByComparator,
 		boolean previous) {
+
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(4 +
-					(orderByComparator.getOrderByConditionFields().length * 3) +
+			query = new StringBundler(
+				4 + (orderByComparator.getOrderByConditionFields().length * 3) +
 					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
@@ -956,7 +955,8 @@ public class UserGroupGroupRolePersistenceImpl extends BasePersistenceImpl<UserG
 		query.append(_FINDER_COLUMN_GROUPID_GROUPID_2);
 
 		if (orderByComparator != null) {
-			String[] orderByConditionFields = orderByComparator.getOrderByConditionFields();
+			String[] orderByConditionFields =
+				orderByComparator.getOrderByConditionFields();
 
 			if (orderByConditionFields.length > 0) {
 				query.append(WHERE_AND);
@@ -1026,10 +1026,11 @@ public class UserGroupGroupRolePersistenceImpl extends BasePersistenceImpl<UserG
 		qPos.add(groupId);
 
 		if (orderByComparator != null) {
-			Object[] values = orderByComparator.getOrderByConditionValues(userGroupGroupRole);
+			for (Object orderByConditionValue :
+					orderByComparator.getOrderByConditionValues(
+						userGroupGroupRole)) {
 
-			for (Object value : values) {
-				qPos.add(value);
+				qPos.add(orderByConditionValue);
 			}
 		}
 
@@ -1050,8 +1051,10 @@ public class UserGroupGroupRolePersistenceImpl extends BasePersistenceImpl<UserG
 	 */
 	@Override
 	public void removeByGroupId(long groupId) {
-		for (UserGroupGroupRole userGroupGroupRole : findByGroupId(groupId,
-				QueryUtil.ALL_POS, QueryUtil.ALL_POS, null)) {
+		for (UserGroupGroupRole userGroupGroupRole :
+				findByGroupId(
+					groupId, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null)) {
+
 			remove(userGroupGroupRole);
 		}
 	}
@@ -1064,12 +1067,12 @@ public class UserGroupGroupRolePersistenceImpl extends BasePersistenceImpl<UserG
 	 */
 	@Override
 	public int countByGroupId(long groupId) {
-		FinderPath finderPath = FINDER_PATH_COUNT_BY_GROUPID;
+		FinderPath finderPath = _finderPathCountByGroupId;
 
-		Object[] finderArgs = new Object[] { groupId };
+		Object[] finderArgs = new Object[] {groupId};
 
-		Long count = (Long)FinderCacheUtil.getResult(finderPath, finderArgs,
-				this);
+		Long count = (Long)FinderCacheUtil.getResult(
+			finderPath, finderArgs, this);
 
 		if (count == null) {
 			StringBundler query = new StringBundler(2);
@@ -1108,28 +1111,12 @@ public class UserGroupGroupRolePersistenceImpl extends BasePersistenceImpl<UserG
 		return count.intValue();
 	}
 
-	private static final String _FINDER_COLUMN_GROUPID_GROUPID_2 = "userGroupGroupRole.id.groupId = ?";
-	public static final FinderPath FINDER_PATH_WITH_PAGINATION_FIND_BY_ROLEID = new FinderPath(UserGroupGroupRoleModelImpl.ENTITY_CACHE_ENABLED,
-			UserGroupGroupRoleModelImpl.FINDER_CACHE_ENABLED,
-			UserGroupGroupRoleImpl.class,
-			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByRoleId",
-			new String[] {
-				Long.class.getName(),
-				
-			Integer.class.getName(), Integer.class.getName(),
-				OrderByComparator.class.getName()
-			});
-	public static final FinderPath FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_ROLEID =
-		new FinderPath(UserGroupGroupRoleModelImpl.ENTITY_CACHE_ENABLED,
-			UserGroupGroupRoleModelImpl.FINDER_CACHE_ENABLED,
-			UserGroupGroupRoleImpl.class,
-			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByRoleId",
-			new String[] { Long.class.getName() },
-			UserGroupGroupRoleModelImpl.ROLEID_COLUMN_BITMASK);
-	public static final FinderPath FINDER_PATH_COUNT_BY_ROLEID = new FinderPath(UserGroupGroupRoleModelImpl.ENTITY_CACHE_ENABLED,
-			UserGroupGroupRoleModelImpl.FINDER_CACHE_ENABLED, Long.class,
-			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByRoleId",
-			new String[] { Long.class.getName() });
+	private static final String _FINDER_COLUMN_GROUPID_GROUPID_2 =
+		"userGroupGroupRole.id.groupId = ?";
+
+	private FinderPath _finderPathWithPaginationFindByRoleId;
+	private FinderPath _finderPathWithoutPaginationFindByRoleId;
+	private FinderPath _finderPathCountByRoleId;
 
 	/**
 	 * Returns all the user group group roles where roleId = &#63;.
@@ -1146,7 +1133,7 @@ public class UserGroupGroupRolePersistenceImpl extends BasePersistenceImpl<UserG
 	 * Returns a range of all the user group group roles where roleId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link UserGroupGroupRoleModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>UserGroupGroupRoleModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param roleId the role ID
@@ -1155,7 +1142,9 @@ public class UserGroupGroupRolePersistenceImpl extends BasePersistenceImpl<UserG
 	 * @return the range of matching user group group roles
 	 */
 	@Override
-	public List<UserGroupGroupRole> findByRoleId(long roleId, int start, int end) {
+	public List<UserGroupGroupRole> findByRoleId(
+		long roleId, int start, int end) {
+
 		return findByRoleId(roleId, start, end, null);
 	}
 
@@ -1163,7 +1152,7 @@ public class UserGroupGroupRolePersistenceImpl extends BasePersistenceImpl<UserG
 	 * Returns an ordered range of all the user group group roles where roleId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link UserGroupGroupRoleModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>UserGroupGroupRoleModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param roleId the role ID
@@ -1173,8 +1162,10 @@ public class UserGroupGroupRolePersistenceImpl extends BasePersistenceImpl<UserG
 	 * @return the ordered range of matching user group group roles
 	 */
 	@Override
-	public List<UserGroupGroupRole> findByRoleId(long roleId, int start,
-		int end, OrderByComparator<UserGroupGroupRole> orderByComparator) {
+	public List<UserGroupGroupRole> findByRoleId(
+		long roleId, int start, int end,
+		OrderByComparator<UserGroupGroupRole> orderByComparator) {
+
 		return findByRoleId(roleId, start, end, orderByComparator, true);
 	}
 
@@ -1182,7 +1173,7 @@ public class UserGroupGroupRolePersistenceImpl extends BasePersistenceImpl<UserG
 	 * Returns an ordered range of all the user group group roles where roleId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link UserGroupGroupRoleModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>UserGroupGroupRoleModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param roleId the role ID
@@ -1193,29 +1184,32 @@ public class UserGroupGroupRolePersistenceImpl extends BasePersistenceImpl<UserG
 	 * @return the ordered range of matching user group group roles
 	 */
 	@Override
-	public List<UserGroupGroupRole> findByRoleId(long roleId, int start,
-		int end, OrderByComparator<UserGroupGroupRole> orderByComparator,
+	public List<UserGroupGroupRole> findByRoleId(
+		long roleId, int start, int end,
+		OrderByComparator<UserGroupGroupRole> orderByComparator,
 		boolean retrieveFromCache) {
+
 		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
-				(orderByComparator == null)) {
+			(orderByComparator == null)) {
+
 			pagination = false;
-			finderPath = FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_ROLEID;
-			finderArgs = new Object[] { roleId };
+			finderPath = _finderPathWithoutPaginationFindByRoleId;
+			finderArgs = new Object[] {roleId};
 		}
 		else {
-			finderPath = FINDER_PATH_WITH_PAGINATION_FIND_BY_ROLEID;
-			finderArgs = new Object[] { roleId, start, end, orderByComparator };
+			finderPath = _finderPathWithPaginationFindByRoleId;
+			finderArgs = new Object[] {roleId, start, end, orderByComparator};
 		}
 
 		List<UserGroupGroupRole> list = null;
 
 		if (retrieveFromCache) {
-			list = (List<UserGroupGroupRole>)FinderCacheUtil.getResult(finderPath,
-					finderArgs, this);
+			list = (List<UserGroupGroupRole>)FinderCacheUtil.getResult(
+				finderPath, finderArgs, this);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (UserGroupGroupRole userGroupGroupRole : list) {
@@ -1232,8 +1226,8 @@ public class UserGroupGroupRolePersistenceImpl extends BasePersistenceImpl<UserG
 			StringBundler query = null;
 
 			if (orderByComparator != null) {
-				query = new StringBundler(3 +
-						(orderByComparator.getOrderByFields().length * 2));
+				query = new StringBundler(
+					3 + (orderByComparator.getOrderByFields().length * 2));
 			}
 			else {
 				query = new StringBundler(3);
@@ -1244,11 +1238,10 @@ public class UserGroupGroupRolePersistenceImpl extends BasePersistenceImpl<UserG
 			query.append(_FINDER_COLUMN_ROLEID_ROLEID_2);
 
 			if (orderByComparator != null) {
-				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
-					orderByComparator);
+				appendOrderByComparator(
+					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
 			}
-			else
-			 if (pagination) {
+			else if (pagination) {
 				query.append(UserGroupGroupRoleModelImpl.ORDER_BY_JPQL);
 			}
 
@@ -1266,16 +1259,16 @@ public class UserGroupGroupRolePersistenceImpl extends BasePersistenceImpl<UserG
 				qPos.add(roleId);
 
 				if (!pagination) {
-					list = (List<UserGroupGroupRole>)QueryUtil.list(q,
-							getDialect(), start, end, false);
+					list = (List<UserGroupGroupRole>)QueryUtil.list(
+						q, getDialect(), start, end, false);
 
 					Collections.sort(list);
 
 					list = Collections.unmodifiableList(list);
 				}
 				else {
-					list = (List<UserGroupGroupRole>)QueryUtil.list(q,
-							getDialect(), start, end);
+					list = (List<UserGroupGroupRole>)QueryUtil.list(
+						q, getDialect(), start, end);
 				}
 
 				cacheResult(list);
@@ -1304,11 +1297,13 @@ public class UserGroupGroupRolePersistenceImpl extends BasePersistenceImpl<UserG
 	 * @throws NoSuchUserGroupGroupRoleException if a matching user group group role could not be found
 	 */
 	@Override
-	public UserGroupGroupRole findByRoleId_First(long roleId,
-		OrderByComparator<UserGroupGroupRole> orderByComparator)
+	public UserGroupGroupRole findByRoleId_First(
+			long roleId,
+			OrderByComparator<UserGroupGroupRole> orderByComparator)
 		throws NoSuchUserGroupGroupRoleException {
-		UserGroupGroupRole userGroupGroupRole = fetchByRoleId_First(roleId,
-				orderByComparator);
+
+		UserGroupGroupRole userGroupGroupRole = fetchByRoleId_First(
+			roleId, orderByComparator);
 
 		if (userGroupGroupRole != null) {
 			return userGroupGroupRole;
@@ -1334,10 +1329,11 @@ public class UserGroupGroupRolePersistenceImpl extends BasePersistenceImpl<UserG
 	 * @return the first matching user group group role, or <code>null</code> if a matching user group group role could not be found
 	 */
 	@Override
-	public UserGroupGroupRole fetchByRoleId_First(long roleId,
-		OrderByComparator<UserGroupGroupRole> orderByComparator) {
-		List<UserGroupGroupRole> list = findByRoleId(roleId, 0, 1,
-				orderByComparator);
+	public UserGroupGroupRole fetchByRoleId_First(
+		long roleId, OrderByComparator<UserGroupGroupRole> orderByComparator) {
+
+		List<UserGroupGroupRole> list = findByRoleId(
+			roleId, 0, 1, orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -1355,11 +1351,13 @@ public class UserGroupGroupRolePersistenceImpl extends BasePersistenceImpl<UserG
 	 * @throws NoSuchUserGroupGroupRoleException if a matching user group group role could not be found
 	 */
 	@Override
-	public UserGroupGroupRole findByRoleId_Last(long roleId,
-		OrderByComparator<UserGroupGroupRole> orderByComparator)
+	public UserGroupGroupRole findByRoleId_Last(
+			long roleId,
+			OrderByComparator<UserGroupGroupRole> orderByComparator)
 		throws NoSuchUserGroupGroupRoleException {
-		UserGroupGroupRole userGroupGroupRole = fetchByRoleId_Last(roleId,
-				orderByComparator);
+
+		UserGroupGroupRole userGroupGroupRole = fetchByRoleId_Last(
+			roleId, orderByComparator);
 
 		if (userGroupGroupRole != null) {
 			return userGroupGroupRole;
@@ -1385,16 +1383,17 @@ public class UserGroupGroupRolePersistenceImpl extends BasePersistenceImpl<UserG
 	 * @return the last matching user group group role, or <code>null</code> if a matching user group group role could not be found
 	 */
 	@Override
-	public UserGroupGroupRole fetchByRoleId_Last(long roleId,
-		OrderByComparator<UserGroupGroupRole> orderByComparator) {
+	public UserGroupGroupRole fetchByRoleId_Last(
+		long roleId, OrderByComparator<UserGroupGroupRole> orderByComparator) {
+
 		int count = countByRoleId(roleId);
 
 		if (count == 0) {
 			return null;
 		}
 
-		List<UserGroupGroupRole> list = findByRoleId(roleId, count - 1, count,
-				orderByComparator);
+		List<UserGroupGroupRole> list = findByRoleId(
+			roleId, count - 1, count, orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -1414,10 +1413,12 @@ public class UserGroupGroupRolePersistenceImpl extends BasePersistenceImpl<UserG
 	 */
 	@Override
 	public UserGroupGroupRole[] findByRoleId_PrevAndNext(
-		UserGroupGroupRolePK userGroupGroupRolePK, long roleId,
-		OrderByComparator<UserGroupGroupRole> orderByComparator)
+			UserGroupGroupRolePK userGroupGroupRolePK, long roleId,
+			OrderByComparator<UserGroupGroupRole> orderByComparator)
 		throws NoSuchUserGroupGroupRoleException {
-		UserGroupGroupRole userGroupGroupRole = findByPrimaryKey(userGroupGroupRolePK);
+
+		UserGroupGroupRole userGroupGroupRole = findByPrimaryKey(
+			userGroupGroupRolePK);
 
 		Session session = null;
 
@@ -1426,13 +1427,13 @@ public class UserGroupGroupRolePersistenceImpl extends BasePersistenceImpl<UserG
 
 			UserGroupGroupRole[] array = new UserGroupGroupRoleImpl[3];
 
-			array[0] = getByRoleId_PrevAndNext(session, userGroupGroupRole,
-					roleId, orderByComparator, true);
+			array[0] = getByRoleId_PrevAndNext(
+				session, userGroupGroupRole, roleId, orderByComparator, true);
 
 			array[1] = userGroupGroupRole;
 
-			array[2] = getByRoleId_PrevAndNext(session, userGroupGroupRole,
-					roleId, orderByComparator, false);
+			array[2] = getByRoleId_PrevAndNext(
+				session, userGroupGroupRole, roleId, orderByComparator, false);
 
 			return array;
 		}
@@ -1444,15 +1445,16 @@ public class UserGroupGroupRolePersistenceImpl extends BasePersistenceImpl<UserG
 		}
 	}
 
-	protected UserGroupGroupRole getByRoleId_PrevAndNext(Session session,
-		UserGroupGroupRole userGroupGroupRole, long roleId,
+	protected UserGroupGroupRole getByRoleId_PrevAndNext(
+		Session session, UserGroupGroupRole userGroupGroupRole, long roleId,
 		OrderByComparator<UserGroupGroupRole> orderByComparator,
 		boolean previous) {
+
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(4 +
-					(orderByComparator.getOrderByConditionFields().length * 3) +
+			query = new StringBundler(
+				4 + (orderByComparator.getOrderByConditionFields().length * 3) +
 					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
@@ -1464,7 +1466,8 @@ public class UserGroupGroupRolePersistenceImpl extends BasePersistenceImpl<UserG
 		query.append(_FINDER_COLUMN_ROLEID_ROLEID_2);
 
 		if (orderByComparator != null) {
-			String[] orderByConditionFields = orderByComparator.getOrderByConditionFields();
+			String[] orderByConditionFields =
+				orderByComparator.getOrderByConditionFields();
 
 			if (orderByConditionFields.length > 0) {
 				query.append(WHERE_AND);
@@ -1534,10 +1537,11 @@ public class UserGroupGroupRolePersistenceImpl extends BasePersistenceImpl<UserG
 		qPos.add(roleId);
 
 		if (orderByComparator != null) {
-			Object[] values = orderByComparator.getOrderByConditionValues(userGroupGroupRole);
+			for (Object orderByConditionValue :
+					orderByComparator.getOrderByConditionValues(
+						userGroupGroupRole)) {
 
-			for (Object value : values) {
-				qPos.add(value);
+				qPos.add(orderByConditionValue);
 			}
 		}
 
@@ -1558,8 +1562,10 @@ public class UserGroupGroupRolePersistenceImpl extends BasePersistenceImpl<UserG
 	 */
 	@Override
 	public void removeByRoleId(long roleId) {
-		for (UserGroupGroupRole userGroupGroupRole : findByRoleId(roleId,
-				QueryUtil.ALL_POS, QueryUtil.ALL_POS, null)) {
+		for (UserGroupGroupRole userGroupGroupRole :
+				findByRoleId(
+					roleId, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null)) {
+
 			remove(userGroupGroupRole);
 		}
 	}
@@ -1572,12 +1578,12 @@ public class UserGroupGroupRolePersistenceImpl extends BasePersistenceImpl<UserG
 	 */
 	@Override
 	public int countByRoleId(long roleId) {
-		FinderPath finderPath = FINDER_PATH_COUNT_BY_ROLEID;
+		FinderPath finderPath = _finderPathCountByRoleId;
 
-		Object[] finderArgs = new Object[] { roleId };
+		Object[] finderArgs = new Object[] {roleId};
 
-		Long count = (Long)FinderCacheUtil.getResult(finderPath, finderArgs,
-				this);
+		Long count = (Long)FinderCacheUtil.getResult(
+			finderPath, finderArgs, this);
 
 		if (count == null) {
 			StringBundler query = new StringBundler(2);
@@ -1616,28 +1622,12 @@ public class UserGroupGroupRolePersistenceImpl extends BasePersistenceImpl<UserG
 		return count.intValue();
 	}
 
-	private static final String _FINDER_COLUMN_ROLEID_ROLEID_2 = "userGroupGroupRole.id.roleId = ?";
-	public static final FinderPath FINDER_PATH_WITH_PAGINATION_FIND_BY_U_G = new FinderPath(UserGroupGroupRoleModelImpl.ENTITY_CACHE_ENABLED,
-			UserGroupGroupRoleModelImpl.FINDER_CACHE_ENABLED,
-			UserGroupGroupRoleImpl.class,
-			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByU_G",
-			new String[] {
-				Long.class.getName(), Long.class.getName(),
-				
-			Integer.class.getName(), Integer.class.getName(),
-				OrderByComparator.class.getName()
-			});
-	public static final FinderPath FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_U_G = new FinderPath(UserGroupGroupRoleModelImpl.ENTITY_CACHE_ENABLED,
-			UserGroupGroupRoleModelImpl.FINDER_CACHE_ENABLED,
-			UserGroupGroupRoleImpl.class,
-			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByU_G",
-			new String[] { Long.class.getName(), Long.class.getName() },
-			UserGroupGroupRoleModelImpl.USERGROUPID_COLUMN_BITMASK |
-			UserGroupGroupRoleModelImpl.GROUPID_COLUMN_BITMASK);
-	public static final FinderPath FINDER_PATH_COUNT_BY_U_G = new FinderPath(UserGroupGroupRoleModelImpl.ENTITY_CACHE_ENABLED,
-			UserGroupGroupRoleModelImpl.FINDER_CACHE_ENABLED, Long.class,
-			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByU_G",
-			new String[] { Long.class.getName(), Long.class.getName() });
+	private static final String _FINDER_COLUMN_ROLEID_ROLEID_2 =
+		"userGroupGroupRole.id.roleId = ?";
+
+	private FinderPath _finderPathWithPaginationFindByU_G;
+	private FinderPath _finderPathWithoutPaginationFindByU_G;
+	private FinderPath _finderPathCountByU_G;
 
 	/**
 	 * Returns all the user group group roles where userGroupId = &#63; and groupId = &#63;.
@@ -1648,15 +1638,15 @@ public class UserGroupGroupRolePersistenceImpl extends BasePersistenceImpl<UserG
 	 */
 	@Override
 	public List<UserGroupGroupRole> findByU_G(long userGroupId, long groupId) {
-		return findByU_G(userGroupId, groupId, QueryUtil.ALL_POS,
-			QueryUtil.ALL_POS, null);
+		return findByU_G(
+			userGroupId, groupId, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
 	}
 
 	/**
 	 * Returns a range of all the user group group roles where userGroupId = &#63; and groupId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link UserGroupGroupRoleModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>UserGroupGroupRoleModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param userGroupId the user group ID
@@ -1666,8 +1656,9 @@ public class UserGroupGroupRolePersistenceImpl extends BasePersistenceImpl<UserG
 	 * @return the range of matching user group group roles
 	 */
 	@Override
-	public List<UserGroupGroupRole> findByU_G(long userGroupId, long groupId,
-		int start, int end) {
+	public List<UserGroupGroupRole> findByU_G(
+		long userGroupId, long groupId, int start, int end) {
+
 		return findByU_G(userGroupId, groupId, start, end, null);
 	}
 
@@ -1675,7 +1666,7 @@ public class UserGroupGroupRolePersistenceImpl extends BasePersistenceImpl<UserG
 	 * Returns an ordered range of all the user group group roles where userGroupId = &#63; and groupId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link UserGroupGroupRoleModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>UserGroupGroupRoleModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param userGroupId the user group ID
@@ -1686,18 +1677,19 @@ public class UserGroupGroupRolePersistenceImpl extends BasePersistenceImpl<UserG
 	 * @return the ordered range of matching user group group roles
 	 */
 	@Override
-	public List<UserGroupGroupRole> findByU_G(long userGroupId, long groupId,
-		int start, int end,
+	public List<UserGroupGroupRole> findByU_G(
+		long userGroupId, long groupId, int start, int end,
 		OrderByComparator<UserGroupGroupRole> orderByComparator) {
-		return findByU_G(userGroupId, groupId, start, end, orderByComparator,
-			true);
+
+		return findByU_G(
+			userGroupId, groupId, start, end, orderByComparator, true);
 	}
 
 	/**
 	 * Returns an ordered range of all the user group group roles where userGroupId = &#63; and groupId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link UserGroupGroupRoleModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>UserGroupGroupRoleModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param userGroupId the user group ID
@@ -1709,39 +1701,40 @@ public class UserGroupGroupRolePersistenceImpl extends BasePersistenceImpl<UserG
 	 * @return the ordered range of matching user group group roles
 	 */
 	@Override
-	public List<UserGroupGroupRole> findByU_G(long userGroupId, long groupId,
-		int start, int end,
+	public List<UserGroupGroupRole> findByU_G(
+		long userGroupId, long groupId, int start, int end,
 		OrderByComparator<UserGroupGroupRole> orderByComparator,
 		boolean retrieveFromCache) {
+
 		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
-				(orderByComparator == null)) {
+			(orderByComparator == null)) {
+
 			pagination = false;
-			finderPath = FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_U_G;
-			finderArgs = new Object[] { userGroupId, groupId };
+			finderPath = _finderPathWithoutPaginationFindByU_G;
+			finderArgs = new Object[] {userGroupId, groupId};
 		}
 		else {
-			finderPath = FINDER_PATH_WITH_PAGINATION_FIND_BY_U_G;
+			finderPath = _finderPathWithPaginationFindByU_G;
 			finderArgs = new Object[] {
-					userGroupId, groupId,
-					
-					start, end, orderByComparator
-				};
+				userGroupId, groupId, start, end, orderByComparator
+			};
 		}
 
 		List<UserGroupGroupRole> list = null;
 
 		if (retrieveFromCache) {
-			list = (List<UserGroupGroupRole>)FinderCacheUtil.getResult(finderPath,
-					finderArgs, this);
+			list = (List<UserGroupGroupRole>)FinderCacheUtil.getResult(
+				finderPath, finderArgs, this);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (UserGroupGroupRole userGroupGroupRole : list) {
 					if ((userGroupId != userGroupGroupRole.getUserGroupId()) ||
-							(groupId != userGroupGroupRole.getGroupId())) {
+						(groupId != userGroupGroupRole.getGroupId())) {
+
 						list = null;
 
 						break;
@@ -1754,8 +1747,8 @@ public class UserGroupGroupRolePersistenceImpl extends BasePersistenceImpl<UserG
 			StringBundler query = null;
 
 			if (orderByComparator != null) {
-				query = new StringBundler(4 +
-						(orderByComparator.getOrderByFields().length * 2));
+				query = new StringBundler(
+					4 + (orderByComparator.getOrderByFields().length * 2));
 			}
 			else {
 				query = new StringBundler(4);
@@ -1768,11 +1761,10 @@ public class UserGroupGroupRolePersistenceImpl extends BasePersistenceImpl<UserG
 			query.append(_FINDER_COLUMN_U_G_GROUPID_2);
 
 			if (orderByComparator != null) {
-				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
-					orderByComparator);
+				appendOrderByComparator(
+					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
 			}
-			else
-			 if (pagination) {
+			else if (pagination) {
 				query.append(UserGroupGroupRoleModelImpl.ORDER_BY_JPQL);
 			}
 
@@ -1792,16 +1784,16 @@ public class UserGroupGroupRolePersistenceImpl extends BasePersistenceImpl<UserG
 				qPos.add(groupId);
 
 				if (!pagination) {
-					list = (List<UserGroupGroupRole>)QueryUtil.list(q,
-							getDialect(), start, end, false);
+					list = (List<UserGroupGroupRole>)QueryUtil.list(
+						q, getDialect(), start, end, false);
 
 					Collections.sort(list);
 
 					list = Collections.unmodifiableList(list);
 				}
 				else {
-					list = (List<UserGroupGroupRole>)QueryUtil.list(q,
-							getDialect(), start, end);
+					list = (List<UserGroupGroupRole>)QueryUtil.list(
+						q, getDialect(), start, end);
 				}
 
 				cacheResult(list);
@@ -1831,11 +1823,13 @@ public class UserGroupGroupRolePersistenceImpl extends BasePersistenceImpl<UserG
 	 * @throws NoSuchUserGroupGroupRoleException if a matching user group group role could not be found
 	 */
 	@Override
-	public UserGroupGroupRole findByU_G_First(long userGroupId, long groupId,
-		OrderByComparator<UserGroupGroupRole> orderByComparator)
+	public UserGroupGroupRole findByU_G_First(
+			long userGroupId, long groupId,
+			OrderByComparator<UserGroupGroupRole> orderByComparator)
 		throws NoSuchUserGroupGroupRoleException {
-		UserGroupGroupRole userGroupGroupRole = fetchByU_G_First(userGroupId,
-				groupId, orderByComparator);
+
+		UserGroupGroupRole userGroupGroupRole = fetchByU_G_First(
+			userGroupId, groupId, orderByComparator);
 
 		if (userGroupGroupRole != null) {
 			return userGroupGroupRole;
@@ -1865,10 +1859,12 @@ public class UserGroupGroupRolePersistenceImpl extends BasePersistenceImpl<UserG
 	 * @return the first matching user group group role, or <code>null</code> if a matching user group group role could not be found
 	 */
 	@Override
-	public UserGroupGroupRole fetchByU_G_First(long userGroupId, long groupId,
+	public UserGroupGroupRole fetchByU_G_First(
+		long userGroupId, long groupId,
 		OrderByComparator<UserGroupGroupRole> orderByComparator) {
-		List<UserGroupGroupRole> list = findByU_G(userGroupId, groupId, 0, 1,
-				orderByComparator);
+
+		List<UserGroupGroupRole> list = findByU_G(
+			userGroupId, groupId, 0, 1, orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -1887,11 +1883,13 @@ public class UserGroupGroupRolePersistenceImpl extends BasePersistenceImpl<UserG
 	 * @throws NoSuchUserGroupGroupRoleException if a matching user group group role could not be found
 	 */
 	@Override
-	public UserGroupGroupRole findByU_G_Last(long userGroupId, long groupId,
-		OrderByComparator<UserGroupGroupRole> orderByComparator)
+	public UserGroupGroupRole findByU_G_Last(
+			long userGroupId, long groupId,
+			OrderByComparator<UserGroupGroupRole> orderByComparator)
 		throws NoSuchUserGroupGroupRoleException {
-		UserGroupGroupRole userGroupGroupRole = fetchByU_G_Last(userGroupId,
-				groupId, orderByComparator);
+
+		UserGroupGroupRole userGroupGroupRole = fetchByU_G_Last(
+			userGroupId, groupId, orderByComparator);
 
 		if (userGroupGroupRole != null) {
 			return userGroupGroupRole;
@@ -1921,16 +1919,18 @@ public class UserGroupGroupRolePersistenceImpl extends BasePersistenceImpl<UserG
 	 * @return the last matching user group group role, or <code>null</code> if a matching user group group role could not be found
 	 */
 	@Override
-	public UserGroupGroupRole fetchByU_G_Last(long userGroupId, long groupId,
+	public UserGroupGroupRole fetchByU_G_Last(
+		long userGroupId, long groupId,
 		OrderByComparator<UserGroupGroupRole> orderByComparator) {
+
 		int count = countByU_G(userGroupId, groupId);
 
 		if (count == 0) {
 			return null;
 		}
 
-		List<UserGroupGroupRole> list = findByU_G(userGroupId, groupId,
-				count - 1, count, orderByComparator);
+		List<UserGroupGroupRole> list = findByU_G(
+			userGroupId, groupId, count - 1, count, orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -1951,10 +1951,13 @@ public class UserGroupGroupRolePersistenceImpl extends BasePersistenceImpl<UserG
 	 */
 	@Override
 	public UserGroupGroupRole[] findByU_G_PrevAndNext(
-		UserGroupGroupRolePK userGroupGroupRolePK, long userGroupId,
-		long groupId, OrderByComparator<UserGroupGroupRole> orderByComparator)
+			UserGroupGroupRolePK userGroupGroupRolePK, long userGroupId,
+			long groupId,
+			OrderByComparator<UserGroupGroupRole> orderByComparator)
 		throws NoSuchUserGroupGroupRoleException {
-		UserGroupGroupRole userGroupGroupRole = findByPrimaryKey(userGroupGroupRolePK);
+
+		UserGroupGroupRole userGroupGroupRole = findByPrimaryKey(
+			userGroupGroupRolePK);
 
 		Session session = null;
 
@@ -1963,13 +1966,15 @@ public class UserGroupGroupRolePersistenceImpl extends BasePersistenceImpl<UserG
 
 			UserGroupGroupRole[] array = new UserGroupGroupRoleImpl[3];
 
-			array[0] = getByU_G_PrevAndNext(session, userGroupGroupRole,
-					userGroupId, groupId, orderByComparator, true);
+			array[0] = getByU_G_PrevAndNext(
+				session, userGroupGroupRole, userGroupId, groupId,
+				orderByComparator, true);
 
 			array[1] = userGroupGroupRole;
 
-			array[2] = getByU_G_PrevAndNext(session, userGroupGroupRole,
-					userGroupId, groupId, orderByComparator, false);
+			array[2] = getByU_G_PrevAndNext(
+				session, userGroupGroupRole, userGroupId, groupId,
+				orderByComparator, false);
 
 			return array;
 		}
@@ -1981,15 +1986,17 @@ public class UserGroupGroupRolePersistenceImpl extends BasePersistenceImpl<UserG
 		}
 	}
 
-	protected UserGroupGroupRole getByU_G_PrevAndNext(Session session,
-		UserGroupGroupRole userGroupGroupRole, long userGroupId, long groupId,
+	protected UserGroupGroupRole getByU_G_PrevAndNext(
+		Session session, UserGroupGroupRole userGroupGroupRole,
+		long userGroupId, long groupId,
 		OrderByComparator<UserGroupGroupRole> orderByComparator,
 		boolean previous) {
+
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(5 +
-					(orderByComparator.getOrderByConditionFields().length * 3) +
+			query = new StringBundler(
+				5 + (orderByComparator.getOrderByConditionFields().length * 3) +
 					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
@@ -2003,7 +2010,8 @@ public class UserGroupGroupRolePersistenceImpl extends BasePersistenceImpl<UserG
 		query.append(_FINDER_COLUMN_U_G_GROUPID_2);
 
 		if (orderByComparator != null) {
-			String[] orderByConditionFields = orderByComparator.getOrderByConditionFields();
+			String[] orderByConditionFields =
+				orderByComparator.getOrderByConditionFields();
 
 			if (orderByConditionFields.length > 0) {
 				query.append(WHERE_AND);
@@ -2075,10 +2083,11 @@ public class UserGroupGroupRolePersistenceImpl extends BasePersistenceImpl<UserG
 		qPos.add(groupId);
 
 		if (orderByComparator != null) {
-			Object[] values = orderByComparator.getOrderByConditionValues(userGroupGroupRole);
+			for (Object orderByConditionValue :
+					orderByComparator.getOrderByConditionValues(
+						userGroupGroupRole)) {
 
-			for (Object value : values) {
-				qPos.add(value);
+				qPos.add(orderByConditionValue);
 			}
 		}
 
@@ -2100,8 +2109,11 @@ public class UserGroupGroupRolePersistenceImpl extends BasePersistenceImpl<UserG
 	 */
 	@Override
 	public void removeByU_G(long userGroupId, long groupId) {
-		for (UserGroupGroupRole userGroupGroupRole : findByU_G(userGroupId,
-				groupId, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null)) {
+		for (UserGroupGroupRole userGroupGroupRole :
+				findByU_G(
+					userGroupId, groupId, QueryUtil.ALL_POS, QueryUtil.ALL_POS,
+					null)) {
+
 			remove(userGroupGroupRole);
 		}
 	}
@@ -2115,12 +2127,12 @@ public class UserGroupGroupRolePersistenceImpl extends BasePersistenceImpl<UserG
 	 */
 	@Override
 	public int countByU_G(long userGroupId, long groupId) {
-		FinderPath finderPath = FINDER_PATH_COUNT_BY_U_G;
+		FinderPath finderPath = _finderPathCountByU_G;
 
-		Object[] finderArgs = new Object[] { userGroupId, groupId };
+		Object[] finderArgs = new Object[] {userGroupId, groupId};
 
-		Long count = (Long)FinderCacheUtil.getResult(finderPath, finderArgs,
-				this);
+		Long count = (Long)FinderCacheUtil.getResult(
+			finderPath, finderArgs, this);
 
 		if (count == null) {
 			StringBundler query = new StringBundler(3);
@@ -2163,29 +2175,15 @@ public class UserGroupGroupRolePersistenceImpl extends BasePersistenceImpl<UserG
 		return count.intValue();
 	}
 
-	private static final String _FINDER_COLUMN_U_G_USERGROUPID_2 = "userGroupGroupRole.id.userGroupId = ? AND ";
-	private static final String _FINDER_COLUMN_U_G_GROUPID_2 = "userGroupGroupRole.id.groupId = ?";
-	public static final FinderPath FINDER_PATH_WITH_PAGINATION_FIND_BY_G_R = new FinderPath(UserGroupGroupRoleModelImpl.ENTITY_CACHE_ENABLED,
-			UserGroupGroupRoleModelImpl.FINDER_CACHE_ENABLED,
-			UserGroupGroupRoleImpl.class,
-			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByG_R",
-			new String[] {
-				Long.class.getName(), Long.class.getName(),
-				
-			Integer.class.getName(), Integer.class.getName(),
-				OrderByComparator.class.getName()
-			});
-	public static final FinderPath FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_G_R = new FinderPath(UserGroupGroupRoleModelImpl.ENTITY_CACHE_ENABLED,
-			UserGroupGroupRoleModelImpl.FINDER_CACHE_ENABLED,
-			UserGroupGroupRoleImpl.class,
-			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByG_R",
-			new String[] { Long.class.getName(), Long.class.getName() },
-			UserGroupGroupRoleModelImpl.GROUPID_COLUMN_BITMASK |
-			UserGroupGroupRoleModelImpl.ROLEID_COLUMN_BITMASK);
-	public static final FinderPath FINDER_PATH_COUNT_BY_G_R = new FinderPath(UserGroupGroupRoleModelImpl.ENTITY_CACHE_ENABLED,
-			UserGroupGroupRoleModelImpl.FINDER_CACHE_ENABLED, Long.class,
-			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByG_R",
-			new String[] { Long.class.getName(), Long.class.getName() });
+	private static final String _FINDER_COLUMN_U_G_USERGROUPID_2 =
+		"userGroupGroupRole.id.userGroupId = ? AND ";
+
+	private static final String _FINDER_COLUMN_U_G_GROUPID_2 =
+		"userGroupGroupRole.id.groupId = ?";
+
+	private FinderPath _finderPathWithPaginationFindByG_R;
+	private FinderPath _finderPathWithoutPaginationFindByG_R;
+	private FinderPath _finderPathCountByG_R;
 
 	/**
 	 * Returns all the user group group roles where groupId = &#63; and roleId = &#63;.
@@ -2196,15 +2194,15 @@ public class UserGroupGroupRolePersistenceImpl extends BasePersistenceImpl<UserG
 	 */
 	@Override
 	public List<UserGroupGroupRole> findByG_R(long groupId, long roleId) {
-		return findByG_R(groupId, roleId, QueryUtil.ALL_POS, QueryUtil.ALL_POS,
-			null);
+		return findByG_R(
+			groupId, roleId, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
 	}
 
 	/**
 	 * Returns a range of all the user group group roles where groupId = &#63; and roleId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link UserGroupGroupRoleModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>UserGroupGroupRoleModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param groupId the group ID
@@ -2214,8 +2212,9 @@ public class UserGroupGroupRolePersistenceImpl extends BasePersistenceImpl<UserG
 	 * @return the range of matching user group group roles
 	 */
 	@Override
-	public List<UserGroupGroupRole> findByG_R(long groupId, long roleId,
-		int start, int end) {
+	public List<UserGroupGroupRole> findByG_R(
+		long groupId, long roleId, int start, int end) {
+
 		return findByG_R(groupId, roleId, start, end, null);
 	}
 
@@ -2223,7 +2222,7 @@ public class UserGroupGroupRolePersistenceImpl extends BasePersistenceImpl<UserG
 	 * Returns an ordered range of all the user group group roles where groupId = &#63; and roleId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link UserGroupGroupRoleModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>UserGroupGroupRoleModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param groupId the group ID
@@ -2234,9 +2233,10 @@ public class UserGroupGroupRolePersistenceImpl extends BasePersistenceImpl<UserG
 	 * @return the ordered range of matching user group group roles
 	 */
 	@Override
-	public List<UserGroupGroupRole> findByG_R(long groupId, long roleId,
-		int start, int end,
+	public List<UserGroupGroupRole> findByG_R(
+		long groupId, long roleId, int start, int end,
 		OrderByComparator<UserGroupGroupRole> orderByComparator) {
+
 		return findByG_R(groupId, roleId, start, end, orderByComparator, true);
 	}
 
@@ -2244,7 +2244,7 @@ public class UserGroupGroupRolePersistenceImpl extends BasePersistenceImpl<UserG
 	 * Returns an ordered range of all the user group group roles where groupId = &#63; and roleId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link UserGroupGroupRoleModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>UserGroupGroupRoleModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param groupId the group ID
@@ -2256,39 +2256,40 @@ public class UserGroupGroupRolePersistenceImpl extends BasePersistenceImpl<UserG
 	 * @return the ordered range of matching user group group roles
 	 */
 	@Override
-	public List<UserGroupGroupRole> findByG_R(long groupId, long roleId,
-		int start, int end,
+	public List<UserGroupGroupRole> findByG_R(
+		long groupId, long roleId, int start, int end,
 		OrderByComparator<UserGroupGroupRole> orderByComparator,
 		boolean retrieveFromCache) {
+
 		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
-				(orderByComparator == null)) {
+			(orderByComparator == null)) {
+
 			pagination = false;
-			finderPath = FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_G_R;
-			finderArgs = new Object[] { groupId, roleId };
+			finderPath = _finderPathWithoutPaginationFindByG_R;
+			finderArgs = new Object[] {groupId, roleId};
 		}
 		else {
-			finderPath = FINDER_PATH_WITH_PAGINATION_FIND_BY_G_R;
+			finderPath = _finderPathWithPaginationFindByG_R;
 			finderArgs = new Object[] {
-					groupId, roleId,
-					
-					start, end, orderByComparator
-				};
+				groupId, roleId, start, end, orderByComparator
+			};
 		}
 
 		List<UserGroupGroupRole> list = null;
 
 		if (retrieveFromCache) {
-			list = (List<UserGroupGroupRole>)FinderCacheUtil.getResult(finderPath,
-					finderArgs, this);
+			list = (List<UserGroupGroupRole>)FinderCacheUtil.getResult(
+				finderPath, finderArgs, this);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (UserGroupGroupRole userGroupGroupRole : list) {
 					if ((groupId != userGroupGroupRole.getGroupId()) ||
-							(roleId != userGroupGroupRole.getRoleId())) {
+						(roleId != userGroupGroupRole.getRoleId())) {
+
 						list = null;
 
 						break;
@@ -2301,8 +2302,8 @@ public class UserGroupGroupRolePersistenceImpl extends BasePersistenceImpl<UserG
 			StringBundler query = null;
 
 			if (orderByComparator != null) {
-				query = new StringBundler(4 +
-						(orderByComparator.getOrderByFields().length * 2));
+				query = new StringBundler(
+					4 + (orderByComparator.getOrderByFields().length * 2));
 			}
 			else {
 				query = new StringBundler(4);
@@ -2315,11 +2316,10 @@ public class UserGroupGroupRolePersistenceImpl extends BasePersistenceImpl<UserG
 			query.append(_FINDER_COLUMN_G_R_ROLEID_2);
 
 			if (orderByComparator != null) {
-				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
-					orderByComparator);
+				appendOrderByComparator(
+					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
 			}
-			else
-			 if (pagination) {
+			else if (pagination) {
 				query.append(UserGroupGroupRoleModelImpl.ORDER_BY_JPQL);
 			}
 
@@ -2339,16 +2339,16 @@ public class UserGroupGroupRolePersistenceImpl extends BasePersistenceImpl<UserG
 				qPos.add(roleId);
 
 				if (!pagination) {
-					list = (List<UserGroupGroupRole>)QueryUtil.list(q,
-							getDialect(), start, end, false);
+					list = (List<UserGroupGroupRole>)QueryUtil.list(
+						q, getDialect(), start, end, false);
 
 					Collections.sort(list);
 
 					list = Collections.unmodifiableList(list);
 				}
 				else {
-					list = (List<UserGroupGroupRole>)QueryUtil.list(q,
-							getDialect(), start, end);
+					list = (List<UserGroupGroupRole>)QueryUtil.list(
+						q, getDialect(), start, end);
 				}
 
 				cacheResult(list);
@@ -2378,11 +2378,13 @@ public class UserGroupGroupRolePersistenceImpl extends BasePersistenceImpl<UserG
 	 * @throws NoSuchUserGroupGroupRoleException if a matching user group group role could not be found
 	 */
 	@Override
-	public UserGroupGroupRole findByG_R_First(long groupId, long roleId,
-		OrderByComparator<UserGroupGroupRole> orderByComparator)
+	public UserGroupGroupRole findByG_R_First(
+			long groupId, long roleId,
+			OrderByComparator<UserGroupGroupRole> orderByComparator)
 		throws NoSuchUserGroupGroupRoleException {
-		UserGroupGroupRole userGroupGroupRole = fetchByG_R_First(groupId,
-				roleId, orderByComparator);
+
+		UserGroupGroupRole userGroupGroupRole = fetchByG_R_First(
+			groupId, roleId, orderByComparator);
 
 		if (userGroupGroupRole != null) {
 			return userGroupGroupRole;
@@ -2412,10 +2414,12 @@ public class UserGroupGroupRolePersistenceImpl extends BasePersistenceImpl<UserG
 	 * @return the first matching user group group role, or <code>null</code> if a matching user group group role could not be found
 	 */
 	@Override
-	public UserGroupGroupRole fetchByG_R_First(long groupId, long roleId,
+	public UserGroupGroupRole fetchByG_R_First(
+		long groupId, long roleId,
 		OrderByComparator<UserGroupGroupRole> orderByComparator) {
-		List<UserGroupGroupRole> list = findByG_R(groupId, roleId, 0, 1,
-				orderByComparator);
+
+		List<UserGroupGroupRole> list = findByG_R(
+			groupId, roleId, 0, 1, orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -2434,11 +2438,13 @@ public class UserGroupGroupRolePersistenceImpl extends BasePersistenceImpl<UserG
 	 * @throws NoSuchUserGroupGroupRoleException if a matching user group group role could not be found
 	 */
 	@Override
-	public UserGroupGroupRole findByG_R_Last(long groupId, long roleId,
-		OrderByComparator<UserGroupGroupRole> orderByComparator)
+	public UserGroupGroupRole findByG_R_Last(
+			long groupId, long roleId,
+			OrderByComparator<UserGroupGroupRole> orderByComparator)
 		throws NoSuchUserGroupGroupRoleException {
-		UserGroupGroupRole userGroupGroupRole = fetchByG_R_Last(groupId,
-				roleId, orderByComparator);
+
+		UserGroupGroupRole userGroupGroupRole = fetchByG_R_Last(
+			groupId, roleId, orderByComparator);
 
 		if (userGroupGroupRole != null) {
 			return userGroupGroupRole;
@@ -2468,16 +2474,18 @@ public class UserGroupGroupRolePersistenceImpl extends BasePersistenceImpl<UserG
 	 * @return the last matching user group group role, or <code>null</code> if a matching user group group role could not be found
 	 */
 	@Override
-	public UserGroupGroupRole fetchByG_R_Last(long groupId, long roleId,
+	public UserGroupGroupRole fetchByG_R_Last(
+		long groupId, long roleId,
 		OrderByComparator<UserGroupGroupRole> orderByComparator) {
+
 		int count = countByG_R(groupId, roleId);
 
 		if (count == 0) {
 			return null;
 		}
 
-		List<UserGroupGroupRole> list = findByG_R(groupId, roleId, count - 1,
-				count, orderByComparator);
+		List<UserGroupGroupRole> list = findByG_R(
+			groupId, roleId, count - 1, count, orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -2498,10 +2506,13 @@ public class UserGroupGroupRolePersistenceImpl extends BasePersistenceImpl<UserG
 	 */
 	@Override
 	public UserGroupGroupRole[] findByG_R_PrevAndNext(
-		UserGroupGroupRolePK userGroupGroupRolePK, long groupId, long roleId,
-		OrderByComparator<UserGroupGroupRole> orderByComparator)
+			UserGroupGroupRolePK userGroupGroupRolePK, long groupId,
+			long roleId,
+			OrderByComparator<UserGroupGroupRole> orderByComparator)
 		throws NoSuchUserGroupGroupRoleException {
-		UserGroupGroupRole userGroupGroupRole = findByPrimaryKey(userGroupGroupRolePK);
+
+		UserGroupGroupRole userGroupGroupRole = findByPrimaryKey(
+			userGroupGroupRolePK);
 
 		Session session = null;
 
@@ -2510,13 +2521,15 @@ public class UserGroupGroupRolePersistenceImpl extends BasePersistenceImpl<UserG
 
 			UserGroupGroupRole[] array = new UserGroupGroupRoleImpl[3];
 
-			array[0] = getByG_R_PrevAndNext(session, userGroupGroupRole,
-					groupId, roleId, orderByComparator, true);
+			array[0] = getByG_R_PrevAndNext(
+				session, userGroupGroupRole, groupId, roleId, orderByComparator,
+				true);
 
 			array[1] = userGroupGroupRole;
 
-			array[2] = getByG_R_PrevAndNext(session, userGroupGroupRole,
-					groupId, roleId, orderByComparator, false);
+			array[2] = getByG_R_PrevAndNext(
+				session, userGroupGroupRole, groupId, roleId, orderByComparator,
+				false);
 
 			return array;
 		}
@@ -2528,15 +2541,16 @@ public class UserGroupGroupRolePersistenceImpl extends BasePersistenceImpl<UserG
 		}
 	}
 
-	protected UserGroupGroupRole getByG_R_PrevAndNext(Session session,
-		UserGroupGroupRole userGroupGroupRole, long groupId, long roleId,
-		OrderByComparator<UserGroupGroupRole> orderByComparator,
+	protected UserGroupGroupRole getByG_R_PrevAndNext(
+		Session session, UserGroupGroupRole userGroupGroupRole, long groupId,
+		long roleId, OrderByComparator<UserGroupGroupRole> orderByComparator,
 		boolean previous) {
+
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(5 +
-					(orderByComparator.getOrderByConditionFields().length * 3) +
+			query = new StringBundler(
+				5 + (orderByComparator.getOrderByConditionFields().length * 3) +
 					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
@@ -2550,7 +2564,8 @@ public class UserGroupGroupRolePersistenceImpl extends BasePersistenceImpl<UserG
 		query.append(_FINDER_COLUMN_G_R_ROLEID_2);
 
 		if (orderByComparator != null) {
-			String[] orderByConditionFields = orderByComparator.getOrderByConditionFields();
+			String[] orderByConditionFields =
+				orderByComparator.getOrderByConditionFields();
 
 			if (orderByConditionFields.length > 0) {
 				query.append(WHERE_AND);
@@ -2622,10 +2637,11 @@ public class UserGroupGroupRolePersistenceImpl extends BasePersistenceImpl<UserG
 		qPos.add(roleId);
 
 		if (orderByComparator != null) {
-			Object[] values = orderByComparator.getOrderByConditionValues(userGroupGroupRole);
+			for (Object orderByConditionValue :
+					orderByComparator.getOrderByConditionValues(
+						userGroupGroupRole)) {
 
-			for (Object value : values) {
-				qPos.add(value);
+				qPos.add(orderByConditionValue);
 			}
 		}
 
@@ -2647,8 +2663,11 @@ public class UserGroupGroupRolePersistenceImpl extends BasePersistenceImpl<UserG
 	 */
 	@Override
 	public void removeByG_R(long groupId, long roleId) {
-		for (UserGroupGroupRole userGroupGroupRole : findByG_R(groupId, roleId,
-				QueryUtil.ALL_POS, QueryUtil.ALL_POS, null)) {
+		for (UserGroupGroupRole userGroupGroupRole :
+				findByG_R(
+					groupId, roleId, QueryUtil.ALL_POS, QueryUtil.ALL_POS,
+					null)) {
+
 			remove(userGroupGroupRole);
 		}
 	}
@@ -2662,12 +2681,12 @@ public class UserGroupGroupRolePersistenceImpl extends BasePersistenceImpl<UserG
 	 */
 	@Override
 	public int countByG_R(long groupId, long roleId) {
-		FinderPath finderPath = FINDER_PATH_COUNT_BY_G_R;
+		FinderPath finderPath = _finderPathCountByG_R;
 
-		Object[] finderArgs = new Object[] { groupId, roleId };
+		Object[] finderArgs = new Object[] {groupId, roleId};
 
-		Long count = (Long)FinderCacheUtil.getResult(finderPath, finderArgs,
-				this);
+		Long count = (Long)FinderCacheUtil.getResult(
+			finderPath, finderArgs, this);
 
 		if (count == null) {
 			StringBundler query = new StringBundler(3);
@@ -2710,8 +2729,11 @@ public class UserGroupGroupRolePersistenceImpl extends BasePersistenceImpl<UserG
 		return count.intValue();
 	}
 
-	private static final String _FINDER_COLUMN_G_R_GROUPID_2 = "userGroupGroupRole.id.groupId = ? AND ";
-	private static final String _FINDER_COLUMN_G_R_ROLEID_2 = "userGroupGroupRole.id.roleId = ?";
+	private static final String _FINDER_COLUMN_G_R_GROUPID_2 =
+		"userGroupGroupRole.id.groupId = ? AND ";
+
+	private static final String _FINDER_COLUMN_G_R_ROLEID_2 =
+		"userGroupGroupRole.id.roleId = ?";
 
 	public UserGroupGroupRolePersistenceImpl() {
 		setModelClass(UserGroupGroupRole.class);
@@ -2724,7 +2746,8 @@ public class UserGroupGroupRolePersistenceImpl extends BasePersistenceImpl<UserG
 	 */
 	@Override
 	public void cacheResult(UserGroupGroupRole userGroupGroupRole) {
-		EntityCacheUtil.putResult(UserGroupGroupRoleModelImpl.ENTITY_CACHE_ENABLED,
+		EntityCacheUtil.putResult(
+			UserGroupGroupRoleModelImpl.ENTITY_CACHE_ENABLED,
 			UserGroupGroupRoleImpl.class, userGroupGroupRole.getPrimaryKey(),
 			userGroupGroupRole);
 
@@ -2740,9 +2763,10 @@ public class UserGroupGroupRolePersistenceImpl extends BasePersistenceImpl<UserG
 	public void cacheResult(List<UserGroupGroupRole> userGroupGroupRoles) {
 		for (UserGroupGroupRole userGroupGroupRole : userGroupGroupRoles) {
 			if (EntityCacheUtil.getResult(
-						UserGroupGroupRoleModelImpl.ENTITY_CACHE_ENABLED,
-						UserGroupGroupRoleImpl.class,
-						userGroupGroupRole.getPrimaryKey()) == null) {
+					UserGroupGroupRoleModelImpl.ENTITY_CACHE_ENABLED,
+					UserGroupGroupRoleImpl.class,
+					userGroupGroupRole.getPrimaryKey()) == null) {
+
 				cacheResult(userGroupGroupRole);
 			}
 			else {
@@ -2755,7 +2779,7 @@ public class UserGroupGroupRolePersistenceImpl extends BasePersistenceImpl<UserG
 	 * Clears the cache for all user group group roles.
 	 *
 	 * <p>
-	 * The {@link com.liferay.portal.kernel.dao.orm.EntityCache} and {@link com.liferay.portal.kernel.dao.orm.FinderCache} are both cleared by this method.
+	 * The <code>com.liferay.portal.kernel.dao.orm.EntityCache</code> and <code>com.liferay.portal.kernel.dao.orm.FinderCache</code> are both cleared by this method.
 	 * </p>
 	 */
 	@Override
@@ -2771,12 +2795,13 @@ public class UserGroupGroupRolePersistenceImpl extends BasePersistenceImpl<UserG
 	 * Clears the cache for the user group group role.
 	 *
 	 * <p>
-	 * The {@link com.liferay.portal.kernel.dao.orm.EntityCache} and {@link com.liferay.portal.kernel.dao.orm.FinderCache} are both cleared by this method.
+	 * The <code>com.liferay.portal.kernel.dao.orm.EntityCache</code> and <code>com.liferay.portal.kernel.dao.orm.FinderCache</code> are both cleared by this method.
 	 * </p>
 	 */
 	@Override
 	public void clearCache(UserGroupGroupRole userGroupGroupRole) {
-		EntityCacheUtil.removeResult(UserGroupGroupRoleModelImpl.ENTITY_CACHE_ENABLED,
+		EntityCacheUtil.removeResult(
+			UserGroupGroupRoleModelImpl.ENTITY_CACHE_ENABLED,
 			UserGroupGroupRoleImpl.class, userGroupGroupRole.getPrimaryKey());
 
 		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
@@ -2789,8 +2814,10 @@ public class UserGroupGroupRolePersistenceImpl extends BasePersistenceImpl<UserG
 		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
 
 		for (UserGroupGroupRole userGroupGroupRole : userGroupGroupRoles) {
-			EntityCacheUtil.removeResult(UserGroupGroupRoleModelImpl.ENTITY_CACHE_ENABLED,
-				UserGroupGroupRoleImpl.class, userGroupGroupRole.getPrimaryKey());
+			EntityCacheUtil.removeResult(
+				UserGroupGroupRoleModelImpl.ENTITY_CACHE_ENABLED,
+				UserGroupGroupRoleImpl.class,
+				userGroupGroupRole.getPrimaryKey());
 		}
 	}
 
@@ -2801,7 +2828,9 @@ public class UserGroupGroupRolePersistenceImpl extends BasePersistenceImpl<UserG
 	 * @return the new user group group role
 	 */
 	@Override
-	public UserGroupGroupRole create(UserGroupGroupRolePK userGroupGroupRolePK) {
+	public UserGroupGroupRole create(
+		UserGroupGroupRolePK userGroupGroupRolePK) {
+
 		UserGroupGroupRole userGroupGroupRole = new UserGroupGroupRoleImpl();
 
 		userGroupGroupRole.setNew(true);
@@ -2822,6 +2851,7 @@ public class UserGroupGroupRolePersistenceImpl extends BasePersistenceImpl<UserG
 	@Override
 	public UserGroupGroupRole remove(UserGroupGroupRolePK userGroupGroupRolePK)
 		throws NoSuchUserGroupGroupRoleException {
+
 		return remove((Serializable)userGroupGroupRolePK);
 	}
 
@@ -2835,21 +2865,23 @@ public class UserGroupGroupRolePersistenceImpl extends BasePersistenceImpl<UserG
 	@Override
 	public UserGroupGroupRole remove(Serializable primaryKey)
 		throws NoSuchUserGroupGroupRoleException {
+
 		Session session = null;
 
 		try {
 			session = openSession();
 
-			UserGroupGroupRole userGroupGroupRole = (UserGroupGroupRole)session.get(UserGroupGroupRoleImpl.class,
-					primaryKey);
+			UserGroupGroupRole userGroupGroupRole =
+				(UserGroupGroupRole)session.get(
+					UserGroupGroupRoleImpl.class, primaryKey);
 
 			if (userGroupGroupRole == null) {
 				if (_log.isDebugEnabled()) {
 					_log.debug(_NO_SUCH_ENTITY_WITH_PRIMARY_KEY + primaryKey);
 				}
 
-				throw new NoSuchUserGroupGroupRoleException(_NO_SUCH_ENTITY_WITH_PRIMARY_KEY +
-					primaryKey);
+				throw new NoSuchUserGroupGroupRoleException(
+					_NO_SUCH_ENTITY_WITH_PRIMARY_KEY + primaryKey);
 			}
 
 			return remove(userGroupGroupRole);
@@ -2868,14 +2900,16 @@ public class UserGroupGroupRolePersistenceImpl extends BasePersistenceImpl<UserG
 	@Override
 	protected UserGroupGroupRole removeImpl(
 		UserGroupGroupRole userGroupGroupRole) {
+
 		Session session = null;
 
 		try {
 			session = openSession();
 
 			if (!session.contains(userGroupGroupRole)) {
-				userGroupGroupRole = (UserGroupGroupRole)session.get(UserGroupGroupRoleImpl.class,
-						userGroupGroupRole.getPrimaryKeyObj());
+				userGroupGroupRole = (UserGroupGroupRole)session.get(
+					UserGroupGroupRoleImpl.class,
+					userGroupGroupRole.getPrimaryKeyObj());
 			}
 
 			if (userGroupGroupRole != null) {
@@ -2897,26 +2931,30 @@ public class UserGroupGroupRolePersistenceImpl extends BasePersistenceImpl<UserG
 	}
 
 	@Override
-	public UserGroupGroupRole updateImpl(UserGroupGroupRole userGroupGroupRole) {
+	public UserGroupGroupRole updateImpl(
+		UserGroupGroupRole userGroupGroupRole) {
+
 		boolean isNew = userGroupGroupRole.isNew();
 
 		if (!(userGroupGroupRole instanceof UserGroupGroupRoleModelImpl)) {
 			InvocationHandler invocationHandler = null;
 
 			if (ProxyUtil.isProxyClass(userGroupGroupRole.getClass())) {
-				invocationHandler = ProxyUtil.getInvocationHandler(userGroupGroupRole);
+				invocationHandler = ProxyUtil.getInvocationHandler(
+					userGroupGroupRole);
 
 				throw new IllegalArgumentException(
 					"Implement ModelWrapper in userGroupGroupRole proxy " +
-					invocationHandler.getClass());
+						invocationHandler.getClass());
 			}
 
 			throw new IllegalArgumentException(
 				"Implement ModelWrapper in custom UserGroupGroupRole implementation " +
-				userGroupGroupRole.getClass());
+					userGroupGroupRole.getClass());
 		}
 
-		UserGroupGroupRoleModelImpl userGroupGroupRoleModelImpl = (UserGroupGroupRoleModelImpl)userGroupGroupRole;
+		UserGroupGroupRoleModelImpl userGroupGroupRoleModelImpl =
+			(UserGroupGroupRoleModelImpl)userGroupGroupRole;
 
 		Session session = null;
 
@@ -2929,7 +2967,8 @@ public class UserGroupGroupRolePersistenceImpl extends BasePersistenceImpl<UserG
 				userGroupGroupRole.setNew(false);
 			}
 			else {
-				userGroupGroupRole = (UserGroupGroupRole)session.merge(userGroupGroupRole);
+				userGroupGroupRole = (UserGroupGroupRole)session.merge(
+					userGroupGroupRole);
 			}
 		}
 		catch (Exception e) {
@@ -2942,152 +2981,164 @@ public class UserGroupGroupRolePersistenceImpl extends BasePersistenceImpl<UserG
 		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
 
 		if (!UserGroupGroupRoleModelImpl.COLUMN_BITMASK_ENABLED) {
-			FinderCacheUtil.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
+			FinderCacheUtil.clearCache(
+				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
 		}
-		else
-		 if (isNew) {
+		else if (isNew) {
 			Object[] args = new Object[] {
+				userGroupGroupRoleModelImpl.getUserGroupId()
+			};
+
+			FinderCacheUtil.removeResult(_finderPathCountByUserGroupId, args);
+			FinderCacheUtil.removeResult(
+				_finderPathWithoutPaginationFindByUserGroupId, args);
+
+			args = new Object[] {userGroupGroupRoleModelImpl.getGroupId()};
+
+			FinderCacheUtil.removeResult(_finderPathCountByGroupId, args);
+			FinderCacheUtil.removeResult(
+				_finderPathWithoutPaginationFindByGroupId, args);
+
+			args = new Object[] {userGroupGroupRoleModelImpl.getRoleId()};
+
+			FinderCacheUtil.removeResult(_finderPathCountByRoleId, args);
+			FinderCacheUtil.removeResult(
+				_finderPathWithoutPaginationFindByRoleId, args);
+
+			args = new Object[] {
+				userGroupGroupRoleModelImpl.getUserGroupId(),
+				userGroupGroupRoleModelImpl.getGroupId()
+			};
+
+			FinderCacheUtil.removeResult(_finderPathCountByU_G, args);
+			FinderCacheUtil.removeResult(
+				_finderPathWithoutPaginationFindByU_G, args);
+
+			args = new Object[] {
+				userGroupGroupRoleModelImpl.getGroupId(),
+				userGroupGroupRoleModelImpl.getRoleId()
+			};
+
+			FinderCacheUtil.removeResult(_finderPathCountByG_R, args);
+			FinderCacheUtil.removeResult(
+				_finderPathWithoutPaginationFindByG_R, args);
+
+			FinderCacheUtil.removeResult(
+				_finderPathCountAll, FINDER_ARGS_EMPTY);
+			FinderCacheUtil.removeResult(
+				_finderPathWithoutPaginationFindAll, FINDER_ARGS_EMPTY);
+		}
+		else {
+			if ((userGroupGroupRoleModelImpl.getColumnBitmask() &
+				 _finderPathWithoutPaginationFindByUserGroupId.
+					 getColumnBitmask()) != 0) {
+
+				Object[] args = new Object[] {
+					userGroupGroupRoleModelImpl.getOriginalUserGroupId()
+				};
+
+				FinderCacheUtil.removeResult(
+					_finderPathCountByUserGroupId, args);
+				FinderCacheUtil.removeResult(
+					_finderPathWithoutPaginationFindByUserGroupId, args);
+
+				args = new Object[] {
 					userGroupGroupRoleModelImpl.getUserGroupId()
 				};
 
-			FinderCacheUtil.removeResult(FINDER_PATH_COUNT_BY_USERGROUPID, args);
-			FinderCacheUtil.removeResult(FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_USERGROUPID,
-				args);
+				FinderCacheUtil.removeResult(
+					_finderPathCountByUserGroupId, args);
+				FinderCacheUtil.removeResult(
+					_finderPathWithoutPaginationFindByUserGroupId, args);
+			}
 
-			args = new Object[] { userGroupGroupRoleModelImpl.getGroupId() };
+			if ((userGroupGroupRoleModelImpl.getColumnBitmask() &
+				 _finderPathWithoutPaginationFindByGroupId.
+					 getColumnBitmask()) != 0) {
 
-			FinderCacheUtil.removeResult(FINDER_PATH_COUNT_BY_GROUPID, args);
-			FinderCacheUtil.removeResult(FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_GROUPID,
-				args);
+				Object[] args = new Object[] {
+					userGroupGroupRoleModelImpl.getOriginalGroupId()
+				};
 
-			args = new Object[] { userGroupGroupRoleModelImpl.getRoleId() };
+				FinderCacheUtil.removeResult(_finderPathCountByGroupId, args);
+				FinderCacheUtil.removeResult(
+					_finderPathWithoutPaginationFindByGroupId, args);
 
-			FinderCacheUtil.removeResult(FINDER_PATH_COUNT_BY_ROLEID, args);
-			FinderCacheUtil.removeResult(FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_ROLEID,
-				args);
+				args = new Object[] {userGroupGroupRoleModelImpl.getGroupId()};
 
-			args = new Object[] {
+				FinderCacheUtil.removeResult(_finderPathCountByGroupId, args);
+				FinderCacheUtil.removeResult(
+					_finderPathWithoutPaginationFindByGroupId, args);
+			}
+
+			if ((userGroupGroupRoleModelImpl.getColumnBitmask() &
+				 _finderPathWithoutPaginationFindByRoleId.getColumnBitmask()) !=
+					 0) {
+
+				Object[] args = new Object[] {
+					userGroupGroupRoleModelImpl.getOriginalRoleId()
+				};
+
+				FinderCacheUtil.removeResult(_finderPathCountByRoleId, args);
+				FinderCacheUtil.removeResult(
+					_finderPathWithoutPaginationFindByRoleId, args);
+
+				args = new Object[] {userGroupGroupRoleModelImpl.getRoleId()};
+
+				FinderCacheUtil.removeResult(_finderPathCountByRoleId, args);
+				FinderCacheUtil.removeResult(
+					_finderPathWithoutPaginationFindByRoleId, args);
+			}
+
+			if ((userGroupGroupRoleModelImpl.getColumnBitmask() &
+				 _finderPathWithoutPaginationFindByU_G.getColumnBitmask()) !=
+					 0) {
+
+				Object[] args = new Object[] {
+					userGroupGroupRoleModelImpl.getOriginalUserGroupId(),
+					userGroupGroupRoleModelImpl.getOriginalGroupId()
+				};
+
+				FinderCacheUtil.removeResult(_finderPathCountByU_G, args);
+				FinderCacheUtil.removeResult(
+					_finderPathWithoutPaginationFindByU_G, args);
+
+				args = new Object[] {
 					userGroupGroupRoleModelImpl.getUserGroupId(),
 					userGroupGroupRoleModelImpl.getGroupId()
 				};
 
-			FinderCacheUtil.removeResult(FINDER_PATH_COUNT_BY_U_G, args);
-			FinderCacheUtil.removeResult(FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_U_G,
-				args);
+				FinderCacheUtil.removeResult(_finderPathCountByU_G, args);
+				FinderCacheUtil.removeResult(
+					_finderPathWithoutPaginationFindByU_G, args);
+			}
 
-			args = new Object[] {
+			if ((userGroupGroupRoleModelImpl.getColumnBitmask() &
+				 _finderPathWithoutPaginationFindByG_R.getColumnBitmask()) !=
+					 0) {
+
+				Object[] args = new Object[] {
+					userGroupGroupRoleModelImpl.getOriginalGroupId(),
+					userGroupGroupRoleModelImpl.getOriginalRoleId()
+				};
+
+				FinderCacheUtil.removeResult(_finderPathCountByG_R, args);
+				FinderCacheUtil.removeResult(
+					_finderPathWithoutPaginationFindByG_R, args);
+
+				args = new Object[] {
 					userGroupGroupRoleModelImpl.getGroupId(),
 					userGroupGroupRoleModelImpl.getRoleId()
 				};
 
-			FinderCacheUtil.removeResult(FINDER_PATH_COUNT_BY_G_R, args);
-			FinderCacheUtil.removeResult(FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_G_R,
-				args);
-
-			FinderCacheUtil.removeResult(FINDER_PATH_COUNT_ALL,
-				FINDER_ARGS_EMPTY);
-			FinderCacheUtil.removeResult(FINDER_PATH_WITHOUT_PAGINATION_FIND_ALL,
-				FINDER_ARGS_EMPTY);
-		}
-
-		else {
-			if ((userGroupGroupRoleModelImpl.getColumnBitmask() &
-					FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_USERGROUPID.getColumnBitmask()) != 0) {
-				Object[] args = new Object[] {
-						userGroupGroupRoleModelImpl.getOriginalUserGroupId()
-					};
-
-				FinderCacheUtil.removeResult(FINDER_PATH_COUNT_BY_USERGROUPID,
-					args);
-				FinderCacheUtil.removeResult(FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_USERGROUPID,
-					args);
-
-				args = new Object[] { userGroupGroupRoleModelImpl.getUserGroupId() };
-
-				FinderCacheUtil.removeResult(FINDER_PATH_COUNT_BY_USERGROUPID,
-					args);
-				FinderCacheUtil.removeResult(FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_USERGROUPID,
-					args);
-			}
-
-			if ((userGroupGroupRoleModelImpl.getColumnBitmask() &
-					FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_GROUPID.getColumnBitmask()) != 0) {
-				Object[] args = new Object[] {
-						userGroupGroupRoleModelImpl.getOriginalGroupId()
-					};
-
-				FinderCacheUtil.removeResult(FINDER_PATH_COUNT_BY_GROUPID, args);
-				FinderCacheUtil.removeResult(FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_GROUPID,
-					args);
-
-				args = new Object[] { userGroupGroupRoleModelImpl.getGroupId() };
-
-				FinderCacheUtil.removeResult(FINDER_PATH_COUNT_BY_GROUPID, args);
-				FinderCacheUtil.removeResult(FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_GROUPID,
-					args);
-			}
-
-			if ((userGroupGroupRoleModelImpl.getColumnBitmask() &
-					FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_ROLEID.getColumnBitmask()) != 0) {
-				Object[] args = new Object[] {
-						userGroupGroupRoleModelImpl.getOriginalRoleId()
-					};
-
-				FinderCacheUtil.removeResult(FINDER_PATH_COUNT_BY_ROLEID, args);
-				FinderCacheUtil.removeResult(FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_ROLEID,
-					args);
-
-				args = new Object[] { userGroupGroupRoleModelImpl.getRoleId() };
-
-				FinderCacheUtil.removeResult(FINDER_PATH_COUNT_BY_ROLEID, args);
-				FinderCacheUtil.removeResult(FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_ROLEID,
-					args);
-			}
-
-			if ((userGroupGroupRoleModelImpl.getColumnBitmask() &
-					FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_U_G.getColumnBitmask()) != 0) {
-				Object[] args = new Object[] {
-						userGroupGroupRoleModelImpl.getOriginalUserGroupId(),
-						userGroupGroupRoleModelImpl.getOriginalGroupId()
-					};
-
-				FinderCacheUtil.removeResult(FINDER_PATH_COUNT_BY_U_G, args);
-				FinderCacheUtil.removeResult(FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_U_G,
-					args);
-
-				args = new Object[] {
-						userGroupGroupRoleModelImpl.getUserGroupId(),
-						userGroupGroupRoleModelImpl.getGroupId()
-					};
-
-				FinderCacheUtil.removeResult(FINDER_PATH_COUNT_BY_U_G, args);
-				FinderCacheUtil.removeResult(FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_U_G,
-					args);
-			}
-
-			if ((userGroupGroupRoleModelImpl.getColumnBitmask() &
-					FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_G_R.getColumnBitmask()) != 0) {
-				Object[] args = new Object[] {
-						userGroupGroupRoleModelImpl.getOriginalGroupId(),
-						userGroupGroupRoleModelImpl.getOriginalRoleId()
-					};
-
-				FinderCacheUtil.removeResult(FINDER_PATH_COUNT_BY_G_R, args);
-				FinderCacheUtil.removeResult(FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_G_R,
-					args);
-
-				args = new Object[] {
-						userGroupGroupRoleModelImpl.getGroupId(),
-						userGroupGroupRoleModelImpl.getRoleId()
-					};
-
-				FinderCacheUtil.removeResult(FINDER_PATH_COUNT_BY_G_R, args);
-				FinderCacheUtil.removeResult(FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_G_R,
-					args);
+				FinderCacheUtil.removeResult(_finderPathCountByG_R, args);
+				FinderCacheUtil.removeResult(
+					_finderPathWithoutPaginationFindByG_R, args);
 			}
 		}
 
-		EntityCacheUtil.putResult(UserGroupGroupRoleModelImpl.ENTITY_CACHE_ENABLED,
+		EntityCacheUtil.putResult(
+			UserGroupGroupRoleModelImpl.ENTITY_CACHE_ENABLED,
 			UserGroupGroupRoleImpl.class, userGroupGroupRole.getPrimaryKey(),
 			userGroupGroupRole, false);
 
@@ -3097,7 +3148,7 @@ public class UserGroupGroupRolePersistenceImpl extends BasePersistenceImpl<UserG
 	}
 
 	/**
-	 * Returns the user group group role with the primary key or throws a {@link com.liferay.portal.kernel.exception.NoSuchModelException} if it could not be found.
+	 * Returns the user group group role with the primary key or throws a <code>com.liferay.portal.kernel.exception.NoSuchModelException</code> if it could not be found.
 	 *
 	 * @param primaryKey the primary key of the user group group role
 	 * @return the user group group role
@@ -3106,6 +3157,7 @@ public class UserGroupGroupRolePersistenceImpl extends BasePersistenceImpl<UserG
 	@Override
 	public UserGroupGroupRole findByPrimaryKey(Serializable primaryKey)
 		throws NoSuchUserGroupGroupRoleException {
+
 		UserGroupGroupRole userGroupGroupRole = fetchByPrimaryKey(primaryKey);
 
 		if (userGroupGroupRole == null) {
@@ -3113,15 +3165,15 @@ public class UserGroupGroupRolePersistenceImpl extends BasePersistenceImpl<UserG
 				_log.debug(_NO_SUCH_ENTITY_WITH_PRIMARY_KEY + primaryKey);
 			}
 
-			throw new NoSuchUserGroupGroupRoleException(_NO_SUCH_ENTITY_WITH_PRIMARY_KEY +
-				primaryKey);
+			throw new NoSuchUserGroupGroupRoleException(
+				_NO_SUCH_ENTITY_WITH_PRIMARY_KEY + primaryKey);
 		}
 
 		return userGroupGroupRole;
 	}
 
 	/**
-	 * Returns the user group group role with the primary key or throws a {@link NoSuchUserGroupGroupRoleException} if it could not be found.
+	 * Returns the user group group role with the primary key or throws a <code>NoSuchUserGroupGroupRoleException</code> if it could not be found.
 	 *
 	 * @param userGroupGroupRolePK the primary key of the user group group role
 	 * @return the user group group role
@@ -3129,8 +3181,9 @@ public class UserGroupGroupRolePersistenceImpl extends BasePersistenceImpl<UserG
 	 */
 	@Override
 	public UserGroupGroupRole findByPrimaryKey(
-		UserGroupGroupRolePK userGroupGroupRolePK)
+			UserGroupGroupRolePK userGroupGroupRolePK)
 		throws NoSuchUserGroupGroupRoleException {
+
 		return findByPrimaryKey((Serializable)userGroupGroupRolePK);
 	}
 
@@ -3142,14 +3195,16 @@ public class UserGroupGroupRolePersistenceImpl extends BasePersistenceImpl<UserG
 	 */
 	@Override
 	public UserGroupGroupRole fetchByPrimaryKey(Serializable primaryKey) {
-		Serializable serializable = EntityCacheUtil.getResult(UserGroupGroupRoleModelImpl.ENTITY_CACHE_ENABLED,
-				UserGroupGroupRoleImpl.class, primaryKey);
+		Serializable serializable = EntityCacheUtil.getResult(
+			UserGroupGroupRoleModelImpl.ENTITY_CACHE_ENABLED,
+			UserGroupGroupRoleImpl.class, primaryKey);
 
 		if (serializable == nullModel) {
 			return null;
 		}
 
-		UserGroupGroupRole userGroupGroupRole = (UserGroupGroupRole)serializable;
+		UserGroupGroupRole userGroupGroupRole =
+			(UserGroupGroupRole)serializable;
 
 		if (userGroupGroupRole == null) {
 			Session session = null;
@@ -3157,19 +3212,21 @@ public class UserGroupGroupRolePersistenceImpl extends BasePersistenceImpl<UserG
 			try {
 				session = openSession();
 
-				userGroupGroupRole = (UserGroupGroupRole)session.get(UserGroupGroupRoleImpl.class,
-						primaryKey);
+				userGroupGroupRole = (UserGroupGroupRole)session.get(
+					UserGroupGroupRoleImpl.class, primaryKey);
 
 				if (userGroupGroupRole != null) {
 					cacheResult(userGroupGroupRole);
 				}
 				else {
-					EntityCacheUtil.putResult(UserGroupGroupRoleModelImpl.ENTITY_CACHE_ENABLED,
+					EntityCacheUtil.putResult(
+						UserGroupGroupRoleModelImpl.ENTITY_CACHE_ENABLED,
 						UserGroupGroupRoleImpl.class, primaryKey, nullModel);
 				}
 			}
 			catch (Exception e) {
-				EntityCacheUtil.removeResult(UserGroupGroupRoleModelImpl.ENTITY_CACHE_ENABLED,
+				EntityCacheUtil.removeResult(
+					UserGroupGroupRoleModelImpl.ENTITY_CACHE_ENABLED,
 					UserGroupGroupRoleImpl.class, primaryKey);
 
 				throw processException(e);
@@ -3191,20 +3248,24 @@ public class UserGroupGroupRolePersistenceImpl extends BasePersistenceImpl<UserG
 	@Override
 	public UserGroupGroupRole fetchByPrimaryKey(
 		UserGroupGroupRolePK userGroupGroupRolePK) {
+
 		return fetchByPrimaryKey((Serializable)userGroupGroupRolePK);
 	}
 
 	@Override
 	public Map<Serializable, UserGroupGroupRole> fetchByPrimaryKeys(
 		Set<Serializable> primaryKeys) {
+
 		if (primaryKeys.isEmpty()) {
 			return Collections.emptyMap();
 		}
 
-		Map<Serializable, UserGroupGroupRole> map = new HashMap<Serializable, UserGroupGroupRole>();
+		Map<Serializable, UserGroupGroupRole> map =
+			new HashMap<Serializable, UserGroupGroupRole>();
 
 		for (Serializable primaryKey : primaryKeys) {
-			UserGroupGroupRole userGroupGroupRole = fetchByPrimaryKey(primaryKey);
+			UserGroupGroupRole userGroupGroupRole = fetchByPrimaryKey(
+				primaryKey);
 
 			if (userGroupGroupRole != null) {
 				map.put(primaryKey, userGroupGroupRole);
@@ -3228,7 +3289,7 @@ public class UserGroupGroupRolePersistenceImpl extends BasePersistenceImpl<UserG
 	 * Returns a range of all the user group group roles.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link UserGroupGroupRoleModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>UserGroupGroupRoleModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param start the lower bound of the range of user group group roles
@@ -3244,7 +3305,7 @@ public class UserGroupGroupRolePersistenceImpl extends BasePersistenceImpl<UserG
 	 * Returns an ordered range of all the user group group roles.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link UserGroupGroupRoleModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>UserGroupGroupRoleModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param start the lower bound of the range of user group group roles
@@ -3253,8 +3314,10 @@ public class UserGroupGroupRolePersistenceImpl extends BasePersistenceImpl<UserG
 	 * @return the ordered range of user group group roles
 	 */
 	@Override
-	public List<UserGroupGroupRole> findAll(int start, int end,
+	public List<UserGroupGroupRole> findAll(
+		int start, int end,
 		OrderByComparator<UserGroupGroupRole> orderByComparator) {
+
 		return findAll(start, end, orderByComparator, true);
 	}
 
@@ -3262,7 +3325,7 @@ public class UserGroupGroupRolePersistenceImpl extends BasePersistenceImpl<UserG
 	 * Returns an ordered range of all the user group group roles.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link UserGroupGroupRoleModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>UserGroupGroupRoleModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param start the lower bound of the range of user group group roles
@@ -3272,29 +3335,32 @@ public class UserGroupGroupRolePersistenceImpl extends BasePersistenceImpl<UserG
 	 * @return the ordered range of user group group roles
 	 */
 	@Override
-	public List<UserGroupGroupRole> findAll(int start, int end,
+	public List<UserGroupGroupRole> findAll(
+		int start, int end,
 		OrderByComparator<UserGroupGroupRole> orderByComparator,
 		boolean retrieveFromCache) {
+
 		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
-				(orderByComparator == null)) {
+			(orderByComparator == null)) {
+
 			pagination = false;
-			finderPath = FINDER_PATH_WITHOUT_PAGINATION_FIND_ALL;
+			finderPath = _finderPathWithoutPaginationFindAll;
 			finderArgs = FINDER_ARGS_EMPTY;
 		}
 		else {
-			finderPath = FINDER_PATH_WITH_PAGINATION_FIND_ALL;
-			finderArgs = new Object[] { start, end, orderByComparator };
+			finderPath = _finderPathWithPaginationFindAll;
+			finderArgs = new Object[] {start, end, orderByComparator};
 		}
 
 		List<UserGroupGroupRole> list = null;
 
 		if (retrieveFromCache) {
-			list = (List<UserGroupGroupRole>)FinderCacheUtil.getResult(finderPath,
-					finderArgs, this);
+			list = (List<UserGroupGroupRole>)FinderCacheUtil.getResult(
+				finderPath, finderArgs, this);
 		}
 
 		if (list == null) {
@@ -3302,13 +3368,13 @@ public class UserGroupGroupRolePersistenceImpl extends BasePersistenceImpl<UserG
 			String sql = null;
 
 			if (orderByComparator != null) {
-				query = new StringBundler(2 +
-						(orderByComparator.getOrderByFields().length * 2));
+				query = new StringBundler(
+					2 + (orderByComparator.getOrderByFields().length * 2));
 
 				query.append(_SQL_SELECT_USERGROUPGROUPROLE);
 
-				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
-					orderByComparator);
+				appendOrderByComparator(
+					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
 
 				sql = query.toString();
 			}
@@ -3328,16 +3394,16 @@ public class UserGroupGroupRolePersistenceImpl extends BasePersistenceImpl<UserG
 				Query q = session.createQuery(sql);
 
 				if (!pagination) {
-					list = (List<UserGroupGroupRole>)QueryUtil.list(q,
-							getDialect(), start, end, false);
+					list = (List<UserGroupGroupRole>)QueryUtil.list(
+						q, getDialect(), start, end, false);
 
 					Collections.sort(list);
 
 					list = Collections.unmodifiableList(list);
 				}
 				else {
-					list = (List<UserGroupGroupRole>)QueryUtil.list(q,
-							getDialect(), start, end);
+					list = (List<UserGroupGroupRole>)QueryUtil.list(
+						q, getDialect(), start, end);
 				}
 
 				cacheResult(list);
@@ -3375,8 +3441,8 @@ public class UserGroupGroupRolePersistenceImpl extends BasePersistenceImpl<UserG
 	 */
 	@Override
 	public int countAll() {
-		Long count = (Long)FinderCacheUtil.getResult(FINDER_PATH_COUNT_ALL,
-				FINDER_ARGS_EMPTY, this);
+		Long count = (Long)FinderCacheUtil.getResult(
+			_finderPathCountAll, FINDER_ARGS_EMPTY, this);
 
 		if (count == null) {
 			Session session = null;
@@ -3388,12 +3454,12 @@ public class UserGroupGroupRolePersistenceImpl extends BasePersistenceImpl<UserG
 
 				count = (Long)q.uniqueResult();
 
-				FinderCacheUtil.putResult(FINDER_PATH_COUNT_ALL,
-					FINDER_ARGS_EMPTY, count);
+				FinderCacheUtil.putResult(
+					_finderPathCountAll, FINDER_ARGS_EMPTY, count);
 			}
 			catch (Exception e) {
-				FinderCacheUtil.removeResult(FINDER_PATH_COUNT_ALL,
-					FINDER_ARGS_EMPTY);
+				FinderCacheUtil.removeResult(
+					_finderPathCountAll, FINDER_ARGS_EMPTY);
 
 				throw processException(e);
 			}
@@ -3419,6 +3485,148 @@ public class UserGroupGroupRolePersistenceImpl extends BasePersistenceImpl<UserG
 	 * Initializes the user group group role persistence.
 	 */
 	public void afterPropertiesSet() {
+		_finderPathWithPaginationFindAll = new FinderPath(
+			UserGroupGroupRoleModelImpl.ENTITY_CACHE_ENABLED,
+			UserGroupGroupRoleModelImpl.FINDER_CACHE_ENABLED,
+			UserGroupGroupRoleImpl.class,
+			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findAll", new String[0]);
+
+		_finderPathWithoutPaginationFindAll = new FinderPath(
+			UserGroupGroupRoleModelImpl.ENTITY_CACHE_ENABLED,
+			UserGroupGroupRoleModelImpl.FINDER_CACHE_ENABLED,
+			UserGroupGroupRoleImpl.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findAll",
+			new String[0]);
+
+		_finderPathCountAll = new FinderPath(
+			UserGroupGroupRoleModelImpl.ENTITY_CACHE_ENABLED,
+			UserGroupGroupRoleModelImpl.FINDER_CACHE_ENABLED, Long.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countAll",
+			new String[0]);
+
+		_finderPathWithPaginationFindByUserGroupId = new FinderPath(
+			UserGroupGroupRoleModelImpl.ENTITY_CACHE_ENABLED,
+			UserGroupGroupRoleModelImpl.FINDER_CACHE_ENABLED,
+			UserGroupGroupRoleImpl.class,
+			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByUserGroupId",
+			new String[] {
+				Long.class.getName(), Integer.class.getName(),
+				Integer.class.getName(), OrderByComparator.class.getName()
+			});
+
+		_finderPathWithoutPaginationFindByUserGroupId = new FinderPath(
+			UserGroupGroupRoleModelImpl.ENTITY_CACHE_ENABLED,
+			UserGroupGroupRoleModelImpl.FINDER_CACHE_ENABLED,
+			UserGroupGroupRoleImpl.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByUserGroupId",
+			new String[] {Long.class.getName()},
+			UserGroupGroupRoleModelImpl.USERGROUPID_COLUMN_BITMASK);
+
+		_finderPathCountByUserGroupId = new FinderPath(
+			UserGroupGroupRoleModelImpl.ENTITY_CACHE_ENABLED,
+			UserGroupGroupRoleModelImpl.FINDER_CACHE_ENABLED, Long.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByUserGroupId",
+			new String[] {Long.class.getName()});
+
+		_finderPathWithPaginationFindByGroupId = new FinderPath(
+			UserGroupGroupRoleModelImpl.ENTITY_CACHE_ENABLED,
+			UserGroupGroupRoleModelImpl.FINDER_CACHE_ENABLED,
+			UserGroupGroupRoleImpl.class,
+			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByGroupId",
+			new String[] {
+				Long.class.getName(), Integer.class.getName(),
+				Integer.class.getName(), OrderByComparator.class.getName()
+			});
+
+		_finderPathWithoutPaginationFindByGroupId = new FinderPath(
+			UserGroupGroupRoleModelImpl.ENTITY_CACHE_ENABLED,
+			UserGroupGroupRoleModelImpl.FINDER_CACHE_ENABLED,
+			UserGroupGroupRoleImpl.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByGroupId",
+			new String[] {Long.class.getName()},
+			UserGroupGroupRoleModelImpl.GROUPID_COLUMN_BITMASK);
+
+		_finderPathCountByGroupId = new FinderPath(
+			UserGroupGroupRoleModelImpl.ENTITY_CACHE_ENABLED,
+			UserGroupGroupRoleModelImpl.FINDER_CACHE_ENABLED, Long.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByGroupId",
+			new String[] {Long.class.getName()});
+
+		_finderPathWithPaginationFindByRoleId = new FinderPath(
+			UserGroupGroupRoleModelImpl.ENTITY_CACHE_ENABLED,
+			UserGroupGroupRoleModelImpl.FINDER_CACHE_ENABLED,
+			UserGroupGroupRoleImpl.class,
+			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByRoleId",
+			new String[] {
+				Long.class.getName(), Integer.class.getName(),
+				Integer.class.getName(), OrderByComparator.class.getName()
+			});
+
+		_finderPathWithoutPaginationFindByRoleId = new FinderPath(
+			UserGroupGroupRoleModelImpl.ENTITY_CACHE_ENABLED,
+			UserGroupGroupRoleModelImpl.FINDER_CACHE_ENABLED,
+			UserGroupGroupRoleImpl.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByRoleId",
+			new String[] {Long.class.getName()},
+			UserGroupGroupRoleModelImpl.ROLEID_COLUMN_BITMASK);
+
+		_finderPathCountByRoleId = new FinderPath(
+			UserGroupGroupRoleModelImpl.ENTITY_CACHE_ENABLED,
+			UserGroupGroupRoleModelImpl.FINDER_CACHE_ENABLED, Long.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByRoleId",
+			new String[] {Long.class.getName()});
+
+		_finderPathWithPaginationFindByU_G = new FinderPath(
+			UserGroupGroupRoleModelImpl.ENTITY_CACHE_ENABLED,
+			UserGroupGroupRoleModelImpl.FINDER_CACHE_ENABLED,
+			UserGroupGroupRoleImpl.class,
+			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByU_G",
+			new String[] {
+				Long.class.getName(), Long.class.getName(),
+				Integer.class.getName(), Integer.class.getName(),
+				OrderByComparator.class.getName()
+			});
+
+		_finderPathWithoutPaginationFindByU_G = new FinderPath(
+			UserGroupGroupRoleModelImpl.ENTITY_CACHE_ENABLED,
+			UserGroupGroupRoleModelImpl.FINDER_CACHE_ENABLED,
+			UserGroupGroupRoleImpl.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByU_G",
+			new String[] {Long.class.getName(), Long.class.getName()},
+			UserGroupGroupRoleModelImpl.USERGROUPID_COLUMN_BITMASK |
+			UserGroupGroupRoleModelImpl.GROUPID_COLUMN_BITMASK);
+
+		_finderPathCountByU_G = new FinderPath(
+			UserGroupGroupRoleModelImpl.ENTITY_CACHE_ENABLED,
+			UserGroupGroupRoleModelImpl.FINDER_CACHE_ENABLED, Long.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByU_G",
+			new String[] {Long.class.getName(), Long.class.getName()});
+
+		_finderPathWithPaginationFindByG_R = new FinderPath(
+			UserGroupGroupRoleModelImpl.ENTITY_CACHE_ENABLED,
+			UserGroupGroupRoleModelImpl.FINDER_CACHE_ENABLED,
+			UserGroupGroupRoleImpl.class,
+			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByG_R",
+			new String[] {
+				Long.class.getName(), Long.class.getName(),
+				Integer.class.getName(), Integer.class.getName(),
+				OrderByComparator.class.getName()
+			});
+
+		_finderPathWithoutPaginationFindByG_R = new FinderPath(
+			UserGroupGroupRoleModelImpl.ENTITY_CACHE_ENABLED,
+			UserGroupGroupRoleModelImpl.FINDER_CACHE_ENABLED,
+			UserGroupGroupRoleImpl.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByG_R",
+			new String[] {Long.class.getName(), Long.class.getName()},
+			UserGroupGroupRoleModelImpl.GROUPID_COLUMN_BITMASK |
+			UserGroupGroupRoleModelImpl.ROLEID_COLUMN_BITMASK);
+
+		_finderPathCountByG_R = new FinderPath(
+			UserGroupGroupRoleModelImpl.ENTITY_CACHE_ENABLED,
+			UserGroupGroupRoleModelImpl.FINDER_CACHE_ENABLED, Long.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByG_R",
+			new String[] {Long.class.getName(), Long.class.getName()});
 	}
 
 	public void destroy() {
@@ -3430,15 +3638,31 @@ public class UserGroupGroupRolePersistenceImpl extends BasePersistenceImpl<UserG
 
 	@BeanReference(type = CompanyProviderWrapper.class)
 	protected CompanyProvider companyProvider;
-	private static final String _SQL_SELECT_USERGROUPGROUPROLE = "SELECT userGroupGroupRole FROM UserGroupGroupRole userGroupGroupRole";
-	private static final String _SQL_SELECT_USERGROUPGROUPROLE_WHERE = "SELECT userGroupGroupRole FROM UserGroupGroupRole userGroupGroupRole WHERE ";
-	private static final String _SQL_COUNT_USERGROUPGROUPROLE = "SELECT COUNT(userGroupGroupRole) FROM UserGroupGroupRole userGroupGroupRole";
-	private static final String _SQL_COUNT_USERGROUPGROUPROLE_WHERE = "SELECT COUNT(userGroupGroupRole) FROM UserGroupGroupRole userGroupGroupRole WHERE ";
+
+	private static final String _SQL_SELECT_USERGROUPGROUPROLE =
+		"SELECT userGroupGroupRole FROM UserGroupGroupRole userGroupGroupRole";
+
+	private static final String _SQL_SELECT_USERGROUPGROUPROLE_WHERE =
+		"SELECT userGroupGroupRole FROM UserGroupGroupRole userGroupGroupRole WHERE ";
+
+	private static final String _SQL_COUNT_USERGROUPGROUPROLE =
+		"SELECT COUNT(userGroupGroupRole) FROM UserGroupGroupRole userGroupGroupRole";
+
+	private static final String _SQL_COUNT_USERGROUPGROUPROLE_WHERE =
+		"SELECT COUNT(userGroupGroupRole) FROM UserGroupGroupRole userGroupGroupRole WHERE ";
+
 	private static final String _ORDER_BY_ENTITY_ALIAS = "userGroupGroupRole.";
-	private static final String _NO_SUCH_ENTITY_WITH_PRIMARY_KEY = "No UserGroupGroupRole exists with the primary key ";
-	private static final String _NO_SUCH_ENTITY_WITH_KEY = "No UserGroupGroupRole exists with the key {";
-	private static final Log _log = LogFactoryUtil.getLog(UserGroupGroupRolePersistenceImpl.class);
-	private static final Set<String> _compoundPKColumnNames = SetUtil.fromArray(new String[] {
-				"userGroupId", "groupId", "roleId"
-			});
+
+	private static final String _NO_SUCH_ENTITY_WITH_PRIMARY_KEY =
+		"No UserGroupGroupRole exists with the primary key ";
+
+	private static final String _NO_SUCH_ENTITY_WITH_KEY =
+		"No UserGroupGroupRole exists with the key {";
+
+	private static final Log _log = LogFactoryUtil.getLog(
+		UserGroupGroupRolePersistenceImpl.class);
+
+	private static final Set<String> _compoundPKColumnNames = SetUtil.fromArray(
+		new String[] {"userGroupId", "groupId", "roleId"});
+
 }

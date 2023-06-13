@@ -20,6 +20,8 @@ import com.liferay.portal.search.elasticsearch6.internal.connection.Elasticsearc
 import com.liferay.portal.search.elasticsearch6.internal.connection.TestElasticsearchConnectionManager;
 import com.liferay.portal.search.engine.adapter.index.UpdateIndexSettingsIndexRequest;
 
+import java.util.Arrays;
+
 import org.elasticsearch.action.admin.indices.settings.put.UpdateSettingsRequest;
 import org.elasticsearch.action.admin.indices.settings.put.UpdateSettingsRequestBuilder;
 
@@ -89,8 +91,10 @@ public class UpdateIndexSettingsIndexRequestExecutorTest {
 		UpdateSettingsRequest updateSettingsRequest =
 			updateSettingsRequestBuilder.request();
 
-		Assert.assertEquals(1, updateSettingsRequest.indices().length);
-		Assert.assertEquals(_INDEX_NAME, updateSettingsRequest.indices()[0]);
+		String[] indices = updateSettingsRequest.indices();
+
+		Assert.assertEquals(Arrays.toString(indices), 1, indices.length);
+		Assert.assertEquals(_INDEX_NAME, indices[0]);
 	}
 
 	private static final String _INDEX_NAME = "test_request_index";

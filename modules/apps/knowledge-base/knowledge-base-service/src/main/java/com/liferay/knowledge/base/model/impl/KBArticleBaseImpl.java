@@ -32,12 +32,13 @@ import com.liferay.knowledge.base.service.KBArticleLocalServiceUtil;
  * @generated
  */
 @ProviderType
-public abstract class KBArticleBaseImpl extends KBArticleModelImpl
-	implements KBArticle {
+public abstract class KBArticleBaseImpl
+	extends KBArticleModelImpl implements KBArticle {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
-	 * Never modify or reference this class directly. All methods that expect a kb article model instance should use the {@link KBArticle} interface instead.
+	 * Never modify or reference this class directly. All methods that expect a kb article model instance should use the <code>KBArticle</code> interface instead.
 	 */
 	@Override
 	public void persist() {
@@ -48,4 +49,5 @@ public abstract class KBArticleBaseImpl extends KBArticleModelImpl
 			KBArticleLocalServiceUtil.updateKBArticle(this);
 		}
 	}
+
 }

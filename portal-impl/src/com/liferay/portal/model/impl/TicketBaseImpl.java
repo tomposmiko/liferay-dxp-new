@@ -33,10 +33,11 @@ import com.liferay.portal.kernel.service.TicketLocalServiceUtil;
  */
 @ProviderType
 public abstract class TicketBaseImpl extends TicketModelImpl implements Ticket {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
-	 * Never modify or reference this class directly. All methods that expect a ticket model instance should use the {@link Ticket} interface instead.
+	 * Never modify or reference this class directly. All methods that expect a ticket model instance should use the <code>Ticket</code> interface instead.
 	 */
 	@Override
 	public void persist() {
@@ -47,4 +48,5 @@ public abstract class TicketBaseImpl extends TicketModelImpl implements Ticket {
 			TicketLocalServiceUtil.updateTicket(this);
 		}
 	}
+
 }

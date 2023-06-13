@@ -15,14 +15,13 @@
 package com.liferay.dynamic.data.mapping.internal.security.permission.resource;
 
 import com.liferay.dynamic.data.mapping.constants.DDMConstants;
-import com.liferay.dynamic.data.mapping.constants.DDMPortletKeys;
 import com.liferay.dynamic.data.mapping.model.DDMDataProviderInstance;
 import com.liferay.dynamic.data.mapping.service.DDMDataProviderInstanceLocalService;
 import com.liferay.exportimport.kernel.staging.permission.StagingPermission;
 import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermission;
 import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermissionFactory;
 import com.liferay.portal.kernel.security.permission.resource.PortletResourcePermission;
-import com.liferay.portal.kernel.security.permission.resource.StagedModelPermissionLogic;
+import com.liferay.portal.kernel.service.GroupLocalService;
 import com.liferay.portal.kernel.util.HashMapDictionary;
 
 import java.util.Dictionary;
@@ -55,10 +54,8 @@ public class DDMDataProviderInstanceModelResourcePermissionRegistrar {
 				_ddmDataProviderInstanceLocalService::
 					getDDMDataProviderInstance,
 				_portletResourcePermission,
-				(modelResourcePermission, consumer) -> consumer.accept(
-					new StagedModelPermissionLogic<>(
-						_stagingPermission, DDMPortletKeys.DYNAMIC_DATA_MAPPING,
-						DDMDataProviderInstance::getDataProviderInstanceId))),
+				(modelResourcePermission, consumer) -> {
+				}),
 			properties);
 	}
 
@@ -70,6 +67,9 @@ public class DDMDataProviderInstanceModelResourcePermissionRegistrar {
 	@Reference
 	private DDMDataProviderInstanceLocalService
 		_ddmDataProviderInstanceLocalService;
+
+	@Reference
+	private GroupLocalService _groupLocalService;
 
 	@Reference(target = "(resource.name=" + DDMConstants.RESOURCE_NAME + ")")
 	private PortletResourcePermission _portletResourcePermission;

@@ -19,7 +19,7 @@ import com.liferay.apio.architect.credentials.Credentials;
 import com.liferay.apio.architect.identifier.Identifier;
 import com.liferay.asset.kernel.model.AssetTag;
 import com.liferay.asset.kernel.service.AssetTagService;
-import com.liferay.content.space.apio.architect.identifier.ContentSpaceIdentifier;
+import com.liferay.content.space.apio.architect.model.ContentSpace;
 import com.liferay.portal.apio.permission.HasPermission;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
@@ -30,7 +30,7 @@ import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
 /**
- * @author Eduardo Perez
+ * @author Eduardo Pérez
  */
 @Component(
 	immediate = true,
@@ -43,12 +43,10 @@ public class KeywordHasPermissionImpl implements HasPermission<Long> {
 	public <S> HasNestedAddingPermissionFunction<S> forAddingIn(
 		Class<? extends Identifier<S>> identifierClass) {
 
-		if (identifierClass.equals(ContentSpaceIdentifier.class)) {
-			return (credentials, groupId) -> {
-				return AssetTagsPermission.contains(
-					(PermissionChecker)credentials.get(), (Long)groupId,
-					ActionKeys.MANAGE_TAG);
-			};
+		if (identifierClass.equals(ContentSpace.class)) {
+			return (credentials, groupId) -> AssetTagsPermission.contains(
+				(PermissionChecker)credentials.get(), (Long)groupId,
+				ActionKeys.MANAGE_TAG);
 		}
 
 		return (credentials, s) -> false;

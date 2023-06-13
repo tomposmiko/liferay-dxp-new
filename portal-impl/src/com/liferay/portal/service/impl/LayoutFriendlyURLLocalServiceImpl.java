@@ -238,35 +238,39 @@ public class LayoutFriendlyURLLocalServiceImpl
 		UnicodeProperties typeSettingsProperties =
 			siteGroup.getTypeSettingsProperties();
 
-		if (!GetterUtil.getBoolean(
+		List<LayoutFriendlyURL> layoutFriendlyURLs =
+			layoutFriendlyURLPersistence.findByP_L(
+				ListUtil.toLongArray(layouts, Layout.PLID_ACCESSOR),
+				languageId);
+
+		for (LayoutFriendlyURL layoutFriendlyURL : layoutFriendlyURLs) {
+			layoutFriendlyURLMap.put(
+				layoutFriendlyURL.getPlid(),
+				layoutFriendlyURL.getFriendlyURL());
+		}
+
+		if (GetterUtil.getBoolean(
 				typeSettingsProperties.getProperty(
 					GroupConstants.TYPE_SETTINGS_KEY_INHERIT_LOCALES),
 				true)) {
 
-			String[] locales = StringUtil.split(
-				typeSettingsProperties.getProperty(PropsKeys.LOCALES));
-
-			if (!ArrayUtil.contains(locales, languageId)) {
-				for (Layout layout : layouts) {
-					layoutFriendlyURLMap.put(
-						layout.getPlid(), layout.getFriendlyURL());
-				}
-			}
+			return layoutFriendlyURLMap;
 		}
-		else {
-			List<LayoutFriendlyURL> layoutFriendlyURLs =
-				layoutFriendlyURLPersistence.findByP_L(
-					ListUtil.toLongArray(layouts, Layout.PLID_ACCESSOR),
-					languageId);
 
-			for (LayoutFriendlyURL layoutFriendlyURL : layoutFriendlyURLs) {
-				layoutFriendlyURLMap.put(
-					layoutFriendlyURL.getPlid(),
-					layoutFriendlyURL.getFriendlyURL());
+		Map<Long, String> filteredLayoutFriendlyURLMap = new HashMap<>();
+
+		String[] locales = StringUtil.split(
+			typeSettingsProperties.getProperty(PropsKeys.LOCALES));
+
+		if (!ArrayUtil.contains(locales, languageId)) {
+			for (Layout layout : layouts) {
+				String friendlyURL = layoutFriendlyURLMap.get(layout.getPlid());
+
+				filteredLayoutFriendlyURLMap.put(layout.getPlid(), friendlyURL);
 			}
 		}
 
-		return layoutFriendlyURLMap;
+		return filteredLayoutFriendlyURLMap;
 	}
 
 	@Override

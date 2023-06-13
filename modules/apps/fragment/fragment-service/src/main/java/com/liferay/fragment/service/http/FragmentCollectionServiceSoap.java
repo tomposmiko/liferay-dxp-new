@@ -17,7 +17,6 @@ package com.liferay.fragment.service.http;
 import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.fragment.service.FragmentCollectionServiceUtil;
-
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 
@@ -25,19 +24,20 @@ import java.rmi.RemoteException;
 
 /**
  * Provides the SOAP utility for the
- * {@link FragmentCollectionServiceUtil} service utility. The
- * static methods of this class calls the same methods of the service utility.
- * However, the signatures are different because it is difficult for SOAP to
- * support certain types.
+ * <code>FragmentCollectionServiceUtil</code> service
+ * utility. The static methods of this class call the same methods of the
+ * service utility. However, the signatures are different because it is
+ * difficult for SOAP to support certain types.
  *
  * <p>
  * ServiceBuilder follows certain rules in translating the methods. For example,
- * if the method in the service utility returns a {@link java.util.List}, that
- * is translated to an array of {@link com.liferay.fragment.model.FragmentCollectionSoap}.
- * If the method in the service utility returns a
- * {@link com.liferay.fragment.model.FragmentCollection}, that is translated to a
- * {@link com.liferay.fragment.model.FragmentCollectionSoap}. Methods that SOAP cannot
- * safely wire are skipped.
+ * if the method in the service utility returns a <code>java.util.List</code>,
+ * that is translated to an array of
+ * <code>com.liferay.fragment.model.FragmentCollectionSoap</code>. If the method in the
+ * service utility returns a
+ * <code>com.liferay.fragment.model.FragmentCollection</code>, that is translated to a
+ * <code>com.liferay.fragment.model.FragmentCollectionSoap</code>. Methods that SOAP
+ * cannot safely wire are skipped.
  * </p>
  *
  * <p>
@@ -59,21 +59,24 @@ import java.rmi.RemoteException;
  *
  * @author Brian Wing Shun Chan
  * @see FragmentCollectionServiceHttp
- * @see com.liferay.fragment.model.FragmentCollectionSoap
- * @see FragmentCollectionServiceUtil
  * @generated
  */
 @ProviderType
 public class FragmentCollectionServiceSoap {
-	public static com.liferay.fragment.model.FragmentCollectionSoap addFragmentCollection(
-		long groupId, String name, String description,
-		com.liferay.portal.kernel.service.ServiceContext serviceContext)
-		throws RemoteException {
-		try {
-			com.liferay.fragment.model.FragmentCollection returnValue = FragmentCollectionServiceUtil.addFragmentCollection(groupId,
-					name, description, serviceContext);
 
-			return com.liferay.fragment.model.FragmentCollectionSoap.toSoapModel(returnValue);
+	public static com.liferay.fragment.model.FragmentCollectionSoap
+			addFragmentCollection(
+				long groupId, String name, String description,
+				com.liferay.portal.kernel.service.ServiceContext serviceContext)
+		throws RemoteException {
+
+		try {
+			com.liferay.fragment.model.FragmentCollection returnValue =
+				FragmentCollectionServiceUtil.addFragmentCollection(
+					groupId, name, description, serviceContext);
+
+			return com.liferay.fragment.model.FragmentCollectionSoap.
+				toSoapModel(returnValue);
 		}
 		catch (Exception e) {
 			_log.error(e, e);
@@ -82,16 +85,21 @@ public class FragmentCollectionServiceSoap {
 		}
 	}
 
-	public static com.liferay.fragment.model.FragmentCollectionSoap addFragmentCollection(
-		long groupId, String fragmentCollectionKey, String name,
-		String description,
-		com.liferay.portal.kernel.service.ServiceContext serviceContext)
+	public static com.liferay.fragment.model.FragmentCollectionSoap
+			addFragmentCollection(
+				long groupId, String fragmentCollectionKey, String name,
+				String description,
+				com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws RemoteException {
-		try {
-			com.liferay.fragment.model.FragmentCollection returnValue = FragmentCollectionServiceUtil.addFragmentCollection(groupId,
-					fragmentCollectionKey, name, description, serviceContext);
 
-			return com.liferay.fragment.model.FragmentCollectionSoap.toSoapModel(returnValue);
+		try {
+			com.liferay.fragment.model.FragmentCollection returnValue =
+				FragmentCollectionServiceUtil.addFragmentCollection(
+					groupId, fragmentCollectionKey, name, description,
+					serviceContext);
+
+			return com.liferay.fragment.model.FragmentCollectionSoap.
+				toSoapModel(returnValue);
 		}
 		catch (Exception e) {
 			_log.error(e, e);
@@ -100,12 +108,17 @@ public class FragmentCollectionServiceSoap {
 		}
 	}
 
-	public static com.liferay.fragment.model.FragmentCollectionSoap deleteFragmentCollection(
-		long fragmentCollectionId) throws RemoteException {
-		try {
-			com.liferay.fragment.model.FragmentCollection returnValue = FragmentCollectionServiceUtil.deleteFragmentCollection(fragmentCollectionId);
+	public static com.liferay.fragment.model.FragmentCollectionSoap
+			deleteFragmentCollection(long fragmentCollectionId)
+		throws RemoteException {
 
-			return com.liferay.fragment.model.FragmentCollectionSoap.toSoapModel(returnValue);
+		try {
+			com.liferay.fragment.model.FragmentCollection returnValue =
+				FragmentCollectionServiceUtil.deleteFragmentCollection(
+					fragmentCollectionId);
+
+			return com.liferay.fragment.model.FragmentCollectionSoap.
+				toSoapModel(returnValue);
 		}
 		catch (Exception e) {
 			_log.error(e, e);
@@ -116,8 +129,10 @@ public class FragmentCollectionServiceSoap {
 
 	public static void deleteFragmentCollections(long[] fragmentCollectionIds)
 		throws RemoteException {
+
 		try {
-			FragmentCollectionServiceUtil.deleteFragmentCollections(fragmentCollectionIds);
+			FragmentCollectionServiceUtil.deleteFragmentCollections(
+				fragmentCollectionIds);
 		}
 		catch (Exception e) {
 			_log.error(e, e);
@@ -126,61 +141,17 @@ public class FragmentCollectionServiceSoap {
 		}
 	}
 
-	public static com.liferay.fragment.model.FragmentCollectionSoap fetchFragmentCollection(
-		long fragmentCollectionId) throws RemoteException {
-		try {
-			com.liferay.fragment.model.FragmentCollection returnValue = FragmentCollectionServiceUtil.fetchFragmentCollection(fragmentCollectionId);
-
-			return com.liferay.fragment.model.FragmentCollectionSoap.toSoapModel(returnValue);
-		}
-		catch (Exception e) {
-			_log.error(e, e);
-
-			throw new RemoteException(e.getMessage());
-		}
-	}
-
-	public static com.liferay.fragment.model.FragmentCollectionSoap[] getFragmentCollections(
-		long groupId) throws RemoteException {
-		try {
-			java.util.List<com.liferay.fragment.model.FragmentCollection> returnValue =
-				FragmentCollectionServiceUtil.getFragmentCollections(groupId);
-
-			return com.liferay.fragment.model.FragmentCollectionSoap.toSoapModels(returnValue);
-		}
-		catch (Exception e) {
-			_log.error(e, e);
-
-			throw new RemoteException(e.getMessage());
-		}
-	}
-
-	public static com.liferay.fragment.model.FragmentCollectionSoap[] getFragmentCollections(
-		long groupId, int start, int end) throws RemoteException {
-		try {
-			java.util.List<com.liferay.fragment.model.FragmentCollection> returnValue =
-				FragmentCollectionServiceUtil.getFragmentCollections(groupId,
-					start, end);
-
-			return com.liferay.fragment.model.FragmentCollectionSoap.toSoapModels(returnValue);
-		}
-		catch (Exception e) {
-			_log.error(e, e);
-
-			throw new RemoteException(e.getMessage());
-		}
-	}
-
-	public static com.liferay.fragment.model.FragmentCollectionSoap[] getFragmentCollections(
-		long groupId, int start, int end,
-		com.liferay.portal.kernel.util.OrderByComparator<com.liferay.fragment.model.FragmentCollection> orderByComparator)
+	public static com.liferay.fragment.model.FragmentCollectionSoap
+			fetchFragmentCollection(long fragmentCollectionId)
 		throws RemoteException {
-		try {
-			java.util.List<com.liferay.fragment.model.FragmentCollection> returnValue =
-				FragmentCollectionServiceUtil.getFragmentCollections(groupId,
-					start, end, orderByComparator);
 
-			return com.liferay.fragment.model.FragmentCollectionSoap.toSoapModels(returnValue);
+		try {
+			com.liferay.fragment.model.FragmentCollection returnValue =
+				FragmentCollectionServiceUtil.fetchFragmentCollection(
+					fragmentCollectionId);
+
+			return com.liferay.fragment.model.FragmentCollectionSoap.
+				toSoapModel(returnValue);
 		}
 		catch (Exception e) {
 			_log.error(e, e);
@@ -189,16 +160,86 @@ public class FragmentCollectionServiceSoap {
 		}
 	}
 
-	public static com.liferay.fragment.model.FragmentCollectionSoap[] getFragmentCollections(
-		long groupId, String name, int start, int end,
-		com.liferay.portal.kernel.util.OrderByComparator<com.liferay.fragment.model.FragmentCollection> orderByComparator)
+	public static com.liferay.fragment.model.FragmentCollectionSoap[]
+			getFragmentCollections(long groupId)
 		throws RemoteException {
-		try {
-			java.util.List<com.liferay.fragment.model.FragmentCollection> returnValue =
-				FragmentCollectionServiceUtil.getFragmentCollections(groupId,
-					name, start, end, orderByComparator);
 
-			return com.liferay.fragment.model.FragmentCollectionSoap.toSoapModels(returnValue);
+		try {
+			java.util.List<com.liferay.fragment.model.FragmentCollection>
+				returnValue =
+					FragmentCollectionServiceUtil.getFragmentCollections(
+						groupId);
+
+			return com.liferay.fragment.model.FragmentCollectionSoap.
+				toSoapModels(returnValue);
+		}
+		catch (Exception e) {
+			_log.error(e, e);
+
+			throw new RemoteException(e.getMessage());
+		}
+	}
+
+	public static com.liferay.fragment.model.FragmentCollectionSoap[]
+			getFragmentCollections(long groupId, int start, int end)
+		throws RemoteException {
+
+		try {
+			java.util.List<com.liferay.fragment.model.FragmentCollection>
+				returnValue =
+					FragmentCollectionServiceUtil.getFragmentCollections(
+						groupId, start, end);
+
+			return com.liferay.fragment.model.FragmentCollectionSoap.
+				toSoapModels(returnValue);
+		}
+		catch (Exception e) {
+			_log.error(e, e);
+
+			throw new RemoteException(e.getMessage());
+		}
+	}
+
+	public static com.liferay.fragment.model.FragmentCollectionSoap[]
+			getFragmentCollections(
+				long groupId, int start, int end,
+				com.liferay.portal.kernel.util.OrderByComparator
+					<com.liferay.fragment.model.FragmentCollection>
+						orderByComparator)
+		throws RemoteException {
+
+		try {
+			java.util.List<com.liferay.fragment.model.FragmentCollection>
+				returnValue =
+					FragmentCollectionServiceUtil.getFragmentCollections(
+						groupId, start, end, orderByComparator);
+
+			return com.liferay.fragment.model.FragmentCollectionSoap.
+				toSoapModels(returnValue);
+		}
+		catch (Exception e) {
+			_log.error(e, e);
+
+			throw new RemoteException(e.getMessage());
+		}
+	}
+
+	public static com.liferay.fragment.model.FragmentCollectionSoap[]
+			getFragmentCollections(
+				long groupId, String name, int start, int end,
+				com.liferay.portal.kernel.util.OrderByComparator
+					<com.liferay.fragment.model.FragmentCollection>
+						orderByComparator)
+		throws RemoteException {
+
+		try {
+			java.util.List<com.liferay.fragment.model.FragmentCollection>
+				returnValue =
+					FragmentCollectionServiceUtil.getFragmentCollections(
+						groupId, name, start, end, orderByComparator);
+
+			return com.liferay.fragment.model.FragmentCollectionSoap.
+				toSoapModels(returnValue);
 		}
 		catch (Exception e) {
 			_log.error(e, e);
@@ -209,8 +250,11 @@ public class FragmentCollectionServiceSoap {
 
 	public static int getFragmentCollectionsCount(long groupId)
 		throws RemoteException {
+
 		try {
-			int returnValue = FragmentCollectionServiceUtil.getFragmentCollectionsCount(groupId);
+			int returnValue =
+				FragmentCollectionServiceUtil.getFragmentCollectionsCount(
+					groupId);
 
 			return returnValue;
 		}
@@ -223,9 +267,11 @@ public class FragmentCollectionServiceSoap {
 
 	public static int getFragmentCollectionsCount(long groupId, String name)
 		throws RemoteException {
+
 		try {
-			int returnValue = FragmentCollectionServiceUtil.getFragmentCollectionsCount(groupId,
-					name);
+			int returnValue =
+				FragmentCollectionServiceUtil.getFragmentCollectionsCount(
+					groupId, name);
 
 			return returnValue;
 		}
@@ -238,9 +284,11 @@ public class FragmentCollectionServiceSoap {
 
 	public static String[] getTempFileNames(long groupId, String folderName)
 		throws RemoteException {
+
 		try {
-			String[] returnValue = FragmentCollectionServiceUtil.getTempFileNames(groupId,
-					folderName);
+			String[] returnValue =
+				FragmentCollectionServiceUtil.getTempFileNames(
+					groupId, folderName);
 
 			return returnValue;
 		}
@@ -251,14 +299,18 @@ public class FragmentCollectionServiceSoap {
 		}
 	}
 
-	public static com.liferay.fragment.model.FragmentCollectionSoap updateFragmentCollection(
-		long fragmentCollectionId, String name, String description)
+	public static com.liferay.fragment.model.FragmentCollectionSoap
+			updateFragmentCollection(
+				long fragmentCollectionId, String name, String description)
 		throws RemoteException {
-		try {
-			com.liferay.fragment.model.FragmentCollection returnValue = FragmentCollectionServiceUtil.updateFragmentCollection(fragmentCollectionId,
-					name, description);
 
-			return com.liferay.fragment.model.FragmentCollectionSoap.toSoapModel(returnValue);
+		try {
+			com.liferay.fragment.model.FragmentCollection returnValue =
+				FragmentCollectionServiceUtil.updateFragmentCollection(
+					fragmentCollectionId, name, description);
+
+			return com.liferay.fragment.model.FragmentCollectionSoap.
+				toSoapModel(returnValue);
 		}
 		catch (Exception e) {
 			_log.error(e, e);
@@ -267,5 +319,7 @@ public class FragmentCollectionServiceSoap {
 		}
 	}
 
-	private static Log _log = LogFactoryUtil.getLog(FragmentCollectionServiceSoap.class);
+	private static Log _log = LogFactoryUtil.getLog(
+		FragmentCollectionServiceSoap.class);
+
 }

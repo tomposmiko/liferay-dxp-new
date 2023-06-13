@@ -17,7 +17,6 @@ package com.liferay.knowledge.base.model.impl;
 import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.knowledge.base.model.KBFolder;
-
 import com.liferay.portal.kernel.model.CacheModel;
 import com.liferay.portal.kernel.util.HashUtil;
 import com.liferay.portal.kernel.util.StringBundler;
@@ -33,11 +32,12 @@ import java.util.Date;
  * The cache model class for representing KBFolder in entity cache.
  *
  * @author Brian Wing Shun Chan
- * @see KBFolder
  * @generated
  */
 @ProviderType
-public class KBFolderCacheModel implements CacheModel<KBFolder>, Externalizable {
+public class KBFolderCacheModel
+	implements CacheModel<KBFolder>, Externalizable {
+
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj) {
@@ -192,8 +192,7 @@ public class KBFolderCacheModel implements CacheModel<KBFolder>, Externalizable 
 	}
 
 	@Override
-	public void writeExternal(ObjectOutput objectOutput)
-		throws IOException {
+	public void writeExternal(ObjectOutput objectOutput) throws IOException {
 		if (uuid == null) {
 			objectOutput.writeUTF("");
 		}
@@ -258,4 +257,5 @@ public class KBFolderCacheModel implements CacheModel<KBFolder>, Externalizable 
 	public String urlTitle;
 	public String description;
 	public long lastPublishDate;
+
 }

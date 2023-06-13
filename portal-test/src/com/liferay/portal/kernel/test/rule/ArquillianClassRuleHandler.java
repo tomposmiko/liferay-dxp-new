@@ -16,7 +16,9 @@ package com.liferay.portal.kernel.test.rule;
 
 /**
  * @author Shuyang Zhou
+ * @deprecated As of Mueller (7.2.x), with no direct replacement
  */
+@Deprecated
 public interface ArquillianClassRuleHandler {
 
 	public void handleAfterClass(boolean enable);

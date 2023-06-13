@@ -30,9 +30,9 @@ public class ThrowableHeptaFunctionTest {
 
 		ThrowableHeptaFunction
 			<String, String, String, String, String, String, String, String>
-				throwableHeptaFunction = (
-					string1, string2, string3, string4, string5,
-					string6, string7) ->
+				throwableHeptaFunction =
+					(string1, string2, string3, string4, string5, string6,
+					 string7) ->
 						string1 + string2 + string3 + string4 + string5 +
 							string6 + string7;
 
@@ -52,9 +52,9 @@ public class ThrowableHeptaFunctionTest {
 	public void testOnInvokingAndThenWithNullAfterFunctionThrowsException() {
 		ThrowableHeptaFunction
 			<String, String, String, String, String, String, String, String>
-				throwableHeptaFunction = (
-					string1, string2, string3, string4, string5, string6,
-					string7) ->
+				throwableHeptaFunction =
+					(string1, string2, string3, string4, string5, string6,
+					 string7) ->
 						string1 + string2 + string3 + string4 + string5 +
 							string6 + string7;
 

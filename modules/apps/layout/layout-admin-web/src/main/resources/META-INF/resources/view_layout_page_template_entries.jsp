@@ -160,7 +160,7 @@ request.setAttribute(LayoutAdminWebKeys.LAYOUT_PAGE_TEMPLATE_DISPLAY_CONTEXT, la
 	function addLayoutPageTemplateEntry(event) {
 		event.preventDefault();
 
-		var itemData = event.data.item.data
+		var itemData = event.data.data || event.data.item.data;
 
 		modalCommands.openSimpleInputModal(
 			{
@@ -215,9 +215,9 @@ request.setAttribute(LayoutAdminWebKeys.LAYOUT_PAGE_TEMPLATE_DISPLAY_CONTEXT, la
 	Liferay.componentReady('layoutPageTemplateEntriesManagementToolbar').then(
 		function(managementToolbar) {
 			managementToolbar.on(
-				['actionItemClicked', 'creationMenuItemClicked', 'filterItemClicked'],
+				['actionItemClicked', 'creationButtonClicked', 'creationMenuItemClicked', 'filterItemClicked'],
 				function(event) {
-					var itemData = event.data.item.data;
+					var itemData = event.data.data || event.data.item.data;
 
 					if (itemData && itemData.action && ACTIONS[itemData.action]) {
 						ACTIONS[itemData.action](event);

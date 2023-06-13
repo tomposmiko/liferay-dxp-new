@@ -185,6 +185,22 @@ AUI.add(
 				return root || instance;
 			},
 
+			getReadOnly: function() {
+				var instance = this;
+
+				if (instance.get('readOnly')) {
+					return true;
+				}
+
+				var form = instance.getForm();
+
+				if (!instance.get('localizable') && form.getDefaultLocale() != instance.get('displayLocale')) {
+					return true;
+				}
+
+				return false;
+			},
+
 			_getField: function(fieldNode) {
 				var instance = this;
 
@@ -277,6 +293,12 @@ AUI.add(
 					displayLocale = instance.getDefaultLocale();
 				}
 
+				var defaultEditLocale = instance.get('defaultEditLocale');
+
+				if (defaultEditLocale) {
+					displayLocale = defaultEditLocale;
+				}
+
 				return displayLocale;
 			},
 
@@ -350,7 +372,15 @@ AUI.add(
 					initializer: function() {
 						var instance = this;
 
-						Liferay.on('inputLocalized:localeChanged', A.bind('_onLocaleChanged', instance));
+						instance._bindedOnLocaleChanged = A.bind(
+							'_onLocaleChanged',
+							instance
+						);
+
+						Liferay.on(
+							'inputLocalized:localeChanged',
+							instance._bindedOnLocaleChanged
+						);
 					},
 
 					renderUI: function() {
@@ -375,6 +405,13 @@ AUI.add(
 
 					destructor: function() {
 						var instance = this;
+
+						if (instance._bindedOnLocaleChanged) {
+							Liferay.detach(
+								'inputLocalized:localeChanged',
+								instance._bindedOnLocaleChanged
+							);
+						}
 
 						instance.get('container').remove();
 					},
@@ -594,6 +631,22 @@ AUI.add(
 							function(fieldTemplate) {
 								var field = instance.createField(fieldTemplate);
 
+								var displayLocale = instance.get('displayLocale');
+
+								field.addLocaleToLocalizationMap(displayLocale);
+								field.set('displayLocale', displayLocale);
+
+								if (instance.originalField) {
+									field.originalField = instance.originalField;
+								}
+								else {
+									field.originalField = instance;
+								}
+
+								var form = field.getForm();
+
+								form.newRepeatableInstances.push(field);
+
 								field.renderUI();
 
 								instance._addFieldValidation(field, instance);
@@ -636,10 +689,12 @@ AUI.add(
 					syncReadOnlyUI: function() {
 						var instance = this;
 
+						var readOnly = instance.getReadOnly();
+
 						var inputNode = instance.getInputNode();
 
 						if (inputNode) {
-							inputNode.attr('disabled', instance.get('readOnly'));
+							inputNode.attr('disabled', readOnly);
 						}
 
 						var container = instance.get('container');
@@ -648,13 +703,13 @@ AUI.add(
 							var selectorInput = container.one('.selector-input');
 
 							if (selectorInput) {
-								selectorInput.attr('disabled', instance.get('readOnly'));
+								selectorInput.attr('disabled', readOnly);
 							}
 
 							var checkboxInput = container.one('input[type="checkbox"]');
 
 							if (checkboxInput) {
-								checkboxInput.attr('disabled', instance.get('readOnly'));
+								checkboxInput.attr('disabled', readOnly);
 							}
 
 							var disableCheckboxInput = container.one('input[type="checkbox"][name$="disable"]');
@@ -1127,11 +1182,13 @@ AUI.add(
 
 						var documentLibrarySelectorURL = form.get('documentLibrarySelectorURL');
 
+						var retVal = instance.getDocumentLibraryURL('com.liferay.item.selector.criteria.file.criterion.FileItemSelectorCriterion');
+
 						if (documentLibrarySelectorURL) {
-							return documentLibrarySelectorURL;
+							retVal = documentLibrarySelectorURL;
 						}
 
-						return instance.getDocumentLibraryURL('com.liferay.item.selector.criteria.file.criterion.FileItemSelectorCriterion');
+						return retVal;
 					},
 
 					getDocumentLibraryURL: function(criteria) {
@@ -1217,20 +1274,22 @@ AUI.add(
 					syncReadOnlyUI: function() {
 						var instance = this;
 
+						var readOnly = instance.getReadOnly();
+
 						var container = instance.get('container');
 
 						var selectButtonNode = container.one('#' + instance.getInputName() + 'SelectButton');
 
-						selectButtonNode.attr('disabled', instance.get('readOnly'));
+						selectButtonNode.attr('disabled', readOnly);
 
 						var clearButtonNode = container.one('#' + instance.getInputName() + 'ClearButton');
 
-						clearButtonNode.attr('disabled', instance.get('readOnly'));
+						clearButtonNode.attr('disabled', readOnly);
 
 						var altNode = container.one('#' + instance.getInputName() + 'Alt');
 
 						if (altNode) {
-							altNode.set('readOnly', instance.get('readOnly'));
+							altNode.set('readOnly', readOnly);
 						}
 					},
 
@@ -1272,6 +1331,7 @@ AUI.add(
 
 											instance.setValue(
 												{
+													classPK: itemValue.fileEntryId,
 													groupId: itemValue.groupId,
 													title: itemValue.title,
 													type: itemValue.type,
@@ -1340,10 +1400,14 @@ AUI.add(
 
 						var url = Liferay.PortletURL.createRenderURL(themeDisplay.getURLControlPanel());
 
+						var groupIdNode = A.one('#' + this.get('portletNamespace') + 'groupId');
+
+						var groupId = (groupIdNode && groupIdNode.getAttribute('value')) || themeDisplay.getScopeGroupId();
+
 						url.setParameter('eventName', 'selectContent');
-						url.setParameter('groupId', themeDisplay.getScopeGroupId());
+						url.setParameter('groupId', groupId);
 						url.setParameter('p_p_auth', container.getData('assetBrowserAuthToken'));
-						url.setParameter('selectedGroupId', themeDisplay.getScopeGroupId());
+						url.setParameter('selectedGroupId', groupId);
 						url.setParameter('showNonindexable', true);
 						url.setParameter('showScheduled', true);
 						url.setParameter('typeSelection', 'com.liferay.journal.model.JournalArticle');
@@ -1389,15 +1453,17 @@ AUI.add(
 					syncReadOnlyUI: function() {
 						var instance = this;
 
+						var readOnly = instance.getReadOnly();
+
 						var container = instance.get('container');
 
 						var selectButtonNode = container.one('#' + instance.getInputName() + 'SelectButton');
 
-						selectButtonNode.attr('disabled', instance.get('readOnly'));
+						selectButtonNode.attr('disabled', readOnly);
 
 						var clearButtonNode = container.one('#' + instance.getInputName() + 'ClearButton');
 
-						clearButtonNode.attr('disabled', instance.get('readOnly'));
+						clearButtonNode.attr('disabled', readOnly);
 					},
 
 					_handleButtonsClick: function(event) {
@@ -1419,6 +1485,8 @@ AUI.add(
 						var instance = this;
 
 						instance.setValue('');
+
+						instance._hideMessage();
 					},
 
 					_handleSelectButtonClick: function(event) {
@@ -1447,9 +1515,27 @@ AUI.add(
 											title: selectedWebContent.assettitle || ''
 										}
 									);
+
+									instance._hideMessage();
 								}
 							}
 						);
+					},
+
+					_hideMessage: function() {
+						var instance = this;
+
+						var container = instance.get('container');
+
+						var message = container.one('#' + instance.getInputName() + 'Message');
+
+						if (message) {
+							message.addClass('hide');
+						}
+
+						var formGroup = container.one('#' + instance.getInputName() + 'FormGroup');
+
+						formGroup.removeClass('has-warning');
 					}
 				}
 			}
@@ -1488,8 +1574,12 @@ AUI.add(
 
 							var privateLayout = !!(layoutValue && layoutValue.privateLayout);
 
+							var groupIdNode = A.one('#' + this.get('portletNamespace') + 'groupId');
+
+							var groupId = (groupIdNode && groupIdNode.getAttribute('value')) || themeDisplay.getScopeGroupId();
+
 							var layoutsRoot = {
-								groupId: themeDisplay.getScopeGroupId(),
+								groupId: groupId,
 								label: Liferay.Language.get('all'),
 								layoutId: 0,
 								privateLayout: privateLayout
@@ -1570,15 +1660,17 @@ AUI.add(
 					syncReadOnlyUI: function() {
 						var instance = this;
 
+						var readOnly = instance.getReadOnly();
+
 						var container = instance.get('container');
 
 						var selectButtonNode = container.one('#' + instance.getInputName() + 'SelectButton');
 
-						selectButtonNode.attr('disabled', instance.get('readOnly'));
+						selectButtonNode.attr('disabled', readOnly);
 
 						var clearButtonNode = container.one('#' + instance.getInputName() + 'ClearButton');
 
-						clearButtonNode.attr('disabled', instance.get('readOnly'));
+						clearButtonNode.attr('disabled', readOnly);
 					},
 
 					_addBreadcrumbElement: function(label, layoutId, groupId, privateLayout) {
@@ -1910,7 +2002,9 @@ AUI.add(
 
 						var delta = instance.get('delta');
 
-						var groupId = themeDisplay.getScopeGroupId();
+						var groupIdNode = A.one('#' + this.get('portletNamespace') + 'groupId');
+
+						var groupId = (groupIdNode && groupIdNode.getAttribute('value')) || themeDisplay.getScopeGroupId();
 
 						var parentLayoutId = instance._currentParentLayoutId;
 
@@ -2149,9 +2243,11 @@ AUI.add(
 
 						var selectedLayout = instance.get('selectedLayout');
 
-						if (selectedLayout && selectedLayout.layoutId) {
-							var groupId = themeDisplay.getScopeGroupId();
+						var groupIdNode = A.one('#' + this.get('portletNamespace') + 'groupId');
 
+						var groupId = (groupIdNode && groupIdNode.getAttribute('value')) || themeDisplay.getScopeGroupId();
+
+						if (selectedLayout && selectedLayout.layoutId) {
 							instance._requestSiblingLayouts(
 								groupId,
 								privateLayout,
@@ -2175,7 +2271,7 @@ AUI.add(
 						else {
 							listNode.addClass('top-ended');
 
-							instance._requestInitialLayouts(0, themeDisplay.getScopeGroupId(), privateLayout, instance._renderLayouts);
+							instance._requestInitialLayouts(0, groupId, privateLayout, instance._renderLayouts);
 						}
 					},
 
@@ -2285,6 +2381,15 @@ AUI.add(
 								themeDisplay.getPathMain() + '/portal/get_layouts',
 								{
 									after: {
+										failure: function() {
+											var bodyNode = instance._modal.bodyNode;
+
+											var listNode = bodyNode.one('.lfr-ddm-pages-container');
+
+											listNode.addClass('top-ended');
+
+											instance._requestInitialLayouts(0, groupId, privateLayout, instance._renderLayouts);
+										},
 										success: function() {
 											var	response = JSON.parse(this.get('responseData'));
 
@@ -2487,11 +2592,13 @@ AUI.add(
 
 						var imageSelectorURL = form.get('imageSelectorURL');
 
+						var retVal = instance.getDocumentLibraryURL('com.liferay.journal.item.selector.criterion.JournalItemSelectorCriterion,com.liferay.item.selector.criteria.image.criterion.ImageItemSelectorCriterion');
+
 						if (imageSelectorURL) {
-							return imageSelectorURL;
+							retVal = imageSelectorURL;
 						}
 
-						return instance.getDocumentLibraryURL('com.liferay.journal.item.selector.criterion.JournalItemSelectorCriterion,com.liferay.item.selector.criteria.image.criterion.ImageItemSelectorCriterion');
+						return retVal;
 					},
 
 					getDocumentLibraryURL: function(criteria) {
@@ -2751,7 +2858,7 @@ AUI.add(
 						instance.readOnlyLabel.html(instance.getLabelNode().getHTML());
 						instance.readOnlyText.html('<p>' + instance.getValue() + '</p>');
 
-						var readOnly = instance.get('readOnly');
+						var readOnly = instance.getReadOnly();
 
 						instance.readOnlyLabel.toggle(readOnly);
 						instance.readOnlyText.toggle(readOnly);
@@ -2845,9 +2952,11 @@ AUI.add(
 					syncReadOnlyUI: function() {
 						var instance = this;
 
+						var readOnly = instance.getReadOnly();
+
 						var radioNodes = instance.getRadioNodes();
 
-						radioNodes.attr('disabled', instance.get('readOnly'));
+						radioNodes.attr('disabled', readOnly);
 					}
 				}
 			}
@@ -2971,6 +3080,9 @@ AUI.add(
 						setter: A.one
 					},
 
+					defaultEditLocale: {
+					},
+
 					documentLibrarySelectorURL: {
 					},
 
@@ -3011,6 +3123,7 @@ AUI.add(
 						var instance = this;
 
 						instance.eventHandlers = [];
+						instance.newRepeatableInstances = [];
 						instance.repeatableInstances = {};
 
 						instance.bindUI();
@@ -3036,7 +3149,7 @@ AUI.add(
 									instance._afterUpdateRepeatableFields,
 									instance
 								),
-								Liferay.after('form:registered', instance._afterFormRegistered, instance),
+								Liferay.after('form:registered', instance._afterFormRegistered, instance)
 							);
 
 							if (instance.get('synchronousFormSubmission')) {
@@ -3080,6 +3193,47 @@ AUI.add(
 								}
 							}
 						);
+					},
+
+					finalizeRepeatableFieldLocalizations: function() {
+						var instance = this;
+
+						var defaultLocale = instance.getDefaultLocale();
+
+						for (x in instance.newRepeatableInstances) {
+							var field = instance.newRepeatableInstances[x];
+
+							if (!field.get('localizable')) {
+								continue;
+							}
+
+							var currentLocale = field.get('displayLocale');
+							var originalField = field.originalField;
+
+							var newFieldLocalizations = field.get('localizationMap');
+							var totalLocalizations = originalField.get('localizationMap');
+
+							for (var localization in totalLocalizations) {
+								if (localization === currentLocale) {
+									continue;
+								}
+
+								if (!newFieldLocalizations[localization]) {
+									var localizationValue = '';
+
+									if (newFieldLocalizations[defaultLocale]) {
+										localizationValue = newFieldLocalizations[defaultLocale];
+									}
+									else if (defaultLocale === field.get('displayLocale') && field.getValue()) {
+										localizationValue = field.getValue();
+									}
+
+									newFieldLocalizations[localization] = localizationValue;
+								}
+							}
+
+							field.set('localizationMap', newFieldLocalizations);
+						}
 					},
 
 					moveField: function(parentField, oldIndex, newIndex) {
@@ -3151,11 +3305,13 @@ AUI.add(
 
 										var dragNodeAncestor = dragNode.ancestor();
 
+										var retVal = dropNode.getData('fieldName') === fieldName;
+
 										if (dropNodeAncestor.get('id') !== dragNodeAncestor.get('id')) {
-											return false;
+											retVal = false;
 										}
 
-										return dropNode.getData('fieldName') === fieldName;
+										return retVal;
 									}
 								}
 							);
@@ -3168,6 +3324,10 @@ AUI.add(
 						}
 						else {
 							repeatableInstance.add(fieldContainer);
+						}
+
+						if (fieldContainer.hasAttribute('draggable')) {
+							fieldContainer.removeAttribute('draggable');
 						}
 
 						var drag = A.DD.DDM.getDrag(fieldContainer);
@@ -3301,6 +3461,8 @@ AUI.add(
 
 					_onSubmitForm: function(event) {
 						var instance = this;
+
+						instance.finalizeRepeatableFieldLocalizations();
 
 						instance.updateDDMFormInputValue();
 					},

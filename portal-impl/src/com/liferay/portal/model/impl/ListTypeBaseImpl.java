@@ -32,12 +32,13 @@ import com.liferay.portal.kernel.service.ListTypeLocalServiceUtil;
  * @generated
  */
 @ProviderType
-public abstract class ListTypeBaseImpl extends ListTypeModelImpl
-	implements ListType {
+public abstract class ListTypeBaseImpl
+	extends ListTypeModelImpl implements ListType {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
-	 * Never modify or reference this class directly. All methods that expect a list type model instance should use the {@link ListType} interface instead.
+	 * Never modify or reference this class directly. All methods that expect a list type model instance should use the <code>ListType</code> interface instead.
 	 */
 	@Override
 	public void persist() {
@@ -48,4 +49,5 @@ public abstract class ListTypeBaseImpl extends ListTypeModelImpl
 			ListTypeLocalServiceUtil.updateListType(this);
 		}
 	}
+
 }

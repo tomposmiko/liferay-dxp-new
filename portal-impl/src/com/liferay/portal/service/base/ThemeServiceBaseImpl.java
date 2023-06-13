@@ -15,7 +15,6 @@
 package com.liferay.portal.service.base;
 
 import com.liferay.counter.kernel.service.persistence.CounterPersistence;
-
 import com.liferay.portal.kernel.bean.BeanReference;
 import com.liferay.portal.kernel.dao.db.DB;
 import com.liferay.portal.kernel.dao.db.DBManagerUtil;
@@ -40,15 +39,15 @@ import javax.sql.DataSource;
  *
  * @author Brian Wing Shun Chan
  * @see com.liferay.portal.service.impl.ThemeServiceImpl
- * @see com.liferay.portal.kernel.service.ThemeServiceUtil
  * @generated
  */
-public abstract class ThemeServiceBaseImpl extends BaseServiceImpl
-	implements ThemeService, IdentifiableOSGiService {
+public abstract class ThemeServiceBaseImpl
+	extends BaseServiceImpl implements ThemeService, IdentifiableOSGiService {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
-	 * Never modify or reference this class directly. Always use {@link com.liferay.portal.kernel.service.ThemeServiceUtil} to access the theme remote service.
+	 * Never modify or reference this class directly. Use <code>ThemeService</code> via injection or a <code>org.osgi.util.tracker.ServiceTracker</code> or use <code>com.liferay.portal.kernel.service.ThemeServiceUtil</code>.
 	 */
 
 	/**
@@ -56,7 +55,9 @@ public abstract class ThemeServiceBaseImpl extends BaseServiceImpl
 	 *
 	 * @return the theme local service
 	 */
-	public com.liferay.portal.kernel.service.ThemeLocalService getThemeLocalService() {
+	public com.liferay.portal.kernel.service.ThemeLocalService
+		getThemeLocalService() {
+
 		return themeLocalService;
 	}
 
@@ -67,6 +68,7 @@ public abstract class ThemeServiceBaseImpl extends BaseServiceImpl
 	 */
 	public void setThemeLocalService(
 		com.liferay.portal.kernel.service.ThemeLocalService themeLocalService) {
+
 		this.themeLocalService = themeLocalService;
 	}
 
@@ -93,7 +95,9 @@ public abstract class ThemeServiceBaseImpl extends BaseServiceImpl
 	 *
 	 * @return the counter local service
 	 */
-	public com.liferay.counter.kernel.service.CounterLocalService getCounterLocalService() {
+	public com.liferay.counter.kernel.service.CounterLocalService
+		getCounterLocalService() {
+
 		return counterLocalService;
 	}
 
@@ -103,7 +107,9 @@ public abstract class ThemeServiceBaseImpl extends BaseServiceImpl
 	 * @param counterLocalService the counter local service
 	 */
 	public void setCounterLocalService(
-		com.liferay.counter.kernel.service.CounterLocalService counterLocalService) {
+		com.liferay.counter.kernel.service.CounterLocalService
+			counterLocalService) {
+
 		this.counterLocalService = counterLocalService;
 	}
 
@@ -130,7 +136,9 @@ public abstract class ThemeServiceBaseImpl extends BaseServiceImpl
 	 *
 	 * @return the layout template local service
 	 */
-	public com.liferay.portal.kernel.service.LayoutTemplateLocalService getLayoutTemplateLocalService() {
+	public com.liferay.portal.kernel.service.LayoutTemplateLocalService
+		getLayoutTemplateLocalService() {
+
 		return layoutTemplateLocalService;
 	}
 
@@ -140,7 +148,9 @@ public abstract class ThemeServiceBaseImpl extends BaseServiceImpl
 	 * @param layoutTemplateLocalService the layout template local service
 	 */
 	public void setLayoutTemplateLocalService(
-		com.liferay.portal.kernel.service.LayoutTemplateLocalService layoutTemplateLocalService) {
+		com.liferay.portal.kernel.service.LayoutTemplateLocalService
+			layoutTemplateLocalService) {
+
 		this.layoutTemplateLocalService = layoutTemplateLocalService;
 	}
 
@@ -149,7 +159,9 @@ public abstract class ThemeServiceBaseImpl extends BaseServiceImpl
 	 *
 	 * @return the plugin setting local service
 	 */
-	public com.liferay.portal.kernel.service.PluginSettingLocalService getPluginSettingLocalService() {
+	public com.liferay.portal.kernel.service.PluginSettingLocalService
+		getPluginSettingLocalService() {
+
 		return pluginSettingLocalService;
 	}
 
@@ -159,7 +171,9 @@ public abstract class ThemeServiceBaseImpl extends BaseServiceImpl
 	 * @param pluginSettingLocalService the plugin setting local service
 	 */
 	public void setPluginSettingLocalService(
-		com.liferay.portal.kernel.service.PluginSettingLocalService pluginSettingLocalService) {
+		com.liferay.portal.kernel.service.PluginSettingLocalService
+			pluginSettingLocalService) {
+
 		this.pluginSettingLocalService = pluginSettingLocalService;
 	}
 
@@ -168,7 +182,9 @@ public abstract class ThemeServiceBaseImpl extends BaseServiceImpl
 	 *
 	 * @return the plugin setting remote service
 	 */
-	public com.liferay.portal.kernel.service.PluginSettingService getPluginSettingService() {
+	public com.liferay.portal.kernel.service.PluginSettingService
+		getPluginSettingService() {
+
 		return pluginSettingService;
 	}
 
@@ -178,7 +194,9 @@ public abstract class ThemeServiceBaseImpl extends BaseServiceImpl
 	 * @param pluginSettingService the plugin setting remote service
 	 */
 	public void setPluginSettingService(
-		com.liferay.portal.kernel.service.PluginSettingService pluginSettingService) {
+		com.liferay.portal.kernel.service.PluginSettingService
+			pluginSettingService) {
+
 		this.pluginSettingService = pluginSettingService;
 	}
 
@@ -198,6 +216,7 @@ public abstract class ThemeServiceBaseImpl extends BaseServiceImpl
 	 */
 	public void setPluginSettingPersistence(
 		PluginSettingPersistence pluginSettingPersistence) {
+
 		this.pluginSettingPersistence = pluginSettingPersistence;
 	}
 
@@ -231,8 +250,8 @@ public abstract class ThemeServiceBaseImpl extends BaseServiceImpl
 			sql = db.buildSQL(sql);
 			sql = PortalUtil.transformSQL(sql);
 
-			SqlUpdate sqlUpdate = SqlUpdateFactoryUtil.getSqlUpdate(dataSource,
-					sql);
+			SqlUpdate sqlUpdate = SqlUpdateFactoryUtil.getSqlUpdate(
+				dataSource, sql);
 
 			sqlUpdate.update();
 		}
@@ -241,20 +260,43 @@ public abstract class ThemeServiceBaseImpl extends BaseServiceImpl
 		}
 	}
 
-	@BeanReference(type = com.liferay.portal.kernel.service.ThemeLocalService.class)
-	protected com.liferay.portal.kernel.service.ThemeLocalService themeLocalService;
+	@BeanReference(
+		type = com.liferay.portal.kernel.service.ThemeLocalService.class
+	)
+	protected com.liferay.portal.kernel.service.ThemeLocalService
+		themeLocalService;
+
 	@BeanReference(type = ThemeService.class)
 	protected ThemeService themeService;
-	@BeanReference(type = com.liferay.counter.kernel.service.CounterLocalService.class)
-	protected com.liferay.counter.kernel.service.CounterLocalService counterLocalService;
+
+	@BeanReference(
+		type = com.liferay.counter.kernel.service.CounterLocalService.class
+	)
+	protected com.liferay.counter.kernel.service.CounterLocalService
+		counterLocalService;
+
 	@BeanReference(type = CounterPersistence.class)
 	protected CounterPersistence counterPersistence;
-	@BeanReference(type = com.liferay.portal.kernel.service.LayoutTemplateLocalService.class)
-	protected com.liferay.portal.kernel.service.LayoutTemplateLocalService layoutTemplateLocalService;
-	@BeanReference(type = com.liferay.portal.kernel.service.PluginSettingLocalService.class)
-	protected com.liferay.portal.kernel.service.PluginSettingLocalService pluginSettingLocalService;
-	@BeanReference(type = com.liferay.portal.kernel.service.PluginSettingService.class)
-	protected com.liferay.portal.kernel.service.PluginSettingService pluginSettingService;
+
+	@BeanReference(
+		type = com.liferay.portal.kernel.service.LayoutTemplateLocalService.class
+	)
+	protected com.liferay.portal.kernel.service.LayoutTemplateLocalService
+		layoutTemplateLocalService;
+
+	@BeanReference(
+		type = com.liferay.portal.kernel.service.PluginSettingLocalService.class
+	)
+	protected com.liferay.portal.kernel.service.PluginSettingLocalService
+		pluginSettingLocalService;
+
+	@BeanReference(
+		type = com.liferay.portal.kernel.service.PluginSettingService.class
+	)
+	protected com.liferay.portal.kernel.service.PluginSettingService
+		pluginSettingService;
+
 	@BeanReference(type = PluginSettingPersistence.class)
 	protected PluginSettingPersistence pluginSettingPersistence;
+
 }

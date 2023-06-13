@@ -32,12 +32,13 @@ import com.liferay.social.kernel.service.SocialRequestLocalServiceUtil;
  * @generated
  */
 @ProviderType
-public abstract class SocialRequestBaseImpl extends SocialRequestModelImpl
-	implements SocialRequest {
+public abstract class SocialRequestBaseImpl
+	extends SocialRequestModelImpl implements SocialRequest {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
-	 * Never modify or reference this class directly. All methods that expect a social request model instance should use the {@link SocialRequest} interface instead.
+	 * Never modify or reference this class directly. All methods that expect a social request model instance should use the <code>SocialRequest</code> interface instead.
 	 */
 	@Override
 	public void persist() {
@@ -48,4 +49,5 @@ public abstract class SocialRequestBaseImpl extends SocialRequestModelImpl
 			SocialRequestLocalServiceUtil.updateSocialRequest(this);
 		}
 	}
+
 }

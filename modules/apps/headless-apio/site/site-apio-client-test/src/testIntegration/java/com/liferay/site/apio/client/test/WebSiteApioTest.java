@@ -16,11 +16,13 @@ package com.liferay.site.apio.client.test;
 
 import com.liferay.oauth2.provider.test.util.OAuth2ProviderTestUtil;
 import com.liferay.portal.apio.test.util.ApioClientBuilder;
-import com.liferay.site.apio.client.test.activator.WebSiteApioTestBundleActivator;
+import com.liferay.portal.apio.test.util.ContentSpaceApioTestUtil;
+import com.liferay.site.apio.client.test.internal.activator.WebSiteApioTestBundleActivator;
 
 import java.net.MalformedURLException;
 import java.net.URL;
 
+import org.hamcrest.Matchers;
 import org.hamcrest.core.IsNull;
 
 import org.jboss.arquillian.container.test.api.Deployment;
@@ -52,23 +54,92 @@ public class WebSiteApioTest {
 	}
 
 	@Test
-	public void testWebSite() {
+	public void testChildWebSite() {
 		ApioClientBuilder.given(
 		).basicAuth(
 			"test@liferay.com", "test"
 		).header(
 			"Accept", "application/hal+json"
-		).header(
-			"Accept-Language", "es-ES"
 		).when(
 		).get(
 			_rootEndpointURL.toExternalForm()
 		).follow(
 			"_links.web-site.href"
 		).follow(
-			"_embedded.WebSite.find { it.name == '" +
+			"_embedded.WebSite.find {it.name == '" +
 				WebSiteApioTestBundleActivator.WEB_SITE_NAME +
-					"' }._links.self.href"
+					"'}._links.webSites.href"
+		).then(
+		).statusCode(
+			200
+		).body(
+			"_embedded.WebSite.find {it.name == '" +
+				WebSiteApioTestBundleActivator.CHILD_WEB_SITE_NAME +
+					"'}.availableLanguages",
+			Matchers.hasItems("en-US")
+		).body(
+			"_embedded.WebSite.find {it.name == '" +
+				WebSiteApioTestBundleActivator.CHILD_WEB_SITE_NAME +
+					"'}.description",
+			IsNull.notNullValue()
+		).body(
+			"_embedded.WebSite.find {it.name == '" +
+				WebSiteApioTestBundleActivator.CHILD_WEB_SITE_NAME +
+					"'}.membershipType",
+			Matchers.equalTo("open")
+		).body(
+			"_embedded.WebSite.find {it.name == '" +
+				WebSiteApioTestBundleActivator.CHILD_WEB_SITE_NAME + "'}.name",
+			Matchers.equalTo(WebSiteApioTestBundleActivator.CHILD_WEB_SITE_NAME)
+		).body(
+			"_embedded.WebSite.find {it.name == '" +
+				WebSiteApioTestBundleActivator.CHILD_WEB_SITE_NAME +
+					"'}.privateUrl",
+			IsNull.nullValue()
+		).body(
+			"_embedded.WebSite.find {it.name == '" +
+				WebSiteApioTestBundleActivator.CHILD_WEB_SITE_NAME +
+					"'}.publicUrl",
+			IsNull.nullValue()
+		).body(
+			"_embedded.WebSite.find {it.name == '" +
+				WebSiteApioTestBundleActivator.CHILD_WEB_SITE_NAME +
+					"'}._links.contentSpace.href",
+			IsNull.notNullValue()
+		).body(
+			"_embedded.WebSite.find {it.name == '" +
+				WebSiteApioTestBundleActivator.CHILD_WEB_SITE_NAME +
+					"'}._links.creator.href",
+			IsNull.notNullValue()
+		).body(
+			"_embedded.WebSite.find {it.name == '" +
+				WebSiteApioTestBundleActivator.CHILD_WEB_SITE_NAME +
+					"'}._links.self.href",
+			IsNull.notNullValue()
+		).body(
+			"_embedded.WebSite.find {it.name == '" +
+				WebSiteApioTestBundleActivator.CHILD_WEB_SITE_NAME +
+					"'}._links.webSites.href",
+			IsNull.notNullValue()
+		);
+	}
+
+	@Test
+	public void testWebSite() {
+		ApioClientBuilder.given(
+		).basicAuth(
+			"test@liferay.com", "test"
+		).header(
+			"Accept", "application/hal+json"
+		).when(
+		).get(
+			_rootEndpointURL.toExternalForm()
+		).follow(
+			"_links.web-site.href"
+		).follow(
+			"_embedded.WebSite.find {it.name == '" +
+				WebSiteApioTestBundleActivator.WEB_SITE_NAME +
+					"'}._links.self.href"
 		).then(
 		).statusCode(
 			200
@@ -79,7 +150,8 @@ public class WebSiteApioTest {
 		).body(
 			"membershipType", IsNull.notNullValue()
 		).body(
-			"name", IsNull.notNullValue()
+			"name",
+			Matchers.equalTo(WebSiteApioTestBundleActivator.WEB_SITE_NAME)
 		).body(
 			"privateUrl", IsNull.notNullValue()
 		).body(
@@ -89,8 +161,6 @@ public class WebSiteApioTest {
 		).body(
 			"_links.creator.href", IsNull.notNullValue()
 		).body(
-			"_links.embeddedWebPages.href", IsNull.notNullValue()
-		).body(
 			"_links.self.href", IsNull.notNullValue()
 		).body(
 			"_links.webSites.href", IsNull.notNullValue()
@@ -98,7 +168,50 @@ public class WebSiteApioTest {
 	}
 
 	@Test
-	public void testWebSiteExists() {
+	public void testWebSiteHrefIsInContenSpaceCollection() {
+		ApioClientBuilder.given(
+		).basicAuth(
+			"test@liferay.com", "test"
+		).header(
+			"Accept", "application/hal+json"
+		).when(
+		).get(
+			_rootEndpointURL.toExternalForm()
+		).follow(
+			"_links.content-space.href"
+		).then(
+		).body(
+			"_embedded.ContentSpace.find {it.name == '" +
+				WebSiteApioTestBundleActivator.WEB_SITE_NAME +
+					"'}._links.webSite.href",
+			IsNull.notNullValue()
+		);
+	}
+
+	@Test
+	public void testWebSiteHrefIsInContentSpace() {
+		String contentSpaceHref = ContentSpaceApioTestUtil.getContentSpaceHref(
+			_rootEndpointURL.toExternalForm(),
+			WebSiteApioTestBundleActivator.WEB_SITE_NAME);
+
+		ApioClientBuilder.given(
+		).basicAuth(
+			"test@liferay.com", "test"
+		).header(
+			"Accept", "application/hal+json"
+		).when(
+		).get(
+			contentSpaceHref
+		).then(
+		).statusCode(
+			200
+		).body(
+			"_links.webSite.href", IsNull.notNullValue()
+		);
+	}
+
+	@Test
+	public void testWebSiteIsInWebSiteCollections() {
 		ApioClientBuilder.given(
 		).basicAuth(
 			"test@liferay.com", "test"
@@ -113,9 +226,71 @@ public class WebSiteApioTest {
 		).statusCode(
 			200
 		).body(
-			"_embedded.WebSite.find { it.name == '" +
+			"_embedded.WebSite.find {it.name == '" +
 				WebSiteApioTestBundleActivator.WEB_SITE_NAME +
-					"' }._links.self.href",
+					"'}.availableLanguages",
+			IsNull.notNullValue()
+		).body(
+			"_embedded.WebSite.find {it.name == '" +
+				WebSiteApioTestBundleActivator.WEB_SITE_NAME + "'}.description",
+			IsNull.notNullValue()
+		).body(
+			"_embedded.WebSite.find {it.name == '" +
+				WebSiteApioTestBundleActivator.WEB_SITE_NAME +
+					"'}.membershipType",
+			Matchers.equalTo("open")
+		).body(
+			"_embedded.WebSite.find {it.name == '" +
+				WebSiteApioTestBundleActivator.WEB_SITE_NAME + "'}.name",
+			IsNull.notNullValue()
+		).body(
+			"_embedded.WebSite.find {it.name == '" +
+				WebSiteApioTestBundleActivator.WEB_SITE_NAME + "'}.privateUrl",
+			IsNull.notNullValue()
+		).body(
+			"_embedded.WebSite.find {it.name == '" +
+				WebSiteApioTestBundleActivator.WEB_SITE_NAME + "'}.publicUrl",
+			IsNull.notNullValue()
+		).body(
+			"_embedded.WebSite.find {it.name == '" +
+				WebSiteApioTestBundleActivator.WEB_SITE_NAME +
+					"'}._links.contentSpace.href",
+			IsNull.notNullValue()
+		).body(
+			"_embedded.WebSite.find {it.name == '" +
+				WebSiteApioTestBundleActivator.WEB_SITE_NAME +
+					"'}._links.creator.href",
+			IsNull.notNullValue()
+		).body(
+			"_embedded.WebSite.find {it.name == '" +
+				WebSiteApioTestBundleActivator.WEB_SITE_NAME +
+					"'}._links.self.href",
+			IsNull.notNullValue()
+		).body(
+			"_embedded.WebSite.find {it.name == '" +
+				WebSiteApioTestBundleActivator.WEB_SITE_NAME +
+					"'}._links.webSites.href",
+			IsNull.notNullValue()
+		);
+	}
+
+	@Test
+	public void testWebSiteLinkExistsInMyUserAccount() {
+		ApioClientBuilder.given(
+		).basicAuth(
+			"test@liferay.com", "test"
+		).header(
+			"Accept", "application/hal+json"
+		).when(
+		).get(
+			_rootEndpointURL.toExternalForm()
+		).follow(
+			"_links.my-user-account.href"
+		).then(
+		).statusCode(
+			200
+		).body(
+			"_embedded.'Liferay:UserAccount'[0]._links.myWebSites.href",
 			IsNull.notNullValue()
 		);
 	}
@@ -135,6 +310,27 @@ public class WebSiteApioTest {
 			200
 		).body(
 			"_links.web-site.href", IsNull.notNullValue()
+		);
+	}
+
+	@Test
+	public void testWebSiteLinkExistsInUserAccount() {
+		ApioClientBuilder.given(
+		).basicAuth(
+			"test@liferay.com", "test"
+		).header(
+			"Accept", "application/hal+json"
+		).when(
+		).get(
+			_rootEndpointURL.toExternalForm()
+		).follow(
+			"_links.user-account.href"
+		).then(
+		).statusCode(
+			200
+		).body(
+			"_embedded.'Liferay:UserAccount'[0]._links.webSites.href",
+			IsNull.notNullValue()
 		);
 	}
 

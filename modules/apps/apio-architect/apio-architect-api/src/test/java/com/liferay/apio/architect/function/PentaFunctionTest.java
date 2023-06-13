@@ -46,9 +46,8 @@ public class PentaFunctionTest {
 	@Test(expected = NullPointerException.class)
 	public void testOnInvokingAndThenWithNullAfterFunctionThrowsException() {
 		PentaFunction<String, String, String, String, String, String>
-			firstFunction = (
-				string1, string2, string3, string4, string5) ->
-					string1 + string2 + string3 + string4 + string5;
+			firstFunction = (string1, string2, string3, string4, string5) ->
+				string1 + string2 + string3 + string4 + string5;
 
 		firstFunction.andThen(null);
 	}

@@ -20,7 +20,7 @@ import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.Validator;
 
-import java.util.EnumSet;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.regex.Matcher;
@@ -36,9 +36,24 @@ import javax.servlet.http.HttpServletRequest;
  */
 public class FilterMapping {
 
+	/**
+	 * @deprecated As of Judson (7.1.x), replaced by {@link
+	 *             #FilterMapping(String, Filter, FilterConfig, List<String>,
+	 *             Set<Dispatcher>)}
+	 */
+	@Deprecated
 	public FilterMapping(
 		String filterName, Filter filter, FilterConfig filterConfig,
 		List<String> urlPatterns, List<String> dispatchers) {
+
+		this(
+			filterName, filter, filterConfig, urlPatterns,
+			_toDispatchers(dispatchers));
+	}
+
+	public FilterMapping(
+		String filterName, Filter filter, FilterConfig filterConfig,
+		List<String> urlPatterns, Set<Dispatcher> dispatchers) {
 
 		_filterName = filterName;
 		_filter = filter;
@@ -65,11 +80,7 @@ public class FilterMapping {
 			_urlRegexIgnorePattern = Pattern.compile(urlRegexIgnorePattern);
 		}
 
-		_dispatchers = EnumSet.noneOf(Dispatcher.class);
-
-		for (String dispatcher : dispatchers) {
-			_dispatchers.add(Dispatcher.valueOf(dispatcher));
-		}
+		_dispatchers = dispatchers;
 
 		if (_dispatchers.isEmpty()) {
 			_dispatchers.add(Dispatcher.REQUEST);
@@ -128,7 +139,11 @@ public class FilterMapping {
 		String queryString = request.getQueryString();
 
 		if (Validator.isNotNull(queryString)) {
-			url = url.concat(StringPool.QUESTION).concat(queryString);
+			url = url.concat(
+				StringPool.QUESTION
+			).concat(
+				queryString
+			);
 		}
 
 		boolean matchURLRegexPattern = true;
@@ -187,6 +202,16 @@ public class FilterMapping {
 		}
 
 		return false;
+	}
+
+	private static Set<Dispatcher> _toDispatchers(List<String> dispatchers) {
+		Set<Dispatcher> dispatcherSet = new HashSet<>();
+
+		for (String dispatcher : dispatchers) {
+			dispatcherSet.add(Dispatcher.valueOf(dispatcher));
+		}
+
+		return dispatcherSet;
 	}
 
 	private FilterMapping(

@@ -17,9 +17,7 @@ package com.liferay.portal.kernel.model;
 import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.expando.kernel.model.ExpandoBridge;
-
 import com.liferay.exportimport.kernel.lar.StagedModelType;
-
 import com.liferay.portal.kernel.service.ServiceContext;
 
 import java.io.Serializable;
@@ -39,8 +37,9 @@ import java.util.Objects;
  * @generated
  */
 @ProviderType
-public class OrganizationWrapper implements Organization,
-	ModelWrapper<Organization> {
+public class OrganizationWrapper
+	implements Organization, ModelWrapper<Organization> {
+
 	public OrganizationWrapper(Organization organization) {
 		_organization = organization;
 	}
@@ -97,7 +96,7 @@ public class OrganizationWrapper implements Organization,
 		}
 
 		String externalReferenceCode = (String)attributes.get(
-				"externalReferenceCode");
+			"externalReferenceCode");
 
 		if (externalReferenceCode != null) {
 			setExternalReferenceCode(externalReferenceCode);
@@ -139,7 +138,8 @@ public class OrganizationWrapper implements Organization,
 			setModifiedDate(modifiedDate);
 		}
 
-		Long parentOrganizationId = (Long)attributes.get("parentOrganizationId");
+		Long parentOrganizationId = (Long)attributes.get(
+			"parentOrganizationId");
 
 		if (parentOrganizationId != null) {
 			setParentOrganizationId(parentOrganizationId);
@@ -203,6 +203,7 @@ public class OrganizationWrapper implements Organization,
 	@Override
 	public String buildTreePath()
 		throws com.liferay.portal.kernel.exception.PortalException {
+
 		return _organization.buildTreePath();
 	}
 
@@ -229,12 +230,14 @@ public class OrganizationWrapper implements Organization,
 	@Override
 	public long[] getAncestorOrganizationIds()
 		throws com.liferay.portal.kernel.exception.PortalException {
+
 		return _organization.getAncestorOrganizationIds();
 	}
 
 	@Override
 	public java.util.List<Organization> getAncestors()
 		throws com.liferay.portal.kernel.exception.PortalException {
+
 		return _organization.getAncestors();
 	}
 
@@ -244,40 +247,40 @@ public class OrganizationWrapper implements Organization,
 	}
 
 	/**
-	* Returns the comments of this organization.
-	*
-	* @return the comments of this organization
-	*/
+	 * Returns the comments of this organization.
+	 *
+	 * @return the comments of this organization
+	 */
 	@Override
 	public String getComments() {
 		return _organization.getComments();
 	}
 
 	/**
-	* Returns the company ID of this organization.
-	*
-	* @return the company ID of this organization
-	*/
+	 * Returns the company ID of this organization.
+	 *
+	 * @return the company ID of this organization
+	 */
 	@Override
 	public long getCompanyId() {
 		return _organization.getCompanyId();
 	}
 
 	/**
-	* Returns the country ID of this organization.
-	*
-	* @return the country ID of this organization
-	*/
+	 * Returns the country ID of this organization.
+	 *
+	 * @return the country ID of this organization
+	 */
 	@Override
 	public long getCountryId() {
 		return _organization.getCountryId();
 	}
 
 	/**
-	* Returns the create date of this organization.
-	*
-	* @return the create date of this organization
-	*/
+	 * Returns the create date of this organization.
+	 *
+	 * @return the create date of this organization
+	 */
 	@Override
 	public Date getCreateDate() {
 		return _organization.getCreateDate();
@@ -294,10 +297,10 @@ public class OrganizationWrapper implements Organization,
 	}
 
 	/**
-	* Returns the external reference code of this organization.
-	*
-	* @return the external reference code of this organization
-	*/
+	 * Returns the external reference code of this organization.
+	 *
+	 * @return the external reference code of this organization
+	 */
 	@Override
 	public String getExternalReferenceCode() {
 		return _organization.getExternalReferenceCode();
@@ -314,50 +317,50 @@ public class OrganizationWrapper implements Organization,
 	}
 
 	/**
-	* Returns the logo ID of this organization.
-	*
-	* @return the logo ID of this organization
-	*/
+	 * Returns the logo ID of this organization.
+	 *
+	 * @return the logo ID of this organization
+	 */
 	@Override
 	public long getLogoId() {
 		return _organization.getLogoId();
 	}
 
 	/**
-	* Returns the modified date of this organization.
-	*
-	* @return the modified date of this organization
-	*/
+	 * Returns the modified date of this organization.
+	 *
+	 * @return the modified date of this organization
+	 */
 	@Override
 	public Date getModifiedDate() {
 		return _organization.getModifiedDate();
 	}
 
 	/**
-	* Returns the mvcc version of this organization.
-	*
-	* @return the mvcc version of this organization
-	*/
+	 * Returns the mvcc version of this organization.
+	 *
+	 * @return the mvcc version of this organization
+	 */
 	@Override
 	public long getMvccVersion() {
 		return _organization.getMvccVersion();
 	}
 
 	/**
-	* Returns the name of this organization.
-	*
-	* @return the name of this organization
-	*/
+	 * Returns the name of this organization.
+	 *
+	 * @return the name of this organization
+	 */
 	@Override
 	public String getName() {
 		return _organization.getName();
 	}
 
 	/**
-	* Returns the organization ID of this organization.
-	*
-	* @return the organization ID of this organization
-	*/
+	 * Returns the organization ID of this organization.
+	 *
+	 * @return the organization ID of this organization
+	 */
 	@Override
 	public long getOrganizationId() {
 		return _organization.getOrganizationId();
@@ -366,14 +369,15 @@ public class OrganizationWrapper implements Organization,
 	@Override
 	public Organization getParentOrganization()
 		throws com.liferay.portal.kernel.exception.PortalException {
+
 		return _organization.getParentOrganization();
 	}
 
 	/**
-	* Returns the parent organization ID of this organization.
-	*
-	* @return the parent organization ID of this organization
-	*/
+	 * Returns the parent organization ID of this organization.
+	 *
+	 * @return the parent organization ID of this organization
+	 */
 	@Override
 	public long getParentOrganizationId() {
 		return _organization.getParentOrganizationId();
@@ -390,10 +394,10 @@ public class OrganizationWrapper implements Organization,
 	}
 
 	/**
-	* Returns the primary key of this organization.
-	*
-	* @return the primary key of this organization
-	*/
+	 * Returns the primary key of this organization.
+	 *
+	 * @return the primary key of this organization
+	 */
 	@Override
 	public long getPrimaryKey() {
 		return _organization.getPrimaryKey();
@@ -415,20 +419,20 @@ public class OrganizationWrapper implements Organization,
 	}
 
 	/**
-	* Returns the recursable of this organization.
-	*
-	* @return the recursable of this organization
-	*/
+	 * Returns the recursable of this organization.
+	 *
+	 * @return the recursable of this organization
+	 */
 	@Override
 	public boolean getRecursable() {
 		return _organization.getRecursable();
 	}
 
 	/**
-	* Returns the region ID of this organization.
-	*
-	* @return the region ID of this organization
-	*/
+	 * Returns the region ID of this organization.
+	 *
+	 * @return the region ID of this organization
+	 */
 	@Override
 	public long getRegionId() {
 		return _organization.getRegionId();
@@ -437,6 +441,7 @@ public class OrganizationWrapper implements Organization,
 	@Override
 	public java.util.Set<String> getReminderQueryQuestions(
 		java.util.Locale locale) {
+
 		return _organization.getReminderQueryQuestions(locale);
 	}
 
@@ -446,10 +451,10 @@ public class OrganizationWrapper implements Organization,
 	}
 
 	/**
-	* Returns the status ID of this organization.
-	*
-	* @return the status ID of this organization
-	*/
+	 * Returns the status ID of this organization.
+	 *
+	 * @return the status ID of this organization
+	 */
 	@Override
 	public long getStatusId() {
 		return _organization.getStatusId();
@@ -466,20 +471,20 @@ public class OrganizationWrapper implements Organization,
 	}
 
 	/**
-	* Returns the tree path of this organization.
-	*
-	* @return the tree path of this organization
-	*/
+	 * Returns the tree path of this organization.
+	 *
+	 * @return the tree path of this organization
+	 */
 	@Override
 	public String getTreePath() {
 		return _organization.getTreePath();
 	}
 
 	/**
-	* Returns the type of this organization.
-	*
-	* @return the type of this organization
-	*/
+	 * Returns the type of this organization.
+	 *
+	 * @return the type of this organization
+	 */
 	@Override
 	public String getType() {
 		return _organization.getType();
@@ -491,40 +496,40 @@ public class OrganizationWrapper implements Organization,
 	}
 
 	/**
-	* Returns the user ID of this organization.
-	*
-	* @return the user ID of this organization
-	*/
+	 * Returns the user ID of this organization.
+	 *
+	 * @return the user ID of this organization
+	 */
 	@Override
 	public long getUserId() {
 		return _organization.getUserId();
 	}
 
 	/**
-	* Returns the user name of this organization.
-	*
-	* @return the user name of this organization
-	*/
+	 * Returns the user name of this organization.
+	 *
+	 * @return the user name of this organization
+	 */
 	@Override
 	public String getUserName() {
 		return _organization.getUserName();
 	}
 
 	/**
-	* Returns the user uuid of this organization.
-	*
-	* @return the user uuid of this organization
-	*/
+	 * Returns the user uuid of this organization.
+	 *
+	 * @return the user uuid of this organization
+	 */
 	@Override
 	public String getUserUuid() {
 		return _organization.getUserUuid();
 	}
 
 	/**
-	* Returns the uuid of this organization.
-	*
-	* @return the uuid of this organization
-	*/
+	 * Returns the uuid of this organization.
+	 *
+	 * @return the uuid of this organization
+	 */
 	@Override
 	public String getUuid() {
 		return _organization.getUuid();
@@ -571,10 +576,10 @@ public class OrganizationWrapper implements Organization,
 	}
 
 	/**
-	* Returns <code>true</code> if this organization is recursable.
-	*
-	* @return <code>true</code> if this organization is recursable; <code>false</code> otherwise
-	*/
+	 * Returns <code>true</code> if this organization is recursable.
+	 *
+	 * @return <code>true</code> if this organization is recursable; <code>false</code> otherwise
+	 */
 	@Override
 	public boolean isRecursable() {
 		return _organization.isRecursable();
@@ -596,40 +601,40 @@ public class OrganizationWrapper implements Organization,
 	}
 
 	/**
-	* Sets the comments of this organization.
-	*
-	* @param comments the comments of this organization
-	*/
+	 * Sets the comments of this organization.
+	 *
+	 * @param comments the comments of this organization
+	 */
 	@Override
 	public void setComments(String comments) {
 		_organization.setComments(comments);
 	}
 
 	/**
-	* Sets the company ID of this organization.
-	*
-	* @param companyId the company ID of this organization
-	*/
+	 * Sets the company ID of this organization.
+	 *
+	 * @param companyId the company ID of this organization
+	 */
 	@Override
 	public void setCompanyId(long companyId) {
 		_organization.setCompanyId(companyId);
 	}
 
 	/**
-	* Sets the country ID of this organization.
-	*
-	* @param countryId the country ID of this organization
-	*/
+	 * Sets the country ID of this organization.
+	 *
+	 * @param countryId the country ID of this organization
+	 */
 	@Override
 	public void setCountryId(long countryId) {
 		_organization.setCountryId(countryId);
 	}
 
 	/**
-	* Sets the create date of this organization.
-	*
-	* @param createDate the create date of this organization
-	*/
+	 * Sets the create date of this organization.
+	 *
+	 * @param createDate the create date of this organization
+	 */
 	@Override
 	public void setCreateDate(Date createDate) {
 		_organization.setCreateDate(createDate);
@@ -651,50 +656,50 @@ public class OrganizationWrapper implements Organization,
 	}
 
 	/**
-	* Sets the external reference code of this organization.
-	*
-	* @param externalReferenceCode the external reference code of this organization
-	*/
+	 * Sets the external reference code of this organization.
+	 *
+	 * @param externalReferenceCode the external reference code of this organization
+	 */
 	@Override
 	public void setExternalReferenceCode(String externalReferenceCode) {
 		_organization.setExternalReferenceCode(externalReferenceCode);
 	}
 
 	/**
-	* Sets the logo ID of this organization.
-	*
-	* @param logoId the logo ID of this organization
-	*/
+	 * Sets the logo ID of this organization.
+	 *
+	 * @param logoId the logo ID of this organization
+	 */
 	@Override
 	public void setLogoId(long logoId) {
 		_organization.setLogoId(logoId);
 	}
 
 	/**
-	* Sets the modified date of this organization.
-	*
-	* @param modifiedDate the modified date of this organization
-	*/
+	 * Sets the modified date of this organization.
+	 *
+	 * @param modifiedDate the modified date of this organization
+	 */
 	@Override
 	public void setModifiedDate(Date modifiedDate) {
 		_organization.setModifiedDate(modifiedDate);
 	}
 
 	/**
-	* Sets the mvcc version of this organization.
-	*
-	* @param mvccVersion the mvcc version of this organization
-	*/
+	 * Sets the mvcc version of this organization.
+	 *
+	 * @param mvccVersion the mvcc version of this organization
+	 */
 	@Override
 	public void setMvccVersion(long mvccVersion) {
 		_organization.setMvccVersion(mvccVersion);
 	}
 
 	/**
-	* Sets the name of this organization.
-	*
-	* @param name the name of this organization
-	*/
+	 * Sets the name of this organization.
+	 *
+	 * @param name the name of this organization
+	 */
 	@Override
 	public void setName(String name) {
 		_organization.setName(name);
@@ -706,30 +711,30 @@ public class OrganizationWrapper implements Organization,
 	}
 
 	/**
-	* Sets the organization ID of this organization.
-	*
-	* @param organizationId the organization ID of this organization
-	*/
+	 * Sets the organization ID of this organization.
+	 *
+	 * @param organizationId the organization ID of this organization
+	 */
 	@Override
 	public void setOrganizationId(long organizationId) {
 		_organization.setOrganizationId(organizationId);
 	}
 
 	/**
-	* Sets the parent organization ID of this organization.
-	*
-	* @param parentOrganizationId the parent organization ID of this organization
-	*/
+	 * Sets the parent organization ID of this organization.
+	 *
+	 * @param parentOrganizationId the parent organization ID of this organization
+	 */
 	@Override
 	public void setParentOrganizationId(long parentOrganizationId) {
 		_organization.setParentOrganizationId(parentOrganizationId);
 	}
 
 	/**
-	* Sets the primary key of this organization.
-	*
-	* @param primaryKey the primary key of this organization
-	*/
+	 * Sets the primary key of this organization.
+	 *
+	 * @param primaryKey the primary key of this organization
+	 */
 	@Override
 	public void setPrimaryKey(long primaryKey) {
 		_organization.setPrimaryKey(primaryKey);
@@ -741,90 +746,90 @@ public class OrganizationWrapper implements Organization,
 	}
 
 	/**
-	* Sets whether this organization is recursable.
-	*
-	* @param recursable the recursable of this organization
-	*/
+	 * Sets whether this organization is recursable.
+	 *
+	 * @param recursable the recursable of this organization
+	 */
 	@Override
 	public void setRecursable(boolean recursable) {
 		_organization.setRecursable(recursable);
 	}
 
 	/**
-	* Sets the region ID of this organization.
-	*
-	* @param regionId the region ID of this organization
-	*/
+	 * Sets the region ID of this organization.
+	 *
+	 * @param regionId the region ID of this organization
+	 */
 	@Override
 	public void setRegionId(long regionId) {
 		_organization.setRegionId(regionId);
 	}
 
 	/**
-	* Sets the status ID of this organization.
-	*
-	* @param statusId the status ID of this organization
-	*/
+	 * Sets the status ID of this organization.
+	 *
+	 * @param statusId the status ID of this organization
+	 */
 	@Override
 	public void setStatusId(long statusId) {
 		_organization.setStatusId(statusId);
 	}
 
 	/**
-	* Sets the tree path of this organization.
-	*
-	* @param treePath the tree path of this organization
-	*/
+	 * Sets the tree path of this organization.
+	 *
+	 * @param treePath the tree path of this organization
+	 */
 	@Override
 	public void setTreePath(String treePath) {
 		_organization.setTreePath(treePath);
 	}
 
 	/**
-	* Sets the type of this organization.
-	*
-	* @param type the type of this organization
-	*/
+	 * Sets the type of this organization.
+	 *
+	 * @param type the type of this organization
+	 */
 	@Override
 	public void setType(String type) {
 		_organization.setType(type);
 	}
 
 	/**
-	* Sets the user ID of this organization.
-	*
-	* @param userId the user ID of this organization
-	*/
+	 * Sets the user ID of this organization.
+	 *
+	 * @param userId the user ID of this organization
+	 */
 	@Override
 	public void setUserId(long userId) {
 		_organization.setUserId(userId);
 	}
 
 	/**
-	* Sets the user name of this organization.
-	*
-	* @param userName the user name of this organization
-	*/
+	 * Sets the user name of this organization.
+	 *
+	 * @param userName the user name of this organization
+	 */
 	@Override
 	public void setUserName(String userName) {
 		_organization.setUserName(userName);
 	}
 
 	/**
-	* Sets the user uuid of this organization.
-	*
-	* @param userUuid the user uuid of this organization
-	*/
+	 * Sets the user uuid of this organization.
+	 *
+	 * @param userUuid the user uuid of this organization
+	 */
 	@Override
 	public void setUserUuid(String userUuid) {
 		_organization.setUserUuid(userUuid);
 	}
 
 	/**
-	* Sets the uuid of this organization.
-	*
-	* @param uuid the uuid of this organization
-	*/
+	 * Sets the uuid of this organization.
+	 *
+	 * @param uuid the uuid of this organization
+	 */
 	@Override
 	public void setUuid(String uuid) {
 		_organization.setUuid(uuid);
@@ -905,4 +910,5 @@ public class OrganizationWrapper implements Organization,
 	}
 
 	private final Organization _organization;
+
 }

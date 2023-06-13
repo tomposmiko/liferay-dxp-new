@@ -190,20 +190,30 @@ public class InvokerFilter extends BasePortalLifecycle implements Filter {
 	protected InvokerFilterChain getInvokerFilterChain(
 		HttpServletRequest request, String uri, FilterChain filterChain) {
 
-		if ((_filterChains == null) ||
-			Validator.isNotNull(request.getQueryString())) {
-
+		if (_filterChains == null) {
 			return _invokerFilterHelper.createInvokerFilterChain(
 				request, _dispatcher, uri, filterChain);
 		}
 
-		InvokerFilterChain invokerFilterChain = _filterChains.get(uri);
+		String key = uri;
+
+		String queryString = request.getQueryString();
+
+		if (Validator.isNotNull(queryString)) {
+			key = key.concat(
+				StringPool.QUESTION
+			).concat(
+				queryString
+			);
+		}
+
+		InvokerFilterChain invokerFilterChain = _filterChains.get(key);
 
 		if (invokerFilterChain == null) {
 			invokerFilterChain = _invokerFilterHelper.createInvokerFilterChain(
 				request, _dispatcher, uri, filterChain);
 
-			_filterChains.put(uri, invokerFilterChain);
+			_filterChains.put(key, invokerFilterChain);
 		}
 
 		return invokerFilterChain.clone(filterChain);

@@ -103,7 +103,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Eduardo Lundgren
  * @author Brian Wing Shun Chan
- * @author Eduardo Garcia
+ * @author Eduardo García
  * @author Marcellus Tavares
  */
 @Component(immediate = true, service = DDM.class)
@@ -145,9 +145,7 @@ public class DDMImpl implements DDM {
 			DDMStructure structure = DDMStructureLocalServiceUtil.getStructure(
 				classPK);
 
-			DDMForm ddmForm = structure.getFullHierarchyDDMForm();
-
-			return ddmForm;
+			return structure.getFullHierarchyDDMForm();
 		}
 		else if (classNameId == ddmTemplateClassNameId) {
 			DDMTemplate template = DDMTemplateLocalServiceUtil.getTemplate(
@@ -775,6 +773,7 @@ public class DDMImpl implements DDM {
 			jsonObject.put("localizable", ddmFormField.isLocalizable());
 			jsonObject.put("multiple", ddmFormField.isMultiple());
 			jsonObject.put("name", ddmFormField.getName());
+			jsonObject.put("readOnly", ddmFormField.isReadOnly());
 			jsonObject.put("repeatable", ddmFormField.isRepeatable());
 			jsonObject.put("required", ddmFormField.isRequired());
 			jsonObject.put("showLabel", ddmFormField.isShowLabel());

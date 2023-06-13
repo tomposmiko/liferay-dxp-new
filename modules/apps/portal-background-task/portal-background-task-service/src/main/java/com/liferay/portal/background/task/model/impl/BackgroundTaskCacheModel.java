@@ -35,12 +35,12 @@ import java.util.Map;
  * The cache model class for representing BackgroundTask in entity cache.
  *
  * @author Brian Wing Shun Chan
- * @see BackgroundTask
  * @generated
  */
 @ProviderType
-public class BackgroundTaskCacheModel implements CacheModel<BackgroundTask>,
-	Externalizable, MVCCModel {
+public class BackgroundTaskCacheModel
+	implements CacheModel<BackgroundTask>, Externalizable, MVCCModel {
+
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj) {
@@ -51,10 +51,12 @@ public class BackgroundTaskCacheModel implements CacheModel<BackgroundTask>,
 			return false;
 		}
 
-		BackgroundTaskCacheModel backgroundTaskCacheModel = (BackgroundTaskCacheModel)obj;
+		BackgroundTaskCacheModel backgroundTaskCacheModel =
+			(BackgroundTaskCacheModel)obj;
 
 		if ((backgroundTaskId == backgroundTaskCacheModel.backgroundTaskId) &&
-				(mvccVersion == backgroundTaskCacheModel.mvccVersion)) {
+			(mvccVersion == backgroundTaskCacheModel.mvccVersion)) {
+
 			return true;
 		}
 
@@ -198,6 +200,7 @@ public class BackgroundTaskCacheModel implements CacheModel<BackgroundTask>,
 	@Override
 	public void readExternal(ObjectInput objectInput)
 		throws ClassNotFoundException, IOException {
+
 		mvccVersion = objectInput.readLong();
 
 		backgroundTaskId = objectInput.readLong();
@@ -223,8 +226,7 @@ public class BackgroundTaskCacheModel implements CacheModel<BackgroundTask>,
 	}
 
 	@Override
-	public void writeExternal(ObjectOutput objectOutput)
-		throws IOException {
+	public void writeExternal(ObjectOutput objectOutput) throws IOException {
 		objectOutput.writeLong(mvccVersion);
 
 		objectOutput.writeLong(backgroundTaskId);
@@ -297,4 +299,5 @@ public class BackgroundTaskCacheModel implements CacheModel<BackgroundTask>,
 	public long completionDate;
 	public int status;
 	public String statusMessage;
+
 }

@@ -763,7 +763,7 @@ definition {
 		}
 
 		UploadCommonFile.uploadCommonFileHiddenNoMouseOver(
-			locator1 = "WorkflowUpload#FILE_UPLOAD",
+			locator1 = "TextInput#FILE",
 			value1 = "${workflowDefinitionFile}"
 		);
 

@@ -45,8 +45,8 @@ public class PersonReusableNestedCollectionRouter
 		<Person, Long, PersonIdentifier, ModelNameModelIdIdentifier> {
 
 	@Override
-	public NestedCollectionRoutes
-		<Person, Long, ModelNameModelIdIdentifier> collectionRoutes(
+	public NestedCollectionRoutes<Person, Long, ModelNameModelIdIdentifier>
+		collectionRoutes(
 			NestedCollectionRoutes.Builder
 				<Person, Long, ModelNameModelIdIdentifier> builder) {
 
@@ -67,7 +67,8 @@ public class PersonReusableNestedCollectionRouter
 				);
 
 				return new PageItems<>(persons, persons.size());
-			}).build();
+			}
+		).build();
 	}
 
 	private Long _getCreatorId(String modelName, long modelId) {

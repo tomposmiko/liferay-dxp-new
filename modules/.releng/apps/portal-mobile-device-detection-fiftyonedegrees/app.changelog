@@ -1,0 +1,11 @@
+#
+# Liferay App Version 2.0.0
+#
+
+app.artifacts-2.0.0=\
+	com.liferay.portal.mobile.device.detection.fiftyonedegrees-3.0.4.jar,\
+	com.liferay.portal.mobile.device.detection.fiftyonedegrees.api-2.0.0.jar
+
+app.change.log-2.0.0=LPS-70728 LPS-71745 LPS-72263 LPS-72705 LPS-73178 LPS-74131 LPS-74544 LPS-75049 LPS-75216 LPS-75302 LPS-75377 LPS-76221 LPS-76956 LPS-77425 LPS-77699 LPS-78305 LPS-79186 LPS-80332 LPS-80517 LPS-81723 LPS-82343 LPS-82828 LPS-84093 LPS-84119 LPS-84958
+
+app.git.id-2.0.0=a982bf007b57984fa3dc38be4249c79933fe4f1f

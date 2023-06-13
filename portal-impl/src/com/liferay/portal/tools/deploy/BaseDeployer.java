@@ -1324,11 +1324,9 @@ public class BaseDeployer implements AutoDeployer, Deployer {
 		}
 
 		if (ignoreFiltersEnabled) {
-			String ignoreFiltersContent = FileUtil.read(
+			return FileUtil.read(
 				DeployUtil.getResourcePath(
 					tempDirPaths, "ignore-filters-web.xml"));
-
-			return ignoreFiltersContent;
 		}
 
 		return StringPool.BLANK;
@@ -1585,11 +1583,9 @@ public class BaseDeployer implements AutoDeployer, Deployer {
 	}
 
 	public String getSessionFiltersContent() throws Exception {
-		String sessionFiltersContent = FileUtil.read(
+		return FileUtil.read(
 			DeployUtil.getResourcePath(
 				tempDirPaths, "session-filters-web.xml"));
-
-		return sessionFiltersContent;
 	}
 
 	public String getSpeedFiltersContent(File srcFile) throws Exception {
@@ -1603,11 +1599,9 @@ public class BaseDeployer implements AutoDeployer, Deployer {
 		}
 
 		if (speedFiltersEnabled) {
-			String speedFiltersContent = FileUtil.read(
+			return FileUtil.read(
 				DeployUtil.getResourcePath(
 					tempDirPaths, "speed-filters-web.xml"));
-
-			return speedFiltersContent;
 		}
 
 		return StringPool.BLANK;
@@ -1820,13 +1814,12 @@ public class BaseDeployer implements AutoDeployer, Deployer {
 				return PluginPackageUtil.readPluginPackageProperties(
 					displayName, properties);
 			}
-			else {
-				String xml = StringUtil.read(is);
 
-				xml = XMLUtil.fixProlog(xml);
+			String xml = StringUtil.read(is);
 
-				return PluginPackageUtil.readPluginPackageXml(xml);
-			}
+			xml = XMLUtil.fixProlog(xml);
+
+			return PluginPackageUtil.readPluginPackageXml(xml);
 		}
 		catch (Exception e) {
 			_log.error(file.getPath() + ": " + e.toString(), e);

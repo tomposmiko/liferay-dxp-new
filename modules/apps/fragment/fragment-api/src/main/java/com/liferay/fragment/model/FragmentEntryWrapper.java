@@ -17,9 +17,7 @@ package com.liferay.fragment.model;
 import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.expando.kernel.model.ExpandoBridge;
-
 import com.liferay.exportimport.kernel.lar.StagedModelType;
-
 import com.liferay.portal.kernel.model.ModelWrapper;
 import com.liferay.portal.kernel.service.ServiceContext;
 
@@ -40,8 +38,9 @@ import java.util.Objects;
  * @generated
  */
 @ProviderType
-public class FragmentEntryWrapper implements FragmentEntry,
-	ModelWrapper<FragmentEntry> {
+public class FragmentEntryWrapper
+	implements FragmentEntry, ModelWrapper<FragmentEntry> {
+
 	public FragmentEntryWrapper(FragmentEntry fragmentEntry) {
 		_fragmentEntry = fragmentEntry;
 	}
@@ -134,7 +133,8 @@ public class FragmentEntryWrapper implements FragmentEntry,
 			setModifiedDate(modifiedDate);
 		}
 
-		Long fragmentCollectionId = (Long)attributes.get("fragmentCollectionId");
+		Long fragmentCollectionId = (Long)attributes.get(
+			"fragmentCollectionId");
 
 		if (fragmentCollectionId != null) {
 			setFragmentCollectionId(fragmentCollectionId);
@@ -218,10 +218,10 @@ public class FragmentEntryWrapper implements FragmentEntry,
 	}
 
 	/**
-	* Returns the company ID of this fragment entry.
-	*
-	* @return the company ID of this fragment entry
-	*/
+	 * Returns the company ID of this fragment entry.
+	 *
+	 * @return the company ID of this fragment entry
+	 */
 	@Override
 	public long getCompanyId() {
 		return _fragmentEntry.getCompanyId();
@@ -233,20 +233,20 @@ public class FragmentEntryWrapper implements FragmentEntry,
 	}
 
 	/**
-	* Returns the create date of this fragment entry.
-	*
-	* @return the create date of this fragment entry
-	*/
+	 * Returns the create date of this fragment entry.
+	 *
+	 * @return the create date of this fragment entry
+	 */
 	@Override
 	public Date getCreateDate() {
 		return _fragmentEntry.getCreateDate();
 	}
 
 	/**
-	* Returns the css of this fragment entry.
-	*
-	* @return the css of this fragment entry
-	*/
+	 * Returns the css of this fragment entry.
+	 *
+	 * @return the css of this fragment entry
+	 */
 	@Override
 	public String getCss() {
 		return _fragmentEntry.getCss();
@@ -258,50 +258,50 @@ public class FragmentEntryWrapper implements FragmentEntry,
 	}
 
 	/**
-	* Returns the fragment collection ID of this fragment entry.
-	*
-	* @return the fragment collection ID of this fragment entry
-	*/
+	 * Returns the fragment collection ID of this fragment entry.
+	 *
+	 * @return the fragment collection ID of this fragment entry
+	 */
 	@Override
 	public long getFragmentCollectionId() {
 		return _fragmentEntry.getFragmentCollectionId();
 	}
 
 	/**
-	* Returns the fragment entry ID of this fragment entry.
-	*
-	* @return the fragment entry ID of this fragment entry
-	*/
+	 * Returns the fragment entry ID of this fragment entry.
+	 *
+	 * @return the fragment entry ID of this fragment entry
+	 */
 	@Override
 	public long getFragmentEntryId() {
 		return _fragmentEntry.getFragmentEntryId();
 	}
 
 	/**
-	* Returns the fragment entry key of this fragment entry.
-	*
-	* @return the fragment entry key of this fragment entry
-	*/
+	 * Returns the fragment entry key of this fragment entry.
+	 *
+	 * @return the fragment entry key of this fragment entry
+	 */
 	@Override
 	public String getFragmentEntryKey() {
 		return _fragmentEntry.getFragmentEntryKey();
 	}
 
 	/**
-	* Returns the group ID of this fragment entry.
-	*
-	* @return the group ID of this fragment entry
-	*/
+	 * Returns the group ID of this fragment entry.
+	 *
+	 * @return the group ID of this fragment entry
+	 */
 	@Override
 	public long getGroupId() {
 		return _fragmentEntry.getGroupId();
 	}
 
 	/**
-	* Returns the html of this fragment entry.
-	*
-	* @return the html of this fragment entry
-	*/
+	 * Returns the html of this fragment entry.
+	 *
+	 * @return the html of this fragment entry
+	 */
 	@Override
 	public String getHtml() {
 		return _fragmentEntry.getHtml();
@@ -310,64 +310,65 @@ public class FragmentEntryWrapper implements FragmentEntry,
 	@Override
 	public String getImagePreviewURL(
 		com.liferay.portal.kernel.theme.ThemeDisplay themeDisplay) {
+
 		return _fragmentEntry.getImagePreviewURL(themeDisplay);
 	}
 
 	/**
-	* Returns the js of this fragment entry.
-	*
-	* @return the js of this fragment entry
-	*/
+	 * Returns the js of this fragment entry.
+	 *
+	 * @return the js of this fragment entry
+	 */
 	@Override
 	public String getJs() {
 		return _fragmentEntry.getJs();
 	}
 
 	/**
-	* Returns the last publish date of this fragment entry.
-	*
-	* @return the last publish date of this fragment entry
-	*/
+	 * Returns the last publish date of this fragment entry.
+	 *
+	 * @return the last publish date of this fragment entry
+	 */
 	@Override
 	public Date getLastPublishDate() {
 		return _fragmentEntry.getLastPublishDate();
 	}
 
 	/**
-	* Returns the modified date of this fragment entry.
-	*
-	* @return the modified date of this fragment entry
-	*/
+	 * Returns the modified date of this fragment entry.
+	 *
+	 * @return the modified date of this fragment entry
+	 */
 	@Override
 	public Date getModifiedDate() {
 		return _fragmentEntry.getModifiedDate();
 	}
 
 	/**
-	* Returns the name of this fragment entry.
-	*
-	* @return the name of this fragment entry
-	*/
+	 * Returns the name of this fragment entry.
+	 *
+	 * @return the name of this fragment entry
+	 */
 	@Override
 	public String getName() {
 		return _fragmentEntry.getName();
 	}
 
 	/**
-	* Returns the preview file entry ID of this fragment entry.
-	*
-	* @return the preview file entry ID of this fragment entry
-	*/
+	 * Returns the preview file entry ID of this fragment entry.
+	 *
+	 * @return the preview file entry ID of this fragment entry
+	 */
 	@Override
 	public long getPreviewFileEntryId() {
 		return _fragmentEntry.getPreviewFileEntryId();
 	}
 
 	/**
-	* Returns the primary key of this fragment entry.
-	*
-	* @return the primary key of this fragment entry
-	*/
+	 * Returns the primary key of this fragment entry.
+	 *
+	 * @return the primary key of this fragment entry
+	 */
 	@Override
 	public long getPrimaryKey() {
 		return _fragmentEntry.getPrimaryKey();
@@ -379,50 +380,50 @@ public class FragmentEntryWrapper implements FragmentEntry,
 	}
 
 	/**
-	* Returns the status of this fragment entry.
-	*
-	* @return the status of this fragment entry
-	*/
+	 * Returns the status of this fragment entry.
+	 *
+	 * @return the status of this fragment entry
+	 */
 	@Override
 	public int getStatus() {
 		return _fragmentEntry.getStatus();
 	}
 
 	/**
-	* Returns the status by user ID of this fragment entry.
-	*
-	* @return the status by user ID of this fragment entry
-	*/
+	 * Returns the status by user ID of this fragment entry.
+	 *
+	 * @return the status by user ID of this fragment entry
+	 */
 	@Override
 	public long getStatusByUserId() {
 		return _fragmentEntry.getStatusByUserId();
 	}
 
 	/**
-	* Returns the status by user name of this fragment entry.
-	*
-	* @return the status by user name of this fragment entry
-	*/
+	 * Returns the status by user name of this fragment entry.
+	 *
+	 * @return the status by user name of this fragment entry
+	 */
 	@Override
 	public String getStatusByUserName() {
 		return _fragmentEntry.getStatusByUserName();
 	}
 
 	/**
-	* Returns the status by user uuid of this fragment entry.
-	*
-	* @return the status by user uuid of this fragment entry
-	*/
+	 * Returns the status by user uuid of this fragment entry.
+	 *
+	 * @return the status by user uuid of this fragment entry
+	 */
 	@Override
 	public String getStatusByUserUuid() {
 		return _fragmentEntry.getStatusByUserUuid();
 	}
 
 	/**
-	* Returns the status date of this fragment entry.
-	*
-	* @return the status date of this fragment entry
-	*/
+	 * Returns the status date of this fragment entry.
+	 *
+	 * @return the status date of this fragment entry
+	 */
 	@Override
 	public Date getStatusDate() {
 		return _fragmentEntry.getStatusDate();
@@ -434,40 +435,40 @@ public class FragmentEntryWrapper implements FragmentEntry,
 	}
 
 	/**
-	* Returns the user ID of this fragment entry.
-	*
-	* @return the user ID of this fragment entry
-	*/
+	 * Returns the user ID of this fragment entry.
+	 *
+	 * @return the user ID of this fragment entry
+	 */
 	@Override
 	public long getUserId() {
 		return _fragmentEntry.getUserId();
 	}
 
 	/**
-	* Returns the user name of this fragment entry.
-	*
-	* @return the user name of this fragment entry
-	*/
+	 * Returns the user name of this fragment entry.
+	 *
+	 * @return the user name of this fragment entry
+	 */
 	@Override
 	public String getUserName() {
 		return _fragmentEntry.getUserName();
 	}
 
 	/**
-	* Returns the user uuid of this fragment entry.
-	*
-	* @return the user uuid of this fragment entry
-	*/
+	 * Returns the user uuid of this fragment entry.
+	 *
+	 * @return the user uuid of this fragment entry
+	 */
 	@Override
 	public String getUserUuid() {
 		return _fragmentEntry.getUserUuid();
 	}
 
 	/**
-	* Returns the uuid of this fragment entry.
-	*
-	* @return the uuid of this fragment entry
-	*/
+	 * Returns the uuid of this fragment entry.
+	 *
+	 * @return the uuid of this fragment entry
+	 */
 	@Override
 	public String getUuid() {
 		return _fragmentEntry.getUuid();
@@ -479,10 +480,10 @@ public class FragmentEntryWrapper implements FragmentEntry,
 	}
 
 	/**
-	* Returns <code>true</code> if this fragment entry is approved.
-	*
-	* @return <code>true</code> if this fragment entry is approved; <code>false</code> otherwise
-	*/
+	 * Returns <code>true</code> if this fragment entry is approved.
+	 *
+	 * @return <code>true</code> if this fragment entry is approved; <code>false</code> otherwise
+	 */
 	@Override
 	public boolean isApproved() {
 		return _fragmentEntry.isApproved();
@@ -494,20 +495,20 @@ public class FragmentEntryWrapper implements FragmentEntry,
 	}
 
 	/**
-	* Returns <code>true</code> if this fragment entry is denied.
-	*
-	* @return <code>true</code> if this fragment entry is denied; <code>false</code> otherwise
-	*/
+	 * Returns <code>true</code> if this fragment entry is denied.
+	 *
+	 * @return <code>true</code> if this fragment entry is denied; <code>false</code> otherwise
+	 */
 	@Override
 	public boolean isDenied() {
 		return _fragmentEntry.isDenied();
 	}
 
 	/**
-	* Returns <code>true</code> if this fragment entry is a draft.
-	*
-	* @return <code>true</code> if this fragment entry is a draft; <code>false</code> otherwise
-	*/
+	 * Returns <code>true</code> if this fragment entry is a draft.
+	 *
+	 * @return <code>true</code> if this fragment entry is a draft; <code>false</code> otherwise
+	 */
 	@Override
 	public boolean isDraft() {
 		return _fragmentEntry.isDraft();
@@ -519,30 +520,30 @@ public class FragmentEntryWrapper implements FragmentEntry,
 	}
 
 	/**
-	* Returns <code>true</code> if this fragment entry is expired.
-	*
-	* @return <code>true</code> if this fragment entry is expired; <code>false</code> otherwise
-	*/
+	 * Returns <code>true</code> if this fragment entry is expired.
+	 *
+	 * @return <code>true</code> if this fragment entry is expired; <code>false</code> otherwise
+	 */
 	@Override
 	public boolean isExpired() {
 		return _fragmentEntry.isExpired();
 	}
 
 	/**
-	* Returns <code>true</code> if this fragment entry is inactive.
-	*
-	* @return <code>true</code> if this fragment entry is inactive; <code>false</code> otherwise
-	*/
+	 * Returns <code>true</code> if this fragment entry is inactive.
+	 *
+	 * @return <code>true</code> if this fragment entry is inactive; <code>false</code> otherwise
+	 */
 	@Override
 	public boolean isInactive() {
 		return _fragmentEntry.isInactive();
 	}
 
 	/**
-	* Returns <code>true</code> if this fragment entry is incomplete.
-	*
-	* @return <code>true</code> if this fragment entry is incomplete; <code>false</code> otherwise
-	*/
+	 * Returns <code>true</code> if this fragment entry is incomplete.
+	 *
+	 * @return <code>true</code> if this fragment entry is incomplete; <code>false</code> otherwise
+	 */
 	@Override
 	public boolean isIncomplete() {
 		return _fragmentEntry.isIncomplete();
@@ -554,20 +555,20 @@ public class FragmentEntryWrapper implements FragmentEntry,
 	}
 
 	/**
-	* Returns <code>true</code> if this fragment entry is pending.
-	*
-	* @return <code>true</code> if this fragment entry is pending; <code>false</code> otherwise
-	*/
+	 * Returns <code>true</code> if this fragment entry is pending.
+	 *
+	 * @return <code>true</code> if this fragment entry is pending; <code>false</code> otherwise
+	 */
 	@Override
 	public boolean isPending() {
 		return _fragmentEntry.isPending();
 	}
 
 	/**
-	* Returns <code>true</code> if this fragment entry is scheduled.
-	*
-	* @return <code>true</code> if this fragment entry is scheduled; <code>false</code> otherwise
-	*/
+	 * Returns <code>true</code> if this fragment entry is scheduled.
+	 *
+	 * @return <code>true</code> if this fragment entry is scheduled; <code>false</code> otherwise
+	 */
 	@Override
 	public boolean isScheduled() {
 		return _fragmentEntry.isScheduled();
@@ -580,8 +581,9 @@ public class FragmentEntryWrapper implements FragmentEntry,
 
 	@Override
 	public void populateZipWriter(
-		com.liferay.portal.kernel.zip.ZipWriter zipWriter, String path)
+			com.liferay.portal.kernel.zip.ZipWriter zipWriter, String path)
 		throws Exception {
+
 		_fragmentEntry.populateZipWriter(zipWriter, path);
 	}
 
@@ -591,30 +593,30 @@ public class FragmentEntryWrapper implements FragmentEntry,
 	}
 
 	/**
-	* Sets the company ID of this fragment entry.
-	*
-	* @param companyId the company ID of this fragment entry
-	*/
+	 * Sets the company ID of this fragment entry.
+	 *
+	 * @param companyId the company ID of this fragment entry
+	 */
 	@Override
 	public void setCompanyId(long companyId) {
 		_fragmentEntry.setCompanyId(companyId);
 	}
 
 	/**
-	* Sets the create date of this fragment entry.
-	*
-	* @param createDate the create date of this fragment entry
-	*/
+	 * Sets the create date of this fragment entry.
+	 *
+	 * @param createDate the create date of this fragment entry
+	 */
 	@Override
 	public void setCreateDate(Date createDate) {
 		_fragmentEntry.setCreateDate(createDate);
 	}
 
 	/**
-	* Sets the css of this fragment entry.
-	*
-	* @param css the css of this fragment entry
-	*/
+	 * Sets the css of this fragment entry.
+	 *
+	 * @param css the css of this fragment entry
+	 */
 	@Override
 	public void setCss(String css) {
 		_fragmentEntry.setCss(css);
@@ -623,6 +625,7 @@ public class FragmentEntryWrapper implements FragmentEntry,
 	@Override
 	public void setExpandoBridgeAttributes(
 		com.liferay.portal.kernel.model.BaseModel<?> baseModel) {
+
 		_fragmentEntry.setExpandoBridgeAttributes(baseModel);
 	}
 
@@ -637,90 +640,90 @@ public class FragmentEntryWrapper implements FragmentEntry,
 	}
 
 	/**
-	* Sets the fragment collection ID of this fragment entry.
-	*
-	* @param fragmentCollectionId the fragment collection ID of this fragment entry
-	*/
+	 * Sets the fragment collection ID of this fragment entry.
+	 *
+	 * @param fragmentCollectionId the fragment collection ID of this fragment entry
+	 */
 	@Override
 	public void setFragmentCollectionId(long fragmentCollectionId) {
 		_fragmentEntry.setFragmentCollectionId(fragmentCollectionId);
 	}
 
 	/**
-	* Sets the fragment entry ID of this fragment entry.
-	*
-	* @param fragmentEntryId the fragment entry ID of this fragment entry
-	*/
+	 * Sets the fragment entry ID of this fragment entry.
+	 *
+	 * @param fragmentEntryId the fragment entry ID of this fragment entry
+	 */
 	@Override
 	public void setFragmentEntryId(long fragmentEntryId) {
 		_fragmentEntry.setFragmentEntryId(fragmentEntryId);
 	}
 
 	/**
-	* Sets the fragment entry key of this fragment entry.
-	*
-	* @param fragmentEntryKey the fragment entry key of this fragment entry
-	*/
+	 * Sets the fragment entry key of this fragment entry.
+	 *
+	 * @param fragmentEntryKey the fragment entry key of this fragment entry
+	 */
 	@Override
 	public void setFragmentEntryKey(String fragmentEntryKey) {
 		_fragmentEntry.setFragmentEntryKey(fragmentEntryKey);
 	}
 
 	/**
-	* Sets the group ID of this fragment entry.
-	*
-	* @param groupId the group ID of this fragment entry
-	*/
+	 * Sets the group ID of this fragment entry.
+	 *
+	 * @param groupId the group ID of this fragment entry
+	 */
 	@Override
 	public void setGroupId(long groupId) {
 		_fragmentEntry.setGroupId(groupId);
 	}
 
 	/**
-	* Sets the html of this fragment entry.
-	*
-	* @param html the html of this fragment entry
-	*/
+	 * Sets the html of this fragment entry.
+	 *
+	 * @param html the html of this fragment entry
+	 */
 	@Override
 	public void setHtml(String html) {
 		_fragmentEntry.setHtml(html);
 	}
 
 	/**
-	* Sets the js of this fragment entry.
-	*
-	* @param js the js of this fragment entry
-	*/
+	 * Sets the js of this fragment entry.
+	 *
+	 * @param js the js of this fragment entry
+	 */
 	@Override
 	public void setJs(String js) {
 		_fragmentEntry.setJs(js);
 	}
 
 	/**
-	* Sets the last publish date of this fragment entry.
-	*
-	* @param lastPublishDate the last publish date of this fragment entry
-	*/
+	 * Sets the last publish date of this fragment entry.
+	 *
+	 * @param lastPublishDate the last publish date of this fragment entry
+	 */
 	@Override
 	public void setLastPublishDate(Date lastPublishDate) {
 		_fragmentEntry.setLastPublishDate(lastPublishDate);
 	}
 
 	/**
-	* Sets the modified date of this fragment entry.
-	*
-	* @param modifiedDate the modified date of this fragment entry
-	*/
+	 * Sets the modified date of this fragment entry.
+	 *
+	 * @param modifiedDate the modified date of this fragment entry
+	 */
 	@Override
 	public void setModifiedDate(Date modifiedDate) {
 		_fragmentEntry.setModifiedDate(modifiedDate);
 	}
 
 	/**
-	* Sets the name of this fragment entry.
-	*
-	* @param name the name of this fragment entry
-	*/
+	 * Sets the name of this fragment entry.
+	 *
+	 * @param name the name of this fragment entry
+	 */
 	@Override
 	public void setName(String name) {
 		_fragmentEntry.setName(name);
@@ -732,20 +735,20 @@ public class FragmentEntryWrapper implements FragmentEntry,
 	}
 
 	/**
-	* Sets the preview file entry ID of this fragment entry.
-	*
-	* @param previewFileEntryId the preview file entry ID of this fragment entry
-	*/
+	 * Sets the preview file entry ID of this fragment entry.
+	 *
+	 * @param previewFileEntryId the preview file entry ID of this fragment entry
+	 */
 	@Override
 	public void setPreviewFileEntryId(long previewFileEntryId) {
 		_fragmentEntry.setPreviewFileEntryId(previewFileEntryId);
 	}
 
 	/**
-	* Sets the primary key of this fragment entry.
-	*
-	* @param primaryKey the primary key of this fragment entry
-	*/
+	 * Sets the primary key of this fragment entry.
+	 *
+	 * @param primaryKey the primary key of this fragment entry
+	 */
 	@Override
 	public void setPrimaryKey(long primaryKey) {
 		_fragmentEntry.setPrimaryKey(primaryKey);
@@ -757,97 +760,99 @@ public class FragmentEntryWrapper implements FragmentEntry,
 	}
 
 	/**
-	* Sets the status of this fragment entry.
-	*
-	* @param status the status of this fragment entry
-	*/
+	 * Sets the status of this fragment entry.
+	 *
+	 * @param status the status of this fragment entry
+	 */
 	@Override
 	public void setStatus(int status) {
 		_fragmentEntry.setStatus(status);
 	}
 
 	/**
-	* Sets the status by user ID of this fragment entry.
-	*
-	* @param statusByUserId the status by user ID of this fragment entry
-	*/
+	 * Sets the status by user ID of this fragment entry.
+	 *
+	 * @param statusByUserId the status by user ID of this fragment entry
+	 */
 	@Override
 	public void setStatusByUserId(long statusByUserId) {
 		_fragmentEntry.setStatusByUserId(statusByUserId);
 	}
 
 	/**
-	* Sets the status by user name of this fragment entry.
-	*
-	* @param statusByUserName the status by user name of this fragment entry
-	*/
+	 * Sets the status by user name of this fragment entry.
+	 *
+	 * @param statusByUserName the status by user name of this fragment entry
+	 */
 	@Override
 	public void setStatusByUserName(String statusByUserName) {
 		_fragmentEntry.setStatusByUserName(statusByUserName);
 	}
 
 	/**
-	* Sets the status by user uuid of this fragment entry.
-	*
-	* @param statusByUserUuid the status by user uuid of this fragment entry
-	*/
+	 * Sets the status by user uuid of this fragment entry.
+	 *
+	 * @param statusByUserUuid the status by user uuid of this fragment entry
+	 */
 	@Override
 	public void setStatusByUserUuid(String statusByUserUuid) {
 		_fragmentEntry.setStatusByUserUuid(statusByUserUuid);
 	}
 
 	/**
-	* Sets the status date of this fragment entry.
-	*
-	* @param statusDate the status date of this fragment entry
-	*/
+	 * Sets the status date of this fragment entry.
+	 *
+	 * @param statusDate the status date of this fragment entry
+	 */
 	@Override
 	public void setStatusDate(Date statusDate) {
 		_fragmentEntry.setStatusDate(statusDate);
 	}
 
 	/**
-	* Sets the user ID of this fragment entry.
-	*
-	* @param userId the user ID of this fragment entry
-	*/
+	 * Sets the user ID of this fragment entry.
+	 *
+	 * @param userId the user ID of this fragment entry
+	 */
 	@Override
 	public void setUserId(long userId) {
 		_fragmentEntry.setUserId(userId);
 	}
 
 	/**
-	* Sets the user name of this fragment entry.
-	*
-	* @param userName the user name of this fragment entry
-	*/
+	 * Sets the user name of this fragment entry.
+	 *
+	 * @param userName the user name of this fragment entry
+	 */
 	@Override
 	public void setUserName(String userName) {
 		_fragmentEntry.setUserName(userName);
 	}
 
 	/**
-	* Sets the user uuid of this fragment entry.
-	*
-	* @param userUuid the user uuid of this fragment entry
-	*/
+	 * Sets the user uuid of this fragment entry.
+	 *
+	 * @param userUuid the user uuid of this fragment entry
+	 */
 	@Override
 	public void setUserUuid(String userUuid) {
 		_fragmentEntry.setUserUuid(userUuid);
 	}
 
 	/**
-	* Sets the uuid of this fragment entry.
-	*
-	* @param uuid the uuid of this fragment entry
-	*/
+	 * Sets the uuid of this fragment entry.
+	 *
+	 * @param uuid the uuid of this fragment entry
+	 */
 	@Override
 	public void setUuid(String uuid) {
 		_fragmentEntry.setUuid(uuid);
 	}
 
 	@Override
-	public com.liferay.portal.kernel.model.CacheModel<FragmentEntry> toCacheModel() {
+	public com.liferay.portal.kernel.model.CacheModel<FragmentEntry>
+		toCacheModel() {
+
 		return _fragmentEntry.toCacheModel();
 	}
 
@@ -883,7 +888,9 @@ public class FragmentEntryWrapper implements FragmentEntry,
 
 		FragmentEntryWrapper fragmentEntryWrapper = (FragmentEntryWrapper)obj;
 
-		if (Objects.equals(_fragmentEntry, fragmentEntryWrapper._fragmentEntry)) {
+		if (Objects.equals(
+				_fragmentEntry, fragmentEntryWrapper._fragmentEntry)) {
+
 			return true;
 		}
 
@@ -916,4 +923,5 @@ public class FragmentEntryWrapper implements FragmentEntry,
 	}
 
 	private final FragmentEntry _fragmentEntry;
+
 }

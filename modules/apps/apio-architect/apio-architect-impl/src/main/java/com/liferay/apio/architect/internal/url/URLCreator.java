@@ -16,18 +16,24 @@ package com.liferay.apio.architect.internal.url;
 
 import static java.lang.String.join;
 
-import com.liferay.apio.architect.form.Form;
-import com.liferay.apio.architect.internal.operation.BatchCreateOperation;
-import com.liferay.apio.architect.internal.operation.CreateOperation;
-import com.liferay.apio.architect.internal.operation.DeleteOperation;
-import com.liferay.apio.architect.internal.operation.RetrieveOperation;
-import com.liferay.apio.architect.internal.operation.UpdateOperation;
+import static java.util.Arrays.asList;
+
 import com.liferay.apio.architect.internal.pagination.PageType;
-import com.liferay.apio.architect.operation.Operation;
 import com.liferay.apio.architect.pagination.Page;
+import com.liferay.apio.architect.resource.Resource;
+import com.liferay.apio.architect.resource.Resource.GenericParent;
+import com.liferay.apio.architect.resource.Resource.Id;
+import com.liferay.apio.architect.resource.Resource.Item;
+import com.liferay.apio.architect.resource.Resource.Nested;
+import com.liferay.apio.architect.resource.Resource.Paged;
 import com.liferay.apio.architect.uri.Path;
 
+import java.net.URI;
+
+import java.util.List;
 import java.util.Optional;
+import java.util.function.Function;
+import java.util.function.Predicate;
 
 import javax.ws.rs.core.UriBuilder;
 
@@ -69,6 +75,30 @@ public final class URLCreator {
 	}
 
 	/**
+	 * Returns the URL for a resource's action.
+	 *
+	 * @param  applicationURL the application URL
+	 * @param  resource the action's resource
+	 * @param  actionName the action's name
+	 * @return the URL for the action
+	 * @review
+	 */
+	public static Optional<String> createActionURL(
+		ApplicationURL applicationURL, Resource resource, String actionName) {
+
+		Optional<String> optional = createResourceURL(applicationURL, resource);
+
+		return optional.map(
+			url -> {
+				if (_resourceActions.contains(actionName)) {
+					return url;
+				}
+
+				return url + "/" + actionName;
+			});
+	}
+
+	/**
 	 * Returns the URL for a binary resource.
 	 *
 	 * @param  applicationURL the application URL
@@ -79,8 +109,17 @@ public final class URLCreator {
 	public static String createBinaryURL(
 		ApplicationURL applicationURL, String binaryId, Path path) {
 
-		return createAbsoluteURL(
-			applicationURL, join("/", "b", path.asURI(), binaryId));
+		URI uri = UriBuilder.fromPath(
+			"{name}"
+		).path(
+			"{id}"
+		).path(
+			"{binaryId}"
+		).build(
+			path.getName(), path.getId(), binaryId
+		);
+
+		return createAbsoluteURL(applicationURL, uri.toString());
 	}
 
 	/**
@@ -104,123 +143,183 @@ public final class URLCreator {
 	}
 
 	/**
-	 * Returns the URL for a collection.
+	 * Returns the URL for a generic parent resource, if an ID for the generic
+	 * parent is present. Returns {@code Optional#empty()} otherwise.
 	 *
 	 * @param  applicationURL the application URL
-	 * @param  name the resource's name
-	 * @return the collection URL
+	 * @param  genericParent the resource
+	 * @return the resource's URL, if an ID for the generic parent is present;
+	 *         {@code Optional#empty()} otherwise
+	 * @review
 	 */
-	public static String createCollectionURL(
-		ApplicationURL applicationURL, String name) {
+	public static Optional<String> createGenericParentResourceURL(
+		ApplicationURL applicationURL, GenericParent genericParent) {
 
-		return createAbsoluteURL(applicationURL, "/p/" + name);
-	}
-
-	/**
-	 * Returns the URL for a {@code Form}.
-	 *
-	 * @param  applicationURL the application URL
-	 * @param  form the form
-	 * @return the URL for a {@code Form}
-	 */
-	public static String createFormURL(
-		ApplicationURL applicationURL, Form form) {
-
-		return createAbsoluteURL(applicationURL, join("/", "f", form.getId()));
-	}
-
-	/**
-	 * Returns the URL for a nested collection.
-	 *
-	 * @param  applicationURL the application URL
-	 * @param  path the single resource's {@link Path}
-	 * @param  name the nested resource's name
-	 * @return the collection URL
-	 */
-	public static String createNestedCollectionURL(
-		ApplicationURL applicationURL, Path path, String name) {
-
-		return createAbsoluteURL(applicationURL, _getReusablePath(path, name));
-	}
-
-	/**
-	 * Returns an operation's URL.
-	 *
-	 * @param  applicationURL the application URL
-	 * @param  operation the operation
-	 * @return the operation's URL
-	 */
-	public static Optional<String> createOperationURL(
-		ApplicationURL applicationURL, Operation operation) {
-
-		Optional<String> optional = operation.getURIOptional();
+		Optional<Id> optional = genericParent.getParentIdOptional();
 
 		return optional.map(
-			uri -> {
-				if (operation instanceof BatchCreateOperation) {
-					return "batch/" + uri;
-				}
-
-				if (operation.isCustom()) {
-					return _createCustomOperationURL(operation, uri);
-				}
-
-				if (operation instanceof CreateOperation) {
-					return "p/" + uri;
-				}
-
-				if (operation instanceof DeleteOperation) {
-					return "p/" + uri;
-				}
-
-				if (operation instanceof RetrieveOperation) {
-					return "p/" + uri;
-				}
-
-				if (operation instanceof UpdateOperation) {
-					return "p/" + uri;
-				}
-
-				return null;
-			}
+			id -> UriBuilder.fromPath(
+				"{name}"
+			).path(
+				"{parentName}"
+			).path(
+				"{parentId}"
+			).build(
+				genericParent.getName(), genericParent.getParentName(),
+				id.asString()
+			)
 		).map(
-			uri -> createAbsoluteURL(applicationURL, uri)
+			uri -> createAbsoluteURL(applicationURL, uri.toString())
 		);
 	}
 
 	/**
-	 * Returns the URL of a model's resource.
+	 * Returns the URL for an item resource, if the resource ID is present.
+	 * Returns {@code Optional#empty()} otherwise.
 	 *
 	 * @param  applicationURL the application URL
-	 * @param  path the resource's {@link Path}
-	 * @return the URL for the {@link
-	 *         com.liferay.apio.architect.resource.CollectionResource}
+	 * @param  item the resource
+	 * @return the resource's URL, if the resource ID is present; {@code
+	 *         Optional#empty()} otherwise
+	 * @review
 	 */
-	public static String createSingleURL(
-		ApplicationURL applicationURL, Path path) {
+	public static Optional<String> createItemResourceURL(
+		ApplicationURL applicationURL, Item item) {
 
-		return createAbsoluteURL(applicationURL, "/p/" + path.asURI());
+		Optional<Id> optional = item.getIdOptional();
+
+		return optional.map(
+			id -> UriBuilder.fromPath(
+				"{name}"
+			).path(
+				"{id}"
+			).build(
+				item.getName(), id.asString()
+			)
+		).map(
+			uri -> createAbsoluteURL(applicationURL, uri.toString())
+		);
 	}
 
 	/**
-	 * Returns the {@link Path} from the HTTP servlet request's original URL.
+	 * Returns the URL for a nested resource, if an ID for the parent resource
+	 * is present. Returns {@code Optional#empty()} otherwise.
 	 *
-	 * @return a Path objectSingleModelWriter.java
+	 * @param  applicationURL the application URL
+	 * @param  nested the resource
+	 * @return the resource's URL, if an ID for the parent resource is present;
+	 *         {@code Optional#empty()} otherwise
+	 * @review
 	 */
-	public static Path getPath(String url) {
-		String[] serverAndPath = url.split("/[bfp]/");
+	public static Optional<String> createNestedResourceURL(
+		ApplicationURL applicationURL, Nested nested) {
 
-		if (serverAndPath.length == 2) {
-			String fullPath = serverAndPath[1];
+		Item parent = nested.getParentItem();
 
-			String[] pathComponents = fullPath.split("/");
+		Optional<Id> optional = parent.getIdOptional();
 
-			String id = pathComponents.length == 1 ? null : pathComponents[1];
+		return optional.map(
+			id -> UriBuilder.fromPath(
+				"{parentName}"
+			).path(
+				"{id}"
+			).path(
+				"{name}"
+			).build(
+				parent.getName(), id.asString(), nested.getName()
+			)
+		).map(
+			uri -> createAbsoluteURL(applicationURL, uri.toString())
+		);
+	}
 
-			return new Path(pathComponents[0], id);
+	/**
+	 * Returns the URL for a paged resource.
+	 *
+	 * @param  applicationURL the application URL
+	 * @param  paged the paged resource
+	 * @return the resource's URL
+	 * @review
+	 */
+	public static String createPagedResourceURL(
+		ApplicationURL applicationURL, Paged paged) {
+
+		URI uri = UriBuilder.fromPath(
+			"{name}"
+		).build(
+			paged.getName()
+		);
+
+		return createAbsoluteURL(applicationURL, uri.toString());
+	}
+
+	/**
+	 * Returns the URL for a resource.
+	 *
+	 * @param  applicationURL the application URL
+	 * @param  resource the resource
+	 * @return the resource's URL
+	 * @review
+	 */
+	public static Optional<String> createResourceURL(
+		ApplicationURL applicationURL, Resource resource) {
+
+		if (resource instanceof Paged) {
+			Paged paged = (Paged)resource;
+
+			return Optional.of(createPagedResourceURL(applicationURL, paged));
 		}
 
-		return null;
+		if (resource instanceof Nested) {
+			Nested nested = (Nested)resource;
+
+			return createNestedResourceURL(applicationURL, nested);
+		}
+
+		if (resource instanceof GenericParent) {
+			GenericParent genericParent = (GenericParent)resource;
+
+			return createGenericParentResourceURL(
+				applicationURL, genericParent);
+		}
+
+		if (resource instanceof Item) {
+			Item item = (Item)resource;
+
+			return createItemResourceURL(applicationURL, item);
+		}
+
+		return Optional.empty();
+	}
+
+	/**
+	 * Returns a {@link Path} from the URL if it's a valid URL for a resource
+	 * with the provided name. Returns {@link Optional#empty()} otherwise.
+	 *
+	 * @param  url the resource URL to parse
+	 * @param  name the resource's name
+	 * @return a {@link Path} if the URL is valid; {@link Optional#empty()}
+	 *         otherwise
+	 * @review
+	 */
+	public static Optional<Path> getPath(String url, String name) {
+		return Optional.of(
+			url.lastIndexOf(name)
+		).filter(
+			index -> index != -1
+		).map(
+			url::substring
+		).map(
+			uri -> uri.split("/")
+		).filter(
+			components -> components.length == 2
+		).map(
+			components -> new Path(components[0], components[1])
+		).filter(
+			_isNotEmpty(Path::getName)
+		).filter(
+			_isNotEmpty(Path::getId)
+		);
 	}
 
 	private static String _buildURL(String baseUrl, String relativeURL) {
@@ -239,29 +338,21 @@ public final class URLCreator {
 		return join("/", baseUrl, relativeURL);
 	}
 
-	private static String _createCustomOperationURL(
-		Operation operation, String uri) {
+	private static Predicate<Path> _isNotEmpty(
+		Function<Path, String> function) {
 
-		StringBuilder sb = new StringBuilder();
-
-		sb.append("c/");
-		sb.append(uri);
-		sb.append("/");
-		sb.append(operation.getCustomRoute());
-
-		return sb.toString();
-	}
-
-	private static String _getReusablePath(Path path, String name) {
-		if (name.equals(path.getName())) {
-			return join("/", "p", "r", path.asURI());
-		}
-
-		return join("/", "p", path.asURI(), name);
+		return path -> function.andThen(
+			s -> (s != null) && !s.isEmpty()
+		).apply(
+			path
+		);
 	}
 
 	private URLCreator() {
 		throw new UnsupportedOperationException();
 	}
+
+	private static final List<String> _resourceActions = asList(
+		"create", "remove", "replace", "retrieve");
 
 }

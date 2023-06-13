@@ -275,17 +275,17 @@ definition {
 			for (var dmDocumentFile : list "${dmDocumentFileList}") {
 				var key_dmDocumentFile = "${dmDocumentFile}";
 
-				AssertClick(locator1 = "Button#SELECT_FILES", value1 = "Select Files");
+				AssertElementPresent(locator1 = "Button#SELECT_FILES");
 
 				if ("${uploadTempFile}" == "true") {
-					SikuliUploadTempFile(
-						locator1 = "OS#FILE_DIALOG_BOX_FILE_NAME_FIELD_PNG",
+					UploadTempFile.uploadTempFileHiddenNoMouseOver(
+						locator1 = "TextInput#FILE",
 						value1 = "${dmDocumentFile}"
 					);
 				}
 				else {
-					SikuliUploadCommonFile(
-						locator1 = "OS#FILE_DIALOG_BOX_FILE_NAME_FIELD_PNG",
+					UploadCommonFile.uploadCommonFileHiddenNoMouseOver(
+						locator1 = "TextInput#FILE",
 						value1 = "${dmDocumentFile}"
 					);
 				}
@@ -618,7 +618,10 @@ definition {
 		);
 
 		if ("${dmRepositoryName}" == "true") {
-			AssertElementNotPresent(locator1 = "Message#CHECKOUT_SUCCESS");
+			AssertTextEquals.assertPartialText(
+				locator1 = "Message#CHECKOUT_SUCCESS",
+				value1 = "You now have an indefinite lock on this document. No one else can edit this document until you unlock it. This lock will never expire."
+			);
 		}
 		else {
 			AssertTextEquals.assertPartialText(
@@ -893,8 +896,6 @@ definition {
 		SelectFrame(locator1 = "DocumentsAndMedia#CONFIGURATION_IFRAME");
 
 		Check(locator1 = "Checkbox#SHOW_ACTIONS_CHECKBOX");
-
-		Check(locator1 = "Checkbox#SHOW_NAVIGATION_LINKS_CHECKBOX");
 
 		PortletEntry.save();
 
@@ -1941,7 +1942,7 @@ definition {
 		if (isSet(dmRepositoryName)) {
 			AssertClick.assertTextClickAtAndPause(
 				locator1 = "DocumentsAndMedia#SEARCH_REPOSITORY_TAB",
-				value1 = "repository ${dmRepositoryName}"
+				value1 = "${dmRepositoryName}"
 			);
 		}
 

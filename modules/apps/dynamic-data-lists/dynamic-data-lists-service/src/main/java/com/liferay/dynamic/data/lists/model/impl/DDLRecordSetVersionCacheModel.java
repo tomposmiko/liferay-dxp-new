@@ -17,7 +17,6 @@ package com.liferay.dynamic.data.lists.model.impl;
 import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.dynamic.data.lists.model.DDLRecordSetVersion;
-
 import com.liferay.portal.kernel.model.CacheModel;
 import com.liferay.portal.kernel.util.HashUtil;
 import com.liferay.portal.kernel.util.StringBundler;
@@ -33,12 +32,12 @@ import java.util.Date;
  * The cache model class for representing DDLRecordSetVersion in entity cache.
  *
  * @author Brian Wing Shun Chan
- * @see DDLRecordSetVersion
  * @generated
  */
 @ProviderType
-public class DDLRecordSetVersionCacheModel implements CacheModel<DDLRecordSetVersion>,
-	Externalizable {
+public class DDLRecordSetVersionCacheModel
+	implements CacheModel<DDLRecordSetVersion>, Externalizable {
+
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj) {
@@ -49,9 +48,12 @@ public class DDLRecordSetVersionCacheModel implements CacheModel<DDLRecordSetVer
 			return false;
 		}
 
-		DDLRecordSetVersionCacheModel ddlRecordSetVersionCacheModel = (DDLRecordSetVersionCacheModel)obj;
+		DDLRecordSetVersionCacheModel ddlRecordSetVersionCacheModel =
+			(DDLRecordSetVersionCacheModel)obj;
 
-		if (recordSetVersionId == ddlRecordSetVersionCacheModel.recordSetVersionId) {
+		if (recordSetVersionId ==
+				ddlRecordSetVersionCacheModel.recordSetVersionId) {
+
 			return true;
 		}
 
@@ -106,7 +108,8 @@ public class DDLRecordSetVersionCacheModel implements CacheModel<DDLRecordSetVer
 
 	@Override
 	public DDLRecordSetVersion toEntityModel() {
-		DDLRecordSetVersionImpl ddlRecordSetVersionImpl = new DDLRecordSetVersionImpl();
+		DDLRecordSetVersionImpl ddlRecordSetVersionImpl =
+			new DDLRecordSetVersionImpl();
 
 		ddlRecordSetVersionImpl.setRecordSetVersionId(recordSetVersionId);
 		ddlRecordSetVersionImpl.setGroupId(groupId);
@@ -208,8 +211,7 @@ public class DDLRecordSetVersionCacheModel implements CacheModel<DDLRecordSetVer
 	}
 
 	@Override
-	public void writeExternal(ObjectOutput objectOutput)
-		throws IOException {
+	public void writeExternal(ObjectOutput objectOutput) throws IOException {
 		objectOutput.writeLong(recordSetVersionId);
 
 		objectOutput.writeLong(groupId);
@@ -289,4 +291,5 @@ public class DDLRecordSetVersionCacheModel implements CacheModel<DDLRecordSetVer
 	public long statusByUserId;
 	public String statusByUserName;
 	public long statusDate;
+
 }

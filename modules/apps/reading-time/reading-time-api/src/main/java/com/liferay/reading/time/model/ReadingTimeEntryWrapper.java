@@ -17,9 +17,7 @@ package com.liferay.reading.time.model;
 import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.expando.kernel.model.ExpandoBridge;
-
 import com.liferay.exportimport.kernel.lar.StagedModelType;
-
 import com.liferay.portal.kernel.model.ModelWrapper;
 import com.liferay.portal.kernel.service.ServiceContext;
 
@@ -40,8 +38,9 @@ import java.util.Objects;
  * @generated
  */
 @ProviderType
-public class ReadingTimeEntryWrapper implements ReadingTimeEntry,
-	ModelWrapper<ReadingTimeEntry> {
+public class ReadingTimeEntryWrapper
+	implements ReadingTimeEntry, ModelWrapper<ReadingTimeEntry> {
+
 	public ReadingTimeEntryWrapper(ReadingTimeEntry readingTimeEntry) {
 		_readingTimeEntry = readingTimeEntry;
 	}
@@ -132,7 +131,8 @@ public class ReadingTimeEntryWrapper implements ReadingTimeEntry,
 
 	@Override
 	public Object clone() {
-		return new ReadingTimeEntryWrapper((ReadingTimeEntry)_readingTimeEntry.clone());
+		return new ReadingTimeEntryWrapper(
+			(ReadingTimeEntry)_readingTimeEntry.clone());
 	}
 
 	@Override
@@ -141,50 +141,50 @@ public class ReadingTimeEntryWrapper implements ReadingTimeEntry,
 	}
 
 	/**
-	* Returns the fully qualified class name of this reading time entry.
-	*
-	* @return the fully qualified class name of this reading time entry
-	*/
+	 * Returns the fully qualified class name of this reading time entry.
+	 *
+	 * @return the fully qualified class name of this reading time entry
+	 */
 	@Override
 	public String getClassName() {
 		return _readingTimeEntry.getClassName();
 	}
 
 	/**
-	* Returns the class name ID of this reading time entry.
-	*
-	* @return the class name ID of this reading time entry
-	*/
+	 * Returns the class name ID of this reading time entry.
+	 *
+	 * @return the class name ID of this reading time entry
+	 */
 	@Override
 	public long getClassNameId() {
 		return _readingTimeEntry.getClassNameId();
 	}
 
 	/**
-	* Returns the class pk of this reading time entry.
-	*
-	* @return the class pk of this reading time entry
-	*/
+	 * Returns the class pk of this reading time entry.
+	 *
+	 * @return the class pk of this reading time entry
+	 */
 	@Override
 	public long getClassPK() {
 		return _readingTimeEntry.getClassPK();
 	}
 
 	/**
-	* Returns the company ID of this reading time entry.
-	*
-	* @return the company ID of this reading time entry
-	*/
+	 * Returns the company ID of this reading time entry.
+	 *
+	 * @return the company ID of this reading time entry
+	 */
 	@Override
 	public long getCompanyId() {
 		return _readingTimeEntry.getCompanyId();
 	}
 
 	/**
-	* Returns the create date of this reading time entry.
-	*
-	* @return the create date of this reading time entry
-	*/
+	 * Returns the create date of this reading time entry.
+	 *
+	 * @return the create date of this reading time entry
+	 */
 	@Override
 	public Date getCreateDate() {
 		return _readingTimeEntry.getCreateDate();
@@ -196,30 +196,30 @@ public class ReadingTimeEntryWrapper implements ReadingTimeEntry,
 	}
 
 	/**
-	* Returns the group ID of this reading time entry.
-	*
-	* @return the group ID of this reading time entry
-	*/
+	 * Returns the group ID of this reading time entry.
+	 *
+	 * @return the group ID of this reading time entry
+	 */
 	@Override
 	public long getGroupId() {
 		return _readingTimeEntry.getGroupId();
 	}
 
 	/**
-	* Returns the modified date of this reading time entry.
-	*
-	* @return the modified date of this reading time entry
-	*/
+	 * Returns the modified date of this reading time entry.
+	 *
+	 * @return the modified date of this reading time entry
+	 */
 	@Override
 	public Date getModifiedDate() {
 		return _readingTimeEntry.getModifiedDate();
 	}
 
 	/**
-	* Returns the primary key of this reading time entry.
-	*
-	* @return the primary key of this reading time entry
-	*/
+	 * Returns the primary key of this reading time entry.
+	 *
+	 * @return the primary key of this reading time entry
+	 */
 	@Override
 	public long getPrimaryKey() {
 		return _readingTimeEntry.getPrimaryKey();
@@ -231,62 +231,63 @@ public class ReadingTimeEntryWrapper implements ReadingTimeEntry,
 	}
 
 	/**
-	* Returns the reading time of this reading time entry.
-	*
-	* @return the reading time of this reading time entry
-	*/
+	 * Returns the reading time of this reading time entry.
+	 *
+	 * @return the reading time of this reading time entry
+	 */
 	@Override
 	public long getReadingTime() {
 		return _readingTimeEntry.getReadingTime();
 	}
 
 	/**
-	* Returns the reading time entry ID of this reading time entry.
-	*
-	* @return the reading time entry ID of this reading time entry
-	*/
+	 * Returns the reading time entry ID of this reading time entry.
+	 *
+	 * @return the reading time entry ID of this reading time entry
+	 */
 	@Override
 	public long getReadingTimeEntryId() {
 		return _readingTimeEntry.getReadingTimeEntryId();
 	}
 
 	/**
-	* Returns the status of this reading time entry.
-	*
-	* @return the status of this reading time entry
-	*/
+	 * Returns the status of this reading time entry.
+	 *
+	 * @return the status of this reading time entry
+	 */
 	@Override
 	public int getStatus() {
 		return _readingTimeEntry.getStatus();
 	}
 
 	/**
-	* Returns the trash entry created when this reading time entry was moved to the Recycle Bin. The trash entry may belong to one of the ancestors of this reading time entry.
-	*
-	* @return the trash entry created when this reading time entry was moved to the Recycle Bin
-	*/
+	 * Returns the trash entry created when this reading time entry was moved to the Recycle Bin. The trash entry may belong to one of the ancestors of this reading time entry.
+	 *
+	 * @return the trash entry created when this reading time entry was moved to the Recycle Bin
+	 */
 	@Override
 	public com.liferay.trash.kernel.model.TrashEntry getTrashEntry()
 		throws com.liferay.portal.kernel.exception.PortalException {
+
 		return _readingTimeEntry.getTrashEntry();
 	}
 
 	/**
-	* Returns the class primary key of the trash entry for this reading time entry.
-	*
-	* @return the class primary key of the trash entry for this reading time entry
-	*/
+	 * Returns the class primary key of the trash entry for this reading time entry.
+	 *
+	 * @return the class primary key of the trash entry for this reading time entry
+	 */
 	@Override
 	public long getTrashEntryClassPK() {
 		return _readingTimeEntry.getTrashEntryClassPK();
 	}
 
 	/**
-	* Returns the trash handler for this reading time entry.
-	*
-	* @return the trash handler for this reading time entry
-	* @deprecated As of Judson (7.1.x), with no direct replacement
-	*/
+	 * Returns the trash handler for this reading time entry.
+	 *
+	 * @return the trash handler for this reading time entry
+	 * @deprecated As of Judson (7.1.x), with no direct replacement
+	 */
 	@Deprecated
 	@Override
 	public com.liferay.portal.kernel.trash.TrashHandler getTrashHandler() {
@@ -294,10 +295,10 @@ public class ReadingTimeEntryWrapper implements ReadingTimeEntry,
 	}
 
 	/**
-	* Returns the uuid of this reading time entry.
-	*
-	* @return the uuid of this reading time entry
-	*/
+	 * Returns the uuid of this reading time entry.
+	 *
+	 * @return the uuid of this reading time entry
+	 */
 	@Override
 	public String getUuid() {
 		return _readingTimeEntry.getUuid();
@@ -319,20 +320,20 @@ public class ReadingTimeEntryWrapper implements ReadingTimeEntry,
 	}
 
 	/**
-	* Returns <code>true</code> if this reading time entry is in the Recycle Bin.
-	*
-	* @return <code>true</code> if this reading time entry is in the Recycle Bin; <code>false</code> otherwise
-	*/
+	 * Returns <code>true</code> if this reading time entry is in the Recycle Bin.
+	 *
+	 * @return <code>true</code> if this reading time entry is in the Recycle Bin; <code>false</code> otherwise
+	 */
 	@Override
 	public boolean isInTrash() {
 		return _readingTimeEntry.isInTrash();
 	}
 
 	/**
-	* Returns <code>true</code> if the parent of this reading time entry is in the Recycle Bin.
-	*
-	* @return <code>true</code> if the parent of this reading time entry is in the Recycle Bin; <code>false</code> otherwise
-	*/
+	 * Returns <code>true</code> if the parent of this reading time entry is in the Recycle Bin.
+	 *
+	 * @return <code>true</code> if the parent of this reading time entry is in the Recycle Bin; <code>false</code> otherwise
+	 */
 	@Override
 	public boolean isInTrashContainer() {
 		return _readingTimeEntry.isInTrashContainer();
@@ -369,40 +370,40 @@ public class ReadingTimeEntryWrapper implements ReadingTimeEntry,
 	}
 
 	/**
-	* Sets the class name ID of this reading time entry.
-	*
-	* @param classNameId the class name ID of this reading time entry
-	*/
+	 * Sets the class name ID of this reading time entry.
+	 *
+	 * @param classNameId the class name ID of this reading time entry
+	 */
 	@Override
 	public void setClassNameId(long classNameId) {
 		_readingTimeEntry.setClassNameId(classNameId);
 	}
 
 	/**
-	* Sets the class pk of this reading time entry.
-	*
-	* @param classPK the class pk of this reading time entry
-	*/
+	 * Sets the class pk of this reading time entry.
+	 *
+	 * @param classPK the class pk of this reading time entry
+	 */
 	@Override
 	public void setClassPK(long classPK) {
 		_readingTimeEntry.setClassPK(classPK);
 	}
 
 	/**
-	* Sets the company ID of this reading time entry.
-	*
-	* @param companyId the company ID of this reading time entry
-	*/
+	 * Sets the company ID of this reading time entry.
+	 *
+	 * @param companyId the company ID of this reading time entry
+	 */
 	@Override
 	public void setCompanyId(long companyId) {
 		_readingTimeEntry.setCompanyId(companyId);
 	}
 
 	/**
-	* Sets the create date of this reading time entry.
-	*
-	* @param createDate the create date of this reading time entry
-	*/
+	 * Sets the create date of this reading time entry.
+	 *
+	 * @param createDate the create date of this reading time entry
+	 */
 	@Override
 	public void setCreateDate(Date createDate) {
 		_readingTimeEntry.setCreateDate(createDate);
@@ -411,6 +412,7 @@ public class ReadingTimeEntryWrapper implements ReadingTimeEntry,
 	@Override
 	public void setExpandoBridgeAttributes(
 		com.liferay.portal.kernel.model.BaseModel<?> baseModel) {
+
 		_readingTimeEntry.setExpandoBridgeAttributes(baseModel);
 	}
 
@@ -425,20 +427,20 @@ public class ReadingTimeEntryWrapper implements ReadingTimeEntry,
 	}
 
 	/**
-	* Sets the group ID of this reading time entry.
-	*
-	* @param groupId the group ID of this reading time entry
-	*/
+	 * Sets the group ID of this reading time entry.
+	 *
+	 * @param groupId the group ID of this reading time entry
+	 */
 	@Override
 	public void setGroupId(long groupId) {
 		_readingTimeEntry.setGroupId(groupId);
 	}
 
 	/**
-	* Sets the modified date of this reading time entry.
-	*
-	* @param modifiedDate the modified date of this reading time entry
-	*/
+	 * Sets the modified date of this reading time entry.
+	 *
+	 * @param modifiedDate the modified date of this reading time entry
+	 */
 	@Override
 	public void setModifiedDate(Date modifiedDate) {
 		_readingTimeEntry.setModifiedDate(modifiedDate);
@@ -450,10 +452,10 @@ public class ReadingTimeEntryWrapper implements ReadingTimeEntry,
 	}
 
 	/**
-	* Sets the primary key of this reading time entry.
-	*
-	* @param primaryKey the primary key of this reading time entry
-	*/
+	 * Sets the primary key of this reading time entry.
+	 *
+	 * @param primaryKey the primary key of this reading time entry
+	 */
 	@Override
 	public void setPrimaryKey(long primaryKey) {
 		_readingTimeEntry.setPrimaryKey(primaryKey);
@@ -465,37 +467,39 @@ public class ReadingTimeEntryWrapper implements ReadingTimeEntry,
 	}
 
 	/**
-	* Sets the reading time of this reading time entry.
-	*
-	* @param readingTime the reading time of this reading time entry
-	*/
+	 * Sets the reading time of this reading time entry.
+	 *
+	 * @param readingTime the reading time of this reading time entry
+	 */
 	@Override
 	public void setReadingTime(long readingTime) {
 		_readingTimeEntry.setReadingTime(readingTime);
 	}
 
 	/**
-	* Sets the reading time entry ID of this reading time entry.
-	*
-	* @param readingTimeEntryId the reading time entry ID of this reading time entry
-	*/
+	 * Sets the reading time entry ID of this reading time entry.
+	 *
+	 * @param readingTimeEntryId the reading time entry ID of this reading time entry
+	 */
 	@Override
 	public void setReadingTimeEntryId(long readingTimeEntryId) {
 		_readingTimeEntry.setReadingTimeEntryId(readingTimeEntryId);
 	}
 
 	/**
-	* Sets the uuid of this reading time entry.
-	*
-	* @param uuid the uuid of this reading time entry
-	*/
+	 * Sets the uuid of this reading time entry.
+	 *
+	 * @param uuid the uuid of this reading time entry
+	 */
 	@Override
 	public void setUuid(String uuid) {
 		_readingTimeEntry.setUuid(uuid);
 	}
 
 	@Override
-	public com.liferay.portal.kernel.model.CacheModel<ReadingTimeEntry> toCacheModel() {
+	public com.liferay.portal.kernel.model.CacheModel<ReadingTimeEntry>
+		toCacheModel() {
+
 		return _readingTimeEntry.toCacheModel();
 	}
 
@@ -511,7 +515,8 @@ public class ReadingTimeEntryWrapper implements ReadingTimeEntry,
 
 	@Override
 	public ReadingTimeEntry toUnescapedModel() {
-		return new ReadingTimeEntryWrapper(_readingTimeEntry.toUnescapedModel());
+		return new ReadingTimeEntryWrapper(
+			_readingTimeEntry.toUnescapedModel());
 	}
 
 	@Override
@@ -529,10 +534,12 @@ public class ReadingTimeEntryWrapper implements ReadingTimeEntry,
 			return false;
 		}
 
-		ReadingTimeEntryWrapper readingTimeEntryWrapper = (ReadingTimeEntryWrapper)obj;
+		ReadingTimeEntryWrapper readingTimeEntryWrapper =
+			(ReadingTimeEntryWrapper)obj;
 
-		if (Objects.equals(_readingTimeEntry,
-					readingTimeEntryWrapper._readingTimeEntry)) {
+		if (Objects.equals(
+				_readingTimeEntry, readingTimeEntryWrapper._readingTimeEntry)) {
+
 			return true;
 		}
 
@@ -565,4 +572,5 @@ public class ReadingTimeEntryWrapper implements ReadingTimeEntry,
 	}
 
 	private final ReadingTimeEntry _readingTimeEntry;
+
 }

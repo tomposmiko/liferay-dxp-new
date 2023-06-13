@@ -15,7 +15,6 @@
 package com.liferay.screens.service.base;
 
 import com.liferay.asset.kernel.service.persistence.AssetEntryPersistence;
-
 import com.liferay.portal.kernel.bean.BeanReference;
 import com.liferay.portal.kernel.dao.db.DB;
 import com.liferay.portal.kernel.dao.db.DBManagerUtil;
@@ -30,7 +29,6 @@ import com.liferay.portal.kernel.service.persistence.UserPersistence;
 import com.liferay.portal.kernel.util.InfrastructureUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.spring.extender.service.ServiceReference;
-
 import com.liferay.screens.service.ScreensCommentService;
 
 import javax.sql.DataSource;
@@ -44,15 +42,16 @@ import javax.sql.DataSource;
  *
  * @author José Manuel Navarro
  * @see com.liferay.screens.service.impl.ScreensCommentServiceImpl
- * @see com.liferay.screens.service.ScreensCommentServiceUtil
  * @generated
  */
-public abstract class ScreensCommentServiceBaseImpl extends BaseServiceImpl
+public abstract class ScreensCommentServiceBaseImpl
+	extends BaseServiceImpl
 	implements ScreensCommentService, IdentifiableOSGiService {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
-	 * Never modify or reference this class directly. Always use {@link com.liferay.screens.service.ScreensCommentServiceUtil} to access the screens comment remote service.
+	 * Never modify or reference this class directly. Use <code>ScreensCommentService</code> via injection or a <code>org.osgi.util.tracker.ServiceTracker</code> or use <code>com.liferay.screens.service.ScreensCommentServiceUtil</code>.
 	 */
 
 	/**
@@ -60,7 +59,9 @@ public abstract class ScreensCommentServiceBaseImpl extends BaseServiceImpl
 	 *
 	 * @return the screens asset entry remote service
 	 */
-	public com.liferay.screens.service.ScreensAssetEntryService getScreensAssetEntryService() {
+	public com.liferay.screens.service.ScreensAssetEntryService
+		getScreensAssetEntryService() {
+
 		return screensAssetEntryService;
 	}
 
@@ -70,7 +71,9 @@ public abstract class ScreensCommentServiceBaseImpl extends BaseServiceImpl
 	 * @param screensAssetEntryService the screens asset entry remote service
 	 */
 	public void setScreensAssetEntryService(
-		com.liferay.screens.service.ScreensAssetEntryService screensAssetEntryService) {
+		com.liferay.screens.service.ScreensAssetEntryService
+			screensAssetEntryService) {
+
 		this.screensAssetEntryService = screensAssetEntryService;
 	}
 
@@ -90,6 +93,7 @@ public abstract class ScreensCommentServiceBaseImpl extends BaseServiceImpl
 	 */
 	public void setScreensCommentService(
 		ScreensCommentService screensCommentService) {
+
 		this.screensCommentService = screensCommentService;
 	}
 
@@ -98,7 +102,9 @@ public abstract class ScreensCommentServiceBaseImpl extends BaseServiceImpl
 	 *
 	 * @return the screens ddl record remote service
 	 */
-	public com.liferay.screens.service.ScreensDDLRecordService getScreensDDLRecordService() {
+	public com.liferay.screens.service.ScreensDDLRecordService
+		getScreensDDLRecordService() {
+
 		return screensDDLRecordService;
 	}
 
@@ -108,7 +114,9 @@ public abstract class ScreensCommentServiceBaseImpl extends BaseServiceImpl
 	 * @param screensDDLRecordService the screens ddl record remote service
 	 */
 	public void setScreensDDLRecordService(
-		com.liferay.screens.service.ScreensDDLRecordService screensDDLRecordService) {
+		com.liferay.screens.service.ScreensDDLRecordService
+			screensDDLRecordService) {
+
 		this.screensDDLRecordService = screensDDLRecordService;
 	}
 
@@ -117,7 +125,9 @@ public abstract class ScreensCommentServiceBaseImpl extends BaseServiceImpl
 	 *
 	 * @return the screens ddm structure version remote service
 	 */
-	public com.liferay.screens.service.ScreensDDMStructureVersionService getScreensDDMStructureVersionService() {
+	public com.liferay.screens.service.ScreensDDMStructureVersionService
+		getScreensDDMStructureVersionService() {
+
 		return screensDDMStructureVersionService;
 	}
 
@@ -127,8 +137,11 @@ public abstract class ScreensCommentServiceBaseImpl extends BaseServiceImpl
 	 * @param screensDDMStructureVersionService the screens ddm structure version remote service
 	 */
 	public void setScreensDDMStructureVersionService(
-		com.liferay.screens.service.ScreensDDMStructureVersionService screensDDMStructureVersionService) {
-		this.screensDDMStructureVersionService = screensDDMStructureVersionService;
+		com.liferay.screens.service.ScreensDDMStructureVersionService
+			screensDDMStructureVersionService) {
+
+		this.screensDDMStructureVersionService =
+			screensDDMStructureVersionService;
 	}
 
 	/**
@@ -136,7 +149,9 @@ public abstract class ScreensCommentServiceBaseImpl extends BaseServiceImpl
 	 *
 	 * @return the screens journal article remote service
 	 */
-	public com.liferay.screens.service.ScreensJournalArticleService getScreensJournalArticleService() {
+	public com.liferay.screens.service.ScreensJournalArticleService
+		getScreensJournalArticleService() {
+
 		return screensJournalArticleService;
 	}
 
@@ -146,7 +161,9 @@ public abstract class ScreensCommentServiceBaseImpl extends BaseServiceImpl
 	 * @param screensJournalArticleService the screens journal article remote service
 	 */
 	public void setScreensJournalArticleService(
-		com.liferay.screens.service.ScreensJournalArticleService screensJournalArticleService) {
+		com.liferay.screens.service.ScreensJournalArticleService
+			screensJournalArticleService) {
+
 		this.screensJournalArticleService = screensJournalArticleService;
 	}
 
@@ -155,7 +172,9 @@ public abstract class ScreensCommentServiceBaseImpl extends BaseServiceImpl
 	 *
 	 * @return the screens ratings entry remote service
 	 */
-	public com.liferay.screens.service.ScreensRatingsEntryService getScreensRatingsEntryService() {
+	public com.liferay.screens.service.ScreensRatingsEntryService
+		getScreensRatingsEntryService() {
+
 		return screensRatingsEntryService;
 	}
 
@@ -165,7 +184,9 @@ public abstract class ScreensCommentServiceBaseImpl extends BaseServiceImpl
 	 * @param screensRatingsEntryService the screens ratings entry remote service
 	 */
 	public void setScreensRatingsEntryService(
-		com.liferay.screens.service.ScreensRatingsEntryService screensRatingsEntryService) {
+		com.liferay.screens.service.ScreensRatingsEntryService
+			screensRatingsEntryService) {
+
 		this.screensRatingsEntryService = screensRatingsEntryService;
 	}
 
@@ -174,7 +195,9 @@ public abstract class ScreensCommentServiceBaseImpl extends BaseServiceImpl
 	 *
 	 * @return the counter local service
 	 */
-	public com.liferay.counter.kernel.service.CounterLocalService getCounterLocalService() {
+	public com.liferay.counter.kernel.service.CounterLocalService
+		getCounterLocalService() {
+
 		return counterLocalService;
 	}
 
@@ -184,7 +207,9 @@ public abstract class ScreensCommentServiceBaseImpl extends BaseServiceImpl
 	 * @param counterLocalService the counter local service
 	 */
 	public void setCounterLocalService(
-		com.liferay.counter.kernel.service.CounterLocalService counterLocalService) {
+		com.liferay.counter.kernel.service.CounterLocalService
+			counterLocalService) {
+
 		this.counterLocalService = counterLocalService;
 	}
 
@@ -193,7 +218,9 @@ public abstract class ScreensCommentServiceBaseImpl extends BaseServiceImpl
 	 *
 	 * @return the class name local service
 	 */
-	public com.liferay.portal.kernel.service.ClassNameLocalService getClassNameLocalService() {
+	public com.liferay.portal.kernel.service.ClassNameLocalService
+		getClassNameLocalService() {
+
 		return classNameLocalService;
 	}
 
@@ -203,7 +230,9 @@ public abstract class ScreensCommentServiceBaseImpl extends BaseServiceImpl
 	 * @param classNameLocalService the class name local service
 	 */
 	public void setClassNameLocalService(
-		com.liferay.portal.kernel.service.ClassNameLocalService classNameLocalService) {
+		com.liferay.portal.kernel.service.ClassNameLocalService
+			classNameLocalService) {
+
 		this.classNameLocalService = classNameLocalService;
 	}
 
@@ -212,7 +241,9 @@ public abstract class ScreensCommentServiceBaseImpl extends BaseServiceImpl
 	 *
 	 * @return the class name remote service
 	 */
-	public com.liferay.portal.kernel.service.ClassNameService getClassNameService() {
+	public com.liferay.portal.kernel.service.ClassNameService
+		getClassNameService() {
+
 		return classNameService;
 	}
 
@@ -223,6 +254,7 @@ public abstract class ScreensCommentServiceBaseImpl extends BaseServiceImpl
 	 */
 	public void setClassNameService(
 		com.liferay.portal.kernel.service.ClassNameService classNameService) {
+
 		this.classNameService = classNameService;
 	}
 
@@ -242,6 +274,7 @@ public abstract class ScreensCommentServiceBaseImpl extends BaseServiceImpl
 	 */
 	public void setClassNamePersistence(
 		ClassNamePersistence classNamePersistence) {
+
 		this.classNamePersistence = classNamePersistence;
 	}
 
@@ -250,7 +283,9 @@ public abstract class ScreensCommentServiceBaseImpl extends BaseServiceImpl
 	 *
 	 * @return the group local service
 	 */
-	public com.liferay.portal.kernel.service.GroupLocalService getGroupLocalService() {
+	public com.liferay.portal.kernel.service.GroupLocalService
+		getGroupLocalService() {
+
 		return groupLocalService;
 	}
 
@@ -261,6 +296,7 @@ public abstract class ScreensCommentServiceBaseImpl extends BaseServiceImpl
 	 */
 	public void setGroupLocalService(
 		com.liferay.portal.kernel.service.GroupLocalService groupLocalService) {
+
 		this.groupLocalService = groupLocalService;
 	}
 
@@ -280,6 +316,7 @@ public abstract class ScreensCommentServiceBaseImpl extends BaseServiceImpl
 	 */
 	public void setGroupService(
 		com.liferay.portal.kernel.service.GroupService groupService) {
+
 		this.groupService = groupService;
 	}
 
@@ -306,7 +343,9 @@ public abstract class ScreensCommentServiceBaseImpl extends BaseServiceImpl
 	 *
 	 * @return the resource local service
 	 */
-	public com.liferay.portal.kernel.service.ResourceLocalService getResourceLocalService() {
+	public com.liferay.portal.kernel.service.ResourceLocalService
+		getResourceLocalService() {
+
 		return resourceLocalService;
 	}
 
@@ -316,7 +355,9 @@ public abstract class ScreensCommentServiceBaseImpl extends BaseServiceImpl
 	 * @param resourceLocalService the resource local service
 	 */
 	public void setResourceLocalService(
-		com.liferay.portal.kernel.service.ResourceLocalService resourceLocalService) {
+		com.liferay.portal.kernel.service.ResourceLocalService
+			resourceLocalService) {
+
 		this.resourceLocalService = resourceLocalService;
 	}
 
@@ -325,7 +366,9 @@ public abstract class ScreensCommentServiceBaseImpl extends BaseServiceImpl
 	 *
 	 * @return the user local service
 	 */
-	public com.liferay.portal.kernel.service.UserLocalService getUserLocalService() {
+	public com.liferay.portal.kernel.service.UserLocalService
+		getUserLocalService() {
+
 		return userLocalService;
 	}
 
@@ -336,6 +379,7 @@ public abstract class ScreensCommentServiceBaseImpl extends BaseServiceImpl
 	 */
 	public void setUserLocalService(
 		com.liferay.portal.kernel.service.UserLocalService userLocalService) {
+
 		this.userLocalService = userLocalService;
 	}
 
@@ -355,6 +399,7 @@ public abstract class ScreensCommentServiceBaseImpl extends BaseServiceImpl
 	 */
 	public void setUserService(
 		com.liferay.portal.kernel.service.UserService userService) {
+
 		this.userService = userService;
 	}
 
@@ -381,7 +426,9 @@ public abstract class ScreensCommentServiceBaseImpl extends BaseServiceImpl
 	 *
 	 * @return the asset entry local service
 	 */
-	public com.liferay.asset.kernel.service.AssetEntryLocalService getAssetEntryLocalService() {
+	public com.liferay.asset.kernel.service.AssetEntryLocalService
+		getAssetEntryLocalService() {
+
 		return assetEntryLocalService;
 	}
 
@@ -391,7 +438,9 @@ public abstract class ScreensCommentServiceBaseImpl extends BaseServiceImpl
 	 * @param assetEntryLocalService the asset entry local service
 	 */
 	public void setAssetEntryLocalService(
-		com.liferay.asset.kernel.service.AssetEntryLocalService assetEntryLocalService) {
+		com.liferay.asset.kernel.service.AssetEntryLocalService
+			assetEntryLocalService) {
+
 		this.assetEntryLocalService = assetEntryLocalService;
 	}
 
@@ -400,7 +449,9 @@ public abstract class ScreensCommentServiceBaseImpl extends BaseServiceImpl
 	 *
 	 * @return the asset entry remote service
 	 */
-	public com.liferay.asset.kernel.service.AssetEntryService getAssetEntryService() {
+	public com.liferay.asset.kernel.service.AssetEntryService
+		getAssetEntryService() {
+
 		return assetEntryService;
 	}
 
@@ -411,6 +462,7 @@ public abstract class ScreensCommentServiceBaseImpl extends BaseServiceImpl
 	 */
 	public void setAssetEntryService(
 		com.liferay.asset.kernel.service.AssetEntryService assetEntryService) {
+
 		this.assetEntryService = assetEntryService;
 	}
 
@@ -430,6 +482,7 @@ public abstract class ScreensCommentServiceBaseImpl extends BaseServiceImpl
 	 */
 	public void setAssetEntryPersistence(
 		AssetEntryPersistence assetEntryPersistence) {
+
 		this.assetEntryPersistence = assetEntryPersistence;
 	}
 
@@ -463,8 +516,8 @@ public abstract class ScreensCommentServiceBaseImpl extends BaseServiceImpl
 			sql = db.buildSQL(sql);
 			sql = PortalUtil.transformSQL(sql);
 
-			SqlUpdate sqlUpdate = SqlUpdateFactoryUtil.getSqlUpdate(dataSource,
-					sql);
+			SqlUpdate sqlUpdate = SqlUpdateFactoryUtil.getSqlUpdate(
+				dataSource, sql);
 
 			sqlUpdate.update();
 		}
@@ -473,44 +526,107 @@ public abstract class ScreensCommentServiceBaseImpl extends BaseServiceImpl
 		}
 	}
 
-	@BeanReference(type = com.liferay.screens.service.ScreensAssetEntryService.class)
-	protected com.liferay.screens.service.ScreensAssetEntryService screensAssetEntryService;
+	@BeanReference(
+		type = com.liferay.screens.service.ScreensAssetEntryService.class
+	)
+	protected com.liferay.screens.service.ScreensAssetEntryService
+		screensAssetEntryService;
+
 	@BeanReference(type = ScreensCommentService.class)
 	protected ScreensCommentService screensCommentService;
-	@BeanReference(type = com.liferay.screens.service.ScreensDDLRecordService.class)
-	protected com.liferay.screens.service.ScreensDDLRecordService screensDDLRecordService;
-	@BeanReference(type = com.liferay.screens.service.ScreensDDMStructureVersionService.class)
-	protected com.liferay.screens.service.ScreensDDMStructureVersionService screensDDMStructureVersionService;
-	@BeanReference(type = com.liferay.screens.service.ScreensJournalArticleService.class)
-	protected com.liferay.screens.service.ScreensJournalArticleService screensJournalArticleService;
-	@BeanReference(type = com.liferay.screens.service.ScreensRatingsEntryService.class)
-	protected com.liferay.screens.service.ScreensRatingsEntryService screensRatingsEntryService;
-	@ServiceReference(type = com.liferay.counter.kernel.service.CounterLocalService.class)
-	protected com.liferay.counter.kernel.service.CounterLocalService counterLocalService;
-	@ServiceReference(type = com.liferay.portal.kernel.service.ClassNameLocalService.class)
-	protected com.liferay.portal.kernel.service.ClassNameLocalService classNameLocalService;
-	@ServiceReference(type = com.liferay.portal.kernel.service.ClassNameService.class)
-	protected com.liferay.portal.kernel.service.ClassNameService classNameService;
+
+	@BeanReference(
+		type = com.liferay.screens.service.ScreensDDLRecordService.class
+	)
+	protected com.liferay.screens.service.ScreensDDLRecordService
+		screensDDLRecordService;
+
+	@BeanReference(
+		type = com.liferay.screens.service.ScreensDDMStructureVersionService.class
+	)
+	protected com.liferay.screens.service.ScreensDDMStructureVersionService
+		screensDDMStructureVersionService;
+
+	@BeanReference(
+		type = com.liferay.screens.service.ScreensJournalArticleService.class
+	)
+	protected com.liferay.screens.service.ScreensJournalArticleService
+		screensJournalArticleService;
+
+	@BeanReference(
+		type = com.liferay.screens.service.ScreensRatingsEntryService.class
+	)
+	protected com.liferay.screens.service.ScreensRatingsEntryService
+		screensRatingsEntryService;
+
+	@ServiceReference(
+		type = com.liferay.counter.kernel.service.CounterLocalService.class
+	)
+	protected com.liferay.counter.kernel.service.CounterLocalService
+		counterLocalService;
+
+	@ServiceReference(
+		type = com.liferay.portal.kernel.service.ClassNameLocalService.class
+	)
+	protected com.liferay.portal.kernel.service.ClassNameLocalService
+		classNameLocalService;
+
+	@ServiceReference(
+		type = com.liferay.portal.kernel.service.ClassNameService.class
+	)
+	protected com.liferay.portal.kernel.service.ClassNameService
+		classNameService;
+
 	@ServiceReference(type = ClassNamePersistence.class)
 	protected ClassNamePersistence classNamePersistence;
-	@ServiceReference(type = com.liferay.portal.kernel.service.GroupLocalService.class)
-	protected com.liferay.portal.kernel.service.GroupLocalService groupLocalService;
-	@ServiceReference(type = com.liferay.portal.kernel.service.GroupService.class)
+
+	@ServiceReference(
+		type = com.liferay.portal.kernel.service.GroupLocalService.class
+	)
+	protected com.liferay.portal.kernel.service.GroupLocalService
+		groupLocalService;
+
+	@ServiceReference(
+		type = com.liferay.portal.kernel.service.GroupService.class
+	)
 	protected com.liferay.portal.kernel.service.GroupService groupService;
+
 	@ServiceReference(type = GroupPersistence.class)
 	protected GroupPersistence groupPersistence;
-	@ServiceReference(type = com.liferay.portal.kernel.service.ResourceLocalService.class)
-	protected com.liferay.portal.kernel.service.ResourceLocalService resourceLocalService;
-	@ServiceReference(type = com.liferay.portal.kernel.service.UserLocalService.class)
-	protected com.liferay.portal.kernel.service.UserLocalService userLocalService;
-	@ServiceReference(type = com.liferay.portal.kernel.service.UserService.class)
+
+	@ServiceReference(
+		type = com.liferay.portal.kernel.service.ResourceLocalService.class
+	)
+	protected com.liferay.portal.kernel.service.ResourceLocalService
+		resourceLocalService;
+
+	@ServiceReference(
+		type = com.liferay.portal.kernel.service.UserLocalService.class
+	)
+	protected com.liferay.portal.kernel.service.UserLocalService
+		userLocalService;
+
+	@ServiceReference(
+		type = com.liferay.portal.kernel.service.UserService.class
+	)
 	protected com.liferay.portal.kernel.service.UserService userService;
+
 	@ServiceReference(type = UserPersistence.class)
 	protected UserPersistence userPersistence;
-	@ServiceReference(type = com.liferay.asset.kernel.service.AssetEntryLocalService.class)
-	protected com.liferay.asset.kernel.service.AssetEntryLocalService assetEntryLocalService;
-	@ServiceReference(type = com.liferay.asset.kernel.service.AssetEntryService.class)
-	protected com.liferay.asset.kernel.service.AssetEntryService assetEntryService;
+
+	@ServiceReference(
+		type = com.liferay.asset.kernel.service.AssetEntryLocalService.class
+	)
+	protected com.liferay.asset.kernel.service.AssetEntryLocalService
+		assetEntryLocalService;
+
+	@ServiceReference(
+		type = com.liferay.asset.kernel.service.AssetEntryService.class
+	)
+	protected com.liferay.asset.kernel.service.AssetEntryService
+		assetEntryService;
+
 	@ServiceReference(type = AssetEntryPersistence.class)
 	protected AssetEntryPersistence assetEntryPersistence;
+
 }

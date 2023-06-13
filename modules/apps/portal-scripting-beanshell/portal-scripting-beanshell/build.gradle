@@ -1,5 +1,5 @@
 dependencies {
-	compileInclude group: "org.apache-extras.beanshell", name: "bsh", version: "2.0b5"
+	compileInclude group: "org.apache-extras.beanshell", name: "bsh", version: "2.0b6"
 
 	compileOnly group: "com.liferay", name: "com.liferay.portal.scripting.api", version: "2.0.0"
 	compileOnly group: "com.liferay.portal", name: "com.liferay.portal.kernel", version: "3.0.0"

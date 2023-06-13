@@ -31,12 +31,12 @@ import java.io.ObjectOutput;
  * The cache model class for representing ListType in entity cache.
  *
  * @author Brian Wing Shun Chan
- * @see ListType
  * @generated
  */
 @ProviderType
-public class ListTypeCacheModel implements CacheModel<ListType>, Externalizable,
-	MVCCModel {
+public class ListTypeCacheModel
+	implements CacheModel<ListType>, Externalizable, MVCCModel {
+
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj) {
@@ -50,7 +50,8 @@ public class ListTypeCacheModel implements CacheModel<ListType>, Externalizable,
 		ListTypeCacheModel listTypeCacheModel = (ListTypeCacheModel)obj;
 
 		if ((listTypeId == listTypeCacheModel.listTypeId) &&
-				(mvccVersion == listTypeCacheModel.mvccVersion)) {
+			(mvccVersion == listTypeCacheModel.mvccVersion)) {
+
 			return true;
 		}
 
@@ -127,8 +128,7 @@ public class ListTypeCacheModel implements CacheModel<ListType>, Externalizable,
 	}
 
 	@Override
-	public void writeExternal(ObjectOutput objectOutput)
-		throws IOException {
+	public void writeExternal(ObjectOutput objectOutput) throws IOException {
 		objectOutput.writeLong(mvccVersion);
 
 		objectOutput.writeLong(listTypeId);
@@ -152,4 +152,5 @@ public class ListTypeCacheModel implements CacheModel<ListType>, Externalizable,
 	public long listTypeId;
 	public String name;
 	public String type;
+
 }

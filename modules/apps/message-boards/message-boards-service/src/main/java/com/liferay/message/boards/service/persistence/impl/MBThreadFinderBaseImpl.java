@@ -16,7 +16,6 @@ package com.liferay.message.boards.service.persistence.impl;
 
 import com.liferay.message.boards.model.MBThread;
 import com.liferay.message.boards.service.persistence.MBThreadPersistence;
-
 import com.liferay.portal.kernel.bean.BeanReference;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
@@ -33,18 +32,19 @@ import java.util.Set;
  * @generated
  */
 public class MBThreadFinderBaseImpl extends BasePersistenceImpl<MBThread> {
+
 	public MBThreadFinderBaseImpl() {
 		setModelClass(MBThread.class);
 
+		Map<String, String> dbColumnNames = new HashMap<String, String>();
+
+		dbColumnNames.put("uuid", "uuid_");
+
 		try {
 			Field field = BasePersistenceImpl.class.getDeclaredField(
-					"_dbColumnNames");
+				"_dbColumnNames");
 
 			field.setAccessible(true);
-
-			Map<String, String> dbColumnNames = new HashMap<String, String>();
-
-			dbColumnNames.put("uuid", "uuid_");
 
 			field.set(this, dbColumnNames);
 		}
@@ -74,11 +74,16 @@ public class MBThreadFinderBaseImpl extends BasePersistenceImpl<MBThread> {
 	 *
 	 * @param mbThreadPersistence the message boards thread persistence
 	 */
-	public void setMBThreadPersistence(MBThreadPersistence mbThreadPersistence) {
+	public void setMBThreadPersistence(
+		MBThreadPersistence mbThreadPersistence) {
+
 		this.mbThreadPersistence = mbThreadPersistence;
 	}
 
 	@BeanReference(type = MBThreadPersistence.class)
 	protected MBThreadPersistence mbThreadPersistence;
-	private static final Log _log = LogFactoryUtil.getLog(MBThreadFinderBaseImpl.class);
+
+	private static final Log _log = LogFactoryUtil.getLog(
+		MBThreadFinderBaseImpl.class);
+
 }

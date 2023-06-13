@@ -81,6 +81,12 @@ definition {
 		SiteAdmin.viewPortletTitle(portletTitle = "Recycle Bin");
 	}
 
+	macro openRecycleBinAdmin {
+		Navigator.openWithAppendToBaseURL(
+			urlAppend = "group/${siteURLKey}/~/control_panel/manage/-/recycle_bin/entries"
+		);
+	}
+
 	macro restoreContentFromFolderCP {
 		var key_assetName = "${assetName}";
 

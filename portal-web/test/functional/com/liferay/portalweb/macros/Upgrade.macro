@@ -231,6 +231,31 @@ definition {
 
 		UsersAndOrganizationsNavigator.gotoOrganizations();
 
+		Organization.viewSubOrganizationCP(
+			orgName = "Organization1",
+			orgType = "Organization",
+			suborgName = "Sub-organization-Pre",
+			suborgType = "Organization"
+		);
+
+		Organization.gotoCP(
+			orgName = "Sub-organization-Pre",
+			searchToken = "Sub-organization-Pre"
+		);
+
+		Organization.viewAssignMemberCP(
+			userName = "userfn userln",
+			userScreenName = "usersn"
+		);
+
+		ProductMenu.gotoPortlet(
+			category = "Users",
+			panel = "Control Panel",
+			portlet = "Users and Organizations"
+		);
+
+		UsersAndOrganizationsNavigator.gotoOrganizations();
+
 		Organization.editSiteCP(
 			orgName = "Organization1",
 			orgNameEdit = "Organization1 Edit"
@@ -991,16 +1016,23 @@ definition {
 	macro viewAssetPublisher {
 		Navigator.gotoPage(pageName = "Asset Publisher");
 
-		AssertTextEquals.assertTextCaseInsensitive(
+		AssertTextEquals(
 			locator1 = "Portlet#TITLE",
 			value1 = "Asset Publisher",
 			key_portletName = "Asset Publisher"
 		);
 
-		WebContent.viewPGViaAP(
-			webContentContent = "Web Content Content",
-			webContentTitle = "Web Content Title"
+		AssetPublisherPortlet.viewAssetPG(
+			assetContent = "Web Content Content",
+			assetTitle = "Web Content Title"
 		);
+
+		if (isSet(categoryName)) {
+			AssetPublisherPortlet.viewAssetMetadataPG(
+				categoryName = "${categoryName}",
+				vocabularyName = "Vocabulary Name"
+			);
+		}
 	}
 
 	macro viewCalendar {
@@ -1073,11 +1105,16 @@ definition {
 			portlet = "App Manager"
 		);
 
-		AppManager.viewAppCP(appName = "Liferay Drools", appStatus = "Active");
+		AppManager.viewAppCP(
+			appName = "Liferay Drools",
+			appStatus = "Active",
+			searchTerm = "Drools"
+		);
 
 		AppManager.viewAppCP(
 			appName = "Liferay Portal Rules Engine Drools",
-			appStatus = "Active"
+			appStatus = "Active",
+			searchTerm = "Drools"
 		);
 	}
 
@@ -1090,7 +1127,7 @@ definition {
 	macro viewNestedPortlets {
 		Navigator.gotoPage(pageName = "Nested Portlets");
 
-		AssertTextEquals.assertTextCaseInsensitive(
+		AssertTextEquals(
 			locator1 = "Portlet#TITLE",
 			value1 = "Nested Applications",
 			key_portletName = "Nested Applications"
@@ -1267,7 +1304,7 @@ definition {
 			siteName = "Staging Site"
 		);
 
-		AssertTextEquals.assertTextCaseInsensitive(
+		AssertTextEquals(
 			locator1 = "Portlet#TITLE",
 			value1 = "Nested Applications",
 			key_portletName = "Nested Applications"

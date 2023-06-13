@@ -178,7 +178,11 @@ public class SetupWizardUtil {
 	private static String _getParameter(
 		HttpServletRequest request, String name, String defaultValue) {
 
-		name = _PROPERTIES_PREFIX.concat(name).concat(StringPool.DOUBLE_DASH);
+		name = _PROPERTIES_PREFIX.concat(
+			name
+		).concat(
+			StringPool.DOUBLE_DASH
+		);
 
 		return ParamUtil.getString(request, name, defaultValue);
 	}

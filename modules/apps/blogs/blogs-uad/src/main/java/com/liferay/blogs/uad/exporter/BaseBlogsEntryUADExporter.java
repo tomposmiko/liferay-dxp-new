@@ -17,10 +17,8 @@ package com.liferay.blogs.uad.exporter;
 import com.liferay.blogs.model.BlogsEntry;
 import com.liferay.blogs.service.BlogsEntryLocalService;
 import com.liferay.blogs.uad.constants.BlogsUADConstants;
-
 import com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery;
 import com.liferay.portal.kernel.util.StringBundler;
-
 import com.liferay.user.associated.data.exporter.DynamicQueryUADExporter;
 
 import org.osgi.service.component.annotations.Reference;
@@ -37,7 +35,9 @@ import org.osgi.service.component.annotations.Reference;
  * @author Brian Wing Shun Chan
  * @generated
  */
-public abstract class BaseBlogsEntryUADExporter extends DynamicQueryUADExporter<BlogsEntry> {
+public abstract class BaseBlogsEntryUADExporter
+	extends DynamicQueryUADExporter<BlogsEntry> {
+
 	@Override
 	public Class<BlogsEntry> getTypeClass() {
 		return BlogsEntry.class;
@@ -117,4 +117,5 @@ public abstract class BaseBlogsEntryUADExporter extends DynamicQueryUADExporter<
 
 	@Reference
 	protected BlogsEntryLocalService blogsEntryLocalService;
+
 }

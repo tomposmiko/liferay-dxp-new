@@ -19,7 +19,7 @@ import static com.liferay.forms.apio.internal.util.LocalizedValueUtil.getLocaliz
 import com.liferay.apio.architect.functional.Try;
 import com.liferay.apio.architect.representor.NestedRepresentor;
 import com.liferay.apio.architect.representor.Representor;
-import com.liferay.content.space.apio.architect.identifier.ContentSpaceIdentifier;
+import com.liferay.content.space.apio.architect.model.ContentSpace;
 import com.liferay.dynamic.data.mapping.model.DDMForm;
 import com.liferay.dynamic.data.mapping.model.DDMFormField;
 import com.liferay.dynamic.data.mapping.model.DDMFormRule;
@@ -59,7 +59,7 @@ public class FormStructureRepresentorBuilderHelper {
 
 		Representor.FirstStep<DDMStructure> bidirectionalModelStepBuilder =
 			ddmStructureFirstStep.addBidirectionalModel(
-				"contentSpace", "formStructures", ContentSpaceIdentifier.class,
+				"contentSpace", "formStructures", ContentSpace.class,
 				DDMStructure::getGroupId);
 
 		bidirectionalModelStepBuilder.addNested(
@@ -67,7 +67,9 @@ public class FormStructureRepresentorBuilderHelper {
 			this::_buildDDMFormSuccessPageSettings
 		).addNestedList(
 			"formPages", _structureRepresentorBuilderHelper::getFormLayoutPages,
-			nestedBuilder -> _buildFormLayoutPage(nestedBuilder).build()
+			nestedBuilder -> _buildFormLayoutPage(
+				nestedBuilder
+			).build()
 		);
 
 		return ddmStructureFirstStep;
@@ -163,7 +165,8 @@ public class FormStructureRepresentorBuilderHelper {
 		formLayoutPageFirstStep.addNestedList(
 			"fields", FormLayoutPage::getFields,
 			ddmFormFieldBuilder -> _buildDDMFormFields(
-				ddmFormFieldBuilder).build());
+				ddmFormFieldBuilder
+			).build());
 
 		return formLayoutPageFirstStep;
 	}

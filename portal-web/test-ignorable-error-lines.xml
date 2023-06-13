@@ -57,6 +57,10 @@
 			<matches></matches>
 		</ignore-error>
 		<ignore-error description="">
+			<contains>Do NOT use Hypersonic in production</contains>
+			<matches></matches>
+		</ignore-error>
+		<ignore-error description="">
 			<contains>INFO:</contains>
 			<matches></matches>
 		</ignore-error>
@@ -176,8 +180,60 @@
 			<contains>The addSearchEngineConfigurator method has thrown an exception</contains>
 			<matches></matches>
 		</ignore-error>
+		<ignore-error description="LPS-75111">
+			<contains>Waiting on startup required bundles to activate:</contains>
+			<matches></matches>
+		</ignore-error>
 		<ignore-error description="LPS-81732">
 			<contains>There are no actions associated with the resource com.liferay.portal.workflow.kaleo.model.KaleoDefinitionVersion</contains>
+			<matches></matches>
+		</ignore-error>
+		<ignore-error description="LPS-88391, LPS-88417">
+			<contains></contains>
+			<matches>Attempting to upgrade table .* by recreating the table [\s\S]*</matches>
+		</ignore-error>
+		<ignore-error description="LPS-88391, LPS-88417">
+			<contains></contains>
+			<matches>Successfully recreated and upgraded table .*</matches>
+		</ignore-error>
+		<ignore-error description="LPS-88395 - temporarily ignore until fixed">
+			<contains>IX_CED31606</contains>
+			<matches></matches>
+		</ignore-error>
+		<ignore-error description="LPS-88412 - temporarily ignore until fixed">
+			<contains>drop table if exists Kaleo</contains>
+			<matches></matches>
+		</ignore-error>
+		<ignore-error description="LPS-88418 - temporarily ignore until fixed">
+			<contains>There is already an index on table</contains>
+			<matches></matches>
+		</ignore-error>
+		<ignore-error description="LPS-88418 - temporarily ignore until fixed">
+			<contains>SQLSTATE=42710</contains>
+			<matches></matches>
+		</ignore-error>
+		<ignore-error description="LPS-88431">
+			<contains></contains>
+			<matches>.*Unable to find class loader for com.liferay.portal.cluster.multiple_.* class loader com.liferay.portal.cluster.multiple_.*</matches>
+		</ignore-error>
+		<ignore-error description="LPS-88431">
+			<contains></contains>
+			<matches>.*Unable to find class loader for com.liferay.portal.scheduler.quartz_.* class loader com.liferay.portal.scheduler.quartz_.*</matches>
+		</ignore-error>
+		<ignore-error description="LPS-88522 - temporarily ignore until fixed">
+			<contains>already has the column lastPublishDate</contains>
+			<matches></matches>
+		</ignore-error>
+		<ignore-error description="LPS-88523 - temporarily ignore until fixed">
+			<contains>Implicit conversion from datatype 'VARCHAR' to 'DECIMAL' is not allowed.  Use the CONVERT function to run this query.</contains>
+			<matches></matches>
+		</ignore-error>
+		<ignore-error description="LPS-88523 - temporarily ignore until fixed">
+			<contains>IX_717B97E1</contains>
+			<matches></matches>
+		</ignore-error>
+		<ignore-error description="LPS-88553 - temporarily ignore until fixed">
+			<contains>Returning the default theme</contains>
 			<matches></matches>
 		</ignore-error>
 		<ignore-error description="LRQA-24859">

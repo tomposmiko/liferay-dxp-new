@@ -37,15 +37,14 @@ public class LogicalEvaluationTest {
 	public void testCombinedExpression() throws Exception {
 		boolean expected = false;
 
-		if (true && ((false || true) && (false || false))) {
+		if (true && (false || true) && (false || false)) {
 			expected = true;
 		}
 
 		Assert.assertEquals(
-			expected,
-			evaluate("true && ((false || true) && (false || false))"));
+			expected, evaluate("true && (false || true) && (false || false)"));
 
-		expected = ((true && 2 > 1) || (4.0 < 3)) && ((2 + 1) > 5 || true);
+		expected = ((true && (2 > 1)) || (4.0 < 3)) && (((2 + 1) > 5) || true);
 
 		Assert.assertEquals(
 			expected,

@@ -21,7 +21,7 @@ import java.util.Map;
 /**
  * Represents a profile.
  *
- * @author Eduardo Garcia
+ * @author Eduardo García
  * @review
  */
 @ProviderType

@@ -919,8 +919,9 @@ public class DDLRecordLocalServiceImpl extends DDLRecordLocalServiceBaseImpl {
 
 			WorkflowHandlerRegistryUtil.startWorkflowInstance(
 				user.getCompanyId(), record.getGroupId(), userId,
-				DDLRecord.class.getName(), recordVersion.getRecordVersionId(),
-				recordVersion, serviceContext);
+				getWorkflowAssetClassName(record.getRecordSet()),
+				recordVersion.getRecordVersionId(), recordVersion,
+				serviceContext);
 		}
 
 		return record;
@@ -1168,10 +1169,7 @@ public class DDLRecordLocalServiceImpl extends DDLRecordLocalServiceBaseImpl {
 	}
 
 	protected Indexer<DDLRecord> getDDLRecordIndexer() {
-		Indexer<DDLRecord> indexer = indexerRegistry.nullSafeGetIndexer(
-			DDLRecord.class);
-
-		return indexer;
+		return indexerRegistry.nullSafeGetIndexer(DDLRecord.class);
 	}
 
 	protected String getNextVersion(

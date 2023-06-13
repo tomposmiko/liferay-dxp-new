@@ -21,6 +21,7 @@ import com.liferay.portal.kernel.dao.jdbc.AutoBatchPreparedStatementUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.ResourceConstants;
+import com.liferay.portal.kernel.model.ResourcePermission;
 import com.liferay.portal.kernel.portlet.PortletPreferencesFactoryUtil;
 import com.liferay.portal.kernel.upgrade.v6_2_0.BaseUpgradePortletPreferences;
 import com.liferay.portal.kernel.util.FriendlyURLNormalizerUtil;
@@ -201,7 +202,7 @@ public class UpgradeJournal extends BaseUpgradePortletPreferences {
 		PreparedStatement ps, long companyId, String primKey, long roleId) {
 
 		try {
-			ps.setLong(1, increment());
+			ps.setLong(1, increment(ResourcePermission.class.getName()));
 			ps.setLong(2, companyId);
 			ps.setString(3, "com.liferay.portlet.journal");
 			ps.setInt(4, ResourceConstants.SCOPE_INDIVIDUAL);

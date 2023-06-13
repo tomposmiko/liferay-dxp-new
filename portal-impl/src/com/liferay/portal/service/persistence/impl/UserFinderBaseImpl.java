@@ -32,19 +32,20 @@ import java.util.Set;
  * @generated
  */
 public class UserFinderBaseImpl extends BasePersistenceImpl<User> {
+
 	public UserFinderBaseImpl() {
 		setModelClass(User.class);
 
+		Map<String, String> dbColumnNames = new HashMap<String, String>();
+
+		dbColumnNames.put("uuid", "uuid_");
+		dbColumnNames.put("password", "password_");
+
 		try {
 			Field field = BasePersistenceImpl.class.getDeclaredField(
-					"_dbColumnNames");
+				"_dbColumnNames");
 
 			field.setAccessible(true);
-
-			Map<String, String> dbColumnNames = new HashMap<String, String>();
-
-			dbColumnNames.put("uuid", "uuid_");
-			dbColumnNames.put("password", "password_");
 
 			field.set(this, dbColumnNames);
 		}
@@ -80,5 +81,8 @@ public class UserFinderBaseImpl extends BasePersistenceImpl<User> {
 
 	@BeanReference(type = UserPersistence.class)
 	protected UserPersistence userPersistence;
-	private static final Log _log = LogFactoryUtil.getLog(UserFinderBaseImpl.class);
+
+	private static final Log _log = LogFactoryUtil.getLog(
+		UserFinderBaseImpl.class);
+
 }

@@ -31,12 +31,12 @@ import java.io.ObjectOutput;
  * The cache model class for representing ServiceComponent in entity cache.
  *
  * @author Brian Wing Shun Chan
- * @see ServiceComponent
  * @generated
  */
 @ProviderType
-public class ServiceComponentCacheModel implements CacheModel<ServiceComponent>,
-	Externalizable, MVCCModel {
+public class ServiceComponentCacheModel
+	implements CacheModel<ServiceComponent>, Externalizable, MVCCModel {
+
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj) {
@@ -47,10 +47,13 @@ public class ServiceComponentCacheModel implements CacheModel<ServiceComponent>,
 			return false;
 		}
 
-		ServiceComponentCacheModel serviceComponentCacheModel = (ServiceComponentCacheModel)obj;
+		ServiceComponentCacheModel serviceComponentCacheModel =
+			(ServiceComponentCacheModel)obj;
 
-		if ((serviceComponentId == serviceComponentCacheModel.serviceComponentId) &&
-				(mvccVersion == serviceComponentCacheModel.mvccVersion)) {
+		if ((serviceComponentId ==
+				serviceComponentCacheModel.serviceComponentId) &&
+			(mvccVersion == serviceComponentCacheModel.mvccVersion)) {
+
 			return true;
 		}
 
@@ -138,8 +141,7 @@ public class ServiceComponentCacheModel implements CacheModel<ServiceComponent>,
 	}
 
 	@Override
-	public void writeExternal(ObjectOutput objectOutput)
-		throws IOException {
+	public void writeExternal(ObjectOutput objectOutput) throws IOException {
 		objectOutput.writeLong(mvccVersion);
 
 		objectOutput.writeLong(serviceComponentId);
@@ -169,4 +171,5 @@ public class ServiceComponentCacheModel implements CacheModel<ServiceComponent>,
 	public long buildNumber;
 	public long buildDate;
 	public String data;
+
 }

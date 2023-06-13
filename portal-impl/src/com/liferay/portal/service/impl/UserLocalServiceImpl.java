@@ -1824,9 +1824,8 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 
 			return new KeyValuePair(name, password);
 		}
-		else {
-			throw new PrincipalException.MustBeAuthenticated(userId);
-		}
+
+		throw new PrincipalException.MustBeAuthenticated(userId);
 	}
 
 	/**
@@ -2934,9 +2933,8 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 
 			throw new NoSuchUserException(sb.toString());
 		}
-		else {
-			return users.get(0);
-		}
+
+		return users.get(0);
 	}
 
 	/**
@@ -5698,7 +5696,7 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 					user.getCompanyId(), emailAddress) != null) {
 
 				throw new UserEmailAddressException.MustNotBeDuplicate(
-					user.getUserId(), emailAddress);
+					user.getCompanyId(), user.getUserId(), emailAddress);
 			}
 
 			setEmailAddress(
@@ -6734,7 +6732,18 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 			validGroupIds = ArrayUtil.clone(groupIds);
 		}
 		else {
-			validGroupIds = user.getGroupIds();
+			List<Group> userGroups = groupLocalService.getUserGroups(
+				user.getUserId(), true);
+
+			int size = userGroups.size();
+
+			validGroupIds = new long[size];
+
+			for (int i = 0; i < size; i++) {
+				Group userGroup = userGroups.get(i);
+
+				validGroupIds[i] = userGroup.getGroupId();
+			}
 		}
 
 		if (organizationIds == null) {
@@ -6745,8 +6754,10 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 			Organization organization =
 				organizationPersistence.findByPrimaryKey(organizationId);
 
-			validGroupIds = ArrayUtil.append(
-				validGroupIds, organization.getGroupId());
+			if (!ArrayUtil.contains(validGroupIds, organization.getGroupId())) {
+				validGroupIds = ArrayUtil.append(
+					validGroupIds, organization.getGroupId());
+			}
 		}
 
 		Arrays.sort(validGroupIds);
@@ -6789,7 +6800,7 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 
 			if ((user != null) && (user.getUserId() != userId)) {
 				throw new UserEmailAddressException.MustNotBeDuplicate(
-					userId, emailAddress);
+					companyId, emailAddress);
 			}
 		}
 
@@ -6835,7 +6846,7 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 						user.getCompanyId(), emailAddress) != null) {
 
 					throw new UserEmailAddressException.MustNotBeDuplicate(
-						userId, emailAddress);
+						user.getCompanyId(), userId, emailAddress);
 				}
 			}
 
@@ -6923,7 +6934,7 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 					user.getCompanyId(), emailAddress1) != null) {
 
 				throw new UserEmailAddressException.MustNotBeDuplicate(
-					user.getUserId(), emailAddress1);
+					user.getCompanyId(), user.getUserId(), emailAddress1);
 			}
 		}
 	}
@@ -7116,7 +7127,9 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 
 			user = doCheckLockout(user, passwordPolicy);
 
-			user = doCheckPasswordExpired(user, passwordPolicy);
+			if (!PasswordModificationThreadLocal.isPasswordModified()) {
+				user = doCheckPasswordExpired(user, passwordPolicy);
+			}
 		}
 
 		return user;

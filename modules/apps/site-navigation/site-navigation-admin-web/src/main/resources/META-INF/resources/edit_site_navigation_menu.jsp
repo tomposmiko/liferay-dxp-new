@@ -135,7 +135,16 @@ renderResponse.setTitle(siteNavigationAdminDisplayContext.getSiteNavigationMenuN
 	Liferay.on('destroyPortlet', destroyAddMenuItemClickHandler);
 </aui:script>
 
-<aui:script require="site-navigation-menu-web/js/SiteNavigationMenuEditor.es as siteNavigationMenuEditorModule, site-navigation-menu-web/js/SiteNavigationMenuItemDOMHandler.es as siteNavigationMenuItemDOMHandlerModule">
+<%
+StringBundler sb = new StringBundler(4);
+
+sb.append(npmResolvedPackageName);
+sb.append("/js/SiteNavigationMenuEditor.es as siteNavigationMenuEditorModule, ");
+sb.append(npmResolvedPackageName);
+sb.append("/js/SiteNavigationMenuItemDOMHandler.es as siteNavigationMenuItemDOMHandlerModule");
+%>
+
+<aui:script require="<%= sb.toString() %>">
 	var changed = false;
 	var showSiteNavigationMenuSettingsButtonClickHandler = null;
 	var sidebar = null;

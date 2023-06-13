@@ -29,9 +29,8 @@ public class ThrowableTetraFunctionTest {
 		throws Exception {
 
 		ThrowableTetraFunction<String, String, String, String, String>
-			throwableTetraFunction =
-				(string1, string2, string3, string4) ->
-					string1 + string2 + string3 + string4;
+			throwableTetraFunction = (string1, string2, string3, string4) ->
+				string1 + string2 + string3 + string4;
 
 		ThrowableFunction<String, String> throwableFunction =
 			string -> string + "prosper";
@@ -48,9 +47,8 @@ public class ThrowableTetraFunctionTest {
 	@Test(expected = NullPointerException.class)
 	public void testOnInvokingAndThenWithNullAfterFunctionThrowsException() {
 		ThrowableTetraFunction<String, String, String, String, String>
-			throwableTetraFunction =
-				(string1, string2, string3, string4) ->
-					string1 + string2 + string3 + string4;
+			throwableTetraFunction = (string1, string2, string3, string4) ->
+				string1 + string2 + string3 + string4;
 
 		throwableTetraFunction.andThen(null);
 	}

@@ -77,8 +77,9 @@ definition {
 
 		SAMLNavigation.gotoIdentityProviderConnection();
 
-		SAMLPortlet.configureIdentityProviderConnection(
+		SAMLPortlet.addIdentityProviderConnection(
 			IdpEntityID = "samlidp",
+			IdpKeepAliveURL = "${idpKeepAliveURL}",
 			IdpMetadataURL = "http://localhost:8080/c/portal/saml/metadata",
 			IdpNameID = "samlidp",
 			nameIdentifierFormat = "${nameIdentifierFormat}"
@@ -94,6 +95,10 @@ definition {
 
 		Navigator.openURL();
 
+		if (IsElementNotPresent(locator1 = "ProductMenu#PRODUCT_MENU_OPENED")) {
+			User.loginPG(password = "test", userEmailAddress = "test@liferay.com");
+		}
+
 		ProductMenu.gotoPortlet(
 			category = "Configuration",
 			panel = "Control Panel",
@@ -107,6 +112,7 @@ definition {
 			nameIdentifierAttributeName = "${nameIdentifierAttributeName}",
 			nameIdentifierFormat = "${nameIdentifierFormat}",
 			SPEntityID = "${samlEntityID}",
+			SPKeepAliveURL = "${spKeepAliveURL}",
 			SPMetadataURL = "${spURL}/c/portal/saml/metadata",
 			SPNameID = "${samlEntityID}"
 		);

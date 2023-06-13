@@ -52,7 +52,6 @@ import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import com.liferay.portal.util.test.LayoutTestUtil;
 
 import java.util.List;
-import java.util.Locale;
 
 import javax.portlet.PortletRequest;
 import javax.portlet.PortletResponse;
@@ -278,13 +277,14 @@ public class JournalArticleIndexerSummaryTest {
 
 	protected String getFieldName(String field) {
 		return StringBundler.concat(
-			field, StringPool.UNDERLINE, LocaleUtil.toLanguageId(Locale.US));
+			field, StringPool.UNDERLINE,
+			LocaleUtil.toLanguageId(LocaleUtil.US));
 	}
 
 	protected String getSnippetFieldName(String field) {
 		return StringBundler.concat(
 			Field.SNIPPET, StringPool.UNDERLINE, field, StringPool.UNDERLINE,
-			LocaleUtil.toLanguageId(Locale.US));
+			LocaleUtil.toLanguageId(LocaleUtil.US));
 	}
 
 	protected Summary getSummary(Document document) throws Exception {

@@ -17,7 +17,6 @@ package com.liferay.portlet.documentlibrary.model.impl;
 import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.document.library.kernel.model.DLFileShortcut;
-
 import com.liferay.portal.kernel.model.CacheModel;
 import com.liferay.portal.kernel.util.HashUtil;
 import com.liferay.portal.kernel.util.StringBundler;
@@ -33,12 +32,12 @@ import java.util.Date;
  * The cache model class for representing DLFileShortcut in entity cache.
  *
  * @author Brian Wing Shun Chan
- * @see DLFileShortcut
  * @generated
  */
 @ProviderType
-public class DLFileShortcutCacheModel implements CacheModel<DLFileShortcut>,
-	Externalizable {
+public class DLFileShortcutCacheModel
+	implements CacheModel<DLFileShortcut>, Externalizable {
+
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj) {
@@ -49,7 +48,8 @@ public class DLFileShortcutCacheModel implements CacheModel<DLFileShortcut>,
 			return false;
 		}
 
-		DLFileShortcutCacheModel dlFileShortcutCacheModel = (DLFileShortcutCacheModel)obj;
+		DLFileShortcutCacheModel dlFileShortcutCacheModel =
+			(DLFileShortcutCacheModel)obj;
 
 		if (fileShortcutId == dlFileShortcutCacheModel.fileShortcutId) {
 			return true;
@@ -220,8 +220,7 @@ public class DLFileShortcutCacheModel implements CacheModel<DLFileShortcut>,
 	}
 
 	@Override
-	public void writeExternal(ObjectOutput objectOutput)
-		throws IOException {
+	public void writeExternal(ObjectOutput objectOutput) throws IOException {
 		if (uuid == null) {
 			objectOutput.writeUTF("");
 		}
@@ -295,4 +294,5 @@ public class DLFileShortcutCacheModel implements CacheModel<DLFileShortcut>,
 	public long statusByUserId;
 	public String statusByUserName;
 	public long statusDate;
+
 }

@@ -14,39 +14,127 @@
 
 package com.liferay.apio.architect.internal.wiring.osgi.manager.router;
 
-import com.liferay.apio.architect.routes.CollectionRoutes;
+import static com.liferay.apio.architect.internal.wiring.osgi.manager.cache.ManagerCache.INSTANCE;
 
-import java.util.List;
+import static org.slf4j.LoggerFactory.getLogger;
+
+import com.liferay.apio.architect.internal.action.ActionSemantics;
+import com.liferay.apio.architect.internal.form.FormImpl;
+import com.liferay.apio.architect.internal.routes.CollectionRoutesImpl;
+import com.liferay.apio.architect.internal.routes.CollectionRoutesImpl.BuilderImpl;
+import com.liferay.apio.architect.internal.wiring.osgi.manager.base.ClassNameBaseManager;
+import com.liferay.apio.architect.internal.wiring.osgi.manager.representable.NameManager;
+import com.liferay.apio.architect.internal.wiring.osgi.manager.representable.RepresentableManager;
+import com.liferay.apio.architect.internal.wiring.osgi.manager.uri.mapper.PathIdentifierMapperManager;
+import com.liferay.apio.architect.representor.Representor;
+import com.liferay.apio.architect.resource.Resource.Paged;
+import com.liferay.apio.architect.router.CollectionRouter;
+import com.liferay.apio.architect.routes.CollectionRoutes;
+import com.liferay.apio.architect.routes.CollectionRoutes.Builder;
+
+import java.util.Collection;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Stream;
+
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
+
+import org.slf4j.Logger;
 
 /**
  * Provides methods to retrieve the routes information provided by the different
- * {@link com.liferay.apio.architect.router.CollectionRouter} instances.
+ * {@link CollectionRouter} instances.
  *
  * @author Alejandro Hernández
- * @see    com.liferay.apio.architect.router.CollectionRouter
+ * @see    CollectionRouter
  */
-public interface CollectionRouterManager {
+@Component(service = CollectionRouterManager.class)
+public class CollectionRouterManager
+	extends ClassNameBaseManager<CollectionRouter> {
 
-	public Map<String, CollectionRoutes> getCollectionRoutes();
-
-	/**
-	 * Returns the collection routes for the collection resource's name.
-	 *
-	 * @param  name the collection resource's name
-	 * @return the collection routes
-	 */
-	public <T, S> Optional<CollectionRoutes<T, S>> getCollectionRoutesOptional(
-		String name);
+	public CollectionRouterManager() {
+		super(CollectionRouter.class, 2);
+	}
 
 	/**
-	 * Returns a list containing the names of the resources with routes in this
-	 * manager.
+	 * Returns the list of {@link ActionSemantics} created by the managed
+	 * routers.
 	 *
-	 * @return a list containing the names of the resources with routes in this
-	 *         manager
+	 * @review
 	 */
-	public List<String> getResourceNames();
+	public Stream<ActionSemantics> getActionSemantics() {
+		return Optional.ofNullable(
+			INSTANCE.getCollectionRoutes(this::_computeCollectionRoutes)
+		).map(
+			Map::values
+		).map(
+			Collection::stream
+		).orElseGet(
+			Stream::empty
+		).map(
+			CollectionRoutesImpl.class::cast
+		).map(
+			CollectionRoutesImpl::getActionSemantics
+		).flatMap(
+			Collection::stream
+		);
+	}
+
+	private void _computeCollectionRoutes() {
+		forEachService(
+			(className, collectionRouter) -> {
+				Optional<String> nameOptional = _nameManager.getNameOptional(
+					className);
+
+				if (!nameOptional.isPresent()) {
+					_logger.warn(
+						"Unable to find a Representable for class name {}",
+						className);
+
+					return;
+				}
+
+				String name = nameOptional.get();
+
+				Optional<Representor<Object>> representorOptional =
+					_representableManager.getRepresentorOptional(name);
+
+				if (!representorOptional.isPresent()) {
+					_logger.warn(
+						"Unable to find a Representable for class name {}",
+						className);
+
+					return;
+				}
+
+				Representor<Object> representor = representorOptional.get();
+
+				Builder builder = new BuilderImpl<>(
+					Paged.of(name),
+					() -> new FormImpl.BuilderImpl<>(
+						_pathIdentifierMapperManager::mapToIdentifierOrFail,
+						_nameManager::getNameOptional),
+					representor::getIdentifier, _nameManager::getNameOptional);
+
+				@SuppressWarnings("unchecked")
+				CollectionRoutes collectionRoutes =
+					collectionRouter.collectionRoutes(builder);
+
+				INSTANCE.putRootResourceNameSdk(name);
+				INSTANCE.putCollectionRoutes(name, collectionRoutes);
+			});
+	}
+
+	private Logger _logger = getLogger(getClass());
+
+	@Reference
+	private NameManager _nameManager;
+
+	@Reference
+	private PathIdentifierMapperManager _pathIdentifierMapperManager;
+
+	@Reference
+	private RepresentableManager _representableManager;
 
 }

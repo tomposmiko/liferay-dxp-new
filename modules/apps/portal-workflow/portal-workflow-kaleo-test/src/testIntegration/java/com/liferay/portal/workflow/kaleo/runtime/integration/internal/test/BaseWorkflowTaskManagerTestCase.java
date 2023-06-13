@@ -728,7 +728,6 @@ public abstract class BaseWorkflowTaskManagerTestCase {
 
 		PermissionThreadLocal.setPermissionChecker(
 			new SimplePermissionChecker() {
-
 				{
 					init(companyAdminUser);
 				}

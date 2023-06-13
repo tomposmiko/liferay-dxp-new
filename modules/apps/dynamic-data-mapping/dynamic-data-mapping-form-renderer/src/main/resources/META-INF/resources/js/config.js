@@ -152,6 +152,7 @@
 						'liferay-ddm-form-renderer-type': {
 							path: 'type.js',
 							requires: [
+								'aui-component',
 								'aui-form-builder-field-type'
 							]
 						},

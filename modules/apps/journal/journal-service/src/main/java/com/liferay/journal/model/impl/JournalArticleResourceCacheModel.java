@@ -17,7 +17,6 @@ package com.liferay.journal.model.impl;
 import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.journal.model.JournalArticleResource;
-
 import com.liferay.portal.kernel.model.CacheModel;
 import com.liferay.portal.kernel.util.HashUtil;
 import com.liferay.portal.kernel.util.StringBundler;
@@ -31,12 +30,12 @@ import java.io.ObjectOutput;
  * The cache model class for representing JournalArticleResource in entity cache.
  *
  * @author Brian Wing Shun Chan
- * @see JournalArticleResource
  * @generated
  */
 @ProviderType
-public class JournalArticleResourceCacheModel implements CacheModel<JournalArticleResource>,
-	Externalizable {
+public class JournalArticleResourceCacheModel
+	implements CacheModel<JournalArticleResource>, Externalizable {
+
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj) {
@@ -47,9 +46,12 @@ public class JournalArticleResourceCacheModel implements CacheModel<JournalArtic
 			return false;
 		}
 
-		JournalArticleResourceCacheModel journalArticleResourceCacheModel = (JournalArticleResourceCacheModel)obj;
+		JournalArticleResourceCacheModel journalArticleResourceCacheModel =
+			(JournalArticleResourceCacheModel)obj;
 
-		if (resourcePrimKey == journalArticleResourceCacheModel.resourcePrimKey) {
+		if (resourcePrimKey ==
+				journalArticleResourceCacheModel.resourcePrimKey) {
+
 			return true;
 		}
 
@@ -82,7 +84,8 @@ public class JournalArticleResourceCacheModel implements CacheModel<JournalArtic
 
 	@Override
 	public JournalArticleResource toEntityModel() {
-		JournalArticleResourceImpl journalArticleResourceImpl = new JournalArticleResourceImpl();
+		JournalArticleResourceImpl journalArticleResourceImpl =
+			new JournalArticleResourceImpl();
 
 		if (uuid == null) {
 			journalArticleResourceImpl.setUuid("");
@@ -120,8 +123,7 @@ public class JournalArticleResourceCacheModel implements CacheModel<JournalArtic
 	}
 
 	@Override
-	public void writeExternal(ObjectOutput objectOutput)
-		throws IOException {
+	public void writeExternal(ObjectOutput objectOutput) throws IOException {
 		if (uuid == null) {
 			objectOutput.writeUTF("");
 		}
@@ -148,4 +150,5 @@ public class JournalArticleResourceCacheModel implements CacheModel<JournalArtic
 	public long groupId;
 	public long companyId;
 	public String articleId;
+
 }

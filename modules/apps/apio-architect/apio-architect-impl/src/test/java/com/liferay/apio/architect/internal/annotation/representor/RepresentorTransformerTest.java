@@ -17,6 +17,7 @@ package com.liferay.apio.architect.internal.annotation.representor;
 import static com.liferay.apio.architect.internal.representor.RepresentorTestUtil.testRelatedModel;
 
 import static java.util.Arrays.asList;
+import static java.util.Collections.singletonList;
 
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.core.Is.is;
@@ -24,8 +25,10 @@ import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 
 import com.liferay.apio.architect.alias.representor.FieldFunction;
+import com.liferay.apio.architect.internal.annotation.representor.processor.ParsedType;
+import com.liferay.apio.architect.internal.annotation.representor.processor.TypeProcessor;
 import com.liferay.apio.architect.internal.annotation.representor.types.Dummy;
-import com.liferay.apio.architect.internal.annotation.representor.types.Dummy.DummpyImpl;
+import com.liferay.apio.architect.internal.annotation.representor.types.Dummy.DummyImpl;
 import com.liferay.apio.architect.internal.annotation.representor.types.Dummy.IntegerIdentifier;
 import com.liferay.apio.architect.internal.annotation.representor.types.Dummy.StringIdentifier;
 import com.liferay.apio.architect.internal.representor.RepresentorTestUtil;
@@ -51,17 +54,18 @@ public class RepresentorTransformerTest {
 
 	@Before
 	public void setUp() {
-		_relatedCollections = new HashMap<>();
+		ParsedType parsedType = TypeProcessor.processType(Dummy.class);
 
 		_representor = RepresentorTransformer.toRepresentor(
-			Dummy.class, null, _relatedCollections);
+			parsedType, null, new HashMap<>());
 	}
 
 	@Test
 	public void testApplicationRelativeUrlFields() {
 		_testFields(
 			_representor.getApplicationRelativeURLFunctions(),
-			asList("applicationRelativeUrl"), asList("/application"));
+			singletonList("applicationRelativeUrl"),
+			singletonList("/application"));
 	}
 
 	@Test
@@ -94,11 +98,11 @@ public class RepresentorTransformerTest {
 			StringIdentifier.class, "2d1d");
 
 		testRelatedModel(
-			relatedModels.get(2), _dummy, "linkedModel1",
+			relatedModels.get(2), _dummy, "linkToSingle1",
 			IntegerIdentifier.class, 1);
 
 		testRelatedModel(
-			relatedModels.get(3), _dummy, "linkedModel2",
+			relatedModels.get(3), _dummy, "linkToSingle2",
 			StringIdentifier.class, "2d1d");
 	}
 
@@ -113,7 +117,7 @@ public class RepresentorTransformerTest {
 		_testFields(
 			_representor.getNumberListFunctions(),
 			asList("numberListField1", "numberListField2"),
-			asList(asList(1, 2, 3), asList(4, 5, 6)));
+			asList(asList(1L, 2L, 3L), asList(4L, 5L, 6L)));
 
 		_testFields(
 			_representor.getBooleanListFunctions(),
@@ -140,9 +144,17 @@ public class RepresentorTransformerTest {
 				(relatedCollection.getIdentifierClass() ==
 					StringIdentifier.class)
 		).filter(
-			relatedCollection ->
-				relatedCollection.getKey().equals("relatedCollection1") ||
-				relatedCollection.getKey().equals("relatedCollection2")
+			relatedCollection -> {
+				String key = relatedCollection.getKey();
+
+				if (key.equals("linkToChildCollection1") ||
+					key.equals("linkToChildCollection2")) {
+
+					return true;
+				}
+
+				return false;
+			}
 		).collect(
 			Collectors.toList()
 		);
@@ -154,15 +166,16 @@ public class RepresentorTransformerTest {
 	public void testRelativeUrlFields() {
 		_testFields(
 			_representor.getRelativeURLFunctions(),
-			asList("relativeUrl1", "relativeUrl2"),
-			asList("/first", "/second"));
+			singletonList("relativeUrl2"), singletonList("/second"));
 	}
 
 	@Test
 	public void testStringFields() {
 		_testFields(
 			_representor.getStringFunctions(),
-			asList("dateField1", "dateField2", "stringField1", "stringField2"),
+			asList(
+				"dateField1", "dateField2", "stringField1",
+				"stringFieldOptional"),
 			asList(
 				"1970-01-01T00:00Z", "1970-01-01T00:03Z", "string1",
 				"string2"));
@@ -181,8 +194,7 @@ public class RepresentorTransformerTest {
 		RepresentorTestUtil.testFields(_dummy, list, keys, values);
 	}
 
-	private final Dummy _dummy = new DummpyImpl();
-	private HashMap<String, List<RelatedCollection<?, ?>>> _relatedCollections;
+	private final Dummy _dummy = new DummyImpl();
 	private Representor<Dummy> _representor;
 
 }

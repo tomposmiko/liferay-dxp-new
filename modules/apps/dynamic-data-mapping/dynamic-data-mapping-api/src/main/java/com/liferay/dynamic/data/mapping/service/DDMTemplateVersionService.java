@@ -17,7 +17,6 @@ package com.liferay.dynamic.data.mapping.service;
 import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.dynamic.data.mapping.model.DDMTemplateVersion;
-
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.jsonwebservice.JSONWebService;
@@ -38,32 +37,38 @@ import java.util.List;
  *
  * @author Brian Wing Shun Chan
  * @see DDMTemplateVersionServiceUtil
- * @see com.liferay.dynamic.data.mapping.service.base.DDMTemplateVersionServiceBaseImpl
- * @see com.liferay.dynamic.data.mapping.service.impl.DDMTemplateVersionServiceImpl
  * @generated
  */
 @AccessControlled
 @JSONWebService
-@OSGiBeanProperties(property =  {
-	"json.web.service.context.name=ddm", "json.web.service.context.path=DDMTemplateVersion"}, service = DDMTemplateVersionService.class)
+@OSGiBeanProperties(
+	property = {
+		"json.web.service.context.name=ddm",
+		"json.web.service.context.path=DDMTemplateVersion"
+	},
+	service = DDMTemplateVersionService.class
+)
 @ProviderType
-@Transactional(isolation = Isolation.PORTAL, rollbackFor =  {
-	PortalException.class, SystemException.class})
+@Transactional(
+	isolation = Isolation.PORTAL,
+	rollbackFor = {PortalException.class, SystemException.class}
+)
 public interface DDMTemplateVersionService extends BaseService {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
-	 * Never modify or reference this interface directly. Always use {@link DDMTemplateVersionServiceUtil} to access the ddm template version remote service. Add custom service methods to {@link com.liferay.dynamic.data.mapping.service.impl.DDMTemplateVersionServiceImpl} and rerun ServiceBuilder to automatically copy the method declarations to this interface.
+	 * Never modify or reference this interface directly. Always use {@link DDMTemplateVersionServiceUtil} to access the ddm template version remote service. Add custom service methods to <code>com.liferay.dynamic.data.mapping.service.impl.DDMTemplateVersionServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
 	 */
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public DDMTemplateVersion getLatestTemplateVersion(long templateId)
 		throws PortalException;
 
 	/**
-	* Returns the OSGi service identifier.
-	*
-	* @return the OSGi service identifier
-	*/
+	 * Returns the OSGi service identifier.
+	 *
+	 * @return the OSGi service identifier
+	 */
 	public String getOSGiServiceIdentifier();
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
@@ -71,12 +76,12 @@ public interface DDMTemplateVersionService extends BaseService {
 		throws PortalException;
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public List<DDMTemplateVersion> getTemplateVersions(long templateId,
-		int start, int end,
-		OrderByComparator<DDMTemplateVersion> orderByComparator)
+	public List<DDMTemplateVersion> getTemplateVersions(
+			long templateId, int start, int end,
+			OrderByComparator<DDMTemplateVersion> orderByComparator)
 		throws PortalException;
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public int getTemplateVersionsCount(long templateId)
-		throws PortalException;
+	public int getTemplateVersionsCount(long templateId) throws PortalException;
+
 }

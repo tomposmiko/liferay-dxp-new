@@ -140,6 +140,7 @@ name = HtmlUtil.escapeJS(name);
 %>
 
 <aui:script use="<%= modules %>">
+	var windowNode = A.getWin();
 
 	<%
 	Locale contentsLocale = LocaleUtil.fromLanguageId(contentsLanguageId);
@@ -163,7 +164,21 @@ name = HtmlUtil.escapeJS(name);
 	};
 
 	var createInstance = function() {
-		document.getElementById('<%= name %>').setAttribute('contenteditable', true);
+		var editorNode = A.one('#<%= name %>');
+
+		if (!editorNode) {
+			var editorContainer = A.one('#<%= name %>Container');
+
+			editorContainer.setHTML('');
+
+			editorNode = A.Node.create('<%= HtmlUtil.escapeJS(editor) %>');
+
+			editorContainer.appendChild(editorNode);
+		}
+
+		if (editorNode) {
+			editorNode.attr('contenteditable', true);
+		}
 
 		var editorConfig = <%= Validator.isNotNull(editorConfigJSONObject) %> ? <%= editorConfigJSONObject %> : {};
 
@@ -256,6 +271,34 @@ name = HtmlUtil.escapeJS(name);
 		Liferay.namespace('EDITORS').alloyEditor.addInstance();
 	};
 
+	var preventImageDragoverHandler = windowNode.on(
+		'dragover',
+		function(event) {
+			var validDropTarget = event.target.getDOMNode().isContentEditable;
+
+			if (!validDropTarget) {
+				event.preventDefault();
+			}
+		}
+	);
+
+	var preventImageDropHandler = windowNode.on(
+		'drop',
+		function(event) {
+			var validDropTarget = event.target.getDOMNode().isContentEditable;
+
+			if (!validDropTarget) {
+				event.preventDefault();
+				event.stopImmediatePropagation();
+			}
+		}
+	);
+
+	var eventHandles = [
+		preventImageDragoverHandler,
+		preventImageDropHandler
+	];
+
 	window['<%= name %>'] = {
 		create: function() {
 			if (!alloyEditor) {
@@ -283,6 +326,8 @@ name = HtmlUtil.escapeJS(name);
 
 				alloyEditor = null;
 			}
+
+			(new A.EventHandle(eventHandles)).detach();
 
 			var editorNode = document.getElementById('<%= name %>');
 

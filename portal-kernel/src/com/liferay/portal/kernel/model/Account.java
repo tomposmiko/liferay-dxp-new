@@ -24,19 +24,20 @@ import com.liferay.portal.kernel.util.Accessor;
  *
  * @author Brian Wing Shun Chan
  * @see AccountModel
- * @see com.liferay.portal.model.impl.AccountImpl
- * @see com.liferay.portal.model.impl.AccountModelImpl
  * @generated
  */
 @ImplementationClassName("com.liferay.portal.model.impl.AccountImpl")
 @ProviderType
 public interface Account extends AccountModel, PersistedModel {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
-	 * Never modify this interface directly. Add methods to {@link com.liferay.portal.model.impl.AccountImpl} and rerun ServiceBuilder to automatically copy the method declarations to this interface.
+	 * Never modify this interface directly. Add methods to <code>com.liferay.portal.model.impl.AccountImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
 	 */
-	public static final Accessor<Account, Long> ACCOUNT_ID_ACCESSOR = new Accessor<Account, Long>() {
+	public static final Accessor<Account, Long> ACCOUNT_ID_ACCESSOR =
+		new Accessor<Account, Long>() {
+
 			@Override
 			public Long get(Account account) {
 				return account.getAccountId();
@@ -51,5 +52,7 @@ public interface Account extends AccountModel, PersistedModel {
 			public Class<Account> getTypeClass() {
 				return Account.class;
 			}
+
 		};
+
 }

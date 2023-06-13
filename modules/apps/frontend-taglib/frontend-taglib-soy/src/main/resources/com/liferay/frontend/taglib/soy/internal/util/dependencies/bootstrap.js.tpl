@@ -10,19 +10,45 @@ Liferay.Loader.require.apply(
 					portletId: context.portletId
 				};
 
-				if ($WRAPPER) {
-					Liferay.component(
-						'$ID',
-						new Component.default(context, '#$ID'),
-						destroyConfig
+				if (context.defaultEventHandler) {
+					Liferay.componentReady(
+						context.defaultEventHandler
+					).then(
+						function(defaultEventHandler) {
+							context.defaultEventHandler = defaultEventHandler;
+
+							if ($WRAPPER) {
+								Liferay.component(
+									'$ID',
+									new Component.default(context, '#$ID'),
+									destroyConfig
+								);
+							}
+							else {
+								Liferay.component(
+									'$ID',
+									new Component.default(context),
+									destroyConfig
+								);
+							}
+						}
 					);
 				}
 				else {
-					Liferay.component(
-						'$ID',
-						new Component.default(context),
-						destroyConfig
-					);
+					if ($WRAPPER) {
+						Liferay.component(
+							'$ID',
+							new Component.default(context, '#$ID'),
+							destroyConfig
+						);
+					}
+					else {
+						Liferay.component(
+							'$ID',
+							new Component.default(context),
+							destroyConfig
+						);
+					}
 				}
 			},
 			function(error) {

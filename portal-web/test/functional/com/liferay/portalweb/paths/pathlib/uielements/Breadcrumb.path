@@ -20,7 +20,7 @@
 </tr>
 <tr>
 	<td>BREADCRUMB_ENTRY_LINK</td>
-	<td>//div[contains(@id,'breadcrumb')]//li/a[contains(.,'${key_breadcrumbName}')]</td>
+	<td>//nav[contains(@id,'breadcrumb')]//li/a[contains(.,'${key_breadcrumbName}')]</td>
 	<td></td>
 </tr>
 </tbody>

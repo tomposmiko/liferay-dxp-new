@@ -18,6 +18,7 @@
 		separator: bool,
 		type: string
 	]>}
+	{@param? checkboxStatus: string}
 	{@param? clearResultsURL: string}
 	{@param? contentRenderer: string}
 	{@param? creationMenu: [
@@ -27,6 +28,7 @@
 		maxSecondaryItems: int,
 		maxTotalItems: int,
 		primaryItems: list<[
+			data: any,
 			disabled: bool,
 			href: string,
 			icon: string,
@@ -34,10 +36,12 @@
 			separator: bool
 		]>,
 		secondaryItems: list<[
+			data: any,
 			disabled: bool,
 			href: string,
 			icon: string,
 			items: list<[
+				data: any,
 				disabled: bool,
 				href: string,
 				icon: string,
@@ -49,6 +53,7 @@
 		]>,
 		viewMoreURL: string
 	]}
+	{@param? defaultEventHandler: ?}
 	{@param? disabled: bool}
 	{@param? elementClasses: string}
 	{@param? filterItems: list<[
@@ -88,6 +93,7 @@
 	{@param? showCreationMenu: bool}
 	{@param? showFiltersDoneButton: bool}
 	{@param? showInfoButton: bool}
+	{@param? showResultsBar: bool}
 	{@param? showSearch: bool}
 	{@param? sortingOrder: string}
 	{@param? sortingURL: string}
@@ -101,9 +107,11 @@
 	]>}
 
 	{call ClayManagementToolbar.render}
+		{param defaultEventHandler: $defaultEventHandler /}
 		{param actionItems: $actionItems /}
 		{param clearResultsURL: $clearResultsURL /}
 		{param contentRenderer: $contentRenderer /}
+		{param checkboxStatus: $checkboxStatus /}
 		{param creationMenu: $creationMenu /}
 		{param customData: [
 			'searchData': $searchData
@@ -131,6 +139,7 @@
 		{param showCreationMenu: $showCreationMenu /}
 		{param showFiltersDoneButton: $showFiltersDoneButton /}
 		{param showInfoButton: $showInfoButton /}
+		{param showResultsBar: $showResultsBar /}
 		{param showSearch: $showSearch /}
 		{param sortingOrder: $sortingOrder /}
 		{param sortingURL: $sortingURL /}

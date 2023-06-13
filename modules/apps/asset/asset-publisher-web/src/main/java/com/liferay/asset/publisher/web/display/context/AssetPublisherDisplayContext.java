@@ -49,6 +49,7 @@ import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.model.Layout;
+import com.liferay.portal.kernel.model.LayoutConstants;
 import com.liferay.portal.kernel.module.configuration.ConfigurationException;
 import com.liferay.portal.kernel.portlet.LiferayPortletRequest;
 import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
@@ -1029,14 +1030,13 @@ public class AssetPublisherDisplayContext {
 			return AssetEntryServiceUtil.incrementViewCounter(
 				assetEntry.getClassName(), assetEntry.getClassPK());
 		}
-		else {
-			ThemeDisplay themeDisplay = (ThemeDisplay)_request.getAttribute(
-				WebKeys.THEME_DISPLAY);
 
-			return AssetEntryLocalServiceUtil.incrementViewCounter(
-				themeDisplay.getUserId(), assetEntry.getClassName(),
-				assetEntry.getClassPK());
-		}
+		ThemeDisplay themeDisplay = (ThemeDisplay)_request.getAttribute(
+			WebKeys.THEME_DISPLAY);
+
+		return AssetEntryLocalServiceUtil.incrementViewCounter(
+			themeDisplay.getUserId(), assetEntry.getClassName(),
+			assetEntry.getClassPK());
 	}
 
 	public Boolean isAnyAssetType() {
@@ -1173,9 +1173,13 @@ public class AssetPublisherDisplayContext {
 	}
 
 	public boolean isEnableSetAsDefaultAssetPublisher() {
+		Layout layout = getLayout();
+
 		String rootPortletId = getRootPortletId();
 
-		if (rootPortletId.equals(AssetPublisherPortletKeys.ASSET_PUBLISHER)) {
+		if (Objects.equals(layout.getType(), LayoutConstants.TYPE_PORTLET) &&
+			rootPortletId.equals(AssetPublisherPortletKeys.ASSET_PUBLISHER)) {
+
 			return true;
 		}
 

@@ -43,15 +43,21 @@ import java.util.Optional;
  * instances of this interface.
  * </p>
  *
- * @author Alejandro Hernández
- * @param  <T> the model's type
- * @param  <S> the type of the model's identifier (e.g., {@code Long}, {@code
- *         String}, etc.)
- * @param  <U> the type of the parent model's identifier (e.g., {@code Long},
- *         {@code String}, etc.)
- * @see    Builder
+ * @author     Alejandro Hernández
+ * @param      <T> the model's type
+ * @param      <S> the type of the model's identifier (e.g., {@code Long},
+ *             {@code String}, etc.)
+ * @param      <U> the type of the parent model's identifier (e.g., {@code
+ *             Long}, {@code String}, etc.)
+ * @see        Builder
+ * @deprecated As of 1.9.0, use {@link
+ *             com.liferay.apio.architect.annotation.Actions} annotations
+ *             instead
+ * @review
  */
+@Deprecated
 @ProviderType
+@SuppressWarnings("DeprecatedIsStillUsed")
 public interface NestedCollectionRoutes<T, S, U> {
 
 	/**
@@ -59,9 +65,14 @@ public interface NestedCollectionRoutes<T, S, U> {
 	 * added through the {@link NestedCollectionRoutes.Builder}. Returns {@code
 	 * Optional#empty()} otherwise.
 	 *
-	 * @return the form used to create a collection item; {@code
-	 *         Optional#empty()} otherwise
+	 * @return     the form used to create a collection item; {@code
+	 *             Optional#empty()} otherwise
+	 * @deprecated As of 1.9.0, use {@link
+	 *             com.liferay.apio.architect.annotation.Actions} annotations
+	 *             instead
+	 * @review
 	 */
+	@Deprecated
 	public Optional<Form> getFormOptional();
 
 	/**
@@ -69,8 +80,14 @@ public interface NestedCollectionRoutes<T, S, U> {
 	 * the endpoint was added through the builder and the function therefore
 	 * exists; returns {@code Optional#empty()} otherwise.
 	 *
-	 * @return the function, if it exists; {@code Optional#empty()} otherwise
+	 * @return     the function, if it exists; {@code Optional#empty()}
+	 *             otherwise
+	 * @deprecated As of 1.9.0, use {@link
+	 *             com.liferay.apio.architect.annotation.Actions} annotations
+	 *             instead
+	 * @review
 	 */
+	@Deprecated
 	public Optional<NestedBatchCreateItemFunction<S, U>>
 		getNestedBatchCreateItemFunctionOptional();
 
@@ -80,9 +97,14 @@ public interface NestedCollectionRoutes<T, S, U> {
 	 * the function therefore exists. Returns {@code Optional#empty()}
 	 * otherwise.
 	 *
-	 * @return the function used to create a collection item, if the function
-	 *         exists; {@code Optional#empty()} otherwise
+	 * @return     the function used to create a collection item, if the
+	 *             function exists; {@code Optional#empty()} otherwise
+	 * @deprecated As of 1.9.0, use {@link
+	 *             com.liferay.apio.architect.annotation.Actions} annotations
+	 *             instead
+	 * @review
 	 */
+	@Deprecated
 	public Optional<NestedCreateItemFunction<T, U>>
 		getNestedCreateItemFunctionOptional();
 
@@ -91,9 +113,14 @@ public interface NestedCollectionRoutes<T, S, U> {
 	 * through the {@link NestedCollectionRoutes.Builder} and the function
 	 * therefore exists. Returns {@code Optional#empty()} otherwise.
 	 *
-	 * @return the function used to obtain the page, if the function exists;
-	 *         {@code Optional#empty()} otherwise
+	 * @return     the function used to obtain the page, if the function exists;
+	 *             {@code Optional#empty()} otherwise
+	 * @deprecated As of 1.9.0, use {@link
+	 *             com.liferay.apio.architect.annotation.Actions} annotations
+	 *             instead
+	 * @review
 	 */
+	@Deprecated
 	public Optional<NestedGetPageFunction<T, U>>
 		getNestedGetPageFunctionOptional();
 
@@ -101,67 +128,105 @@ public interface NestedCollectionRoutes<T, S, U> {
 	 * Creates the {@link NestedCollectionRoutes} of a {@link
 	 * com.liferay.apio.architect.router.NestedCollectionRouter}.
 	 *
-	 * @param <T> the model's type
-	 * @param <S> the type of the model's identifier (e.g., {@code Long}, {@code
-	 *        String}, etc.)
-	 * @param <U> the type of the parent model's identifier (e.g., {@code Long},
-	 *        {@code String}, etc.)
+	 * @param      <T> the model's type
+	 * @param      <S> the type of the model's identifier (e.g., {@code Long},
+	 *             {@code String}, etc.)
+	 * @param      <U> the type of the parent model's identifier (e.g., {@code
+	 *             Long}, {@code String}, etc.)
+	 * @deprecated As of 1.9.0, use {@link
+	 *             com.liferay.apio.architect.annotation.Actions} annotations
+	 *             instead
+	 * @review
 	 */
+	@Deprecated
 	@ProviderType
 	public interface Builder<T, S, U> {
 
 		/**
 		 * Adds a route to a creator function that has no extra parameters.
 		 *
-		 * @param  creatorThrowableBiFunction the creator function that adds the
-		 *         collection item
-		 * @param  hasNestedAddingPermissionFunction the permission function for
-		 *         this route
-		 * @param  formBuilderFunction the function that creates the form for
-		 *         this operation
-		 * @return the updated builder
+		 * @param      creatorThrowableBiFunction the creator function that adds
+		 *             the collection item
+		 * @param      hasNestedAddingPermissionFunction the permission function
+		 *             for this route
+		 * @param      formBuilderFunction the function that creates the form
+		 *             for this operation
+		 * @return     the updated builder
+		 * @deprecated As of 1.9.0, use {@link
+		 *             com.liferay.apio.architect.annotation.Actions.Create}
+		 *             annotation instead
+		 * @review
 		 */
-		public <R> Builder<T, S, U> addCreator(
+		@Deprecated
+		public default <R> Builder<T, S, U> addCreator(
 			ThrowableBiFunction<U, R, T> creatorThrowableBiFunction,
 			HasNestedAddingPermissionFunction<U>
 				hasNestedAddingPermissionFunction,
-			FormBuilderFunction<R> formBuilderFunction);
+			FormBuilderFunction<R> formBuilderFunction) {
+
+			return addCreator(
+				(u, r, ignored) -> creatorThrowableBiFunction.apply(u, r),
+				Void.class, hasNestedAddingPermissionFunction,
+				formBuilderFunction);
+		}
 
 		/**
 		 * Adds a route to a creator function that has no extra parameters.
 		 *
-		 * @param  creatorThrowableBiFunction the creator function that adds the
-		 *         collection item
-		 * @param  batchCreatorThrowableBiFunction the batch creator function
-		 * @param  hasNestedAddingPermissionFunction the permission function for
-		 *         this route
-		 * @param  formBuilderFunction the function that creates the form for
-		 *         this operation
-		 * @return the updated builder
+		 * @param      creatorThrowableBiFunction the creator function that adds
+		 *             the collection item
+		 * @param      batchCreatorThrowableBiFunction the batch creator
+		 *             function
+		 * @param      hasNestedAddingPermissionFunction the permission function
+		 *             for this route
+		 * @param      formBuilderFunction the function that creates the form
+		 *             for this operation
+		 * @return     the updated builder
+		 * @deprecated As of 1.9.0, use {@link
+		 *             com.liferay.apio.architect.annotation.Actions.Create}
+		 *             annotation instead
+		 * @review
 		 */
-		public <R> Builder<T, S, U> addCreator(
+		@Deprecated
+		public default <R> Builder<T, S, U> addCreator(
 			ThrowableBiFunction<U, R, T> creatorThrowableBiFunction,
 			ThrowableBiFunction<U, List<R>, List<S>>
 				batchCreatorThrowableBiFunction,
 			HasNestedAddingPermissionFunction<U>
 				hasNestedAddingPermissionFunction,
-			FormBuilderFunction<R> formBuilderFunction);
+			FormBuilderFunction<R> formBuilderFunction) {
+
+			return addCreator(
+				(u, r, ignored) -> creatorThrowableBiFunction.apply(u, r),
+				(u, l, ignored) -> batchCreatorThrowableBiFunction.apply(u, l),
+				Void.class, hasNestedAddingPermissionFunction,
+				formBuilderFunction);
+		}
 
 		/**
 		 * Adds a route to a creator function that has four extra parameters.
 		 *
-		 * @param  creatorThrowableHexaFunction the creator function that adds
-		 *         the collection item
-		 * @param  aClass the class of the creator function's third parameter
-		 * @param  bClass the class of the creator function's fourth parameter
-		 * @param  cClass the class of the creator function's fifth parameter
-		 * @param  dClass the class of the creator function's sixth parameter
-		 * @param  hasNestedAddingPermissionFunction the permission function for
-		 *         this route
-		 * @param  formBuilderFunction the function that creates the form for
-		 *         this operation
-		 * @return the updated builder
+		 * @param      creatorThrowableHexaFunction the creator function that
+		 *             adds the collection item
+		 * @param      aClass the class of the creator function's third
+		 *             parameter
+		 * @param      bClass the class of the creator function's fourth
+		 *             parameter
+		 * @param      cClass the class of the creator function's fifth
+		 *             parameter
+		 * @param      dClass the class of the creator function's sixth
+		 *             parameter
+		 * @param      hasNestedAddingPermissionFunction the permission function
+		 *             for this route
+		 * @param      formBuilderFunction the function that creates the form
+		 *             for this operation
+		 * @return     the updated builder
+		 * @deprecated As of 1.9.0, use {@link
+		 *             com.liferay.apio.architect.annotation.Actions.Create}
+		 *             annotation instead
+		 * @review
 		 */
+		@Deprecated
 		public <A, B, C, D, R> Builder<T, S, U> addCreator(
 			ThrowableHexaFunction<U, R, A, B, C, D, T>
 				creatorThrowableHexaFunction,
@@ -173,19 +238,29 @@ public interface NestedCollectionRoutes<T, S, U> {
 		/**
 		 * Adds a route to a creator function that has four extra parameters.
 		 *
-		 * @param  creatorThrowableHexaFunction the creator function that adds
-		 *         the collection item
-		 * @param  batchCreatorThrowableHexaFunction the batch creator function
-		 * @param  aClass the class of the creator function's third parameter
-		 * @param  bClass the class of the creator function's fourth parameter
-		 * @param  cClass the class of the creator function's fifth parameter
-		 * @param  dClass the class of the creator function's sixth parameter
-		 * @param  hasNestedAddingPermissionFunction the permission function for
-		 *         this route
-		 * @param  formBuilderFunction the function that creates the form for
-		 *         this operation
-		 * @return the updated builder
+		 * @param      creatorThrowableHexaFunction the creator function that
+		 *             adds the collection item
+		 * @param      batchCreatorThrowableHexaFunction the batch creator
+		 *             function
+		 * @param      aClass the class of the creator function's third
+		 *             parameter
+		 * @param      bClass the class of the creator function's fourth
+		 *             parameter
+		 * @param      cClass the class of the creator function's fifth
+		 *             parameter
+		 * @param      dClass the class of the creator function's sixth
+		 *             parameter
+		 * @param      hasNestedAddingPermissionFunction the permission function
+		 *             for this route
+		 * @param      formBuilderFunction the function that creates the form
+		 *             for this operation
+		 * @return     the updated builder
+		 * @deprecated As of 1.9.0, use {@link
+		 *             com.liferay.apio.architect.annotation.Actions.Create}
+		 *             annotation instead
+		 * @review
 		 */
+		@Deprecated
 		public <A, B, C, D, R> Builder<T, S, U> addCreator(
 			ThrowableHexaFunction<U, R, A, B, C, D, T>
 				creatorThrowableHexaFunction,
@@ -199,41 +274,65 @@ public interface NestedCollectionRoutes<T, S, U> {
 		/**
 		 * Adds a route to a creator function that has three extra parameters.
 		 *
-		 * @param  creatorThrowablePentaFunction the creator function that adds
-		 *         the collection item
-		 * @param  aClass the class of the creator function's third parameter
-		 * @param  bClass the class of the creator function's fourth parameter
-		 * @param  cClass the class of the creator function's fifth parameter
-		 * @param  hasNestedAddingPermissionFunction the permission function for
-		 *         this route
-		 * @param  formBuilderFunction the function that creates the form for
-		 *         this operation
-		 * @return the updated builder
+		 * @param      creatorThrowablePentaFunction the creator function that
+		 *             adds the collection item
+		 * @param      aClass the class of the creator function's third
+		 *             parameter
+		 * @param      bClass the class of the creator function's fourth
+		 *             parameter
+		 * @param      cClass the class of the creator function's fifth
+		 *             parameter
+		 * @param      hasNestedAddingPermissionFunction the permission function
+		 *             for this route
+		 * @param      formBuilderFunction the function that creates the form
+		 *             for this operation
+		 * @return     the updated builder
+		 * @deprecated As of 1.9.0, use {@link
+		 *             com.liferay.apio.architect.annotation.Actions.Create}
+		 *             annotation instead
+		 * @review
 		 */
-		public <A, B, C, R> Builder<T, S, U> addCreator(
+		@Deprecated
+		public default <A, B, C, R> Builder<T, S, U> addCreator(
 			ThrowablePentaFunction<U, R, A, B, C, T>
 				creatorThrowablePentaFunction,
 			Class<A> aClass, Class<B> bClass, Class<C> cClass,
 			HasNestedAddingPermissionFunction<U>
 				hasNestedAddingPermissionFunction,
-			FormBuilderFunction<R> formBuilderFunction);
+			FormBuilderFunction<R> formBuilderFunction) {
+
+			return addCreator(
+				(u, r, a, b, c, ignored) -> creatorThrowablePentaFunction.apply(
+					u, r, a, b, c),
+				aClass, bClass, cClass, Void.class,
+				hasNestedAddingPermissionFunction, formBuilderFunction);
+		}
 
 		/**
 		 * Adds a route to a creator function that has three extra parameters.
 		 *
-		 * @param  creatorThrowablePentaFunction the creator function that adds
-		 *         the collection item
-		 * @param  batchCreatorThrowablePentaFunction the batch creator function
-		 * @param  aClass the class of the creator function's third parameter
-		 * @param  bClass the class of the creator function's fourth parameter
-		 * @param  cClass the class of the creator function's fifth parameter
-		 * @param  hasNestedAddingPermissionFunction the permission function for
-		 *         this route
-		 * @param  formBuilderFunction the function that creates the form for
-		 *         this operation
-		 * @return the updated builder
+		 * @param      creatorThrowablePentaFunction the creator function that
+		 *             adds the collection item
+		 * @param      batchCreatorThrowablePentaFunction the batch creator
+		 *             function
+		 * @param      aClass the class of the creator function's third
+		 *             parameter
+		 * @param      bClass the class of the creator function's fourth
+		 *             parameter
+		 * @param      cClass the class of the creator function's fifth
+		 *             parameter
+		 * @param      hasNestedAddingPermissionFunction the permission function
+		 *             for this route
+		 * @param      formBuilderFunction the function that creates the form
+		 *             for this operation
+		 * @return     the updated builder
+		 * @deprecated As of 1.9.0, use {@link
+		 *             com.liferay.apio.architect.annotation.Actions.Create}
+		 *             annotation instead
+		 * @review
 		 */
-		public <A, B, C, R> Builder<T, S, U> addCreator(
+		@Deprecated
+		public default <A, B, C, R> Builder<T, S, U> addCreator(
 			ThrowablePentaFunction<U, R, A, B, C, T>
 				creatorThrowablePentaFunction,
 			ThrowablePentaFunction<U, List<R>, A, B, C, List<S>>
@@ -241,116 +340,200 @@ public interface NestedCollectionRoutes<T, S, U> {
 			Class<A> aClass, Class<B> bClass, Class<C> cClass,
 			HasNestedAddingPermissionFunction<U>
 				hasNestedAddingPermissionFunction,
-			FormBuilderFunction<R> formBuilderFunction);
+			FormBuilderFunction<R> formBuilderFunction) {
+
+			return addCreator(
+				(u, r, a, b, c, ignored) -> creatorThrowablePentaFunction.apply(
+					u, r, a, b, c),
+				(u, l, a, b, c, ignored) ->
+					batchCreatorThrowablePentaFunction.apply(u, l, a, b, c),
+				aClass, bClass, cClass, Void.class,
+				hasNestedAddingPermissionFunction, formBuilderFunction);
+		}
 
 		/**
 		 * Adds a route to a creator function that has two extra parameters.
 		 *
-		 * @param  creatorThrowableTetraFunction the creator function that adds
-		 *         the collection item
-		 * @param  aClass the class of the creator function's third parameter
-		 * @param  bClass the class of the creator function's fourth parameter
-		 * @param  hasNestedAddingPermissionFunction the permission function for
-		 *         this route
-		 * @param  formBuilderFunction the function that creates the form for
-		 *         this operation
-		 * @return the updated builder
+		 * @param      creatorThrowableTetraFunction the creator function that
+		 *             adds the collection item
+		 * @param      aClass the class of the creator function's third
+		 *             parameter
+		 * @param      bClass the class of the creator function's fourth
+		 *             parameter
+		 * @param      hasNestedAddingPermissionFunction the permission function
+		 *             for this route
+		 * @param      formBuilderFunction the function that creates the form
+		 *             for this operation
+		 * @return     the updated builder
+		 * @deprecated As of 1.9.0, use {@link
+		 *             com.liferay.apio.architect.annotation.Actions.Create}
+		 *             annotation instead
+		 * @review
 		 */
-		public <A, B, R> Builder<T, S, U> addCreator(
+		@Deprecated
+		public default <A, B, R> Builder<T, S, U> addCreator(
 			ThrowableTetraFunction<U, R, A, B, T> creatorThrowableTetraFunction,
 			Class<A> aClass, Class<B> bClass,
 			HasNestedAddingPermissionFunction<U>
 				hasNestedAddingPermissionFunction,
-			FormBuilderFunction<R> formBuilderFunction);
+			FormBuilderFunction<R> formBuilderFunction) {
+
+			return addCreator(
+				(u, r, a, b, ignored) -> creatorThrowableTetraFunction.apply(
+					u, r, a, b),
+				aClass, bClass, Void.class, hasNestedAddingPermissionFunction,
+				formBuilderFunction);
+		}
 
 		/**
 		 * Adds a route to a creator function that has two extra parameters.
 		 *
-		 * @param  creatorThrowableTetraFunction the creator function that adds
-		 *         the collection item
-		 * @param  batchCreatorThrowableTetraFunction the batch creator function
-		 * @param  aClass the class of the creator function's third parameter
-		 * @param  bClass the class of the creator function's fourth parameter
-		 * @param  hasNestedAddingPermissionFunction the permission function for
-		 *         this route
-		 * @param  formBuilderFunction the function that creates the form for
-		 *         this operation
-		 * @return the updated builder
+		 * @param      creatorThrowableTetraFunction the creator function that
+		 *             adds the collection item
+		 * @param      batchCreatorThrowableTetraFunction the batch creator
+		 *             function
+		 * @param      aClass the class of the creator function's third
+		 *             parameter
+		 * @param      bClass the class of the creator function's fourth
+		 *             parameter
+		 * @param      hasNestedAddingPermissionFunction the permission function
+		 *             for this route
+		 * @param      formBuilderFunction the function that creates the form
+		 *             for this operation
+		 * @return     the updated builder
+		 * @deprecated As of 1.9.0, use {@link
+		 *             com.liferay.apio.architect.annotation.Actions.Create}
+		 *             annotation instead
+		 * @review
 		 */
-		public <A, B, R> Builder<T, S, U> addCreator(
+		@Deprecated
+		public default <A, B, R> Builder<T, S, U> addCreator(
 			ThrowableTetraFunction<U, R, A, B, T> creatorThrowableTetraFunction,
 			ThrowableTetraFunction<U, List<R>, A, B, List<S>>
 				batchCreatorThrowableTetraFunction,
 			Class<A> aClass, Class<B> bClass,
 			HasNestedAddingPermissionFunction<U>
 				hasNestedAddingPermissionFunction,
-			FormBuilderFunction<R> formBuilderFunction);
+			FormBuilderFunction<R> formBuilderFunction) {
+
+			return addCreator(
+				(u, r, a, b, ignored) -> creatorThrowableTetraFunction.apply(
+					u, r, a, b),
+				(u, l, a, b, ignored) ->
+					batchCreatorThrowableTetraFunction.apply(u, l, a, b),
+				aClass, bClass, Void.class, hasNestedAddingPermissionFunction,
+				formBuilderFunction);
+		}
 
 		/**
 		 * Adds a route to a creator function that has one extra parameter.
 		 *
-		 * @param  creatorThrowableTriFunction the creator function that adds
-		 *         the collection item
-		 * @param  aClass the class of the creator function's third parameter
-		 * @param  hasNestedAddingPermissionFunction the permission function for
-		 *         this route
-		 * @param  formBuilderFunction the function that creates the form for
-		 *         this operation
-		 * @return the updated builder
+		 * @param      creatorThrowableTriFunction the creator function that
+		 *             adds the collection item
+		 * @param      aClass the class of the creator function's third
+		 *             parameter
+		 * @param      hasNestedAddingPermissionFunction the permission function
+		 *             for this route
+		 * @param      formBuilderFunction the function that creates the form
+		 *             for this operation
+		 * @return     the updated builder
+		 * @deprecated As of 1.9.0, use {@link
+		 *             com.liferay.apio.architect.annotation.Actions.Create}
+		 *             annotation instead
+		 * @review
 		 */
-		public <A, R> Builder<T, S, U> addCreator(
+		@Deprecated
+		public default <A, R> Builder<T, S, U> addCreator(
 			ThrowableTriFunction<U, R, A, T> creatorThrowableTriFunction,
 			Class<A> aClass,
 			HasNestedAddingPermissionFunction<U>
 				hasNestedAddingPermissionFunction,
-			FormBuilderFunction<R> formBuilderFunction);
+			FormBuilderFunction<R> formBuilderFunction) {
+
+			return addCreator(
+				(u, r, a, ignored) -> creatorThrowableTriFunction.apply(
+					u, r, a),
+				aClass, Void.class, hasNestedAddingPermissionFunction,
+				formBuilderFunction);
+		}
 
 		/**
 		 * Adds a route to a creator function that has one extra parameter.
 		 *
-		 * @param  creatorThrowableTriFunction the creator function that adds
-		 *         the collection item
-		 * @param  batchCreatorThrowableTriFunction the batch creator function
-		 * @param  aClass the class of the creator function's third parameter
-		 * @param  hasNestedAddingPermissionFunction the permission function for
-		 *         this route
-		 * @param  formBuilderFunction the function that creates the form for
-		 *         this operation
-		 * @return the updated builder
+		 * @param      creatorThrowableTriFunction the creator function that
+		 *             adds the collection item
+		 * @param      batchCreatorThrowableTriFunction the batch creator
+		 *             function
+		 * @param      aClass the class of the creator function's third
+		 *             parameter
+		 * @param      hasNestedAddingPermissionFunction the permission function
+		 *             for this route
+		 * @param      formBuilderFunction the function that creates the form
+		 *             for this operation
+		 * @return     the updated builder
+		 * @deprecated As of 1.9.0, use {@link
+		 *             com.liferay.apio.architect.annotation.Actions.Create}
+		 *             annotation instead
+		 * @review
 		 */
-		public <A, R> Builder<T, S, U> addCreator(
+		@Deprecated
+		public default <A, R> Builder<T, S, U> addCreator(
 			ThrowableTriFunction<U, R, A, T> creatorThrowableTriFunction,
 			ThrowableTriFunction<U, List<R>, A, List<S>>
 				batchCreatorThrowableTriFunction,
 			Class<A> aClass,
 			HasNestedAddingPermissionFunction<U>
 				hasNestedAddingPermissionFunction,
-			FormBuilderFunction<R> formBuilderFunction);
+			FormBuilderFunction<R> formBuilderFunction) {
+
+			return addCreator(
+				(u, r, a, ignored) -> creatorThrowableTriFunction.apply(
+					u, r, a),
+				(u, l, a, ignored) -> batchCreatorThrowableTriFunction.apply(
+					u, l, a),
+				aClass, Void.class, hasNestedAddingPermissionFunction,
+				formBuilderFunction);
+		}
 
 		/**
 		 * Adds a route to a collection page function with none extra
 		 * parameters.
 		 *
-		 * @param  getterThrowableBiFunction the function that calculates the
-		 *         page
-		 * @return the updated builder
+		 * @param      getterThrowableBiFunction the function that calculates
+		 *             the page
+		 * @return     the updated builder
+		 * @deprecated As of 1.9.0, use {@link
+		 *             com.liferay.apio.architect.annotation.Actions.Retrieve}
+		 *             annotation instead
+		 * @review
 		 */
-		public Builder<T, S, U> addGetter(
+		@Deprecated
+		public default Builder<T, S, U> addGetter(
 			ThrowableBiFunction<Pagination, U, PageItems<T>>
-				getterThrowableBiFunction);
+				getterThrowableBiFunction) {
+
+			return addGetter(
+				(p, u, ignored) -> getterThrowableBiFunction.apply(p, u),
+				Void.class);
+		}
 
 		/**
 		 * Adds a route to a collection page function with four extra
 		 * parameters.
 		 *
-		 * @param  getterThrowableHexaFunction the function that calculates the
-		 *         page
-		 * @param  aClass the class of the page function's second parameter
-		 * @param  bClass the class of the page function's third parameter
-		 * @param  cClass the class of the page function's fourth parameter
-		 * @param  dClass the class of the page function's fifth parameter
-		 * @return the updated builder
+		 * @param      getterThrowableHexaFunction the function that calculates
+		 *             the page
+		 * @param      aClass the class of the page function's second parameter
+		 * @param      bClass the class of the page function's third parameter
+		 * @param      cClass the class of the page function's fourth parameter
+		 * @param      dClass the class of the page function's fifth parameter
+		 * @return     the updated builder
+		 * @deprecated As of 1.9.0, use {@link
+		 *             com.liferay.apio.architect.annotation.Actions.Retrieve}
+		 *             annotation instead
+		 * @review
 		 */
+		@Deprecated
 		public <A, B, C, D> Builder<T, S, U> addGetter(
 			ThrowableHexaFunction<Pagination, U, A, B, C, D, PageItems<T>>
 				getterThrowableHexaFunction,
@@ -360,51 +543,88 @@ public interface NestedCollectionRoutes<T, S, U> {
 		 * Adds a route to a collection page function with three extra
 		 * parameters.
 		 *
-		 * @param  getterThrowablePentaFunction the function that calculates the
-		 *         page
-		 * @param  aClass the class of the page function's second parameter
-		 * @param  bClass the class of the page function's third parameter
-		 * @param  cClass the class of the page function's fourth parameter
-		 * @return the updated builder
+		 * @param      getterThrowablePentaFunction the function that calculates
+		 *             the page
+		 * @param      aClass the class of the page function's second parameter
+		 * @param      bClass the class of the page function's third parameter
+		 * @param      cClass the class of the page function's fourth parameter
+		 * @return     the updated builder
+		 * @deprecated As of 1.9.0, use {@link
+		 *             com.liferay.apio.architect.annotation.Actions.Retrieve}
+		 *             annotation instead
+		 * @review
 		 */
-		public <A, B, C> Builder<T, S, U> addGetter(
+		@Deprecated
+		public default <A, B, C> Builder<T, S, U> addGetter(
 			ThrowablePentaFunction<Pagination, U, A, B, C, PageItems<T>>
 				getterThrowablePentaFunction,
-			Class<A> aClass, Class<B> bClass, Class<C> cClass);
+			Class<A> aClass, Class<B> bClass, Class<C> cClass) {
+
+			return addGetter(
+				(p, u, a, b, c, ignored) -> getterThrowablePentaFunction.apply(
+					p, u, a, b, c),
+				aClass, bClass, cClass, Void.class);
+		}
 
 		/**
 		 * Adds a route to a collection page function with two extra parameters.
 		 *
-		 * @param  getterThrowableTetraFunction the function that calculates the
-		 *         page
-		 * @param  aClass the class of the page function's second parameter
-		 * @param  bClass the class of the page function's third parameter
-		 * @return the updated builder
+		 * @param      getterThrowableTetraFunction the function that calculates
+		 *             the page
+		 * @param      aClass the class of the page function's second parameter
+		 * @param      bClass the class of the page function's third parameter
+		 * @return     the updated builder
+		 * @deprecated As of 1.9.0, use {@link
+		 *             com.liferay.apio.architect.annotation.Actions.Retrieve}
+		 *             annotation instead
+		 * @review
 		 */
-		public <A, B> Builder<T, S, U> addGetter(
+		@Deprecated
+		public default <A, B> Builder<T, S, U> addGetter(
 			ThrowableTetraFunction<Pagination, U, A, B, PageItems<T>>
 				getterThrowableTetraFunction,
-			Class<A> aClass, Class<B> bClass);
+			Class<A> aClass, Class<B> bClass) {
+
+			return addGetter(
+				(p, u, a, b, ignored) -> getterThrowableTetraFunction.apply(
+					p, u, a, b),
+				aClass, bClass, Void.class);
+		}
 
 		/**
 		 * Adds a route to a collection page function with one extra parameter.
 		 *
-		 * @param  getterThrowableTriFunction the function that calculates the
-		 *         page
-		 * @param  aClass the class of the page function's second parameter
-		 * @return the updated builder
+		 * @param      getterThrowableTriFunction the function that calculates
+		 *             the page
+		 * @param      aClass the class of the page function's second parameter
+		 * @return     the updated builder
+		 * @deprecated As of 1.9.0, use {@link
+		 *             com.liferay.apio.architect.annotation.Actions.Retrieve}
+		 *             annotation instead
+		 * @review
 		 */
-		public <A> Builder<T, S, U> addGetter(
+		@Deprecated
+		public default <A> Builder<T, S, U> addGetter(
 			ThrowableTriFunction<Pagination, U, A, PageItems<T>>
 				getterThrowableTriFunction,
-			Class<A> aClass);
+			Class<A> aClass) {
+
+			return addGetter(
+				(p, u, a, ignored) -> getterThrowableTriFunction.apply(p, u, a),
+				aClass, Void.class);
+		}
 
 		/**
 		 * Constructs the {@link NestedCollectionRoutes} instance with the
 		 * information provided to the builder.
 		 *
-		 * @return the {@code Routes} instance
+		 * @return     the {@code Routes} instance
+		 * @deprecated As of 1.9.0, use {@link
+		 *             com.liferay.apio.architect.annotation.Actions}
+		 *             annotations instead
+		 * @review
 		 */
+		@Deprecated
 		public NestedCollectionRoutes<T, S, U> build();
 
 	}

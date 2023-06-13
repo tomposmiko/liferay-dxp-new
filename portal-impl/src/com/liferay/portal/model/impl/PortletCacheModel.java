@@ -31,12 +31,12 @@ import java.io.ObjectOutput;
  * The cache model class for representing Portlet in entity cache.
  *
  * @author Brian Wing Shun Chan
- * @see Portlet
  * @generated
  */
 @ProviderType
-public class PortletCacheModel implements CacheModel<Portlet>, Externalizable,
-	MVCCModel {
+public class PortletCacheModel
+	implements CacheModel<Portlet>, Externalizable, MVCCModel {
+
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj) {
@@ -50,7 +50,8 @@ public class PortletCacheModel implements CacheModel<Portlet>, Externalizable,
 		PortletCacheModel portletCacheModel = (PortletCacheModel)obj;
 
 		if ((id == portletCacheModel.id) &&
-				(mvccVersion == portletCacheModel.mvccVersion)) {
+			(mvccVersion == portletCacheModel.mvccVersion)) {
+
 			return true;
 		}
 
@@ -138,8 +139,7 @@ public class PortletCacheModel implements CacheModel<Portlet>, Externalizable,
 	}
 
 	@Override
-	public void writeExternal(ObjectOutput objectOutput)
-		throws IOException {
+	public void writeExternal(ObjectOutput objectOutput) throws IOException {
 		objectOutput.writeLong(mvccVersion);
 
 		objectOutput.writeLong(id);
@@ -169,4 +169,5 @@ public class PortletCacheModel implements CacheModel<Portlet>, Externalizable,
 	public String portletId;
 	public String roles;
 	public boolean active;
+
 }

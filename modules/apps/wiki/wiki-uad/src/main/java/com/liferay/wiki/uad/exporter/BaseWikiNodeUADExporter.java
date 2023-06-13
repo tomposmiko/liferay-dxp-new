@@ -16,9 +16,7 @@ package com.liferay.wiki.uad.exporter;
 
 import com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery;
 import com.liferay.portal.kernel.util.StringBundler;
-
 import com.liferay.user.associated.data.exporter.DynamicQueryUADExporter;
-
 import com.liferay.wiki.model.WikiNode;
 import com.liferay.wiki.service.WikiNodeLocalService;
 import com.liferay.wiki.uad.constants.WikiUADConstants;
@@ -37,7 +35,9 @@ import org.osgi.service.component.annotations.Reference;
  * @author Brian Wing Shun Chan
  * @generated
  */
-public abstract class BaseWikiNodeUADExporter extends DynamicQueryUADExporter<WikiNode> {
+public abstract class BaseWikiNodeUADExporter
+	extends DynamicQueryUADExporter<WikiNode> {
+
 	@Override
 	public Class<WikiNode> getTypeClass() {
 		return WikiNode.class;
@@ -97,4 +97,5 @@ public abstract class BaseWikiNodeUADExporter extends DynamicQueryUADExporter<Wi
 
 	@Reference
 	protected WikiNodeLocalService wikiNodeLocalService;
+
 }

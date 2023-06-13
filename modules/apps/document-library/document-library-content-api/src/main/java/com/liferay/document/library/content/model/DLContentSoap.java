@@ -31,6 +31,7 @@ import java.util.List;
  */
 @ProviderType
 public class DLContentSoap implements Serializable {
+
 	public static DLContentSoap toSoapModel(DLContent model) {
 		DLContentSoap soapModel = new DLContentSoap();
 
@@ -74,7 +75,8 @@ public class DLContentSoap implements Serializable {
 	}
 
 	public static DLContentSoap[] toSoapModels(List<DLContent> models) {
-		List<DLContentSoap> soapModels = new ArrayList<DLContentSoap>(models.size());
+		List<DLContentSoap> soapModels = new ArrayList<DLContentSoap>(
+			models.size());
 
 		for (DLContent model : models) {
 			soapModels.add(toSoapModel(model));
@@ -166,4 +168,5 @@ public class DLContentSoap implements Serializable {
 	private String _version;
 	private Blob _data;
 	private long _size;
+
 }

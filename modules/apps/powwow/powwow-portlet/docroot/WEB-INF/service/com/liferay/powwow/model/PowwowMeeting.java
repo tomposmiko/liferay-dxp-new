@@ -25,20 +25,20 @@ import com.liferay.portal.kernel.util.Accessor;
  *
  * @author Shinn Lok
  * @see PowwowMeetingModel
- * @see com.liferay.powwow.model.impl.PowwowMeetingImpl
- * @see com.liferay.powwow.model.impl.PowwowMeetingModelImpl
  * @generated
  */
 @ImplementationClassName("com.liferay.powwow.model.impl.PowwowMeetingImpl")
 @ProviderType
-public interface PowwowMeeting extends PowwowMeetingModel, PersistedModel {
+public interface PowwowMeeting extends PersistedModel, PowwowMeetingModel {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
-	 * Never modify this interface directly. Add methods to {@link com.liferay.powwow.model.impl.PowwowMeetingImpl} and rerun ServiceBuilder to automatically copy the method declarations to this interface.
+	 * Never modify this interface directly. Add methods to <code>com.liferay.powwow.model.impl.PowwowMeetingImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
 	 */
-	public static final Accessor<PowwowMeeting, Long> POWWOW_MEETING_ID_ACCESSOR =
-		new Accessor<PowwowMeeting, Long>() {
+	public static final Accessor<PowwowMeeting, Long>
+		POWWOW_MEETING_ID_ACCESSOR = new Accessor<PowwowMeeting, Long>() {
+
 			@Override
 			public Long get(PowwowMeeting powwowMeeting) {
 				return powwowMeeting.getPowwowMeetingId();
@@ -53,7 +53,10 @@ public interface PowwowMeeting extends PowwowMeetingModel, PersistedModel {
 			public Class<PowwowMeeting> getTypeClass() {
 				return PowwowMeeting.class;
 			}
+
 		};
 
-	public java.util.Map<String, java.io.Serializable> getProviderTypeMetadataMap();
+	public java.util.Map<String, java.io.Serializable>
+		getProviderTypeMetadataMap();
+
 }

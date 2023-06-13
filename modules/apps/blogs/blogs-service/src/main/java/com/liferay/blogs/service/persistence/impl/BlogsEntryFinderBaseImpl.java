@@ -16,7 +16,6 @@ package com.liferay.blogs.service.persistence.impl;
 
 import com.liferay.blogs.model.BlogsEntry;
 import com.liferay.blogs.service.persistence.BlogsEntryPersistence;
-
 import com.liferay.portal.kernel.bean.BeanReference;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
@@ -33,18 +32,19 @@ import java.util.Set;
  * @generated
  */
 public class BlogsEntryFinderBaseImpl extends BasePersistenceImpl<BlogsEntry> {
+
 	public BlogsEntryFinderBaseImpl() {
 		setModelClass(BlogsEntry.class);
 
+		Map<String, String> dbColumnNames = new HashMap<String, String>();
+
+		dbColumnNames.put("uuid", "uuid_");
+
 		try {
 			Field field = BasePersistenceImpl.class.getDeclaredField(
-					"_dbColumnNames");
+				"_dbColumnNames");
 
 			field.setAccessible(true);
-
-			Map<String, String> dbColumnNames = new HashMap<String, String>();
-
-			dbColumnNames.put("uuid", "uuid_");
 
 			field.set(this, dbColumnNames);
 		}
@@ -76,10 +76,14 @@ public class BlogsEntryFinderBaseImpl extends BasePersistenceImpl<BlogsEntry> {
 	 */
 	public void setBlogsEntryPersistence(
 		BlogsEntryPersistence blogsEntryPersistence) {
+
 		this.blogsEntryPersistence = blogsEntryPersistence;
 	}
 
 	@BeanReference(type = BlogsEntryPersistence.class)
 	protected BlogsEntryPersistence blogsEntryPersistence;
-	private static final Log _log = LogFactoryUtil.getLog(BlogsEntryFinderBaseImpl.class);
+
+	private static final Log _log = LogFactoryUtil.getLog(
+		BlogsEntryFinderBaseImpl.class);
+
 }

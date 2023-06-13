@@ -17,7 +17,6 @@ package com.liferay.friendly.url.model.impl;
 import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.friendly.url.model.FriendlyURLEntry;
-
 import com.liferay.portal.kernel.model.CacheModel;
 import com.liferay.portal.kernel.model.MVCCModel;
 import com.liferay.portal.kernel.util.HashUtil;
@@ -34,12 +33,12 @@ import java.util.Date;
  * The cache model class for representing FriendlyURLEntry in entity cache.
  *
  * @author Brian Wing Shun Chan
- * @see FriendlyURLEntry
  * @generated
  */
 @ProviderType
-public class FriendlyURLEntryCacheModel implements CacheModel<FriendlyURLEntry>,
-	Externalizable, MVCCModel {
+public class FriendlyURLEntryCacheModel
+	implements CacheModel<FriendlyURLEntry>, Externalizable, MVCCModel {
+
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj) {
@@ -50,10 +49,13 @@ public class FriendlyURLEntryCacheModel implements CacheModel<FriendlyURLEntry>,
 			return false;
 		}
 
-		FriendlyURLEntryCacheModel friendlyURLEntryCacheModel = (FriendlyURLEntryCacheModel)obj;
+		FriendlyURLEntryCacheModel friendlyURLEntryCacheModel =
+			(FriendlyURLEntryCacheModel)obj;
 
-		if ((friendlyURLEntryId == friendlyURLEntryCacheModel.friendlyURLEntryId) &&
-				(mvccVersion == friendlyURLEntryCacheModel.mvccVersion)) {
+		if ((friendlyURLEntryId ==
+				friendlyURLEntryCacheModel.friendlyURLEntryId) &&
+			(mvccVersion == friendlyURLEntryCacheModel.mvccVersion)) {
+
 			return true;
 		}
 
@@ -172,8 +174,7 @@ public class FriendlyURLEntryCacheModel implements CacheModel<FriendlyURLEntry>,
 	}
 
 	@Override
-	public void writeExternal(ObjectOutput objectOutput)
-		throws IOException {
+	public void writeExternal(ObjectOutput objectOutput) throws IOException {
 		objectOutput.writeLong(mvccVersion);
 
 		if (uuid == null) {
@@ -213,4 +214,5 @@ public class FriendlyURLEntryCacheModel implements CacheModel<FriendlyURLEntry>,
 	public long modifiedDate;
 	public long classNameId;
 	public long classPK;
+
 }

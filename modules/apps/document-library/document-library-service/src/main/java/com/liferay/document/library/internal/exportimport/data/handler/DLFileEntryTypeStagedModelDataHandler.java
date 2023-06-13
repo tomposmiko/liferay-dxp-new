@@ -46,7 +46,7 @@ import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
 /**
- * @author Mate Thurzo
+ * @author Máté Thurzó
  */
 @Component(immediate = true, service = StagedModelDataHandler.class)
 public class DLFileEntryTypeStagedModelDataHandler
@@ -391,12 +391,17 @@ public class DLFileEntryTypeStagedModelDataHandler
 
 		Group group = _groupLocalService.fetchGroup(groupId);
 
+		if (group == null) {
+			return fetchExistingFileEntryType(
+				uuid, groupId, fileEntryTypeKey, preloaded);
+		}
+
 		long companyId = group.getCompanyId();
 
 		while (group != null) {
 			DLFileEntryType existingDLFileEntryType =
 				fetchExistingFileEntryType(
-					uuid, groupId, fileEntryTypeKey, preloaded);
+					uuid, group.getGroupId(), fileEntryTypeKey, preloaded);
 
 			if (existingDLFileEntryType != null) {
 				return existingDLFileEntryType;

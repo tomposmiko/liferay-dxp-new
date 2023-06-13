@@ -18,44 +18,78 @@
 
 <aui:script use="liferay-ddm-form-builder, liferay-ddm-form-builder-fieldset, liferay-ddm-form-builder-rule-builder">
 
-	Liferay.namespace('DDM').Settings = {
-		evaluatorURL: '<%= HtmlUtil.escapeJS(evaluatorURL) %>',
-		fieldSetDefinitionURL: '<%= HtmlUtil.escapeJS(fieldSetDefinitionURL) %>',
-		functionsMetadata: JSON.parse('<%= HtmlUtil.escapeJS(functionsMetadata) %>'),
-		getDataProviderInstancesURL: '<%= HtmlUtil.escapeJS(dataProviderInstancesURL) %>',
-		getDataProviderParametersSettingsURL: '<%= HtmlUtil.escapeJS(dataProviderInstanceParameterSettingsURL) %>',
-		getFieldTypeSettingFormContextURL: '<%= HtmlUtil.escapeJS(fieldSettingsDDMFormContextURL) %>',
-		getFunctionsURL: '<%= HtmlUtil.escapeJS(functionsURL) %>',
-		getRolesURL: '<%= HtmlUtil.escapeJS(rolesURL) %>',
-		portletNamespace: '<%= HtmlUtil.escapeJS(refererPortletNamespace) %>'
-	};
+	function initTagLib() {
+		Liferay.namespace('DDM').Settings = {
+			evaluatorURL: '<%= HtmlUtil.escapeJS(evaluatorURL) %>',
+			fieldSetDefinitionURL: '<%= HtmlUtil.escapeJS(fieldSetDefinitionURL) %>',
+			functionsMetadata: JSON.parse('<%= HtmlUtil.escapeJS(functionsMetadata) %>'),
+			getDataProviderInstancesURL: '<%= HtmlUtil.escapeJS(dataProviderInstancesURL) %>',
+			getDataProviderParametersSettingsURL: '<%= HtmlUtil.escapeJS(dataProviderInstanceParameterSettingsURL) %>',
+			getFieldTypeSettingFormContextURL: '<%= HtmlUtil.escapeJS(fieldSettingsDDMFormContextURL) %>',
+			getFunctionsURL: '<%= HtmlUtil.escapeJS(functionsURL) %>',
+			getRolesURL: '<%= HtmlUtil.escapeJS(rolesURL) %>',
+			portletNamespace: '<%= HtmlUtil.escapeJS(refererPortletNamespace) %>'
+		};
 
-	Liferay.DDM.FieldSets.register(<%= fieldSets %>);
+		Liferay.DDM.FieldSets.register(<%= fieldSets %>);
 
-	Liferay.component(
-		'<%= HtmlUtil.escapeJS(refererPortletNamespace) %>formBuilder',
-		function() {
-			return new Liferay.DDM.FormBuilder(
-				{
-					context: JSON.parse('<%= HtmlUtil.escapeJS(formBuilderContext) %>'),
-					defaultLanguageId: '<%= HtmlUtil.escapeJS(defaultLanguageId) %>',
-					editingLanguageId: '<%= HtmlUtil.escapeJS(editingLanguageId) %>',
-					showPagination: <%= showPagination %>
+		Liferay.component(
+			'<%= HtmlUtil.escapeJS(refererPortletNamespace) %>formBuilder',
+			function() {
+				return new Liferay.DDM.FormBuilder(
+					{
+						context: JSON.parse('<%= HtmlUtil.escapeJS(formBuilderContext) %>'),
+						defaultLanguageId: '<%= HtmlUtil.escapeJS(defaultLanguageId) %>',
+						editingLanguageId: '<%= HtmlUtil.escapeJS(editingLanguageId) %>',
+						showPagination: <%= showPagination %>
+					}
+				);
+			}
+		);
+
+		Liferay.component(
+			'<%= HtmlUtil.escapeJS(refererPortletNamespace) %>ruleBuilder',
+			function() {
+				return new Liferay.DDM.FormBuilderRuleBuilder(
+					{
+						formBuilder: Liferay.component('<%= HtmlUtil.escapeJS(refererPortletNamespace) %>formBuilder'),
+						rules: JSON.parse('<%= HtmlUtil.escapeJS(serializedDDMFormRules) %>'),
+						visible: false
+					}
+				);
+			}
+		);
+	}
+
+	if (Liferay.Loader.version().indexOf('3.') === 0) {
+		var modules = Object.keys(Liferay.MODULES);
+
+		var dependencies = modules.filter(
+			function(item) {
+				return /dynamic-data-mapping-form-builder.*\.es/.test(item);
+			}
+		);
+
+		Liferay.Loader.require.apply(
+			Liferay.Loader,
+			dependencies.concat(initTagLib)
+		);
+	}
+	else {
+		fetch(Liferay.MODULES_PATH + '?query=' + encodeURI('dynamic-data-mapping-form-builder.*\\.es'))
+			.then(
+				function(response) {
+					return response.json();
+				}
+			).then(
+				function(modules) {
+					var dependencies = Object.keys(modules);
+
+					Liferay.Loader.require.apply(
+						Liferay.Loader,
+						dependencies.concat(initTagLib)
+					);
 				}
 			);
-		}
-	);
-
-	Liferay.component(
-		'<%= HtmlUtil.escapeJS(refererPortletNamespace) %>ruleBuilder',
-		function() {
-			return new Liferay.DDM.FormBuilderRuleBuilder(
-				{
-					formBuilder: Liferay.component('<%= HtmlUtil.escapeJS(refererPortletNamespace) %>formBuilder'),
-					rules: JSON.parse('<%= HtmlUtil.escapeJS(serializedDDMFormRules) %>'),
-					visible: false
-				}
-			);
-		}
-	);
+	}
 </aui:script>

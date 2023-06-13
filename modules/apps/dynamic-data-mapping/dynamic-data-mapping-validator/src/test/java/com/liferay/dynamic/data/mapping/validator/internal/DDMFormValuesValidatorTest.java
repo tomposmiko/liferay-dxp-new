@@ -35,23 +35,20 @@ import com.liferay.dynamic.data.mapping.validator.DDMFormValuesValidationExcepti
 import com.liferay.dynamic.data.mapping.validator.DDMFormValuesValidationException.RequiredValue;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.json.JSONFactoryImpl;
+import com.liferay.portal.kernel.test.ReflectionTestUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
+import com.liferay.portal.kernel.util.ProxyFactory;
 import com.liferay.portal.kernel.util.StringUtil;
 
 import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.modules.junit4.PowerMockRunner;
 
 /**
  * @author Marcellus Tavares
  */
-@RunWith(PowerMockRunner.class)
-public class DDMFormValuesValidatorTest extends PowerMockito {
+public class DDMFormValuesValidatorTest {
 
 	@Before
 	public void setUp() throws Exception {
@@ -767,12 +764,10 @@ public class DDMFormValuesValidatorTest extends PowerMockito {
 
 		_ddmFormValuesValidatorImpl.setJSONFactory(new JSONFactoryImpl());
 
-		field(
-			DDMFormValuesValidatorImpl.class, "_ddmFormFieldTypeServicesTracker"
-		).set(
-			_ddmFormValuesValidatorImpl,
-			mock(DDMFormFieldTypeServicesTracker.class)
-		);
+		ReflectionTestUtil.setFieldValue(
+			_ddmFormValuesValidatorImpl, "_ddmFormFieldTypeServicesTracker",
+			ProxyFactory.newDummyInstance(
+				DDMFormFieldTypeServicesTracker.class));
 	}
 
 	private final DDMFormValuesValidatorImpl _ddmFormValuesValidatorImpl =

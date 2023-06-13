@@ -18,11 +18,12 @@ import static javax.ws.rs.core.Variant.VariantListBuilder.newInstance;
 
 import com.liferay.apio.architect.documentation.contributor.CustomDocumentation;
 import com.liferay.apio.architect.identifier.Identifier;
+import com.liferay.apio.architect.internal.action.ActionSemantics;
+import com.liferay.apio.architect.internal.annotation.representor.processor.ParsedType;
 import com.liferay.apio.architect.internal.message.json.BatchResultMessageMapper;
 import com.liferay.apio.architect.internal.message.json.DocumentationMessageMapper;
 import com.liferay.apio.architect.internal.message.json.EntryPointMessageMapper;
 import com.liferay.apio.architect.internal.message.json.ErrorMessageMapper;
-import com.liferay.apio.architect.internal.message.json.FormMessageMapper;
 import com.liferay.apio.architect.internal.message.json.PageMessageMapper;
 import com.liferay.apio.architect.internal.message.json.SingleModelMessageMapper;
 import com.liferay.apio.architect.internal.unsafe.Unsafe;
@@ -34,7 +35,6 @@ import com.liferay.apio.architect.routes.NestedCollectionRoutes;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -64,24 +64,49 @@ public class ManagerCache {
 	public static final ManagerCache INSTANCE = new ManagerCache();
 
 	/**
+	 * Adds action semantics.
+	 *
+	 * @param actionSemantics the action semantics
+	 */
+	public void addActionSemantics(ActionSemantics actionSemantics) {
+		if (_actionSemantics == null) {
+			_actionSemantics = new ArrayList<>();
+		}
+
+		_actionSemantics.add(actionSemantics);
+	}
+
+	/**
 	 * Clears the cache.
 	 */
 	public void clear() {
+		_actionSemantics = null;
 		_collectionRoutes = null;
 		_documentationMessageMappers = null;
 		_entryPointMessageMappers = null;
 		_errorMessageMappers = null;
-		_formMessageMappers = null;
 		_identifierClasses = null;
+		_reusableIdentifierClasses = null;
 		_itemRoutes = null;
 		_names = null;
 		_nestedCollectionRoutes = null;
 		_pageMessageMappers = null;
+		_parsedTypes = null;
 		_batchResultMessageMappers = null;
 		_representors = null;
 		_reusableNestedCollectionRoutes = null;
-		_rootResourceNames = null;
+		_rootResourceNameSdks = null;
 		_singleModelMessageMappers = null;
+	}
+
+	public List<ActionSemantics> getActionSemantics(
+		EmptyFunction computeEmptyFunction) {
+
+		if (_actionSemantics == null) {
+			computeEmptyFunction.invoke();
+		}
+
+		return _actionSemantics;
 	}
 
 	/**
@@ -116,30 +141,6 @@ public class ManagerCache {
 		}
 
 		return _collectionRoutes;
-	}
-
-	/**
-	 * Returns the collection routes for the collection resource's name.
-	 *
-	 * @param  name the collection resource's name
-	 * @param  computeEmptyFunction the function that can be called to compute
-	 *         the data
-	 * @return the collection routes
-	 */
-	public <T, S> Optional<CollectionRoutes<T, S>> getCollectionRoutesOptional(
-		String name, EmptyFunction computeEmptyFunction) {
-
-		if (_collectionRoutes == null) {
-			computeEmptyFunction.invoke();
-		}
-
-		return Optional.ofNullable(
-			_collectionRoutes
-		).map(
-			map -> map.get(name)
-		).map(
-			Unsafe::unsafeCast
-		);
 	}
 
 	public CustomDocumentation getDocumentationContribution(
@@ -223,29 +224,6 @@ public class ManagerCache {
 	}
 
 	/**
-	 * Returns the form message mapper, if present, for the current request;
-	 * {@code Optional#empty()} otherwise.
-	 *
-	 * @param  request the current request
-	 * @param  computeEmptyFunction the function that can be called to compute
-	 *         the data
-	 * @return the form message mapper, if present; {@code Optional#empty()}
-	 *         otherwise
-	 */
-	public Optional<FormMessageMapper> getFormMessageMapperOptional(
-		Request request, EmptyFunction computeEmptyFunction) {
-
-		if (_formMessageMappers == null) {
-			computeEmptyFunction.invoke();
-		}
-
-		Optional<FormMessageMapper> optional = _getMessageMapperOptional(
-			request, _formMessageMappers);
-
-		return optional.map(Unsafe::unsafeCast);
-	}
-
-	/**
 	 * Returns the resource name's identifier class.
 	 *
 	 * @param  name the resource name
@@ -277,30 +255,6 @@ public class ManagerCache {
 		}
 
 		return _itemRoutes;
-	}
-
-	/**
-	 * Returns the item routes for the item resource's name.
-	 *
-	 * @param  name the item resource's name
-	 * @param  computeEmptyFunction the function that can be called to compute
-	 *         the data
-	 * @return the item routes
-	 */
-	public <T, S> Optional<ItemRoutes<T, S>> getItemRoutesOptional(
-		String name, EmptyFunction computeEmptyFunction) {
-
-		if (_itemRoutes == null) {
-			computeEmptyFunction.invoke();
-		}
-
-		return Optional.ofNullable(
-			_itemRoutes
-		).map(
-			map -> map.get(name)
-		).map(
-			Unsafe::unsafeCast
-		);
 	}
 
 	/**
@@ -348,34 +302,6 @@ public class ManagerCache {
 	}
 
 	/**
-	 * Returns the nested collection routes for the nested collection resource's
-	 * name.
-	 *
-	 * @param  name the parent resource's name
-	 * @param  nestedName the nested collection resource's name
-	 * @param  computeEmptyFunction the function that can be called to compute
-	 *         the data
-	 * @return the nested collection routes
-	 */
-	public <T, S, U> Optional<NestedCollectionRoutes<T, S, U>>
-		getNestedCollectionRoutesOptional(
-			String name, String nestedName,
-			EmptyFunction computeEmptyFunction) {
-
-		if (_nestedCollectionRoutes == null) {
-			computeEmptyFunction.invoke();
-		}
-
-		return Optional.ofNullable(
-			_nestedCollectionRoutes
-		).map(
-			map -> map.get(name + "-" + nestedName)
-		).map(
-			Unsafe::unsafeCast
-		);
-	}
-
-	/**
 	 * Returns the page message mapper, if present, for the current request;
 	 * {@code Optional#empty()} otherwise.
 	 *
@@ -396,6 +322,24 @@ public class ManagerCache {
 			request, _pageMessageMappers);
 
 		return optional.map(Unsafe::unsafeCast);
+	}
+
+	/**
+	 * Returns the parsed types.
+	 *
+	 * @param  computeEmptyFunction the function that can be called to compute
+	 *         the data
+	 * @return the parsed type
+	 * @review
+	 */
+	public Map<String, ParsedType> getParsedTypesMap(
+		EmptyFunction computeEmptyFunction) {
+
+		if (_parsedTypes == null) {
+			computeEmptyFunction.invoke();
+		}
+
+		return _parsedTypes;
 	}
 
 	public Map<String, Representor> getRepresentorMap(
@@ -443,50 +387,13 @@ public class ManagerCache {
 		return _reusableNestedCollectionRoutes;
 	}
 
-	/**
-	 * Returns the nested collection routes for the reusable nested collection
-	 * resource's name.
-	 *
-	 * @param  name the reusable nested collection resource's name
-	 * @param  computeEmptyFunction the function that can be called to compute
-	 *         the data
-	 * @return the nested collection routes
-	 */
-	public Optional<NestedCollectionRoutes>
-		getReusableNestedCollectionRoutesOptional(
-			String name, EmptyFunction computeEmptyFunction) {
-
-		if (_reusableNestedCollectionRoutes == null) {
-			computeEmptyFunction.invoke();
-		}
-
+	public Optional<Class<?>> getReusableIdentifierClassOptional(String name) {
 		return Optional.ofNullable(
-			_reusableNestedCollectionRoutes
+			_reusableIdentifierClasses
 		).map(
 			map -> map.get(name)
 		).map(
 			Unsafe::unsafeCast
-		);
-	}
-
-	/**
-	 * Returns a list containing the names of the root resources with routes.
-	 *
-	 * @param  computeEmptyFunction the function that can be called to compute
-	 *         the data
-	 * @return the list of root resources
-	 */
-	public List<String> getRootResourceNames(
-		EmptyFunction computeEmptyFunction) {
-
-		if (_rootResourceNames == null) {
-			computeEmptyFunction.invoke();
-		}
-
-		return Optional.ofNullable(
-			_rootResourceNames
-		).orElseGet(
-			Collections::emptyList
 		);
 	}
 
@@ -603,22 +510,6 @@ public class ManagerCache {
 	}
 
 	/**
-	 * Adds a form message mapper.
-	 *
-	 * @param mediaType the media type
-	 * @param formMessageMapper the form message mapper
-	 */
-	public void putFormMessageMapper(
-		MediaType mediaType, FormMessageMapper formMessageMapper) {
-
-		if (_formMessageMappers == null) {
-			_formMessageMappers = new HashMap<>();
-		}
-
-		_formMessageMappers.put(mediaType, formMessageMapper);
-	}
-
-	/**
 	 * Adds an identifier class.
 	 *
 	 * @param key the key
@@ -695,6 +586,21 @@ public class ManagerCache {
 	}
 
 	/**
+	 * Adds a parsed type.
+	 *
+	 * @param  key the key
+	 * @param  parsedType the parsed type
+	 * @review
+	 */
+	public void putParsedType(String key, ParsedType parsedType) {
+		if (_parsedTypes == null) {
+			_parsedTypes = new HashMap<>();
+		}
+
+		_parsedTypes.put(key, parsedType);
+	}
+
+	/**
 	 * Adds a representor.
 	 *
 	 * @param key the key
@@ -706,6 +612,16 @@ public class ManagerCache {
 		}
 
 		_representors.put(key, representor);
+	}
+
+	public void putReusableIdentifierClass(
+		String key, Class<?> identifierClass) {
+
+		if (_reusableIdentifierClasses == null) {
+			_reusableIdentifierClasses = new HashMap<>();
+		}
+
+		_reusableIdentifierClasses.put(key, identifierClass);
 	}
 
 	/**
@@ -729,14 +645,15 @@ public class ManagerCache {
 	/**
 	 * Adds a root resource name.
 	 *
-	 * @param rootResourceName the root resource name
+	 * @param  rootResourceNameSdk the root resource name
+	 * @review
 	 */
-	public void putRootResourceName(String rootResourceName) {
-		if (_rootResourceNames == null) {
-			_rootResourceNames = new ArrayList<>();
+	public void putRootResourceNameSdk(String rootResourceNameSdk) {
+		if (_rootResourceNameSdks == null) {
+			_rootResourceNameSdks = new ArrayList<>();
 		}
 
-		_rootResourceNames.add(rootResourceName);
+		_rootResourceNameSdks.add(rootResourceNameSdk);
 	}
 
 	/**
@@ -804,9 +721,10 @@ public class ManagerCache {
 		return variantListBuilder.mediaTypes(mediaTypes);
 	}
 
-	private static final MediaType _MEDIA_TYPE = MediaType.valueOf(
-		"application/hal+json");
+	private static final MediaType _MEDIA_TYPE = new MediaType(
+		"application", "hal+json");
 
+	private List<ActionSemantics> _actionSemantics;
 	private Map<MediaType, BatchResultMessageMapper> _batchResultMessageMappers;
 	private Map<String, CollectionRoutes> _collectionRoutes;
 	private CustomDocumentation _customDocumentation;
@@ -814,15 +732,16 @@ public class ManagerCache {
 		_documentationMessageMappers;
 	private Map<MediaType, EntryPointMessageMapper> _entryPointMessageMappers;
 	private Map<MediaType, ErrorMessageMapper> _errorMessageMappers;
-	private Map<MediaType, FormMessageMapper> _formMessageMappers;
 	private Map<String, Class<Identifier>> _identifierClasses;
 	private Map<String, ItemRoutes> _itemRoutes;
 	private Map<String, String> _names;
 	private Map<String, NestedCollectionRoutes> _nestedCollectionRoutes;
 	private Map<MediaType, PageMessageMapper> _pageMessageMappers;
+	private Map<String, ParsedType> _parsedTypes;
 	private Map<String, Representor> _representors;
+	private Map<String, Class<?>> _reusableIdentifierClasses;
 	private Map<String, NestedCollectionRoutes> _reusableNestedCollectionRoutes;
-	private List<String> _rootResourceNames;
+	private List<String> _rootResourceNameSdks;
 	private Map<MediaType, SingleModelMessageMapper> _singleModelMessageMappers;
 
 }

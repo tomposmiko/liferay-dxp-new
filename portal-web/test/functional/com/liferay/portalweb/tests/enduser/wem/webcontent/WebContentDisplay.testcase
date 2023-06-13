@@ -749,7 +749,7 @@ definition {
 		WebContent.addExistingRelatedAssetCP(
 			assetTitle = "Web Content Title 2",
 			assetType = "Basic Web Content",
-			siteName = "Liferay",
+			siteName = "Test Site Name",
 			webContentTitle = "Web Content Title 1"
 		);
 
@@ -1083,7 +1083,10 @@ definition {
 			portlet = "Web Content"
 		);
 
-		WebContent.deleteCP(webContentTitle = "WC WebContent Title");
+		WebContent.deleteCP(
+			siteURLKey = "test-site-name",
+			webContentTitle = "WC WebContent Title"
+		);
 
 		Navigator.gotoSitePage(
 			pageName = "Web Content Display Page",

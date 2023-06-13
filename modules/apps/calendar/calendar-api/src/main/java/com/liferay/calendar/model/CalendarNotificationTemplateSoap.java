@@ -26,17 +26,20 @@ import java.util.List;
  * This class is used by SOAP remote services, specifically {@link com.liferay.calendar.service.http.CalendarNotificationTemplateServiceSoap}.
  *
  * @author Eduardo Lundgren
- * @see com.liferay.calendar.service.http.CalendarNotificationTemplateServiceSoap
  * @generated
  */
 @ProviderType
 public class CalendarNotificationTemplateSoap implements Serializable {
+
 	public static CalendarNotificationTemplateSoap toSoapModel(
 		CalendarNotificationTemplate model) {
-		CalendarNotificationTemplateSoap soapModel = new CalendarNotificationTemplateSoap();
+
+		CalendarNotificationTemplateSoap soapModel =
+			new CalendarNotificationTemplateSoap();
 
 		soapModel.setUuid(model.getUuid());
-		soapModel.setCalendarNotificationTemplateId(model.getCalendarNotificationTemplateId());
+		soapModel.setCalendarNotificationTemplateId(
+			model.getCalendarNotificationTemplateId());
 		soapModel.setGroupId(model.getGroupId());
 		soapModel.setCompanyId(model.getCompanyId());
 		soapModel.setUserId(model.getUserId());
@@ -45,8 +48,10 @@ public class CalendarNotificationTemplateSoap implements Serializable {
 		soapModel.setModifiedDate(model.getModifiedDate());
 		soapModel.setCalendarId(model.getCalendarId());
 		soapModel.setNotificationType(model.getNotificationType());
-		soapModel.setNotificationTypeSettings(model.getNotificationTypeSettings());
-		soapModel.setNotificationTemplateType(model.getNotificationTemplateType());
+		soapModel.setNotificationTypeSettings(
+			model.getNotificationTypeSettings());
+		soapModel.setNotificationTemplateType(
+			model.getNotificationTemplateType());
 		soapModel.setSubject(model.getSubject());
 		soapModel.setBody(model.getBody());
 		soapModel.setLastPublishDate(model.getLastPublishDate());
@@ -56,7 +61,9 @@ public class CalendarNotificationTemplateSoap implements Serializable {
 
 	public static CalendarNotificationTemplateSoap[] toSoapModels(
 		CalendarNotificationTemplate[] models) {
-		CalendarNotificationTemplateSoap[] soapModels = new CalendarNotificationTemplateSoap[models.length];
+
+		CalendarNotificationTemplateSoap[] soapModels =
+			new CalendarNotificationTemplateSoap[models.length];
 
 		for (int i = 0; i < models.length; i++) {
 			soapModels[i] = toSoapModel(models[i]);
@@ -67,10 +74,12 @@ public class CalendarNotificationTemplateSoap implements Serializable {
 
 	public static CalendarNotificationTemplateSoap[][] toSoapModels(
 		CalendarNotificationTemplate[][] models) {
+
 		CalendarNotificationTemplateSoap[][] soapModels = null;
 
 		if (models.length > 0) {
-			soapModels = new CalendarNotificationTemplateSoap[models.length][models[0].length];
+			soapModels = new CalendarNotificationTemplateSoap
+				[models.length][models[0].length];
 		}
 		else {
 			soapModels = new CalendarNotificationTemplateSoap[0][0];
@@ -85,13 +94,16 @@ public class CalendarNotificationTemplateSoap implements Serializable {
 
 	public static CalendarNotificationTemplateSoap[] toSoapModels(
 		List<CalendarNotificationTemplate> models) {
-		List<CalendarNotificationTemplateSoap> soapModels = new ArrayList<CalendarNotificationTemplateSoap>(models.size());
+
+		List<CalendarNotificationTemplateSoap> soapModels =
+			new ArrayList<CalendarNotificationTemplateSoap>(models.size());
 
 		for (CalendarNotificationTemplate model : models) {
 			soapModels.add(toSoapModel(model));
 		}
 
-		return soapModels.toArray(new CalendarNotificationTemplateSoap[soapModels.size()]);
+		return soapModels.toArray(
+			new CalendarNotificationTemplateSoap[soapModels.size()]);
 	}
 
 	public CalendarNotificationTemplateSoap() {
@@ -119,6 +131,7 @@ public class CalendarNotificationTemplateSoap implements Serializable {
 
 	public void setCalendarNotificationTemplateId(
 		long calendarNotificationTemplateId) {
+
 		_calendarNotificationTemplateId = calendarNotificationTemplateId;
 	}
 
@@ -241,4 +254,5 @@ public class CalendarNotificationTemplateSoap implements Serializable {
 	private String _subject;
 	private String _body;
 	private Date _lastPublishDate;
+
 }

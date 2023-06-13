@@ -24,20 +24,20 @@ import com.liferay.portal.kernel.util.Accessor;
  *
  * @author Brian Wing Shun Chan
  * @see PasswordTrackerModel
- * @see com.liferay.portal.model.impl.PasswordTrackerImpl
- * @see com.liferay.portal.model.impl.PasswordTrackerModelImpl
  * @generated
  */
 @ImplementationClassName("com.liferay.portal.model.impl.PasswordTrackerImpl")
 @ProviderType
 public interface PasswordTracker extends PasswordTrackerModel, PersistedModel {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
-	 * Never modify this interface directly. Add methods to {@link com.liferay.portal.model.impl.PasswordTrackerImpl} and rerun ServiceBuilder to automatically copy the method declarations to this interface.
+	 * Never modify this interface directly. Add methods to <code>com.liferay.portal.model.impl.PasswordTrackerImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
 	 */
-	public static final Accessor<PasswordTracker, Long> PASSWORD_TRACKER_ID_ACCESSOR =
-		new Accessor<PasswordTracker, Long>() {
+	public static final Accessor<PasswordTracker, Long>
+		PASSWORD_TRACKER_ID_ACCESSOR = new Accessor<PasswordTracker, Long>() {
+
 			@Override
 			public Long get(PasswordTracker passwordTracker) {
 				return passwordTracker.getPasswordTrackerId();
@@ -52,5 +52,7 @@ public interface PasswordTracker extends PasswordTrackerModel, PersistedModel {
 			public Class<PasswordTracker> getTypeClass() {
 				return PasswordTracker.class;
 			}
+
 		};
+
 }

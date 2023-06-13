@@ -14,14 +14,15 @@
 
 package com.liferay.apio.architect.internal.message.json.ld;
 
+import static java.lang.String.join;
+
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 
-import com.liferay.apio.architect.internal.operation.BatchCreateOperation;
-import com.liferay.apio.architect.internal.operation.CreateOperation;
-import com.liferay.apio.architect.internal.operation.DeleteOperation;
-import com.liferay.apio.architect.internal.operation.UpdateOperation;
-import com.liferay.apio.architect.operation.Operation;
+import com.liferay.apio.architect.resource.Resource;
+import com.liferay.apio.architect.resource.Resource.GenericParent;
+import com.liferay.apio.architect.resource.Resource.Item;
+import com.liferay.apio.architect.resource.Resource.Nested;
 
 import java.util.List;
 
@@ -37,29 +38,55 @@ import java.util.List;
 public class JSONLDMessageMapperUtil {
 
 	/**
-	 * Return the list of {@link Operation} types.
+	 * Returns an action's ID.
 	 *
-	 * @param  operation the operation
-	 * @return the list
+	 * @param  resource the action's resource
+	 * @param  actionName the action's name
+	 * @return the action's ID
+	 * @review
 	 */
-	public static List<String> getOperationTypes(Operation operation) {
-		if (operation instanceof BatchCreateOperation) {
-			return asList("BatchCreateAction", "Operation");
+	public static String getActionId(Resource resource, String actionName) {
+		String resourceName = "";
+
+		if (resource instanceof Nested) {
+			Item parent = ((Nested)resource).getParentItem();
+
+			resourceName = join("/", parent.getName(), resource.getName());
+		}
+		else if (resource instanceof GenericParent) {
+			GenericParent genericParent = (GenericParent)resource;
+
+			resourceName = join(
+				"/", genericParent.getName(), genericParent.getParentName());
+		}
+		else {
+			resourceName = resource.getName();
 		}
 
-		if (operation instanceof CreateOperation) {
+		return "_:" + join("/", resourceName, actionName);
+	}
+
+	/**
+	 * Returns the list of types for a certain action based on its name.
+	 *
+	 * @review
+	 */
+	public static List<String> getActionTypes(String actionName) {
+		if ("batch-create".equals(actionName)) {
 			return asList("CreateAction", "Operation");
 		}
-
-		if (operation instanceof DeleteOperation) {
+		else if ("create".equals(actionName)) {
+			return asList("CreateAction", "Operation");
+		}
+		else if ("remove".equals(actionName)) {
 			return asList("DeleteAction", "Operation");
 		}
-
-		if (operation instanceof UpdateOperation) {
+		else if ("replace".equals(actionName)) {
 			return asList("ReplaceAction", "Operation");
 		}
-
-		return singletonList("Operation");
+		else {
+			return singletonList("Operation");
+		}
 	}
 
 	private JSONLDMessageMapperUtil() {

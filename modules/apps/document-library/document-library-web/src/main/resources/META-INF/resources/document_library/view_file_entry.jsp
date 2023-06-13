@@ -257,7 +257,7 @@ if (portletTitleBasedNavigation) {
 					</c:if>
 
 					<span class="document-description">
-						<%= HtmlUtil.escape(fileVersion.getDescription()) %>
+						<%= HtmlUtil.replaceNewLine(HtmlUtil.escape(fileVersion.getDescription())) %>
 					</span>
 
 					<c:if test="<%= fileEntry.isSupportsSocial() %>">
@@ -311,7 +311,7 @@ if (portletTitleBasedNavigation) {
 						formName="fm2"
 						ratingsEnabled="<%= dlPortletInstanceSettings.isEnableCommentRatings() %>"
 						redirect="<%= currentURL %>"
-						userId="<%= fileEntry.getUserId() %>"
+						userId="<%= PortalUtil.getValidUserId(fileEntry.getCompanyId(), fileEntry.getUserId()) %>"
 					/>
 				</liferay-ui:panel>
 			</c:if>

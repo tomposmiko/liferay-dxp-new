@@ -47,8 +47,8 @@ public class HexaFunctionTest {
 	@Test(expected = NullPointerException.class)
 	public void testOnInvokingAndThenWithNullAfterFunctionThrowsException() {
 		HexaFunction<String, String, String, String, String, String, String>
-			firstFunction = (
-				string1, string2, string3, string4, string5, string6) ->
+			firstFunction =
+				(string1, string2, string3, string4, string5, string6) ->
 					string1 + string2 + string3 + string4 + string5 + string6;
 
 		firstFunction.andThen(null);

@@ -33,12 +33,12 @@ import java.util.Date;
  * The cache model class for representing RepositoryEntry in entity cache.
  *
  * @author Brian Wing Shun Chan
- * @see RepositoryEntry
  * @generated
  */
 @ProviderType
-public class RepositoryEntryCacheModel implements CacheModel<RepositoryEntry>,
-	Externalizable, MVCCModel {
+public class RepositoryEntryCacheModel
+	implements CacheModel<RepositoryEntry>, Externalizable, MVCCModel {
+
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj) {
@@ -49,10 +49,13 @@ public class RepositoryEntryCacheModel implements CacheModel<RepositoryEntry>,
 			return false;
 		}
 
-		RepositoryEntryCacheModel repositoryEntryCacheModel = (RepositoryEntryCacheModel)obj;
+		RepositoryEntryCacheModel repositoryEntryCacheModel =
+			(RepositoryEntryCacheModel)obj;
 
-		if ((repositoryEntryId == repositoryEntryCacheModel.repositoryEntryId) &&
-				(mvccVersion == repositoryEntryCacheModel.mvccVersion)) {
+		if ((repositoryEntryId ==
+				repositoryEntryCacheModel.repositoryEntryId) &&
+			(mvccVersion == repositoryEntryCacheModel.mvccVersion)) {
+
 			return true;
 		}
 
@@ -197,8 +200,7 @@ public class RepositoryEntryCacheModel implements CacheModel<RepositoryEntry>,
 	}
 
 	@Override
-	public void writeExternal(ObjectOutput objectOutput)
-		throws IOException {
+	public void writeExternal(ObjectOutput objectOutput) throws IOException {
 		objectOutput.writeLong(mvccVersion);
 
 		if (uuid == null) {
@@ -252,4 +254,5 @@ public class RepositoryEntryCacheModel implements CacheModel<RepositoryEntry>,
 	public String mappedId;
 	public boolean manualCheckInRequired;
 	public long lastPublishDate;
+
 }

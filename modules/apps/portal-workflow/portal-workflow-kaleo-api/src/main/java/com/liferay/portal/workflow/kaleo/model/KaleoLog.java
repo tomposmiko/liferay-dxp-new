@@ -25,19 +25,22 @@ import com.liferay.portal.kernel.util.Accessor;
  *
  * @author Brian Wing Shun Chan
  * @see KaleoLogModel
- * @see com.liferay.portal.workflow.kaleo.model.impl.KaleoLogImpl
- * @see com.liferay.portal.workflow.kaleo.model.impl.KaleoLogModelImpl
  * @generated
  */
-@ImplementationClassName("com.liferay.portal.workflow.kaleo.model.impl.KaleoLogImpl")
+@ImplementationClassName(
+	"com.liferay.portal.workflow.kaleo.model.impl.KaleoLogImpl"
+)
 @ProviderType
 public interface KaleoLog extends KaleoLogModel, PersistedModel {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
-	 * Never modify this interface directly. Add methods to {@link com.liferay.portal.workflow.kaleo.model.impl.KaleoLogImpl} and rerun ServiceBuilder to automatically copy the method declarations to this interface.
+	 * Never modify this interface directly. Add methods to <code>com.liferay.portal.workflow.kaleo.model.impl.KaleoLogImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
 	 */
-	public static final Accessor<KaleoLog, Long> KALEO_LOG_ID_ACCESSOR = new Accessor<KaleoLog, Long>() {
+	public static final Accessor<KaleoLog, Long> KALEO_LOG_ID_ACCESSOR =
+		new Accessor<KaleoLog, Long>() {
+
 			@Override
 			public Long get(KaleoLog kaleoLog) {
 				return kaleoLog.getKaleoLogId();
@@ -52,5 +55,7 @@ public interface KaleoLog extends KaleoLogModel, PersistedModel {
 			public Class<KaleoLog> getTypeClass() {
 				return KaleoLog.class;
 			}
+
 		};
+
 }

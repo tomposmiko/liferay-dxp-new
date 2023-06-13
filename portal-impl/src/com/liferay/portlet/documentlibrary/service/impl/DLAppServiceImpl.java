@@ -213,11 +213,9 @@ public class DLAppServiceImpl extends DLAppServiceBaseImpl {
 
 		Repository repository = getRepository(repositoryId);
 
-		FileEntry fileEntry = repository.addFileEntry(
+		return repository.addFileEntry(
 			getUserId(), folderId, sourceFileName, mimeType, title, description,
 			changeLog, file, serviceContext);
-
-		return fileEntry;
 	}
 
 	/**
@@ -294,11 +292,9 @@ public class DLAppServiceImpl extends DLAppServiceBaseImpl {
 
 		Repository repository = getRepository(repositoryId);
 
-		FileEntry fileEntry = repository.addFileEntry(
+		return repository.addFileEntry(
 			getUserId(), folderId, sourceFileName, mimeType, title, description,
 			changeLog, is, size, serviceContext);
-
-		return fileEntry;
 	}
 
 	/**
@@ -2950,10 +2946,9 @@ public class DLAppServiceImpl extends DLAppServiceBaseImpl {
 			if (next == null) {
 				break;
 			}
-			else {
-				curSrcFolder = next[0];
-				curDestFolder = next[1];
-			}
+
+			curSrcFolder = next[0];
+			curDestFolder = next[1];
 		}
 
 		TransactionCommitCallbackUtil.registerCallback(

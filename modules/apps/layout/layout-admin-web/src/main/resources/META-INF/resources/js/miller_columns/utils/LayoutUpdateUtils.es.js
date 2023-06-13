@@ -16,6 +16,7 @@ import {setIn} from '../../utils/utils.es';
  * @return {object[]}
  * @review
  */
+
 function appendItemToColumn(sourceItem, layoutColumns, targetColumnIndex) {
 	let nextLayoutColumns = layoutColumns;
 
@@ -40,6 +41,7 @@ function appendItemToColumn(sourceItem, layoutColumns, targetColumnIndex) {
  * @return {object}
  * @review
  */
+
 function clearFollowingColumns(layoutColumns, startColumnIndex) {
 	const nextLayoutColumns = layoutColumns.map(
 		(layoutColumn) => [...layoutColumn]
@@ -61,6 +63,7 @@ function clearFollowingColumns(layoutColumns, startColumnIndex) {
  * @return {object}
  * @review
  */
+
 function clearPath(
 	layoutColumns,
 	sourceItem,
@@ -107,6 +110,7 @@ function clearPath(
  * @return {object}
  * @review
  */
+
 function deleteEmptyColumns(layoutColumns) {
 	const nextLayoutColumns = [...layoutColumns];
 
@@ -129,6 +133,7 @@ function deleteEmptyColumns(layoutColumns) {
  * @return {object}
  * @review
  */
+
 function moveItemInside(
 	layoutColumns,
 	pathUpdated,
@@ -207,6 +212,7 @@ function moveItemInside(
  * @return {object[]} new column array
  * @review
  */
+
 function removeItem(itemPlid, layoutColumns) {
 	const item = getItem(layoutColumns, itemPlid);
 	let nextLayoutColumns = layoutColumns;
@@ -241,6 +247,7 @@ function removeItem(itemPlid, layoutColumns) {
  * @return {object|null}
  * @review
  */
+
 function setHomePage(layoutColumns) {
 	let nextLayoutColumns = layoutColumns;
 
@@ -287,6 +294,7 @@ function setHomePage(layoutColumns) {
  * @return {object}
  * @review
  */
+
 function setActiveItem(layoutColumns, itemPlid) {
 	const columnIndex = getItemColumnIndex(layoutColumns, itemPlid);
 

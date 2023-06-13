@@ -17,9 +17,7 @@ package com.liferay.site.model;
 import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.expando.kernel.model.ExpandoBridge;
-
 import com.liferay.exportimport.kernel.lar.StagedModelType;
-
 import com.liferay.portal.kernel.model.ModelWrapper;
 import com.liferay.portal.kernel.service.ServiceContext;
 
@@ -40,8 +38,9 @@ import java.util.Objects;
  * @generated
  */
 @ProviderType
-public class SiteFriendlyURLWrapper implements SiteFriendlyURL,
-	ModelWrapper<SiteFriendlyURL> {
+public class SiteFriendlyURLWrapper
+	implements SiteFriendlyURL, ModelWrapper<SiteFriendlyURL> {
+
 	public SiteFriendlyURLWrapper(SiteFriendlyURL siteFriendlyURL) {
 		_siteFriendlyURL = siteFriendlyURL;
 	}
@@ -146,7 +145,8 @@ public class SiteFriendlyURLWrapper implements SiteFriendlyURL,
 
 	@Override
 	public Object clone() {
-		return new SiteFriendlyURLWrapper((SiteFriendlyURL)_siteFriendlyURL.clone());
+		return new SiteFriendlyURLWrapper(
+			(SiteFriendlyURL)_siteFriendlyURL.clone());
 	}
 
 	@Override
@@ -155,20 +155,20 @@ public class SiteFriendlyURLWrapper implements SiteFriendlyURL,
 	}
 
 	/**
-	* Returns the company ID of this site friendly url.
-	*
-	* @return the company ID of this site friendly url
-	*/
+	 * Returns the company ID of this site friendly url.
+	 *
+	 * @return the company ID of this site friendly url
+	 */
 	@Override
 	public long getCompanyId() {
 		return _siteFriendlyURL.getCompanyId();
 	}
 
 	/**
-	* Returns the create date of this site friendly url.
-	*
-	* @return the create date of this site friendly url
-	*/
+	 * Returns the create date of this site friendly url.
+	 *
+	 * @return the create date of this site friendly url
+	 */
 	@Override
 	public Date getCreateDate() {
 		return _siteFriendlyURL.getCreateDate();
@@ -180,60 +180,60 @@ public class SiteFriendlyURLWrapper implements SiteFriendlyURL,
 	}
 
 	/**
-	* Returns the friendly url of this site friendly url.
-	*
-	* @return the friendly url of this site friendly url
-	*/
+	 * Returns the friendly url of this site friendly url.
+	 *
+	 * @return the friendly url of this site friendly url
+	 */
 	@Override
 	public String getFriendlyURL() {
 		return _siteFriendlyURL.getFriendlyURL();
 	}
 
 	/**
-	* Returns the group ID of this site friendly url.
-	*
-	* @return the group ID of this site friendly url
-	*/
+	 * Returns the group ID of this site friendly url.
+	 *
+	 * @return the group ID of this site friendly url
+	 */
 	@Override
 	public long getGroupId() {
 		return _siteFriendlyURL.getGroupId();
 	}
 
 	/**
-	* Returns the language ID of this site friendly url.
-	*
-	* @return the language ID of this site friendly url
-	*/
+	 * Returns the language ID of this site friendly url.
+	 *
+	 * @return the language ID of this site friendly url
+	 */
 	@Override
 	public String getLanguageId() {
 		return _siteFriendlyURL.getLanguageId();
 	}
 
 	/**
-	* Returns the last publish date of this site friendly url.
-	*
-	* @return the last publish date of this site friendly url
-	*/
+	 * Returns the last publish date of this site friendly url.
+	 *
+	 * @return the last publish date of this site friendly url
+	 */
 	@Override
 	public Date getLastPublishDate() {
 		return _siteFriendlyURL.getLastPublishDate();
 	}
 
 	/**
-	* Returns the modified date of this site friendly url.
-	*
-	* @return the modified date of this site friendly url
-	*/
+	 * Returns the modified date of this site friendly url.
+	 *
+	 * @return the modified date of this site friendly url
+	 */
 	@Override
 	public Date getModifiedDate() {
 		return _siteFriendlyURL.getModifiedDate();
 	}
 
 	/**
-	* Returns the primary key of this site friendly url.
-	*
-	* @return the primary key of this site friendly url
-	*/
+	 * Returns the primary key of this site friendly url.
+	 *
+	 * @return the primary key of this site friendly url
+	 */
 	@Override
 	public long getPrimaryKey() {
 		return _siteFriendlyURL.getPrimaryKey();
@@ -245,50 +245,50 @@ public class SiteFriendlyURLWrapper implements SiteFriendlyURL,
 	}
 
 	/**
-	* Returns the site friendly url ID of this site friendly url.
-	*
-	* @return the site friendly url ID of this site friendly url
-	*/
+	 * Returns the site friendly url ID of this site friendly url.
+	 *
+	 * @return the site friendly url ID of this site friendly url
+	 */
 	@Override
 	public long getSiteFriendlyURLId() {
 		return _siteFriendlyURL.getSiteFriendlyURLId();
 	}
 
 	/**
-	* Returns the user ID of this site friendly url.
-	*
-	* @return the user ID of this site friendly url
-	*/
+	 * Returns the user ID of this site friendly url.
+	 *
+	 * @return the user ID of this site friendly url
+	 */
 	@Override
 	public long getUserId() {
 		return _siteFriendlyURL.getUserId();
 	}
 
 	/**
-	* Returns the user name of this site friendly url.
-	*
-	* @return the user name of this site friendly url
-	*/
+	 * Returns the user name of this site friendly url.
+	 *
+	 * @return the user name of this site friendly url
+	 */
 	@Override
 	public String getUserName() {
 		return _siteFriendlyURL.getUserName();
 	}
 
 	/**
-	* Returns the user uuid of this site friendly url.
-	*
-	* @return the user uuid of this site friendly url
-	*/
+	 * Returns the user uuid of this site friendly url.
+	 *
+	 * @return the user uuid of this site friendly url
+	 */
 	@Override
 	public String getUserUuid() {
 		return _siteFriendlyURL.getUserUuid();
 	}
 
 	/**
-	* Returns the uuid of this site friendly url.
-	*
-	* @return the uuid of this site friendly url
-	*/
+	 * Returns the uuid of this site friendly url.
+	 *
+	 * @return the uuid of this site friendly url
+	 */
 	@Override
 	public String getUuid() {
 		return _siteFriendlyURL.getUuid();
@@ -325,20 +325,20 @@ public class SiteFriendlyURLWrapper implements SiteFriendlyURL,
 	}
 
 	/**
-	* Sets the company ID of this site friendly url.
-	*
-	* @param companyId the company ID of this site friendly url
-	*/
+	 * Sets the company ID of this site friendly url.
+	 *
+	 * @param companyId the company ID of this site friendly url
+	 */
 	@Override
 	public void setCompanyId(long companyId) {
 		_siteFriendlyURL.setCompanyId(companyId);
 	}
 
 	/**
-	* Sets the create date of this site friendly url.
-	*
-	* @param createDate the create date of this site friendly url
-	*/
+	 * Sets the create date of this site friendly url.
+	 *
+	 * @param createDate the create date of this site friendly url
+	 */
 	@Override
 	public void setCreateDate(Date createDate) {
 		_siteFriendlyURL.setCreateDate(createDate);
@@ -347,6 +347,7 @@ public class SiteFriendlyURLWrapper implements SiteFriendlyURL,
 	@Override
 	public void setExpandoBridgeAttributes(
 		com.liferay.portal.kernel.model.BaseModel<?> baseModel) {
+
 		_siteFriendlyURL.setExpandoBridgeAttributes(baseModel);
 	}
 
@@ -361,50 +362,50 @@ public class SiteFriendlyURLWrapper implements SiteFriendlyURL,
 	}
 
 	/**
-	* Sets the friendly url of this site friendly url.
-	*
-	* @param friendlyURL the friendly url of this site friendly url
-	*/
+	 * Sets the friendly url of this site friendly url.
+	 *
+	 * @param friendlyURL the friendly url of this site friendly url
+	 */
 	@Override
 	public void setFriendlyURL(String friendlyURL) {
 		_siteFriendlyURL.setFriendlyURL(friendlyURL);
 	}
 
 	/**
-	* Sets the group ID of this site friendly url.
-	*
-	* @param groupId the group ID of this site friendly url
-	*/
+	 * Sets the group ID of this site friendly url.
+	 *
+	 * @param groupId the group ID of this site friendly url
+	 */
 	@Override
 	public void setGroupId(long groupId) {
 		_siteFriendlyURL.setGroupId(groupId);
 	}
 
 	/**
-	* Sets the language ID of this site friendly url.
-	*
-	* @param languageId the language ID of this site friendly url
-	*/
+	 * Sets the language ID of this site friendly url.
+	 *
+	 * @param languageId the language ID of this site friendly url
+	 */
 	@Override
 	public void setLanguageId(String languageId) {
 		_siteFriendlyURL.setLanguageId(languageId);
 	}
 
 	/**
-	* Sets the last publish date of this site friendly url.
-	*
-	* @param lastPublishDate the last publish date of this site friendly url
-	*/
+	 * Sets the last publish date of this site friendly url.
+	 *
+	 * @param lastPublishDate the last publish date of this site friendly url
+	 */
 	@Override
 	public void setLastPublishDate(Date lastPublishDate) {
 		_siteFriendlyURL.setLastPublishDate(lastPublishDate);
 	}
 
 	/**
-	* Sets the modified date of this site friendly url.
-	*
-	* @param modifiedDate the modified date of this site friendly url
-	*/
+	 * Sets the modified date of this site friendly url.
+	 *
+	 * @param modifiedDate the modified date of this site friendly url
+	 */
 	@Override
 	public void setModifiedDate(Date modifiedDate) {
 		_siteFriendlyURL.setModifiedDate(modifiedDate);
@@ -416,10 +417,10 @@ public class SiteFriendlyURLWrapper implements SiteFriendlyURL,
 	}
 
 	/**
-	* Sets the primary key of this site friendly url.
-	*
-	* @param primaryKey the primary key of this site friendly url
-	*/
+	 * Sets the primary key of this site friendly url.
+	 *
+	 * @param primaryKey the primary key of this site friendly url
+	 */
 	@Override
 	public void setPrimaryKey(long primaryKey) {
 		_siteFriendlyURL.setPrimaryKey(primaryKey);
@@ -431,57 +432,59 @@ public class SiteFriendlyURLWrapper implements SiteFriendlyURL,
 	}
 
 	/**
-	* Sets the site friendly url ID of this site friendly url.
-	*
-	* @param siteFriendlyURLId the site friendly url ID of this site friendly url
-	*/
+	 * Sets the site friendly url ID of this site friendly url.
+	 *
+	 * @param siteFriendlyURLId the site friendly url ID of this site friendly url
+	 */
 	@Override
 	public void setSiteFriendlyURLId(long siteFriendlyURLId) {
 		_siteFriendlyURL.setSiteFriendlyURLId(siteFriendlyURLId);
 	}
 
 	/**
-	* Sets the user ID of this site friendly url.
-	*
-	* @param userId the user ID of this site friendly url
-	*/
+	 * Sets the user ID of this site friendly url.
+	 *
+	 * @param userId the user ID of this site friendly url
+	 */
 	@Override
 	public void setUserId(long userId) {
 		_siteFriendlyURL.setUserId(userId);
 	}
 
 	/**
-	* Sets the user name of this site friendly url.
-	*
-	* @param userName the user name of this site friendly url
-	*/
+	 * Sets the user name of this site friendly url.
+	 *
+	 * @param userName the user name of this site friendly url
+	 */
 	@Override
 	public void setUserName(String userName) {
 		_siteFriendlyURL.setUserName(userName);
 	}
 
 	/**
-	* Sets the user uuid of this site friendly url.
-	*
-	* @param userUuid the user uuid of this site friendly url
-	*/
+	 * Sets the user uuid of this site friendly url.
+	 *
+	 * @param userUuid the user uuid of this site friendly url
+	 */
 	@Override
 	public void setUserUuid(String userUuid) {
 		_siteFriendlyURL.setUserUuid(userUuid);
 	}
 
 	/**
-	* Sets the uuid of this site friendly url.
-	*
-	* @param uuid the uuid of this site friendly url
-	*/
+	 * Sets the uuid of this site friendly url.
+	 *
+	 * @param uuid the uuid of this site friendly url
+	 */
 	@Override
 	public void setUuid(String uuid) {
 		_siteFriendlyURL.setUuid(uuid);
 	}
 
 	@Override
-	public com.liferay.portal.kernel.model.CacheModel<SiteFriendlyURL> toCacheModel() {
+	public com.liferay.portal.kernel.model.CacheModel<SiteFriendlyURL>
+		toCacheModel() {
+
 		return _siteFriendlyURL.toCacheModel();
 	}
 
@@ -515,10 +518,12 @@ public class SiteFriendlyURLWrapper implements SiteFriendlyURL,
 			return false;
 		}
 
-		SiteFriendlyURLWrapper siteFriendlyURLWrapper = (SiteFriendlyURLWrapper)obj;
+		SiteFriendlyURLWrapper siteFriendlyURLWrapper =
+			(SiteFriendlyURLWrapper)obj;
 
-		if (Objects.equals(_siteFriendlyURL,
-					siteFriendlyURLWrapper._siteFriendlyURL)) {
+		if (Objects.equals(
+				_siteFriendlyURL, siteFriendlyURLWrapper._siteFriendlyURL)) {
+
 			return true;
 		}
 
@@ -551,4 +556,5 @@ public class SiteFriendlyURLWrapper implements SiteFriendlyURL,
 	}
 
 	private final SiteFriendlyURL _siteFriendlyURL;
+
 }

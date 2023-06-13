@@ -230,6 +230,8 @@ public class SolrIndexingFixture implements IndexingFixture {
 				setSpellCheckIndexWriter(
 					createSolrSpellCheckIndexWriter(
 						solrClientManager, solrUpdateDocumentCommand));
+
+				activate(_properties);
 			}
 		};
 	}
@@ -270,6 +272,7 @@ public class SolrIndexingFixture implements IndexingFixture {
 	protected Map<String, Object> createSolrConfigurationProperties() {
 		Map<String, Object> properties = new HashMap<>();
 
+		properties.put("defaultCollection", "liferay");
 		properties.put("logExceptionsOnly", false);
 		properties.put("readURL", "http://localhost:8983/solr/liferay");
 		properties.put("writeURL", "http://localhost:8983/solr/liferay");
@@ -286,6 +289,8 @@ public class SolrIndexingFixture implements IndexingFixture {
 
 				setNGramQueryBuilder(createNGramQueryBuilder());
 				setSolrClientManager(solrClientManager);
+
+				activate(_properties);
 			}
 		};
 	}
@@ -301,6 +306,8 @@ public class SolrIndexingFixture implements IndexingFixture {
 
 				setSolrClientManager(solrClientManager);
 				setSolrUpdateDocumentCommand(solrUpdateDocumentCommand);
+
+				activate(_properties);
 			}
 		};
 	}
@@ -312,6 +319,8 @@ public class SolrIndexingFixture implements IndexingFixture {
 			{
 				setSolrClientManager(solrClientManager);
 				setSolrDocumentFactory(new DefaultSolrDocumentFactory());
+
+				activate(_properties);
 			}
 		};
 	}

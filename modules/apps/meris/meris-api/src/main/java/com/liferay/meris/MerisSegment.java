@@ -21,7 +21,7 @@ import java.util.Locale;
 /**
  * Represents a segment.
  *
- * @author Eduardo Garcia
+ * @author Eduardo García
  * @review
  */
 @ProviderType

@@ -19,6 +19,7 @@ import {DRAG_POSITIONS, DROP_TARGET_TYPES} from './LayoutDragDrop.es';
  * @return {boolean} Returns whether a drop is valid or not
  * @review
  */
+
 function dropIsValid(
 	sourceItem,
 	sourceItemColumnIndex,
@@ -52,6 +53,7 @@ function dropIsValid(
  * @return {object}
  * @review
  */
+
 function dropItemInsideColumn(layoutColumns, sourceItem, targetColumnIndex) {
 	const nextLayoutColumns = appendItemToColumn(
 		sourceItem,
@@ -84,6 +86,7 @@ function dropItemInsideColumn(layoutColumns, sourceItem, targetColumnIndex) {
  * @return {object}
  * @review
  */
+
 function dropItemInsideItem(
 	layoutColumns,
 	sourceItem,
@@ -130,6 +133,7 @@ function dropItemInsideItem(
  * @return {object}
  * @review
  */
+
 function dropItemNextToItem(layoutColumns, sourceItem, dropPosition, targetItem) {
 	const nextLayoutColumns = removeItem(sourceItem.plid, layoutColumns);
 

@@ -33,12 +33,12 @@ import java.util.Date;
  * The cache model class for representing Release in entity cache.
  *
  * @author Brian Wing Shun Chan
- * @see Release
  * @generated
  */
 @ProviderType
-public class ReleaseCacheModel implements CacheModel<Release>, Externalizable,
-	MVCCModel {
+public class ReleaseCacheModel
+	implements CacheModel<Release>, Externalizable, MVCCModel {
+
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj) {
@@ -52,7 +52,8 @@ public class ReleaseCacheModel implements CacheModel<Release>, Externalizable,
 		ReleaseCacheModel releaseCacheModel = (ReleaseCacheModel)obj;
 
 		if ((releaseId == releaseCacheModel.releaseId) &&
-				(mvccVersion == releaseCacheModel.mvccVersion)) {
+			(mvccVersion == releaseCacheModel.mvccVersion)) {
+
 			return true;
 		}
 
@@ -186,8 +187,7 @@ public class ReleaseCacheModel implements CacheModel<Release>, Externalizable,
 	}
 
 	@Override
-	public void writeExternal(ObjectOutput objectOutput)
-		throws IOException {
+	public void writeExternal(ObjectOutput objectOutput) throws IOException {
 		objectOutput.writeLong(mvccVersion);
 
 		objectOutput.writeLong(releaseId);
@@ -234,4 +234,5 @@ public class ReleaseCacheModel implements CacheModel<Release>, Externalizable,
 	public boolean verified;
 	public int state;
 	public String testString;
+
 }

@@ -17,7 +17,6 @@ package com.liferay.calendar.model.impl;
 import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.calendar.model.CalendarBooking;
-
 import com.liferay.portal.kernel.model.CacheModel;
 import com.liferay.portal.kernel.util.HashUtil;
 import com.liferay.portal.kernel.util.StringBundler;
@@ -33,12 +32,12 @@ import java.util.Date;
  * The cache model class for representing CalendarBooking in entity cache.
  *
  * @author Eduardo Lundgren
- * @see CalendarBooking
  * @generated
  */
 @ProviderType
-public class CalendarBookingCacheModel implements CacheModel<CalendarBooking>,
-	Externalizable {
+public class CalendarBookingCacheModel
+	implements CacheModel<CalendarBooking>, Externalizable {
+
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj) {
@@ -49,7 +48,8 @@ public class CalendarBookingCacheModel implements CacheModel<CalendarBooking>,
 			return false;
 		}
 
-		CalendarBookingCacheModel calendarBookingCacheModel = (CalendarBookingCacheModel)obj;
+		CalendarBookingCacheModel calendarBookingCacheModel =
+			(CalendarBookingCacheModel)obj;
 
 		if (calendarBookingId == calendarBookingCacheModel.calendarBookingId) {
 			return true;
@@ -170,7 +170,8 @@ public class CalendarBookingCacheModel implements CacheModel<CalendarBooking>,
 		calendarBookingImpl.setCalendarId(calendarId);
 		calendarBookingImpl.setCalendarResourceId(calendarResourceId);
 		calendarBookingImpl.setParentCalendarBookingId(parentCalendarBookingId);
-		calendarBookingImpl.setRecurringCalendarBookingId(recurringCalendarBookingId);
+		calendarBookingImpl.setRecurringCalendarBookingId(
+			recurringCalendarBookingId);
 
 		if (vEventUid == null) {
 			calendarBookingImpl.setVEventUid("");
@@ -307,8 +308,7 @@ public class CalendarBookingCacheModel implements CacheModel<CalendarBooking>,
 	}
 
 	@Override
-	public void writeExternal(ObjectOutput objectOutput)
-		throws IOException {
+	public void writeExternal(ObjectOutput objectOutput) throws IOException {
 		if (uuid == null) {
 			objectOutput.writeUTF("");
 		}
@@ -446,4 +446,5 @@ public class CalendarBookingCacheModel implements CacheModel<CalendarBooking>,
 	public long statusByUserId;
 	public String statusByUserName;
 	public long statusDate;
+
 }

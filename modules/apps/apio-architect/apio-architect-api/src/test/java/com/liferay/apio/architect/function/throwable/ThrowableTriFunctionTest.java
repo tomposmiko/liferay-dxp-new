@@ -29,8 +29,8 @@ public class ThrowableTriFunctionTest {
 		throws Exception {
 
 		ThrowableTriFunction<String, String, String, String>
-			throwableTriFunction = (string1, string2, string3) ->
-				string1 + string2 + string3;
+			throwableTriFunction =
+				(string1, string2, string3) -> string1 + string2 + string3;
 
 		ThrowableFunction<String, String> throwableFunction =
 			string -> string + "prosper";

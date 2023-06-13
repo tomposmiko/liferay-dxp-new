@@ -32,19 +32,20 @@ import java.util.Set;
  * @generated
  */
 public class RoleFinderBaseImpl extends BasePersistenceImpl<Role> {
+
 	public RoleFinderBaseImpl() {
 		setModelClass(Role.class);
 
+		Map<String, String> dbColumnNames = new HashMap<String, String>();
+
+		dbColumnNames.put("uuid", "uuid_");
+		dbColumnNames.put("type", "type_");
+
 		try {
 			Field field = BasePersistenceImpl.class.getDeclaredField(
-					"_dbColumnNames");
+				"_dbColumnNames");
 
 			field.setAccessible(true);
-
-			Map<String, String> dbColumnNames = new HashMap<String, String>();
-
-			dbColumnNames.put("uuid", "uuid_");
-			dbColumnNames.put("type", "type_");
 
 			field.set(this, dbColumnNames);
 		}
@@ -80,5 +81,8 @@ public class RoleFinderBaseImpl extends BasePersistenceImpl<Role> {
 
 	@BeanReference(type = RolePersistence.class)
 	protected RolePersistence rolePersistence;
-	private static final Log _log = LogFactoryUtil.getLog(RoleFinderBaseImpl.class);
+
+	private static final Log _log = LogFactoryUtil.getLog(
+		RoleFinderBaseImpl.class);
+
 }

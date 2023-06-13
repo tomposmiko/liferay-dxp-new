@@ -148,9 +148,8 @@ public class CMISRepository extends BaseCmisRepository {
 			if (size == 0) {
 				throw new FileNameException("Title is null");
 			}
-			else {
-				title = sourceFileName;
-			}
+
+			title = sourceFileName;
 		}
 
 		try {
@@ -953,9 +952,12 @@ public class CMISRepository extends BaseCmisRepository {
 	@Override
 	public void initRepository() throws PortalException {
 		try {
-			_sessionKey =
-				Session.class.getName().concat(StringPool.POUND).concat(
-					String.valueOf(getRepositoryId()));
+			_sessionKey = Session.class.getName(
+			).concat(
+				StringPool.POUND
+			).concat(
+				String.valueOf(getRepositoryId())
+			);
 
 			Session session = getSession();
 
@@ -1852,10 +1854,8 @@ public class CMISRepository extends BaseCmisRepository {
 
 		Folder folder = getFolder(session, folderId);
 
-		org.apache.chemistry.opencmis.client.api.Folder cmisFolder =
-			(org.apache.chemistry.opencmis.client.api.Folder)folder.getModel();
-
-		return cmisFolder;
+		return (org.apache.chemistry.opencmis.client.api.Folder)
+			folder.getModel();
 	}
 
 	protected List<String> getCmisFolderIds(Session session, long folderId)
@@ -2165,7 +2165,7 @@ public class CMISRepository extends BaseCmisRepository {
 	protected void processException(Exception e) throws PortalException {
 		String message = e.getMessage();
 
-		if ((e instanceof CmisRuntimeException &&
+		if (((e instanceof CmisRuntimeException) &&
 			 message.contains("authorized")) ||
 			(e instanceof CmisPermissionDeniedException)) {
 
@@ -2185,10 +2185,10 @@ public class CMISRepository extends BaseCmisRepository {
 		List<E> list, int start, int end, OrderByComparator<E> obc) {
 
 		if ((obc != null) &&
-			((obc instanceof RepositoryModelCreateDateComparator) ||
-			 (obc instanceof RepositoryModelModifiedDateComparator) ||
-			 (obc instanceof RepositoryModelSizeComparator) ||
-			 (obc instanceof RepositoryModelTitleComparator))) {
+			(obc instanceof RepositoryModelCreateDateComparator ||
+			 obc instanceof RepositoryModelModifiedDateComparator ||
+			 obc instanceof RepositoryModelSizeComparator ||
+			 obc instanceof RepositoryModelTitleComparator)) {
 
 			list = ListUtil.sort(list, obc);
 		}

@@ -17,9 +17,7 @@ package com.liferay.friendly.url.model;
 import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.expando.kernel.model.ExpandoBridge;
-
 import com.liferay.exportimport.kernel.lar.StagedModelType;
-
 import com.liferay.portal.kernel.model.ModelWrapper;
 import com.liferay.portal.kernel.service.ServiceContext;
 
@@ -40,8 +38,9 @@ import java.util.Objects;
  * @generated
  */
 @ProviderType
-public class FriendlyURLEntryWrapper implements FriendlyURLEntry,
-	ModelWrapper<FriendlyURLEntry> {
+public class FriendlyURLEntryWrapper
+	implements FriendlyURLEntry, ModelWrapper<FriendlyURLEntry> {
+
 	public FriendlyURLEntryWrapper(FriendlyURLEntry friendlyURLEntry) {
 		_friendlyURLEntry = friendlyURLEntry;
 	}
@@ -139,7 +138,8 @@ public class FriendlyURLEntryWrapper implements FriendlyURLEntry,
 
 	@Override
 	public Object clone() {
-		return new FriendlyURLEntryWrapper((FriendlyURLEntry)_friendlyURLEntry.clone());
+		return new FriendlyURLEntryWrapper(
+			(FriendlyURLEntry)_friendlyURLEntry.clone());
 	}
 
 	@Override
@@ -153,60 +153,60 @@ public class FriendlyURLEntryWrapper implements FriendlyURLEntry,
 	}
 
 	/**
-	* Returns the fully qualified class name of this friendly url entry.
-	*
-	* @return the fully qualified class name of this friendly url entry
-	*/
+	 * Returns the fully qualified class name of this friendly url entry.
+	 *
+	 * @return the fully qualified class name of this friendly url entry
+	 */
 	@Override
 	public String getClassName() {
 		return _friendlyURLEntry.getClassName();
 	}
 
 	/**
-	* Returns the class name ID of this friendly url entry.
-	*
-	* @return the class name ID of this friendly url entry
-	*/
+	 * Returns the class name ID of this friendly url entry.
+	 *
+	 * @return the class name ID of this friendly url entry
+	 */
 	@Override
 	public long getClassNameId() {
 		return _friendlyURLEntry.getClassNameId();
 	}
 
 	/**
-	* Returns the class pk of this friendly url entry.
-	*
-	* @return the class pk of this friendly url entry
-	*/
+	 * Returns the class pk of this friendly url entry.
+	 *
+	 * @return the class pk of this friendly url entry
+	 */
 	@Override
 	public long getClassPK() {
 		return _friendlyURLEntry.getClassPK();
 	}
 
 	/**
-	* Returns the company ID of this friendly url entry.
-	*
-	* @return the company ID of this friendly url entry
-	*/
+	 * Returns the company ID of this friendly url entry.
+	 *
+	 * @return the company ID of this friendly url entry
+	 */
 	@Override
 	public long getCompanyId() {
 		return _friendlyURLEntry.getCompanyId();
 	}
 
 	/**
-	* Returns the create date of this friendly url entry.
-	*
-	* @return the create date of this friendly url entry
-	*/
+	 * Returns the create date of this friendly url entry.
+	 *
+	 * @return the create date of this friendly url entry
+	 */
 	@Override
 	public Date getCreateDate() {
 		return _friendlyURLEntry.getCreateDate();
 	}
 
 	/**
-	* Returns the default language ID of this friendly url entry.
-	*
-	* @return the default language ID of this friendly url entry
-	*/
+	 * Returns the default language ID of this friendly url entry.
+	 *
+	 * @return the default language ID of this friendly url entry
+	 */
 	@Override
 	public String getDefaultLanguageId() {
 		return _friendlyURLEntry.getDefaultLanguageId();
@@ -218,20 +218,20 @@ public class FriendlyURLEntryWrapper implements FriendlyURLEntry,
 	}
 
 	/**
-	* Returns the friendly url entry ID of this friendly url entry.
-	*
-	* @return the friendly url entry ID of this friendly url entry
-	*/
+	 * Returns the friendly url entry ID of this friendly url entry.
+	 *
+	 * @return the friendly url entry ID of this friendly url entry
+	 */
 	@Override
 	public long getFriendlyURLEntryId() {
 		return _friendlyURLEntry.getFriendlyURLEntryId();
 	}
 
 	/**
-	* Returns the group ID of this friendly url entry.
-	*
-	* @return the group ID of this friendly url entry
-	*/
+	 * Returns the group ID of this friendly url entry.
+	 *
+	 * @return the group ID of this friendly url entry
+	 */
 	@Override
 	public long getGroupId() {
 		return _friendlyURLEntry.getGroupId();
@@ -243,30 +243,30 @@ public class FriendlyURLEntryWrapper implements FriendlyURLEntry,
 	}
 
 	/**
-	* Returns the modified date of this friendly url entry.
-	*
-	* @return the modified date of this friendly url entry
-	*/
+	 * Returns the modified date of this friendly url entry.
+	 *
+	 * @return the modified date of this friendly url entry
+	 */
 	@Override
 	public Date getModifiedDate() {
 		return _friendlyURLEntry.getModifiedDate();
 	}
 
 	/**
-	* Returns the mvcc version of this friendly url entry.
-	*
-	* @return the mvcc version of this friendly url entry
-	*/
+	 * Returns the mvcc version of this friendly url entry.
+	 *
+	 * @return the mvcc version of this friendly url entry
+	 */
 	@Override
 	public long getMvccVersion() {
 		return _friendlyURLEntry.getMvccVersion();
 	}
 
 	/**
-	* Returns the primary key of this friendly url entry.
-	*
-	* @return the primary key of this friendly url entry
-	*/
+	 * Returns the primary key of this friendly url entry.
+	 *
+	 * @return the primary key of this friendly url entry
+	 */
 	@Override
 	public long getPrimaryKey() {
 		return _friendlyURLEntry.getPrimaryKey();
@@ -298,10 +298,10 @@ public class FriendlyURLEntryWrapper implements FriendlyURLEntry,
 	}
 
 	/**
-	* Returns the uuid of this friendly url entry.
-	*
-	* @return the uuid of this friendly url entry
-	*/
+	 * Returns the uuid of this friendly url entry.
+	 *
+	 * @return the uuid of this friendly url entry
+	 */
 	@Override
 	public String getUuid() {
 		return _friendlyURLEntry.getUuid();
@@ -325,6 +325,7 @@ public class FriendlyURLEntryWrapper implements FriendlyURLEntry,
 	@Override
 	public boolean isMain()
 		throws com.liferay.portal.kernel.exception.PortalException {
+
 		return _friendlyURLEntry.isMain();
 	}
 
@@ -349,50 +350,50 @@ public class FriendlyURLEntryWrapper implements FriendlyURLEntry,
 	}
 
 	/**
-	* Sets the class name ID of this friendly url entry.
-	*
-	* @param classNameId the class name ID of this friendly url entry
-	*/
+	 * Sets the class name ID of this friendly url entry.
+	 *
+	 * @param classNameId the class name ID of this friendly url entry
+	 */
 	@Override
 	public void setClassNameId(long classNameId) {
 		_friendlyURLEntry.setClassNameId(classNameId);
 	}
 
 	/**
-	* Sets the class pk of this friendly url entry.
-	*
-	* @param classPK the class pk of this friendly url entry
-	*/
+	 * Sets the class pk of this friendly url entry.
+	 *
+	 * @param classPK the class pk of this friendly url entry
+	 */
 	@Override
 	public void setClassPK(long classPK) {
 		_friendlyURLEntry.setClassPK(classPK);
 	}
 
 	/**
-	* Sets the company ID of this friendly url entry.
-	*
-	* @param companyId the company ID of this friendly url entry
-	*/
+	 * Sets the company ID of this friendly url entry.
+	 *
+	 * @param companyId the company ID of this friendly url entry
+	 */
 	@Override
 	public void setCompanyId(long companyId) {
 		_friendlyURLEntry.setCompanyId(companyId);
 	}
 
 	/**
-	* Sets the create date of this friendly url entry.
-	*
-	* @param createDate the create date of this friendly url entry
-	*/
+	 * Sets the create date of this friendly url entry.
+	 *
+	 * @param createDate the create date of this friendly url entry
+	 */
 	@Override
 	public void setCreateDate(Date createDate) {
 		_friendlyURLEntry.setCreateDate(createDate);
 	}
 
 	/**
-	* Sets the default language ID of this friendly url entry.
-	*
-	* @param defaultLanguageId the default language ID of this friendly url entry
-	*/
+	 * Sets the default language ID of this friendly url entry.
+	 *
+	 * @param defaultLanguageId the default language ID of this friendly url entry
+	 */
 	@Override
 	public void setDefaultLanguageId(String defaultLanguageId) {
 		_friendlyURLEntry.setDefaultLanguageId(defaultLanguageId);
@@ -401,6 +402,7 @@ public class FriendlyURLEntryWrapper implements FriendlyURLEntry,
 	@Override
 	public void setExpandoBridgeAttributes(
 		com.liferay.portal.kernel.model.BaseModel<?> baseModel) {
+
 		_friendlyURLEntry.setExpandoBridgeAttributes(baseModel);
 	}
 
@@ -415,40 +417,40 @@ public class FriendlyURLEntryWrapper implements FriendlyURLEntry,
 	}
 
 	/**
-	* Sets the friendly url entry ID of this friendly url entry.
-	*
-	* @param friendlyURLEntryId the friendly url entry ID of this friendly url entry
-	*/
+	 * Sets the friendly url entry ID of this friendly url entry.
+	 *
+	 * @param friendlyURLEntryId the friendly url entry ID of this friendly url entry
+	 */
 	@Override
 	public void setFriendlyURLEntryId(long friendlyURLEntryId) {
 		_friendlyURLEntry.setFriendlyURLEntryId(friendlyURLEntryId);
 	}
 
 	/**
-	* Sets the group ID of this friendly url entry.
-	*
-	* @param groupId the group ID of this friendly url entry
-	*/
+	 * Sets the group ID of this friendly url entry.
+	 *
+	 * @param groupId the group ID of this friendly url entry
+	 */
 	@Override
 	public void setGroupId(long groupId) {
 		_friendlyURLEntry.setGroupId(groupId);
 	}
 
 	/**
-	* Sets the modified date of this friendly url entry.
-	*
-	* @param modifiedDate the modified date of this friendly url entry
-	*/
+	 * Sets the modified date of this friendly url entry.
+	 *
+	 * @param modifiedDate the modified date of this friendly url entry
+	 */
 	@Override
 	public void setModifiedDate(Date modifiedDate) {
 		_friendlyURLEntry.setModifiedDate(modifiedDate);
 	}
 
 	/**
-	* Sets the mvcc version of this friendly url entry.
-	*
-	* @param mvccVersion the mvcc version of this friendly url entry
-	*/
+	 * Sets the mvcc version of this friendly url entry.
+	 *
+	 * @param mvccVersion the mvcc version of this friendly url entry
+	 */
 	@Override
 	public void setMvccVersion(long mvccVersion) {
 		_friendlyURLEntry.setMvccVersion(mvccVersion);
@@ -460,10 +462,10 @@ public class FriendlyURLEntryWrapper implements FriendlyURLEntry,
 	}
 
 	/**
-	* Sets the primary key of this friendly url entry.
-	*
-	* @param primaryKey the primary key of this friendly url entry
-	*/
+	 * Sets the primary key of this friendly url entry.
+	 *
+	 * @param primaryKey the primary key of this friendly url entry
+	 */
 	@Override
 	public void setPrimaryKey(long primaryKey) {
 		_friendlyURLEntry.setPrimaryKey(primaryKey);
@@ -475,17 +477,19 @@ public class FriendlyURLEntryWrapper implements FriendlyURLEntry,
 	}
 
 	/**
-	* Sets the uuid of this friendly url entry.
-	*
-	* @param uuid the uuid of this friendly url entry
-	*/
+	 * Sets the uuid of this friendly url entry.
+	 *
+	 * @param uuid the uuid of this friendly url entry
+	 */
 	@Override
 	public void setUuid(String uuid) {
 		_friendlyURLEntry.setUuid(uuid);
 	}
 
 	@Override
-	public com.liferay.portal.kernel.model.CacheModel<FriendlyURLEntry> toCacheModel() {
+	public com.liferay.portal.kernel.model.CacheModel<FriendlyURLEntry>
+		toCacheModel() {
+
 		return _friendlyURLEntry.toCacheModel();
 	}
 
@@ -501,7 +505,8 @@ public class FriendlyURLEntryWrapper implements FriendlyURLEntry,
 
 	@Override
 	public FriendlyURLEntry toUnescapedModel() {
-		return new FriendlyURLEntryWrapper(_friendlyURLEntry.toUnescapedModel());
+		return new FriendlyURLEntryWrapper(
+			_friendlyURLEntry.toUnescapedModel());
 	}
 
 	@Override
@@ -519,10 +524,12 @@ public class FriendlyURLEntryWrapper implements FriendlyURLEntry,
 			return false;
 		}
 
-		FriendlyURLEntryWrapper friendlyURLEntryWrapper = (FriendlyURLEntryWrapper)obj;
+		FriendlyURLEntryWrapper friendlyURLEntryWrapper =
+			(FriendlyURLEntryWrapper)obj;
 
-		if (Objects.equals(_friendlyURLEntry,
-					friendlyURLEntryWrapper._friendlyURLEntry)) {
+		if (Objects.equals(
+				_friendlyURLEntry, friendlyURLEntryWrapper._friendlyURLEntry)) {
+
 			return true;
 		}
 
@@ -555,4 +562,5 @@ public class FriendlyURLEntryWrapper implements FriendlyURLEntry,
 	}
 
 	private final FriendlyURLEntry _friendlyURLEntry;
+
 }

@@ -26,11 +26,11 @@ import java.util.List;
  * This class is used by SOAP remote services, specifically {@link com.liferay.portlet.asset.service.http.AssetCategoryServiceSoap}.
  *
  * @author Brian Wing Shun Chan
- * @see com.liferay.portlet.asset.service.http.AssetCategoryServiceSoap
  * @generated
  */
 @ProviderType
 public class AssetCategorySoap implements Serializable {
+
 	public static AssetCategorySoap toSoapModel(AssetCategory model) {
 		AssetCategorySoap soapModel = new AssetCategorySoap();
 
@@ -83,7 +83,8 @@ public class AssetCategorySoap implements Serializable {
 	}
 
 	public static AssetCategorySoap[] toSoapModels(List<AssetCategory> models) {
-		List<AssetCategorySoap> soapModels = new ArrayList<AssetCategorySoap>(models.size());
+		List<AssetCategorySoap> soapModels = new ArrayList<AssetCategorySoap>(
+			models.size());
 
 		for (AssetCategory model : models) {
 			soapModels.add(toSoapModel(model));
@@ -256,4 +257,5 @@ public class AssetCategorySoap implements Serializable {
 	private String _description;
 	private long _vocabularyId;
 	private Date _lastPublishDate;
+
 }

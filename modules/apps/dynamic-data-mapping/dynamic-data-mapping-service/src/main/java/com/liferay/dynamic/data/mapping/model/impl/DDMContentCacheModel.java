@@ -17,7 +17,6 @@ package com.liferay.dynamic.data.mapping.model.impl;
 import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.dynamic.data.mapping.model.DDMContent;
-
 import com.liferay.portal.kernel.model.CacheModel;
 import com.liferay.portal.kernel.util.HashUtil;
 import com.liferay.portal.kernel.util.StringBundler;
@@ -33,12 +32,12 @@ import java.util.Date;
  * The cache model class for representing DDMContent in entity cache.
  *
  * @author Brian Wing Shun Chan
- * @see DDMContent
  * @generated
  */
 @ProviderType
-public class DDMContentCacheModel implements CacheModel<DDMContent>,
-	Externalizable {
+public class DDMContentCacheModel
+	implements CacheModel<DDMContent>, Externalizable {
+
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj) {
@@ -177,8 +176,7 @@ public class DDMContentCacheModel implements CacheModel<DDMContent>,
 	}
 
 	@Override
-	public void writeExternal(ObjectOutput objectOutput)
-		throws IOException {
+	public void writeExternal(ObjectOutput objectOutput) throws IOException {
 		if (uuid == null) {
 			objectOutput.writeUTF("");
 		}
@@ -237,4 +235,5 @@ public class DDMContentCacheModel implements CacheModel<DDMContent>,
 	public String name;
 	public String description;
 	public String data;
+
 }

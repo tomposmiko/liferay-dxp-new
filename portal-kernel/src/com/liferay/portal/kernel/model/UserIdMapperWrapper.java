@@ -17,7 +17,6 @@ package com.liferay.portal.kernel.model;
 import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.expando.kernel.model.ExpandoBridge;
-
 import com.liferay.portal.kernel.service.ServiceContext;
 
 import java.io.Serializable;
@@ -36,8 +35,9 @@ import java.util.Objects;
  * @generated
  */
 @ProviderType
-public class UserIdMapperWrapper implements UserIdMapper,
-	ModelWrapper<UserIdMapper> {
+public class UserIdMapperWrapper
+	implements UserIdMapper, ModelWrapper<UserIdMapper> {
+
 	public UserIdMapperWrapper(UserIdMapper userIdMapper) {
 		_userIdMapper = userIdMapper;
 	}
@@ -123,20 +123,20 @@ public class UserIdMapperWrapper implements UserIdMapper,
 	}
 
 	/**
-	* Returns the company ID of this user ID mapper.
-	*
-	* @return the company ID of this user ID mapper
-	*/
+	 * Returns the company ID of this user ID mapper.
+	 *
+	 * @return the company ID of this user ID mapper
+	 */
 	@Override
 	public long getCompanyId() {
 		return _userIdMapper.getCompanyId();
 	}
 
 	/**
-	* Returns the description of this user ID mapper.
-	*
-	* @return the description of this user ID mapper
-	*/
+	 * Returns the description of this user ID mapper.
+	 *
+	 * @return the description of this user ID mapper
+	 */
 	@Override
 	public String getDescription() {
 		return _userIdMapper.getDescription();
@@ -148,30 +148,30 @@ public class UserIdMapperWrapper implements UserIdMapper,
 	}
 
 	/**
-	* Returns the external user ID of this user ID mapper.
-	*
-	* @return the external user ID of this user ID mapper
-	*/
+	 * Returns the external user ID of this user ID mapper.
+	 *
+	 * @return the external user ID of this user ID mapper
+	 */
 	@Override
 	public String getExternalUserId() {
 		return _userIdMapper.getExternalUserId();
 	}
 
 	/**
-	* Returns the mvcc version of this user ID mapper.
-	*
-	* @return the mvcc version of this user ID mapper
-	*/
+	 * Returns the mvcc version of this user ID mapper.
+	 *
+	 * @return the mvcc version of this user ID mapper
+	 */
 	@Override
 	public long getMvccVersion() {
 		return _userIdMapper.getMvccVersion();
 	}
 
 	/**
-	* Returns the primary key of this user ID mapper.
-	*
-	* @return the primary key of this user ID mapper
-	*/
+	 * Returns the primary key of this user ID mapper.
+	 *
+	 * @return the primary key of this user ID mapper
+	 */
 	@Override
 	public long getPrimaryKey() {
 		return _userIdMapper.getPrimaryKey();
@@ -183,40 +183,40 @@ public class UserIdMapperWrapper implements UserIdMapper,
 	}
 
 	/**
-	* Returns the type of this user ID mapper.
-	*
-	* @return the type of this user ID mapper
-	*/
+	 * Returns the type of this user ID mapper.
+	 *
+	 * @return the type of this user ID mapper
+	 */
 	@Override
 	public String getType() {
 		return _userIdMapper.getType();
 	}
 
 	/**
-	* Returns the user ID of this user ID mapper.
-	*
-	* @return the user ID of this user ID mapper
-	*/
+	 * Returns the user ID of this user ID mapper.
+	 *
+	 * @return the user ID of this user ID mapper
+	 */
 	@Override
 	public long getUserId() {
 		return _userIdMapper.getUserId();
 	}
 
 	/**
-	* Returns the user ID mapper ID of this user ID mapper.
-	*
-	* @return the user ID mapper ID of this user ID mapper
-	*/
+	 * Returns the user ID mapper ID of this user ID mapper.
+	 *
+	 * @return the user ID mapper ID of this user ID mapper
+	 */
 	@Override
 	public long getUserIdMapperId() {
 		return _userIdMapper.getUserIdMapperId();
 	}
 
 	/**
-	* Returns the user uuid of this user ID mapper.
-	*
-	* @return the user uuid of this user ID mapper
-	*/
+	 * Returns the user uuid of this user ID mapper.
+	 *
+	 * @return the user uuid of this user ID mapper
+	 */
 	@Override
 	public String getUserUuid() {
 		return _userIdMapper.getUserUuid();
@@ -253,20 +253,20 @@ public class UserIdMapperWrapper implements UserIdMapper,
 	}
 
 	/**
-	* Sets the company ID of this user ID mapper.
-	*
-	* @param companyId the company ID of this user ID mapper
-	*/
+	 * Sets the company ID of this user ID mapper.
+	 *
+	 * @param companyId the company ID of this user ID mapper
+	 */
 	@Override
 	public void setCompanyId(long companyId) {
 		_userIdMapper.setCompanyId(companyId);
 	}
 
 	/**
-	* Sets the description of this user ID mapper.
-	*
-	* @param description the description of this user ID mapper
-	*/
+	 * Sets the description of this user ID mapper.
+	 *
+	 * @param description the description of this user ID mapper
+	 */
 	@Override
 	public void setDescription(String description) {
 		_userIdMapper.setDescription(description);
@@ -288,20 +288,20 @@ public class UserIdMapperWrapper implements UserIdMapper,
 	}
 
 	/**
-	* Sets the external user ID of this user ID mapper.
-	*
-	* @param externalUserId the external user ID of this user ID mapper
-	*/
+	 * Sets the external user ID of this user ID mapper.
+	 *
+	 * @param externalUserId the external user ID of this user ID mapper
+	 */
 	@Override
 	public void setExternalUserId(String externalUserId) {
 		_userIdMapper.setExternalUserId(externalUserId);
 	}
 
 	/**
-	* Sets the mvcc version of this user ID mapper.
-	*
-	* @param mvccVersion the mvcc version of this user ID mapper
-	*/
+	 * Sets the mvcc version of this user ID mapper.
+	 *
+	 * @param mvccVersion the mvcc version of this user ID mapper
+	 */
 	@Override
 	public void setMvccVersion(long mvccVersion) {
 		_userIdMapper.setMvccVersion(mvccVersion);
@@ -313,10 +313,10 @@ public class UserIdMapperWrapper implements UserIdMapper,
 	}
 
 	/**
-	* Sets the primary key of this user ID mapper.
-	*
-	* @param primaryKey the primary key of this user ID mapper
-	*/
+	 * Sets the primary key of this user ID mapper.
+	 *
+	 * @param primaryKey the primary key of this user ID mapper
+	 */
 	@Override
 	public void setPrimaryKey(long primaryKey) {
 		_userIdMapper.setPrimaryKey(primaryKey);
@@ -328,40 +328,40 @@ public class UserIdMapperWrapper implements UserIdMapper,
 	}
 
 	/**
-	* Sets the type of this user ID mapper.
-	*
-	* @param type the type of this user ID mapper
-	*/
+	 * Sets the type of this user ID mapper.
+	 *
+	 * @param type the type of this user ID mapper
+	 */
 	@Override
 	public void setType(String type) {
 		_userIdMapper.setType(type);
 	}
 
 	/**
-	* Sets the user ID of this user ID mapper.
-	*
-	* @param userId the user ID of this user ID mapper
-	*/
+	 * Sets the user ID of this user ID mapper.
+	 *
+	 * @param userId the user ID of this user ID mapper
+	 */
 	@Override
 	public void setUserId(long userId) {
 		_userIdMapper.setUserId(userId);
 	}
 
 	/**
-	* Sets the user ID mapper ID of this user ID mapper.
-	*
-	* @param userIdMapperId the user ID mapper ID of this user ID mapper
-	*/
+	 * Sets the user ID mapper ID of this user ID mapper.
+	 *
+	 * @param userIdMapperId the user ID mapper ID of this user ID mapper
+	 */
 	@Override
 	public void setUserIdMapperId(long userIdMapperId) {
 		_userIdMapper.setUserIdMapperId(userIdMapperId);
 	}
 
 	/**
-	* Sets the user uuid of this user ID mapper.
-	*
-	* @param userUuid the user uuid of this user ID mapper
-	*/
+	 * Sets the user uuid of this user ID mapper.
+	 *
+	 * @param userUuid the user uuid of this user ID mapper
+	 */
 	@Override
 	public void setUserUuid(String userUuid) {
 		_userIdMapper.setUserUuid(userUuid);
@@ -432,4 +432,5 @@ public class UserIdMapperWrapper implements UserIdMapper,
 	}
 
 	private final UserIdMapper _userIdMapper;
+
 }

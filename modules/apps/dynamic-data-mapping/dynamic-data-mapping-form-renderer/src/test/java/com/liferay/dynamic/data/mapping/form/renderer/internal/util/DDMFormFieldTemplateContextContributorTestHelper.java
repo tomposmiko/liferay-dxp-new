@@ -24,6 +24,8 @@ import com.liferay.dynamic.data.mapping.form.field.type.select.internal.SelectDD
 import com.liferay.dynamic.data.mapping.form.field.type.text.internal.TextDDMFormFieldTemplateContextContributor;
 import com.liferay.portal.json.JSONFactoryImpl;
 import com.liferay.portal.kernel.json.JSONFactory;
+import com.liferay.portal.kernel.util.Portal;
+import com.liferay.portal.util.PortalImpl;
 
 import org.powermock.api.mockito.PowerMockito;
 
@@ -78,11 +80,7 @@ public class DDMFormFieldTemplateContextContributorTestHelper
 			createNumericDDMFormFieldTemplateContextContributor()
 		throws Exception {
 
-		NumericDDMFormFieldTemplateContextContributor
-			numericDDMFormFieldTemplateContextContributor =
-				new NumericDDMFormFieldTemplateContextContributor();
-
-		return numericDDMFormFieldTemplateContextContributor;
+		return new NumericDDMFormFieldTemplateContextContributor();
 	}
 
 	public RadioDDMFormFieldTemplateContextContributor
@@ -124,6 +122,12 @@ public class DDMFormFieldTemplateContextContributorTestHelper
 			selectDDMFormFieldTemplateContextContributor, _jsonFactory
 		);
 
+		field(
+			SelectDDMFormFieldTemplateContextContributor.class, "portal"
+		).set(
+			selectDDMFormFieldTemplateContextContributor, _portal
+		);
+
 		return selectDDMFormFieldTemplateContextContributor;
 	}
 
@@ -147,5 +151,6 @@ public class DDMFormFieldTemplateContextContributorTestHelper
 	}
 
 	private final JSONFactory _jsonFactory = new JSONFactoryImpl();
+	private final Portal _portal = new PortalImpl();
 
 }

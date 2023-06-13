@@ -63,48 +63,35 @@ import java.util.Set;
  * </p>
  *
  * @author Supritha Sundaram
- * @see WeDeployAuthAppPersistence
- * @see com.liferay.portal.security.wedeploy.auth.service.persistence.WeDeployAuthAppUtil
  * @generated
  */
 @ProviderType
-public class WeDeployAuthAppPersistenceImpl extends BasePersistenceImpl<WeDeployAuthApp>
+public class WeDeployAuthAppPersistenceImpl
+	extends BasePersistenceImpl<WeDeployAuthApp>
 	implements WeDeployAuthAppPersistence {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
-	 * Never modify or reference this class directly. Always use {@link WeDeployAuthAppUtil} to access the we deploy auth app persistence. Modify <code>service.xml</code> and rerun ServiceBuilder to regenerate this class.
+	 * Never modify or reference this class directly. Always use <code>WeDeployAuthAppUtil</code> to access the we deploy auth app persistence. Modify <code>service.xml</code> and rerun ServiceBuilder to regenerate this class.
 	 */
-	public static final String FINDER_CLASS_NAME_ENTITY = WeDeployAuthAppImpl.class.getName();
-	public static final String FINDER_CLASS_NAME_LIST_WITH_PAGINATION = FINDER_CLASS_NAME_ENTITY +
-		".List1";
-	public static final String FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION = FINDER_CLASS_NAME_ENTITY +
-		".List2";
-	public static final FinderPath FINDER_PATH_WITH_PAGINATION_FIND_ALL = new FinderPath(WeDeployAuthAppModelImpl.ENTITY_CACHE_ENABLED,
-			WeDeployAuthAppModelImpl.FINDER_CACHE_ENABLED,
-			WeDeployAuthAppImpl.class, FINDER_CLASS_NAME_LIST_WITH_PAGINATION,
-			"findAll", new String[0]);
-	public static final FinderPath FINDER_PATH_WITHOUT_PAGINATION_FIND_ALL = new FinderPath(WeDeployAuthAppModelImpl.ENTITY_CACHE_ENABLED,
-			WeDeployAuthAppModelImpl.FINDER_CACHE_ENABLED,
-			WeDeployAuthAppImpl.class,
-			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findAll", new String[0]);
-	public static final FinderPath FINDER_PATH_COUNT_ALL = new FinderPath(WeDeployAuthAppModelImpl.ENTITY_CACHE_ENABLED,
-			WeDeployAuthAppModelImpl.FINDER_CACHE_ENABLED, Long.class,
-			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countAll", new String[0]);
-	public static final FinderPath FINDER_PATH_FETCH_BY_RU_CI = new FinderPath(WeDeployAuthAppModelImpl.ENTITY_CACHE_ENABLED,
-			WeDeployAuthAppModelImpl.FINDER_CACHE_ENABLED,
-			WeDeployAuthAppImpl.class, FINDER_CLASS_NAME_ENTITY,
-			"fetchByRU_CI",
-			new String[] { String.class.getName(), String.class.getName() },
-			WeDeployAuthAppModelImpl.REDIRECTURI_COLUMN_BITMASK |
-			WeDeployAuthAppModelImpl.CLIENTID_COLUMN_BITMASK);
-	public static final FinderPath FINDER_PATH_COUNT_BY_RU_CI = new FinderPath(WeDeployAuthAppModelImpl.ENTITY_CACHE_ENABLED,
-			WeDeployAuthAppModelImpl.FINDER_CACHE_ENABLED, Long.class,
-			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByRU_CI",
-			new String[] { String.class.getName(), String.class.getName() });
+	public static final String FINDER_CLASS_NAME_ENTITY =
+		WeDeployAuthAppImpl.class.getName();
+
+	public static final String FINDER_CLASS_NAME_LIST_WITH_PAGINATION =
+		FINDER_CLASS_NAME_ENTITY + ".List1";
+
+	public static final String FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION =
+		FINDER_CLASS_NAME_ENTITY + ".List2";
+
+	private FinderPath _finderPathWithPaginationFindAll;
+	private FinderPath _finderPathWithoutPaginationFindAll;
+	private FinderPath _finderPathCountAll;
+	private FinderPath _finderPathFetchByRU_CI;
+	private FinderPath _finderPathCountByRU_CI;
 
 	/**
-	 * Returns the we deploy auth app where redirectURI = &#63; and clientId = &#63; or throws a {@link NoSuchAppException} if it could not be found.
+	 * Returns the we deploy auth app where redirectURI = &#63; and clientId = &#63; or throws a <code>NoSuchAppException</code> if it could not be found.
 	 *
 	 * @param redirectURI the redirect uri
 	 * @param clientId the client ID
@@ -114,6 +101,7 @@ public class WeDeployAuthAppPersistenceImpl extends BasePersistenceImpl<WeDeploy
 	@Override
 	public WeDeployAuthApp findByRU_CI(String redirectURI, String clientId)
 		throws NoSuchAppException {
+
 		WeDeployAuthApp weDeployAuthApp = fetchByRU_CI(redirectURI, clientId);
 
 		if (weDeployAuthApp == null) {
@@ -160,25 +148,28 @@ public class WeDeployAuthAppPersistenceImpl extends BasePersistenceImpl<WeDeploy
 	 * @return the matching we deploy auth app, or <code>null</code> if a matching we deploy auth app could not be found
 	 */
 	@Override
-	public WeDeployAuthApp fetchByRU_CI(String redirectURI, String clientId,
-		boolean retrieveFromCache) {
+	public WeDeployAuthApp fetchByRU_CI(
+		String redirectURI, String clientId, boolean retrieveFromCache) {
+
 		redirectURI = Objects.toString(redirectURI, "");
 		clientId = Objects.toString(clientId, "");
 
-		Object[] finderArgs = new Object[] { redirectURI, clientId };
+		Object[] finderArgs = new Object[] {redirectURI, clientId};
 
 		Object result = null;
 
 		if (retrieveFromCache) {
-			result = finderCache.getResult(FINDER_PATH_FETCH_BY_RU_CI,
-					finderArgs, this);
+			result = finderCache.getResult(
+				_finderPathFetchByRU_CI, finderArgs, this);
 		}
 
 		if (result instanceof WeDeployAuthApp) {
 			WeDeployAuthApp weDeployAuthApp = (WeDeployAuthApp)result;
 
-			if (!Objects.equals(redirectURI, weDeployAuthApp.getRedirectURI()) ||
-					!Objects.equals(clientId, weDeployAuthApp.getClientId())) {
+			if (!Objects.equals(
+					redirectURI, weDeployAuthApp.getRedirectURI()) ||
+				!Objects.equals(clientId, weDeployAuthApp.getClientId())) {
+
 				result = null;
 			}
 		}
@@ -232,8 +223,8 @@ public class WeDeployAuthAppPersistenceImpl extends BasePersistenceImpl<WeDeploy
 				List<WeDeployAuthApp> list = q.list();
 
 				if (list.isEmpty()) {
-					finderCache.putResult(FINDER_PATH_FETCH_BY_RU_CI,
-						finderArgs, list);
+					finderCache.putResult(
+						_finderPathFetchByRU_CI, finderArgs, list);
 				}
 				else {
 					if (list.size() > 1) {
@@ -242,8 +233,8 @@ public class WeDeployAuthAppPersistenceImpl extends BasePersistenceImpl<WeDeploy
 						if (_log.isWarnEnabled()) {
 							_log.warn(
 								"WeDeployAuthAppPersistenceImpl.fetchByRU_CI(String, String, boolean) with parameters (" +
-								StringUtil.merge(finderArgs) +
-								") yields a result set with more than 1 result. This violates the logical unique restriction. There is no order guarantee on which result is returned by this finder.");
+									StringUtil.merge(finderArgs) +
+										") yields a result set with more than 1 result. This violates the logical unique restriction. There is no order guarantee on which result is returned by this finder.");
 						}
 					}
 
@@ -255,7 +246,7 @@ public class WeDeployAuthAppPersistenceImpl extends BasePersistenceImpl<WeDeploy
 				}
 			}
 			catch (Exception e) {
-				finderCache.removeResult(FINDER_PATH_FETCH_BY_RU_CI, finderArgs);
+				finderCache.removeResult(_finderPathFetchByRU_CI, finderArgs);
 
 				throw processException(e);
 			}
@@ -282,6 +273,7 @@ public class WeDeployAuthAppPersistenceImpl extends BasePersistenceImpl<WeDeploy
 	@Override
 	public WeDeployAuthApp removeByRU_CI(String redirectURI, String clientId)
 		throws NoSuchAppException {
+
 		WeDeployAuthApp weDeployAuthApp = findByRU_CI(redirectURI, clientId);
 
 		return remove(weDeployAuthApp);
@@ -299,9 +291,9 @@ public class WeDeployAuthAppPersistenceImpl extends BasePersistenceImpl<WeDeploy
 		redirectURI = Objects.toString(redirectURI, "");
 		clientId = Objects.toString(clientId, "");
 
-		FinderPath finderPath = FINDER_PATH_COUNT_BY_RU_CI;
+		FinderPath finderPath = _finderPathCountByRU_CI;
 
-		Object[] finderArgs = new Object[] { redirectURI, clientId };
+		Object[] finderArgs = new Object[] {redirectURI, clientId};
 
 		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
 
@@ -368,24 +360,23 @@ public class WeDeployAuthAppPersistenceImpl extends BasePersistenceImpl<WeDeploy
 		return count.intValue();
 	}
 
-	private static final String _FINDER_COLUMN_RU_CI_REDIRECTURI_2 = "weDeployAuthApp.redirectURI = ? AND ";
-	private static final String _FINDER_COLUMN_RU_CI_REDIRECTURI_3 = "(weDeployAuthApp.redirectURI IS NULL OR weDeployAuthApp.redirectURI = '') AND ";
-	private static final String _FINDER_COLUMN_RU_CI_CLIENTID_2 = "weDeployAuthApp.clientId = ?";
-	private static final String _FINDER_COLUMN_RU_CI_CLIENTID_3 = "(weDeployAuthApp.clientId IS NULL OR weDeployAuthApp.clientId = '')";
-	public static final FinderPath FINDER_PATH_FETCH_BY_CI_CS = new FinderPath(WeDeployAuthAppModelImpl.ENTITY_CACHE_ENABLED,
-			WeDeployAuthAppModelImpl.FINDER_CACHE_ENABLED,
-			WeDeployAuthAppImpl.class, FINDER_CLASS_NAME_ENTITY,
-			"fetchByCI_CS",
-			new String[] { String.class.getName(), String.class.getName() },
-			WeDeployAuthAppModelImpl.CLIENTID_COLUMN_BITMASK |
-			WeDeployAuthAppModelImpl.CLIENTSECRET_COLUMN_BITMASK);
-	public static final FinderPath FINDER_PATH_COUNT_BY_CI_CS = new FinderPath(WeDeployAuthAppModelImpl.ENTITY_CACHE_ENABLED,
-			WeDeployAuthAppModelImpl.FINDER_CACHE_ENABLED, Long.class,
-			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByCI_CS",
-			new String[] { String.class.getName(), String.class.getName() });
+	private static final String _FINDER_COLUMN_RU_CI_REDIRECTURI_2 =
+		"weDeployAuthApp.redirectURI = ? AND ";
+
+	private static final String _FINDER_COLUMN_RU_CI_REDIRECTURI_3 =
+		"(weDeployAuthApp.redirectURI IS NULL OR weDeployAuthApp.redirectURI = '') AND ";
+
+	private static final String _FINDER_COLUMN_RU_CI_CLIENTID_2 =
+		"weDeployAuthApp.clientId = ?";
+
+	private static final String _FINDER_COLUMN_RU_CI_CLIENTID_3 =
+		"(weDeployAuthApp.clientId IS NULL OR weDeployAuthApp.clientId = '')";
+
+	private FinderPath _finderPathFetchByCI_CS;
+	private FinderPath _finderPathCountByCI_CS;
 
 	/**
-	 * Returns the we deploy auth app where clientId = &#63; and clientSecret = &#63; or throws a {@link NoSuchAppException} if it could not be found.
+	 * Returns the we deploy auth app where clientId = &#63; and clientSecret = &#63; or throws a <code>NoSuchAppException</code> if it could not be found.
 	 *
 	 * @param clientId the client ID
 	 * @param clientSecret the client secret
@@ -395,6 +386,7 @@ public class WeDeployAuthAppPersistenceImpl extends BasePersistenceImpl<WeDeploy
 	@Override
 	public WeDeployAuthApp findByCI_CS(String clientId, String clientSecret)
 		throws NoSuchAppException {
+
 		WeDeployAuthApp weDeployAuthApp = fetchByCI_CS(clientId, clientSecret);
 
 		if (weDeployAuthApp == null) {
@@ -441,26 +433,28 @@ public class WeDeployAuthAppPersistenceImpl extends BasePersistenceImpl<WeDeploy
 	 * @return the matching we deploy auth app, or <code>null</code> if a matching we deploy auth app could not be found
 	 */
 	@Override
-	public WeDeployAuthApp fetchByCI_CS(String clientId, String clientSecret,
-		boolean retrieveFromCache) {
+	public WeDeployAuthApp fetchByCI_CS(
+		String clientId, String clientSecret, boolean retrieveFromCache) {
+
 		clientId = Objects.toString(clientId, "");
 		clientSecret = Objects.toString(clientSecret, "");
 
-		Object[] finderArgs = new Object[] { clientId, clientSecret };
+		Object[] finderArgs = new Object[] {clientId, clientSecret};
 
 		Object result = null;
 
 		if (retrieveFromCache) {
-			result = finderCache.getResult(FINDER_PATH_FETCH_BY_CI_CS,
-					finderArgs, this);
+			result = finderCache.getResult(
+				_finderPathFetchByCI_CS, finderArgs, this);
 		}
 
 		if (result instanceof WeDeployAuthApp) {
 			WeDeployAuthApp weDeployAuthApp = (WeDeployAuthApp)result;
 
 			if (!Objects.equals(clientId, weDeployAuthApp.getClientId()) ||
-					!Objects.equals(clientSecret,
-						weDeployAuthApp.getClientSecret())) {
+				!Objects.equals(
+					clientSecret, weDeployAuthApp.getClientSecret())) {
+
 				result = null;
 			}
 		}
@@ -514,8 +508,8 @@ public class WeDeployAuthAppPersistenceImpl extends BasePersistenceImpl<WeDeploy
 				List<WeDeployAuthApp> list = q.list();
 
 				if (list.isEmpty()) {
-					finderCache.putResult(FINDER_PATH_FETCH_BY_CI_CS,
-						finderArgs, list);
+					finderCache.putResult(
+						_finderPathFetchByCI_CS, finderArgs, list);
 				}
 				else {
 					if (list.size() > 1) {
@@ -524,8 +518,8 @@ public class WeDeployAuthAppPersistenceImpl extends BasePersistenceImpl<WeDeploy
 						if (_log.isWarnEnabled()) {
 							_log.warn(
 								"WeDeployAuthAppPersistenceImpl.fetchByCI_CS(String, String, boolean) with parameters (" +
-								StringUtil.merge(finderArgs) +
-								") yields a result set with more than 1 result. This violates the logical unique restriction. There is no order guarantee on which result is returned by this finder.");
+									StringUtil.merge(finderArgs) +
+										") yields a result set with more than 1 result. This violates the logical unique restriction. There is no order guarantee on which result is returned by this finder.");
 						}
 					}
 
@@ -537,7 +531,7 @@ public class WeDeployAuthAppPersistenceImpl extends BasePersistenceImpl<WeDeploy
 				}
 			}
 			catch (Exception e) {
-				finderCache.removeResult(FINDER_PATH_FETCH_BY_CI_CS, finderArgs);
+				finderCache.removeResult(_finderPathFetchByCI_CS, finderArgs);
 
 				throw processException(e);
 			}
@@ -564,6 +558,7 @@ public class WeDeployAuthAppPersistenceImpl extends BasePersistenceImpl<WeDeploy
 	@Override
 	public WeDeployAuthApp removeByCI_CS(String clientId, String clientSecret)
 		throws NoSuchAppException {
+
 		WeDeployAuthApp weDeployAuthApp = findByCI_CS(clientId, clientSecret);
 
 		return remove(weDeployAuthApp);
@@ -581,9 +576,9 @@ public class WeDeployAuthAppPersistenceImpl extends BasePersistenceImpl<WeDeploy
 		clientId = Objects.toString(clientId, "");
 		clientSecret = Objects.toString(clientSecret, "");
 
-		FinderPath finderPath = FINDER_PATH_COUNT_BY_CI_CS;
+		FinderPath finderPath = _finderPathCountByCI_CS;
 
-		Object[] finderArgs = new Object[] { clientId, clientSecret };
+		Object[] finderArgs = new Object[] {clientId, clientSecret};
 
 		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
 
@@ -650,10 +645,17 @@ public class WeDeployAuthAppPersistenceImpl extends BasePersistenceImpl<WeDeploy
 		return count.intValue();
 	}
 
-	private static final String _FINDER_COLUMN_CI_CS_CLIENTID_2 = "weDeployAuthApp.clientId = ? AND ";
-	private static final String _FINDER_COLUMN_CI_CS_CLIENTID_3 = "(weDeployAuthApp.clientId IS NULL OR weDeployAuthApp.clientId = '') AND ";
-	private static final String _FINDER_COLUMN_CI_CS_CLIENTSECRET_2 = "weDeployAuthApp.clientSecret = ?";
-	private static final String _FINDER_COLUMN_CI_CS_CLIENTSECRET_3 = "(weDeployAuthApp.clientSecret IS NULL OR weDeployAuthApp.clientSecret = '')";
+	private static final String _FINDER_COLUMN_CI_CS_CLIENTID_2 =
+		"weDeployAuthApp.clientId = ? AND ";
+
+	private static final String _FINDER_COLUMN_CI_CS_CLIENTID_3 =
+		"(weDeployAuthApp.clientId IS NULL OR weDeployAuthApp.clientId = '') AND ";
+
+	private static final String _FINDER_COLUMN_CI_CS_CLIENTSECRET_2 =
+		"weDeployAuthApp.clientSecret = ?";
+
+	private static final String _FINDER_COLUMN_CI_CS_CLIENTSECRET_3 =
+		"(weDeployAuthApp.clientSecret IS NULL OR weDeployAuthApp.clientSecret = '')";
 
 	public WeDeployAuthAppPersistenceImpl() {
 		setModelClass(WeDeployAuthApp.class);
@@ -666,19 +668,24 @@ public class WeDeployAuthAppPersistenceImpl extends BasePersistenceImpl<WeDeploy
 	 */
 	@Override
 	public void cacheResult(WeDeployAuthApp weDeployAuthApp) {
-		entityCache.putResult(WeDeployAuthAppModelImpl.ENTITY_CACHE_ENABLED,
+		entityCache.putResult(
+			WeDeployAuthAppModelImpl.ENTITY_CACHE_ENABLED,
 			WeDeployAuthAppImpl.class, weDeployAuthApp.getPrimaryKey(),
 			weDeployAuthApp);
 
-		finderCache.putResult(FINDER_PATH_FETCH_BY_RU_CI,
+		finderCache.putResult(
+			_finderPathFetchByRU_CI,
 			new Object[] {
 				weDeployAuthApp.getRedirectURI(), weDeployAuthApp.getClientId()
-			}, weDeployAuthApp);
+			},
+			weDeployAuthApp);
 
-		finderCache.putResult(FINDER_PATH_FETCH_BY_CI_CS,
+		finderCache.putResult(
+			_finderPathFetchByCI_CS,
 			new Object[] {
 				weDeployAuthApp.getClientId(), weDeployAuthApp.getClientSecret()
-			}, weDeployAuthApp);
+			},
+			weDeployAuthApp);
 
 		weDeployAuthApp.resetOriginalValues();
 	}
@@ -692,9 +699,10 @@ public class WeDeployAuthAppPersistenceImpl extends BasePersistenceImpl<WeDeploy
 	public void cacheResult(List<WeDeployAuthApp> weDeployAuthApps) {
 		for (WeDeployAuthApp weDeployAuthApp : weDeployAuthApps) {
 			if (entityCache.getResult(
-						WeDeployAuthAppModelImpl.ENTITY_CACHE_ENABLED,
-						WeDeployAuthAppImpl.class,
-						weDeployAuthApp.getPrimaryKey()) == null) {
+					WeDeployAuthAppModelImpl.ENTITY_CACHE_ENABLED,
+					WeDeployAuthAppImpl.class,
+					weDeployAuthApp.getPrimaryKey()) == null) {
+
 				cacheResult(weDeployAuthApp);
 			}
 			else {
@@ -707,7 +715,7 @@ public class WeDeployAuthAppPersistenceImpl extends BasePersistenceImpl<WeDeploy
 	 * Clears the cache for all we deploy auth apps.
 	 *
 	 * <p>
-	 * The {@link EntityCache} and {@link FinderCache} are both cleared by this method.
+	 * The <code>EntityCache</code> and <code>FinderCache</code> are both cleared by this method.
 	 * </p>
 	 */
 	@Override
@@ -723,18 +731,20 @@ public class WeDeployAuthAppPersistenceImpl extends BasePersistenceImpl<WeDeploy
 	 * Clears the cache for the we deploy auth app.
 	 *
 	 * <p>
-	 * The {@link EntityCache} and {@link FinderCache} are both cleared by this method.
+	 * The <code>EntityCache</code> and <code>FinderCache</code> are both cleared by this method.
 	 * </p>
 	 */
 	@Override
 	public void clearCache(WeDeployAuthApp weDeployAuthApp) {
-		entityCache.removeResult(WeDeployAuthAppModelImpl.ENTITY_CACHE_ENABLED,
+		entityCache.removeResult(
+			WeDeployAuthAppModelImpl.ENTITY_CACHE_ENABLED,
 			WeDeployAuthAppImpl.class, weDeployAuthApp.getPrimaryKey());
 
 		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
 		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
 
-		clearUniqueFindersCache((WeDeployAuthAppModelImpl)weDeployAuthApp, true);
+		clearUniqueFindersCache(
+			(WeDeployAuthAppModelImpl)weDeployAuthApp, true);
 	}
 
 	@Override
@@ -743,79 +753,85 @@ public class WeDeployAuthAppPersistenceImpl extends BasePersistenceImpl<WeDeploy
 		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
 
 		for (WeDeployAuthApp weDeployAuthApp : weDeployAuthApps) {
-			entityCache.removeResult(WeDeployAuthAppModelImpl.ENTITY_CACHE_ENABLED,
+			entityCache.removeResult(
+				WeDeployAuthAppModelImpl.ENTITY_CACHE_ENABLED,
 				WeDeployAuthAppImpl.class, weDeployAuthApp.getPrimaryKey());
 
-			clearUniqueFindersCache((WeDeployAuthAppModelImpl)weDeployAuthApp,
-				true);
+			clearUniqueFindersCache(
+				(WeDeployAuthAppModelImpl)weDeployAuthApp, true);
 		}
 	}
 
 	protected void cacheUniqueFindersCache(
 		WeDeployAuthAppModelImpl weDeployAuthAppModelImpl) {
+
 		Object[] args = new Object[] {
+			weDeployAuthAppModelImpl.getRedirectURI(),
+			weDeployAuthAppModelImpl.getClientId()
+		};
+
+		finderCache.putResult(
+			_finderPathCountByRU_CI, args, Long.valueOf(1), false);
+		finderCache.putResult(
+			_finderPathFetchByRU_CI, args, weDeployAuthAppModelImpl, false);
+
+		args = new Object[] {
+			weDeployAuthAppModelImpl.getClientId(),
+			weDeployAuthAppModelImpl.getClientSecret()
+		};
+
+		finderCache.putResult(
+			_finderPathCountByCI_CS, args, Long.valueOf(1), false);
+		finderCache.putResult(
+			_finderPathFetchByCI_CS, args, weDeployAuthAppModelImpl, false);
+	}
+
+	protected void clearUniqueFindersCache(
+		WeDeployAuthAppModelImpl weDeployAuthAppModelImpl,
+		boolean clearCurrent) {
+
+		if (clearCurrent) {
+			Object[] args = new Object[] {
 				weDeployAuthAppModelImpl.getRedirectURI(),
 				weDeployAuthAppModelImpl.getClientId()
 			};
 
-		finderCache.putResult(FINDER_PATH_COUNT_BY_RU_CI, args,
-			Long.valueOf(1), false);
-		finderCache.putResult(FINDER_PATH_FETCH_BY_RU_CI, args,
-			weDeployAuthAppModelImpl, false);
+			finderCache.removeResult(_finderPathCountByRU_CI, args);
+			finderCache.removeResult(_finderPathFetchByRU_CI, args);
+		}
 
-		args = new Object[] {
+		if ((weDeployAuthAppModelImpl.getColumnBitmask() &
+			 _finderPathFetchByRU_CI.getColumnBitmask()) != 0) {
+
+			Object[] args = new Object[] {
+				weDeployAuthAppModelImpl.getOriginalRedirectURI(),
+				weDeployAuthAppModelImpl.getOriginalClientId()
+			};
+
+			finderCache.removeResult(_finderPathCountByRU_CI, args);
+			finderCache.removeResult(_finderPathFetchByRU_CI, args);
+		}
+
+		if (clearCurrent) {
+			Object[] args = new Object[] {
 				weDeployAuthAppModelImpl.getClientId(),
 				weDeployAuthAppModelImpl.getClientSecret()
 			};
 
-		finderCache.putResult(FINDER_PATH_COUNT_BY_CI_CS, args,
-			Long.valueOf(1), false);
-		finderCache.putResult(FINDER_PATH_FETCH_BY_CI_CS, args,
-			weDeployAuthAppModelImpl, false);
-	}
-
-	protected void clearUniqueFindersCache(
-		WeDeployAuthAppModelImpl weDeployAuthAppModelImpl, boolean clearCurrent) {
-		if (clearCurrent) {
-			Object[] args = new Object[] {
-					weDeployAuthAppModelImpl.getRedirectURI(),
-					weDeployAuthAppModelImpl.getClientId()
-				};
-
-			finderCache.removeResult(FINDER_PATH_COUNT_BY_RU_CI, args);
-			finderCache.removeResult(FINDER_PATH_FETCH_BY_RU_CI, args);
+			finderCache.removeResult(_finderPathCountByCI_CS, args);
+			finderCache.removeResult(_finderPathFetchByCI_CS, args);
 		}
 
 		if ((weDeployAuthAppModelImpl.getColumnBitmask() &
-				FINDER_PATH_FETCH_BY_RU_CI.getColumnBitmask()) != 0) {
+			 _finderPathFetchByCI_CS.getColumnBitmask()) != 0) {
+
 			Object[] args = new Object[] {
-					weDeployAuthAppModelImpl.getOriginalRedirectURI(),
-					weDeployAuthAppModelImpl.getOriginalClientId()
-				};
+				weDeployAuthAppModelImpl.getOriginalClientId(),
+				weDeployAuthAppModelImpl.getOriginalClientSecret()
+			};
 
-			finderCache.removeResult(FINDER_PATH_COUNT_BY_RU_CI, args);
-			finderCache.removeResult(FINDER_PATH_FETCH_BY_RU_CI, args);
-		}
-
-		if (clearCurrent) {
-			Object[] args = new Object[] {
-					weDeployAuthAppModelImpl.getClientId(),
-					weDeployAuthAppModelImpl.getClientSecret()
-				};
-
-			finderCache.removeResult(FINDER_PATH_COUNT_BY_CI_CS, args);
-			finderCache.removeResult(FINDER_PATH_FETCH_BY_CI_CS, args);
-		}
-
-		if ((weDeployAuthAppModelImpl.getColumnBitmask() &
-				FINDER_PATH_FETCH_BY_CI_CS.getColumnBitmask()) != 0) {
-			Object[] args = new Object[] {
-					weDeployAuthAppModelImpl.getOriginalClientId(),
-					weDeployAuthAppModelImpl.getOriginalClientSecret()
-				};
-
-			finderCache.removeResult(FINDER_PATH_COUNT_BY_CI_CS, args);
-			finderCache.removeResult(FINDER_PATH_FETCH_BY_CI_CS, args);
+			finderCache.removeResult(_finderPathCountByCI_CS, args);
+			finderCache.removeResult(_finderPathFetchByCI_CS, args);
 		}
 	}
 
@@ -847,6 +863,7 @@ public class WeDeployAuthAppPersistenceImpl extends BasePersistenceImpl<WeDeploy
 	@Override
 	public WeDeployAuthApp remove(long weDeployAuthAppId)
 		throws NoSuchAppException {
+
 		return remove((Serializable)weDeployAuthAppId);
 	}
 
@@ -860,21 +877,22 @@ public class WeDeployAuthAppPersistenceImpl extends BasePersistenceImpl<WeDeploy
 	@Override
 	public WeDeployAuthApp remove(Serializable primaryKey)
 		throws NoSuchAppException {
+
 		Session session = null;
 
 		try {
 			session = openSession();
 
-			WeDeployAuthApp weDeployAuthApp = (WeDeployAuthApp)session.get(WeDeployAuthAppImpl.class,
-					primaryKey);
+			WeDeployAuthApp weDeployAuthApp = (WeDeployAuthApp)session.get(
+				WeDeployAuthAppImpl.class, primaryKey);
 
 			if (weDeployAuthApp == null) {
 				if (_log.isDebugEnabled()) {
 					_log.debug(_NO_SUCH_ENTITY_WITH_PRIMARY_KEY + primaryKey);
 				}
 
-				throw new NoSuchAppException(_NO_SUCH_ENTITY_WITH_PRIMARY_KEY +
-					primaryKey);
+				throw new NoSuchAppException(
+					_NO_SUCH_ENTITY_WITH_PRIMARY_KEY + primaryKey);
 			}
 
 			return remove(weDeployAuthApp);
@@ -898,8 +916,9 @@ public class WeDeployAuthAppPersistenceImpl extends BasePersistenceImpl<WeDeploy
 			session = openSession();
 
 			if (!session.contains(weDeployAuthApp)) {
-				weDeployAuthApp = (WeDeployAuthApp)session.get(WeDeployAuthAppImpl.class,
-						weDeployAuthApp.getPrimaryKeyObj());
+				weDeployAuthApp = (WeDeployAuthApp)session.get(
+					WeDeployAuthAppImpl.class,
+					weDeployAuthApp.getPrimaryKeyObj());
 			}
 
 			if (weDeployAuthApp != null) {
@@ -928,21 +947,24 @@ public class WeDeployAuthAppPersistenceImpl extends BasePersistenceImpl<WeDeploy
 			InvocationHandler invocationHandler = null;
 
 			if (ProxyUtil.isProxyClass(weDeployAuthApp.getClass())) {
-				invocationHandler = ProxyUtil.getInvocationHandler(weDeployAuthApp);
+				invocationHandler = ProxyUtil.getInvocationHandler(
+					weDeployAuthApp);
 
 				throw new IllegalArgumentException(
 					"Implement ModelWrapper in weDeployAuthApp proxy " +
-					invocationHandler.getClass());
+						invocationHandler.getClass());
 			}
 
 			throw new IllegalArgumentException(
 				"Implement ModelWrapper in custom WeDeployAuthApp implementation " +
-				weDeployAuthApp.getClass());
+					weDeployAuthApp.getClass());
 		}
 
-		WeDeployAuthAppModelImpl weDeployAuthAppModelImpl = (WeDeployAuthAppModelImpl)weDeployAuthApp;
+		WeDeployAuthAppModelImpl weDeployAuthAppModelImpl =
+			(WeDeployAuthAppModelImpl)weDeployAuthApp;
 
-		ServiceContext serviceContext = ServiceContextThreadLocal.getServiceContext();
+		ServiceContext serviceContext =
+			ServiceContextThreadLocal.getServiceContext();
 
 		Date now = new Date();
 
@@ -951,7 +973,8 @@ public class WeDeployAuthAppPersistenceImpl extends BasePersistenceImpl<WeDeploy
 				weDeployAuthApp.setCreateDate(now);
 			}
 			else {
-				weDeployAuthApp.setCreateDate(serviceContext.getCreateDate(now));
+				weDeployAuthApp.setCreateDate(
+					serviceContext.getCreateDate(now));
 			}
 		}
 
@@ -960,8 +983,8 @@ public class WeDeployAuthAppPersistenceImpl extends BasePersistenceImpl<WeDeploy
 				weDeployAuthApp.setModifiedDate(now);
 			}
 			else {
-				weDeployAuthApp.setModifiedDate(serviceContext.getModifiedDate(
-						now));
+				weDeployAuthApp.setModifiedDate(
+					serviceContext.getModifiedDate(now));
 			}
 		}
 
@@ -976,7 +999,8 @@ public class WeDeployAuthAppPersistenceImpl extends BasePersistenceImpl<WeDeploy
 				weDeployAuthApp.setNew(false);
 			}
 			else {
-				weDeployAuthApp = (WeDeployAuthApp)session.merge(weDeployAuthApp);
+				weDeployAuthApp = (WeDeployAuthApp)session.merge(
+					weDeployAuthApp);
 			}
 		}
 		catch (Exception e) {
@@ -991,14 +1015,14 @@ public class WeDeployAuthAppPersistenceImpl extends BasePersistenceImpl<WeDeploy
 		if (!WeDeployAuthAppModelImpl.COLUMN_BITMASK_ENABLED) {
 			finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
 		}
-		else
-		 if (isNew) {
-			finderCache.removeResult(FINDER_PATH_COUNT_ALL, FINDER_ARGS_EMPTY);
-			finderCache.removeResult(FINDER_PATH_WITHOUT_PAGINATION_FIND_ALL,
-				FINDER_ARGS_EMPTY);
+		else if (isNew) {
+			finderCache.removeResult(_finderPathCountAll, FINDER_ARGS_EMPTY);
+			finderCache.removeResult(
+				_finderPathWithoutPaginationFindAll, FINDER_ARGS_EMPTY);
 		}
 
-		entityCache.putResult(WeDeployAuthAppModelImpl.ENTITY_CACHE_ENABLED,
+		entityCache.putResult(
+			WeDeployAuthAppModelImpl.ENTITY_CACHE_ENABLED,
 			WeDeployAuthAppImpl.class, weDeployAuthApp.getPrimaryKey(),
 			weDeployAuthApp, false);
 
@@ -1011,7 +1035,7 @@ public class WeDeployAuthAppPersistenceImpl extends BasePersistenceImpl<WeDeploy
 	}
 
 	/**
-	 * Returns the we deploy auth app with the primary key or throws a {@link com.liferay.portal.kernel.exception.NoSuchModelException} if it could not be found.
+	 * Returns the we deploy auth app with the primary key or throws a <code>com.liferay.portal.kernel.exception.NoSuchModelException</code> if it could not be found.
 	 *
 	 * @param primaryKey the primary key of the we deploy auth app
 	 * @return the we deploy auth app
@@ -1020,6 +1044,7 @@ public class WeDeployAuthAppPersistenceImpl extends BasePersistenceImpl<WeDeploy
 	@Override
 	public WeDeployAuthApp findByPrimaryKey(Serializable primaryKey)
 		throws NoSuchAppException {
+
 		WeDeployAuthApp weDeployAuthApp = fetchByPrimaryKey(primaryKey);
 
 		if (weDeployAuthApp == null) {
@@ -1027,15 +1052,15 @@ public class WeDeployAuthAppPersistenceImpl extends BasePersistenceImpl<WeDeploy
 				_log.debug(_NO_SUCH_ENTITY_WITH_PRIMARY_KEY + primaryKey);
 			}
 
-			throw new NoSuchAppException(_NO_SUCH_ENTITY_WITH_PRIMARY_KEY +
-				primaryKey);
+			throw new NoSuchAppException(
+				_NO_SUCH_ENTITY_WITH_PRIMARY_KEY + primaryKey);
 		}
 
 		return weDeployAuthApp;
 	}
 
 	/**
-	 * Returns the we deploy auth app with the primary key or throws a {@link NoSuchAppException} if it could not be found.
+	 * Returns the we deploy auth app with the primary key or throws a <code>NoSuchAppException</code> if it could not be found.
 	 *
 	 * @param weDeployAuthAppId the primary key of the we deploy auth app
 	 * @return the we deploy auth app
@@ -1044,6 +1069,7 @@ public class WeDeployAuthAppPersistenceImpl extends BasePersistenceImpl<WeDeploy
 	@Override
 	public WeDeployAuthApp findByPrimaryKey(long weDeployAuthAppId)
 		throws NoSuchAppException {
+
 		return findByPrimaryKey((Serializable)weDeployAuthAppId);
 	}
 
@@ -1055,8 +1081,9 @@ public class WeDeployAuthAppPersistenceImpl extends BasePersistenceImpl<WeDeploy
 	 */
 	@Override
 	public WeDeployAuthApp fetchByPrimaryKey(Serializable primaryKey) {
-		Serializable serializable = entityCache.getResult(WeDeployAuthAppModelImpl.ENTITY_CACHE_ENABLED,
-				WeDeployAuthAppImpl.class, primaryKey);
+		Serializable serializable = entityCache.getResult(
+			WeDeployAuthAppModelImpl.ENTITY_CACHE_ENABLED,
+			WeDeployAuthAppImpl.class, primaryKey);
 
 		if (serializable == nullModel) {
 			return null;
@@ -1070,19 +1097,21 @@ public class WeDeployAuthAppPersistenceImpl extends BasePersistenceImpl<WeDeploy
 			try {
 				session = openSession();
 
-				weDeployAuthApp = (WeDeployAuthApp)session.get(WeDeployAuthAppImpl.class,
-						primaryKey);
+				weDeployAuthApp = (WeDeployAuthApp)session.get(
+					WeDeployAuthAppImpl.class, primaryKey);
 
 				if (weDeployAuthApp != null) {
 					cacheResult(weDeployAuthApp);
 				}
 				else {
-					entityCache.putResult(WeDeployAuthAppModelImpl.ENTITY_CACHE_ENABLED,
+					entityCache.putResult(
+						WeDeployAuthAppModelImpl.ENTITY_CACHE_ENABLED,
 						WeDeployAuthAppImpl.class, primaryKey, nullModel);
 				}
 			}
 			catch (Exception e) {
-				entityCache.removeResult(WeDeployAuthAppModelImpl.ENTITY_CACHE_ENABLED,
+				entityCache.removeResult(
+					WeDeployAuthAppModelImpl.ENTITY_CACHE_ENABLED,
 					WeDeployAuthAppImpl.class, primaryKey);
 
 				throw processException(e);
@@ -1109,11 +1138,13 @@ public class WeDeployAuthAppPersistenceImpl extends BasePersistenceImpl<WeDeploy
 	@Override
 	public Map<Serializable, WeDeployAuthApp> fetchByPrimaryKeys(
 		Set<Serializable> primaryKeys) {
+
 		if (primaryKeys.isEmpty()) {
 			return Collections.emptyMap();
 		}
 
-		Map<Serializable, WeDeployAuthApp> map = new HashMap<Serializable, WeDeployAuthApp>();
+		Map<Serializable, WeDeployAuthApp> map =
+			new HashMap<Serializable, WeDeployAuthApp>();
 
 		if (primaryKeys.size() == 1) {
 			Iterator<Serializable> iterator = primaryKeys.iterator();
@@ -1132,8 +1163,9 @@ public class WeDeployAuthAppPersistenceImpl extends BasePersistenceImpl<WeDeploy
 		Set<Serializable> uncachedPrimaryKeys = null;
 
 		for (Serializable primaryKey : primaryKeys) {
-			Serializable serializable = entityCache.getResult(WeDeployAuthAppModelImpl.ENTITY_CACHE_ENABLED,
-					WeDeployAuthAppImpl.class, primaryKey);
+			Serializable serializable = entityCache.getResult(
+				WeDeployAuthAppModelImpl.ENTITY_CACHE_ENABLED,
+				WeDeployAuthAppImpl.class, primaryKey);
 
 			if (serializable != nullModel) {
 				if (serializable == null) {
@@ -1153,8 +1185,8 @@ public class WeDeployAuthAppPersistenceImpl extends BasePersistenceImpl<WeDeploy
 			return map;
 		}
 
-		StringBundler query = new StringBundler((uncachedPrimaryKeys.size() * 2) +
-				1);
+		StringBundler query = new StringBundler(
+			uncachedPrimaryKeys.size() * 2 + 1);
 
 		query.append(_SQL_SELECT_WEDEPLOYAUTHAPP_WHERE_PKS_IN);
 
@@ -1177,7 +1209,9 @@ public class WeDeployAuthAppPersistenceImpl extends BasePersistenceImpl<WeDeploy
 
 			Query q = session.createQuery(sql);
 
-			for (WeDeployAuthApp weDeployAuthApp : (List<WeDeployAuthApp>)q.list()) {
+			for (WeDeployAuthApp weDeployAuthApp :
+					(List<WeDeployAuthApp>)q.list()) {
+
 				map.put(weDeployAuthApp.getPrimaryKeyObj(), weDeployAuthApp);
 
 				cacheResult(weDeployAuthApp);
@@ -1186,7 +1220,8 @@ public class WeDeployAuthAppPersistenceImpl extends BasePersistenceImpl<WeDeploy
 			}
 
 			for (Serializable primaryKey : uncachedPrimaryKeys) {
-				entityCache.putResult(WeDeployAuthAppModelImpl.ENTITY_CACHE_ENABLED,
+				entityCache.putResult(
+					WeDeployAuthAppModelImpl.ENTITY_CACHE_ENABLED,
 					WeDeployAuthAppImpl.class, primaryKey, nullModel);
 			}
 		}
@@ -1214,7 +1249,7 @@ public class WeDeployAuthAppPersistenceImpl extends BasePersistenceImpl<WeDeploy
 	 * Returns a range of all the we deploy auth apps.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link WeDeployAuthAppModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>WeDeployAuthAppModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param start the lower bound of the range of we deploy auth apps
@@ -1230,7 +1265,7 @@ public class WeDeployAuthAppPersistenceImpl extends BasePersistenceImpl<WeDeploy
 	 * Returns an ordered range of all the we deploy auth apps.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link WeDeployAuthAppModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>WeDeployAuthAppModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param start the lower bound of the range of we deploy auth apps
@@ -1239,8 +1274,10 @@ public class WeDeployAuthAppPersistenceImpl extends BasePersistenceImpl<WeDeploy
 	 * @return the ordered range of we deploy auth apps
 	 */
 	@Override
-	public List<WeDeployAuthApp> findAll(int start, int end,
+	public List<WeDeployAuthApp> findAll(
+		int start, int end,
 		OrderByComparator<WeDeployAuthApp> orderByComparator) {
+
 		return findAll(start, end, orderByComparator, true);
 	}
 
@@ -1248,7 +1285,7 @@ public class WeDeployAuthAppPersistenceImpl extends BasePersistenceImpl<WeDeploy
 	 * Returns an ordered range of all the we deploy auth apps.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link WeDeployAuthAppModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>WeDeployAuthAppModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param start the lower bound of the range of we deploy auth apps
@@ -1258,29 +1295,32 @@ public class WeDeployAuthAppPersistenceImpl extends BasePersistenceImpl<WeDeploy
 	 * @return the ordered range of we deploy auth apps
 	 */
 	@Override
-	public List<WeDeployAuthApp> findAll(int start, int end,
+	public List<WeDeployAuthApp> findAll(
+		int start, int end,
 		OrderByComparator<WeDeployAuthApp> orderByComparator,
 		boolean retrieveFromCache) {
+
 		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
-				(orderByComparator == null)) {
+			(orderByComparator == null)) {
+
 			pagination = false;
-			finderPath = FINDER_PATH_WITHOUT_PAGINATION_FIND_ALL;
+			finderPath = _finderPathWithoutPaginationFindAll;
 			finderArgs = FINDER_ARGS_EMPTY;
 		}
 		else {
-			finderPath = FINDER_PATH_WITH_PAGINATION_FIND_ALL;
-			finderArgs = new Object[] { start, end, orderByComparator };
+			finderPath = _finderPathWithPaginationFindAll;
+			finderArgs = new Object[] {start, end, orderByComparator};
 		}
 
 		List<WeDeployAuthApp> list = null;
 
 		if (retrieveFromCache) {
-			list = (List<WeDeployAuthApp>)finderCache.getResult(finderPath,
-					finderArgs, this);
+			list = (List<WeDeployAuthApp>)finderCache.getResult(
+				finderPath, finderArgs, this);
 		}
 
 		if (list == null) {
@@ -1288,13 +1328,13 @@ public class WeDeployAuthAppPersistenceImpl extends BasePersistenceImpl<WeDeploy
 			String sql = null;
 
 			if (orderByComparator != null) {
-				query = new StringBundler(2 +
-						(orderByComparator.getOrderByFields().length * 2));
+				query = new StringBundler(
+					2 + (orderByComparator.getOrderByFields().length * 2));
 
 				query.append(_SQL_SELECT_WEDEPLOYAUTHAPP);
 
-				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
-					orderByComparator);
+				appendOrderByComparator(
+					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
 
 				sql = query.toString();
 			}
@@ -1314,16 +1354,16 @@ public class WeDeployAuthAppPersistenceImpl extends BasePersistenceImpl<WeDeploy
 				Query q = session.createQuery(sql);
 
 				if (!pagination) {
-					list = (List<WeDeployAuthApp>)QueryUtil.list(q,
-							getDialect(), start, end, false);
+					list = (List<WeDeployAuthApp>)QueryUtil.list(
+						q, getDialect(), start, end, false);
 
 					Collections.sort(list);
 
 					list = Collections.unmodifiableList(list);
 				}
 				else {
-					list = (List<WeDeployAuthApp>)QueryUtil.list(q,
-							getDialect(), start, end);
+					list = (List<WeDeployAuthApp>)QueryUtil.list(
+						q, getDialect(), start, end);
 				}
 
 				cacheResult(list);
@@ -1361,8 +1401,8 @@ public class WeDeployAuthAppPersistenceImpl extends BasePersistenceImpl<WeDeploy
 	 */
 	@Override
 	public int countAll() {
-		Long count = (Long)finderCache.getResult(FINDER_PATH_COUNT_ALL,
-				FINDER_ARGS_EMPTY, this);
+		Long count = (Long)finderCache.getResult(
+			_finderPathCountAll, FINDER_ARGS_EMPTY, this);
 
 		if (count == null) {
 			Session session = null;
@@ -1374,12 +1414,12 @@ public class WeDeployAuthAppPersistenceImpl extends BasePersistenceImpl<WeDeploy
 
 				count = (Long)q.uniqueResult();
 
-				finderCache.putResult(FINDER_PATH_COUNT_ALL, FINDER_ARGS_EMPTY,
-					count);
+				finderCache.putResult(
+					_finderPathCountAll, FINDER_ARGS_EMPTY, count);
 			}
 			catch (Exception e) {
-				finderCache.removeResult(FINDER_PATH_COUNT_ALL,
-					FINDER_ARGS_EMPTY);
+				finderCache.removeResult(
+					_finderPathCountAll, FINDER_ARGS_EMPTY);
 
 				throw processException(e);
 			}
@@ -1400,6 +1440,52 @@ public class WeDeployAuthAppPersistenceImpl extends BasePersistenceImpl<WeDeploy
 	 * Initializes the we deploy auth app persistence.
 	 */
 	public void afterPropertiesSet() {
+		_finderPathWithPaginationFindAll = new FinderPath(
+			WeDeployAuthAppModelImpl.ENTITY_CACHE_ENABLED,
+			WeDeployAuthAppModelImpl.FINDER_CACHE_ENABLED,
+			WeDeployAuthAppImpl.class, FINDER_CLASS_NAME_LIST_WITH_PAGINATION,
+			"findAll", new String[0]);
+
+		_finderPathWithoutPaginationFindAll = new FinderPath(
+			WeDeployAuthAppModelImpl.ENTITY_CACHE_ENABLED,
+			WeDeployAuthAppModelImpl.FINDER_CACHE_ENABLED,
+			WeDeployAuthAppImpl.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findAll",
+			new String[0]);
+
+		_finderPathCountAll = new FinderPath(
+			WeDeployAuthAppModelImpl.ENTITY_CACHE_ENABLED,
+			WeDeployAuthAppModelImpl.FINDER_CACHE_ENABLED, Long.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countAll",
+			new String[0]);
+
+		_finderPathFetchByRU_CI = new FinderPath(
+			WeDeployAuthAppModelImpl.ENTITY_CACHE_ENABLED,
+			WeDeployAuthAppModelImpl.FINDER_CACHE_ENABLED,
+			WeDeployAuthAppImpl.class, FINDER_CLASS_NAME_ENTITY, "fetchByRU_CI",
+			new String[] {String.class.getName(), String.class.getName()},
+			WeDeployAuthAppModelImpl.REDIRECTURI_COLUMN_BITMASK |
+			WeDeployAuthAppModelImpl.CLIENTID_COLUMN_BITMASK);
+
+		_finderPathCountByRU_CI = new FinderPath(
+			WeDeployAuthAppModelImpl.ENTITY_CACHE_ENABLED,
+			WeDeployAuthAppModelImpl.FINDER_CACHE_ENABLED, Long.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByRU_CI",
+			new String[] {String.class.getName(), String.class.getName()});
+
+		_finderPathFetchByCI_CS = new FinderPath(
+			WeDeployAuthAppModelImpl.ENTITY_CACHE_ENABLED,
+			WeDeployAuthAppModelImpl.FINDER_CACHE_ENABLED,
+			WeDeployAuthAppImpl.class, FINDER_CLASS_NAME_ENTITY, "fetchByCI_CS",
+			new String[] {String.class.getName(), String.class.getName()},
+			WeDeployAuthAppModelImpl.CLIENTID_COLUMN_BITMASK |
+			WeDeployAuthAppModelImpl.CLIENTSECRET_COLUMN_BITMASK);
+
+		_finderPathCountByCI_CS = new FinderPath(
+			WeDeployAuthAppModelImpl.ENTITY_CACHE_ENABLED,
+			WeDeployAuthAppModelImpl.FINDER_CACHE_ENABLED, Long.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByCI_CS",
+			new String[] {String.class.getName(), String.class.getName()});
 	}
 
 	public void destroy() {
@@ -1411,17 +1497,37 @@ public class WeDeployAuthAppPersistenceImpl extends BasePersistenceImpl<WeDeploy
 
 	@ServiceReference(type = CompanyProviderWrapper.class)
 	protected CompanyProvider companyProvider;
+
 	@ServiceReference(type = EntityCache.class)
 	protected EntityCache entityCache;
+
 	@ServiceReference(type = FinderCache.class)
 	protected FinderCache finderCache;
-	private static final String _SQL_SELECT_WEDEPLOYAUTHAPP = "SELECT weDeployAuthApp FROM WeDeployAuthApp weDeployAuthApp";
-	private static final String _SQL_SELECT_WEDEPLOYAUTHAPP_WHERE_PKS_IN = "SELECT weDeployAuthApp FROM WeDeployAuthApp weDeployAuthApp WHERE weDeployAuthAppId IN (";
-	private static final String _SQL_SELECT_WEDEPLOYAUTHAPP_WHERE = "SELECT weDeployAuthApp FROM WeDeployAuthApp weDeployAuthApp WHERE ";
-	private static final String _SQL_COUNT_WEDEPLOYAUTHAPP = "SELECT COUNT(weDeployAuthApp) FROM WeDeployAuthApp weDeployAuthApp";
-	private static final String _SQL_COUNT_WEDEPLOYAUTHAPP_WHERE = "SELECT COUNT(weDeployAuthApp) FROM WeDeployAuthApp weDeployAuthApp WHERE ";
+
+	private static final String _SQL_SELECT_WEDEPLOYAUTHAPP =
+		"SELECT weDeployAuthApp FROM WeDeployAuthApp weDeployAuthApp";
+
+	private static final String _SQL_SELECT_WEDEPLOYAUTHAPP_WHERE_PKS_IN =
+		"SELECT weDeployAuthApp FROM WeDeployAuthApp weDeployAuthApp WHERE weDeployAuthAppId IN (";
+
+	private static final String _SQL_SELECT_WEDEPLOYAUTHAPP_WHERE =
+		"SELECT weDeployAuthApp FROM WeDeployAuthApp weDeployAuthApp WHERE ";
+
+	private static final String _SQL_COUNT_WEDEPLOYAUTHAPP =
+		"SELECT COUNT(weDeployAuthApp) FROM WeDeployAuthApp weDeployAuthApp";
+
+	private static final String _SQL_COUNT_WEDEPLOYAUTHAPP_WHERE =
+		"SELECT COUNT(weDeployAuthApp) FROM WeDeployAuthApp weDeployAuthApp WHERE ";
+
 	private static final String _ORDER_BY_ENTITY_ALIAS = "weDeployAuthApp.";
-	private static final String _NO_SUCH_ENTITY_WITH_PRIMARY_KEY = "No WeDeployAuthApp exists with the primary key ";
-	private static final String _NO_SUCH_ENTITY_WITH_KEY = "No WeDeployAuthApp exists with the key {";
-	private static final Log _log = LogFactoryUtil.getLog(WeDeployAuthAppPersistenceImpl.class);
+
+	private static final String _NO_SUCH_ENTITY_WITH_PRIMARY_KEY =
+		"No WeDeployAuthApp exists with the primary key ";
+
+	private static final String _NO_SUCH_ENTITY_WITH_KEY =
+		"No WeDeployAuthApp exists with the key {";
+
+	private static final Log _log = LogFactoryUtil.getLog(
+		WeDeployAuthAppPersistenceImpl.class);
+
 }

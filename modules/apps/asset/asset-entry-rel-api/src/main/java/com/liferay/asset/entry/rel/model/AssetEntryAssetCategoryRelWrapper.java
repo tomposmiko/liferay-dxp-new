@@ -17,7 +17,6 @@ package com.liferay.asset.entry.rel.model;
 import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.expando.kernel.model.ExpandoBridge;
-
 import com.liferay.portal.kernel.model.ModelWrapper;
 import com.liferay.portal.kernel.service.ServiceContext;
 
@@ -39,9 +38,11 @@ import java.util.Objects;
 @ProviderType
 public class AssetEntryAssetCategoryRelWrapper
 	implements AssetEntryAssetCategoryRel,
-		ModelWrapper<AssetEntryAssetCategoryRel> {
+			   ModelWrapper<AssetEntryAssetCategoryRel> {
+
 	public AssetEntryAssetCategoryRelWrapper(
 		AssetEntryAssetCategoryRel assetEntryAssetCategoryRel) {
+
 		_assetEntryAssetCategoryRel = assetEntryAssetCategoryRel;
 	}
 
@@ -59,8 +60,8 @@ public class AssetEntryAssetCategoryRelWrapper
 	public Map<String, Object> getModelAttributes() {
 		Map<String, Object> attributes = new HashMap<String, Object>();
 
-		attributes.put("assetEntryAssetCategoryRelId",
-			getAssetEntryAssetCategoryRelId());
+		attributes.put(
+			"assetEntryAssetCategoryRelId", getAssetEntryAssetCategoryRelId());
 		attributes.put("assetEntryId", getAssetEntryId());
 		attributes.put("assetCategoryId", getAssetCategoryId());
 		attributes.put("priority", getPriority());
@@ -71,7 +72,7 @@ public class AssetEntryAssetCategoryRelWrapper
 	@Override
 	public void setModelAttributes(Map<String, Object> attributes) {
 		Long assetEntryAssetCategoryRelId = (Long)attributes.get(
-				"assetEntryAssetCategoryRelId");
+			"assetEntryAssetCategoryRelId");
 
 		if (assetEntryAssetCategoryRelId != null) {
 			setAssetEntryAssetCategoryRelId(assetEntryAssetCategoryRelId);
@@ -98,39 +99,43 @@ public class AssetEntryAssetCategoryRelWrapper
 
 	@Override
 	public Object clone() {
-		return new AssetEntryAssetCategoryRelWrapper((AssetEntryAssetCategoryRel)_assetEntryAssetCategoryRel.clone());
+		return new AssetEntryAssetCategoryRelWrapper(
+			(AssetEntryAssetCategoryRel)_assetEntryAssetCategoryRel.clone());
 	}
 
 	@Override
-	public int compareTo(AssetEntryAssetCategoryRel assetEntryAssetCategoryRel) {
-		return _assetEntryAssetCategoryRel.compareTo(assetEntryAssetCategoryRel);
+	public int compareTo(
+		AssetEntryAssetCategoryRel assetEntryAssetCategoryRel) {
+
+		return _assetEntryAssetCategoryRel.compareTo(
+			assetEntryAssetCategoryRel);
 	}
 
 	/**
-	* Returns the asset category ID of this asset entry asset category rel.
-	*
-	* @return the asset category ID of this asset entry asset category rel
-	*/
+	 * Returns the asset category ID of this asset entry asset category rel.
+	 *
+	 * @return the asset category ID of this asset entry asset category rel
+	 */
 	@Override
 	public long getAssetCategoryId() {
 		return _assetEntryAssetCategoryRel.getAssetCategoryId();
 	}
 
 	/**
-	* Returns the asset entry asset category rel ID of this asset entry asset category rel.
-	*
-	* @return the asset entry asset category rel ID of this asset entry asset category rel
-	*/
+	 * Returns the asset entry asset category rel ID of this asset entry asset category rel.
+	 *
+	 * @return the asset entry asset category rel ID of this asset entry asset category rel
+	 */
 	@Override
 	public long getAssetEntryAssetCategoryRelId() {
 		return _assetEntryAssetCategoryRel.getAssetEntryAssetCategoryRelId();
 	}
 
 	/**
-	* Returns the asset entry ID of this asset entry asset category rel.
-	*
-	* @return the asset entry ID of this asset entry asset category rel
-	*/
+	 * Returns the asset entry ID of this asset entry asset category rel.
+	 *
+	 * @return the asset entry ID of this asset entry asset category rel
+	 */
 	@Override
 	public long getAssetEntryId() {
 		return _assetEntryAssetCategoryRel.getAssetEntryId();
@@ -142,10 +147,10 @@ public class AssetEntryAssetCategoryRelWrapper
 	}
 
 	/**
-	* Returns the primary key of this asset entry asset category rel.
-	*
-	* @return the primary key of this asset entry asset category rel
-	*/
+	 * Returns the primary key of this asset entry asset category rel.
+	 *
+	 * @return the primary key of this asset entry asset category rel
+	 */
 	@Override
 	public long getPrimaryKey() {
 		return _assetEntryAssetCategoryRel.getPrimaryKey();
@@ -157,10 +162,10 @@ public class AssetEntryAssetCategoryRelWrapper
 	}
 
 	/**
-	* Returns the priority of this asset entry asset category rel.
-	*
-	* @return the priority of this asset entry asset category rel
-	*/
+	 * Returns the priority of this asset entry asset category rel.
+	 *
+	 * @return the priority of this asset entry asset category rel
+	 */
 	@Override
 	public int getPriority() {
 		return _assetEntryAssetCategoryRel.getPriority();
@@ -192,31 +197,33 @@ public class AssetEntryAssetCategoryRelWrapper
 	}
 
 	/**
-	* Sets the asset category ID of this asset entry asset category rel.
-	*
-	* @param assetCategoryId the asset category ID of this asset entry asset category rel
-	*/
+	 * Sets the asset category ID of this asset entry asset category rel.
+	 *
+	 * @param assetCategoryId the asset category ID of this asset entry asset category rel
+	 */
 	@Override
 	public void setAssetCategoryId(long assetCategoryId) {
 		_assetEntryAssetCategoryRel.setAssetCategoryId(assetCategoryId);
 	}
 
 	/**
-	* Sets the asset entry asset category rel ID of this asset entry asset category rel.
-	*
-	* @param assetEntryAssetCategoryRelId the asset entry asset category rel ID of this asset entry asset category rel
-	*/
+	 * Sets the asset entry asset category rel ID of this asset entry asset category rel.
+	 *
+	 * @param assetEntryAssetCategoryRelId the asset entry asset category rel ID of this asset entry asset category rel
+	 */
 	@Override
 	public void setAssetEntryAssetCategoryRelId(
 		long assetEntryAssetCategoryRelId) {
-		_assetEntryAssetCategoryRel.setAssetEntryAssetCategoryRelId(assetEntryAssetCategoryRelId);
+
+		_assetEntryAssetCategoryRel.setAssetEntryAssetCategoryRelId(
+			assetEntryAssetCategoryRelId);
 	}
 
 	/**
-	* Sets the asset entry ID of this asset entry asset category rel.
-	*
-	* @param assetEntryId the asset entry ID of this asset entry asset category rel
-	*/
+	 * Sets the asset entry ID of this asset entry asset category rel.
+	 *
+	 * @param assetEntryId the asset entry ID of this asset entry asset category rel
+	 */
 	@Override
 	public void setAssetEntryId(long assetEntryId) {
 		_assetEntryAssetCategoryRel.setAssetEntryId(assetEntryId);
@@ -230,6 +237,7 @@ public class AssetEntryAssetCategoryRelWrapper
 	@Override
 	public void setExpandoBridgeAttributes(
 		com.liferay.portal.kernel.model.BaseModel<?> baseModel) {
+
 		_assetEntryAssetCategoryRel.setExpandoBridgeAttributes(baseModel);
 	}
 
@@ -249,10 +257,10 @@ public class AssetEntryAssetCategoryRelWrapper
 	}
 
 	/**
-	* Sets the primary key of this asset entry asset category rel.
-	*
-	* @param primaryKey the primary key of this asset entry asset category rel
-	*/
+	 * Sets the primary key of this asset entry asset category rel.
+	 *
+	 * @param primaryKey the primary key of this asset entry asset category rel
+	 */
 	@Override
 	public void setPrimaryKey(long primaryKey) {
 		_assetEntryAssetCategoryRel.setPrimaryKey(primaryKey);
@@ -264,23 +272,26 @@ public class AssetEntryAssetCategoryRelWrapper
 	}
 
 	/**
-	* Sets the priority of this asset entry asset category rel.
-	*
-	* @param priority the priority of this asset entry asset category rel
-	*/
+	 * Sets the priority of this asset entry asset category rel.
+	 *
+	 * @param priority the priority of this asset entry asset category rel
+	 */
 	@Override
 	public void setPriority(int priority) {
 		_assetEntryAssetCategoryRel.setPriority(priority);
 	}
 
 	@Override
-	public com.liferay.portal.kernel.model.CacheModel<AssetEntryAssetCategoryRel> toCacheModel() {
+	public com.liferay.portal.kernel.model.CacheModel
+		<AssetEntryAssetCategoryRel> toCacheModel() {
+
 		return _assetEntryAssetCategoryRel.toCacheModel();
 	}
 
 	@Override
 	public AssetEntryAssetCategoryRel toEscapedModel() {
-		return new AssetEntryAssetCategoryRelWrapper(_assetEntryAssetCategoryRel.toEscapedModel());
+		return new AssetEntryAssetCategoryRelWrapper(
+			_assetEntryAssetCategoryRel.toEscapedModel());
 	}
 
 	@Override
@@ -290,7 +301,8 @@ public class AssetEntryAssetCategoryRelWrapper
 
 	@Override
 	public AssetEntryAssetCategoryRel toUnescapedModel() {
-		return new AssetEntryAssetCategoryRelWrapper(_assetEntryAssetCategoryRel.toUnescapedModel());
+		return new AssetEntryAssetCategoryRelWrapper(
+			_assetEntryAssetCategoryRel.toUnescapedModel());
 	}
 
 	@Override
@@ -308,10 +320,14 @@ public class AssetEntryAssetCategoryRelWrapper
 			return false;
 		}
 
-		AssetEntryAssetCategoryRelWrapper assetEntryAssetCategoryRelWrapper = (AssetEntryAssetCategoryRelWrapper)obj;
+		AssetEntryAssetCategoryRelWrapper assetEntryAssetCategoryRelWrapper =
+			(AssetEntryAssetCategoryRelWrapper)obj;
 
-		if (Objects.equals(_assetEntryAssetCategoryRel,
-					assetEntryAssetCategoryRelWrapper._assetEntryAssetCategoryRel)) {
+		if (Objects.equals(
+				_assetEntryAssetCategoryRel,
+				assetEntryAssetCategoryRelWrapper.
+					_assetEntryAssetCategoryRel)) {
+
 			return true;
 		}
 
@@ -339,4 +355,5 @@ public class AssetEntryAssetCategoryRelWrapper
 	}
 
 	private final AssetEntryAssetCategoryRel _assetEntryAssetCategoryRel;
+
 }

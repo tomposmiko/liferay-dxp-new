@@ -21,7 +21,6 @@ import com.liferay.journal.model.JournalFeed;
 import com.liferay.journal.model.impl.JournalFeedImpl;
 import com.liferay.journal.model.impl.JournalFeedModelImpl;
 import com.liferay.journal.service.persistence.JournalFeedPersistence;
-
 import com.liferay.portal.kernel.dao.orm.EntityCache;
 import com.liferay.portal.kernel.dao.orm.FinderCache;
 import com.liferay.portal.kernel.dao.orm.FinderPath;
@@ -69,51 +68,32 @@ import java.util.Set;
  * </p>
  *
  * @author Brian Wing Shun Chan
- * @see JournalFeedPersistence
- * @see com.liferay.journal.service.persistence.JournalFeedUtil
  * @generated
  */
 @ProviderType
-public class JournalFeedPersistenceImpl extends BasePersistenceImpl<JournalFeed>
-	implements JournalFeedPersistence {
+public class JournalFeedPersistenceImpl
+	extends BasePersistenceImpl<JournalFeed> implements JournalFeedPersistence {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
-	 * Never modify or reference this class directly. Always use {@link JournalFeedUtil} to access the journal feed persistence. Modify <code>service.xml</code> and rerun ServiceBuilder to regenerate this class.
+	 * Never modify or reference this class directly. Always use <code>JournalFeedUtil</code> to access the journal feed persistence. Modify <code>service.xml</code> and rerun ServiceBuilder to regenerate this class.
 	 */
-	public static final String FINDER_CLASS_NAME_ENTITY = JournalFeedImpl.class.getName();
-	public static final String FINDER_CLASS_NAME_LIST_WITH_PAGINATION = FINDER_CLASS_NAME_ENTITY +
-		".List1";
-	public static final String FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION = FINDER_CLASS_NAME_ENTITY +
-		".List2";
-	public static final FinderPath FINDER_PATH_WITH_PAGINATION_FIND_ALL = new FinderPath(JournalFeedModelImpl.ENTITY_CACHE_ENABLED,
-			JournalFeedModelImpl.FINDER_CACHE_ENABLED, JournalFeedImpl.class,
-			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findAll", new String[0]);
-	public static final FinderPath FINDER_PATH_WITHOUT_PAGINATION_FIND_ALL = new FinderPath(JournalFeedModelImpl.ENTITY_CACHE_ENABLED,
-			JournalFeedModelImpl.FINDER_CACHE_ENABLED, JournalFeedImpl.class,
-			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findAll", new String[0]);
-	public static final FinderPath FINDER_PATH_COUNT_ALL = new FinderPath(JournalFeedModelImpl.ENTITY_CACHE_ENABLED,
-			JournalFeedModelImpl.FINDER_CACHE_ENABLED, Long.class,
-			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countAll", new String[0]);
-	public static final FinderPath FINDER_PATH_WITH_PAGINATION_FIND_BY_UUID = new FinderPath(JournalFeedModelImpl.ENTITY_CACHE_ENABLED,
-			JournalFeedModelImpl.FINDER_CACHE_ENABLED, JournalFeedImpl.class,
-			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByUuid",
-			new String[] {
-				String.class.getName(),
-				
-			Integer.class.getName(), Integer.class.getName(),
-				OrderByComparator.class.getName()
-			});
-	public static final FinderPath FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_UUID = new FinderPath(JournalFeedModelImpl.ENTITY_CACHE_ENABLED,
-			JournalFeedModelImpl.FINDER_CACHE_ENABLED, JournalFeedImpl.class,
-			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByUuid",
-			new String[] { String.class.getName() },
-			JournalFeedModelImpl.UUID_COLUMN_BITMASK |
-			JournalFeedModelImpl.FEEDID_COLUMN_BITMASK);
-	public static final FinderPath FINDER_PATH_COUNT_BY_UUID = new FinderPath(JournalFeedModelImpl.ENTITY_CACHE_ENABLED,
-			JournalFeedModelImpl.FINDER_CACHE_ENABLED, Long.class,
-			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByUuid",
-			new String[] { String.class.getName() });
+	public static final String FINDER_CLASS_NAME_ENTITY =
+		JournalFeedImpl.class.getName();
+
+	public static final String FINDER_CLASS_NAME_LIST_WITH_PAGINATION =
+		FINDER_CLASS_NAME_ENTITY + ".List1";
+
+	public static final String FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION =
+		FINDER_CLASS_NAME_ENTITY + ".List2";
+
+	private FinderPath _finderPathWithPaginationFindAll;
+	private FinderPath _finderPathWithoutPaginationFindAll;
+	private FinderPath _finderPathCountAll;
+	private FinderPath _finderPathWithPaginationFindByUuid;
+	private FinderPath _finderPathWithoutPaginationFindByUuid;
+	private FinderPath _finderPathCountByUuid;
 
 	/**
 	 * Returns all the journal feeds where uuid = &#63;.
@@ -130,7 +110,7 @@ public class JournalFeedPersistenceImpl extends BasePersistenceImpl<JournalFeed>
 	 * Returns a range of all the journal feeds where uuid = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link JournalFeedModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>JournalFeedModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param uuid the uuid
@@ -147,7 +127,7 @@ public class JournalFeedPersistenceImpl extends BasePersistenceImpl<JournalFeed>
 	 * Returns an ordered range of all the journal feeds where uuid = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link JournalFeedModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>JournalFeedModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param uuid the uuid
@@ -157,8 +137,10 @@ public class JournalFeedPersistenceImpl extends BasePersistenceImpl<JournalFeed>
 	 * @return the ordered range of matching journal feeds
 	 */
 	@Override
-	public List<JournalFeed> findByUuid(String uuid, int start, int end,
+	public List<JournalFeed> findByUuid(
+		String uuid, int start, int end,
 		OrderByComparator<JournalFeed> orderByComparator) {
+
 		return findByUuid(uuid, start, end, orderByComparator, true);
 	}
 
@@ -166,7 +148,7 @@ public class JournalFeedPersistenceImpl extends BasePersistenceImpl<JournalFeed>
 	 * Returns an ordered range of all the journal feeds where uuid = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link JournalFeedModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>JournalFeedModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param uuid the uuid
@@ -177,9 +159,11 @@ public class JournalFeedPersistenceImpl extends BasePersistenceImpl<JournalFeed>
 	 * @return the ordered range of matching journal feeds
 	 */
 	@Override
-	public List<JournalFeed> findByUuid(String uuid, int start, int end,
+	public List<JournalFeed> findByUuid(
+		String uuid, int start, int end,
 		OrderByComparator<JournalFeed> orderByComparator,
 		boolean retrieveFromCache) {
+
 		uuid = Objects.toString(uuid, "");
 
 		boolean pagination = true;
@@ -187,21 +171,22 @@ public class JournalFeedPersistenceImpl extends BasePersistenceImpl<JournalFeed>
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
-				(orderByComparator == null)) {
+			(orderByComparator == null)) {
+
 			pagination = false;
-			finderPath = FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_UUID;
-			finderArgs = new Object[] { uuid };
+			finderPath = _finderPathWithoutPaginationFindByUuid;
+			finderArgs = new Object[] {uuid};
 		}
 		else {
-			finderPath = FINDER_PATH_WITH_PAGINATION_FIND_BY_UUID;
-			finderArgs = new Object[] { uuid, start, end, orderByComparator };
+			finderPath = _finderPathWithPaginationFindByUuid;
+			finderArgs = new Object[] {uuid, start, end, orderByComparator};
 		}
 
 		List<JournalFeed> list = null;
 
 		if (retrieveFromCache) {
-			list = (List<JournalFeed>)finderCache.getResult(finderPath,
-					finderArgs, this);
+			list = (List<JournalFeed>)finderCache.getResult(
+				finderPath, finderArgs, this);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (JournalFeed journalFeed : list) {
@@ -218,8 +203,8 @@ public class JournalFeedPersistenceImpl extends BasePersistenceImpl<JournalFeed>
 			StringBundler query = null;
 
 			if (orderByComparator != null) {
-				query = new StringBundler(3 +
-						(orderByComparator.getOrderByFields().length * 2));
+				query = new StringBundler(
+					3 + (orderByComparator.getOrderByFields().length * 2));
 			}
 			else {
 				query = new StringBundler(3);
@@ -239,11 +224,10 @@ public class JournalFeedPersistenceImpl extends BasePersistenceImpl<JournalFeed>
 			}
 
 			if (orderByComparator != null) {
-				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
-					orderByComparator);
+				appendOrderByComparator(
+					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
 			}
-			else
-			 if (pagination) {
+			else if (pagination) {
 				query.append(JournalFeedModelImpl.ORDER_BY_JPQL);
 			}
 
@@ -263,16 +247,16 @@ public class JournalFeedPersistenceImpl extends BasePersistenceImpl<JournalFeed>
 				}
 
 				if (!pagination) {
-					list = (List<JournalFeed>)QueryUtil.list(q, getDialect(),
-							start, end, false);
+					list = (List<JournalFeed>)QueryUtil.list(
+						q, getDialect(), start, end, false);
 
 					Collections.sort(list);
 
 					list = Collections.unmodifiableList(list);
 				}
 				else {
-					list = (List<JournalFeed>)QueryUtil.list(q, getDialect(),
-							start, end);
+					list = (List<JournalFeed>)QueryUtil.list(
+						q, getDialect(), start, end);
 				}
 
 				cacheResult(list);
@@ -301,9 +285,10 @@ public class JournalFeedPersistenceImpl extends BasePersistenceImpl<JournalFeed>
 	 * @throws NoSuchFeedException if a matching journal feed could not be found
 	 */
 	@Override
-	public JournalFeed findByUuid_First(String uuid,
-		OrderByComparator<JournalFeed> orderByComparator)
+	public JournalFeed findByUuid_First(
+			String uuid, OrderByComparator<JournalFeed> orderByComparator)
 		throws NoSuchFeedException {
+
 		JournalFeed journalFeed = fetchByUuid_First(uuid, orderByComparator);
 
 		if (journalFeed != null) {
@@ -330,8 +315,9 @@ public class JournalFeedPersistenceImpl extends BasePersistenceImpl<JournalFeed>
 	 * @return the first matching journal feed, or <code>null</code> if a matching journal feed could not be found
 	 */
 	@Override
-	public JournalFeed fetchByUuid_First(String uuid,
-		OrderByComparator<JournalFeed> orderByComparator) {
+	public JournalFeed fetchByUuid_First(
+		String uuid, OrderByComparator<JournalFeed> orderByComparator) {
+
 		List<JournalFeed> list = findByUuid(uuid, 0, 1, orderByComparator);
 
 		if (!list.isEmpty()) {
@@ -350,9 +336,10 @@ public class JournalFeedPersistenceImpl extends BasePersistenceImpl<JournalFeed>
 	 * @throws NoSuchFeedException if a matching journal feed could not be found
 	 */
 	@Override
-	public JournalFeed findByUuid_Last(String uuid,
-		OrderByComparator<JournalFeed> orderByComparator)
+	public JournalFeed findByUuid_Last(
+			String uuid, OrderByComparator<JournalFeed> orderByComparator)
 		throws NoSuchFeedException {
+
 		JournalFeed journalFeed = fetchByUuid_Last(uuid, orderByComparator);
 
 		if (journalFeed != null) {
@@ -379,16 +366,17 @@ public class JournalFeedPersistenceImpl extends BasePersistenceImpl<JournalFeed>
 	 * @return the last matching journal feed, or <code>null</code> if a matching journal feed could not be found
 	 */
 	@Override
-	public JournalFeed fetchByUuid_Last(String uuid,
-		OrderByComparator<JournalFeed> orderByComparator) {
+	public JournalFeed fetchByUuid_Last(
+		String uuid, OrderByComparator<JournalFeed> orderByComparator) {
+
 		int count = countByUuid(uuid);
 
 		if (count == 0) {
 			return null;
 		}
 
-		List<JournalFeed> list = findByUuid(uuid, count - 1, count,
-				orderByComparator);
+		List<JournalFeed> list = findByUuid(
+			uuid, count - 1, count, orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -407,9 +395,11 @@ public class JournalFeedPersistenceImpl extends BasePersistenceImpl<JournalFeed>
 	 * @throws NoSuchFeedException if a journal feed with the primary key could not be found
 	 */
 	@Override
-	public JournalFeed[] findByUuid_PrevAndNext(long id, String uuid,
-		OrderByComparator<JournalFeed> orderByComparator)
+	public JournalFeed[] findByUuid_PrevAndNext(
+			long id, String uuid,
+			OrderByComparator<JournalFeed> orderByComparator)
 		throws NoSuchFeedException {
+
 		uuid = Objects.toString(uuid, "");
 
 		JournalFeed journalFeed = findByPrimaryKey(id);
@@ -421,13 +411,13 @@ public class JournalFeedPersistenceImpl extends BasePersistenceImpl<JournalFeed>
 
 			JournalFeed[] array = new JournalFeedImpl[3];
 
-			array[0] = getByUuid_PrevAndNext(session, journalFeed, uuid,
-					orderByComparator, true);
+			array[0] = getByUuid_PrevAndNext(
+				session, journalFeed, uuid, orderByComparator, true);
 
 			array[1] = journalFeed;
 
-			array[2] = getByUuid_PrevAndNext(session, journalFeed, uuid,
-					orderByComparator, false);
+			array[2] = getByUuid_PrevAndNext(
+				session, journalFeed, uuid, orderByComparator, false);
 
 			return array;
 		}
@@ -439,14 +429,15 @@ public class JournalFeedPersistenceImpl extends BasePersistenceImpl<JournalFeed>
 		}
 	}
 
-	protected JournalFeed getByUuid_PrevAndNext(Session session,
-		JournalFeed journalFeed, String uuid,
+	protected JournalFeed getByUuid_PrevAndNext(
+		Session session, JournalFeed journalFeed, String uuid,
 		OrderByComparator<JournalFeed> orderByComparator, boolean previous) {
+
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(4 +
-					(orderByComparator.getOrderByConditionFields().length * 3) +
+			query = new StringBundler(
+				4 + (orderByComparator.getOrderByConditionFields().length * 3) +
 					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
@@ -467,7 +458,8 @@ public class JournalFeedPersistenceImpl extends BasePersistenceImpl<JournalFeed>
 		}
 
 		if (orderByComparator != null) {
-			String[] orderByConditionFields = orderByComparator.getOrderByConditionFields();
+			String[] orderByConditionFields =
+				orderByComparator.getOrderByConditionFields();
 
 			if (orderByConditionFields.length > 0) {
 				query.append(WHERE_AND);
@@ -539,10 +531,10 @@ public class JournalFeedPersistenceImpl extends BasePersistenceImpl<JournalFeed>
 		}
 
 		if (orderByComparator != null) {
-			Object[] values = orderByComparator.getOrderByConditionValues(journalFeed);
+			for (Object orderByConditionValue :
+					orderByComparator.getOrderByConditionValues(journalFeed)) {
 
-			for (Object value : values) {
-				qPos.add(value);
+				qPos.add(orderByConditionValue);
 			}
 		}
 
@@ -563,8 +555,9 @@ public class JournalFeedPersistenceImpl extends BasePersistenceImpl<JournalFeed>
 	 */
 	@Override
 	public void removeByUuid(String uuid) {
-		for (JournalFeed journalFeed : findByUuid(uuid, QueryUtil.ALL_POS,
-				QueryUtil.ALL_POS, null)) {
+		for (JournalFeed journalFeed :
+				findByUuid(uuid, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null)) {
+
 			remove(journalFeed);
 		}
 	}
@@ -579,9 +572,9 @@ public class JournalFeedPersistenceImpl extends BasePersistenceImpl<JournalFeed>
 	public int countByUuid(String uuid) {
 		uuid = Objects.toString(uuid, "");
 
-		FinderPath finderPath = FINDER_PATH_COUNT_BY_UUID;
+		FinderPath finderPath = _finderPathCountByUuid;
 
-		Object[] finderArgs = new Object[] { uuid };
+		Object[] finderArgs = new Object[] {uuid};
 
 		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
 
@@ -633,21 +626,17 @@ public class JournalFeedPersistenceImpl extends BasePersistenceImpl<JournalFeed>
 		return count.intValue();
 	}
 
-	private static final String _FINDER_COLUMN_UUID_UUID_2 = "journalFeed.uuid = ?";
-	private static final String _FINDER_COLUMN_UUID_UUID_3 = "(journalFeed.uuid IS NULL OR journalFeed.uuid = '')";
-	public static final FinderPath FINDER_PATH_FETCH_BY_UUID_G = new FinderPath(JournalFeedModelImpl.ENTITY_CACHE_ENABLED,
-			JournalFeedModelImpl.FINDER_CACHE_ENABLED, JournalFeedImpl.class,
-			FINDER_CLASS_NAME_ENTITY, "fetchByUUID_G",
-			new String[] { String.class.getName(), Long.class.getName() },
-			JournalFeedModelImpl.UUID_COLUMN_BITMASK |
-			JournalFeedModelImpl.GROUPID_COLUMN_BITMASK);
-	public static final FinderPath FINDER_PATH_COUNT_BY_UUID_G = new FinderPath(JournalFeedModelImpl.ENTITY_CACHE_ENABLED,
-			JournalFeedModelImpl.FINDER_CACHE_ENABLED, Long.class,
-			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByUUID_G",
-			new String[] { String.class.getName(), Long.class.getName() });
+	private static final String _FINDER_COLUMN_UUID_UUID_2 =
+		"journalFeed.uuid = ?";
+
+	private static final String _FINDER_COLUMN_UUID_UUID_3 =
+		"(journalFeed.uuid IS NULL OR journalFeed.uuid = '')";
+
+	private FinderPath _finderPathFetchByUUID_G;
+	private FinderPath _finderPathCountByUUID_G;
 
 	/**
-	 * Returns the journal feed where uuid = &#63; and groupId = &#63; or throws a {@link NoSuchFeedException} if it could not be found.
+	 * Returns the journal feed where uuid = &#63; and groupId = &#63; or throws a <code>NoSuchFeedException</code> if it could not be found.
 	 *
 	 * @param uuid the uuid
 	 * @param groupId the group ID
@@ -657,6 +646,7 @@ public class JournalFeedPersistenceImpl extends BasePersistenceImpl<JournalFeed>
 	@Override
 	public JournalFeed findByUUID_G(String uuid, long groupId)
 		throws NoSuchFeedException {
+
 		JournalFeed journalFeed = fetchByUUID_G(uuid, groupId);
 
 		if (journalFeed == null) {
@@ -703,24 +693,26 @@ public class JournalFeedPersistenceImpl extends BasePersistenceImpl<JournalFeed>
 	 * @return the matching journal feed, or <code>null</code> if a matching journal feed could not be found
 	 */
 	@Override
-	public JournalFeed fetchByUUID_G(String uuid, long groupId,
-		boolean retrieveFromCache) {
+	public JournalFeed fetchByUUID_G(
+		String uuid, long groupId, boolean retrieveFromCache) {
+
 		uuid = Objects.toString(uuid, "");
 
-		Object[] finderArgs = new Object[] { uuid, groupId };
+		Object[] finderArgs = new Object[] {uuid, groupId};
 
 		Object result = null;
 
 		if (retrieveFromCache) {
-			result = finderCache.getResult(FINDER_PATH_FETCH_BY_UUID_G,
-					finderArgs, this);
+			result = finderCache.getResult(
+				_finderPathFetchByUUID_G, finderArgs, this);
 		}
 
 		if (result instanceof JournalFeed) {
 			JournalFeed journalFeed = (JournalFeed)result;
 
 			if (!Objects.equals(uuid, journalFeed.getUuid()) ||
-					(groupId != journalFeed.getGroupId())) {
+				(groupId != journalFeed.getGroupId())) {
+
 				result = null;
 			}
 		}
@@ -763,8 +755,8 @@ public class JournalFeedPersistenceImpl extends BasePersistenceImpl<JournalFeed>
 				List<JournalFeed> list = q.list();
 
 				if (list.isEmpty()) {
-					finderCache.putResult(FINDER_PATH_FETCH_BY_UUID_G,
-						finderArgs, list);
+					finderCache.putResult(
+						_finderPathFetchByUUID_G, finderArgs, list);
 				}
 				else {
 					JournalFeed journalFeed = list.get(0);
@@ -775,7 +767,7 @@ public class JournalFeedPersistenceImpl extends BasePersistenceImpl<JournalFeed>
 				}
 			}
 			catch (Exception e) {
-				finderCache.removeResult(FINDER_PATH_FETCH_BY_UUID_G, finderArgs);
+				finderCache.removeResult(_finderPathFetchByUUID_G, finderArgs);
 
 				throw processException(e);
 			}
@@ -802,6 +794,7 @@ public class JournalFeedPersistenceImpl extends BasePersistenceImpl<JournalFeed>
 	@Override
 	public JournalFeed removeByUUID_G(String uuid, long groupId)
 		throws NoSuchFeedException {
+
 		JournalFeed journalFeed = findByUUID_G(uuid, groupId);
 
 		return remove(journalFeed);
@@ -818,9 +811,9 @@ public class JournalFeedPersistenceImpl extends BasePersistenceImpl<JournalFeed>
 	public int countByUUID_G(String uuid, long groupId) {
 		uuid = Objects.toString(uuid, "");
 
-		FinderPath finderPath = FINDER_PATH_COUNT_BY_UUID_G;
+		FinderPath finderPath = _finderPathCountByUUID_G;
 
-		Object[] finderArgs = new Object[] { uuid, groupId };
+		Object[] finderArgs = new Object[] {uuid, groupId};
 
 		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
 
@@ -876,30 +869,18 @@ public class JournalFeedPersistenceImpl extends BasePersistenceImpl<JournalFeed>
 		return count.intValue();
 	}
 
-	private static final String _FINDER_COLUMN_UUID_G_UUID_2 = "journalFeed.uuid = ? AND ";
-	private static final String _FINDER_COLUMN_UUID_G_UUID_3 = "(journalFeed.uuid IS NULL OR journalFeed.uuid = '') AND ";
-	private static final String _FINDER_COLUMN_UUID_G_GROUPID_2 = "journalFeed.groupId = ?";
-	public static final FinderPath FINDER_PATH_WITH_PAGINATION_FIND_BY_UUID_C = new FinderPath(JournalFeedModelImpl.ENTITY_CACHE_ENABLED,
-			JournalFeedModelImpl.FINDER_CACHE_ENABLED, JournalFeedImpl.class,
-			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByUuid_C",
-			new String[] {
-				String.class.getName(), Long.class.getName(),
-				
-			Integer.class.getName(), Integer.class.getName(),
-				OrderByComparator.class.getName()
-			});
-	public static final FinderPath FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_UUID_C =
-		new FinderPath(JournalFeedModelImpl.ENTITY_CACHE_ENABLED,
-			JournalFeedModelImpl.FINDER_CACHE_ENABLED, JournalFeedImpl.class,
-			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByUuid_C",
-			new String[] { String.class.getName(), Long.class.getName() },
-			JournalFeedModelImpl.UUID_COLUMN_BITMASK |
-			JournalFeedModelImpl.COMPANYID_COLUMN_BITMASK |
-			JournalFeedModelImpl.FEEDID_COLUMN_BITMASK);
-	public static final FinderPath FINDER_PATH_COUNT_BY_UUID_C = new FinderPath(JournalFeedModelImpl.ENTITY_CACHE_ENABLED,
-			JournalFeedModelImpl.FINDER_CACHE_ENABLED, Long.class,
-			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByUuid_C",
-			new String[] { String.class.getName(), Long.class.getName() });
+	private static final String _FINDER_COLUMN_UUID_G_UUID_2 =
+		"journalFeed.uuid = ? AND ";
+
+	private static final String _FINDER_COLUMN_UUID_G_UUID_3 =
+		"(journalFeed.uuid IS NULL OR journalFeed.uuid = '') AND ";
+
+	private static final String _FINDER_COLUMN_UUID_G_GROUPID_2 =
+		"journalFeed.groupId = ?";
+
+	private FinderPath _finderPathWithPaginationFindByUuid_C;
+	private FinderPath _finderPathWithoutPaginationFindByUuid_C;
+	private FinderPath _finderPathCountByUuid_C;
 
 	/**
 	 * Returns all the journal feeds where uuid = &#63; and companyId = &#63;.
@@ -910,15 +891,15 @@ public class JournalFeedPersistenceImpl extends BasePersistenceImpl<JournalFeed>
 	 */
 	@Override
 	public List<JournalFeed> findByUuid_C(String uuid, long companyId) {
-		return findByUuid_C(uuid, companyId, QueryUtil.ALL_POS,
-			QueryUtil.ALL_POS, null);
+		return findByUuid_C(
+			uuid, companyId, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
 	}
 
 	/**
 	 * Returns a range of all the journal feeds where uuid = &#63; and companyId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link JournalFeedModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>JournalFeedModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param uuid the uuid
@@ -928,8 +909,9 @@ public class JournalFeedPersistenceImpl extends BasePersistenceImpl<JournalFeed>
 	 * @return the range of matching journal feeds
 	 */
 	@Override
-	public List<JournalFeed> findByUuid_C(String uuid, long companyId,
-		int start, int end) {
+	public List<JournalFeed> findByUuid_C(
+		String uuid, long companyId, int start, int end) {
+
 		return findByUuid_C(uuid, companyId, start, end, null);
 	}
 
@@ -937,7 +919,7 @@ public class JournalFeedPersistenceImpl extends BasePersistenceImpl<JournalFeed>
 	 * Returns an ordered range of all the journal feeds where uuid = &#63; and companyId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link JournalFeedModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>JournalFeedModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param uuid the uuid
@@ -948,16 +930,19 @@ public class JournalFeedPersistenceImpl extends BasePersistenceImpl<JournalFeed>
 	 * @return the ordered range of matching journal feeds
 	 */
 	@Override
-	public List<JournalFeed> findByUuid_C(String uuid, long companyId,
-		int start, int end, OrderByComparator<JournalFeed> orderByComparator) {
-		return findByUuid_C(uuid, companyId, start, end, orderByComparator, true);
+	public List<JournalFeed> findByUuid_C(
+		String uuid, long companyId, int start, int end,
+		OrderByComparator<JournalFeed> orderByComparator) {
+
+		return findByUuid_C(
+			uuid, companyId, start, end, orderByComparator, true);
 	}
 
 	/**
 	 * Returns an ordered range of all the journal feeds where uuid = &#63; and companyId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link JournalFeedModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>JournalFeedModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param uuid the uuid
@@ -969,9 +954,11 @@ public class JournalFeedPersistenceImpl extends BasePersistenceImpl<JournalFeed>
 	 * @return the ordered range of matching journal feeds
 	 */
 	@Override
-	public List<JournalFeed> findByUuid_C(String uuid, long companyId,
-		int start, int end, OrderByComparator<JournalFeed> orderByComparator,
+	public List<JournalFeed> findByUuid_C(
+		String uuid, long companyId, int start, int end,
+		OrderByComparator<JournalFeed> orderByComparator,
 		boolean retrieveFromCache) {
+
 		uuid = Objects.toString(uuid, "");
 
 		boolean pagination = true;
@@ -979,30 +966,30 @@ public class JournalFeedPersistenceImpl extends BasePersistenceImpl<JournalFeed>
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
-				(orderByComparator == null)) {
+			(orderByComparator == null)) {
+
 			pagination = false;
-			finderPath = FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_UUID_C;
-			finderArgs = new Object[] { uuid, companyId };
+			finderPath = _finderPathWithoutPaginationFindByUuid_C;
+			finderArgs = new Object[] {uuid, companyId};
 		}
 		else {
-			finderPath = FINDER_PATH_WITH_PAGINATION_FIND_BY_UUID_C;
+			finderPath = _finderPathWithPaginationFindByUuid_C;
 			finderArgs = new Object[] {
-					uuid, companyId,
-					
-					start, end, orderByComparator
-				};
+				uuid, companyId, start, end, orderByComparator
+			};
 		}
 
 		List<JournalFeed> list = null;
 
 		if (retrieveFromCache) {
-			list = (List<JournalFeed>)finderCache.getResult(finderPath,
-					finderArgs, this);
+			list = (List<JournalFeed>)finderCache.getResult(
+				finderPath, finderArgs, this);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (JournalFeed journalFeed : list) {
 					if (!uuid.equals(journalFeed.getUuid()) ||
-							(companyId != journalFeed.getCompanyId())) {
+						(companyId != journalFeed.getCompanyId())) {
+
 						list = null;
 
 						break;
@@ -1015,8 +1002,8 @@ public class JournalFeedPersistenceImpl extends BasePersistenceImpl<JournalFeed>
 			StringBundler query = null;
 
 			if (orderByComparator != null) {
-				query = new StringBundler(4 +
-						(orderByComparator.getOrderByFields().length * 2));
+				query = new StringBundler(
+					4 + (orderByComparator.getOrderByFields().length * 2));
 			}
 			else {
 				query = new StringBundler(4);
@@ -1038,11 +1025,10 @@ public class JournalFeedPersistenceImpl extends BasePersistenceImpl<JournalFeed>
 			query.append(_FINDER_COLUMN_UUID_C_COMPANYID_2);
 
 			if (orderByComparator != null) {
-				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
-					orderByComparator);
+				appendOrderByComparator(
+					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
 			}
-			else
-			 if (pagination) {
+			else if (pagination) {
 				query.append(JournalFeedModelImpl.ORDER_BY_JPQL);
 			}
 
@@ -1064,16 +1050,16 @@ public class JournalFeedPersistenceImpl extends BasePersistenceImpl<JournalFeed>
 				qPos.add(companyId);
 
 				if (!pagination) {
-					list = (List<JournalFeed>)QueryUtil.list(q, getDialect(),
-							start, end, false);
+					list = (List<JournalFeed>)QueryUtil.list(
+						q, getDialect(), start, end, false);
 
 					Collections.sort(list);
 
 					list = Collections.unmodifiableList(list);
 				}
 				else {
-					list = (List<JournalFeed>)QueryUtil.list(q, getDialect(),
-							start, end);
+					list = (List<JournalFeed>)QueryUtil.list(
+						q, getDialect(), start, end);
 				}
 
 				cacheResult(list);
@@ -1103,11 +1089,13 @@ public class JournalFeedPersistenceImpl extends BasePersistenceImpl<JournalFeed>
 	 * @throws NoSuchFeedException if a matching journal feed could not be found
 	 */
 	@Override
-	public JournalFeed findByUuid_C_First(String uuid, long companyId,
-		OrderByComparator<JournalFeed> orderByComparator)
+	public JournalFeed findByUuid_C_First(
+			String uuid, long companyId,
+			OrderByComparator<JournalFeed> orderByComparator)
 		throws NoSuchFeedException {
-		JournalFeed journalFeed = fetchByUuid_C_First(uuid, companyId,
-				orderByComparator);
+
+		JournalFeed journalFeed = fetchByUuid_C_First(
+			uuid, companyId, orderByComparator);
 
 		if (journalFeed != null) {
 			return journalFeed;
@@ -1137,10 +1125,12 @@ public class JournalFeedPersistenceImpl extends BasePersistenceImpl<JournalFeed>
 	 * @return the first matching journal feed, or <code>null</code> if a matching journal feed could not be found
 	 */
 	@Override
-	public JournalFeed fetchByUuid_C_First(String uuid, long companyId,
+	public JournalFeed fetchByUuid_C_First(
+		String uuid, long companyId,
 		OrderByComparator<JournalFeed> orderByComparator) {
-		List<JournalFeed> list = findByUuid_C(uuid, companyId, 0, 1,
-				orderByComparator);
+
+		List<JournalFeed> list = findByUuid_C(
+			uuid, companyId, 0, 1, orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -1159,11 +1149,13 @@ public class JournalFeedPersistenceImpl extends BasePersistenceImpl<JournalFeed>
 	 * @throws NoSuchFeedException if a matching journal feed could not be found
 	 */
 	@Override
-	public JournalFeed findByUuid_C_Last(String uuid, long companyId,
-		OrderByComparator<JournalFeed> orderByComparator)
+	public JournalFeed findByUuid_C_Last(
+			String uuid, long companyId,
+			OrderByComparator<JournalFeed> orderByComparator)
 		throws NoSuchFeedException {
-		JournalFeed journalFeed = fetchByUuid_C_Last(uuid, companyId,
-				orderByComparator);
+
+		JournalFeed journalFeed = fetchByUuid_C_Last(
+			uuid, companyId, orderByComparator);
 
 		if (journalFeed != null) {
 			return journalFeed;
@@ -1193,16 +1185,18 @@ public class JournalFeedPersistenceImpl extends BasePersistenceImpl<JournalFeed>
 	 * @return the last matching journal feed, or <code>null</code> if a matching journal feed could not be found
 	 */
 	@Override
-	public JournalFeed fetchByUuid_C_Last(String uuid, long companyId,
+	public JournalFeed fetchByUuid_C_Last(
+		String uuid, long companyId,
 		OrderByComparator<JournalFeed> orderByComparator) {
+
 		int count = countByUuid_C(uuid, companyId);
 
 		if (count == 0) {
 			return null;
 		}
 
-		List<JournalFeed> list = findByUuid_C(uuid, companyId, count - 1,
-				count, orderByComparator);
+		List<JournalFeed> list = findByUuid_C(
+			uuid, companyId, count - 1, count, orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -1222,9 +1216,11 @@ public class JournalFeedPersistenceImpl extends BasePersistenceImpl<JournalFeed>
 	 * @throws NoSuchFeedException if a journal feed with the primary key could not be found
 	 */
 	@Override
-	public JournalFeed[] findByUuid_C_PrevAndNext(long id, String uuid,
-		long companyId, OrderByComparator<JournalFeed> orderByComparator)
+	public JournalFeed[] findByUuid_C_PrevAndNext(
+			long id, String uuid, long companyId,
+			OrderByComparator<JournalFeed> orderByComparator)
 		throws NoSuchFeedException {
+
 		uuid = Objects.toString(uuid, "");
 
 		JournalFeed journalFeed = findByPrimaryKey(id);
@@ -1236,13 +1232,14 @@ public class JournalFeedPersistenceImpl extends BasePersistenceImpl<JournalFeed>
 
 			JournalFeed[] array = new JournalFeedImpl[3];
 
-			array[0] = getByUuid_C_PrevAndNext(session, journalFeed, uuid,
-					companyId, orderByComparator, true);
+			array[0] = getByUuid_C_PrevAndNext(
+				session, journalFeed, uuid, companyId, orderByComparator, true);
 
 			array[1] = journalFeed;
 
-			array[2] = getByUuid_C_PrevAndNext(session, journalFeed, uuid,
-					companyId, orderByComparator, false);
+			array[2] = getByUuid_C_PrevAndNext(
+				session, journalFeed, uuid, companyId, orderByComparator,
+				false);
 
 			return array;
 		}
@@ -1254,14 +1251,15 @@ public class JournalFeedPersistenceImpl extends BasePersistenceImpl<JournalFeed>
 		}
 	}
 
-	protected JournalFeed getByUuid_C_PrevAndNext(Session session,
-		JournalFeed journalFeed, String uuid, long companyId,
+	protected JournalFeed getByUuid_C_PrevAndNext(
+		Session session, JournalFeed journalFeed, String uuid, long companyId,
 		OrderByComparator<JournalFeed> orderByComparator, boolean previous) {
+
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(5 +
-					(orderByComparator.getOrderByConditionFields().length * 3) +
+			query = new StringBundler(
+				5 + (orderByComparator.getOrderByConditionFields().length * 3) +
 					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
@@ -1284,7 +1282,8 @@ public class JournalFeedPersistenceImpl extends BasePersistenceImpl<JournalFeed>
 		query.append(_FINDER_COLUMN_UUID_C_COMPANYID_2);
 
 		if (orderByComparator != null) {
-			String[] orderByConditionFields = orderByComparator.getOrderByConditionFields();
+			String[] orderByConditionFields =
+				orderByComparator.getOrderByConditionFields();
 
 			if (orderByConditionFields.length > 0) {
 				query.append(WHERE_AND);
@@ -1358,10 +1357,10 @@ public class JournalFeedPersistenceImpl extends BasePersistenceImpl<JournalFeed>
 		qPos.add(companyId);
 
 		if (orderByComparator != null) {
-			Object[] values = orderByComparator.getOrderByConditionValues(journalFeed);
+			for (Object orderByConditionValue :
+					orderByComparator.getOrderByConditionValues(journalFeed)) {
 
-			for (Object value : values) {
-				qPos.add(value);
+				qPos.add(orderByConditionValue);
 			}
 		}
 
@@ -1383,8 +1382,11 @@ public class JournalFeedPersistenceImpl extends BasePersistenceImpl<JournalFeed>
 	 */
 	@Override
 	public void removeByUuid_C(String uuid, long companyId) {
-		for (JournalFeed journalFeed : findByUuid_C(uuid, companyId,
-				QueryUtil.ALL_POS, QueryUtil.ALL_POS, null)) {
+		for (JournalFeed journalFeed :
+				findByUuid_C(
+					uuid, companyId, QueryUtil.ALL_POS, QueryUtil.ALL_POS,
+					null)) {
+
 			remove(journalFeed);
 		}
 	}
@@ -1400,9 +1402,9 @@ public class JournalFeedPersistenceImpl extends BasePersistenceImpl<JournalFeed>
 	public int countByUuid_C(String uuid, long companyId) {
 		uuid = Objects.toString(uuid, "");
 
-		FinderPath finderPath = FINDER_PATH_COUNT_BY_UUID_C;
+		FinderPath finderPath = _finderPathCountByUuid_C;
 
-		Object[] finderArgs = new Object[] { uuid, companyId };
+		Object[] finderArgs = new Object[] {uuid, companyId};
 
 		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
 
@@ -1458,29 +1460,18 @@ public class JournalFeedPersistenceImpl extends BasePersistenceImpl<JournalFeed>
 		return count.intValue();
 	}
 
-	private static final String _FINDER_COLUMN_UUID_C_UUID_2 = "journalFeed.uuid = ? AND ";
-	private static final String _FINDER_COLUMN_UUID_C_UUID_3 = "(journalFeed.uuid IS NULL OR journalFeed.uuid = '') AND ";
-	private static final String _FINDER_COLUMN_UUID_C_COMPANYID_2 = "journalFeed.companyId = ?";
-	public static final FinderPath FINDER_PATH_WITH_PAGINATION_FIND_BY_GROUPID = new FinderPath(JournalFeedModelImpl.ENTITY_CACHE_ENABLED,
-			JournalFeedModelImpl.FINDER_CACHE_ENABLED, JournalFeedImpl.class,
-			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByGroupId",
-			new String[] {
-				Long.class.getName(),
-				
-			Integer.class.getName(), Integer.class.getName(),
-				OrderByComparator.class.getName()
-			});
-	public static final FinderPath FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_GROUPID =
-		new FinderPath(JournalFeedModelImpl.ENTITY_CACHE_ENABLED,
-			JournalFeedModelImpl.FINDER_CACHE_ENABLED, JournalFeedImpl.class,
-			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByGroupId",
-			new String[] { Long.class.getName() },
-			JournalFeedModelImpl.GROUPID_COLUMN_BITMASK |
-			JournalFeedModelImpl.FEEDID_COLUMN_BITMASK);
-	public static final FinderPath FINDER_PATH_COUNT_BY_GROUPID = new FinderPath(JournalFeedModelImpl.ENTITY_CACHE_ENABLED,
-			JournalFeedModelImpl.FINDER_CACHE_ENABLED, Long.class,
-			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByGroupId",
-			new String[] { Long.class.getName() });
+	private static final String _FINDER_COLUMN_UUID_C_UUID_2 =
+		"journalFeed.uuid = ? AND ";
+
+	private static final String _FINDER_COLUMN_UUID_C_UUID_3 =
+		"(journalFeed.uuid IS NULL OR journalFeed.uuid = '') AND ";
+
+	private static final String _FINDER_COLUMN_UUID_C_COMPANYID_2 =
+		"journalFeed.companyId = ?";
+
+	private FinderPath _finderPathWithPaginationFindByGroupId;
+	private FinderPath _finderPathWithoutPaginationFindByGroupId;
+	private FinderPath _finderPathCountByGroupId;
 
 	/**
 	 * Returns all the journal feeds where groupId = &#63;.
@@ -1490,14 +1481,15 @@ public class JournalFeedPersistenceImpl extends BasePersistenceImpl<JournalFeed>
 	 */
 	@Override
 	public List<JournalFeed> findByGroupId(long groupId) {
-		return findByGroupId(groupId, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
+		return findByGroupId(
+			groupId, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
 	}
 
 	/**
 	 * Returns a range of all the journal feeds where groupId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link JournalFeedModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>JournalFeedModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param groupId the group ID
@@ -1514,7 +1506,7 @@ public class JournalFeedPersistenceImpl extends BasePersistenceImpl<JournalFeed>
 	 * Returns an ordered range of all the journal feeds where groupId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link JournalFeedModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>JournalFeedModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param groupId the group ID
@@ -1524,8 +1516,10 @@ public class JournalFeedPersistenceImpl extends BasePersistenceImpl<JournalFeed>
 	 * @return the ordered range of matching journal feeds
 	 */
 	@Override
-	public List<JournalFeed> findByGroupId(long groupId, int start, int end,
+	public List<JournalFeed> findByGroupId(
+		long groupId, int start, int end,
 		OrderByComparator<JournalFeed> orderByComparator) {
+
 		return findByGroupId(groupId, start, end, orderByComparator, true);
 	}
 
@@ -1533,7 +1527,7 @@ public class JournalFeedPersistenceImpl extends BasePersistenceImpl<JournalFeed>
 	 * Returns an ordered range of all the journal feeds where groupId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link JournalFeedModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>JournalFeedModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param groupId the group ID
@@ -1544,29 +1538,32 @@ public class JournalFeedPersistenceImpl extends BasePersistenceImpl<JournalFeed>
 	 * @return the ordered range of matching journal feeds
 	 */
 	@Override
-	public List<JournalFeed> findByGroupId(long groupId, int start, int end,
+	public List<JournalFeed> findByGroupId(
+		long groupId, int start, int end,
 		OrderByComparator<JournalFeed> orderByComparator,
 		boolean retrieveFromCache) {
+
 		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
-				(orderByComparator == null)) {
+			(orderByComparator == null)) {
+
 			pagination = false;
-			finderPath = FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_GROUPID;
-			finderArgs = new Object[] { groupId };
+			finderPath = _finderPathWithoutPaginationFindByGroupId;
+			finderArgs = new Object[] {groupId};
 		}
 		else {
-			finderPath = FINDER_PATH_WITH_PAGINATION_FIND_BY_GROUPID;
-			finderArgs = new Object[] { groupId, start, end, orderByComparator };
+			finderPath = _finderPathWithPaginationFindByGroupId;
+			finderArgs = new Object[] {groupId, start, end, orderByComparator};
 		}
 
 		List<JournalFeed> list = null;
 
 		if (retrieveFromCache) {
-			list = (List<JournalFeed>)finderCache.getResult(finderPath,
-					finderArgs, this);
+			list = (List<JournalFeed>)finderCache.getResult(
+				finderPath, finderArgs, this);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (JournalFeed journalFeed : list) {
@@ -1583,8 +1580,8 @@ public class JournalFeedPersistenceImpl extends BasePersistenceImpl<JournalFeed>
 			StringBundler query = null;
 
 			if (orderByComparator != null) {
-				query = new StringBundler(3 +
-						(orderByComparator.getOrderByFields().length * 2));
+				query = new StringBundler(
+					3 + (orderByComparator.getOrderByFields().length * 2));
 			}
 			else {
 				query = new StringBundler(3);
@@ -1595,11 +1592,10 @@ public class JournalFeedPersistenceImpl extends BasePersistenceImpl<JournalFeed>
 			query.append(_FINDER_COLUMN_GROUPID_GROUPID_2);
 
 			if (orderByComparator != null) {
-				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
-					orderByComparator);
+				appendOrderByComparator(
+					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
 			}
-			else
-			 if (pagination) {
+			else if (pagination) {
 				query.append(JournalFeedModelImpl.ORDER_BY_JPQL);
 			}
 
@@ -1617,16 +1613,16 @@ public class JournalFeedPersistenceImpl extends BasePersistenceImpl<JournalFeed>
 				qPos.add(groupId);
 
 				if (!pagination) {
-					list = (List<JournalFeed>)QueryUtil.list(q, getDialect(),
-							start, end, false);
+					list = (List<JournalFeed>)QueryUtil.list(
+						q, getDialect(), start, end, false);
 
 					Collections.sort(list);
 
 					list = Collections.unmodifiableList(list);
 				}
 				else {
-					list = (List<JournalFeed>)QueryUtil.list(q, getDialect(),
-							start, end);
+					list = (List<JournalFeed>)QueryUtil.list(
+						q, getDialect(), start, end);
 				}
 
 				cacheResult(list);
@@ -1655,11 +1651,12 @@ public class JournalFeedPersistenceImpl extends BasePersistenceImpl<JournalFeed>
 	 * @throws NoSuchFeedException if a matching journal feed could not be found
 	 */
 	@Override
-	public JournalFeed findByGroupId_First(long groupId,
-		OrderByComparator<JournalFeed> orderByComparator)
+	public JournalFeed findByGroupId_First(
+			long groupId, OrderByComparator<JournalFeed> orderByComparator)
 		throws NoSuchFeedException {
-		JournalFeed journalFeed = fetchByGroupId_First(groupId,
-				orderByComparator);
+
+		JournalFeed journalFeed = fetchByGroupId_First(
+			groupId, orderByComparator);
 
 		if (journalFeed != null) {
 			return journalFeed;
@@ -1685,9 +1682,11 @@ public class JournalFeedPersistenceImpl extends BasePersistenceImpl<JournalFeed>
 	 * @return the first matching journal feed, or <code>null</code> if a matching journal feed could not be found
 	 */
 	@Override
-	public JournalFeed fetchByGroupId_First(long groupId,
-		OrderByComparator<JournalFeed> orderByComparator) {
-		List<JournalFeed> list = findByGroupId(groupId, 0, 1, orderByComparator);
+	public JournalFeed fetchByGroupId_First(
+		long groupId, OrderByComparator<JournalFeed> orderByComparator) {
+
+		List<JournalFeed> list = findByGroupId(
+			groupId, 0, 1, orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -1705,10 +1704,12 @@ public class JournalFeedPersistenceImpl extends BasePersistenceImpl<JournalFeed>
 	 * @throws NoSuchFeedException if a matching journal feed could not be found
 	 */
 	@Override
-	public JournalFeed findByGroupId_Last(long groupId,
-		OrderByComparator<JournalFeed> orderByComparator)
+	public JournalFeed findByGroupId_Last(
+			long groupId, OrderByComparator<JournalFeed> orderByComparator)
 		throws NoSuchFeedException {
-		JournalFeed journalFeed = fetchByGroupId_Last(groupId, orderByComparator);
+
+		JournalFeed journalFeed = fetchByGroupId_Last(
+			groupId, orderByComparator);
 
 		if (journalFeed != null) {
 			return journalFeed;
@@ -1734,16 +1735,17 @@ public class JournalFeedPersistenceImpl extends BasePersistenceImpl<JournalFeed>
 	 * @return the last matching journal feed, or <code>null</code> if a matching journal feed could not be found
 	 */
 	@Override
-	public JournalFeed fetchByGroupId_Last(long groupId,
-		OrderByComparator<JournalFeed> orderByComparator) {
+	public JournalFeed fetchByGroupId_Last(
+		long groupId, OrderByComparator<JournalFeed> orderByComparator) {
+
 		int count = countByGroupId(groupId);
 
 		if (count == 0) {
 			return null;
 		}
 
-		List<JournalFeed> list = findByGroupId(groupId, count - 1, count,
-				orderByComparator);
+		List<JournalFeed> list = findByGroupId(
+			groupId, count - 1, count, orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -1762,9 +1764,11 @@ public class JournalFeedPersistenceImpl extends BasePersistenceImpl<JournalFeed>
 	 * @throws NoSuchFeedException if a journal feed with the primary key could not be found
 	 */
 	@Override
-	public JournalFeed[] findByGroupId_PrevAndNext(long id, long groupId,
-		OrderByComparator<JournalFeed> orderByComparator)
+	public JournalFeed[] findByGroupId_PrevAndNext(
+			long id, long groupId,
+			OrderByComparator<JournalFeed> orderByComparator)
 		throws NoSuchFeedException {
+
 		JournalFeed journalFeed = findByPrimaryKey(id);
 
 		Session session = null;
@@ -1774,13 +1778,13 @@ public class JournalFeedPersistenceImpl extends BasePersistenceImpl<JournalFeed>
 
 			JournalFeed[] array = new JournalFeedImpl[3];
 
-			array[0] = getByGroupId_PrevAndNext(session, journalFeed, groupId,
-					orderByComparator, true);
+			array[0] = getByGroupId_PrevAndNext(
+				session, journalFeed, groupId, orderByComparator, true);
 
 			array[1] = journalFeed;
 
-			array[2] = getByGroupId_PrevAndNext(session, journalFeed, groupId,
-					orderByComparator, false);
+			array[2] = getByGroupId_PrevAndNext(
+				session, journalFeed, groupId, orderByComparator, false);
 
 			return array;
 		}
@@ -1792,14 +1796,15 @@ public class JournalFeedPersistenceImpl extends BasePersistenceImpl<JournalFeed>
 		}
 	}
 
-	protected JournalFeed getByGroupId_PrevAndNext(Session session,
-		JournalFeed journalFeed, long groupId,
+	protected JournalFeed getByGroupId_PrevAndNext(
+		Session session, JournalFeed journalFeed, long groupId,
 		OrderByComparator<JournalFeed> orderByComparator, boolean previous) {
+
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(4 +
-					(orderByComparator.getOrderByConditionFields().length * 3) +
+			query = new StringBundler(
+				4 + (orderByComparator.getOrderByConditionFields().length * 3) +
 					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
@@ -1811,7 +1816,8 @@ public class JournalFeedPersistenceImpl extends BasePersistenceImpl<JournalFeed>
 		query.append(_FINDER_COLUMN_GROUPID_GROUPID_2);
 
 		if (orderByComparator != null) {
-			String[] orderByConditionFields = orderByComparator.getOrderByConditionFields();
+			String[] orderByConditionFields =
+				orderByComparator.getOrderByConditionFields();
 
 			if (orderByConditionFields.length > 0) {
 				query.append(WHERE_AND);
@@ -1881,10 +1887,10 @@ public class JournalFeedPersistenceImpl extends BasePersistenceImpl<JournalFeed>
 		qPos.add(groupId);
 
 		if (orderByComparator != null) {
-			Object[] values = orderByComparator.getOrderByConditionValues(journalFeed);
+			for (Object orderByConditionValue :
+					orderByComparator.getOrderByConditionValues(journalFeed)) {
 
-			for (Object value : values) {
-				qPos.add(value);
+				qPos.add(orderByConditionValue);
 			}
 		}
 
@@ -1906,15 +1912,15 @@ public class JournalFeedPersistenceImpl extends BasePersistenceImpl<JournalFeed>
 	 */
 	@Override
 	public List<JournalFeed> filterFindByGroupId(long groupId) {
-		return filterFindByGroupId(groupId, QueryUtil.ALL_POS,
-			QueryUtil.ALL_POS, null);
+		return filterFindByGroupId(
+			groupId, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
 	}
 
 	/**
 	 * Returns a range of all the journal feeds that the user has permission to view where groupId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link JournalFeedModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>JournalFeedModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param groupId the group ID
@@ -1923,8 +1929,9 @@ public class JournalFeedPersistenceImpl extends BasePersistenceImpl<JournalFeed>
 	 * @return the range of matching journal feeds that the user has permission to view
 	 */
 	@Override
-	public List<JournalFeed> filterFindByGroupId(long groupId, int start,
-		int end) {
+	public List<JournalFeed> filterFindByGroupId(
+		long groupId, int start, int end) {
+
 		return filterFindByGroupId(groupId, start, end, null);
 	}
 
@@ -1932,7 +1939,7 @@ public class JournalFeedPersistenceImpl extends BasePersistenceImpl<JournalFeed>
 	 * Returns an ordered range of all the journal feeds that the user has permissions to view where groupId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link JournalFeedModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>JournalFeedModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param groupId the group ID
@@ -1942,8 +1949,10 @@ public class JournalFeedPersistenceImpl extends BasePersistenceImpl<JournalFeed>
 	 * @return the ordered range of matching journal feeds that the user has permission to view
 	 */
 	@Override
-	public List<JournalFeed> filterFindByGroupId(long groupId, int start,
-		int end, OrderByComparator<JournalFeed> orderByComparator) {
+	public List<JournalFeed> filterFindByGroupId(
+		long groupId, int start, int end,
+		OrderByComparator<JournalFeed> orderByComparator) {
+
 		if (!InlineSQLHelperUtil.isEnabled(groupId)) {
 			return findByGroupId(groupId, start, end, orderByComparator);
 		}
@@ -1951,8 +1960,8 @@ public class JournalFeedPersistenceImpl extends BasePersistenceImpl<JournalFeed>
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(3 +
-					(orderByComparator.getOrderByFields().length * 2));
+			query = new StringBundler(
+				3 + (orderByComparator.getOrderByFields().length * 2));
 		}
 		else {
 			query = new StringBundler(4);
@@ -1962,23 +1971,25 @@ public class JournalFeedPersistenceImpl extends BasePersistenceImpl<JournalFeed>
 			query.append(_FILTER_SQL_SELECT_JOURNALFEED_WHERE);
 		}
 		else {
-			query.append(_FILTER_SQL_SELECT_JOURNALFEED_NO_INLINE_DISTINCT_WHERE_1);
+			query.append(
+				_FILTER_SQL_SELECT_JOURNALFEED_NO_INLINE_DISTINCT_WHERE_1);
 		}
 
 		query.append(_FINDER_COLUMN_GROUPID_GROUPID_2);
 
 		if (!getDB().isSupportsInlineDistinct()) {
-			query.append(_FILTER_SQL_SELECT_JOURNALFEED_NO_INLINE_DISTINCT_WHERE_2);
+			query.append(
+				_FILTER_SQL_SELECT_JOURNALFEED_NO_INLINE_DISTINCT_WHERE_2);
 		}
 
 		if (orderByComparator != null) {
 			if (getDB().isSupportsInlineDistinct()) {
-				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
-					orderByComparator, true);
+				appendOrderByComparator(
+					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator, true);
 			}
 			else {
-				appendOrderByComparator(query, _ORDER_BY_ENTITY_TABLE,
-					orderByComparator, true);
+				appendOrderByComparator(
+					query, _ORDER_BY_ENTITY_TABLE, orderByComparator, true);
 			}
 		}
 		else {
@@ -1990,9 +2001,9 @@ public class JournalFeedPersistenceImpl extends BasePersistenceImpl<JournalFeed>
 			}
 		}
 
-		String sql = InlineSQLHelperUtil.replacePermissionCheck(query.toString(),
-				JournalFeed.class.getName(),
-				_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
+		String sql = InlineSQLHelperUtil.replacePermissionCheck(
+			query.toString(), JournalFeed.class.getName(),
+			_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
 
 		Session session = null;
 
@@ -2012,7 +2023,8 @@ public class JournalFeedPersistenceImpl extends BasePersistenceImpl<JournalFeed>
 
 			qPos.add(groupId);
 
-			return (List<JournalFeed>)QueryUtil.list(q, getDialect(), start, end);
+			return (List<JournalFeed>)QueryUtil.list(
+				q, getDialect(), start, end);
 		}
 		catch (Exception e) {
 			throw processException(e);
@@ -2032,9 +2044,11 @@ public class JournalFeedPersistenceImpl extends BasePersistenceImpl<JournalFeed>
 	 * @throws NoSuchFeedException if a journal feed with the primary key could not be found
 	 */
 	@Override
-	public JournalFeed[] filterFindByGroupId_PrevAndNext(long id, long groupId,
-		OrderByComparator<JournalFeed> orderByComparator)
+	public JournalFeed[] filterFindByGroupId_PrevAndNext(
+			long id, long groupId,
+			OrderByComparator<JournalFeed> orderByComparator)
 		throws NoSuchFeedException {
+
 		if (!InlineSQLHelperUtil.isEnabled(groupId)) {
 			return findByGroupId_PrevAndNext(id, groupId, orderByComparator);
 		}
@@ -2048,13 +2062,13 @@ public class JournalFeedPersistenceImpl extends BasePersistenceImpl<JournalFeed>
 
 			JournalFeed[] array = new JournalFeedImpl[3];
 
-			array[0] = filterGetByGroupId_PrevAndNext(session, journalFeed,
-					groupId, orderByComparator, true);
+			array[0] = filterGetByGroupId_PrevAndNext(
+				session, journalFeed, groupId, orderByComparator, true);
 
 			array[1] = journalFeed;
 
-			array[2] = filterGetByGroupId_PrevAndNext(session, journalFeed,
-					groupId, orderByComparator, false);
+			array[2] = filterGetByGroupId_PrevAndNext(
+				session, journalFeed, groupId, orderByComparator, false);
 
 			return array;
 		}
@@ -2066,14 +2080,15 @@ public class JournalFeedPersistenceImpl extends BasePersistenceImpl<JournalFeed>
 		}
 	}
 
-	protected JournalFeed filterGetByGroupId_PrevAndNext(Session session,
-		JournalFeed journalFeed, long groupId,
+	protected JournalFeed filterGetByGroupId_PrevAndNext(
+		Session session, JournalFeed journalFeed, long groupId,
 		OrderByComparator<JournalFeed> orderByComparator, boolean previous) {
+
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(5 +
-					(orderByComparator.getOrderByConditionFields().length * 3) +
+			query = new StringBundler(
+				5 + (orderByComparator.getOrderByConditionFields().length * 3) +
 					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
@@ -2084,17 +2099,20 @@ public class JournalFeedPersistenceImpl extends BasePersistenceImpl<JournalFeed>
 			query.append(_FILTER_SQL_SELECT_JOURNALFEED_WHERE);
 		}
 		else {
-			query.append(_FILTER_SQL_SELECT_JOURNALFEED_NO_INLINE_DISTINCT_WHERE_1);
+			query.append(
+				_FILTER_SQL_SELECT_JOURNALFEED_NO_INLINE_DISTINCT_WHERE_1);
 		}
 
 		query.append(_FINDER_COLUMN_GROUPID_GROUPID_2);
 
 		if (!getDB().isSupportsInlineDistinct()) {
-			query.append(_FILTER_SQL_SELECT_JOURNALFEED_NO_INLINE_DISTINCT_WHERE_2);
+			query.append(
+				_FILTER_SQL_SELECT_JOURNALFEED_NO_INLINE_DISTINCT_WHERE_2);
 		}
 
 		if (orderByComparator != null) {
-			String[] orderByConditionFields = orderByComparator.getOrderByConditionFields();
+			String[] orderByConditionFields =
+				orderByComparator.getOrderByConditionFields();
 
 			if (orderByConditionFields.length > 0) {
 				query.append(WHERE_AND);
@@ -2102,13 +2120,17 @@ public class JournalFeedPersistenceImpl extends BasePersistenceImpl<JournalFeed>
 
 			for (int i = 0; i < orderByConditionFields.length; i++) {
 				if (getDB().isSupportsInlineDistinct()) {
-					query.append(_ORDER_BY_ENTITY_ALIAS);
+					query.append(
+						getColumnName(
+							_ORDER_BY_ENTITY_ALIAS, orderByConditionFields[i],
+							true));
 				}
 				else {
-					query.append(_ORDER_BY_ENTITY_TABLE);
+					query.append(
+						getColumnName(
+							_ORDER_BY_ENTITY_TABLE, orderByConditionFields[i],
+							true));
 				}
-
-				query.append(orderByConditionFields[i]);
 
 				if ((i + 1) < orderByConditionFields.length) {
 					if (orderByComparator.isAscending() ^ previous) {
@@ -2134,13 +2156,15 @@ public class JournalFeedPersistenceImpl extends BasePersistenceImpl<JournalFeed>
 
 			for (int i = 0; i < orderByFields.length; i++) {
 				if (getDB().isSupportsInlineDistinct()) {
-					query.append(_ORDER_BY_ENTITY_ALIAS);
+					query.append(
+						getColumnName(
+							_ORDER_BY_ENTITY_ALIAS, orderByFields[i], true));
 				}
 				else {
-					query.append(_ORDER_BY_ENTITY_TABLE);
+					query.append(
+						getColumnName(
+							_ORDER_BY_ENTITY_TABLE, orderByFields[i], true));
 				}
-
-				query.append(orderByFields[i]);
 
 				if ((i + 1) < orderByFields.length) {
 					if (orderByComparator.isAscending() ^ previous) {
@@ -2169,9 +2193,9 @@ public class JournalFeedPersistenceImpl extends BasePersistenceImpl<JournalFeed>
 			}
 		}
 
-		String sql = InlineSQLHelperUtil.replacePermissionCheck(query.toString(),
-				JournalFeed.class.getName(),
-				_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
+		String sql = InlineSQLHelperUtil.replacePermissionCheck(
+			query.toString(), JournalFeed.class.getName(),
+			_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
 
 		SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
@@ -2190,10 +2214,10 @@ public class JournalFeedPersistenceImpl extends BasePersistenceImpl<JournalFeed>
 		qPos.add(groupId);
 
 		if (orderByComparator != null) {
-			Object[] values = orderByComparator.getOrderByConditionValues(journalFeed);
+			for (Object orderByConditionValue :
+					orderByComparator.getOrderByConditionValues(journalFeed)) {
 
-			for (Object value : values) {
-				qPos.add(value);
+				qPos.add(orderByConditionValue);
 			}
 		}
 
@@ -2214,8 +2238,10 @@ public class JournalFeedPersistenceImpl extends BasePersistenceImpl<JournalFeed>
 	 */
 	@Override
 	public void removeByGroupId(long groupId) {
-		for (JournalFeed journalFeed : findByGroupId(groupId,
-				QueryUtil.ALL_POS, QueryUtil.ALL_POS, null)) {
+		for (JournalFeed journalFeed :
+				findByGroupId(
+					groupId, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null)) {
+
 			remove(journalFeed);
 		}
 	}
@@ -2228,9 +2254,9 @@ public class JournalFeedPersistenceImpl extends BasePersistenceImpl<JournalFeed>
 	 */
 	@Override
 	public int countByGroupId(long groupId) {
-		FinderPath finderPath = FINDER_PATH_COUNT_BY_GROUPID;
+		FinderPath finderPath = _finderPathCountByGroupId;
 
-		Object[] finderArgs = new Object[] { groupId };
+		Object[] finderArgs = new Object[] {groupId};
 
 		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
 
@@ -2289,9 +2315,9 @@ public class JournalFeedPersistenceImpl extends BasePersistenceImpl<JournalFeed>
 
 		query.append(_FINDER_COLUMN_GROUPID_GROUPID_2);
 
-		String sql = InlineSQLHelperUtil.replacePermissionCheck(query.toString(),
-				JournalFeed.class.getName(),
-				_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
+		String sql = InlineSQLHelperUtil.replacePermissionCheck(
+			query.toString(), JournalFeed.class.getName(),
+			_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
 
 		Session session = null;
 
@@ -2300,8 +2326,8 @@ public class JournalFeedPersistenceImpl extends BasePersistenceImpl<JournalFeed>
 
 			SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
-			q.addScalar(COUNT_COLUMN_NAME,
-				com.liferay.portal.kernel.dao.orm.Type.LONG);
+			q.addScalar(
+				COUNT_COLUMN_NAME, com.liferay.portal.kernel.dao.orm.Type.LONG);
 
 			QueryPos qPos = QueryPos.getInstance(q);
 
@@ -2319,20 +2345,14 @@ public class JournalFeedPersistenceImpl extends BasePersistenceImpl<JournalFeed>
 		}
 	}
 
-	private static final String _FINDER_COLUMN_GROUPID_GROUPID_2 = "journalFeed.groupId = ?";
-	public static final FinderPath FINDER_PATH_FETCH_BY_G_F = new FinderPath(JournalFeedModelImpl.ENTITY_CACHE_ENABLED,
-			JournalFeedModelImpl.FINDER_CACHE_ENABLED, JournalFeedImpl.class,
-			FINDER_CLASS_NAME_ENTITY, "fetchByG_F",
-			new String[] { Long.class.getName(), String.class.getName() },
-			JournalFeedModelImpl.GROUPID_COLUMN_BITMASK |
-			JournalFeedModelImpl.FEEDID_COLUMN_BITMASK);
-	public static final FinderPath FINDER_PATH_COUNT_BY_G_F = new FinderPath(JournalFeedModelImpl.ENTITY_CACHE_ENABLED,
-			JournalFeedModelImpl.FINDER_CACHE_ENABLED, Long.class,
-			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByG_F",
-			new String[] { Long.class.getName(), String.class.getName() });
+	private static final String _FINDER_COLUMN_GROUPID_GROUPID_2 =
+		"journalFeed.groupId = ?";
+
+	private FinderPath _finderPathFetchByG_F;
+	private FinderPath _finderPathCountByG_F;
 
 	/**
-	 * Returns the journal feed where groupId = &#63; and feedId = &#63; or throws a {@link NoSuchFeedException} if it could not be found.
+	 * Returns the journal feed where groupId = &#63; and feedId = &#63; or throws a <code>NoSuchFeedException</code> if it could not be found.
 	 *
 	 * @param groupId the group ID
 	 * @param feedId the feed ID
@@ -2342,6 +2362,7 @@ public class JournalFeedPersistenceImpl extends BasePersistenceImpl<JournalFeed>
 	@Override
 	public JournalFeed findByG_F(long groupId, String feedId)
 		throws NoSuchFeedException {
+
 		JournalFeed journalFeed = fetchByG_F(groupId, feedId);
 
 		if (journalFeed == null) {
@@ -2388,24 +2409,26 @@ public class JournalFeedPersistenceImpl extends BasePersistenceImpl<JournalFeed>
 	 * @return the matching journal feed, or <code>null</code> if a matching journal feed could not be found
 	 */
 	@Override
-	public JournalFeed fetchByG_F(long groupId, String feedId,
-		boolean retrieveFromCache) {
+	public JournalFeed fetchByG_F(
+		long groupId, String feedId, boolean retrieveFromCache) {
+
 		feedId = Objects.toString(feedId, "");
 
-		Object[] finderArgs = new Object[] { groupId, feedId };
+		Object[] finderArgs = new Object[] {groupId, feedId};
 
 		Object result = null;
 
 		if (retrieveFromCache) {
-			result = finderCache.getResult(FINDER_PATH_FETCH_BY_G_F,
-					finderArgs, this);
+			result = finderCache.getResult(
+				_finderPathFetchByG_F, finderArgs, this);
 		}
 
 		if (result instanceof JournalFeed) {
 			JournalFeed journalFeed = (JournalFeed)result;
 
 			if ((groupId != journalFeed.getGroupId()) ||
-					!Objects.equals(feedId, journalFeed.getFeedId())) {
+				!Objects.equals(feedId, journalFeed.getFeedId())) {
+
 				result = null;
 			}
 		}
@@ -2448,8 +2471,8 @@ public class JournalFeedPersistenceImpl extends BasePersistenceImpl<JournalFeed>
 				List<JournalFeed> list = q.list();
 
 				if (list.isEmpty()) {
-					finderCache.putResult(FINDER_PATH_FETCH_BY_G_F, finderArgs,
-						list);
+					finderCache.putResult(
+						_finderPathFetchByG_F, finderArgs, list);
 				}
 				else {
 					JournalFeed journalFeed = list.get(0);
@@ -2460,7 +2483,7 @@ public class JournalFeedPersistenceImpl extends BasePersistenceImpl<JournalFeed>
 				}
 			}
 			catch (Exception e) {
-				finderCache.removeResult(FINDER_PATH_FETCH_BY_G_F, finderArgs);
+				finderCache.removeResult(_finderPathFetchByG_F, finderArgs);
 
 				throw processException(e);
 			}
@@ -2487,6 +2510,7 @@ public class JournalFeedPersistenceImpl extends BasePersistenceImpl<JournalFeed>
 	@Override
 	public JournalFeed removeByG_F(long groupId, String feedId)
 		throws NoSuchFeedException {
+
 		JournalFeed journalFeed = findByG_F(groupId, feedId);
 
 		return remove(journalFeed);
@@ -2503,9 +2527,9 @@ public class JournalFeedPersistenceImpl extends BasePersistenceImpl<JournalFeed>
 	public int countByG_F(long groupId, String feedId) {
 		feedId = Objects.toString(feedId, "");
 
-		FinderPath finderPath = FINDER_PATH_COUNT_BY_G_F;
+		FinderPath finderPath = _finderPathCountByG_F;
 
-		Object[] finderArgs = new Object[] { groupId, feedId };
+		Object[] finderArgs = new Object[] {groupId, feedId};
 
 		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
 
@@ -2561,23 +2585,28 @@ public class JournalFeedPersistenceImpl extends BasePersistenceImpl<JournalFeed>
 		return count.intValue();
 	}
 
-	private static final String _FINDER_COLUMN_G_F_GROUPID_2 = "journalFeed.groupId = ? AND ";
-	private static final String _FINDER_COLUMN_G_F_FEEDID_2 = "journalFeed.feedId = ?";
-	private static final String _FINDER_COLUMN_G_F_FEEDID_3 = "(journalFeed.feedId IS NULL OR journalFeed.feedId = '')";
+	private static final String _FINDER_COLUMN_G_F_GROUPID_2 =
+		"journalFeed.groupId = ? AND ";
+
+	private static final String _FINDER_COLUMN_G_F_FEEDID_2 =
+		"journalFeed.feedId = ?";
+
+	private static final String _FINDER_COLUMN_G_F_FEEDID_3 =
+		"(journalFeed.feedId IS NULL OR journalFeed.feedId = '')";
 
 	public JournalFeedPersistenceImpl() {
 		setModelClass(JournalFeed.class);
 
+		Map<String, String> dbColumnNames = new HashMap<String, String>();
+
+		dbColumnNames.put("uuid", "uuid_");
+		dbColumnNames.put("id", "id_");
+
 		try {
 			Field field = BasePersistenceImpl.class.getDeclaredField(
-					"_dbColumnNames");
+				"_dbColumnNames");
 
 			field.setAccessible(true);
-
-			Map<String, String> dbColumnNames = new HashMap<String, String>();
-
-			dbColumnNames.put("uuid", "uuid_");
-			dbColumnNames.put("id", "id_");
 
 			field.set(this, dbColumnNames);
 		}
@@ -2595,15 +2624,18 @@ public class JournalFeedPersistenceImpl extends BasePersistenceImpl<JournalFeed>
 	 */
 	@Override
 	public void cacheResult(JournalFeed journalFeed) {
-		entityCache.putResult(JournalFeedModelImpl.ENTITY_CACHE_ENABLED,
-			JournalFeedImpl.class, journalFeed.getPrimaryKey(), journalFeed);
+		entityCache.putResult(
+			JournalFeedModelImpl.ENTITY_CACHE_ENABLED, JournalFeedImpl.class,
+			journalFeed.getPrimaryKey(), journalFeed);
 
-		finderCache.putResult(FINDER_PATH_FETCH_BY_UUID_G,
-			new Object[] { journalFeed.getUuid(), journalFeed.getGroupId() },
+		finderCache.putResult(
+			_finderPathFetchByUUID_G,
+			new Object[] {journalFeed.getUuid(), journalFeed.getGroupId()},
 			journalFeed);
 
-		finderCache.putResult(FINDER_PATH_FETCH_BY_G_F,
-			new Object[] { journalFeed.getGroupId(), journalFeed.getFeedId() },
+		finderCache.putResult(
+			_finderPathFetchByG_F,
+			new Object[] {journalFeed.getGroupId(), journalFeed.getFeedId()},
 			journalFeed);
 
 		journalFeed.resetOriginalValues();
@@ -2618,8 +2650,10 @@ public class JournalFeedPersistenceImpl extends BasePersistenceImpl<JournalFeed>
 	public void cacheResult(List<JournalFeed> journalFeeds) {
 		for (JournalFeed journalFeed : journalFeeds) {
 			if (entityCache.getResult(
-						JournalFeedModelImpl.ENTITY_CACHE_ENABLED,
-						JournalFeedImpl.class, journalFeed.getPrimaryKey()) == null) {
+					JournalFeedModelImpl.ENTITY_CACHE_ENABLED,
+					JournalFeedImpl.class, journalFeed.getPrimaryKey()) ==
+						null) {
+
 				cacheResult(journalFeed);
 			}
 			else {
@@ -2632,7 +2666,7 @@ public class JournalFeedPersistenceImpl extends BasePersistenceImpl<JournalFeed>
 	 * Clears the cache for all journal feeds.
 	 *
 	 * <p>
-	 * The {@link EntityCache} and {@link FinderCache} are both cleared by this method.
+	 * The <code>EntityCache</code> and <code>FinderCache</code> are both cleared by this method.
 	 * </p>
 	 */
 	@Override
@@ -2648,13 +2682,14 @@ public class JournalFeedPersistenceImpl extends BasePersistenceImpl<JournalFeed>
 	 * Clears the cache for the journal feed.
 	 *
 	 * <p>
-	 * The {@link EntityCache} and {@link FinderCache} are both cleared by this method.
+	 * The <code>EntityCache</code> and <code>FinderCache</code> are both cleared by this method.
 	 * </p>
 	 */
 	@Override
 	public void clearCache(JournalFeed journalFeed) {
-		entityCache.removeResult(JournalFeedModelImpl.ENTITY_CACHE_ENABLED,
-			JournalFeedImpl.class, journalFeed.getPrimaryKey());
+		entityCache.removeResult(
+			JournalFeedModelImpl.ENTITY_CACHE_ENABLED, JournalFeedImpl.class,
+			journalFeed.getPrimaryKey());
 
 		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
 		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
@@ -2668,7 +2703,8 @@ public class JournalFeedPersistenceImpl extends BasePersistenceImpl<JournalFeed>
 		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
 
 		for (JournalFeed journalFeed : journalFeeds) {
-			entityCache.removeResult(JournalFeedModelImpl.ENTITY_CACHE_ENABLED,
+			entityCache.removeResult(
+				JournalFeedModelImpl.ENTITY_CACHE_ENABLED,
 				JournalFeedImpl.class, journalFeed.getPrimaryKey());
 
 			clearUniqueFindersCache((JournalFeedModelImpl)journalFeed, true);
@@ -2677,69 +2713,71 @@ public class JournalFeedPersistenceImpl extends BasePersistenceImpl<JournalFeed>
 
 	protected void cacheUniqueFindersCache(
 		JournalFeedModelImpl journalFeedModelImpl) {
-		Object[] args = new Object[] {
-				journalFeedModelImpl.getUuid(),
-				journalFeedModelImpl.getGroupId()
-			};
 
-		finderCache.putResult(FINDER_PATH_COUNT_BY_UUID_G, args,
-			Long.valueOf(1), false);
-		finderCache.putResult(FINDER_PATH_FETCH_BY_UUID_G, args,
-			journalFeedModelImpl, false);
+		Object[] args = new Object[] {
+			journalFeedModelImpl.getUuid(), journalFeedModelImpl.getGroupId()
+		};
+
+		finderCache.putResult(
+			_finderPathCountByUUID_G, args, Long.valueOf(1), false);
+		finderCache.putResult(
+			_finderPathFetchByUUID_G, args, journalFeedModelImpl, false);
 
 		args = new Object[] {
-				journalFeedModelImpl.getGroupId(),
-				journalFeedModelImpl.getFeedId()
-			};
+			journalFeedModelImpl.getGroupId(), journalFeedModelImpl.getFeedId()
+		};
 
-		finderCache.putResult(FINDER_PATH_COUNT_BY_G_F, args, Long.valueOf(1),
-			false);
-		finderCache.putResult(FINDER_PATH_FETCH_BY_G_F, args,
-			journalFeedModelImpl, false);
+		finderCache.putResult(
+			_finderPathCountByG_F, args, Long.valueOf(1), false);
+		finderCache.putResult(
+			_finderPathFetchByG_F, args, journalFeedModelImpl, false);
 	}
 
 	protected void clearUniqueFindersCache(
 		JournalFeedModelImpl journalFeedModelImpl, boolean clearCurrent) {
-		if (clearCurrent) {
-			Object[] args = new Object[] {
-					journalFeedModelImpl.getUuid(),
-					journalFeedModelImpl.getGroupId()
-				};
-
-			finderCache.removeResult(FINDER_PATH_COUNT_BY_UUID_G, args);
-			finderCache.removeResult(FINDER_PATH_FETCH_BY_UUID_G, args);
-		}
-
-		if ((journalFeedModelImpl.getColumnBitmask() &
-				FINDER_PATH_FETCH_BY_UUID_G.getColumnBitmask()) != 0) {
-			Object[] args = new Object[] {
-					journalFeedModelImpl.getOriginalUuid(),
-					journalFeedModelImpl.getOriginalGroupId()
-				};
-
-			finderCache.removeResult(FINDER_PATH_COUNT_BY_UUID_G, args);
-			finderCache.removeResult(FINDER_PATH_FETCH_BY_UUID_G, args);
-		}
 
 		if (clearCurrent) {
 			Object[] args = new Object[] {
-					journalFeedModelImpl.getGroupId(),
-					journalFeedModelImpl.getFeedId()
-				};
+				journalFeedModelImpl.getUuid(),
+				journalFeedModelImpl.getGroupId()
+			};
 
-			finderCache.removeResult(FINDER_PATH_COUNT_BY_G_F, args);
-			finderCache.removeResult(FINDER_PATH_FETCH_BY_G_F, args);
+			finderCache.removeResult(_finderPathCountByUUID_G, args);
+			finderCache.removeResult(_finderPathFetchByUUID_G, args);
 		}
 
 		if ((journalFeedModelImpl.getColumnBitmask() &
-				FINDER_PATH_FETCH_BY_G_F.getColumnBitmask()) != 0) {
-			Object[] args = new Object[] {
-					journalFeedModelImpl.getOriginalGroupId(),
-					journalFeedModelImpl.getOriginalFeedId()
-				};
+			 _finderPathFetchByUUID_G.getColumnBitmask()) != 0) {
 
-			finderCache.removeResult(FINDER_PATH_COUNT_BY_G_F, args);
-			finderCache.removeResult(FINDER_PATH_FETCH_BY_G_F, args);
+			Object[] args = new Object[] {
+				journalFeedModelImpl.getOriginalUuid(),
+				journalFeedModelImpl.getOriginalGroupId()
+			};
+
+			finderCache.removeResult(_finderPathCountByUUID_G, args);
+			finderCache.removeResult(_finderPathFetchByUUID_G, args);
+		}
+
+		if (clearCurrent) {
+			Object[] args = new Object[] {
+				journalFeedModelImpl.getGroupId(),
+				journalFeedModelImpl.getFeedId()
+			};
+
+			finderCache.removeResult(_finderPathCountByG_F, args);
+			finderCache.removeResult(_finderPathFetchByG_F, args);
+		}
+
+		if ((journalFeedModelImpl.getColumnBitmask() &
+			 _finderPathFetchByG_F.getColumnBitmask()) != 0) {
+
+			Object[] args = new Object[] {
+				journalFeedModelImpl.getOriginalGroupId(),
+				journalFeedModelImpl.getOriginalFeedId()
+			};
+
+			finderCache.removeResult(_finderPathCountByG_F, args);
+			finderCache.removeResult(_finderPathFetchByG_F, args);
 		}
 	}
 
@@ -2787,21 +2825,22 @@ public class JournalFeedPersistenceImpl extends BasePersistenceImpl<JournalFeed>
 	@Override
 	public JournalFeed remove(Serializable primaryKey)
 		throws NoSuchFeedException {
+
 		Session session = null;
 
 		try {
 			session = openSession();
 
-			JournalFeed journalFeed = (JournalFeed)session.get(JournalFeedImpl.class,
-					primaryKey);
+			JournalFeed journalFeed = (JournalFeed)session.get(
+				JournalFeedImpl.class, primaryKey);
 
 			if (journalFeed == null) {
 				if (_log.isDebugEnabled()) {
 					_log.debug(_NO_SUCH_ENTITY_WITH_PRIMARY_KEY + primaryKey);
 				}
 
-				throw new NoSuchFeedException(_NO_SUCH_ENTITY_WITH_PRIMARY_KEY +
-					primaryKey);
+				throw new NoSuchFeedException(
+					_NO_SUCH_ENTITY_WITH_PRIMARY_KEY + primaryKey);
 			}
 
 			return remove(journalFeed);
@@ -2825,8 +2864,8 @@ public class JournalFeedPersistenceImpl extends BasePersistenceImpl<JournalFeed>
 			session = openSession();
 
 			if (!session.contains(journalFeed)) {
-				journalFeed = (JournalFeed)session.get(JournalFeedImpl.class,
-						journalFeed.getPrimaryKeyObj());
+				journalFeed = (JournalFeed)session.get(
+					JournalFeedImpl.class, journalFeed.getPrimaryKeyObj());
 			}
 
 			if (journalFeed != null) {
@@ -2859,15 +2898,16 @@ public class JournalFeedPersistenceImpl extends BasePersistenceImpl<JournalFeed>
 
 				throw new IllegalArgumentException(
 					"Implement ModelWrapper in journalFeed proxy " +
-					invocationHandler.getClass());
+						invocationHandler.getClass());
 			}
 
 			throw new IllegalArgumentException(
 				"Implement ModelWrapper in custom JournalFeed implementation " +
-				journalFeed.getClass());
+					journalFeed.getClass());
 		}
 
-		JournalFeedModelImpl journalFeedModelImpl = (JournalFeedModelImpl)journalFeed;
+		JournalFeedModelImpl journalFeedModelImpl =
+			(JournalFeedModelImpl)journalFeed;
 
 		if (Validator.isNull(journalFeed.getUuid())) {
 			String uuid = PortalUUIDUtil.generate();
@@ -2875,7 +2915,8 @@ public class JournalFeedPersistenceImpl extends BasePersistenceImpl<JournalFeed>
 			journalFeed.setUuid(uuid);
 		}
 
-		ServiceContext serviceContext = ServiceContextThreadLocal.getServiceContext();
+		ServiceContext serviceContext =
+			ServiceContextThreadLocal.getServiceContext();
 
 		Date now = new Date();
 
@@ -2893,7 +2934,8 @@ public class JournalFeedPersistenceImpl extends BasePersistenceImpl<JournalFeed>
 				journalFeed.setModifiedDate(now);
 			}
 			else {
-				journalFeed.setModifiedDate(serviceContext.getModifiedDate(now));
+				journalFeed.setModifiedDate(
+					serviceContext.getModifiedDate(now));
 			}
 		}
 
@@ -2923,94 +2965,98 @@ public class JournalFeedPersistenceImpl extends BasePersistenceImpl<JournalFeed>
 		if (!JournalFeedModelImpl.COLUMN_BITMASK_ENABLED) {
 			finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
 		}
-		else
-		 if (isNew) {
-			Object[] args = new Object[] { journalFeedModelImpl.getUuid() };
+		else if (isNew) {
+			Object[] args = new Object[] {journalFeedModelImpl.getUuid()};
 
-			finderCache.removeResult(FINDER_PATH_COUNT_BY_UUID, args);
-			finderCache.removeResult(FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_UUID,
-				args);
+			finderCache.removeResult(_finderPathCountByUuid, args);
+			finderCache.removeResult(
+				_finderPathWithoutPaginationFindByUuid, args);
 
 			args = new Object[] {
+				journalFeedModelImpl.getUuid(),
+				journalFeedModelImpl.getCompanyId()
+			};
+
+			finderCache.removeResult(_finderPathCountByUuid_C, args);
+			finderCache.removeResult(
+				_finderPathWithoutPaginationFindByUuid_C, args);
+
+			args = new Object[] {journalFeedModelImpl.getGroupId()};
+
+			finderCache.removeResult(_finderPathCountByGroupId, args);
+			finderCache.removeResult(
+				_finderPathWithoutPaginationFindByGroupId, args);
+
+			finderCache.removeResult(_finderPathCountAll, FINDER_ARGS_EMPTY);
+			finderCache.removeResult(
+				_finderPathWithoutPaginationFindAll, FINDER_ARGS_EMPTY);
+		}
+		else {
+			if ((journalFeedModelImpl.getColumnBitmask() &
+				 _finderPathWithoutPaginationFindByUuid.getColumnBitmask()) !=
+					 0) {
+
+				Object[] args = new Object[] {
+					journalFeedModelImpl.getOriginalUuid()
+				};
+
+				finderCache.removeResult(_finderPathCountByUuid, args);
+				finderCache.removeResult(
+					_finderPathWithoutPaginationFindByUuid, args);
+
+				args = new Object[] {journalFeedModelImpl.getUuid()};
+
+				finderCache.removeResult(_finderPathCountByUuid, args);
+				finderCache.removeResult(
+					_finderPathWithoutPaginationFindByUuid, args);
+			}
+
+			if ((journalFeedModelImpl.getColumnBitmask() &
+				 _finderPathWithoutPaginationFindByUuid_C.getColumnBitmask()) !=
+					 0) {
+
+				Object[] args = new Object[] {
+					journalFeedModelImpl.getOriginalUuid(),
+					journalFeedModelImpl.getOriginalCompanyId()
+				};
+
+				finderCache.removeResult(_finderPathCountByUuid_C, args);
+				finderCache.removeResult(
+					_finderPathWithoutPaginationFindByUuid_C, args);
+
+				args = new Object[] {
 					journalFeedModelImpl.getUuid(),
 					journalFeedModelImpl.getCompanyId()
 				};
 
-			finderCache.removeResult(FINDER_PATH_COUNT_BY_UUID_C, args);
-			finderCache.removeResult(FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_UUID_C,
-				args);
-
-			args = new Object[] { journalFeedModelImpl.getGroupId() };
-
-			finderCache.removeResult(FINDER_PATH_COUNT_BY_GROUPID, args);
-			finderCache.removeResult(FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_GROUPID,
-				args);
-
-			finderCache.removeResult(FINDER_PATH_COUNT_ALL, FINDER_ARGS_EMPTY);
-			finderCache.removeResult(FINDER_PATH_WITHOUT_PAGINATION_FIND_ALL,
-				FINDER_ARGS_EMPTY);
-		}
-
-		else {
-			if ((journalFeedModelImpl.getColumnBitmask() &
-					FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_UUID.getColumnBitmask()) != 0) {
-				Object[] args = new Object[] {
-						journalFeedModelImpl.getOriginalUuid()
-					};
-
-				finderCache.removeResult(FINDER_PATH_COUNT_BY_UUID, args);
-				finderCache.removeResult(FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_UUID,
-					args);
-
-				args = new Object[] { journalFeedModelImpl.getUuid() };
-
-				finderCache.removeResult(FINDER_PATH_COUNT_BY_UUID, args);
-				finderCache.removeResult(FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_UUID,
-					args);
+				finderCache.removeResult(_finderPathCountByUuid_C, args);
+				finderCache.removeResult(
+					_finderPathWithoutPaginationFindByUuid_C, args);
 			}
 
 			if ((journalFeedModelImpl.getColumnBitmask() &
-					FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_UUID_C.getColumnBitmask()) != 0) {
+				 _finderPathWithoutPaginationFindByGroupId.
+					 getColumnBitmask()) != 0) {
+
 				Object[] args = new Object[] {
-						journalFeedModelImpl.getOriginalUuid(),
-						journalFeedModelImpl.getOriginalCompanyId()
-					};
+					journalFeedModelImpl.getOriginalGroupId()
+				};
 
-				finderCache.removeResult(FINDER_PATH_COUNT_BY_UUID_C, args);
-				finderCache.removeResult(FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_UUID_C,
-					args);
+				finderCache.removeResult(_finderPathCountByGroupId, args);
+				finderCache.removeResult(
+					_finderPathWithoutPaginationFindByGroupId, args);
 
-				args = new Object[] {
-						journalFeedModelImpl.getUuid(),
-						journalFeedModelImpl.getCompanyId()
-					};
+				args = new Object[] {journalFeedModelImpl.getGroupId()};
 
-				finderCache.removeResult(FINDER_PATH_COUNT_BY_UUID_C, args);
-				finderCache.removeResult(FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_UUID_C,
-					args);
-			}
-
-			if ((journalFeedModelImpl.getColumnBitmask() &
-					FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_GROUPID.getColumnBitmask()) != 0) {
-				Object[] args = new Object[] {
-						journalFeedModelImpl.getOriginalGroupId()
-					};
-
-				finderCache.removeResult(FINDER_PATH_COUNT_BY_GROUPID, args);
-				finderCache.removeResult(FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_GROUPID,
-					args);
-
-				args = new Object[] { journalFeedModelImpl.getGroupId() };
-
-				finderCache.removeResult(FINDER_PATH_COUNT_BY_GROUPID, args);
-				finderCache.removeResult(FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_GROUPID,
-					args);
+				finderCache.removeResult(_finderPathCountByGroupId, args);
+				finderCache.removeResult(
+					_finderPathWithoutPaginationFindByGroupId, args);
 			}
 		}
 
-		entityCache.putResult(JournalFeedModelImpl.ENTITY_CACHE_ENABLED,
-			JournalFeedImpl.class, journalFeed.getPrimaryKey(), journalFeed,
-			false);
+		entityCache.putResult(
+			JournalFeedModelImpl.ENTITY_CACHE_ENABLED, JournalFeedImpl.class,
+			journalFeed.getPrimaryKey(), journalFeed, false);
 
 		clearUniqueFindersCache(journalFeedModelImpl, false);
 		cacheUniqueFindersCache(journalFeedModelImpl);
@@ -3021,7 +3067,7 @@ public class JournalFeedPersistenceImpl extends BasePersistenceImpl<JournalFeed>
 	}
 
 	/**
-	 * Returns the journal feed with the primary key or throws a {@link com.liferay.portal.kernel.exception.NoSuchModelException} if it could not be found.
+	 * Returns the journal feed with the primary key or throws a <code>com.liferay.portal.kernel.exception.NoSuchModelException</code> if it could not be found.
 	 *
 	 * @param primaryKey the primary key of the journal feed
 	 * @return the journal feed
@@ -3030,6 +3076,7 @@ public class JournalFeedPersistenceImpl extends BasePersistenceImpl<JournalFeed>
 	@Override
 	public JournalFeed findByPrimaryKey(Serializable primaryKey)
 		throws NoSuchFeedException {
+
 		JournalFeed journalFeed = fetchByPrimaryKey(primaryKey);
 
 		if (journalFeed == null) {
@@ -3037,15 +3084,15 @@ public class JournalFeedPersistenceImpl extends BasePersistenceImpl<JournalFeed>
 				_log.debug(_NO_SUCH_ENTITY_WITH_PRIMARY_KEY + primaryKey);
 			}
 
-			throw new NoSuchFeedException(_NO_SUCH_ENTITY_WITH_PRIMARY_KEY +
-				primaryKey);
+			throw new NoSuchFeedException(
+				_NO_SUCH_ENTITY_WITH_PRIMARY_KEY + primaryKey);
 		}
 
 		return journalFeed;
 	}
 
 	/**
-	 * Returns the journal feed with the primary key or throws a {@link NoSuchFeedException} if it could not be found.
+	 * Returns the journal feed with the primary key or throws a <code>NoSuchFeedException</code> if it could not be found.
 	 *
 	 * @param id the primary key of the journal feed
 	 * @return the journal feed
@@ -3064,8 +3111,9 @@ public class JournalFeedPersistenceImpl extends BasePersistenceImpl<JournalFeed>
 	 */
 	@Override
 	public JournalFeed fetchByPrimaryKey(Serializable primaryKey) {
-		Serializable serializable = entityCache.getResult(JournalFeedModelImpl.ENTITY_CACHE_ENABLED,
-				JournalFeedImpl.class, primaryKey);
+		Serializable serializable = entityCache.getResult(
+			JournalFeedModelImpl.ENTITY_CACHE_ENABLED, JournalFeedImpl.class,
+			primaryKey);
 
 		if (serializable == nullModel) {
 			return null;
@@ -3079,19 +3127,21 @@ public class JournalFeedPersistenceImpl extends BasePersistenceImpl<JournalFeed>
 			try {
 				session = openSession();
 
-				journalFeed = (JournalFeed)session.get(JournalFeedImpl.class,
-						primaryKey);
+				journalFeed = (JournalFeed)session.get(
+					JournalFeedImpl.class, primaryKey);
 
 				if (journalFeed != null) {
 					cacheResult(journalFeed);
 				}
 				else {
-					entityCache.putResult(JournalFeedModelImpl.ENTITY_CACHE_ENABLED,
+					entityCache.putResult(
+						JournalFeedModelImpl.ENTITY_CACHE_ENABLED,
 						JournalFeedImpl.class, primaryKey, nullModel);
 				}
 			}
 			catch (Exception e) {
-				entityCache.removeResult(JournalFeedModelImpl.ENTITY_CACHE_ENABLED,
+				entityCache.removeResult(
+					JournalFeedModelImpl.ENTITY_CACHE_ENABLED,
 					JournalFeedImpl.class, primaryKey);
 
 				throw processException(e);
@@ -3118,11 +3168,13 @@ public class JournalFeedPersistenceImpl extends BasePersistenceImpl<JournalFeed>
 	@Override
 	public Map<Serializable, JournalFeed> fetchByPrimaryKeys(
 		Set<Serializable> primaryKeys) {
+
 		if (primaryKeys.isEmpty()) {
 			return Collections.emptyMap();
 		}
 
-		Map<Serializable, JournalFeed> map = new HashMap<Serializable, JournalFeed>();
+		Map<Serializable, JournalFeed> map =
+			new HashMap<Serializable, JournalFeed>();
 
 		if (primaryKeys.size() == 1) {
 			Iterator<Serializable> iterator = primaryKeys.iterator();
@@ -3141,8 +3193,9 @@ public class JournalFeedPersistenceImpl extends BasePersistenceImpl<JournalFeed>
 		Set<Serializable> uncachedPrimaryKeys = null;
 
 		for (Serializable primaryKey : primaryKeys) {
-			Serializable serializable = entityCache.getResult(JournalFeedModelImpl.ENTITY_CACHE_ENABLED,
-					JournalFeedImpl.class, primaryKey);
+			Serializable serializable = entityCache.getResult(
+				JournalFeedModelImpl.ENTITY_CACHE_ENABLED,
+				JournalFeedImpl.class, primaryKey);
 
 			if (serializable != nullModel) {
 				if (serializable == null) {
@@ -3162,8 +3215,8 @@ public class JournalFeedPersistenceImpl extends BasePersistenceImpl<JournalFeed>
 			return map;
 		}
 
-		StringBundler query = new StringBundler((uncachedPrimaryKeys.size() * 2) +
-				1);
+		StringBundler query = new StringBundler(
+			uncachedPrimaryKeys.size() * 2 + 1);
 
 		query.append(_SQL_SELECT_JOURNALFEED_WHERE_PKS_IN);
 
@@ -3195,7 +3248,8 @@ public class JournalFeedPersistenceImpl extends BasePersistenceImpl<JournalFeed>
 			}
 
 			for (Serializable primaryKey : uncachedPrimaryKeys) {
-				entityCache.putResult(JournalFeedModelImpl.ENTITY_CACHE_ENABLED,
+				entityCache.putResult(
+					JournalFeedModelImpl.ENTITY_CACHE_ENABLED,
 					JournalFeedImpl.class, primaryKey, nullModel);
 			}
 		}
@@ -3223,7 +3277,7 @@ public class JournalFeedPersistenceImpl extends BasePersistenceImpl<JournalFeed>
 	 * Returns a range of all the journal feeds.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link JournalFeedModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>JournalFeedModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param start the lower bound of the range of journal feeds
@@ -3239,7 +3293,7 @@ public class JournalFeedPersistenceImpl extends BasePersistenceImpl<JournalFeed>
 	 * Returns an ordered range of all the journal feeds.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link JournalFeedModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>JournalFeedModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param start the lower bound of the range of journal feeds
@@ -3248,8 +3302,9 @@ public class JournalFeedPersistenceImpl extends BasePersistenceImpl<JournalFeed>
 	 * @return the ordered range of journal feeds
 	 */
 	@Override
-	public List<JournalFeed> findAll(int start, int end,
-		OrderByComparator<JournalFeed> orderByComparator) {
+	public List<JournalFeed> findAll(
+		int start, int end, OrderByComparator<JournalFeed> orderByComparator) {
+
 		return findAll(start, end, orderByComparator, true);
 	}
 
@@ -3257,7 +3312,7 @@ public class JournalFeedPersistenceImpl extends BasePersistenceImpl<JournalFeed>
 	 * Returns an ordered range of all the journal feeds.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link JournalFeedModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>JournalFeedModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param start the lower bound of the range of journal feeds
@@ -3267,29 +3322,31 @@ public class JournalFeedPersistenceImpl extends BasePersistenceImpl<JournalFeed>
 	 * @return the ordered range of journal feeds
 	 */
 	@Override
-	public List<JournalFeed> findAll(int start, int end,
-		OrderByComparator<JournalFeed> orderByComparator,
+	public List<JournalFeed> findAll(
+		int start, int end, OrderByComparator<JournalFeed> orderByComparator,
 		boolean retrieveFromCache) {
+
 		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
-				(orderByComparator == null)) {
+			(orderByComparator == null)) {
+
 			pagination = false;
-			finderPath = FINDER_PATH_WITHOUT_PAGINATION_FIND_ALL;
+			finderPath = _finderPathWithoutPaginationFindAll;
 			finderArgs = FINDER_ARGS_EMPTY;
 		}
 		else {
-			finderPath = FINDER_PATH_WITH_PAGINATION_FIND_ALL;
-			finderArgs = new Object[] { start, end, orderByComparator };
+			finderPath = _finderPathWithPaginationFindAll;
+			finderArgs = new Object[] {start, end, orderByComparator};
 		}
 
 		List<JournalFeed> list = null;
 
 		if (retrieveFromCache) {
-			list = (List<JournalFeed>)finderCache.getResult(finderPath,
-					finderArgs, this);
+			list = (List<JournalFeed>)finderCache.getResult(
+				finderPath, finderArgs, this);
 		}
 
 		if (list == null) {
@@ -3297,13 +3354,13 @@ public class JournalFeedPersistenceImpl extends BasePersistenceImpl<JournalFeed>
 			String sql = null;
 
 			if (orderByComparator != null) {
-				query = new StringBundler(2 +
-						(orderByComparator.getOrderByFields().length * 2));
+				query = new StringBundler(
+					2 + (orderByComparator.getOrderByFields().length * 2));
 
 				query.append(_SQL_SELECT_JOURNALFEED);
 
-				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
-					orderByComparator);
+				appendOrderByComparator(
+					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
 
 				sql = query.toString();
 			}
@@ -3323,16 +3380,16 @@ public class JournalFeedPersistenceImpl extends BasePersistenceImpl<JournalFeed>
 				Query q = session.createQuery(sql);
 
 				if (!pagination) {
-					list = (List<JournalFeed>)QueryUtil.list(q, getDialect(),
-							start, end, false);
+					list = (List<JournalFeed>)QueryUtil.list(
+						q, getDialect(), start, end, false);
 
 					Collections.sort(list);
 
 					list = Collections.unmodifiableList(list);
 				}
 				else {
-					list = (List<JournalFeed>)QueryUtil.list(q, getDialect(),
-							start, end);
+					list = (List<JournalFeed>)QueryUtil.list(
+						q, getDialect(), start, end);
 				}
 
 				cacheResult(list);
@@ -3370,8 +3427,8 @@ public class JournalFeedPersistenceImpl extends BasePersistenceImpl<JournalFeed>
 	 */
 	@Override
 	public int countAll() {
-		Long count = (Long)finderCache.getResult(FINDER_PATH_COUNT_ALL,
-				FINDER_ARGS_EMPTY, this);
+		Long count = (Long)finderCache.getResult(
+			_finderPathCountAll, FINDER_ARGS_EMPTY, this);
 
 		if (count == null) {
 			Session session = null;
@@ -3383,12 +3440,12 @@ public class JournalFeedPersistenceImpl extends BasePersistenceImpl<JournalFeed>
 
 				count = (Long)q.uniqueResult();
 
-				finderCache.putResult(FINDER_PATH_COUNT_ALL, FINDER_ARGS_EMPTY,
-					count);
+				finderCache.putResult(
+					_finderPathCountAll, FINDER_ARGS_EMPTY, count);
 			}
 			catch (Exception e) {
-				finderCache.removeResult(FINDER_PATH_COUNT_ALL,
-					FINDER_ARGS_EMPTY);
+				finderCache.removeResult(
+					_finderPathCountAll, FINDER_ARGS_EMPTY);
 
 				throw processException(e);
 			}
@@ -3414,6 +3471,121 @@ public class JournalFeedPersistenceImpl extends BasePersistenceImpl<JournalFeed>
 	 * Initializes the journal feed persistence.
 	 */
 	public void afterPropertiesSet() {
+		_finderPathWithPaginationFindAll = new FinderPath(
+			JournalFeedModelImpl.ENTITY_CACHE_ENABLED,
+			JournalFeedModelImpl.FINDER_CACHE_ENABLED, JournalFeedImpl.class,
+			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findAll", new String[0]);
+
+		_finderPathWithoutPaginationFindAll = new FinderPath(
+			JournalFeedModelImpl.ENTITY_CACHE_ENABLED,
+			JournalFeedModelImpl.FINDER_CACHE_ENABLED, JournalFeedImpl.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findAll",
+			new String[0]);
+
+		_finderPathCountAll = new FinderPath(
+			JournalFeedModelImpl.ENTITY_CACHE_ENABLED,
+			JournalFeedModelImpl.FINDER_CACHE_ENABLED, Long.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countAll",
+			new String[0]);
+
+		_finderPathWithPaginationFindByUuid = new FinderPath(
+			JournalFeedModelImpl.ENTITY_CACHE_ENABLED,
+			JournalFeedModelImpl.FINDER_CACHE_ENABLED, JournalFeedImpl.class,
+			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByUuid",
+			new String[] {
+				String.class.getName(), Integer.class.getName(),
+				Integer.class.getName(), OrderByComparator.class.getName()
+			});
+
+		_finderPathWithoutPaginationFindByUuid = new FinderPath(
+			JournalFeedModelImpl.ENTITY_CACHE_ENABLED,
+			JournalFeedModelImpl.FINDER_CACHE_ENABLED, JournalFeedImpl.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByUuid",
+			new String[] {String.class.getName()},
+			JournalFeedModelImpl.UUID_COLUMN_BITMASK |
+			JournalFeedModelImpl.FEEDID_COLUMN_BITMASK);
+
+		_finderPathCountByUuid = new FinderPath(
+			JournalFeedModelImpl.ENTITY_CACHE_ENABLED,
+			JournalFeedModelImpl.FINDER_CACHE_ENABLED, Long.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByUuid",
+			new String[] {String.class.getName()});
+
+		_finderPathFetchByUUID_G = new FinderPath(
+			JournalFeedModelImpl.ENTITY_CACHE_ENABLED,
+			JournalFeedModelImpl.FINDER_CACHE_ENABLED, JournalFeedImpl.class,
+			FINDER_CLASS_NAME_ENTITY, "fetchByUUID_G",
+			new String[] {String.class.getName(), Long.class.getName()},
+			JournalFeedModelImpl.UUID_COLUMN_BITMASK |
+			JournalFeedModelImpl.GROUPID_COLUMN_BITMASK);
+
+		_finderPathCountByUUID_G = new FinderPath(
+			JournalFeedModelImpl.ENTITY_CACHE_ENABLED,
+			JournalFeedModelImpl.FINDER_CACHE_ENABLED, Long.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByUUID_G",
+			new String[] {String.class.getName(), Long.class.getName()});
+
+		_finderPathWithPaginationFindByUuid_C = new FinderPath(
+			JournalFeedModelImpl.ENTITY_CACHE_ENABLED,
+			JournalFeedModelImpl.FINDER_CACHE_ENABLED, JournalFeedImpl.class,
+			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByUuid_C",
+			new String[] {
+				String.class.getName(), Long.class.getName(),
+				Integer.class.getName(), Integer.class.getName(),
+				OrderByComparator.class.getName()
+			});
+
+		_finderPathWithoutPaginationFindByUuid_C = new FinderPath(
+			JournalFeedModelImpl.ENTITY_CACHE_ENABLED,
+			JournalFeedModelImpl.FINDER_CACHE_ENABLED, JournalFeedImpl.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByUuid_C",
+			new String[] {String.class.getName(), Long.class.getName()},
+			JournalFeedModelImpl.UUID_COLUMN_BITMASK |
+			JournalFeedModelImpl.COMPANYID_COLUMN_BITMASK |
+			JournalFeedModelImpl.FEEDID_COLUMN_BITMASK);
+
+		_finderPathCountByUuid_C = new FinderPath(
+			JournalFeedModelImpl.ENTITY_CACHE_ENABLED,
+			JournalFeedModelImpl.FINDER_CACHE_ENABLED, Long.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByUuid_C",
+			new String[] {String.class.getName(), Long.class.getName()});
+
+		_finderPathWithPaginationFindByGroupId = new FinderPath(
+			JournalFeedModelImpl.ENTITY_CACHE_ENABLED,
+			JournalFeedModelImpl.FINDER_CACHE_ENABLED, JournalFeedImpl.class,
+			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByGroupId",
+			new String[] {
+				Long.class.getName(), Integer.class.getName(),
+				Integer.class.getName(), OrderByComparator.class.getName()
+			});
+
+		_finderPathWithoutPaginationFindByGroupId = new FinderPath(
+			JournalFeedModelImpl.ENTITY_CACHE_ENABLED,
+			JournalFeedModelImpl.FINDER_CACHE_ENABLED, JournalFeedImpl.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByGroupId",
+			new String[] {Long.class.getName()},
+			JournalFeedModelImpl.GROUPID_COLUMN_BITMASK |
+			JournalFeedModelImpl.FEEDID_COLUMN_BITMASK);
+
+		_finderPathCountByGroupId = new FinderPath(
+			JournalFeedModelImpl.ENTITY_CACHE_ENABLED,
+			JournalFeedModelImpl.FINDER_CACHE_ENABLED, Long.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByGroupId",
+			new String[] {Long.class.getName()});
+
+		_finderPathFetchByG_F = new FinderPath(
+			JournalFeedModelImpl.ENTITY_CACHE_ENABLED,
+			JournalFeedModelImpl.FINDER_CACHE_ENABLED, JournalFeedImpl.class,
+			FINDER_CLASS_NAME_ENTITY, "fetchByG_F",
+			new String[] {Long.class.getName(), String.class.getName()},
+			JournalFeedModelImpl.GROUPID_COLUMN_BITMASK |
+			JournalFeedModelImpl.FEEDID_COLUMN_BITMASK);
+
+		_finderPathCountByG_F = new FinderPath(
+			JournalFeedModelImpl.ENTITY_CACHE_ENABLED,
+			JournalFeedModelImpl.FINDER_CACHE_ENABLED, Long.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByG_F",
+			new String[] {Long.class.getName(), String.class.getName()});
 	}
 
 	public void destroy() {
@@ -3425,30 +3597,63 @@ public class JournalFeedPersistenceImpl extends BasePersistenceImpl<JournalFeed>
 
 	@ServiceReference(type = CompanyProviderWrapper.class)
 	protected CompanyProvider companyProvider;
+
 	@ServiceReference(type = EntityCache.class)
 	protected EntityCache entityCache;
+
 	@ServiceReference(type = FinderCache.class)
 	protected FinderCache finderCache;
-	private static final String _SQL_SELECT_JOURNALFEED = "SELECT journalFeed FROM JournalFeed journalFeed";
-	private static final String _SQL_SELECT_JOURNALFEED_WHERE_PKS_IN = "SELECT journalFeed FROM JournalFeed journalFeed WHERE id_ IN (";
-	private static final String _SQL_SELECT_JOURNALFEED_WHERE = "SELECT journalFeed FROM JournalFeed journalFeed WHERE ";
-	private static final String _SQL_COUNT_JOURNALFEED = "SELECT COUNT(journalFeed) FROM JournalFeed journalFeed";
-	private static final String _SQL_COUNT_JOURNALFEED_WHERE = "SELECT COUNT(journalFeed) FROM JournalFeed journalFeed WHERE ";
-	private static final String _FILTER_ENTITY_TABLE_FILTER_PK_COLUMN = "journalFeed.id_";
-	private static final String _FILTER_SQL_SELECT_JOURNALFEED_WHERE = "SELECT DISTINCT {journalFeed.*} FROM JournalFeed journalFeed WHERE ";
-	private static final String _FILTER_SQL_SELECT_JOURNALFEED_NO_INLINE_DISTINCT_WHERE_1 =
-		"SELECT {JournalFeed.*} FROM (SELECT DISTINCT journalFeed.id_ FROM JournalFeed journalFeed WHERE ";
-	private static final String _FILTER_SQL_SELECT_JOURNALFEED_NO_INLINE_DISTINCT_WHERE_2 =
-		") TEMP_TABLE INNER JOIN JournalFeed ON TEMP_TABLE.id_ = JournalFeed.id_";
-	private static final String _FILTER_SQL_COUNT_JOURNALFEED_WHERE = "SELECT COUNT(DISTINCT journalFeed.id_) AS COUNT_VALUE FROM JournalFeed journalFeed WHERE ";
+
+	private static final String _SQL_SELECT_JOURNALFEED =
+		"SELECT journalFeed FROM JournalFeed journalFeed";
+
+	private static final String _SQL_SELECT_JOURNALFEED_WHERE_PKS_IN =
+		"SELECT journalFeed FROM JournalFeed journalFeed WHERE id_ IN (";
+
+	private static final String _SQL_SELECT_JOURNALFEED_WHERE =
+		"SELECT journalFeed FROM JournalFeed journalFeed WHERE ";
+
+	private static final String _SQL_COUNT_JOURNALFEED =
+		"SELECT COUNT(journalFeed) FROM JournalFeed journalFeed";
+
+	private static final String _SQL_COUNT_JOURNALFEED_WHERE =
+		"SELECT COUNT(journalFeed) FROM JournalFeed journalFeed WHERE ";
+
+	private static final String _FILTER_ENTITY_TABLE_FILTER_PK_COLUMN =
+		"journalFeed.id_";
+
+	private static final String _FILTER_SQL_SELECT_JOURNALFEED_WHERE =
+		"SELECT DISTINCT {journalFeed.*} FROM JournalFeed journalFeed WHERE ";
+
+	private static final String
+		_FILTER_SQL_SELECT_JOURNALFEED_NO_INLINE_DISTINCT_WHERE_1 =
+			"SELECT {JournalFeed.*} FROM (SELECT DISTINCT journalFeed.id_ FROM JournalFeed journalFeed WHERE ";
+
+	private static final String
+		_FILTER_SQL_SELECT_JOURNALFEED_NO_INLINE_DISTINCT_WHERE_2 =
+			") TEMP_TABLE INNER JOIN JournalFeed ON TEMP_TABLE.id_ = JournalFeed.id_";
+
+	private static final String _FILTER_SQL_COUNT_JOURNALFEED_WHERE =
+		"SELECT COUNT(DISTINCT journalFeed.id_) AS COUNT_VALUE FROM JournalFeed journalFeed WHERE ";
+
 	private static final String _FILTER_ENTITY_ALIAS = "journalFeed";
+
 	private static final String _FILTER_ENTITY_TABLE = "JournalFeed";
+
 	private static final String _ORDER_BY_ENTITY_ALIAS = "journalFeed.";
+
 	private static final String _ORDER_BY_ENTITY_TABLE = "JournalFeed.";
-	private static final String _NO_SUCH_ENTITY_WITH_PRIMARY_KEY = "No JournalFeed exists with the primary key ";
-	private static final String _NO_SUCH_ENTITY_WITH_KEY = "No JournalFeed exists with the key {";
-	private static final Log _log = LogFactoryUtil.getLog(JournalFeedPersistenceImpl.class);
-	private static final Set<String> _badColumnNames = SetUtil.fromArray(new String[] {
-				"uuid", "id"
-			});
+
+	private static final String _NO_SUCH_ENTITY_WITH_PRIMARY_KEY =
+		"No JournalFeed exists with the primary key ";
+
+	private static final String _NO_SUCH_ENTITY_WITH_KEY =
+		"No JournalFeed exists with the key {";
+
+	private static final Log _log = LogFactoryUtil.getLog(
+		JournalFeedPersistenceImpl.class);
+
+	private static final Set<String> _badColumnNames = SetUtil.fromArray(
+		new String[] {"uuid", "id"});
+
 }

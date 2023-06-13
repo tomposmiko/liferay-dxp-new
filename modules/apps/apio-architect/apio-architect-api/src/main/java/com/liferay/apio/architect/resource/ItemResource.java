@@ -56,5 +56,5 @@ import com.liferay.apio.architect.router.ItemRouter;
  */
 @ConsumerType
 public interface ItemResource<T, S, U extends Identifier<S>>
-	extends Representable<T, S, U>, ItemRouter<T, S, U> {
+	extends ItemRouter<T, S, U>, Representable<T, S, U> {
 }

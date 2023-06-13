@@ -86,7 +86,7 @@ public class LiferayAuthorizationAccessTokenCodeGrantHandler
 		}
 
 		ServerAuthorizationCodeGrant serverAuthorizationCodeGrant =
-			_liferayOAuthDataProvider.getCodeGrant(code);
+			_liferayOAuthDataProvider.getServerAuthorizationCodeGrant(code);
 
 		if (serverAuthorizationCodeGrant == null) {
 			if (_log.isDebugEnabled()) {

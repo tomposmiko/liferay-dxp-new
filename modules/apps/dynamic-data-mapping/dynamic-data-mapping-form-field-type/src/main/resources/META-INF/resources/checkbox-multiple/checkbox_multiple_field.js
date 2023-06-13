@@ -87,7 +87,7 @@ AUI.add(
 						for (var i = 0; i < checkboxNodeList.size(); i++) {
 							var node = checkboxNodeList.item(i);
 
-							if (value.includes(checkboxNodeList.item(i).val())) {
+							if (value.indexOf(checkboxNodeList.item(i).val()) > -1) {
 								node.setAttribute('checked', true);
 
 								data = value;
@@ -105,6 +105,14 @@ AUI.add(
 						var instance = this;
 
 						CheckboxMultipleField.superclass.showErrorMessage.apply(instance, arguments);
+					},
+
+					showPendingErrorMessage: function() {
+						var instance = this;
+
+						if (!instance.hasFocus()) {
+							instance.showErrorMessage();
+						}
 					},
 
 					_getOptions: function(options) {

@@ -41,13 +41,11 @@ public class PortalContextLoaderLifecycleThreadLocal {
 
 	private static final ThreadLocal<Boolean> _destroying =
 		new CentralizedThreadLocal<>(
-			PortalContextLoaderLifecycleThreadLocal.class +
-				"._destroying",
+			PortalContextLoaderLifecycleThreadLocal.class + "._destroying",
 			() -> Boolean.FALSE, false);
 	private static final ThreadLocal<Boolean> _initializing =
 		new CentralizedThreadLocal<>(
-			PortalContextLoaderLifecycleThreadLocal.class +
-				"._initializing",
+			PortalContextLoaderLifecycleThreadLocal.class + "._initializing",
 			() -> Boolean.FALSE, false);
 
 }

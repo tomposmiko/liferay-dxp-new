@@ -58,6 +58,30 @@ if (Validator.isNotNull(portletConfigurationPermissionsDisplayContext.getModelRe
 					<liferay-ui:search-container-column-text
 						name="role"
 					>
+
+						<%
+						String icon = "user";
+						String message = "regular-role";
+
+						int roleType = role.getType();
+
+						if (roleType == RoleConstants.TYPE_SITE) {
+							icon = "sites";
+							message = "site-role";
+						}
+						else if (roleType == RoleConstants.TYPE_ORGANIZATION) {
+							icon = "organizations";
+							message = "organization-role";
+						}
+						%>
+
+						<liferay-ui:icon
+							icon="<%= icon %>"
+							label="<%= false %>"
+							markupView="lexicon"
+							message="<%= LanguageUtil.get(request, message) %>"
+						/>
+
 						<%= role.getTitle(locale) %>
 
 						<c:if test="<%= layout.isPrivateLayout() && name.equals(RoleConstants.GUEST) %>">

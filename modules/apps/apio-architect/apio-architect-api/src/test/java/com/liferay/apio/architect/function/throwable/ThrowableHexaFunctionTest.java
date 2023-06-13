@@ -30,8 +30,8 @@ public class ThrowableHexaFunctionTest {
 
 		ThrowableHexaFunction
 			<String, String, String, String, String, String, String>
-				throwableHexaFunction = (
-					string1, string2, string3, string4, string5, string6) ->
+				throwableHexaFunction =
+					(string1, string2, string3, string4, string5, string6) ->
 						string1 + string2 + string3 + string4 + string5 +
 							string6;
 
@@ -51,8 +51,8 @@ public class ThrowableHexaFunctionTest {
 	public void testOnInvokingAndThenWithNullAfterFunctionThrowsException() {
 		ThrowableHexaFunction
 			<String, String, String, String, String, String, String>
-				throwableHexaFunction = (
-					string1, string2, string3, string4, string5, string6) ->
+				throwableHexaFunction =
+					(string1, string2, string3, string4, string5, string6) ->
 						string1 + string2 + string3 + string4 + string5 +
 							string6;
 

@@ -26,49 +26,54 @@ import com.liferay.portal.kernel.service.ServiceWrapper;
  * @generated
  */
 @ProviderType
-public class MDRRuleGroupServiceWrapper implements MDRRuleGroupService,
-	ServiceWrapper<MDRRuleGroupService> {
+public class MDRRuleGroupServiceWrapper
+	implements MDRRuleGroupService, ServiceWrapper<MDRRuleGroupService> {
+
 	public MDRRuleGroupServiceWrapper(MDRRuleGroupService mdrRuleGroupService) {
 		_mdrRuleGroupService = mdrRuleGroupService;
 	}
 
 	@Override
 	public com.liferay.mobile.device.rules.model.MDRRuleGroup addRuleGroup(
-		long groupId, java.util.Map<java.util.Locale, String> nameMap,
-		java.util.Map<java.util.Locale, String> descriptionMap,
-		com.liferay.portal.kernel.service.ServiceContext serviceContext)
+			long groupId, java.util.Map<java.util.Locale, String> nameMap,
+			java.util.Map<java.util.Locale, String> descriptionMap,
+			com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
-		return _mdrRuleGroupService.addRuleGroup(groupId, nameMap,
-			descriptionMap, serviceContext);
+
+		return _mdrRuleGroupService.addRuleGroup(
+			groupId, nameMap, descriptionMap, serviceContext);
 	}
 
 	@Override
 	public com.liferay.mobile.device.rules.model.MDRRuleGroup copyRuleGroup(
-		long ruleGroupId, long groupId,
-		com.liferay.portal.kernel.service.ServiceContext serviceContext)
+			long ruleGroupId, long groupId,
+			com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
-		return _mdrRuleGroupService.copyRuleGroup(ruleGroupId, groupId,
-			serviceContext);
+
+		return _mdrRuleGroupService.copyRuleGroup(
+			ruleGroupId, groupId, serviceContext);
 	}
 
 	@Override
 	public void deleteRuleGroup(long ruleGroupId)
 		throws com.liferay.portal.kernel.exception.PortalException {
+
 		_mdrRuleGroupService.deleteRuleGroup(ruleGroupId);
 	}
 
 	@Override
 	public com.liferay.mobile.device.rules.model.MDRRuleGroup fetchRuleGroup(
-		long ruleGroupId)
+			long ruleGroupId)
 		throws com.liferay.portal.kernel.exception.PortalException {
+
 		return _mdrRuleGroupService.fetchRuleGroup(ruleGroupId);
 	}
 
 	/**
-	* Returns the OSGi service identifier.
-	*
-	* @return the OSGi service identifier
-	*/
+	 * Returns the OSGi service identifier.
+	 *
+	 * @return the OSGi service identifier
+	 */
 	@Override
 	public String getOSGiServiceIdentifier() {
 		return _mdrRuleGroupService.getOSGiServiceIdentifier();
@@ -76,14 +81,16 @@ public class MDRRuleGroupServiceWrapper implements MDRRuleGroupService,
 
 	@Override
 	public com.liferay.mobile.device.rules.model.MDRRuleGroup getRuleGroup(
-		long ruleGroupId)
+			long ruleGroupId)
 		throws com.liferay.portal.kernel.exception.PortalException {
+
 		return _mdrRuleGroupService.getRuleGroup(ruleGroupId);
 	}
 
 	@Override
-	public java.util.List<com.liferay.mobile.device.rules.model.MDRRuleGroup> getRuleGroups(
-		long[] groupIds, int start, int end) {
+	public java.util.List<com.liferay.mobile.device.rules.model.MDRRuleGroup>
+		getRuleGroups(long[] groupIds, int start, int end) {
+
 		return _mdrRuleGroupService.getRuleGroups(groupIds, start, end);
 	}
 
@@ -94,12 +101,13 @@ public class MDRRuleGroupServiceWrapper implements MDRRuleGroupService,
 
 	@Override
 	public com.liferay.mobile.device.rules.model.MDRRuleGroup updateRuleGroup(
-		long ruleGroupId, java.util.Map<java.util.Locale, String> nameMap,
-		java.util.Map<java.util.Locale, String> descriptionMap,
-		com.liferay.portal.kernel.service.ServiceContext serviceContext)
+			long ruleGroupId, java.util.Map<java.util.Locale, String> nameMap,
+			java.util.Map<java.util.Locale, String> descriptionMap,
+			com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
-		return _mdrRuleGroupService.updateRuleGroup(ruleGroupId, nameMap,
-			descriptionMap, serviceContext);
+
+		return _mdrRuleGroupService.updateRuleGroup(
+			ruleGroupId, nameMap, descriptionMap, serviceContext);
 	}
 
 	@Override
@@ -113,4 +121,5 @@ public class MDRRuleGroupServiceWrapper implements MDRRuleGroupService,
 	}
 
 	private MDRRuleGroupService _mdrRuleGroupService;
+
 }

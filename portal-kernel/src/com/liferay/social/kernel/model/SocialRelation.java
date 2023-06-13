@@ -25,19 +25,22 @@ import com.liferay.portal.kernel.util.Accessor;
  *
  * @author Brian Wing Shun Chan
  * @see SocialRelationModel
- * @see com.liferay.portlet.social.model.impl.SocialRelationImpl
- * @see com.liferay.portlet.social.model.impl.SocialRelationModelImpl
  * @generated
  */
-@ImplementationClassName("com.liferay.portlet.social.model.impl.SocialRelationImpl")
+@ImplementationClassName(
+	"com.liferay.portlet.social.model.impl.SocialRelationImpl"
+)
 @ProviderType
-public interface SocialRelation extends SocialRelationModel, PersistedModel {
+public interface SocialRelation extends PersistedModel, SocialRelationModel {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
-	 * Never modify this interface directly. Add methods to {@link com.liferay.portlet.social.model.impl.SocialRelationImpl} and rerun ServiceBuilder to automatically copy the method declarations to this interface.
+	 * Never modify this interface directly. Add methods to <code>com.liferay.portlet.social.model.impl.SocialRelationImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
 	 */
-	public static final Accessor<SocialRelation, Long> RELATION_ID_ACCESSOR = new Accessor<SocialRelation, Long>() {
+	public static final Accessor<SocialRelation, Long> RELATION_ID_ACCESSOR =
+		new Accessor<SocialRelation, Long>() {
+
 			@Override
 			public Long get(SocialRelation socialRelation) {
 				return socialRelation.getRelationId();
@@ -52,5 +55,7 @@ public interface SocialRelation extends SocialRelationModel, PersistedModel {
 			public Class<SocialRelation> getTypeClass() {
 				return SocialRelation.class;
 			}
+
 		};
+
 }

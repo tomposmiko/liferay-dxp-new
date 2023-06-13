@@ -26,11 +26,11 @@ import java.util.List;
  * This class is used by SOAP remote services, specifically {@link com.liferay.portal.service.http.RoleServiceSoap}.
  *
  * @author Brian Wing Shun Chan
- * @see com.liferay.portal.service.http.RoleServiceSoap
  * @generated
  */
 @ProviderType
 public class RoleSoap implements Serializable {
+
 	public static RoleSoap toSoapModel(Role model) {
 		RoleSoap soapModel = new RoleSoap();
 
@@ -236,4 +236,5 @@ public class RoleSoap implements Serializable {
 	private String _description;
 	private int _type;
 	private String _subtype;
+
 }

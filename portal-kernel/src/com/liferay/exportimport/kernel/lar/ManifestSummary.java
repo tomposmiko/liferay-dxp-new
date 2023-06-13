@@ -38,7 +38,7 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * @author Mate Thurzo
+ * @author Máté Thurzó
  * @author Zsolt Berentey
  * @author Daniel Kocsis
  */
@@ -368,7 +368,11 @@ public class ManifestSummary implements Serializable {
 			return modelName;
 		}
 
-		return modelName.concat(StringPool.POUND).concat(referrerModelName);
+		return modelName.concat(
+			StringPool.POUND
+		).concat(
+			referrerModelName
+		);
 	}
 
 	protected long getModelAdditionCount(

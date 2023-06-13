@@ -1,0 +1,9 @@
+Liferay.DDM.SoyTemplateUtil.loadModules(
+	function() {
+		Liferay.DDM.Renderer.FieldTypes.register(#fieldTypes#);
+
+		Liferay.DMMFieldTypesReady = true;
+
+		Liferay.fire('DMMFieldTypesReady');
+	}
+);

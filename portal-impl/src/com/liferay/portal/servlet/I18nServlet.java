@@ -31,6 +31,7 @@ import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.kernel.xml.Element;
+import com.liferay.portal.util.PortalInstances;
 import com.liferay.portal.util.PropsValues;
 import com.liferay.portlet.AsyncPortletServletRequest;
 
@@ -169,17 +170,21 @@ public class I18nServlet extends HttpServlet {
 				String friendlyURL = path.substring(
 					friendlyURLIndices[0], friendlyURLIndices[1]);
 
-				siteGroup = GroupLocalServiceUtil.getFriendlyURLGroup(
-					GetterUtil.getLong(
-						request.getAttribute(WebKeys.COMPANY_ID)),
-					friendlyURL);
+				siteGroup = GroupLocalServiceUtil.fetchFriendlyURLGroup(
+					PortalInstances.getCompanyId(request), friendlyURL);
+
+				if (siteGroup == null) {
+					return null;
+				}
 
 				siteDefaultLocale = LanguageUtil.getLocale(
 					siteGroup.getGroupId(), i18nLanguageCode);
 			}
 		}
 
-		String i18nPath = StringPool.SLASH + i18nLanguageId;
+		Locale i18nLocale = LocaleUtil.fromLanguageId(i18nLanguageId);
+
+		String i18nPath = StringPool.SLASH + i18nLocale.toLanguageTag();
 
 		if (siteDefaultLocale == null) {
 			if (PropsValues.LOCALE_USE_DEFAULT_IF_NOT_AVAILABLE) {
@@ -219,7 +224,7 @@ public class I18nServlet extends HttpServlet {
 	protected I18nData getI18nData(Locale locale) throws PortalException {
 		String languageId = LocaleUtil.toLanguageId(locale);
 
-		String i18nPath = StringPool.SLASH + languageId;
+		String i18nPath = StringPool.SLASH + locale.toLanguageTag();
 
 		Locale defaultLocale = LanguageUtil.getLocale(locale.getLanguage());
 

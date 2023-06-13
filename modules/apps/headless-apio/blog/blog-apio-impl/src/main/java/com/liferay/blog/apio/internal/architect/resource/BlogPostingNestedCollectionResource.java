@@ -17,6 +17,7 @@ package com.liferay.blog.apio.internal.architect.resource;
 import static com.liferay.portal.apio.idempotent.Idempotent.idempotent;
 
 import com.liferay.aggregate.rating.apio.architect.identifier.AggregateRatingIdentifier;
+import com.liferay.apio.architect.functional.Try;
 import com.liferay.apio.architect.pagination.PageItems;
 import com.liferay.apio.architect.pagination.Pagination;
 import com.liferay.apio.architect.representor.Representor;
@@ -26,13 +27,14 @@ import com.liferay.apio.architect.routes.NestedCollectionRoutes;
 import com.liferay.asset.kernel.model.AssetTag;
 import com.liferay.asset.kernel.service.AssetTagLocalService;
 import com.liferay.blog.apio.architect.identifier.BlogPostingIdentifier;
+import com.liferay.blog.apio.architect.model.BlogPosting;
 import com.liferay.blog.apio.internal.architect.form.BlogPostingForm;
 import com.liferay.blogs.model.BlogsEntry;
 import com.liferay.blogs.service.BlogsEntryLocalService;
 import com.liferay.blogs.service.BlogsEntryService;
 import com.liferay.category.apio.architect.identifier.CategoryIdentifier;
 import com.liferay.comment.apio.architect.identifier.CommentIdentifier;
-import com.liferay.content.space.apio.architect.identifier.ContentSpaceIdentifier;
+import com.liferay.content.space.apio.architect.model.ContentSpace;
 import com.liferay.document.library.kernel.service.DLAppLocalService;
 import com.liferay.friendly.url.exception.DuplicateFriendlyURLEntryException;
 import com.liferay.media.object.apio.architect.identifier.MediaObjectIdentifier;
@@ -44,10 +46,16 @@ import com.liferay.portal.apio.user.CurrentUser;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.servlet.taglib.ui.ImageSelector;
+import com.liferay.portal.kernel.util.ArrayUtil;
+import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 
+import java.util.Date;
 import java.util.List;
+import java.util.Optional;
+
+import javax.ws.rs.BadRequestException;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -64,8 +72,7 @@ import org.osgi.service.component.annotations.Reference;
 @Component(immediate = true, service = NestedCollectionResource.class)
 public class BlogPostingNestedCollectionResource
 	implements NestedCollectionResource
-		<BlogsEntry, Long, BlogPostingIdentifier, Long,
-		 ContentSpaceIdentifier> {
+		<BlogsEntry, Long, BlogPostingIdentifier, Long, ContentSpace> {
 
 	@Override
 	public NestedCollectionRoutes<BlogsEntry, Long, Long> collectionRoutes(
@@ -75,7 +82,7 @@ public class BlogPostingNestedCollectionResource
 			this::_getPageItems
 		).addCreator(
 			this::_addBlogsEntry, CurrentUser.class,
-			_hasPermission.forAddingIn(ContentSpaceIdentifier.class),
+			_hasPermission.forAddingIn(ContentSpace.class),
 			BlogPostingForm::buildForm
 		).build();
 	}
@@ -109,7 +116,7 @@ public class BlogPostingNestedCollectionResource
 		).identifier(
 			BlogsEntry::getEntryId
 		).addBidirectionalModel(
-			"contentSpace", "blogPosts", ContentSpaceIdentifier.class,
+			"contentSpace", "blogPosts", ContentSpace.class,
 			BlogsEntry::getGroupId
 		).addDate(
 			"dateCreated", BlogsEntry::getCreateDate
@@ -124,7 +131,7 @@ public class BlogPostingNestedCollectionResource
 			"creator", PersonIdentifier.class, BlogsEntry::getUserId
 		).addLinkedModel(
 			"image", MediaObjectIdentifier.class,
-			BlogsEntry::getCoverImageFileEntryId
+			this::_getCoverImageFileEntryId
 		).addRelatedCollection(
 			"category", CategoryIdentifier.class
 		).addRelatedCollection(
@@ -149,28 +156,18 @@ public class BlogPostingNestedCollectionResource
 	}
 
 	private BlogsEntry _addBlogsEntry(
-			long groupId, BlogPostingForm blogPostingForm,
-			CurrentUser currentUser)
+			long groupId, BlogPosting blogPosting, CurrentUser currentUser)
 		throws PortalException {
-
-		long userId = blogPostingForm.getCreatorId(currentUser.getUserId());
-
-		ImageSelector imageSelector = blogPostingForm.getImageSelector(
-			_dlAppLocalService::getFileEntry);
-
-		ServiceContext serviceContext = blogPostingForm.getServiceContext(
-			groupId);
 
 		try {
 			return _blogsEntryLocalService.addEntry(
-				userId, blogPostingForm.getHeadline(),
-				blogPostingForm.getAlternativeHeadline(),
-				blogPostingForm.getFriendlyURLPath(),
-				blogPostingForm.getDescription(),
-				blogPostingForm.getArticleBody(),
-				blogPostingForm.getDisplayDate(), true, true, new String[0],
-				blogPostingForm.getImageCaption(), imageSelector, null,
-				serviceContext);
+				_getUserId(blogPosting, currentUser), blogPosting.getHeadline(),
+				blogPosting.getAlternativeHeadline(),
+				blogPosting.getFriendlyURLPath(), blogPosting.getDescription(),
+				blogPosting.getArticleBody(), blogPosting.getPublishedDate(),
+				true, true, new String[0], blogPosting.getCaption(),
+				_getImageSelector(blogPosting), null,
+				_getServiceContext(groupId, blogPosting));
 		}
 		catch (DuplicateFriendlyURLEntryException dfurlee) {
 			throw new ValidationException("Duplicate friendly URL", dfurlee);
@@ -182,6 +179,36 @@ public class BlogPostingNestedCollectionResource
 			BlogsEntry.class.getName(), blogsEntry.getEntryId());
 
 		return ListUtil.toList(assetTags, AssetTag::getName);
+	}
+
+	private Long _getCoverImageFileEntryId(BlogsEntry blogsEntry) {
+		long coverImageFileEntryId = blogsEntry.getCoverImageFileEntryId();
+
+		if (coverImageFileEntryId == 0L) {
+			return null;
+		}
+
+		return coverImageFileEntryId;
+	}
+
+	private ImageSelector _getImageSelector(BlogPosting blogPosting) {
+		Long imageId = blogPosting.getImageId();
+
+		if ((imageId == null) || imageId.equals(0L)) {
+			return null;
+		}
+
+		return Try.fromFallible(
+			() -> _dlAppLocalService.getFileEntry(imageId)
+		).map(
+			fileEntry -> new ImageSelector(
+				FileUtil.getBytes(fileEntry.getContentStream()),
+				fileEntry.getFileName(), fileEntry.getMimeType(),
+				"{\"height\": 0,\"width\": 0,\"x\": 0,\"y\": 0}")
+		).orElseThrow(
+			() -> new BadRequestException(
+				"Unable to find file entry with id " + imageId)
+		);
 	}
 
 	private PageItems<BlogsEntry> _getPageItems(
@@ -196,28 +223,71 @@ public class BlogPostingNestedCollectionResource
 		return new PageItems<>(blogsEntries, count);
 	}
 
+	private ServiceContext _getServiceContext(
+		long groupId, BlogPosting blogPosting) {
+
+		ServiceContext serviceContext = new ServiceContext();
+
+		serviceContext.setAddGroupPermissions(true);
+		serviceContext.setAddGuestPermissions(true);
+
+		List<Long> categories = blogPosting.getCategories();
+
+		if (ListUtil.isNotEmpty(categories)) {
+			serviceContext.setAssetCategoryIds(
+				ArrayUtil.toLongArray(categories));
+		}
+
+		List<String> keywords = blogPosting.getKeywords();
+
+		if (ListUtil.isNotEmpty(keywords)) {
+			serviceContext.setAssetTagNames(ArrayUtil.toStringArray(keywords));
+		}
+
+		Date createdDate = blogPosting.getCreatedDate();
+
+		if (createdDate != null) {
+			serviceContext.setCreateDate(createdDate);
+		}
+
+		Date modifiedDate = blogPosting.getModifiedDate();
+
+		if (modifiedDate != null) {
+			serviceContext.setModifiedDate(modifiedDate);
+		}
+
+		serviceContext.setScopeGroupId(groupId);
+
+		return serviceContext;
+	}
+
+	private long _getUserId(BlogPosting blogPosting, CurrentUser currentUser) {
+		return Optional.ofNullable(
+			blogPosting.getCreatorId()
+		).filter(
+			userId -> userId > 0
+		).orElse(
+			currentUser.getUserId()
+		);
+	}
+
 	private BlogsEntry _updateBlogsEntry(
-			long blogsEntryId, BlogPostingForm blogPostingForm,
-			CurrentUser currentUser)
+			long blogsEntryId, BlogPosting blogPosting, CurrentUser currentUser)
 		throws PortalException {
 
-		long userId = blogPostingForm.getCreatorId(currentUser.getUserId());
-
-		ImageSelector imageSelector = blogPostingForm.getImageSelector(
-			_dlAppLocalService::getFileEntry);
-
+		long userId = _getUserId(blogPosting, currentUser);
 		BlogsEntry blogsEntry = _blogsEntryService.getEntry(blogsEntryId);
+		ImageSelector imageSelector = _getImageSelector(blogPosting);
 
-		ServiceContext serviceContext = blogPostingForm.getServiceContext(
-			blogsEntry.getGroupId());
+		ServiceContext serviceContext = _getServiceContext(
+			blogsEntry.getGroupId(), blogPosting);
 
 		return _blogsEntryLocalService.updateEntry(
-			userId, blogsEntryId, blogPostingForm.getHeadline(),
-			blogPostingForm.getAlternativeHeadline(),
-			blogPostingForm.getFriendlyURLPath(),
-			blogPostingForm.getDescription(), blogPostingForm.getArticleBody(),
-			blogPostingForm.getDisplayDate(), true, true, new String[0],
-			blogPostingForm.getImageCaption(), imageSelector, null,
+			userId, blogsEntryId, blogPosting.getHeadline(),
+			blogPosting.getAlternativeHeadline(),
+			blogPosting.getFriendlyURLPath(), blogPosting.getDescription(),
+			blogPosting.getArticleBody(), blogPosting.getPublishedDate(), true,
+			true, new String[0], blogPosting.getCaption(), imageSelector, null,
 			serviceContext);
 	}
 

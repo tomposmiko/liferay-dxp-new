@@ -14,9 +14,10 @@
 
 package com.liferay.apio.architect.internal.application;
 
-import com.liferay.apio.architect.internal.endpoint.RootEndpoint;
+import static java.util.Collections.singleton;
 
-import java.util.Collections;
+import com.liferay.apio.architect.internal.jaxrs.resource.RootResource;
+
 import java.util.Set;
 
 import javax.ws.rs.core.Application;
@@ -26,12 +27,6 @@ import org.osgi.service.component.annotations.Reference;
 
 /**
  * Registers the application's root endpoint, writers, and mappers in JAX-RS.
- *
- * <p>
- * The default {@link RootEndpoint} already deploys all components that
- * implement the representor. Developers only need to provide a valid {@code
- * RootEndpoint} via this class if they want to customize the default behavior.
- * </p>
  *
  * @author Alejandro Hernández
  * @author Carlos Sierra
@@ -48,10 +43,10 @@ public class ApioApplication extends Application {
 
 	@Override
 	public Set<Object> getSingletons() {
-		return Collections.singleton(_rootEndpoint);
+		return singleton(_rootResource);
 	}
 
 	@Reference
-	private RootEndpoint _rootEndpoint;
+	private RootResource _rootResource;
 
 }

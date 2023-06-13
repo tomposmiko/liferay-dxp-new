@@ -11,7 +11,7 @@ dependencies {
 	compileOnly group: "com.liferay", name: "com.liferay.frontend.taglib.soy", version: "2.0.0"
 	compileOnly group: "com.liferay", name: "com.liferay.item.selector.api", version: "3.0.0"
 	compileOnly group: "com.liferay", name: "com.liferay.journal.api", version: "3.0.0"
-	compileOnly group: "com.liferay", name: "com.liferay.knowledge.base.api", version: "5.0.0"
+	compileOnly group: "com.liferay", name: "com.liferay.knowledge.base.api", version: "5.1.0"
 	compileOnly group: "com.liferay", name: "com.liferay.message.boards.api", version: "4.0.0"
 	compileOnly group: "com.liferay", name: "com.liferay.osgi.service.tracker.collections", version: "3.0.0"
 	compileOnly group: "com.liferay", name: "com.liferay.osgi.util", version: "4.0.0"

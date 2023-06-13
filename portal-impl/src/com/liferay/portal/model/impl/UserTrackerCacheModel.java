@@ -33,12 +33,12 @@ import java.util.Date;
  * The cache model class for representing UserTracker in entity cache.
  *
  * @author Brian Wing Shun Chan
- * @see UserTracker
  * @generated
  */
 @ProviderType
-public class UserTrackerCacheModel implements CacheModel<UserTracker>,
-	Externalizable, MVCCModel {
+public class UserTrackerCacheModel
+	implements CacheModel<UserTracker>, Externalizable, MVCCModel {
+
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj) {
@@ -49,10 +49,12 @@ public class UserTrackerCacheModel implements CacheModel<UserTracker>,
 			return false;
 		}
 
-		UserTrackerCacheModel userTrackerCacheModel = (UserTrackerCacheModel)obj;
+		UserTrackerCacheModel userTrackerCacheModel =
+			(UserTrackerCacheModel)obj;
 
 		if ((userTrackerId == userTrackerCacheModel.userTrackerId) &&
-				(mvccVersion == userTrackerCacheModel.mvccVersion)) {
+			(mvccVersion == userTrackerCacheModel.mvccVersion)) {
+
 			return true;
 		}
 
@@ -169,8 +171,7 @@ public class UserTrackerCacheModel implements CacheModel<UserTracker>,
 	}
 
 	@Override
-	public void writeExternal(ObjectOutput objectOutput)
-		throws IOException {
+	public void writeExternal(ObjectOutput objectOutput) throws IOException {
 		objectOutput.writeLong(mvccVersion);
 
 		objectOutput.writeLong(userTrackerId);
@@ -218,4 +219,5 @@ public class UserTrackerCacheModel implements CacheModel<UserTracker>,
 	public String remoteAddr;
 	public String remoteHost;
 	public String userAgent;
+
 }

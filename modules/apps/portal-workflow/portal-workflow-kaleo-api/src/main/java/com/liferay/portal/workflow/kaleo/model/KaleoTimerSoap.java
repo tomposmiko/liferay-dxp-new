@@ -30,6 +30,7 @@ import java.util.List;
  */
 @ProviderType
 public class KaleoTimerSoap implements Serializable {
+
 	public static KaleoTimerSoap toSoapModel(KaleoTimer model) {
 		KaleoTimerSoap soapModel = new KaleoTimerSoap();
 
@@ -42,7 +43,8 @@ public class KaleoTimerSoap implements Serializable {
 		soapModel.setModifiedDate(model.getModifiedDate());
 		soapModel.setKaleoClassName(model.getKaleoClassName());
 		soapModel.setKaleoClassPK(model.getKaleoClassPK());
-		soapModel.setKaleoDefinitionVersionId(model.getKaleoDefinitionVersionId());
+		soapModel.setKaleoDefinitionVersionId(
+			model.getKaleoDefinitionVersionId());
 		soapModel.setName(model.getName());
 		soapModel.setBlocking(model.isBlocking());
 		soapModel.setDescription(model.getDescription());
@@ -82,7 +84,8 @@ public class KaleoTimerSoap implements Serializable {
 	}
 
 	public static KaleoTimerSoap[] toSoapModels(List<KaleoTimer> models) {
-		List<KaleoTimerSoap> soapModels = new ArrayList<KaleoTimerSoap>(models.size());
+		List<KaleoTimerSoap> soapModels = new ArrayList<KaleoTimerSoap>(
+			models.size());
 
 		for (KaleoTimer model : models) {
 			soapModels.add(toSoapModel(model));
@@ -259,4 +262,5 @@ public class KaleoTimerSoap implements Serializable {
 	private String _scale;
 	private double _recurrenceDuration;
 	private String _recurrenceScale;
+
 }

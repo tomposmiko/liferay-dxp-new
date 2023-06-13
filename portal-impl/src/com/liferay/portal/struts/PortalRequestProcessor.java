@@ -371,16 +371,22 @@ public class PortalRequestProcessor {
 		}
 
 		if ((portlet == null) || !portlet.isActive()) {
-			return layoutFriendlyURL.concat(StringPool.QUESTION).concat(
-				request.getQueryString());
+			return layoutFriendlyURL.concat(
+				StringPool.QUESTION
+			).concat(
+				request.getQueryString()
+			);
 		}
 
 		FriendlyURLMapper friendlyURLMapper =
 			portlet.getFriendlyURLMapperInstance();
 
 		if (friendlyURLMapper == null) {
-			return layoutFriendlyURL.concat(StringPool.QUESTION).concat(
-				request.getQueryString());
+			return layoutFriendlyURL.concat(
+				StringPool.QUESTION
+			).concat(
+				request.getQueryString()
+			);
 		}
 
 		String namespace = PortalUtil.getPortletNamespace(portletId);
@@ -406,8 +412,11 @@ public class PortalRequestProcessor {
 			return layoutFriendlyURL.concat(portletFriendlyURL);
 		}
 
-		return layoutFriendlyURL.concat(StringPool.QUESTION).concat(
-			request.getQueryString());
+		return layoutFriendlyURL.concat(
+			StringPool.QUESTION
+		).concat(
+			request.getQueryString()
+		);
 	}
 
 	private String _getLastPath(HttpServletRequest request) {
@@ -916,8 +925,11 @@ public class PortalRequestProcessor {
 				fullPathWithoutQueryString = path;
 
 				if (Validator.isNotNull(queryString)) {
-					fullPath = path.concat(StringPool.QUESTION).concat(
-						queryString);
+					fullPath = path.concat(
+						StringPool.QUESTION
+					).concat(
+						queryString
+					);
 				}
 				else {
 					fullPath = path;

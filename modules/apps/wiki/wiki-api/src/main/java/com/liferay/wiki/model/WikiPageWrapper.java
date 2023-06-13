@@ -17,9 +17,7 @@ package com.liferay.wiki.model;
 import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.expando.kernel.model.ExpandoBridge;
-
 import com.liferay.exportimport.kernel.lar.StagedModelType;
-
 import com.liferay.portal.kernel.model.ModelWrapper;
 import com.liferay.portal.kernel.service.ServiceContext;
 
@@ -41,6 +39,7 @@ import java.util.Objects;
  */
 @ProviderType
 public class WikiPageWrapper implements WikiPage, ModelWrapper<WikiPage> {
+
 	public WikiPageWrapper(WikiPage wikiPage) {
 		_wikiPage = wikiPage;
 	}
@@ -235,8 +234,10 @@ public class WikiPageWrapper implements WikiPage, ModelWrapper<WikiPage> {
 	}
 
 	@Override
-	public com.liferay.portal.kernel.repository.model.Folder addAttachmentsFolder()
+	public com.liferay.portal.kernel.repository.model.Folder
+			addAttachmentsFolder()
 		throws com.liferay.portal.kernel.exception.PortalException {
+
 		return _wikiPage.addAttachmentsFolder();
 	}
 
@@ -261,42 +262,53 @@ public class WikiPageWrapper implements WikiPage, ModelWrapper<WikiPage> {
 	}
 
 	@Override
-	public java.util.List<com.liferay.portal.kernel.repository.model.FileEntry> getAttachmentsFileEntries()
+	public java.util.List<com.liferay.portal.kernel.repository.model.FileEntry>
+			getAttachmentsFileEntries()
 		throws com.liferay.portal.kernel.exception.PortalException {
+
 		return _wikiPage.getAttachmentsFileEntries();
 	}
 
 	@Override
-	public java.util.List<com.liferay.portal.kernel.repository.model.FileEntry> getAttachmentsFileEntries(
-		int start, int end)
+	public java.util.List<com.liferay.portal.kernel.repository.model.FileEntry>
+			getAttachmentsFileEntries(int start, int end)
 		throws com.liferay.portal.kernel.exception.PortalException {
+
 		return _wikiPage.getAttachmentsFileEntries(start, end);
 	}
 
 	@Override
-	public java.util.List<com.liferay.portal.kernel.repository.model.FileEntry> getAttachmentsFileEntries(
-		int start, int end, com.liferay.portal.kernel.util.OrderByComparator obc)
+	public java.util.List<com.liferay.portal.kernel.repository.model.FileEntry>
+			getAttachmentsFileEntries(
+				int start, int end,
+				com.liferay.portal.kernel.util.OrderByComparator obc)
 		throws com.liferay.portal.kernel.exception.PortalException {
+
 		return _wikiPage.getAttachmentsFileEntries(start, end, obc);
 	}
 
 	@Override
-	public java.util.List<com.liferay.portal.kernel.repository.model.FileEntry> getAttachmentsFileEntries(
-		String[] mimeTypes, int start, int end,
-		com.liferay.portal.kernel.util.OrderByComparator<com.liferay.portal.kernel.repository.model.FileEntry> obc)
+	public java.util.List<com.liferay.portal.kernel.repository.model.FileEntry>
+			getAttachmentsFileEntries(
+				String[] mimeTypes, int start, int end,
+				com.liferay.portal.kernel.util.OrderByComparator
+					<com.liferay.portal.kernel.repository.model.FileEntry> obc)
 		throws com.liferay.portal.kernel.exception.PortalException {
+
 		return _wikiPage.getAttachmentsFileEntries(mimeTypes, start, end, obc);
 	}
 
 	@Override
 	public int getAttachmentsFileEntriesCount()
 		throws com.liferay.portal.kernel.exception.PortalException {
+
 		return _wikiPage.getAttachmentsFileEntriesCount();
 	}
 
 	@Override
 	public int getAttachmentsFileEntriesCount(String[] mimeTypes)
 		throws com.liferay.portal.kernel.exception.PortalException {
+
 		return _wikiPage.getAttachmentsFileEntriesCount(mimeTypes);
 	}
 
@@ -311,71 +323,75 @@ public class WikiPageWrapper implements WikiPage, ModelWrapper<WikiPage> {
 	}
 
 	/**
-	* Returns the company ID of this wiki page.
-	*
-	* @return the company ID of this wiki page
-	*/
+	 * Returns the company ID of this wiki page.
+	 *
+	 * @return the company ID of this wiki page
+	 */
 	@Override
 	public long getCompanyId() {
 		return _wikiPage.getCompanyId();
 	}
 
 	/**
-	* Returns the container model ID of this wiki page.
-	*
-	* @return the container model ID of this wiki page
-	*/
+	 * Returns the container model ID of this wiki page.
+	 *
+	 * @return the container model ID of this wiki page
+	 */
 	@Override
 	public long getContainerModelId() {
 		return _wikiPage.getContainerModelId();
 	}
 
 	/**
-	* Returns the container name of this wiki page.
-	*
-	* @return the container name of this wiki page
-	*/
+	 * Returns the container name of this wiki page.
+	 *
+	 * @return the container name of this wiki page
+	 */
 	@Override
 	public String getContainerModelName() {
 		return _wikiPage.getContainerModelName();
 	}
 
 	/**
-	* Returns the content of this wiki page.
-	*
-	* @return the content of this wiki page
-	*/
+	 * Returns the content of this wiki page.
+	 *
+	 * @return the content of this wiki page
+	 */
 	@Override
 	public String getContent() {
 		return _wikiPage.getContent();
 	}
 
 	/**
-	* Returns the create date of this wiki page.
-	*
-	* @return the create date of this wiki page
-	*/
+	 * Returns the create date of this wiki page.
+	 *
+	 * @return the create date of this wiki page
+	 */
 	@Override
 	public Date getCreateDate() {
 		return _wikiPage.getCreateDate();
 	}
 
 	@Override
-	public java.util.List<com.liferay.portal.kernel.repository.model.FileEntry> getDeletedAttachmentsFileEntries()
+	public java.util.List<com.liferay.portal.kernel.repository.model.FileEntry>
+			getDeletedAttachmentsFileEntries()
 		throws com.liferay.portal.kernel.exception.PortalException {
+
 		return _wikiPage.getDeletedAttachmentsFileEntries();
 	}
 
 	@Override
-	public java.util.List<com.liferay.portal.kernel.repository.model.FileEntry> getDeletedAttachmentsFileEntries(
-		int start, int end)
+	public java.util.List<com.liferay.portal.kernel.repository.model.FileEntry>
+			getDeletedAttachmentsFileEntries(int start, int end)
 		throws com.liferay.portal.kernel.exception.PortalException {
+
 		return _wikiPage.getDeletedAttachmentsFileEntries(start, end);
 	}
 
 	@Override
 	public int getDeletedAttachmentsFileEntriesCount()
 		throws com.liferay.portal.kernel.exception.PortalException {
+
 		return _wikiPage.getDeletedAttachmentsFileEntriesCount();
 	}
 
@@ -385,60 +401,60 @@ public class WikiPageWrapper implements WikiPage, ModelWrapper<WikiPage> {
 	}
 
 	/**
-	* Returns the format of this wiki page.
-	*
-	* @return the format of this wiki page
-	*/
+	 * Returns the format of this wiki page.
+	 *
+	 * @return the format of this wiki page
+	 */
 	@Override
 	public String getFormat() {
 		return _wikiPage.getFormat();
 	}
 
 	/**
-	* Returns the group ID of this wiki page.
-	*
-	* @return the group ID of this wiki page
-	*/
+	 * Returns the group ID of this wiki page.
+	 *
+	 * @return the group ID of this wiki page
+	 */
 	@Override
 	public long getGroupId() {
 		return _wikiPage.getGroupId();
 	}
 
 	/**
-	* Returns the head of this wiki page.
-	*
-	* @return the head of this wiki page
-	*/
+	 * Returns the head of this wiki page.
+	 *
+	 * @return the head of this wiki page
+	 */
 	@Override
 	public boolean getHead() {
 		return _wikiPage.getHead();
 	}
 
 	/**
-	* Returns the last publish date of this wiki page.
-	*
-	* @return the last publish date of this wiki page
-	*/
+	 * Returns the last publish date of this wiki page.
+	 *
+	 * @return the last publish date of this wiki page
+	 */
 	@Override
 	public Date getLastPublishDate() {
 		return _wikiPage.getLastPublishDate();
 	}
 
 	/**
-	* Returns the minor edit of this wiki page.
-	*
-	* @return the minor edit of this wiki page
-	*/
+	 * Returns the minor edit of this wiki page.
+	 *
+	 * @return the minor edit of this wiki page
+	 */
 	@Override
 	public boolean getMinorEdit() {
 		return _wikiPage.getMinorEdit();
 	}
 
 	/**
-	* Returns the modified date of this wiki page.
-	*
-	* @return the modified date of this wiki page
-	*/
+	 * Returns the modified date of this wiki page.
+	 *
+	 * @return the modified date of this wiki page
+	 */
 	@Override
 	public Date getModifiedDate() {
 		return _wikiPage.getModifiedDate();
@@ -455,30 +471,30 @@ public class WikiPageWrapper implements WikiPage, ModelWrapper<WikiPage> {
 	}
 
 	/**
-	* Returns the node ID of this wiki page.
-	*
-	* @return the node ID of this wiki page
-	*/
+	 * Returns the node ID of this wiki page.
+	 *
+	 * @return the node ID of this wiki page
+	 */
 	@Override
 	public long getNodeId() {
 		return _wikiPage.getNodeId();
 	}
 
 	/**
-	* Returns the page ID of this wiki page.
-	*
-	* @return the page ID of this wiki page
-	*/
+	 * Returns the page ID of this wiki page.
+	 *
+	 * @return the page ID of this wiki page
+	 */
 	@Override
 	public long getPageId() {
 		return _wikiPage.getPageId();
 	}
 
 	/**
-	* Returns the parent container model ID of this wiki page.
-	*
-	* @return the parent container model ID of this wiki page
-	*/
+	 * Returns the parent container model ID of this wiki page.
+	 *
+	 * @return the parent container model ID of this wiki page
+	 */
 	@Override
 	public long getParentContainerModelId() {
 		return _wikiPage.getParentContainerModelId();
@@ -487,6 +503,7 @@ public class WikiPageWrapper implements WikiPage, ModelWrapper<WikiPage> {
 	@Override
 	public WikiPage getParentPage()
 		throws com.liferay.portal.kernel.exception.PortalException {
+
 		return _wikiPage.getParentPage();
 	}
 
@@ -496,20 +513,20 @@ public class WikiPageWrapper implements WikiPage, ModelWrapper<WikiPage> {
 	}
 
 	/**
-	* Returns the parent title of this wiki page.
-	*
-	* @return the parent title of this wiki page
-	*/
+	 * Returns the parent title of this wiki page.
+	 *
+	 * @return the parent title of this wiki page
+	 */
 	@Override
 	public String getParentTitle() {
 		return _wikiPage.getParentTitle();
 	}
 
 	/**
-	* Returns the primary key of this wiki page.
-	*
-	* @return the primary key of this wiki page
-	*/
+	 * Returns the primary key of this wiki page.
+	 *
+	 * @return the primary key of this wiki page
+	 */
 	@Override
 	public long getPrimaryKey() {
 		return _wikiPage.getPrimaryKey();
@@ -523,126 +540,128 @@ public class WikiPageWrapper implements WikiPage, ModelWrapper<WikiPage> {
 	@Override
 	public WikiPage getRedirectPage()
 		throws com.liferay.portal.kernel.exception.PortalException {
+
 		return _wikiPage.getRedirectPage();
 	}
 
 	/**
-	* Returns the redirect title of this wiki page.
-	*
-	* @return the redirect title of this wiki page
-	*/
+	 * Returns the redirect title of this wiki page.
+	 *
+	 * @return the redirect title of this wiki page
+	 */
 	@Override
 	public String getRedirectTitle() {
 		return _wikiPage.getRedirectTitle();
 	}
 
 	/**
-	* Returns the resource prim key of this wiki page.
-	*
-	* @return the resource prim key of this wiki page
-	*/
+	 * Returns the resource prim key of this wiki page.
+	 *
+	 * @return the resource prim key of this wiki page
+	 */
 	@Override
 	public long getResourcePrimKey() {
 		return _wikiPage.getResourcePrimKey();
 	}
 
 	/**
-	* Returns the status of this wiki page.
-	*
-	* @return the status of this wiki page
-	*/
+	 * Returns the status of this wiki page.
+	 *
+	 * @return the status of this wiki page
+	 */
 	@Override
 	public int getStatus() {
 		return _wikiPage.getStatus();
 	}
 
 	/**
-	* Returns the status by user ID of this wiki page.
-	*
-	* @return the status by user ID of this wiki page
-	*/
+	 * Returns the status by user ID of this wiki page.
+	 *
+	 * @return the status by user ID of this wiki page
+	 */
 	@Override
 	public long getStatusByUserId() {
 		return _wikiPage.getStatusByUserId();
 	}
 
 	/**
-	* Returns the status by user name of this wiki page.
-	*
-	* @return the status by user name of this wiki page
-	*/
+	 * Returns the status by user name of this wiki page.
+	 *
+	 * @return the status by user name of this wiki page
+	 */
 	@Override
 	public String getStatusByUserName() {
 		return _wikiPage.getStatusByUserName();
 	}
 
 	/**
-	* Returns the status by user uuid of this wiki page.
-	*
-	* @return the status by user uuid of this wiki page
-	*/
+	 * Returns the status by user uuid of this wiki page.
+	 *
+	 * @return the status by user uuid of this wiki page
+	 */
 	@Override
 	public String getStatusByUserUuid() {
 		return _wikiPage.getStatusByUserUuid();
 	}
 
 	/**
-	* Returns the status date of this wiki page.
-	*
-	* @return the status date of this wiki page
-	*/
+	 * Returns the status date of this wiki page.
+	 *
+	 * @return the status date of this wiki page
+	 */
 	@Override
 	public Date getStatusDate() {
 		return _wikiPage.getStatusDate();
 	}
 
 	/**
-	* Returns the summary of this wiki page.
-	*
-	* @return the summary of this wiki page
-	*/
+	 * Returns the summary of this wiki page.
+	 *
+	 * @return the summary of this wiki page
+	 */
 	@Override
 	public String getSummary() {
 		return _wikiPage.getSummary();
 	}
 
 	/**
-	* Returns the title of this wiki page.
-	*
-	* @return the title of this wiki page
-	*/
+	 * Returns the title of this wiki page.
+	 *
+	 * @return the title of this wiki page
+	 */
 	@Override
 	public String getTitle() {
 		return _wikiPage.getTitle();
 	}
 
 	/**
-	* Returns the trash entry created when this wiki page was moved to the Recycle Bin. The trash entry may belong to one of the ancestors of this wiki page.
-	*
-	* @return the trash entry created when this wiki page was moved to the Recycle Bin
-	*/
+	 * Returns the trash entry created when this wiki page was moved to the Recycle Bin. The trash entry may belong to one of the ancestors of this wiki page.
+	 *
+	 * @return the trash entry created when this wiki page was moved to the Recycle Bin
+	 */
 	@Override
 	public com.liferay.trash.kernel.model.TrashEntry getTrashEntry()
 		throws com.liferay.portal.kernel.exception.PortalException {
+
 		return _wikiPage.getTrashEntry();
 	}
 
 	/**
-	* Returns the class primary key of the trash entry for this wiki page.
-	*
-	* @return the class primary key of the trash entry for this wiki page
-	*/
+	 * Returns the class primary key of the trash entry for this wiki page.
+	 *
+	 * @return the class primary key of the trash entry for this wiki page
+	 */
 	@Override
 	public long getTrashEntryClassPK() {
 		return _wikiPage.getTrashEntryClassPK();
 	}
 
 	/**
-	* Returns the trash handler for this wiki page.
-	*
-	* @return the trash handler for this wiki page
-	* @deprecated As of Judson (7.1.x), with no direct replacement
-	*/
+	 * Returns the trash handler for this wiki page.
+	 *
+	 * @return the trash handler for this wiki page
+	 * @deprecated As of Judson (7.1.x), with no direct replacement
+	 */
 	@Deprecated
 	@Override
 	public com.liferay.portal.kernel.trash.TrashHandler getTrashHandler() {
@@ -650,50 +669,50 @@ public class WikiPageWrapper implements WikiPage, ModelWrapper<WikiPage> {
 	}
 
 	/**
-	* Returns the user ID of this wiki page.
-	*
-	* @return the user ID of this wiki page
-	*/
+	 * Returns the user ID of this wiki page.
+	 *
+	 * @return the user ID of this wiki page
+	 */
 	@Override
 	public long getUserId() {
 		return _wikiPage.getUserId();
 	}
 
 	/**
-	* Returns the user name of this wiki page.
-	*
-	* @return the user name of this wiki page
-	*/
+	 * Returns the user name of this wiki page.
+	 *
+	 * @return the user name of this wiki page
+	 */
 	@Override
 	public String getUserName() {
 		return _wikiPage.getUserName();
 	}
 
 	/**
-	* Returns the user uuid of this wiki page.
-	*
-	* @return the user uuid of this wiki page
-	*/
+	 * Returns the user uuid of this wiki page.
+	 *
+	 * @return the user uuid of this wiki page
+	 */
 	@Override
 	public String getUserUuid() {
 		return _wikiPage.getUserUuid();
 	}
 
 	/**
-	* Returns the uuid of this wiki page.
-	*
-	* @return the uuid of this wiki page
-	*/
+	 * Returns the uuid of this wiki page.
+	 *
+	 * @return the uuid of this wiki page
+	 */
 	@Override
 	public String getUuid() {
 		return _wikiPage.getUuid();
 	}
 
 	/**
-	* Returns the version of this wiki page.
-	*
-	* @return the version of this wiki page
-	*/
+	 * Returns the version of this wiki page.
+	 *
+	 * @return the version of this wiki page
+	 */
 	@Override
 	public double getVersion() {
 		return _wikiPage.getVersion();
@@ -720,10 +739,10 @@ public class WikiPageWrapper implements WikiPage, ModelWrapper<WikiPage> {
 	}
 
 	/**
-	* Returns <code>true</code> if this wiki page is approved.
-	*
-	* @return <code>true</code> if this wiki page is approved; <code>false</code> otherwise
-	*/
+	 * Returns <code>true</code> if this wiki page is approved.
+	 *
+	 * @return <code>true</code> if this wiki page is approved; <code>false</code> otherwise
+	 */
 	@Override
 	public boolean isApproved() {
 		return _wikiPage.isApproved();
@@ -735,20 +754,20 @@ public class WikiPageWrapper implements WikiPage, ModelWrapper<WikiPage> {
 	}
 
 	/**
-	* Returns <code>true</code> if this wiki page is denied.
-	*
-	* @return <code>true</code> if this wiki page is denied; <code>false</code> otherwise
-	*/
+	 * Returns <code>true</code> if this wiki page is denied.
+	 *
+	 * @return <code>true</code> if this wiki page is denied; <code>false</code> otherwise
+	 */
 	@Override
 	public boolean isDenied() {
 		return _wikiPage.isDenied();
 	}
 
 	/**
-	* Returns <code>true</code> if this wiki page is a draft.
-	*
-	* @return <code>true</code> if this wiki page is a draft; <code>false</code> otherwise
-	*/
+	 * Returns <code>true</code> if this wiki page is a draft.
+	 *
+	 * @return <code>true</code> if this wiki page is a draft; <code>false</code> otherwise
+	 */
 	@Override
 	public boolean isDraft() {
 		return _wikiPage.isDraft();
@@ -760,60 +779,60 @@ public class WikiPageWrapper implements WikiPage, ModelWrapper<WikiPage> {
 	}
 
 	/**
-	* Returns <code>true</code> if this wiki page is expired.
-	*
-	* @return <code>true</code> if this wiki page is expired; <code>false</code> otherwise
-	*/
+	 * Returns <code>true</code> if this wiki page is expired.
+	 *
+	 * @return <code>true</code> if this wiki page is expired; <code>false</code> otherwise
+	 */
 	@Override
 	public boolean isExpired() {
 		return _wikiPage.isExpired();
 	}
 
 	/**
-	* Returns <code>true</code> if this wiki page is head.
-	*
-	* @return <code>true</code> if this wiki page is head; <code>false</code> otherwise
-	*/
+	 * Returns <code>true</code> if this wiki page is head.
+	 *
+	 * @return <code>true</code> if this wiki page is head; <code>false</code> otherwise
+	 */
 	@Override
 	public boolean isHead() {
 		return _wikiPage.isHead();
 	}
 
 	/**
-	* Returns <code>true</code> if this wiki page is inactive.
-	*
-	* @return <code>true</code> if this wiki page is inactive; <code>false</code> otherwise
-	*/
+	 * Returns <code>true</code> if this wiki page is inactive.
+	 *
+	 * @return <code>true</code> if this wiki page is inactive; <code>false</code> otherwise
+	 */
 	@Override
 	public boolean isInactive() {
 		return _wikiPage.isInactive();
 	}
 
 	/**
-	* Returns <code>true</code> if this wiki page is incomplete.
-	*
-	* @return <code>true</code> if this wiki page is incomplete; <code>false</code> otherwise
-	*/
+	 * Returns <code>true</code> if this wiki page is incomplete.
+	 *
+	 * @return <code>true</code> if this wiki page is incomplete; <code>false</code> otherwise
+	 */
 	@Override
 	public boolean isIncomplete() {
 		return _wikiPage.isIncomplete();
 	}
 
 	/**
-	* Returns <code>true</code> if this wiki page is in the Recycle Bin.
-	*
-	* @return <code>true</code> if this wiki page is in the Recycle Bin; <code>false</code> otherwise
-	*/
+	 * Returns <code>true</code> if this wiki page is in the Recycle Bin.
+	 *
+	 * @return <code>true</code> if this wiki page is in the Recycle Bin; <code>false</code> otherwise
+	 */
 	@Override
 	public boolean isInTrash() {
 		return _wikiPage.isInTrash();
 	}
 
 	/**
-	* Returns <code>true</code> if the parent of this wiki page is in the Recycle Bin.
-	*
-	* @return <code>true</code> if the parent of this wiki page is in the Recycle Bin; <code>false</code> otherwise
-	*/
+	 * Returns <code>true</code> if the parent of this wiki page is in the Recycle Bin.
+	 *
+	 * @return <code>true</code> if the parent of this wiki page is in the Recycle Bin; <code>false</code> otherwise
+	 */
 	@Override
 	public boolean isInTrashContainer() {
 		return _wikiPage.isInTrashContainer();
@@ -830,10 +849,10 @@ public class WikiPageWrapper implements WikiPage, ModelWrapper<WikiPage> {
 	}
 
 	/**
-	* Returns <code>true</code> if this wiki page is minor edit.
-	*
-	* @return <code>true</code> if this wiki page is minor edit; <code>false</code> otherwise
-	*/
+	 * Returns <code>true</code> if this wiki page is minor edit.
+	 *
+	 * @return <code>true</code> if this wiki page is minor edit; <code>false</code> otherwise
+	 */
 	@Override
 	public boolean isMinorEdit() {
 		return _wikiPage.isMinorEdit();
@@ -845,10 +864,10 @@ public class WikiPageWrapper implements WikiPage, ModelWrapper<WikiPage> {
 	}
 
 	/**
-	* Returns <code>true</code> if this wiki page is pending.
-	*
-	* @return <code>true</code> if this wiki page is pending; <code>false</code> otherwise
-	*/
+	 * Returns <code>true</code> if this wiki page is pending.
+	 *
+	 * @return <code>true</code> if this wiki page is pending; <code>false</code> otherwise
+	 */
 	@Override
 	public boolean isPending() {
 		return _wikiPage.isPending();
@@ -860,10 +879,10 @@ public class WikiPageWrapper implements WikiPage, ModelWrapper<WikiPage> {
 	}
 
 	/**
-	* Returns <code>true</code> if this wiki page is scheduled.
-	*
-	* @return <code>true</code> if this wiki page is scheduled; <code>false</code> otherwise
-	*/
+	 * Returns <code>true</code> if this wiki page is scheduled.
+	 *
+	 * @return <code>true</code> if this wiki page is scheduled; <code>false</code> otherwise
+	 */
 	@Override
 	public boolean isScheduled() {
 		return _wikiPage.isScheduled();
@@ -885,40 +904,40 @@ public class WikiPageWrapper implements WikiPage, ModelWrapper<WikiPage> {
 	}
 
 	/**
-	* Sets the company ID of this wiki page.
-	*
-	* @param companyId the company ID of this wiki page
-	*/
+	 * Sets the company ID of this wiki page.
+	 *
+	 * @param companyId the company ID of this wiki page
+	 */
 	@Override
 	public void setCompanyId(long companyId) {
 		_wikiPage.setCompanyId(companyId);
 	}
 
 	/**
-	* Sets the container model ID of this wiki page.
-	*
-	* @param containerModelId the container model ID of this wiki page
-	*/
+	 * Sets the container model ID of this wiki page.
+	 *
+	 * @param containerModelId the container model ID of this wiki page
+	 */
 	@Override
 	public void setContainerModelId(long containerModelId) {
 		_wikiPage.setContainerModelId(containerModelId);
 	}
 
 	/**
-	* Sets the content of this wiki page.
-	*
-	* @param content the content of this wiki page
-	*/
+	 * Sets the content of this wiki page.
+	 *
+	 * @param content the content of this wiki page
+	 */
 	@Override
 	public void setContent(String content) {
 		_wikiPage.setContent(content);
 	}
 
 	/**
-	* Sets the create date of this wiki page.
-	*
-	* @param createDate the create date of this wiki page
-	*/
+	 * Sets the create date of this wiki page.
+	 *
+	 * @param createDate the create date of this wiki page
+	 */
 	@Override
 	public void setCreateDate(Date createDate) {
 		_wikiPage.setCreateDate(createDate);
@@ -927,6 +946,7 @@ public class WikiPageWrapper implements WikiPage, ModelWrapper<WikiPage> {
 	@Override
 	public void setExpandoBridgeAttributes(
 		com.liferay.portal.kernel.model.BaseModel<?> baseModel) {
+
 		_wikiPage.setExpandoBridgeAttributes(baseModel);
 	}
 
@@ -941,60 +961,60 @@ public class WikiPageWrapper implements WikiPage, ModelWrapper<WikiPage> {
 	}
 
 	/**
-	* Sets the format of this wiki page.
-	*
-	* @param format the format of this wiki page
-	*/
+	 * Sets the format of this wiki page.
+	 *
+	 * @param format the format of this wiki page
+	 */
 	@Override
 	public void setFormat(String format) {
 		_wikiPage.setFormat(format);
 	}
 
 	/**
-	* Sets the group ID of this wiki page.
-	*
-	* @param groupId the group ID of this wiki page
-	*/
+	 * Sets the group ID of this wiki page.
+	 *
+	 * @param groupId the group ID of this wiki page
+	 */
 	@Override
 	public void setGroupId(long groupId) {
 		_wikiPage.setGroupId(groupId);
 	}
 
 	/**
-	* Sets whether this wiki page is head.
-	*
-	* @param head the head of this wiki page
-	*/
+	 * Sets whether this wiki page is head.
+	 *
+	 * @param head the head of this wiki page
+	 */
 	@Override
 	public void setHead(boolean head) {
 		_wikiPage.setHead(head);
 	}
 
 	/**
-	* Sets the last publish date of this wiki page.
-	*
-	* @param lastPublishDate the last publish date of this wiki page
-	*/
+	 * Sets the last publish date of this wiki page.
+	 *
+	 * @param lastPublishDate the last publish date of this wiki page
+	 */
 	@Override
 	public void setLastPublishDate(Date lastPublishDate) {
 		_wikiPage.setLastPublishDate(lastPublishDate);
 	}
 
 	/**
-	* Sets whether this wiki page is minor edit.
-	*
-	* @param minorEdit the minor edit of this wiki page
-	*/
+	 * Sets whether this wiki page is minor edit.
+	 *
+	 * @param minorEdit the minor edit of this wiki page
+	 */
 	@Override
 	public void setMinorEdit(boolean minorEdit) {
 		_wikiPage.setMinorEdit(minorEdit);
 	}
 
 	/**
-	* Sets the modified date of this wiki page.
-	*
-	* @param modifiedDate the modified date of this wiki page
-	*/
+	 * Sets the modified date of this wiki page.
+	 *
+	 * @param modifiedDate the modified date of this wiki page
+	 */
 	@Override
 	public void setModifiedDate(Date modifiedDate) {
 		_wikiPage.setModifiedDate(modifiedDate);
@@ -1006,50 +1026,50 @@ public class WikiPageWrapper implements WikiPage, ModelWrapper<WikiPage> {
 	}
 
 	/**
-	* Sets the node ID of this wiki page.
-	*
-	* @param nodeId the node ID of this wiki page
-	*/
+	 * Sets the node ID of this wiki page.
+	 *
+	 * @param nodeId the node ID of this wiki page
+	 */
 	@Override
 	public void setNodeId(long nodeId) {
 		_wikiPage.setNodeId(nodeId);
 	}
 
 	/**
-	* Sets the page ID of this wiki page.
-	*
-	* @param pageId the page ID of this wiki page
-	*/
+	 * Sets the page ID of this wiki page.
+	 *
+	 * @param pageId the page ID of this wiki page
+	 */
 	@Override
 	public void setPageId(long pageId) {
 		_wikiPage.setPageId(pageId);
 	}
 
 	/**
-	* Sets the parent container model ID of this wiki page.
-	*
-	* @param parentContainerModelId the parent container model ID of this wiki page
-	*/
+	 * Sets the parent container model ID of this wiki page.
+	 *
+	 * @param parentContainerModelId the parent container model ID of this wiki page
+	 */
 	@Override
 	public void setParentContainerModelId(long parentContainerModelId) {
 		_wikiPage.setParentContainerModelId(parentContainerModelId);
 	}
 
 	/**
-	* Sets the parent title of this wiki page.
-	*
-	* @param parentTitle the parent title of this wiki page
-	*/
+	 * Sets the parent title of this wiki page.
+	 *
+	 * @param parentTitle the parent title of this wiki page
+	 */
 	@Override
 	public void setParentTitle(String parentTitle) {
 		_wikiPage.setParentTitle(parentTitle);
 	}
 
 	/**
-	* Sets the primary key of this wiki page.
-	*
-	* @param primaryKey the primary key of this wiki page
-	*/
+	 * Sets the primary key of this wiki page.
+	 *
+	 * @param primaryKey the primary key of this wiki page
+	 */
 	@Override
 	public void setPrimaryKey(long primaryKey) {
 		_wikiPage.setPrimaryKey(primaryKey);
@@ -1061,140 +1081,140 @@ public class WikiPageWrapper implements WikiPage, ModelWrapper<WikiPage> {
 	}
 
 	/**
-	* Sets the redirect title of this wiki page.
-	*
-	* @param redirectTitle the redirect title of this wiki page
-	*/
+	 * Sets the redirect title of this wiki page.
+	 *
+	 * @param redirectTitle the redirect title of this wiki page
+	 */
 	@Override
 	public void setRedirectTitle(String redirectTitle) {
 		_wikiPage.setRedirectTitle(redirectTitle);
 	}
 
 	/**
-	* Sets the resource prim key of this wiki page.
-	*
-	* @param resourcePrimKey the resource prim key of this wiki page
-	*/
+	 * Sets the resource prim key of this wiki page.
+	 *
+	 * @param resourcePrimKey the resource prim key of this wiki page
+	 */
 	@Override
 	public void setResourcePrimKey(long resourcePrimKey) {
 		_wikiPage.setResourcePrimKey(resourcePrimKey);
 	}
 
 	/**
-	* Sets the status of this wiki page.
-	*
-	* @param status the status of this wiki page
-	*/
+	 * Sets the status of this wiki page.
+	 *
+	 * @param status the status of this wiki page
+	 */
 	@Override
 	public void setStatus(int status) {
 		_wikiPage.setStatus(status);
 	}
 
 	/**
-	* Sets the status by user ID of this wiki page.
-	*
-	* @param statusByUserId the status by user ID of this wiki page
-	*/
+	 * Sets the status by user ID of this wiki page.
+	 *
+	 * @param statusByUserId the status by user ID of this wiki page
+	 */
 	@Override
 	public void setStatusByUserId(long statusByUserId) {
 		_wikiPage.setStatusByUserId(statusByUserId);
 	}
 
 	/**
-	* Sets the status by user name of this wiki page.
-	*
-	* @param statusByUserName the status by user name of this wiki page
-	*/
+	 * Sets the status by user name of this wiki page.
+	 *
+	 * @param statusByUserName the status by user name of this wiki page
+	 */
 	@Override
 	public void setStatusByUserName(String statusByUserName) {
 		_wikiPage.setStatusByUserName(statusByUserName);
 	}
 
 	/**
-	* Sets the status by user uuid of this wiki page.
-	*
-	* @param statusByUserUuid the status by user uuid of this wiki page
-	*/
+	 * Sets the status by user uuid of this wiki page.
+	 *
+	 * @param statusByUserUuid the status by user uuid of this wiki page
+	 */
 	@Override
 	public void setStatusByUserUuid(String statusByUserUuid) {
 		_wikiPage.setStatusByUserUuid(statusByUserUuid);
 	}
 
 	/**
-	* Sets the status date of this wiki page.
-	*
-	* @param statusDate the status date of this wiki page
-	*/
+	 * Sets the status date of this wiki page.
+	 *
+	 * @param statusDate the status date of this wiki page
+	 */
 	@Override
 	public void setStatusDate(Date statusDate) {
 		_wikiPage.setStatusDate(statusDate);
 	}
 
 	/**
-	* Sets the summary of this wiki page.
-	*
-	* @param summary the summary of this wiki page
-	*/
+	 * Sets the summary of this wiki page.
+	 *
+	 * @param summary the summary of this wiki page
+	 */
 	@Override
 	public void setSummary(String summary) {
 		_wikiPage.setSummary(summary);
 	}
 
 	/**
-	* Sets the title of this wiki page.
-	*
-	* @param title the title of this wiki page
-	*/
+	 * Sets the title of this wiki page.
+	 *
+	 * @param title the title of this wiki page
+	 */
 	@Override
 	public void setTitle(String title) {
 		_wikiPage.setTitle(title);
 	}
 
 	/**
-	* Sets the user ID of this wiki page.
-	*
-	* @param userId the user ID of this wiki page
-	*/
+	 * Sets the user ID of this wiki page.
+	 *
+	 * @param userId the user ID of this wiki page
+	 */
 	@Override
 	public void setUserId(long userId) {
 		_wikiPage.setUserId(userId);
 	}
 
 	/**
-	* Sets the user name of this wiki page.
-	*
-	* @param userName the user name of this wiki page
-	*/
+	 * Sets the user name of this wiki page.
+	 *
+	 * @param userName the user name of this wiki page
+	 */
 	@Override
 	public void setUserName(String userName) {
 		_wikiPage.setUserName(userName);
 	}
 
 	/**
-	* Sets the user uuid of this wiki page.
-	*
-	* @param userUuid the user uuid of this wiki page
-	*/
+	 * Sets the user uuid of this wiki page.
+	 *
+	 * @param userUuid the user uuid of this wiki page
+	 */
 	@Override
 	public void setUserUuid(String userUuid) {
 		_wikiPage.setUserUuid(userUuid);
 	}
 
 	/**
-	* Sets the uuid of this wiki page.
-	*
-	* @param uuid the uuid of this wiki page
-	*/
+	 * Sets the uuid of this wiki page.
+	 *
+	 * @param uuid the uuid of this wiki page
+	 */
 	@Override
 	public void setUuid(String uuid) {
 		_wikiPage.setUuid(uuid);
 	}
 
 	/**
-	* Sets the version of this wiki page.
-	*
-	* @param version the version of this wiki page
-	*/
+	 * Sets the version of this wiki page.
+	 *
+	 * @param version the version of this wiki page
+	 */
 	@Override
 	public void setVersion(double version) {
 		_wikiPage.setVersion(version);
@@ -1270,4 +1290,5 @@ public class WikiPageWrapper implements WikiPage, ModelWrapper<WikiPage> {
 	}
 
 	private final WikiPage _wikiPage;
+
 }

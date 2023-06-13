@@ -26,11 +26,11 @@ import java.util.List;
  * This class is used by SOAP remote services, specifically {@link com.liferay.portal.service.http.AccountServiceSoap}.
  *
  * @author Brian Wing Shun Chan
- * @see com.liferay.portal.service.http.AccountServiceSoap
  * @generated
  */
 @ProviderType
 public class AccountSoap implements Serializable {
+
 	public static AccountSoap toSoapModel(Account model) {
 		AccountSoap soapModel = new AccountSoap();
 
@@ -83,7 +83,8 @@ public class AccountSoap implements Serializable {
 	}
 
 	public static AccountSoap[] toSoapModels(List<Account> models) {
-		List<AccountSoap> soapModels = new ArrayList<AccountSoap>(models.size());
+		List<AccountSoap> soapModels = new ArrayList<AccountSoap>(
+			models.size());
 
 		for (Account model : models) {
 			soapModels.add(toSoapModel(model));
@@ -256,4 +257,5 @@ public class AccountSoap implements Serializable {
 	private String _industry;
 	private String _type;
 	private String _size;
+
 }

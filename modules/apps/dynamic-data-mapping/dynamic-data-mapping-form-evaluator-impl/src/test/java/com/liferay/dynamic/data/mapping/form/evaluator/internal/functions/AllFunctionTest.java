@@ -114,7 +114,7 @@ public class AllFunctionTest extends PowerMockito {
 			Double parameter1 = (Double)parameters[1];
 			Double parameter2 = (Double)parameters[2];
 
-			return parameter0 >= parameter1 && parameter0 <= parameter2;
+			return (parameter0 >= parameter1) && (parameter0 <= parameter2);
 		}
 
 	}

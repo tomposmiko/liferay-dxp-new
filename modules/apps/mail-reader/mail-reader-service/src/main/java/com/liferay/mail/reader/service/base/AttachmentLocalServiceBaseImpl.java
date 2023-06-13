@@ -22,7 +22,6 @@ import com.liferay.mail.reader.service.persistence.AccountPersistence;
 import com.liferay.mail.reader.service.persistence.AttachmentPersistence;
 import com.liferay.mail.reader.service.persistence.FolderPersistence;
 import com.liferay.mail.reader.service.persistence.MessagePersistence;
-
 import com.liferay.portal.kernel.bean.BeanReference;
 import com.liferay.portal.kernel.dao.db.DB;
 import com.liferay.portal.kernel.dao.db.DBManagerUtil;
@@ -64,17 +63,17 @@ import javax.sql.DataSource;
  *
  * @author Brian Wing Shun Chan
  * @see com.liferay.mail.reader.service.impl.AttachmentLocalServiceImpl
- * @see com.liferay.mail.reader.service.AttachmentLocalServiceUtil
  * @generated
  */
 @ProviderType
 public abstract class AttachmentLocalServiceBaseImpl
-	extends BaseLocalServiceImpl implements AttachmentLocalService,
-		IdentifiableOSGiService {
+	extends BaseLocalServiceImpl
+	implements AttachmentLocalService, IdentifiableOSGiService {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
-	 * Never modify or reference this class directly. Always use {@link com.liferay.mail.reader.service.AttachmentLocalServiceUtil} to access the attachment local service.
+	 * Never modify or reference this class directly. Use <code>AttachmentLocalService</code> via injection or a <code>org.osgi.util.tracker.ServiceTracker</code> or use <code>com.liferay.mail.reader.service.AttachmentLocalServiceUtil</code>.
 	 */
 
 	/**
@@ -114,6 +113,7 @@ public abstract class AttachmentLocalServiceBaseImpl
 	@Override
 	public Attachment deleteAttachment(long attachmentId)
 		throws PortalException {
+
 		return attachmentPersistence.remove(attachmentId);
 	}
 
@@ -133,8 +133,8 @@ public abstract class AttachmentLocalServiceBaseImpl
 	public DynamicQuery dynamicQuery() {
 		Class<?> clazz = getClass();
 
-		return DynamicQueryFactoryUtil.forClass(Attachment.class,
-			clazz.getClassLoader());
+		return DynamicQueryFactoryUtil.forClass(
+			Attachment.class, clazz.getClassLoader());
 	}
 
 	/**
@@ -152,7 +152,7 @@ public abstract class AttachmentLocalServiceBaseImpl
 	 * Performs a dynamic query on the database and returns a range of the matching rows.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link com.liferay.mail.reader.model.impl.AttachmentModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>com.liferay.mail.reader.model.impl.AttachmentModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param dynamicQuery the dynamic query
@@ -161,17 +161,18 @@ public abstract class AttachmentLocalServiceBaseImpl
 	 * @return the range of matching rows
 	 */
 	@Override
-	public <T> List<T> dynamicQuery(DynamicQuery dynamicQuery, int start,
-		int end) {
-		return attachmentPersistence.findWithDynamicQuery(dynamicQuery, start,
-			end);
+	public <T> List<T> dynamicQuery(
+		DynamicQuery dynamicQuery, int start, int end) {
+
+		return attachmentPersistence.findWithDynamicQuery(
+			dynamicQuery, start, end);
 	}
 
 	/**
 	 * Performs a dynamic query on the database and returns an ordered range of the matching rows.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link com.liferay.mail.reader.model.impl.AttachmentModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>com.liferay.mail.reader.model.impl.AttachmentModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param dynamicQuery the dynamic query
@@ -181,10 +182,12 @@ public abstract class AttachmentLocalServiceBaseImpl
 	 * @return the ordered range of matching rows
 	 */
 	@Override
-	public <T> List<T> dynamicQuery(DynamicQuery dynamicQuery, int start,
-		int end, OrderByComparator<T> orderByComparator) {
-		return attachmentPersistence.findWithDynamicQuery(dynamicQuery, start,
-			end, orderByComparator);
+	public <T> List<T> dynamicQuery(
+		DynamicQuery dynamicQuery, int start, int end,
+		OrderByComparator<T> orderByComparator) {
+
+		return attachmentPersistence.findWithDynamicQuery(
+			dynamicQuery, start, end, orderByComparator);
 	}
 
 	/**
@@ -206,10 +209,11 @@ public abstract class AttachmentLocalServiceBaseImpl
 	 * @return the number of rows matching the dynamic query
 	 */
 	@Override
-	public long dynamicQueryCount(DynamicQuery dynamicQuery,
-		Projection projection) {
-		return attachmentPersistence.countWithDynamicQuery(dynamicQuery,
-			projection);
+	public long dynamicQueryCount(
+		DynamicQuery dynamicQuery, Projection projection) {
+
+		return attachmentPersistence.countWithDynamicQuery(
+			dynamicQuery, projection);
 	}
 
 	@Override
@@ -225,14 +229,14 @@ public abstract class AttachmentLocalServiceBaseImpl
 	 * @throws PortalException if a attachment with the primary key could not be found
 	 */
 	@Override
-	public Attachment getAttachment(long attachmentId)
-		throws PortalException {
+	public Attachment getAttachment(long attachmentId) throws PortalException {
 		return attachmentPersistence.findByPrimaryKey(attachmentId);
 	}
 
 	@Override
 	public ActionableDynamicQuery getActionableDynamicQuery() {
-		ActionableDynamicQuery actionableDynamicQuery = new DefaultActionableDynamicQuery();
+		ActionableDynamicQuery actionableDynamicQuery =
+			new DefaultActionableDynamicQuery();
 
 		actionableDynamicQuery.setBaseLocalService(attachmentLocalService);
 		actionableDynamicQuery.setClassLoader(getClassLoader());
@@ -244,10 +248,14 @@ public abstract class AttachmentLocalServiceBaseImpl
 	}
 
 	@Override
-	public IndexableActionableDynamicQuery getIndexableActionableDynamicQuery() {
-		IndexableActionableDynamicQuery indexableActionableDynamicQuery = new IndexableActionableDynamicQuery();
+	public IndexableActionableDynamicQuery
+		getIndexableActionableDynamicQuery() {
 
-		indexableActionableDynamicQuery.setBaseLocalService(attachmentLocalService);
+		IndexableActionableDynamicQuery indexableActionableDynamicQuery =
+			new IndexableActionableDynamicQuery();
+
+		indexableActionableDynamicQuery.setBaseLocalService(
+			attachmentLocalService);
 		indexableActionableDynamicQuery.setClassLoader(getClassLoader());
 		indexableActionableDynamicQuery.setModelClass(Attachment.class);
 
@@ -259,6 +267,7 @@ public abstract class AttachmentLocalServiceBaseImpl
 
 	protected void initActionableDynamicQuery(
 		ActionableDynamicQuery actionableDynamicQuery) {
+
 		actionableDynamicQuery.setBaseLocalService(attachmentLocalService);
 		actionableDynamicQuery.setClassLoader(getClassLoader());
 		actionableDynamicQuery.setModelClass(Attachment.class);
@@ -272,12 +281,15 @@ public abstract class AttachmentLocalServiceBaseImpl
 	@Override
 	public PersistedModel deletePersistedModel(PersistedModel persistedModel)
 		throws PortalException {
-		return attachmentLocalService.deleteAttachment((Attachment)persistedModel);
+
+		return attachmentLocalService.deleteAttachment(
+			(Attachment)persistedModel);
 	}
 
 	@Override
 	public PersistedModel getPersistedModel(Serializable primaryKeyObj)
 		throws PortalException {
+
 		return attachmentPersistence.findByPrimaryKey(primaryKeyObj);
 	}
 
@@ -285,7 +297,7 @@ public abstract class AttachmentLocalServiceBaseImpl
 	 * Returns a range of all the attachments.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link com.liferay.mail.reader.model.impl.AttachmentModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>com.liferay.mail.reader.model.impl.AttachmentModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param start the lower bound of the range of attachments
@@ -324,7 +336,9 @@ public abstract class AttachmentLocalServiceBaseImpl
 	 *
 	 * @return the account local service
 	 */
-	public com.liferay.mail.reader.service.AccountLocalService getAccountLocalService() {
+	public com.liferay.mail.reader.service.AccountLocalService
+		getAccountLocalService() {
+
 		return accountLocalService;
 	}
 
@@ -334,7 +348,9 @@ public abstract class AttachmentLocalServiceBaseImpl
 	 * @param accountLocalService the account local service
 	 */
 	public void setAccountLocalService(
-		com.liferay.mail.reader.service.AccountLocalService accountLocalService) {
+		com.liferay.mail.reader.service.AccountLocalService
+			accountLocalService) {
+
 		this.accountLocalService = accountLocalService;
 	}
 
@@ -372,6 +388,7 @@ public abstract class AttachmentLocalServiceBaseImpl
 	 */
 	public void setAttachmentLocalService(
 		AttachmentLocalService attachmentLocalService) {
+
 		this.attachmentLocalService = attachmentLocalService;
 	}
 
@@ -391,6 +408,7 @@ public abstract class AttachmentLocalServiceBaseImpl
 	 */
 	public void setAttachmentPersistence(
 		AttachmentPersistence attachmentPersistence) {
+
 		this.attachmentPersistence = attachmentPersistence;
 	}
 
@@ -399,7 +417,9 @@ public abstract class AttachmentLocalServiceBaseImpl
 	 *
 	 * @return the folder local service
 	 */
-	public com.liferay.mail.reader.service.FolderLocalService getFolderLocalService() {
+	public com.liferay.mail.reader.service.FolderLocalService
+		getFolderLocalService() {
+
 		return folderLocalService;
 	}
 
@@ -410,6 +430,7 @@ public abstract class AttachmentLocalServiceBaseImpl
 	 */
 	public void setFolderLocalService(
 		com.liferay.mail.reader.service.FolderLocalService folderLocalService) {
+
 		this.folderLocalService = folderLocalService;
 	}
 
@@ -436,7 +457,9 @@ public abstract class AttachmentLocalServiceBaseImpl
 	 *
 	 * @return the message local service
 	 */
-	public com.liferay.mail.reader.service.MessageLocalService getMessageLocalService() {
+	public com.liferay.mail.reader.service.MessageLocalService
+		getMessageLocalService() {
+
 		return messageLocalService;
 	}
 
@@ -446,7 +469,9 @@ public abstract class AttachmentLocalServiceBaseImpl
 	 * @param messageLocalService the message local service
 	 */
 	public void setMessageLocalService(
-		com.liferay.mail.reader.service.MessageLocalService messageLocalService) {
+		com.liferay.mail.reader.service.MessageLocalService
+			messageLocalService) {
+
 		this.messageLocalService = messageLocalService;
 	}
 
@@ -473,7 +498,9 @@ public abstract class AttachmentLocalServiceBaseImpl
 	 *
 	 * @return the counter local service
 	 */
-	public com.liferay.counter.kernel.service.CounterLocalService getCounterLocalService() {
+	public com.liferay.counter.kernel.service.CounterLocalService
+		getCounterLocalService() {
+
 		return counterLocalService;
 	}
 
@@ -483,7 +510,9 @@ public abstract class AttachmentLocalServiceBaseImpl
 	 * @param counterLocalService the counter local service
 	 */
 	public void setCounterLocalService(
-		com.liferay.counter.kernel.service.CounterLocalService counterLocalService) {
+		com.liferay.counter.kernel.service.CounterLocalService
+			counterLocalService) {
+
 		this.counterLocalService = counterLocalService;
 	}
 
@@ -492,7 +521,9 @@ public abstract class AttachmentLocalServiceBaseImpl
 	 *
 	 * @return the class name local service
 	 */
-	public com.liferay.portal.kernel.service.ClassNameLocalService getClassNameLocalService() {
+	public com.liferay.portal.kernel.service.ClassNameLocalService
+		getClassNameLocalService() {
+
 		return classNameLocalService;
 	}
 
@@ -502,7 +533,9 @@ public abstract class AttachmentLocalServiceBaseImpl
 	 * @param classNameLocalService the class name local service
 	 */
 	public void setClassNameLocalService(
-		com.liferay.portal.kernel.service.ClassNameLocalService classNameLocalService) {
+		com.liferay.portal.kernel.service.ClassNameLocalService
+			classNameLocalService) {
+
 		this.classNameLocalService = classNameLocalService;
 	}
 
@@ -522,6 +555,7 @@ public abstract class AttachmentLocalServiceBaseImpl
 	 */
 	public void setClassNamePersistence(
 		ClassNamePersistence classNamePersistence) {
+
 		this.classNamePersistence = classNamePersistence;
 	}
 
@@ -530,7 +564,9 @@ public abstract class AttachmentLocalServiceBaseImpl
 	 *
 	 * @return the resource local service
 	 */
-	public com.liferay.portal.kernel.service.ResourceLocalService getResourceLocalService() {
+	public com.liferay.portal.kernel.service.ResourceLocalService
+		getResourceLocalService() {
+
 		return resourceLocalService;
 	}
 
@@ -540,7 +576,9 @@ public abstract class AttachmentLocalServiceBaseImpl
 	 * @param resourceLocalService the resource local service
 	 */
 	public void setResourceLocalService(
-		com.liferay.portal.kernel.service.ResourceLocalService resourceLocalService) {
+		com.liferay.portal.kernel.service.ResourceLocalService
+			resourceLocalService) {
+
 		this.resourceLocalService = resourceLocalService;
 	}
 
@@ -549,7 +587,9 @@ public abstract class AttachmentLocalServiceBaseImpl
 	 *
 	 * @return the user local service
 	 */
-	public com.liferay.portal.kernel.service.UserLocalService getUserLocalService() {
+	public com.liferay.portal.kernel.service.UserLocalService
+		getUserLocalService() {
+
 		return userLocalService;
 	}
 
@@ -560,6 +600,7 @@ public abstract class AttachmentLocalServiceBaseImpl
 	 */
 	public void setUserLocalService(
 		com.liferay.portal.kernel.service.UserLocalService userLocalService) {
+
 		this.userLocalService = userLocalService;
 	}
 
@@ -582,8 +623,8 @@ public abstract class AttachmentLocalServiceBaseImpl
 	}
 
 	public void afterPropertiesSet() {
-		persistedModelLocalServiceRegistry.register("com.liferay.mail.reader.model.Attachment",
-			attachmentLocalService);
+		persistedModelLocalServiceRegistry.register(
+			"com.liferay.mail.reader.model.Attachment", attachmentLocalService);
 	}
 
 	public void destroy() {
@@ -623,8 +664,8 @@ public abstract class AttachmentLocalServiceBaseImpl
 			sql = db.buildSQL(sql);
 			sql = PortalUtil.transformSQL(sql);
 
-			SqlUpdate sqlUpdate = SqlUpdateFactoryUtil.getSqlUpdate(dataSource,
-					sql);
+			SqlUpdate sqlUpdate = SqlUpdateFactoryUtil.getSqlUpdate(
+				dataSource, sql);
 
 			sqlUpdate.update();
 		}
@@ -633,34 +674,71 @@ public abstract class AttachmentLocalServiceBaseImpl
 		}
 	}
 
-	@BeanReference(type = com.liferay.mail.reader.service.AccountLocalService.class)
-	protected com.liferay.mail.reader.service.AccountLocalService accountLocalService;
+	@BeanReference(
+		type = com.liferay.mail.reader.service.AccountLocalService.class
+	)
+	protected com.liferay.mail.reader.service.AccountLocalService
+		accountLocalService;
+
 	@BeanReference(type = AccountPersistence.class)
 	protected AccountPersistence accountPersistence;
+
 	@BeanReference(type = AttachmentLocalService.class)
 	protected AttachmentLocalService attachmentLocalService;
+
 	@BeanReference(type = AttachmentPersistence.class)
 	protected AttachmentPersistence attachmentPersistence;
-	@BeanReference(type = com.liferay.mail.reader.service.FolderLocalService.class)
-	protected com.liferay.mail.reader.service.FolderLocalService folderLocalService;
+
+	@BeanReference(
+		type = com.liferay.mail.reader.service.FolderLocalService.class
+	)
+	protected com.liferay.mail.reader.service.FolderLocalService
+		folderLocalService;
+
 	@BeanReference(type = FolderPersistence.class)
 	protected FolderPersistence folderPersistence;
-	@BeanReference(type = com.liferay.mail.reader.service.MessageLocalService.class)
-	protected com.liferay.mail.reader.service.MessageLocalService messageLocalService;
+
+	@BeanReference(
+		type = com.liferay.mail.reader.service.MessageLocalService.class
+	)
+	protected com.liferay.mail.reader.service.MessageLocalService
+		messageLocalService;
+
 	@BeanReference(type = MessagePersistence.class)
 	protected MessagePersistence messagePersistence;
-	@ServiceReference(type = com.liferay.counter.kernel.service.CounterLocalService.class)
-	protected com.liferay.counter.kernel.service.CounterLocalService counterLocalService;
-	@ServiceReference(type = com.liferay.portal.kernel.service.ClassNameLocalService.class)
-	protected com.liferay.portal.kernel.service.ClassNameLocalService classNameLocalService;
+
+	@ServiceReference(
+		type = com.liferay.counter.kernel.service.CounterLocalService.class
+	)
+	protected com.liferay.counter.kernel.service.CounterLocalService
+		counterLocalService;
+
+	@ServiceReference(
+		type = com.liferay.portal.kernel.service.ClassNameLocalService.class
+	)
+	protected com.liferay.portal.kernel.service.ClassNameLocalService
+		classNameLocalService;
+
 	@ServiceReference(type = ClassNamePersistence.class)
 	protected ClassNamePersistence classNamePersistence;
-	@ServiceReference(type = com.liferay.portal.kernel.service.ResourceLocalService.class)
-	protected com.liferay.portal.kernel.service.ResourceLocalService resourceLocalService;
-	@ServiceReference(type = com.liferay.portal.kernel.service.UserLocalService.class)
-	protected com.liferay.portal.kernel.service.UserLocalService userLocalService;
+
+	@ServiceReference(
+		type = com.liferay.portal.kernel.service.ResourceLocalService.class
+	)
+	protected com.liferay.portal.kernel.service.ResourceLocalService
+		resourceLocalService;
+
+	@ServiceReference(
+		type = com.liferay.portal.kernel.service.UserLocalService.class
+	)
+	protected com.liferay.portal.kernel.service.UserLocalService
+		userLocalService;
+
 	@ServiceReference(type = UserPersistence.class)
 	protected UserPersistence userPersistence;
+
 	@ServiceReference(type = PersistedModelLocalServiceRegistry.class)
-	protected PersistedModelLocalServiceRegistry persistedModelLocalServiceRegistry;
+	protected PersistedModelLocalServiceRegistry
+		persistedModelLocalServiceRegistry;
+
 }

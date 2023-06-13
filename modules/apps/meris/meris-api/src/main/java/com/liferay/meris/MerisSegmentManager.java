@@ -23,7 +23,7 @@ import java.util.Map;
 /**
  * Represents a profile manager.
  *
- * @author Eduardo Garcia
+ * @author Eduardo García
  * @review
  */
 @ProviderType

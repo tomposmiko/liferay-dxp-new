@@ -102,7 +102,7 @@ String productMenuState = SessionClicks.get(request, ProductNavigationProductMen
 				};
 
 				if ($('body').hasClass('open')) {
-					if ($(userCollapseSelector).hasClass('in')) {
+					if ($(userCollapseSelector).hasClass('show')) {
 						sidenavToggle.sideNavigation('hide');
 					}
 					else {

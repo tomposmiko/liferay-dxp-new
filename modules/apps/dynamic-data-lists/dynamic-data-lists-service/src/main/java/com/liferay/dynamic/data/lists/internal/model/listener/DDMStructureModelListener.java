@@ -17,6 +17,7 @@ package com.liferay.dynamic.data.lists.internal.model.listener;
 import com.liferay.dynamic.data.lists.model.DDLRecordSet;
 import com.liferay.dynamic.data.lists.service.DDLRecordSetLocalService;
 import com.liferay.dynamic.data.mapping.model.DDMStructure;
+import com.liferay.exportimport.kernel.lar.ExportImportThreadLocal;
 import com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.Property;
 import com.liferay.portal.kernel.dao.orm.PropertyFactoryUtil;
@@ -26,6 +27,10 @@ import com.liferay.portal.kernel.model.BaseModelListener;
 import com.liferay.portal.kernel.model.ModelListener;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.UserLocalService;
+import com.liferay.portal.kernel.util.LocaleThreadLocal;
+import com.liferay.portal.kernel.util.LocaleUtil;
+
+import java.util.Locale;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -67,6 +72,17 @@ public class DDMStructureModelListener extends BaseModelListener<DDMStructure> {
 			});
 		actionableDynamicQuery.setPerformActionMethod(
 			(DDLRecordSet recordSet) -> {
+				Locale siteLocale = null;
+
+				if (ExportImportThreadLocal.isImportInProcess()) {
+					siteLocale = LocaleThreadLocal.getSiteDefaultLocale();
+
+					Locale stagingLocale = LocaleUtil.fromLanguageId(
+						ddmStructure.getDefaultLanguageId());
+
+					LocaleThreadLocal.setSiteDefaultLocale(stagingLocale);
+				}
+
 				ServiceContext serviceContext = new ServiceContext();
 
 				serviceContext.setAddGuestPermissions(true);
@@ -79,10 +95,18 @@ public class DDMStructureModelListener extends BaseModelListener<DDMStructure> {
 
 				serviceContext.setUserId(defaultUserId);
 
-				_ddlRecordSetLocalService.updateRecordSet(
-					recordSet.getRecordSetId(), ddmStructure.getStructureId(),
-					recordSet.getNameMap(), recordSet.getDescriptionMap(),
-					recordSet.getMinDisplayRows(), serviceContext);
+				try {
+					_ddlRecordSetLocalService.updateRecordSet(
+						recordSet.getRecordSetId(),
+						ddmStructure.getStructureId(), recordSet.getNameMap(),
+						recordSet.getDescriptionMap(),
+						recordSet.getMinDisplayRows(), serviceContext);
+				}
+				finally {
+					if (ExportImportThreadLocal.isImportInProcess()) {
+						LocaleThreadLocal.setSiteDefaultLocale(siteLocale);
+					}
+				}
 			});
 
 		return actionableDynamicQuery;

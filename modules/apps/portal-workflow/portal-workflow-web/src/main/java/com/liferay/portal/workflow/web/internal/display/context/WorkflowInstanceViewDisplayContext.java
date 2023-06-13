@@ -469,16 +469,16 @@ public class WorkflowInstanceViewDisplayContext
 		throws PortalException {
 
 		return WorkflowInstanceManagerUtil.search(
-			workflowInstanceRequestHelper.getCompanyId(), null,
-			getAssetType(getKeywords()), getKeywords(), getKeywords(),
-			getCompleted(), start, end, comparator);
+			workflowInstanceRequestHelper.getCompanyId(), null, getKeywords(),
+			getKeywords(), getAssetType(getKeywords()), getKeywords(),
+			getKeywords(), getCompleted(), start, end, comparator);
 	}
 
 	protected int getSearchContainerTotal() throws PortalException {
 		return WorkflowInstanceManagerUtil.searchCount(
-			workflowInstanceRequestHelper.getCompanyId(), null,
-			getAssetType(getKeywords()), getKeywords(), getKeywords(),
-			getCompleted());
+			workflowInstanceRequestHelper.getCompanyId(), null, getKeywords(),
+			getKeywords(), getAssetType(getKeywords()), getKeywords(),
+			getKeywords(), getCompleted());
 	}
 
 	protected String getWorkflowContextEntryClassName(
@@ -538,7 +538,6 @@ public class WorkflowInstanceViewDisplayContext
 				getViewPortletURL(), "navigation", navigation, "mvcPath",
 				"/view.jsp");
 			dropdownItem.setLabel(LanguageUtil.get(request, navigation));
-
 		};
 	}
 

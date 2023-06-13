@@ -33,12 +33,12 @@ import java.util.Date;
  * The cache model class for representing SystemEvent in entity cache.
  *
  * @author Brian Wing Shun Chan
- * @see SystemEvent
  * @generated
  */
 @ProviderType
-public class SystemEventCacheModel implements CacheModel<SystemEvent>,
-	Externalizable, MVCCModel {
+public class SystemEventCacheModel
+	implements CacheModel<SystemEvent>, Externalizable, MVCCModel {
+
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj) {
@@ -49,10 +49,12 @@ public class SystemEventCacheModel implements CacheModel<SystemEvent>,
 			return false;
 		}
 
-		SystemEventCacheModel systemEventCacheModel = (SystemEventCacheModel)obj;
+		SystemEventCacheModel systemEventCacheModel =
+			(SystemEventCacheModel)obj;
 
 		if ((systemEventId == systemEventCacheModel.systemEventId) &&
-				(mvccVersion == systemEventCacheModel.mvccVersion)) {
+			(mvccVersion == systemEventCacheModel.mvccVersion)) {
+
 			return true;
 		}
 
@@ -196,8 +198,7 @@ public class SystemEventCacheModel implements CacheModel<SystemEvent>,
 	}
 
 	@Override
-	public void writeExternal(ObjectOutput objectOutput)
-		throws IOException {
+	public void writeExternal(ObjectOutput objectOutput) throws IOException {
 		objectOutput.writeLong(mvccVersion);
 
 		objectOutput.writeLong(systemEventId);
@@ -259,4 +260,5 @@ public class SystemEventCacheModel implements CacheModel<SystemEvent>,
 	public long systemEventSetKey;
 	public int type;
 	public String extraData;
+
 }

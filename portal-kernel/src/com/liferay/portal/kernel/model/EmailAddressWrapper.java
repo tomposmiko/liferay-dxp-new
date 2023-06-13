@@ -17,9 +17,7 @@ package com.liferay.portal.kernel.model;
 import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.expando.kernel.model.ExpandoBridge;
-
 import com.liferay.exportimport.kernel.lar.StagedModelType;
-
 import com.liferay.portal.kernel.service.ServiceContext;
 
 import java.io.Serializable;
@@ -39,8 +37,9 @@ import java.util.Objects;
  * @generated
  */
 @ProviderType
-public class EmailAddressWrapper implements EmailAddress,
-	ModelWrapper<EmailAddress> {
+public class EmailAddressWrapper
+	implements EmailAddress, ModelWrapper<EmailAddress> {
+
 	public EmailAddressWrapper(EmailAddress emailAddress) {
 		_emailAddress = emailAddress;
 	}
@@ -168,70 +167,70 @@ public class EmailAddressWrapper implements EmailAddress,
 	}
 
 	/**
-	* Returns the address of this email address.
-	*
-	* @return the address of this email address
-	*/
+	 * Returns the address of this email address.
+	 *
+	 * @return the address of this email address
+	 */
 	@Override
 	public String getAddress() {
 		return _emailAddress.getAddress();
 	}
 
 	/**
-	* Returns the fully qualified class name of this email address.
-	*
-	* @return the fully qualified class name of this email address
-	*/
+	 * Returns the fully qualified class name of this email address.
+	 *
+	 * @return the fully qualified class name of this email address
+	 */
 	@Override
 	public String getClassName() {
 		return _emailAddress.getClassName();
 	}
 
 	/**
-	* Returns the class name ID of this email address.
-	*
-	* @return the class name ID of this email address
-	*/
+	 * Returns the class name ID of this email address.
+	 *
+	 * @return the class name ID of this email address
+	 */
 	@Override
 	public long getClassNameId() {
 		return _emailAddress.getClassNameId();
 	}
 
 	/**
-	* Returns the class pk of this email address.
-	*
-	* @return the class pk of this email address
-	*/
+	 * Returns the class pk of this email address.
+	 *
+	 * @return the class pk of this email address
+	 */
 	@Override
 	public long getClassPK() {
 		return _emailAddress.getClassPK();
 	}
 
 	/**
-	* Returns the company ID of this email address.
-	*
-	* @return the company ID of this email address
-	*/
+	 * Returns the company ID of this email address.
+	 *
+	 * @return the company ID of this email address
+	 */
 	@Override
 	public long getCompanyId() {
 		return _emailAddress.getCompanyId();
 	}
 
 	/**
-	* Returns the create date of this email address.
-	*
-	* @return the create date of this email address
-	*/
+	 * Returns the create date of this email address.
+	 *
+	 * @return the create date of this email address
+	 */
 	@Override
 	public Date getCreateDate() {
 		return _emailAddress.getCreateDate();
 	}
 
 	/**
-	* Returns the email address ID of this email address.
-	*
-	* @return the email address ID of this email address
-	*/
+	 * Returns the email address ID of this email address.
+	 *
+	 * @return the email address ID of this email address
+	 */
 	@Override
 	public long getEmailAddressId() {
 		return _emailAddress.getEmailAddressId();
@@ -243,40 +242,40 @@ public class EmailAddressWrapper implements EmailAddress,
 	}
 
 	/**
-	* Returns the modified date of this email address.
-	*
-	* @return the modified date of this email address
-	*/
+	 * Returns the modified date of this email address.
+	 *
+	 * @return the modified date of this email address
+	 */
 	@Override
 	public Date getModifiedDate() {
 		return _emailAddress.getModifiedDate();
 	}
 
 	/**
-	* Returns the mvcc version of this email address.
-	*
-	* @return the mvcc version of this email address
-	*/
+	 * Returns the mvcc version of this email address.
+	 *
+	 * @return the mvcc version of this email address
+	 */
 	@Override
 	public long getMvccVersion() {
 		return _emailAddress.getMvccVersion();
 	}
 
 	/**
-	* Returns the primary of this email address.
-	*
-	* @return the primary of this email address
-	*/
+	 * Returns the primary of this email address.
+	 *
+	 * @return the primary of this email address
+	 */
 	@Override
 	public boolean getPrimary() {
 		return _emailAddress.getPrimary();
 	}
 
 	/**
-	* Returns the primary key of this email address.
-	*
-	* @return the primary key of this email address
-	*/
+	 * Returns the primary key of this email address.
+	 *
+	 * @return the primary key of this email address
+	 */
 	@Override
 	public long getPrimaryKey() {
 		return _emailAddress.getPrimaryKey();
@@ -290,54 +289,55 @@ public class EmailAddressWrapper implements EmailAddress,
 	@Override
 	public ListType getType()
 		throws com.liferay.portal.kernel.exception.PortalException {
+
 		return _emailAddress.getType();
 	}
 
 	/**
-	* Returns the type ID of this email address.
-	*
-	* @return the type ID of this email address
-	*/
+	 * Returns the type ID of this email address.
+	 *
+	 * @return the type ID of this email address
+	 */
 	@Override
 	public long getTypeId() {
 		return _emailAddress.getTypeId();
 	}
 
 	/**
-	* Returns the user ID of this email address.
-	*
-	* @return the user ID of this email address
-	*/
+	 * Returns the user ID of this email address.
+	 *
+	 * @return the user ID of this email address
+	 */
 	@Override
 	public long getUserId() {
 		return _emailAddress.getUserId();
 	}
 
 	/**
-	* Returns the user name of this email address.
-	*
-	* @return the user name of this email address
-	*/
+	 * Returns the user name of this email address.
+	 *
+	 * @return the user name of this email address
+	 */
 	@Override
 	public String getUserName() {
 		return _emailAddress.getUserName();
 	}
 
 	/**
-	* Returns the user uuid of this email address.
-	*
-	* @return the user uuid of this email address
-	*/
+	 * Returns the user uuid of this email address.
+	 *
+	 * @return the user uuid of this email address
+	 */
 	@Override
 	public String getUserUuid() {
 		return _emailAddress.getUserUuid();
 	}
 
 	/**
-	* Returns the uuid of this email address.
-	*
-	* @return the uuid of this email address
-	*/
+	 * Returns the uuid of this email address.
+	 *
+	 * @return the uuid of this email address
+	 */
 	@Override
 	public String getUuid() {
 		return _emailAddress.getUuid();
@@ -364,10 +364,10 @@ public class EmailAddressWrapper implements EmailAddress,
 	}
 
 	/**
-	* Returns <code>true</code> if this email address is primary.
-	*
-	* @return <code>true</code> if this email address is primary; <code>false</code> otherwise
-	*/
+	 * Returns <code>true</code> if this email address is primary.
+	 *
+	 * @return <code>true</code> if this email address is primary; <code>false</code> otherwise
+	 */
 	@Override
 	public boolean isPrimary() {
 		return _emailAddress.isPrimary();
@@ -379,10 +379,10 @@ public class EmailAddressWrapper implements EmailAddress,
 	}
 
 	/**
-	* Sets the address of this email address.
-	*
-	* @param address the address of this email address
-	*/
+	 * Sets the address of this email address.
+	 *
+	 * @param address the address of this email address
+	 */
 	@Override
 	public void setAddress(String address) {
 		_emailAddress.setAddress(address);
@@ -399,50 +399,50 @@ public class EmailAddressWrapper implements EmailAddress,
 	}
 
 	/**
-	* Sets the class name ID of this email address.
-	*
-	* @param classNameId the class name ID of this email address
-	*/
+	 * Sets the class name ID of this email address.
+	 *
+	 * @param classNameId the class name ID of this email address
+	 */
 	@Override
 	public void setClassNameId(long classNameId) {
 		_emailAddress.setClassNameId(classNameId);
 	}
 
 	/**
-	* Sets the class pk of this email address.
-	*
-	* @param classPK the class pk of this email address
-	*/
+	 * Sets the class pk of this email address.
+	 *
+	 * @param classPK the class pk of this email address
+	 */
 	@Override
 	public void setClassPK(long classPK) {
 		_emailAddress.setClassPK(classPK);
 	}
 
 	/**
-	* Sets the company ID of this email address.
-	*
-	* @param companyId the company ID of this email address
-	*/
+	 * Sets the company ID of this email address.
+	 *
+	 * @param companyId the company ID of this email address
+	 */
 	@Override
 	public void setCompanyId(long companyId) {
 		_emailAddress.setCompanyId(companyId);
 	}
 
 	/**
-	* Sets the create date of this email address.
-	*
-	* @param createDate the create date of this email address
-	*/
+	 * Sets the create date of this email address.
+	 *
+	 * @param createDate the create date of this email address
+	 */
 	@Override
 	public void setCreateDate(Date createDate) {
 		_emailAddress.setCreateDate(createDate);
 	}
 
 	/**
-	* Sets the email address ID of this email address.
-	*
-	* @param emailAddressId the email address ID of this email address
-	*/
+	 * Sets the email address ID of this email address.
+	 *
+	 * @param emailAddressId the email address ID of this email address
+	 */
 	@Override
 	public void setEmailAddressId(long emailAddressId) {
 		_emailAddress.setEmailAddressId(emailAddressId);
@@ -464,20 +464,20 @@ public class EmailAddressWrapper implements EmailAddress,
 	}
 
 	/**
-	* Sets the modified date of this email address.
-	*
-	* @param modifiedDate the modified date of this email address
-	*/
+	 * Sets the modified date of this email address.
+	 *
+	 * @param modifiedDate the modified date of this email address
+	 */
 	@Override
 	public void setModifiedDate(Date modifiedDate) {
 		_emailAddress.setModifiedDate(modifiedDate);
 	}
 
 	/**
-	* Sets the mvcc version of this email address.
-	*
-	* @param mvccVersion the mvcc version of this email address
-	*/
+	 * Sets the mvcc version of this email address.
+	 *
+	 * @param mvccVersion the mvcc version of this email address
+	 */
 	@Override
 	public void setMvccVersion(long mvccVersion) {
 		_emailAddress.setMvccVersion(mvccVersion);
@@ -489,20 +489,20 @@ public class EmailAddressWrapper implements EmailAddress,
 	}
 
 	/**
-	* Sets whether this email address is primary.
-	*
-	* @param primary the primary of this email address
-	*/
+	 * Sets whether this email address is primary.
+	 *
+	 * @param primary the primary of this email address
+	 */
 	@Override
 	public void setPrimary(boolean primary) {
 		_emailAddress.setPrimary(primary);
 	}
 
 	/**
-	* Sets the primary key of this email address.
-	*
-	* @param primaryKey the primary key of this email address
-	*/
+	 * Sets the primary key of this email address.
+	 *
+	 * @param primaryKey the primary key of this email address
+	 */
 	@Override
 	public void setPrimaryKey(long primaryKey) {
 		_emailAddress.setPrimaryKey(primaryKey);
@@ -514,50 +514,50 @@ public class EmailAddressWrapper implements EmailAddress,
 	}
 
 	/**
-	* Sets the type ID of this email address.
-	*
-	* @param typeId the type ID of this email address
-	*/
+	 * Sets the type ID of this email address.
+	 *
+	 * @param typeId the type ID of this email address
+	 */
 	@Override
 	public void setTypeId(long typeId) {
 		_emailAddress.setTypeId(typeId);
 	}
 
 	/**
-	* Sets the user ID of this email address.
-	*
-	* @param userId the user ID of this email address
-	*/
+	 * Sets the user ID of this email address.
+	 *
+	 * @param userId the user ID of this email address
+	 */
 	@Override
 	public void setUserId(long userId) {
 		_emailAddress.setUserId(userId);
 	}
 
 	/**
-	* Sets the user name of this email address.
-	*
-	* @param userName the user name of this email address
-	*/
+	 * Sets the user name of this email address.
+	 *
+	 * @param userName the user name of this email address
+	 */
 	@Override
 	public void setUserName(String userName) {
 		_emailAddress.setUserName(userName);
 	}
 
 	/**
-	* Sets the user uuid of this email address.
-	*
-	* @param userUuid the user uuid of this email address
-	*/
+	 * Sets the user uuid of this email address.
+	 *
+	 * @param userUuid the user uuid of this email address
+	 */
 	@Override
 	public void setUserUuid(String userUuid) {
 		_emailAddress.setUserUuid(userUuid);
 	}
 
 	/**
-	* Sets the uuid of this email address.
-	*
-	* @param uuid the uuid of this email address
-	*/
+	 * Sets the uuid of this email address.
+	 *
+	 * @param uuid the uuid of this email address
+	 */
 	@Override
 	public void setUuid(String uuid) {
 		_emailAddress.setUuid(uuid);
@@ -633,4 +633,5 @@ public class EmailAddressWrapper implements EmailAddress,
 	}
 
 	private final EmailAddress _emailAddress;
+
 }

@@ -58,7 +58,7 @@ String searchContainerId = ParamUtil.getString(request, "searchContainerId");
 				Map<String, Object> rowData = new HashMap<String, Object>();
 
 				if (journalDisplayContext.isShowEditActions()) {
-					rowData.put("draggable", JournalArticlePermission.contains(permissionChecker, curArticle, ActionKeys.DELETE) || JournalArticlePermission.contains(permissionChecker, curArticle, ActionKeys.UPDATE));
+					rowData.put("draggable", !BrowserSnifferUtil.isMobile(request) && (JournalArticlePermission.contains(permissionChecker, curArticle, ActionKeys.DELETE) || JournalArticlePermission.contains(permissionChecker, curArticle, ActionKeys.UPDATE)));
 				}
 
 				rowData.put("title", HtmlUtil.escape(curArticle.getTitle(locale)));
@@ -112,7 +112,7 @@ String searchContainerId = ParamUtil.getString(request, "searchContainerId");
 								</aui:a>
 							</h5>
 
-							<c:if test="<%= journalDisplayContext.isSearch() %>">
+							<c:if test="<%= journalDisplayContext.isSearch() && ((curArticle.getFolderId() <= 0) || JournalFolderPermission.contains(permissionChecker, curArticle.getFolder(), ActionKeys.VIEW)) %>">
 								<h5>
 									<%= JournalHelperUtil.getAbsolutePath(liferayPortletRequest, curArticle.getFolderId()) %>
 								</h5>
@@ -192,7 +192,7 @@ String searchContainerId = ParamUtil.getString(request, "searchContainerId");
 							value="<%= StringUtil.shorten(HtmlUtil.stripHtml(curArticle.getDescription(locale)), 200) %>"
 						/>
 
-						<c:if test="<%= journalDisplayContext.isSearch() %>">
+						<c:if test="<%= journalDisplayContext.isSearch() && ((curArticle.getFolderId() <= 0) || JournalFolderPermission.contains(permissionChecker, curArticle.getFolder(), ActionKeys.VIEW)) %>">
 							<liferay-ui:search-container-column-text
 								cssClass="table-cell-expand-smallest table-cell-minw-200"
 								name="path"
@@ -245,7 +245,7 @@ String searchContainerId = ParamUtil.getString(request, "searchContainerId");
 				<%
 				Map<String, Object> rowData = new HashMap<String, Object>();
 
-				rowData.put("draggable", JournalFolderPermission.contains(permissionChecker, curFolder, ActionKeys.DELETE) || JournalFolderPermission.contains(permissionChecker, curFolder, ActionKeys.UPDATE));
+				rowData.put("draggable", !BrowserSnifferUtil.isMobile(request) && (JournalFolderPermission.contains(permissionChecker, curFolder, ActionKeys.DELETE) || JournalFolderPermission.contains(permissionChecker, curFolder, ActionKeys.UPDATE)));
 				rowData.put("folder", true);
 				rowData.put("folder-id", curFolder.getFolderId());
 				rowData.put("title", HtmlUtil.escape(curFolder.getName()));

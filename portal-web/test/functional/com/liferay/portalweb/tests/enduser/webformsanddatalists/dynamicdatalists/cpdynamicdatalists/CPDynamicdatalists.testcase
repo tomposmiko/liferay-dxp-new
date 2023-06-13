@@ -1752,7 +1752,7 @@ definition {
 
 		DDLRecord.populateFieldBoolean(
 			ddlRecordFieldData = "Yes",
-			fieldFieldLabel = "Boolean asterisk Required",
+			fieldFieldLabel = "Boolean Required",
 			fieldName = "Boolean"
 		);
 

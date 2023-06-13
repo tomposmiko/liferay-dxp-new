@@ -56,6 +56,11 @@
 	<td></td>
 </tr>
 <tr>
+	<td>ADD_PORTLET_LINK_1</td>
+	<td>//*[contains(@data-search,'${portletName}') and contains(@class,'add-content-item')]</td>
+	<td></td>
+</tr>
+<tr>
 	<td>SIDEBAR_APPLICATIONS_PANEL_COLLAPSED</td>
 	<td>//*[@data-qa-id='addMenuAddApplicationCategory'][@aria-expanded='false' and contains(.,'Widgets')]</td>
 	<td></td>

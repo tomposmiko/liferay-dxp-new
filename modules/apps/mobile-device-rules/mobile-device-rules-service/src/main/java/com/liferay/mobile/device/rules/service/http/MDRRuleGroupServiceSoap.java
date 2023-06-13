@@ -17,7 +17,6 @@ package com.liferay.mobile.device.rules.service.http;
 import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.mobile.device.rules.service.MDRRuleGroupServiceUtil;
-
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.LocalizationUtil;
@@ -29,19 +28,20 @@ import java.util.Map;
 
 /**
  * Provides the SOAP utility for the
- * {@link MDRRuleGroupServiceUtil} service utility. The
- * static methods of this class calls the same methods of the service utility.
- * However, the signatures are different because it is difficult for SOAP to
- * support certain types.
+ * <code>MDRRuleGroupServiceUtil</code> service
+ * utility. The static methods of this class call the same methods of the
+ * service utility. However, the signatures are different because it is
+ * difficult for SOAP to support certain types.
  *
  * <p>
  * ServiceBuilder follows certain rules in translating the methods. For example,
- * if the method in the service utility returns a {@link java.util.List}, that
- * is translated to an array of {@link com.liferay.mobile.device.rules.model.MDRRuleGroupSoap}.
- * If the method in the service utility returns a
- * {@link com.liferay.mobile.device.rules.model.MDRRuleGroup}, that is translated to a
- * {@link com.liferay.mobile.device.rules.model.MDRRuleGroupSoap}. Methods that SOAP cannot
- * safely wire are skipped.
+ * if the method in the service utility returns a <code>java.util.List</code>,
+ * that is translated to an array of
+ * <code>com.liferay.mobile.device.rules.model.MDRRuleGroupSoap</code>. If the method in the
+ * service utility returns a
+ * <code>com.liferay.mobile.device.rules.model.MDRRuleGroup</code>, that is translated to a
+ * <code>com.liferay.mobile.device.rules.model.MDRRuleGroupSoap</code>. Methods that SOAP
+ * cannot safely wire are skipped.
  * </p>
  *
  * <p>
@@ -63,27 +63,32 @@ import java.util.Map;
  *
  * @author Edward C. Han
  * @see MDRRuleGroupServiceHttp
- * @see com.liferay.mobile.device.rules.model.MDRRuleGroupSoap
- * @see MDRRuleGroupServiceUtil
  * @generated
  */
 @ProviderType
 public class MDRRuleGroupServiceSoap {
-	public static com.liferay.mobile.device.rules.model.MDRRuleGroupSoap addRuleGroup(
-		long groupId, String[] nameMapLanguageIds, String[] nameMapValues,
-		String[] descriptionMapLanguageIds, String[] descriptionMapValues,
-		com.liferay.portal.kernel.service.ServiceContext serviceContext)
+
+	public static com.liferay.mobile.device.rules.model.MDRRuleGroupSoap
+			addRuleGroup(
+				long groupId, String[] nameMapLanguageIds,
+				String[] nameMapValues, String[] descriptionMapLanguageIds,
+				String[] descriptionMapValues,
+				com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws RemoteException {
+
 		try {
-			Map<Locale, String> nameMap = LocalizationUtil.getLocalizationMap(nameMapLanguageIds,
-					nameMapValues);
-			Map<Locale, String> descriptionMap = LocalizationUtil.getLocalizationMap(descriptionMapLanguageIds,
-					descriptionMapValues);
+			Map<Locale, String> nameMap = LocalizationUtil.getLocalizationMap(
+				nameMapLanguageIds, nameMapValues);
+			Map<Locale, String> descriptionMap =
+				LocalizationUtil.getLocalizationMap(
+					descriptionMapLanguageIds, descriptionMapValues);
 
-			com.liferay.mobile.device.rules.model.MDRRuleGroup returnValue = MDRRuleGroupServiceUtil.addRuleGroup(groupId,
-					nameMap, descriptionMap, serviceContext);
+			com.liferay.mobile.device.rules.model.MDRRuleGroup returnValue =
+				MDRRuleGroupServiceUtil.addRuleGroup(
+					groupId, nameMap, descriptionMap, serviceContext);
 
-			return com.liferay.mobile.device.rules.model.MDRRuleGroupSoap.toSoapModel(returnValue);
+			return com.liferay.mobile.device.rules.model.MDRRuleGroupSoap.
+				toSoapModel(returnValue);
 		}
 		catch (Exception e) {
 			_log.error(e, e);
@@ -92,15 +97,19 @@ public class MDRRuleGroupServiceSoap {
 		}
 	}
 
-	public static com.liferay.mobile.device.rules.model.MDRRuleGroupSoap copyRuleGroup(
-		long ruleGroupId, long groupId,
-		com.liferay.portal.kernel.service.ServiceContext serviceContext)
+	public static com.liferay.mobile.device.rules.model.MDRRuleGroupSoap
+			copyRuleGroup(
+				long ruleGroupId, long groupId,
+				com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws RemoteException {
-		try {
-			com.liferay.mobile.device.rules.model.MDRRuleGroup returnValue = MDRRuleGroupServiceUtil.copyRuleGroup(ruleGroupId,
-					groupId, serviceContext);
 
-			return com.liferay.mobile.device.rules.model.MDRRuleGroupSoap.toSoapModel(returnValue);
+		try {
+			com.liferay.mobile.device.rules.model.MDRRuleGroup returnValue =
+				MDRRuleGroupServiceUtil.copyRuleGroup(
+					ruleGroupId, groupId, serviceContext);
+
+			return com.liferay.mobile.device.rules.model.MDRRuleGroupSoap.
+				toSoapModel(returnValue);
 		}
 		catch (Exception e) {
 			_log.error(e, e);
@@ -111,6 +120,7 @@ public class MDRRuleGroupServiceSoap {
 
 	public static void deleteRuleGroup(long ruleGroupId)
 		throws RemoteException {
+
 		try {
 			MDRRuleGroupServiceUtil.deleteRuleGroup(ruleGroupId);
 		}
@@ -121,12 +131,16 @@ public class MDRRuleGroupServiceSoap {
 		}
 	}
 
-	public static com.liferay.mobile.device.rules.model.MDRRuleGroupSoap fetchRuleGroup(
-		long ruleGroupId) throws RemoteException {
-		try {
-			com.liferay.mobile.device.rules.model.MDRRuleGroup returnValue = MDRRuleGroupServiceUtil.fetchRuleGroup(ruleGroupId);
+	public static com.liferay.mobile.device.rules.model.MDRRuleGroupSoap
+			fetchRuleGroup(long ruleGroupId)
+		throws RemoteException {
 
-			return com.liferay.mobile.device.rules.model.MDRRuleGroupSoap.toSoapModel(returnValue);
+		try {
+			com.liferay.mobile.device.rules.model.MDRRuleGroup returnValue =
+				MDRRuleGroupServiceUtil.fetchRuleGroup(ruleGroupId);
+
+			return com.liferay.mobile.device.rules.model.MDRRuleGroupSoap.
+				toSoapModel(returnValue);
 		}
 		catch (Exception e) {
 			_log.error(e, e);
@@ -135,12 +149,16 @@ public class MDRRuleGroupServiceSoap {
 		}
 	}
 
-	public static com.liferay.mobile.device.rules.model.MDRRuleGroupSoap getRuleGroup(
-		long ruleGroupId) throws RemoteException {
-		try {
-			com.liferay.mobile.device.rules.model.MDRRuleGroup returnValue = MDRRuleGroupServiceUtil.getRuleGroup(ruleGroupId);
+	public static com.liferay.mobile.device.rules.model.MDRRuleGroupSoap
+			getRuleGroup(long ruleGroupId)
+		throws RemoteException {
 
-			return com.liferay.mobile.device.rules.model.MDRRuleGroupSoap.toSoapModel(returnValue);
+		try {
+			com.liferay.mobile.device.rules.model.MDRRuleGroup returnValue =
+				MDRRuleGroupServiceUtil.getRuleGroup(ruleGroupId);
+
+			return com.liferay.mobile.device.rules.model.MDRRuleGroupSoap.
+				toSoapModel(returnValue);
 		}
 		catch (Exception e) {
 			_log.error(e, e);
@@ -149,13 +167,17 @@ public class MDRRuleGroupServiceSoap {
 		}
 	}
 
-	public static com.liferay.mobile.device.rules.model.MDRRuleGroupSoap[] getRuleGroups(
-		long[] groupIds, int start, int end) throws RemoteException {
-		try {
-			java.util.List<com.liferay.mobile.device.rules.model.MDRRuleGroup> returnValue =
-				MDRRuleGroupServiceUtil.getRuleGroups(groupIds, start, end);
+	public static com.liferay.mobile.device.rules.model.MDRRuleGroupSoap[]
+			getRuleGroups(long[] groupIds, int start, int end)
+		throws RemoteException {
 
-			return com.liferay.mobile.device.rules.model.MDRRuleGroupSoap.toSoapModels(returnValue);
+		try {
+			java.util.List<com.liferay.mobile.device.rules.model.MDRRuleGroup>
+				returnValue = MDRRuleGroupServiceUtil.getRuleGroups(
+					groupIds, start, end);
+
+			return com.liferay.mobile.device.rules.model.MDRRuleGroupSoap.
+				toSoapModels(returnValue);
 		}
 		catch (Exception e) {
 			_log.error(e, e);
@@ -166,8 +188,10 @@ public class MDRRuleGroupServiceSoap {
 
 	public static int getRuleGroupsCount(long[] groupIds)
 		throws RemoteException {
+
 		try {
-			int returnValue = MDRRuleGroupServiceUtil.getRuleGroupsCount(groupIds);
+			int returnValue = MDRRuleGroupServiceUtil.getRuleGroupsCount(
+				groupIds);
 
 			return returnValue;
 		}
@@ -178,21 +202,27 @@ public class MDRRuleGroupServiceSoap {
 		}
 	}
 
-	public static com.liferay.mobile.device.rules.model.MDRRuleGroupSoap updateRuleGroup(
-		long ruleGroupId, String[] nameMapLanguageIds, String[] nameMapValues,
-		String[] descriptionMapLanguageIds, String[] descriptionMapValues,
-		com.liferay.portal.kernel.service.ServiceContext serviceContext)
+	public static com.liferay.mobile.device.rules.model.MDRRuleGroupSoap
+			updateRuleGroup(
+				long ruleGroupId, String[] nameMapLanguageIds,
+				String[] nameMapValues, String[] descriptionMapLanguageIds,
+				String[] descriptionMapValues,
+				com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws RemoteException {
+
 		try {
-			Map<Locale, String> nameMap = LocalizationUtil.getLocalizationMap(nameMapLanguageIds,
-					nameMapValues);
-			Map<Locale, String> descriptionMap = LocalizationUtil.getLocalizationMap(descriptionMapLanguageIds,
-					descriptionMapValues);
+			Map<Locale, String> nameMap = LocalizationUtil.getLocalizationMap(
+				nameMapLanguageIds, nameMapValues);
+			Map<Locale, String> descriptionMap =
+				LocalizationUtil.getLocalizationMap(
+					descriptionMapLanguageIds, descriptionMapValues);
 
-			com.liferay.mobile.device.rules.model.MDRRuleGroup returnValue = MDRRuleGroupServiceUtil.updateRuleGroup(ruleGroupId,
-					nameMap, descriptionMap, serviceContext);
+			com.liferay.mobile.device.rules.model.MDRRuleGroup returnValue =
+				MDRRuleGroupServiceUtil.updateRuleGroup(
+					ruleGroupId, nameMap, descriptionMap, serviceContext);
 
-			return com.liferay.mobile.device.rules.model.MDRRuleGroupSoap.toSoapModel(returnValue);
+			return com.liferay.mobile.device.rules.model.MDRRuleGroupSoap.
+				toSoapModel(returnValue);
 		}
 		catch (Exception e) {
 			_log.error(e, e);
@@ -201,5 +231,7 @@ public class MDRRuleGroupServiceSoap {
 		}
 	}
 
-	private static Log _log = LogFactoryUtil.getLog(MDRRuleGroupServiceSoap.class);
+	private static Log _log = LogFactoryUtil.getLog(
+		MDRRuleGroupServiceSoap.class);
+
 }

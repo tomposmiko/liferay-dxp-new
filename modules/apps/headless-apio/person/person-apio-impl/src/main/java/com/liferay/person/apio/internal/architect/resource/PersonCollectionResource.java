@@ -59,7 +59,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
-import java.util.Date;
+import java.util.Calendar;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -154,8 +154,7 @@ public class PersonCollectionResource
 						LocaleUtil.getDefault(),
 						personCreatorForm.getGivenName(), StringPool.BLANK,
 						personCreatorForm.getFamilyName(), prefixId, suffixId,
-						personCreatorForm.isMale(),
-						personCreatorForm.getBirthdayMonth(),
+						true, personCreatorForm.getBirthdayMonth(),
 						personCreatorForm.getBirthdayDay(),
 						personCreatorForm.getBirthdayYear(),
 						personCreatorForm.getJobTitle(), null, null, null, null,
@@ -183,9 +182,7 @@ public class PersonCollectionResource
 		return personUpdaterForm.getAlternateName();
 	}
 
-	private Integer _getDefaultValue(
-		Optional<Integer> optional, int defaultValue) {
-
+	private <T> T _getDefaultValue(Optional<T> optional, T defaultValue) {
 		return optional.orElse(defaultValue);
 	}
 
@@ -270,14 +267,6 @@ public class PersonCollectionResource
 		return new UserWrapper(user, themeDisplay);
 	}
 
-	private Boolean _isMale(PersonUpdaterForm personUpdaterForm, User user)
-		throws PortalException {
-
-		Optional<Boolean> optional = personUpdaterForm.isMaleOptional();
-
-		return optional.orElse(user.isMale());
-	}
-
 	private byte[] _readInputStream(InputStream inputStream)
 		throws IOException {
 
@@ -328,7 +317,9 @@ public class PersonCollectionResource
 
 		String alternateName = _getAlternateName(personUpdaterForm, user);
 
-		Date birthdayDate = user.getBirthday();
+		Calendar calendar = Calendar.getInstance();
+
+		calendar.setTime(user.getBirthday());
 
 		user = _userLocalService.updateUser(
 			user.getUserId(), user.getPassword(),
@@ -339,22 +330,22 @@ public class PersonCollectionResource
 			user.getOpenId(), false, null, user.getLanguageId(),
 			user.getTimeZoneId(), user.getGreeting(), user.getComments(),
 			personUpdaterForm.getGivenName(), user.getMiddleName(),
-			personUpdaterForm.getFamilyName(), prefixId, suffixId,
-			_isMale(personUpdaterForm, user),
+			personUpdaterForm.getFamilyName(), prefixId, suffixId, true,
 			_getDefaultValue(
 				personUpdaterForm.getBirthdayMonthOptional(),
-				birthdayDate.getMonth()),
+				calendar.get(Calendar.MONTH)),
 			_getDefaultValue(
 				personUpdaterForm.getBirthdayDayOptional(),
-				birthdayDate.getDate()),
+				calendar.get(Calendar.DATE)),
 			_getDefaultValue(
 				personUpdaterForm.getBirthdayYearOptional(),
-				birthdayDate.getYear()),
+				calendar.get(Calendar.YEAR)),
 			contact.getSmsSn(), contact.getFacebookSn(), contact.getJabberSn(),
 			contact.getSkypeSn(), contact.getTwitterSn(),
-			personUpdaterForm.getJobTitle(), user.getGroupIds(),
-			user.getOrganizationIds(), user.getRoleIds(), null,
-			user.getUserGroupIds(), new ServiceContext());
+			_getDefaultValue(
+				personUpdaterForm.getJobTitleOptional(), user.getJobTitle()),
+			user.getGroupIds(), user.getOrganizationIds(), user.getRoleIds(),
+			null, user.getUserGroupIds(), new ServiceContext());
 
 		return new UserWrapper(user, themeDisplay);
 	}

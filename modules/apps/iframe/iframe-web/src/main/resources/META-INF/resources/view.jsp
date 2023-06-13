@@ -41,12 +41,6 @@
 
 				var hash = document.location.hash.replace('#', '');
 
-				// LPS-33951
-
-				if (!A.UA.gecko) {
-					hash = A.QueryString.unescape(hash);
-				}
-
 				var hashObj = A.QueryString.parse(hash);
 
 				hash = hashObj['<portlet:namespace />'];
@@ -140,9 +134,7 @@
 					restore.attr('href', restoreHREF + '#' + hash);
 				}
 
-				// LPS-33951
-
-				location.hash = A.QueryString.escape(hash);
+				location.hash = hash;
 			},
 			['aui-base', 'querystring']
 		);
@@ -182,3 +174,20 @@
 		);
 	}
 </aui:script>
+
+<c:if test='<%= iFramePortletInstanceConfiguration.auth() && StringUtil.equals(iFramePortletInstanceConfiguration.authType(), "basic") %>'>
+	<aui:script>
+		const headers = new Headers();
+
+		headers.append('Authorization', 'Basic ' + btoa('<%= iFramePortletInstanceConfiguration.basicUserName() %>:<%= iFramePortletInstanceConfiguration.basicPassword() %>'))
+
+		fetch(
+			'<%= HtmlUtil.escapeHREF(iFrameDisplayContext.getIframeSrc()) %>',
+			{
+				headers: headers,
+				method: 'GET',
+				mode: 'no-cors'
+			}
+		);
+	</aui:script>
+</c:if>

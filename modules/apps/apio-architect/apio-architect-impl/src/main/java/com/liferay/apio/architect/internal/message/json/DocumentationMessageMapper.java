@@ -14,8 +14,9 @@
 
 package com.liferay.apio.architect.internal.message.json;
 
+import com.liferay.apio.architect.internal.action.ActionSemantics;
 import com.liferay.apio.architect.internal.documentation.Documentation;
-import com.liferay.apio.architect.operation.Operation;
+import com.liferay.apio.architect.internal.wiring.osgi.manager.message.json.DocumentationField;
 
 /**
  * Maps the API {@link Documentation} to its JSON object representation.
@@ -36,6 +37,11 @@ import com.liferay.apio.architect.operation.Operation;
 public interface DocumentationMessageMapper
 	extends MessageMapper<Documentation> {
 
+	public default void mapAction(
+		JSONObjectBuilder jsonObjectBuilder, String resourceName, String type,
+		ActionSemantics actionSemantics, String description) {
+	}
+
 	/**
 	 * Maps the API description to its JSON object representation.
 	 *
@@ -50,14 +56,9 @@ public interface DocumentationMessageMapper
 		JSONObjectBuilder jsonObjectBuilder, String entryPoint) {
 	}
 
-	public default void mapOperation(
-		JSONObjectBuilder jsonObjectBuilder, String resourceName, String type,
-		Operation operation, String description) {
-	}
-
 	public default void mapProperty(
-		JSONObjectBuilder jsonObjectBuilder, String fieldName,
-		String description) {
+		JSONObjectBuilder jsonObjectBuilder,
+		DocumentationField documentationField, String description) {
 	}
 
 	public default void mapResource(
@@ -80,9 +81,10 @@ public interface DocumentationMessageMapper
 		JSONObjectBuilder jsonObjectBuilder, String title) {
 	}
 
-	public default void onFinishOperation(
+	public default void onFinishAction(
 		JSONObjectBuilder documentationJsonObjectBuilder,
-		JSONObjectBuilder operationJsonObjectBuilder, Operation operation) {
+		JSONObjectBuilder operationJsonObjectBuilder,
+		ActionSemantics actionSemantics) {
 	}
 
 	public default void onFinishProperty(

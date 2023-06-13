@@ -17,7 +17,6 @@ package com.liferay.changeset.model;
 import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.expando.kernel.model.ExpandoBridge;
-
 import com.liferay.portal.kernel.model.ModelWrapper;
 import com.liferay.portal.kernel.service.ServiceContext;
 
@@ -38,8 +37,9 @@ import java.util.Objects;
  * @generated
  */
 @ProviderType
-public class ChangesetEntryWrapper implements ChangesetEntry,
-	ModelWrapper<ChangesetEntry> {
+public class ChangesetEntryWrapper
+	implements ChangesetEntry, ModelWrapper<ChangesetEntry> {
+
 	public ChangesetEntryWrapper(ChangesetEntry changesetEntry) {
 		_changesetEntry = changesetEntry;
 	}
@@ -117,7 +117,7 @@ public class ChangesetEntryWrapper implements ChangesetEntry,
 		}
 
 		Long changesetCollectionId = (Long)attributes.get(
-				"changesetCollectionId");
+			"changesetCollectionId");
 
 		if (changesetCollectionId != null) {
 			setChangesetCollectionId(changesetCollectionId);
@@ -138,7 +138,8 @@ public class ChangesetEntryWrapper implements ChangesetEntry,
 
 	@Override
 	public Object clone() {
-		return new ChangesetEntryWrapper((ChangesetEntry)_changesetEntry.clone());
+		return new ChangesetEntryWrapper(
+			(ChangesetEntry)_changesetEntry.clone());
 	}
 
 	@Override
@@ -147,70 +148,70 @@ public class ChangesetEntryWrapper implements ChangesetEntry,
 	}
 
 	/**
-	* Returns the changeset collection ID of this changeset entry.
-	*
-	* @return the changeset collection ID of this changeset entry
-	*/
+	 * Returns the changeset collection ID of this changeset entry.
+	 *
+	 * @return the changeset collection ID of this changeset entry
+	 */
 	@Override
 	public long getChangesetCollectionId() {
 		return _changesetEntry.getChangesetCollectionId();
 	}
 
 	/**
-	* Returns the changeset entry ID of this changeset entry.
-	*
-	* @return the changeset entry ID of this changeset entry
-	*/
+	 * Returns the changeset entry ID of this changeset entry.
+	 *
+	 * @return the changeset entry ID of this changeset entry
+	 */
 	@Override
 	public long getChangesetEntryId() {
 		return _changesetEntry.getChangesetEntryId();
 	}
 
 	/**
-	* Returns the fully qualified class name of this changeset entry.
-	*
-	* @return the fully qualified class name of this changeset entry
-	*/
+	 * Returns the fully qualified class name of this changeset entry.
+	 *
+	 * @return the fully qualified class name of this changeset entry
+	 */
 	@Override
 	public String getClassName() {
 		return _changesetEntry.getClassName();
 	}
 
 	/**
-	* Returns the class name ID of this changeset entry.
-	*
-	* @return the class name ID of this changeset entry
-	*/
+	 * Returns the class name ID of this changeset entry.
+	 *
+	 * @return the class name ID of this changeset entry
+	 */
 	@Override
 	public long getClassNameId() {
 		return _changesetEntry.getClassNameId();
 	}
 
 	/**
-	* Returns the class pk of this changeset entry.
-	*
-	* @return the class pk of this changeset entry
-	*/
+	 * Returns the class pk of this changeset entry.
+	 *
+	 * @return the class pk of this changeset entry
+	 */
 	@Override
 	public long getClassPK() {
 		return _changesetEntry.getClassPK();
 	}
 
 	/**
-	* Returns the company ID of this changeset entry.
-	*
-	* @return the company ID of this changeset entry
-	*/
+	 * Returns the company ID of this changeset entry.
+	 *
+	 * @return the company ID of this changeset entry
+	 */
 	@Override
 	public long getCompanyId() {
 		return _changesetEntry.getCompanyId();
 	}
 
 	/**
-	* Returns the create date of this changeset entry.
-	*
-	* @return the create date of this changeset entry
-	*/
+	 * Returns the create date of this changeset entry.
+	 *
+	 * @return the create date of this changeset entry
+	 */
 	@Override
 	public Date getCreateDate() {
 		return _changesetEntry.getCreateDate();
@@ -222,30 +223,30 @@ public class ChangesetEntryWrapper implements ChangesetEntry,
 	}
 
 	/**
-	* Returns the group ID of this changeset entry.
-	*
-	* @return the group ID of this changeset entry
-	*/
+	 * Returns the group ID of this changeset entry.
+	 *
+	 * @return the group ID of this changeset entry
+	 */
 	@Override
 	public long getGroupId() {
 		return _changesetEntry.getGroupId();
 	}
 
 	/**
-	* Returns the modified date of this changeset entry.
-	*
-	* @return the modified date of this changeset entry
-	*/
+	 * Returns the modified date of this changeset entry.
+	 *
+	 * @return the modified date of this changeset entry
+	 */
 	@Override
 	public Date getModifiedDate() {
 		return _changesetEntry.getModifiedDate();
 	}
 
 	/**
-	* Returns the primary key of this changeset entry.
-	*
-	* @return the primary key of this changeset entry
-	*/
+	 * Returns the primary key of this changeset entry.
+	 *
+	 * @return the primary key of this changeset entry
+	 */
 	@Override
 	public long getPrimaryKey() {
 		return _changesetEntry.getPrimaryKey();
@@ -257,30 +258,30 @@ public class ChangesetEntryWrapper implements ChangesetEntry,
 	}
 
 	/**
-	* Returns the user ID of this changeset entry.
-	*
-	* @return the user ID of this changeset entry
-	*/
+	 * Returns the user ID of this changeset entry.
+	 *
+	 * @return the user ID of this changeset entry
+	 */
 	@Override
 	public long getUserId() {
 		return _changesetEntry.getUserId();
 	}
 
 	/**
-	* Returns the user name of this changeset entry.
-	*
-	* @return the user name of this changeset entry
-	*/
+	 * Returns the user name of this changeset entry.
+	 *
+	 * @return the user name of this changeset entry
+	 */
 	@Override
 	public String getUserName() {
 		return _changesetEntry.getUserName();
 	}
 
 	/**
-	* Returns the user uuid of this changeset entry.
-	*
-	* @return the user uuid of this changeset entry
-	*/
+	 * Returns the user uuid of this changeset entry.
+	 *
+	 * @return the user uuid of this changeset entry
+	 */
 	@Override
 	public String getUserUuid() {
 		return _changesetEntry.getUserUuid();
@@ -317,20 +318,20 @@ public class ChangesetEntryWrapper implements ChangesetEntry,
 	}
 
 	/**
-	* Sets the changeset collection ID of this changeset entry.
-	*
-	* @param changesetCollectionId the changeset collection ID of this changeset entry
-	*/
+	 * Sets the changeset collection ID of this changeset entry.
+	 *
+	 * @param changesetCollectionId the changeset collection ID of this changeset entry
+	 */
 	@Override
 	public void setChangesetCollectionId(long changesetCollectionId) {
 		_changesetEntry.setChangesetCollectionId(changesetCollectionId);
 	}
 
 	/**
-	* Sets the changeset entry ID of this changeset entry.
-	*
-	* @param changesetEntryId the changeset entry ID of this changeset entry
-	*/
+	 * Sets the changeset entry ID of this changeset entry.
+	 *
+	 * @param changesetEntryId the changeset entry ID of this changeset entry
+	 */
 	@Override
 	public void setChangesetEntryId(long changesetEntryId) {
 		_changesetEntry.setChangesetEntryId(changesetEntryId);
@@ -342,40 +343,40 @@ public class ChangesetEntryWrapper implements ChangesetEntry,
 	}
 
 	/**
-	* Sets the class name ID of this changeset entry.
-	*
-	* @param classNameId the class name ID of this changeset entry
-	*/
+	 * Sets the class name ID of this changeset entry.
+	 *
+	 * @param classNameId the class name ID of this changeset entry
+	 */
 	@Override
 	public void setClassNameId(long classNameId) {
 		_changesetEntry.setClassNameId(classNameId);
 	}
 
 	/**
-	* Sets the class pk of this changeset entry.
-	*
-	* @param classPK the class pk of this changeset entry
-	*/
+	 * Sets the class pk of this changeset entry.
+	 *
+	 * @param classPK the class pk of this changeset entry
+	 */
 	@Override
 	public void setClassPK(long classPK) {
 		_changesetEntry.setClassPK(classPK);
 	}
 
 	/**
-	* Sets the company ID of this changeset entry.
-	*
-	* @param companyId the company ID of this changeset entry
-	*/
+	 * Sets the company ID of this changeset entry.
+	 *
+	 * @param companyId the company ID of this changeset entry
+	 */
 	@Override
 	public void setCompanyId(long companyId) {
 		_changesetEntry.setCompanyId(companyId);
 	}
 
 	/**
-	* Sets the create date of this changeset entry.
-	*
-	* @param createDate the create date of this changeset entry
-	*/
+	 * Sets the create date of this changeset entry.
+	 *
+	 * @param createDate the create date of this changeset entry
+	 */
 	@Override
 	public void setCreateDate(Date createDate) {
 		_changesetEntry.setCreateDate(createDate);
@@ -384,6 +385,7 @@ public class ChangesetEntryWrapper implements ChangesetEntry,
 	@Override
 	public void setExpandoBridgeAttributes(
 		com.liferay.portal.kernel.model.BaseModel<?> baseModel) {
+
 		_changesetEntry.setExpandoBridgeAttributes(baseModel);
 	}
 
@@ -398,20 +400,20 @@ public class ChangesetEntryWrapper implements ChangesetEntry,
 	}
 
 	/**
-	* Sets the group ID of this changeset entry.
-	*
-	* @param groupId the group ID of this changeset entry
-	*/
+	 * Sets the group ID of this changeset entry.
+	 *
+	 * @param groupId the group ID of this changeset entry
+	 */
 	@Override
 	public void setGroupId(long groupId) {
 		_changesetEntry.setGroupId(groupId);
 	}
 
 	/**
-	* Sets the modified date of this changeset entry.
-	*
-	* @param modifiedDate the modified date of this changeset entry
-	*/
+	 * Sets the modified date of this changeset entry.
+	 *
+	 * @param modifiedDate the modified date of this changeset entry
+	 */
 	@Override
 	public void setModifiedDate(Date modifiedDate) {
 		_changesetEntry.setModifiedDate(modifiedDate);
@@ -423,10 +425,10 @@ public class ChangesetEntryWrapper implements ChangesetEntry,
 	}
 
 	/**
-	* Sets the primary key of this changeset entry.
-	*
-	* @param primaryKey the primary key of this changeset entry
-	*/
+	 * Sets the primary key of this changeset entry.
+	 *
+	 * @param primaryKey the primary key of this changeset entry
+	 */
 	@Override
 	public void setPrimaryKey(long primaryKey) {
 		_changesetEntry.setPrimaryKey(primaryKey);
@@ -438,37 +440,39 @@ public class ChangesetEntryWrapper implements ChangesetEntry,
 	}
 
 	/**
-	* Sets the user ID of this changeset entry.
-	*
-	* @param userId the user ID of this changeset entry
-	*/
+	 * Sets the user ID of this changeset entry.
+	 *
+	 * @param userId the user ID of this changeset entry
+	 */
 	@Override
 	public void setUserId(long userId) {
 		_changesetEntry.setUserId(userId);
 	}
 
 	/**
-	* Sets the user name of this changeset entry.
-	*
-	* @param userName the user name of this changeset entry
-	*/
+	 * Sets the user name of this changeset entry.
+	 *
+	 * @param userName the user name of this changeset entry
+	 */
 	@Override
 	public void setUserName(String userName) {
 		_changesetEntry.setUserName(userName);
 	}
 
 	/**
-	* Sets the user uuid of this changeset entry.
-	*
-	* @param userUuid the user uuid of this changeset entry
-	*/
+	 * Sets the user uuid of this changeset entry.
+	 *
+	 * @param userUuid the user uuid of this changeset entry
+	 */
 	@Override
 	public void setUserUuid(String userUuid) {
 		_changesetEntry.setUserUuid(userUuid);
 	}
 
 	@Override
-	public com.liferay.portal.kernel.model.CacheModel<ChangesetEntry> toCacheModel() {
+	public com.liferay.portal.kernel.model.CacheModel<ChangesetEntry>
+		toCacheModel() {
+
 		return _changesetEntry.toCacheModel();
 	}
 
@@ -502,10 +506,12 @@ public class ChangesetEntryWrapper implements ChangesetEntry,
 			return false;
 		}
 
-		ChangesetEntryWrapper changesetEntryWrapper = (ChangesetEntryWrapper)obj;
+		ChangesetEntryWrapper changesetEntryWrapper =
+			(ChangesetEntryWrapper)obj;
 
-		if (Objects.equals(_changesetEntry,
-					changesetEntryWrapper._changesetEntry)) {
+		if (Objects.equals(
+				_changesetEntry, changesetEntryWrapper._changesetEntry)) {
+
 			return true;
 		}
 
@@ -533,4 +539,5 @@ public class ChangesetEntryWrapper implements ChangesetEntry,
 	}
 
 	private final ChangesetEntry _changesetEntry;
+
 }

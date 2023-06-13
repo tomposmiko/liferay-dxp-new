@@ -32,18 +32,19 @@ import java.util.Set;
  * @generated
  */
 public class UserGroupFinderBaseImpl extends BasePersistenceImpl<UserGroup> {
+
 	public UserGroupFinderBaseImpl() {
 		setModelClass(UserGroup.class);
 
+		Map<String, String> dbColumnNames = new HashMap<String, String>();
+
+		dbColumnNames.put("uuid", "uuid_");
+
 		try {
 			Field field = BasePersistenceImpl.class.getDeclaredField(
-					"_dbColumnNames");
+				"_dbColumnNames");
 
 			field.setAccessible(true);
-
-			Map<String, String> dbColumnNames = new HashMap<String, String>();
-
-			dbColumnNames.put("uuid", "uuid_");
 
 			field.set(this, dbColumnNames);
 		}
@@ -75,10 +76,14 @@ public class UserGroupFinderBaseImpl extends BasePersistenceImpl<UserGroup> {
 	 */
 	public void setUserGroupPersistence(
 		UserGroupPersistence userGroupPersistence) {
+
 		this.userGroupPersistence = userGroupPersistence;
 	}
 
 	@BeanReference(type = UserGroupPersistence.class)
 	protected UserGroupPersistence userGroupPersistence;
-	private static final Log _log = LogFactoryUtil.getLog(UserGroupFinderBaseImpl.class);
+
+	private static final Log _log = LogFactoryUtil.getLog(
+		UserGroupFinderBaseImpl.class);
+
 }

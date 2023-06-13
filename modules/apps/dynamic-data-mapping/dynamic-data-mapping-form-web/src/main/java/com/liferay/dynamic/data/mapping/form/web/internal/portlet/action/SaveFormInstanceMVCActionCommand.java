@@ -47,6 +47,20 @@ import org.osgi.service.component.annotations.Reference;
 public class SaveFormInstanceMVCActionCommand
 	extends BaseTransactionalMVCActionCommand {
 
+	protected void doService(
+			ActionRequest actionRequest, ActionResponse actionResponse,
+			LiferayPortletURL portletURL)
+		throws Exception {
+
+		DDMFormInstance ddmFormInstance =
+			saveFormInstanceMVCCommandHelper.saveFormInstance(
+				actionRequest, actionResponse, true);
+
+		portletURL.setParameter(
+			"formInstanceId",
+			String.valueOf(ddmFormInstance.getFormInstanceId()));
+	}
+
 	@Override
 	protected void doTransactionalCommand(
 			ActionRequest actionRequest, ActionResponse actionResponse)
@@ -65,20 +79,14 @@ public class SaveFormInstanceMVCActionCommand
 		String redirect = ParamUtil.getString(actionRequest, "redirect");
 
 		try {
-			DDMFormInstance formInstance =
-				saveFormInstanceMVCCommandHelper.saveFormInstance(
-					actionRequest, actionResponse, true);
-
-			portletURL.setParameter(
-				"formInstanceId",
-				String.valueOf(formInstance.getFormInstanceId()));
+			doService(actionRequest, actionResponse, portletURL);
 
 			portletURL.setParameter("redirect", redirect);
 
 			actionRequest.setAttribute(WebKeys.REDIRECT, portletURL.toString());
 		}
-		catch (DDMFormValidationException.
-					MustSetValidValidationExpression msvve) {
+		catch (DDMFormValidationException.MustSetValidValidationExpression
+					msvve) {
 
 			SessionErrors.add(actionRequest, msvve.getClass(), msvve);
 		}

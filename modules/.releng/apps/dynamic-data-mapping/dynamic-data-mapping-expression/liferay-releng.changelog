@@ -27,3 +27,38 @@ b7d18d130dba7322580fecefab3fc26c97570634^..2f3bb00bed783b8764251bd8608abfa2a8df5
 # Bundle Version 3.0.5
 #
 422b40de21556422e14569494b0aaef4ed25ec2e^..403f1d4b3c21904f0c4671786af83c94c4f1fadc=LPS-86806
+
+#
+# Bundle Version 3.0.6
+#
+403f1d4b3c21904f0c4671786af83c94c4f1fadc^..a2e7c1ec01b4936babb6296b3b20eceb5ca7a38e=LPS-88190
+
+#
+# Bundle Version 3.0.7
+#
+a2e7c1ec01b4936babb6296b3b20eceb5ca7a38e^..d76996f8eb11bdc8af07e5b0cecb4e662fff6429=LPS-84119 LPS-86806
+
+#
+# Bundle Version 3.0.8
+#
+d76996f8eb11bdc8af07e5b0cecb4e662fff6429^..d6b0fcfde827996be9031ca6ef65715642d019d0=LPS-84119
+
+#
+# Bundle Version 3.0.9
+#
+d6b0fcfde827996be9031ca6ef65715642d019d0^..7b2b1ff74fe92abe0c54d7ef9ee3e65d4b65710d=LPS-85877 LPS-91420
+
+#
+# Bundle Version 3.0.10
+#
+7b2b1ff74fe92abe0c54d7ef9ee3e65d4b65710d^..2160e56979d3ad89b99b717d260ac95d4423daca=LPS-86806
+
+#
+# Bundle Version 3.0.11
+#
+2160e56979d3ad89b99b717d260ac95d4423daca^..d88f76d995cb7d6ed495d48ec5b29c6a39fb1027=LPS-84119
+
+#
+# Bundle Version 3.0.12
+#
+d88f76d995cb7d6ed495d48ec5b29c6a39fb1027^..67db666ef46a4075e436af10bf6973152afa9d13=LPS-94512

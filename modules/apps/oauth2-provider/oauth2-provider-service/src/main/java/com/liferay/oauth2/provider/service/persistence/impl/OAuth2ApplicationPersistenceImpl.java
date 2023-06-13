@@ -21,7 +21,6 @@ import com.liferay.oauth2.provider.model.OAuth2Application;
 import com.liferay.oauth2.provider.model.impl.OAuth2ApplicationImpl;
 import com.liferay.oauth2.provider.model.impl.OAuth2ApplicationModelImpl;
 import com.liferay.oauth2.provider.service.persistence.OAuth2ApplicationPersistence;
-
 import com.liferay.portal.kernel.dao.orm.EntityCache;
 import com.liferay.portal.kernel.dao.orm.FinderCache;
 import com.liferay.portal.kernel.dao.orm.FinderPath;
@@ -68,54 +67,33 @@ import java.util.Set;
  * </p>
  *
  * @author Brian Wing Shun Chan
- * @see OAuth2ApplicationPersistence
- * @see com.liferay.oauth2.provider.service.persistence.OAuth2ApplicationUtil
  * @generated
  */
 @ProviderType
-public class OAuth2ApplicationPersistenceImpl extends BasePersistenceImpl<OAuth2Application>
+public class OAuth2ApplicationPersistenceImpl
+	extends BasePersistenceImpl<OAuth2Application>
 	implements OAuth2ApplicationPersistence {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
-	 * Never modify or reference this class directly. Always use {@link OAuth2ApplicationUtil} to access the o auth2 application persistence. Modify <code>service.xml</code> and rerun ServiceBuilder to regenerate this class.
+	 * Never modify or reference this class directly. Always use <code>OAuth2ApplicationUtil</code> to access the o auth2 application persistence. Modify <code>service.xml</code> and rerun ServiceBuilder to regenerate this class.
 	 */
-	public static final String FINDER_CLASS_NAME_ENTITY = OAuth2ApplicationImpl.class.getName();
-	public static final String FINDER_CLASS_NAME_LIST_WITH_PAGINATION = FINDER_CLASS_NAME_ENTITY +
-		".List1";
-	public static final String FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION = FINDER_CLASS_NAME_ENTITY +
-		".List2";
-	public static final FinderPath FINDER_PATH_WITH_PAGINATION_FIND_ALL = new FinderPath(OAuth2ApplicationModelImpl.ENTITY_CACHE_ENABLED,
-			OAuth2ApplicationModelImpl.FINDER_CACHE_ENABLED,
-			OAuth2ApplicationImpl.class,
-			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findAll", new String[0]);
-	public static final FinderPath FINDER_PATH_WITHOUT_PAGINATION_FIND_ALL = new FinderPath(OAuth2ApplicationModelImpl.ENTITY_CACHE_ENABLED,
-			OAuth2ApplicationModelImpl.FINDER_CACHE_ENABLED,
-			OAuth2ApplicationImpl.class,
-			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findAll", new String[0]);
-	public static final FinderPath FINDER_PATH_COUNT_ALL = new FinderPath(OAuth2ApplicationModelImpl.ENTITY_CACHE_ENABLED,
-			OAuth2ApplicationModelImpl.FINDER_CACHE_ENABLED, Long.class,
-			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countAll", new String[0]);
-	public static final FinderPath FINDER_PATH_WITH_PAGINATION_FIND_BY_C = new FinderPath(OAuth2ApplicationModelImpl.ENTITY_CACHE_ENABLED,
-			OAuth2ApplicationModelImpl.FINDER_CACHE_ENABLED,
-			OAuth2ApplicationImpl.class,
-			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByC",
-			new String[] {
-				Long.class.getName(),
-				
-			Integer.class.getName(), Integer.class.getName(),
-				OrderByComparator.class.getName()
-			});
-	public static final FinderPath FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_C = new FinderPath(OAuth2ApplicationModelImpl.ENTITY_CACHE_ENABLED,
-			OAuth2ApplicationModelImpl.FINDER_CACHE_ENABLED,
-			OAuth2ApplicationImpl.class,
-			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByC",
-			new String[] { Long.class.getName() },
-			OAuth2ApplicationModelImpl.COMPANYID_COLUMN_BITMASK);
-	public static final FinderPath FINDER_PATH_COUNT_BY_C = new FinderPath(OAuth2ApplicationModelImpl.ENTITY_CACHE_ENABLED,
-			OAuth2ApplicationModelImpl.FINDER_CACHE_ENABLED, Long.class,
-			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByC",
-			new String[] { Long.class.getName() });
+	public static final String FINDER_CLASS_NAME_ENTITY =
+		OAuth2ApplicationImpl.class.getName();
+
+	public static final String FINDER_CLASS_NAME_LIST_WITH_PAGINATION =
+		FINDER_CLASS_NAME_ENTITY + ".List1";
+
+	public static final String FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION =
+		FINDER_CLASS_NAME_ENTITY + ".List2";
+
+	private FinderPath _finderPathWithPaginationFindAll;
+	private FinderPath _finderPathWithoutPaginationFindAll;
+	private FinderPath _finderPathCountAll;
+	private FinderPath _finderPathWithPaginationFindByC;
+	private FinderPath _finderPathWithoutPaginationFindByC;
+	private FinderPath _finderPathCountByC;
 
 	/**
 	 * Returns all the o auth2 applications where companyId = &#63;.
@@ -132,7 +110,7 @@ public class OAuth2ApplicationPersistenceImpl extends BasePersistenceImpl<OAuth2
 	 * Returns a range of all the o auth2 applications where companyId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link OAuth2ApplicationModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>OAuth2ApplicationModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param companyId the company ID
@@ -149,7 +127,7 @@ public class OAuth2ApplicationPersistenceImpl extends BasePersistenceImpl<OAuth2
 	 * Returns an ordered range of all the o auth2 applications where companyId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link OAuth2ApplicationModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>OAuth2ApplicationModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param companyId the company ID
@@ -159,8 +137,10 @@ public class OAuth2ApplicationPersistenceImpl extends BasePersistenceImpl<OAuth2
 	 * @return the ordered range of matching o auth2 applications
 	 */
 	@Override
-	public List<OAuth2Application> findByC(long companyId, int start, int end,
+	public List<OAuth2Application> findByC(
+		long companyId, int start, int end,
 		OrderByComparator<OAuth2Application> orderByComparator) {
+
 		return findByC(companyId, start, end, orderByComparator, true);
 	}
 
@@ -168,7 +148,7 @@ public class OAuth2ApplicationPersistenceImpl extends BasePersistenceImpl<OAuth2
 	 * Returns an ordered range of all the o auth2 applications where companyId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link OAuth2ApplicationModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>OAuth2ApplicationModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param companyId the company ID
@@ -179,29 +159,34 @@ public class OAuth2ApplicationPersistenceImpl extends BasePersistenceImpl<OAuth2
 	 * @return the ordered range of matching o auth2 applications
 	 */
 	@Override
-	public List<OAuth2Application> findByC(long companyId, int start, int end,
+	public List<OAuth2Application> findByC(
+		long companyId, int start, int end,
 		OrderByComparator<OAuth2Application> orderByComparator,
 		boolean retrieveFromCache) {
+
 		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
-				(orderByComparator == null)) {
+			(orderByComparator == null)) {
+
 			pagination = false;
-			finderPath = FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_C;
-			finderArgs = new Object[] { companyId };
+			finderPath = _finderPathWithoutPaginationFindByC;
+			finderArgs = new Object[] {companyId};
 		}
 		else {
-			finderPath = FINDER_PATH_WITH_PAGINATION_FIND_BY_C;
-			finderArgs = new Object[] { companyId, start, end, orderByComparator };
+			finderPath = _finderPathWithPaginationFindByC;
+			finderArgs = new Object[] {
+				companyId, start, end, orderByComparator
+			};
 		}
 
 		List<OAuth2Application> list = null;
 
 		if (retrieveFromCache) {
-			list = (List<OAuth2Application>)finderCache.getResult(finderPath,
-					finderArgs, this);
+			list = (List<OAuth2Application>)finderCache.getResult(
+				finderPath, finderArgs, this);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (OAuth2Application oAuth2Application : list) {
@@ -218,8 +203,8 @@ public class OAuth2ApplicationPersistenceImpl extends BasePersistenceImpl<OAuth2
 			StringBundler query = null;
 
 			if (orderByComparator != null) {
-				query = new StringBundler(3 +
-						(orderByComparator.getOrderByFields().length * 2));
+				query = new StringBundler(
+					3 + (orderByComparator.getOrderByFields().length * 2));
 			}
 			else {
 				query = new StringBundler(3);
@@ -230,11 +215,10 @@ public class OAuth2ApplicationPersistenceImpl extends BasePersistenceImpl<OAuth2
 			query.append(_FINDER_COLUMN_C_COMPANYID_2);
 
 			if (orderByComparator != null) {
-				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
-					orderByComparator);
+				appendOrderByComparator(
+					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
 			}
-			else
-			 if (pagination) {
+			else if (pagination) {
 				query.append(OAuth2ApplicationModelImpl.ORDER_BY_JPQL);
 			}
 
@@ -252,16 +236,16 @@ public class OAuth2ApplicationPersistenceImpl extends BasePersistenceImpl<OAuth2
 				qPos.add(companyId);
 
 				if (!pagination) {
-					list = (List<OAuth2Application>)QueryUtil.list(q,
-							getDialect(), start, end, false);
+					list = (List<OAuth2Application>)QueryUtil.list(
+						q, getDialect(), start, end, false);
 
 					Collections.sort(list);
 
 					list = Collections.unmodifiableList(list);
 				}
 				else {
-					list = (List<OAuth2Application>)QueryUtil.list(q,
-							getDialect(), start, end);
+					list = (List<OAuth2Application>)QueryUtil.list(
+						q, getDialect(), start, end);
 				}
 
 				cacheResult(list);
@@ -290,11 +274,13 @@ public class OAuth2ApplicationPersistenceImpl extends BasePersistenceImpl<OAuth2
 	 * @throws NoSuchOAuth2ApplicationException if a matching o auth2 application could not be found
 	 */
 	@Override
-	public OAuth2Application findByC_First(long companyId,
-		OrderByComparator<OAuth2Application> orderByComparator)
+	public OAuth2Application findByC_First(
+			long companyId,
+			OrderByComparator<OAuth2Application> orderByComparator)
 		throws NoSuchOAuth2ApplicationException {
-		OAuth2Application oAuth2Application = fetchByC_First(companyId,
-				orderByComparator);
+
+		OAuth2Application oAuth2Application = fetchByC_First(
+			companyId, orderByComparator);
 
 		if (oAuth2Application != null) {
 			return oAuth2Application;
@@ -320,10 +306,12 @@ public class OAuth2ApplicationPersistenceImpl extends BasePersistenceImpl<OAuth2
 	 * @return the first matching o auth2 application, or <code>null</code> if a matching o auth2 application could not be found
 	 */
 	@Override
-	public OAuth2Application fetchByC_First(long companyId,
+	public OAuth2Application fetchByC_First(
+		long companyId,
 		OrderByComparator<OAuth2Application> orderByComparator) {
-		List<OAuth2Application> list = findByC(companyId, 0, 1,
-				orderByComparator);
+
+		List<OAuth2Application> list = findByC(
+			companyId, 0, 1, orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -341,11 +329,13 @@ public class OAuth2ApplicationPersistenceImpl extends BasePersistenceImpl<OAuth2
 	 * @throws NoSuchOAuth2ApplicationException if a matching o auth2 application could not be found
 	 */
 	@Override
-	public OAuth2Application findByC_Last(long companyId,
-		OrderByComparator<OAuth2Application> orderByComparator)
+	public OAuth2Application findByC_Last(
+			long companyId,
+			OrderByComparator<OAuth2Application> orderByComparator)
 		throws NoSuchOAuth2ApplicationException {
-		OAuth2Application oAuth2Application = fetchByC_Last(companyId,
-				orderByComparator);
+
+		OAuth2Application oAuth2Application = fetchByC_Last(
+			companyId, orderByComparator);
 
 		if (oAuth2Application != null) {
 			return oAuth2Application;
@@ -371,16 +361,18 @@ public class OAuth2ApplicationPersistenceImpl extends BasePersistenceImpl<OAuth2
 	 * @return the last matching o auth2 application, or <code>null</code> if a matching o auth2 application could not be found
 	 */
 	@Override
-	public OAuth2Application fetchByC_Last(long companyId,
+	public OAuth2Application fetchByC_Last(
+		long companyId,
 		OrderByComparator<OAuth2Application> orderByComparator) {
+
 		int count = countByC(companyId);
 
 		if (count == 0) {
 			return null;
 		}
 
-		List<OAuth2Application> list = findByC(companyId, count - 1, count,
-				orderByComparator);
+		List<OAuth2Application> list = findByC(
+			companyId, count - 1, count, orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -399,10 +391,13 @@ public class OAuth2ApplicationPersistenceImpl extends BasePersistenceImpl<OAuth2
 	 * @throws NoSuchOAuth2ApplicationException if a o auth2 application with the primary key could not be found
 	 */
 	@Override
-	public OAuth2Application[] findByC_PrevAndNext(long oAuth2ApplicationId,
-		long companyId, OrderByComparator<OAuth2Application> orderByComparator)
+	public OAuth2Application[] findByC_PrevAndNext(
+			long oAuth2ApplicationId, long companyId,
+			OrderByComparator<OAuth2Application> orderByComparator)
 		throws NoSuchOAuth2ApplicationException {
-		OAuth2Application oAuth2Application = findByPrimaryKey(oAuth2ApplicationId);
+
+		OAuth2Application oAuth2Application = findByPrimaryKey(
+			oAuth2ApplicationId);
 
 		Session session = null;
 
@@ -411,13 +406,14 @@ public class OAuth2ApplicationPersistenceImpl extends BasePersistenceImpl<OAuth2
 
 			OAuth2Application[] array = new OAuth2ApplicationImpl[3];
 
-			array[0] = getByC_PrevAndNext(session, oAuth2Application,
-					companyId, orderByComparator, true);
+			array[0] = getByC_PrevAndNext(
+				session, oAuth2Application, companyId, orderByComparator, true);
 
 			array[1] = oAuth2Application;
 
-			array[2] = getByC_PrevAndNext(session, oAuth2Application,
-					companyId, orderByComparator, false);
+			array[2] = getByC_PrevAndNext(
+				session, oAuth2Application, companyId, orderByComparator,
+				false);
 
 			return array;
 		}
@@ -429,14 +425,16 @@ public class OAuth2ApplicationPersistenceImpl extends BasePersistenceImpl<OAuth2
 		}
 	}
 
-	protected OAuth2Application getByC_PrevAndNext(Session session,
-		OAuth2Application oAuth2Application, long companyId,
-		OrderByComparator<OAuth2Application> orderByComparator, boolean previous) {
+	protected OAuth2Application getByC_PrevAndNext(
+		Session session, OAuth2Application oAuth2Application, long companyId,
+		OrderByComparator<OAuth2Application> orderByComparator,
+		boolean previous) {
+
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(4 +
-					(orderByComparator.getOrderByConditionFields().length * 3) +
+			query = new StringBundler(
+				4 + (orderByComparator.getOrderByConditionFields().length * 3) +
 					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
@@ -448,7 +446,8 @@ public class OAuth2ApplicationPersistenceImpl extends BasePersistenceImpl<OAuth2
 		query.append(_FINDER_COLUMN_C_COMPANYID_2);
 
 		if (orderByComparator != null) {
-			String[] orderByConditionFields = orderByComparator.getOrderByConditionFields();
+			String[] orderByConditionFields =
+				orderByComparator.getOrderByConditionFields();
 
 			if (orderByConditionFields.length > 0) {
 				query.append(WHERE_AND);
@@ -518,10 +517,11 @@ public class OAuth2ApplicationPersistenceImpl extends BasePersistenceImpl<OAuth2
 		qPos.add(companyId);
 
 		if (orderByComparator != null) {
-			Object[] values = orderByComparator.getOrderByConditionValues(oAuth2Application);
+			for (Object orderByConditionValue :
+					orderByComparator.getOrderByConditionValues(
+						oAuth2Application)) {
 
-			for (Object value : values) {
-				qPos.add(value);
+				qPos.add(orderByConditionValue);
 			}
 		}
 
@@ -543,15 +543,15 @@ public class OAuth2ApplicationPersistenceImpl extends BasePersistenceImpl<OAuth2
 	 */
 	@Override
 	public List<OAuth2Application> filterFindByC(long companyId) {
-		return filterFindByC(companyId, QueryUtil.ALL_POS, QueryUtil.ALL_POS,
-			null);
+		return filterFindByC(
+			companyId, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
 	}
 
 	/**
 	 * Returns a range of all the o auth2 applications that the user has permission to view where companyId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link OAuth2ApplicationModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>OAuth2ApplicationModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param companyId the company ID
@@ -560,8 +560,9 @@ public class OAuth2ApplicationPersistenceImpl extends BasePersistenceImpl<OAuth2
 	 * @return the range of matching o auth2 applications that the user has permission to view
 	 */
 	@Override
-	public List<OAuth2Application> filterFindByC(long companyId, int start,
-		int end) {
+	public List<OAuth2Application> filterFindByC(
+		long companyId, int start, int end) {
+
 		return filterFindByC(companyId, start, end, null);
 	}
 
@@ -569,7 +570,7 @@ public class OAuth2ApplicationPersistenceImpl extends BasePersistenceImpl<OAuth2
 	 * Returns an ordered range of all the o auth2 applications that the user has permissions to view where companyId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link OAuth2ApplicationModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>OAuth2ApplicationModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param companyId the company ID
@@ -579,8 +580,10 @@ public class OAuth2ApplicationPersistenceImpl extends BasePersistenceImpl<OAuth2
 	 * @return the ordered range of matching o auth2 applications that the user has permission to view
 	 */
 	@Override
-	public List<OAuth2Application> filterFindByC(long companyId, int start,
-		int end, OrderByComparator<OAuth2Application> orderByComparator) {
+	public List<OAuth2Application> filterFindByC(
+		long companyId, int start, int end,
+		OrderByComparator<OAuth2Application> orderByComparator) {
+
 		if (!InlineSQLHelperUtil.isEnabled(companyId, 0)) {
 			return findByC(companyId, start, end, orderByComparator);
 		}
@@ -588,8 +591,8 @@ public class OAuth2ApplicationPersistenceImpl extends BasePersistenceImpl<OAuth2
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(3 +
-					(orderByComparator.getOrderByFields().length * 2));
+			query = new StringBundler(
+				3 + (orderByComparator.getOrderByFields().length * 2));
 		}
 		else {
 			query = new StringBundler(4);
@@ -599,23 +602,25 @@ public class OAuth2ApplicationPersistenceImpl extends BasePersistenceImpl<OAuth2
 			query.append(_FILTER_SQL_SELECT_OAUTH2APPLICATION_WHERE);
 		}
 		else {
-			query.append(_FILTER_SQL_SELECT_OAUTH2APPLICATION_NO_INLINE_DISTINCT_WHERE_1);
+			query.append(
+				_FILTER_SQL_SELECT_OAUTH2APPLICATION_NO_INLINE_DISTINCT_WHERE_1);
 		}
 
 		query.append(_FINDER_COLUMN_C_COMPANYID_2);
 
 		if (!getDB().isSupportsInlineDistinct()) {
-			query.append(_FILTER_SQL_SELECT_OAUTH2APPLICATION_NO_INLINE_DISTINCT_WHERE_2);
+			query.append(
+				_FILTER_SQL_SELECT_OAUTH2APPLICATION_NO_INLINE_DISTINCT_WHERE_2);
 		}
 
 		if (orderByComparator != null) {
 			if (getDB().isSupportsInlineDistinct()) {
-				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
-					orderByComparator, true);
+				appendOrderByComparator(
+					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator, true);
 			}
 			else {
-				appendOrderByComparator(query, _ORDER_BY_ENTITY_TABLE,
-					orderByComparator, true);
+				appendOrderByComparator(
+					query, _ORDER_BY_ENTITY_TABLE, orderByComparator, true);
 			}
 		}
 		else {
@@ -627,9 +632,9 @@ public class OAuth2ApplicationPersistenceImpl extends BasePersistenceImpl<OAuth2
 			}
 		}
 
-		String sql = InlineSQLHelperUtil.replacePermissionCheck(query.toString(),
-				OAuth2Application.class.getName(),
-				_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN);
+		String sql = InlineSQLHelperUtil.replacePermissionCheck(
+			query.toString(), OAuth2Application.class.getName(),
+			_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN);
 
 		Session session = null;
 
@@ -649,8 +654,8 @@ public class OAuth2ApplicationPersistenceImpl extends BasePersistenceImpl<OAuth2
 
 			qPos.add(companyId);
 
-			return (List<OAuth2Application>)QueryUtil.list(q, getDialect(),
-				start, end);
+			return (List<OAuth2Application>)QueryUtil.list(
+				q, getDialect(), start, end);
 		}
 		catch (Exception e) {
 			throw processException(e);
@@ -671,15 +676,17 @@ public class OAuth2ApplicationPersistenceImpl extends BasePersistenceImpl<OAuth2
 	 */
 	@Override
 	public OAuth2Application[] filterFindByC_PrevAndNext(
-		long oAuth2ApplicationId, long companyId,
-		OrderByComparator<OAuth2Application> orderByComparator)
+			long oAuth2ApplicationId, long companyId,
+			OrderByComparator<OAuth2Application> orderByComparator)
 		throws NoSuchOAuth2ApplicationException {
+
 		if (!InlineSQLHelperUtil.isEnabled(companyId, 0)) {
-			return findByC_PrevAndNext(oAuth2ApplicationId, companyId,
-				orderByComparator);
+			return findByC_PrevAndNext(
+				oAuth2ApplicationId, companyId, orderByComparator);
 		}
 
-		OAuth2Application oAuth2Application = findByPrimaryKey(oAuth2ApplicationId);
+		OAuth2Application oAuth2Application = findByPrimaryKey(
+			oAuth2ApplicationId);
 
 		Session session = null;
 
@@ -688,13 +695,14 @@ public class OAuth2ApplicationPersistenceImpl extends BasePersistenceImpl<OAuth2
 
 			OAuth2Application[] array = new OAuth2ApplicationImpl[3];
 
-			array[0] = filterGetByC_PrevAndNext(session, oAuth2Application,
-					companyId, orderByComparator, true);
+			array[0] = filterGetByC_PrevAndNext(
+				session, oAuth2Application, companyId, orderByComparator, true);
 
 			array[1] = oAuth2Application;
 
-			array[2] = filterGetByC_PrevAndNext(session, oAuth2Application,
-					companyId, orderByComparator, false);
+			array[2] = filterGetByC_PrevAndNext(
+				session, oAuth2Application, companyId, orderByComparator,
+				false);
 
 			return array;
 		}
@@ -706,14 +714,16 @@ public class OAuth2ApplicationPersistenceImpl extends BasePersistenceImpl<OAuth2
 		}
 	}
 
-	protected OAuth2Application filterGetByC_PrevAndNext(Session session,
-		OAuth2Application oAuth2Application, long companyId,
-		OrderByComparator<OAuth2Application> orderByComparator, boolean previous) {
+	protected OAuth2Application filterGetByC_PrevAndNext(
+		Session session, OAuth2Application oAuth2Application, long companyId,
+		OrderByComparator<OAuth2Application> orderByComparator,
+		boolean previous) {
+
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(5 +
-					(orderByComparator.getOrderByConditionFields().length * 3) +
+			query = new StringBundler(
+				5 + (orderByComparator.getOrderByConditionFields().length * 3) +
 					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
@@ -724,17 +734,20 @@ public class OAuth2ApplicationPersistenceImpl extends BasePersistenceImpl<OAuth2
 			query.append(_FILTER_SQL_SELECT_OAUTH2APPLICATION_WHERE);
 		}
 		else {
-			query.append(_FILTER_SQL_SELECT_OAUTH2APPLICATION_NO_INLINE_DISTINCT_WHERE_1);
+			query.append(
+				_FILTER_SQL_SELECT_OAUTH2APPLICATION_NO_INLINE_DISTINCT_WHERE_1);
 		}
 
 		query.append(_FINDER_COLUMN_C_COMPANYID_2);
 
 		if (!getDB().isSupportsInlineDistinct()) {
-			query.append(_FILTER_SQL_SELECT_OAUTH2APPLICATION_NO_INLINE_DISTINCT_WHERE_2);
+			query.append(
+				_FILTER_SQL_SELECT_OAUTH2APPLICATION_NO_INLINE_DISTINCT_WHERE_2);
 		}
 
 		if (orderByComparator != null) {
-			String[] orderByConditionFields = orderByComparator.getOrderByConditionFields();
+			String[] orderByConditionFields =
+				orderByComparator.getOrderByConditionFields();
 
 			if (orderByConditionFields.length > 0) {
 				query.append(WHERE_AND);
@@ -742,13 +755,17 @@ public class OAuth2ApplicationPersistenceImpl extends BasePersistenceImpl<OAuth2
 
 			for (int i = 0; i < orderByConditionFields.length; i++) {
 				if (getDB().isSupportsInlineDistinct()) {
-					query.append(_ORDER_BY_ENTITY_ALIAS);
+					query.append(
+						getColumnName(
+							_ORDER_BY_ENTITY_ALIAS, orderByConditionFields[i],
+							true));
 				}
 				else {
-					query.append(_ORDER_BY_ENTITY_TABLE);
+					query.append(
+						getColumnName(
+							_ORDER_BY_ENTITY_TABLE, orderByConditionFields[i],
+							true));
 				}
-
-				query.append(orderByConditionFields[i]);
 
 				if ((i + 1) < orderByConditionFields.length) {
 					if (orderByComparator.isAscending() ^ previous) {
@@ -774,13 +791,15 @@ public class OAuth2ApplicationPersistenceImpl extends BasePersistenceImpl<OAuth2
 
 			for (int i = 0; i < orderByFields.length; i++) {
 				if (getDB().isSupportsInlineDistinct()) {
-					query.append(_ORDER_BY_ENTITY_ALIAS);
+					query.append(
+						getColumnName(
+							_ORDER_BY_ENTITY_ALIAS, orderByFields[i], true));
 				}
 				else {
-					query.append(_ORDER_BY_ENTITY_TABLE);
+					query.append(
+						getColumnName(
+							_ORDER_BY_ENTITY_TABLE, orderByFields[i], true));
 				}
-
-				query.append(orderByFields[i]);
 
 				if ((i + 1) < orderByFields.length) {
 					if (orderByComparator.isAscending() ^ previous) {
@@ -809,9 +828,9 @@ public class OAuth2ApplicationPersistenceImpl extends BasePersistenceImpl<OAuth2
 			}
 		}
 
-		String sql = InlineSQLHelperUtil.replacePermissionCheck(query.toString(),
-				OAuth2Application.class.getName(),
-				_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN);
+		String sql = InlineSQLHelperUtil.replacePermissionCheck(
+			query.toString(), OAuth2Application.class.getName(),
+			_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN);
 
 		SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
@@ -830,10 +849,11 @@ public class OAuth2ApplicationPersistenceImpl extends BasePersistenceImpl<OAuth2
 		qPos.add(companyId);
 
 		if (orderByComparator != null) {
-			Object[] values = orderByComparator.getOrderByConditionValues(oAuth2Application);
+			for (Object orderByConditionValue :
+					orderByComparator.getOrderByConditionValues(
+						oAuth2Application)) {
 
-			for (Object value : values) {
-				qPos.add(value);
+				qPos.add(orderByConditionValue);
 			}
 		}
 
@@ -854,8 +874,10 @@ public class OAuth2ApplicationPersistenceImpl extends BasePersistenceImpl<OAuth2
 	 */
 	@Override
 	public void removeByC(long companyId) {
-		for (OAuth2Application oAuth2Application : findByC(companyId,
-				QueryUtil.ALL_POS, QueryUtil.ALL_POS, null)) {
+		for (OAuth2Application oAuth2Application :
+				findByC(
+					companyId, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null)) {
+
 			remove(oAuth2Application);
 		}
 	}
@@ -868,9 +890,9 @@ public class OAuth2ApplicationPersistenceImpl extends BasePersistenceImpl<OAuth2
 	 */
 	@Override
 	public int countByC(long companyId) {
-		FinderPath finderPath = FINDER_PATH_COUNT_BY_C;
+		FinderPath finderPath = _finderPathCountByC;
 
-		Object[] finderArgs = new Object[] { companyId };
+		Object[] finderArgs = new Object[] {companyId};
 
 		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
 
@@ -929,9 +951,9 @@ public class OAuth2ApplicationPersistenceImpl extends BasePersistenceImpl<OAuth2
 
 		query.append(_FINDER_COLUMN_C_COMPANYID_2);
 
-		String sql = InlineSQLHelperUtil.replacePermissionCheck(query.toString(),
-				OAuth2Application.class.getName(),
-				_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN);
+		String sql = InlineSQLHelperUtil.replacePermissionCheck(
+			query.toString(), OAuth2Application.class.getName(),
+			_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN);
 
 		Session session = null;
 
@@ -940,8 +962,8 @@ public class OAuth2ApplicationPersistenceImpl extends BasePersistenceImpl<OAuth2
 
 			SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
-			q.addScalar(COUNT_COLUMN_NAME,
-				com.liferay.portal.kernel.dao.orm.Type.LONG);
+			q.addScalar(
+				COUNT_COLUMN_NAME, com.liferay.portal.kernel.dao.orm.Type.LONG);
 
 			QueryPos qPos = QueryPos.getInstance(q);
 
@@ -959,21 +981,14 @@ public class OAuth2ApplicationPersistenceImpl extends BasePersistenceImpl<OAuth2
 		}
 	}
 
-	private static final String _FINDER_COLUMN_C_COMPANYID_2 = "oAuth2Application.companyId = ?";
-	public static final FinderPath FINDER_PATH_FETCH_BY_C_C = new FinderPath(OAuth2ApplicationModelImpl.ENTITY_CACHE_ENABLED,
-			OAuth2ApplicationModelImpl.FINDER_CACHE_ENABLED,
-			OAuth2ApplicationImpl.class, FINDER_CLASS_NAME_ENTITY,
-			"fetchByC_C",
-			new String[] { Long.class.getName(), String.class.getName() },
-			OAuth2ApplicationModelImpl.COMPANYID_COLUMN_BITMASK |
-			OAuth2ApplicationModelImpl.CLIENTID_COLUMN_BITMASK);
-	public static final FinderPath FINDER_PATH_COUNT_BY_C_C = new FinderPath(OAuth2ApplicationModelImpl.ENTITY_CACHE_ENABLED,
-			OAuth2ApplicationModelImpl.FINDER_CACHE_ENABLED, Long.class,
-			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByC_C",
-			new String[] { Long.class.getName(), String.class.getName() });
+	private static final String _FINDER_COLUMN_C_COMPANYID_2 =
+		"oAuth2Application.companyId = ?";
+
+	private FinderPath _finderPathFetchByC_C;
+	private FinderPath _finderPathCountByC_C;
 
 	/**
-	 * Returns the o auth2 application where companyId = &#63; and clientId = &#63; or throws a {@link NoSuchOAuth2ApplicationException} if it could not be found.
+	 * Returns the o auth2 application where companyId = &#63; and clientId = &#63; or throws a <code>NoSuchOAuth2ApplicationException</code> if it could not be found.
 	 *
 	 * @param companyId the company ID
 	 * @param clientId the client ID
@@ -983,6 +998,7 @@ public class OAuth2ApplicationPersistenceImpl extends BasePersistenceImpl<OAuth2
 	@Override
 	public OAuth2Application findByC_C(long companyId, String clientId)
 		throws NoSuchOAuth2ApplicationException {
+
 		OAuth2Application oAuth2Application = fetchByC_C(companyId, clientId);
 
 		if (oAuth2Application == null) {
@@ -1029,24 +1045,26 @@ public class OAuth2ApplicationPersistenceImpl extends BasePersistenceImpl<OAuth2
 	 * @return the matching o auth2 application, or <code>null</code> if a matching o auth2 application could not be found
 	 */
 	@Override
-	public OAuth2Application fetchByC_C(long companyId, String clientId,
-		boolean retrieveFromCache) {
+	public OAuth2Application fetchByC_C(
+		long companyId, String clientId, boolean retrieveFromCache) {
+
 		clientId = Objects.toString(clientId, "");
 
-		Object[] finderArgs = new Object[] { companyId, clientId };
+		Object[] finderArgs = new Object[] {companyId, clientId};
 
 		Object result = null;
 
 		if (retrieveFromCache) {
-			result = finderCache.getResult(FINDER_PATH_FETCH_BY_C_C,
-					finderArgs, this);
+			result = finderCache.getResult(
+				_finderPathFetchByC_C, finderArgs, this);
 		}
 
 		if (result instanceof OAuth2Application) {
 			OAuth2Application oAuth2Application = (OAuth2Application)result;
 
 			if ((companyId != oAuth2Application.getCompanyId()) ||
-					!Objects.equals(clientId, oAuth2Application.getClientId())) {
+				!Objects.equals(clientId, oAuth2Application.getClientId())) {
+
 				result = null;
 			}
 		}
@@ -1089,8 +1107,8 @@ public class OAuth2ApplicationPersistenceImpl extends BasePersistenceImpl<OAuth2
 				List<OAuth2Application> list = q.list();
 
 				if (list.isEmpty()) {
-					finderCache.putResult(FINDER_PATH_FETCH_BY_C_C, finderArgs,
-						list);
+					finderCache.putResult(
+						_finderPathFetchByC_C, finderArgs, list);
 				}
 				else {
 					if (list.size() > 1) {
@@ -1099,8 +1117,8 @@ public class OAuth2ApplicationPersistenceImpl extends BasePersistenceImpl<OAuth2
 						if (_log.isWarnEnabled()) {
 							_log.warn(
 								"OAuth2ApplicationPersistenceImpl.fetchByC_C(long, String, boolean) with parameters (" +
-								StringUtil.merge(finderArgs) +
-								") yields a result set with more than 1 result. This violates the logical unique restriction. There is no order guarantee on which result is returned by this finder.");
+									StringUtil.merge(finderArgs) +
+										") yields a result set with more than 1 result. This violates the logical unique restriction. There is no order guarantee on which result is returned by this finder.");
 						}
 					}
 
@@ -1112,7 +1130,7 @@ public class OAuth2ApplicationPersistenceImpl extends BasePersistenceImpl<OAuth2
 				}
 			}
 			catch (Exception e) {
-				finderCache.removeResult(FINDER_PATH_FETCH_BY_C_C, finderArgs);
+				finderCache.removeResult(_finderPathFetchByC_C, finderArgs);
 
 				throw processException(e);
 			}
@@ -1139,6 +1157,7 @@ public class OAuth2ApplicationPersistenceImpl extends BasePersistenceImpl<OAuth2
 	@Override
 	public OAuth2Application removeByC_C(long companyId, String clientId)
 		throws NoSuchOAuth2ApplicationException {
+
 		OAuth2Application oAuth2Application = findByC_C(companyId, clientId);
 
 		return remove(oAuth2Application);
@@ -1155,9 +1174,9 @@ public class OAuth2ApplicationPersistenceImpl extends BasePersistenceImpl<OAuth2
 	public int countByC_C(long companyId, String clientId) {
 		clientId = Objects.toString(clientId, "");
 
-		FinderPath finderPath = FINDER_PATH_COUNT_BY_C_C;
+		FinderPath finderPath = _finderPathCountByC_C;
 
-		Object[] finderArgs = new Object[] { companyId, clientId };
+		Object[] finderArgs = new Object[] {companyId, clientId};
 
 		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
 
@@ -1213,23 +1232,28 @@ public class OAuth2ApplicationPersistenceImpl extends BasePersistenceImpl<OAuth2
 		return count.intValue();
 	}
 
-	private static final String _FINDER_COLUMN_C_C_COMPANYID_2 = "oAuth2Application.companyId = ? AND ";
-	private static final String _FINDER_COLUMN_C_C_CLIENTID_2 = "oAuth2Application.clientId = ?";
-	private static final String _FINDER_COLUMN_C_C_CLIENTID_3 = "(oAuth2Application.clientId IS NULL OR oAuth2Application.clientId = '')";
+	private static final String _FINDER_COLUMN_C_C_COMPANYID_2 =
+		"oAuth2Application.companyId = ? AND ";
+
+	private static final String _FINDER_COLUMN_C_C_CLIENTID_2 =
+		"oAuth2Application.clientId = ?";
+
+	private static final String _FINDER_COLUMN_C_C_CLIENTID_3 =
+		"(oAuth2Application.clientId IS NULL OR oAuth2Application.clientId = '')";
 
 	public OAuth2ApplicationPersistenceImpl() {
 		setModelClass(OAuth2Application.class);
 
+		Map<String, String> dbColumnNames = new HashMap<String, String>();
+
+		dbColumnNames.put(
+			"oAuth2ApplicationScopeAliasesId", "oA2AScopeAliasesId");
+
 		try {
 			Field field = BasePersistenceImpl.class.getDeclaredField(
-					"_dbColumnNames");
+				"_dbColumnNames");
 
 			field.setAccessible(true);
-
-			Map<String, String> dbColumnNames = new HashMap<String, String>();
-
-			dbColumnNames.put("oAuth2ApplicationScopeAliasesId",
-				"oA2AScopeAliasesId");
 
 			field.set(this, dbColumnNames);
 		}
@@ -1247,15 +1271,18 @@ public class OAuth2ApplicationPersistenceImpl extends BasePersistenceImpl<OAuth2
 	 */
 	@Override
 	public void cacheResult(OAuth2Application oAuth2Application) {
-		entityCache.putResult(OAuth2ApplicationModelImpl.ENTITY_CACHE_ENABLED,
+		entityCache.putResult(
+			OAuth2ApplicationModelImpl.ENTITY_CACHE_ENABLED,
 			OAuth2ApplicationImpl.class, oAuth2Application.getPrimaryKey(),
 			oAuth2Application);
 
-		finderCache.putResult(FINDER_PATH_FETCH_BY_C_C,
+		finderCache.putResult(
+			_finderPathFetchByC_C,
 			new Object[] {
 				oAuth2Application.getCompanyId(),
 				oAuth2Application.getClientId()
-			}, oAuth2Application);
+			},
+			oAuth2Application);
 
 		oAuth2Application.resetOriginalValues();
 	}
@@ -1269,9 +1296,10 @@ public class OAuth2ApplicationPersistenceImpl extends BasePersistenceImpl<OAuth2
 	public void cacheResult(List<OAuth2Application> oAuth2Applications) {
 		for (OAuth2Application oAuth2Application : oAuth2Applications) {
 			if (entityCache.getResult(
-						OAuth2ApplicationModelImpl.ENTITY_CACHE_ENABLED,
-						OAuth2ApplicationImpl.class,
-						oAuth2Application.getPrimaryKey()) == null) {
+					OAuth2ApplicationModelImpl.ENTITY_CACHE_ENABLED,
+					OAuth2ApplicationImpl.class,
+					oAuth2Application.getPrimaryKey()) == null) {
+
 				cacheResult(oAuth2Application);
 			}
 			else {
@@ -1284,7 +1312,7 @@ public class OAuth2ApplicationPersistenceImpl extends BasePersistenceImpl<OAuth2
 	 * Clears the cache for all o auth2 applications.
 	 *
 	 * <p>
-	 * The {@link EntityCache} and {@link FinderCache} are both cleared by this method.
+	 * The <code>EntityCache</code> and <code>FinderCache</code> are both cleared by this method.
 	 * </p>
 	 */
 	@Override
@@ -1300,19 +1328,20 @@ public class OAuth2ApplicationPersistenceImpl extends BasePersistenceImpl<OAuth2
 	 * Clears the cache for the o auth2 application.
 	 *
 	 * <p>
-	 * The {@link EntityCache} and {@link FinderCache} are both cleared by this method.
+	 * The <code>EntityCache</code> and <code>FinderCache</code> are both cleared by this method.
 	 * </p>
 	 */
 	@Override
 	public void clearCache(OAuth2Application oAuth2Application) {
-		entityCache.removeResult(OAuth2ApplicationModelImpl.ENTITY_CACHE_ENABLED,
+		entityCache.removeResult(
+			OAuth2ApplicationModelImpl.ENTITY_CACHE_ENABLED,
 			OAuth2ApplicationImpl.class, oAuth2Application.getPrimaryKey());
 
 		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
 		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
 
-		clearUniqueFindersCache((OAuth2ApplicationModelImpl)oAuth2Application,
-			true);
+		clearUniqueFindersCache(
+			(OAuth2ApplicationModelImpl)oAuth2Application, true);
 	}
 
 	@Override
@@ -1321,49 +1350,53 @@ public class OAuth2ApplicationPersistenceImpl extends BasePersistenceImpl<OAuth2
 		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
 
 		for (OAuth2Application oAuth2Application : oAuth2Applications) {
-			entityCache.removeResult(OAuth2ApplicationModelImpl.ENTITY_CACHE_ENABLED,
+			entityCache.removeResult(
+				OAuth2ApplicationModelImpl.ENTITY_CACHE_ENABLED,
 				OAuth2ApplicationImpl.class, oAuth2Application.getPrimaryKey());
 
-			clearUniqueFindersCache((OAuth2ApplicationModelImpl)oAuth2Application,
-				true);
+			clearUniqueFindersCache(
+				(OAuth2ApplicationModelImpl)oAuth2Application, true);
 		}
 	}
 
 	protected void cacheUniqueFindersCache(
 		OAuth2ApplicationModelImpl oAuth2ApplicationModelImpl) {
-		Object[] args = new Object[] {
-				oAuth2ApplicationModelImpl.getCompanyId(),
-				oAuth2ApplicationModelImpl.getClientId()
-			};
 
-		finderCache.putResult(FINDER_PATH_COUNT_BY_C_C, args, Long.valueOf(1),
-			false);
-		finderCache.putResult(FINDER_PATH_FETCH_BY_C_C, args,
-			oAuth2ApplicationModelImpl, false);
+		Object[] args = new Object[] {
+			oAuth2ApplicationModelImpl.getCompanyId(),
+			oAuth2ApplicationModelImpl.getClientId()
+		};
+
+		finderCache.putResult(
+			_finderPathCountByC_C, args, Long.valueOf(1), false);
+		finderCache.putResult(
+			_finderPathFetchByC_C, args, oAuth2ApplicationModelImpl, false);
 	}
 
 	protected void clearUniqueFindersCache(
 		OAuth2ApplicationModelImpl oAuth2ApplicationModelImpl,
 		boolean clearCurrent) {
+
 		if (clearCurrent) {
 			Object[] args = new Object[] {
-					oAuth2ApplicationModelImpl.getCompanyId(),
-					oAuth2ApplicationModelImpl.getClientId()
-				};
+				oAuth2ApplicationModelImpl.getCompanyId(),
+				oAuth2ApplicationModelImpl.getClientId()
+			};
 
-			finderCache.removeResult(FINDER_PATH_COUNT_BY_C_C, args);
-			finderCache.removeResult(FINDER_PATH_FETCH_BY_C_C, args);
+			finderCache.removeResult(_finderPathCountByC_C, args);
+			finderCache.removeResult(_finderPathFetchByC_C, args);
 		}
 
 		if ((oAuth2ApplicationModelImpl.getColumnBitmask() &
-				FINDER_PATH_FETCH_BY_C_C.getColumnBitmask()) != 0) {
-			Object[] args = new Object[] {
-					oAuth2ApplicationModelImpl.getOriginalCompanyId(),
-					oAuth2ApplicationModelImpl.getOriginalClientId()
-				};
+			 _finderPathFetchByC_C.getColumnBitmask()) != 0) {
 
-			finderCache.removeResult(FINDER_PATH_COUNT_BY_C_C, args);
-			finderCache.removeResult(FINDER_PATH_FETCH_BY_C_C, args);
+			Object[] args = new Object[] {
+				oAuth2ApplicationModelImpl.getOriginalCompanyId(),
+				oAuth2ApplicationModelImpl.getOriginalClientId()
+			};
+
+			finderCache.removeResult(_finderPathCountByC_C, args);
+			finderCache.removeResult(_finderPathFetchByC_C, args);
 		}
 	}
 
@@ -1395,6 +1428,7 @@ public class OAuth2ApplicationPersistenceImpl extends BasePersistenceImpl<OAuth2
 	@Override
 	public OAuth2Application remove(long oAuth2ApplicationId)
 		throws NoSuchOAuth2ApplicationException {
+
 		return remove((Serializable)oAuth2ApplicationId);
 	}
 
@@ -1408,21 +1442,23 @@ public class OAuth2ApplicationPersistenceImpl extends BasePersistenceImpl<OAuth2
 	@Override
 	public OAuth2Application remove(Serializable primaryKey)
 		throws NoSuchOAuth2ApplicationException {
+
 		Session session = null;
 
 		try {
 			session = openSession();
 
-			OAuth2Application oAuth2Application = (OAuth2Application)session.get(OAuth2ApplicationImpl.class,
-					primaryKey);
+			OAuth2Application oAuth2Application =
+				(OAuth2Application)session.get(
+					OAuth2ApplicationImpl.class, primaryKey);
 
 			if (oAuth2Application == null) {
 				if (_log.isDebugEnabled()) {
 					_log.debug(_NO_SUCH_ENTITY_WITH_PRIMARY_KEY + primaryKey);
 				}
 
-				throw new NoSuchOAuth2ApplicationException(_NO_SUCH_ENTITY_WITH_PRIMARY_KEY +
-					primaryKey);
+				throw new NoSuchOAuth2ApplicationException(
+					_NO_SUCH_ENTITY_WITH_PRIMARY_KEY + primaryKey);
 			}
 
 			return remove(oAuth2Application);
@@ -1439,15 +1475,18 @@ public class OAuth2ApplicationPersistenceImpl extends BasePersistenceImpl<OAuth2
 	}
 
 	@Override
-	protected OAuth2Application removeImpl(OAuth2Application oAuth2Application) {
+	protected OAuth2Application removeImpl(
+		OAuth2Application oAuth2Application) {
+
 		Session session = null;
 
 		try {
 			session = openSession();
 
 			if (!session.contains(oAuth2Application)) {
-				oAuth2Application = (OAuth2Application)session.get(OAuth2ApplicationImpl.class,
-						oAuth2Application.getPrimaryKeyObj());
+				oAuth2Application = (OAuth2Application)session.get(
+					OAuth2ApplicationImpl.class,
+					oAuth2Application.getPrimaryKeyObj());
 			}
 
 			if (oAuth2Application != null) {
@@ -1476,21 +1515,24 @@ public class OAuth2ApplicationPersistenceImpl extends BasePersistenceImpl<OAuth2
 			InvocationHandler invocationHandler = null;
 
 			if (ProxyUtil.isProxyClass(oAuth2Application.getClass())) {
-				invocationHandler = ProxyUtil.getInvocationHandler(oAuth2Application);
+				invocationHandler = ProxyUtil.getInvocationHandler(
+					oAuth2Application);
 
 				throw new IllegalArgumentException(
 					"Implement ModelWrapper in oAuth2Application proxy " +
-					invocationHandler.getClass());
+						invocationHandler.getClass());
 			}
 
 			throw new IllegalArgumentException(
 				"Implement ModelWrapper in custom OAuth2Application implementation " +
-				oAuth2Application.getClass());
+					oAuth2Application.getClass());
 		}
 
-		OAuth2ApplicationModelImpl oAuth2ApplicationModelImpl = (OAuth2ApplicationModelImpl)oAuth2Application;
+		OAuth2ApplicationModelImpl oAuth2ApplicationModelImpl =
+			(OAuth2ApplicationModelImpl)oAuth2Application;
 
-		ServiceContext serviceContext = ServiceContextThreadLocal.getServiceContext();
+		ServiceContext serviceContext =
+			ServiceContextThreadLocal.getServiceContext();
 
 		Date now = new Date();
 
@@ -1499,8 +1541,8 @@ public class OAuth2ApplicationPersistenceImpl extends BasePersistenceImpl<OAuth2
 				oAuth2Application.setCreateDate(now);
 			}
 			else {
-				oAuth2Application.setCreateDate(serviceContext.getCreateDate(
-						now));
+				oAuth2Application.setCreateDate(
+					serviceContext.getCreateDate(now));
 			}
 		}
 
@@ -1509,8 +1551,8 @@ public class OAuth2ApplicationPersistenceImpl extends BasePersistenceImpl<OAuth2
 				oAuth2Application.setModifiedDate(now);
 			}
 			else {
-				oAuth2Application.setModifiedDate(serviceContext.getModifiedDate(
-						now));
+				oAuth2Application.setModifiedDate(
+					serviceContext.getModifiedDate(now));
 			}
 		}
 
@@ -1525,7 +1567,8 @@ public class OAuth2ApplicationPersistenceImpl extends BasePersistenceImpl<OAuth2
 				oAuth2Application.setNew(false);
 			}
 			else {
-				oAuth2Application = (OAuth2Application)session.merge(oAuth2Application);
+				oAuth2Application = (OAuth2Application)session.merge(
+					oAuth2Application);
 			}
 		}
 		catch (Exception e) {
@@ -1540,41 +1583,40 @@ public class OAuth2ApplicationPersistenceImpl extends BasePersistenceImpl<OAuth2
 		if (!OAuth2ApplicationModelImpl.COLUMN_BITMASK_ENABLED) {
 			finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
 		}
-		else
-		 if (isNew) {
+		else if (isNew) {
 			Object[] args = new Object[] {
-					oAuth2ApplicationModelImpl.getCompanyId()
-				};
+				oAuth2ApplicationModelImpl.getCompanyId()
+			};
 
-			finderCache.removeResult(FINDER_PATH_COUNT_BY_C, args);
-			finderCache.removeResult(FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_C,
-				args);
+			finderCache.removeResult(_finderPathCountByC, args);
+			finderCache.removeResult(_finderPathWithoutPaginationFindByC, args);
 
-			finderCache.removeResult(FINDER_PATH_COUNT_ALL, FINDER_ARGS_EMPTY);
-			finderCache.removeResult(FINDER_PATH_WITHOUT_PAGINATION_FIND_ALL,
-				FINDER_ARGS_EMPTY);
+			finderCache.removeResult(_finderPathCountAll, FINDER_ARGS_EMPTY);
+			finderCache.removeResult(
+				_finderPathWithoutPaginationFindAll, FINDER_ARGS_EMPTY);
 		}
-
 		else {
 			if ((oAuth2ApplicationModelImpl.getColumnBitmask() &
-					FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_C.getColumnBitmask()) != 0) {
+				 _finderPathWithoutPaginationFindByC.getColumnBitmask()) != 0) {
+
 				Object[] args = new Object[] {
-						oAuth2ApplicationModelImpl.getOriginalCompanyId()
-					};
+					oAuth2ApplicationModelImpl.getOriginalCompanyId()
+				};
 
-				finderCache.removeResult(FINDER_PATH_COUNT_BY_C, args);
-				finderCache.removeResult(FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_C,
-					args);
+				finderCache.removeResult(_finderPathCountByC, args);
+				finderCache.removeResult(
+					_finderPathWithoutPaginationFindByC, args);
 
-				args = new Object[] { oAuth2ApplicationModelImpl.getCompanyId() };
+				args = new Object[] {oAuth2ApplicationModelImpl.getCompanyId()};
 
-				finderCache.removeResult(FINDER_PATH_COUNT_BY_C, args);
-				finderCache.removeResult(FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_C,
-					args);
+				finderCache.removeResult(_finderPathCountByC, args);
+				finderCache.removeResult(
+					_finderPathWithoutPaginationFindByC, args);
 			}
 		}
 
-		entityCache.putResult(OAuth2ApplicationModelImpl.ENTITY_CACHE_ENABLED,
+		entityCache.putResult(
+			OAuth2ApplicationModelImpl.ENTITY_CACHE_ENABLED,
 			OAuth2ApplicationImpl.class, oAuth2Application.getPrimaryKey(),
 			oAuth2Application, false);
 
@@ -1587,7 +1629,7 @@ public class OAuth2ApplicationPersistenceImpl extends BasePersistenceImpl<OAuth2
 	}
 
 	/**
-	 * Returns the o auth2 application with the primary key or throws a {@link com.liferay.portal.kernel.exception.NoSuchModelException} if it could not be found.
+	 * Returns the o auth2 application with the primary key or throws a <code>com.liferay.portal.kernel.exception.NoSuchModelException</code> if it could not be found.
 	 *
 	 * @param primaryKey the primary key of the o auth2 application
 	 * @return the o auth2 application
@@ -1596,6 +1638,7 @@ public class OAuth2ApplicationPersistenceImpl extends BasePersistenceImpl<OAuth2
 	@Override
 	public OAuth2Application findByPrimaryKey(Serializable primaryKey)
 		throws NoSuchOAuth2ApplicationException {
+
 		OAuth2Application oAuth2Application = fetchByPrimaryKey(primaryKey);
 
 		if (oAuth2Application == null) {
@@ -1603,15 +1646,15 @@ public class OAuth2ApplicationPersistenceImpl extends BasePersistenceImpl<OAuth2
 				_log.debug(_NO_SUCH_ENTITY_WITH_PRIMARY_KEY + primaryKey);
 			}
 
-			throw new NoSuchOAuth2ApplicationException(_NO_SUCH_ENTITY_WITH_PRIMARY_KEY +
-				primaryKey);
+			throw new NoSuchOAuth2ApplicationException(
+				_NO_SUCH_ENTITY_WITH_PRIMARY_KEY + primaryKey);
 		}
 
 		return oAuth2Application;
 	}
 
 	/**
-	 * Returns the o auth2 application with the primary key or throws a {@link NoSuchOAuth2ApplicationException} if it could not be found.
+	 * Returns the o auth2 application with the primary key or throws a <code>NoSuchOAuth2ApplicationException</code> if it could not be found.
 	 *
 	 * @param oAuth2ApplicationId the primary key of the o auth2 application
 	 * @return the o auth2 application
@@ -1620,6 +1663,7 @@ public class OAuth2ApplicationPersistenceImpl extends BasePersistenceImpl<OAuth2
 	@Override
 	public OAuth2Application findByPrimaryKey(long oAuth2ApplicationId)
 		throws NoSuchOAuth2ApplicationException {
+
 		return findByPrimaryKey((Serializable)oAuth2ApplicationId);
 	}
 
@@ -1631,8 +1675,9 @@ public class OAuth2ApplicationPersistenceImpl extends BasePersistenceImpl<OAuth2
 	 */
 	@Override
 	public OAuth2Application fetchByPrimaryKey(Serializable primaryKey) {
-		Serializable serializable = entityCache.getResult(OAuth2ApplicationModelImpl.ENTITY_CACHE_ENABLED,
-				OAuth2ApplicationImpl.class, primaryKey);
+		Serializable serializable = entityCache.getResult(
+			OAuth2ApplicationModelImpl.ENTITY_CACHE_ENABLED,
+			OAuth2ApplicationImpl.class, primaryKey);
 
 		if (serializable == nullModel) {
 			return null;
@@ -1646,19 +1691,21 @@ public class OAuth2ApplicationPersistenceImpl extends BasePersistenceImpl<OAuth2
 			try {
 				session = openSession();
 
-				oAuth2Application = (OAuth2Application)session.get(OAuth2ApplicationImpl.class,
-						primaryKey);
+				oAuth2Application = (OAuth2Application)session.get(
+					OAuth2ApplicationImpl.class, primaryKey);
 
 				if (oAuth2Application != null) {
 					cacheResult(oAuth2Application);
 				}
 				else {
-					entityCache.putResult(OAuth2ApplicationModelImpl.ENTITY_CACHE_ENABLED,
+					entityCache.putResult(
+						OAuth2ApplicationModelImpl.ENTITY_CACHE_ENABLED,
 						OAuth2ApplicationImpl.class, primaryKey, nullModel);
 				}
 			}
 			catch (Exception e) {
-				entityCache.removeResult(OAuth2ApplicationModelImpl.ENTITY_CACHE_ENABLED,
+				entityCache.removeResult(
+					OAuth2ApplicationModelImpl.ENTITY_CACHE_ENABLED,
 					OAuth2ApplicationImpl.class, primaryKey);
 
 				throw processException(e);
@@ -1685,11 +1732,13 @@ public class OAuth2ApplicationPersistenceImpl extends BasePersistenceImpl<OAuth2
 	@Override
 	public Map<Serializable, OAuth2Application> fetchByPrimaryKeys(
 		Set<Serializable> primaryKeys) {
+
 		if (primaryKeys.isEmpty()) {
 			return Collections.emptyMap();
 		}
 
-		Map<Serializable, OAuth2Application> map = new HashMap<Serializable, OAuth2Application>();
+		Map<Serializable, OAuth2Application> map =
+			new HashMap<Serializable, OAuth2Application>();
 
 		if (primaryKeys.size() == 1) {
 			Iterator<Serializable> iterator = primaryKeys.iterator();
@@ -1708,8 +1757,9 @@ public class OAuth2ApplicationPersistenceImpl extends BasePersistenceImpl<OAuth2
 		Set<Serializable> uncachedPrimaryKeys = null;
 
 		for (Serializable primaryKey : primaryKeys) {
-			Serializable serializable = entityCache.getResult(OAuth2ApplicationModelImpl.ENTITY_CACHE_ENABLED,
-					OAuth2ApplicationImpl.class, primaryKey);
+			Serializable serializable = entityCache.getResult(
+				OAuth2ApplicationModelImpl.ENTITY_CACHE_ENABLED,
+				OAuth2ApplicationImpl.class, primaryKey);
 
 			if (serializable != nullModel) {
 				if (serializable == null) {
@@ -1729,8 +1779,8 @@ public class OAuth2ApplicationPersistenceImpl extends BasePersistenceImpl<OAuth2
 			return map;
 		}
 
-		StringBundler query = new StringBundler((uncachedPrimaryKeys.size() * 2) +
-				1);
+		StringBundler query = new StringBundler(
+			uncachedPrimaryKeys.size() * 2 + 1);
 
 		query.append(_SQL_SELECT_OAUTH2APPLICATION_WHERE_PKS_IN);
 
@@ -1753,16 +1803,21 @@ public class OAuth2ApplicationPersistenceImpl extends BasePersistenceImpl<OAuth2
 
 			Query q = session.createQuery(sql);
 
-			for (OAuth2Application oAuth2Application : (List<OAuth2Application>)q.list()) {
-				map.put(oAuth2Application.getPrimaryKeyObj(), oAuth2Application);
+			for (OAuth2Application oAuth2Application :
+					(List<OAuth2Application>)q.list()) {
+
+				map.put(
+					oAuth2Application.getPrimaryKeyObj(), oAuth2Application);
 
 				cacheResult(oAuth2Application);
 
-				uncachedPrimaryKeys.remove(oAuth2Application.getPrimaryKeyObj());
+				uncachedPrimaryKeys.remove(
+					oAuth2Application.getPrimaryKeyObj());
 			}
 
 			for (Serializable primaryKey : uncachedPrimaryKeys) {
-				entityCache.putResult(OAuth2ApplicationModelImpl.ENTITY_CACHE_ENABLED,
+				entityCache.putResult(
+					OAuth2ApplicationModelImpl.ENTITY_CACHE_ENABLED,
 					OAuth2ApplicationImpl.class, primaryKey, nullModel);
 			}
 		}
@@ -1790,7 +1845,7 @@ public class OAuth2ApplicationPersistenceImpl extends BasePersistenceImpl<OAuth2
 	 * Returns a range of all the o auth2 applications.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link OAuth2ApplicationModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>OAuth2ApplicationModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param start the lower bound of the range of o auth2 applications
@@ -1806,7 +1861,7 @@ public class OAuth2ApplicationPersistenceImpl extends BasePersistenceImpl<OAuth2
 	 * Returns an ordered range of all the o auth2 applications.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link OAuth2ApplicationModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>OAuth2ApplicationModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param start the lower bound of the range of o auth2 applications
@@ -1815,8 +1870,10 @@ public class OAuth2ApplicationPersistenceImpl extends BasePersistenceImpl<OAuth2
 	 * @return the ordered range of o auth2 applications
 	 */
 	@Override
-	public List<OAuth2Application> findAll(int start, int end,
+	public List<OAuth2Application> findAll(
+		int start, int end,
 		OrderByComparator<OAuth2Application> orderByComparator) {
+
 		return findAll(start, end, orderByComparator, true);
 	}
 
@@ -1824,7 +1881,7 @@ public class OAuth2ApplicationPersistenceImpl extends BasePersistenceImpl<OAuth2
 	 * Returns an ordered range of all the o auth2 applications.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link OAuth2ApplicationModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>OAuth2ApplicationModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param start the lower bound of the range of o auth2 applications
@@ -1834,29 +1891,32 @@ public class OAuth2ApplicationPersistenceImpl extends BasePersistenceImpl<OAuth2
 	 * @return the ordered range of o auth2 applications
 	 */
 	@Override
-	public List<OAuth2Application> findAll(int start, int end,
+	public List<OAuth2Application> findAll(
+		int start, int end,
 		OrderByComparator<OAuth2Application> orderByComparator,
 		boolean retrieveFromCache) {
+
 		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
-				(orderByComparator == null)) {
+			(orderByComparator == null)) {
+
 			pagination = false;
-			finderPath = FINDER_PATH_WITHOUT_PAGINATION_FIND_ALL;
+			finderPath = _finderPathWithoutPaginationFindAll;
 			finderArgs = FINDER_ARGS_EMPTY;
 		}
 		else {
-			finderPath = FINDER_PATH_WITH_PAGINATION_FIND_ALL;
-			finderArgs = new Object[] { start, end, orderByComparator };
+			finderPath = _finderPathWithPaginationFindAll;
+			finderArgs = new Object[] {start, end, orderByComparator};
 		}
 
 		List<OAuth2Application> list = null;
 
 		if (retrieveFromCache) {
-			list = (List<OAuth2Application>)finderCache.getResult(finderPath,
-					finderArgs, this);
+			list = (List<OAuth2Application>)finderCache.getResult(
+				finderPath, finderArgs, this);
 		}
 
 		if (list == null) {
@@ -1864,13 +1924,13 @@ public class OAuth2ApplicationPersistenceImpl extends BasePersistenceImpl<OAuth2
 			String sql = null;
 
 			if (orderByComparator != null) {
-				query = new StringBundler(2 +
-						(orderByComparator.getOrderByFields().length * 2));
+				query = new StringBundler(
+					2 + (orderByComparator.getOrderByFields().length * 2));
 
 				query.append(_SQL_SELECT_OAUTH2APPLICATION);
 
-				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
-					orderByComparator);
+				appendOrderByComparator(
+					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
 
 				sql = query.toString();
 			}
@@ -1890,16 +1950,16 @@ public class OAuth2ApplicationPersistenceImpl extends BasePersistenceImpl<OAuth2
 				Query q = session.createQuery(sql);
 
 				if (!pagination) {
-					list = (List<OAuth2Application>)QueryUtil.list(q,
-							getDialect(), start, end, false);
+					list = (List<OAuth2Application>)QueryUtil.list(
+						q, getDialect(), start, end, false);
 
 					Collections.sort(list);
 
 					list = Collections.unmodifiableList(list);
 				}
 				else {
-					list = (List<OAuth2Application>)QueryUtil.list(q,
-							getDialect(), start, end);
+					list = (List<OAuth2Application>)QueryUtil.list(
+						q, getDialect(), start, end);
 				}
 
 				cacheResult(list);
@@ -1937,8 +1997,8 @@ public class OAuth2ApplicationPersistenceImpl extends BasePersistenceImpl<OAuth2
 	 */
 	@Override
 	public int countAll() {
-		Long count = (Long)finderCache.getResult(FINDER_PATH_COUNT_ALL,
-				FINDER_ARGS_EMPTY, this);
+		Long count = (Long)finderCache.getResult(
+			_finderPathCountAll, FINDER_ARGS_EMPTY, this);
 
 		if (count == null) {
 			Session session = null;
@@ -1950,12 +2010,12 @@ public class OAuth2ApplicationPersistenceImpl extends BasePersistenceImpl<OAuth2
 
 				count = (Long)q.uniqueResult();
 
-				finderCache.putResult(FINDER_PATH_COUNT_ALL, FINDER_ARGS_EMPTY,
-					count);
+				finderCache.putResult(
+					_finderPathCountAll, FINDER_ARGS_EMPTY, count);
 			}
 			catch (Exception e) {
-				finderCache.removeResult(FINDER_PATH_COUNT_ALL,
-					FINDER_ARGS_EMPTY);
+				finderCache.removeResult(
+					_finderPathCountAll, FINDER_ARGS_EMPTY);
 
 				throw processException(e);
 			}
@@ -1981,6 +2041,62 @@ public class OAuth2ApplicationPersistenceImpl extends BasePersistenceImpl<OAuth2
 	 * Initializes the o auth2 application persistence.
 	 */
 	public void afterPropertiesSet() {
+		_finderPathWithPaginationFindAll = new FinderPath(
+			OAuth2ApplicationModelImpl.ENTITY_CACHE_ENABLED,
+			OAuth2ApplicationModelImpl.FINDER_CACHE_ENABLED,
+			OAuth2ApplicationImpl.class, FINDER_CLASS_NAME_LIST_WITH_PAGINATION,
+			"findAll", new String[0]);
+
+		_finderPathWithoutPaginationFindAll = new FinderPath(
+			OAuth2ApplicationModelImpl.ENTITY_CACHE_ENABLED,
+			OAuth2ApplicationModelImpl.FINDER_CACHE_ENABLED,
+			OAuth2ApplicationImpl.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findAll",
+			new String[0]);
+
+		_finderPathCountAll = new FinderPath(
+			OAuth2ApplicationModelImpl.ENTITY_CACHE_ENABLED,
+			OAuth2ApplicationModelImpl.FINDER_CACHE_ENABLED, Long.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countAll",
+			new String[0]);
+
+		_finderPathWithPaginationFindByC = new FinderPath(
+			OAuth2ApplicationModelImpl.ENTITY_CACHE_ENABLED,
+			OAuth2ApplicationModelImpl.FINDER_CACHE_ENABLED,
+			OAuth2ApplicationImpl.class, FINDER_CLASS_NAME_LIST_WITH_PAGINATION,
+			"findByC",
+			new String[] {
+				Long.class.getName(), Integer.class.getName(),
+				Integer.class.getName(), OrderByComparator.class.getName()
+			});
+
+		_finderPathWithoutPaginationFindByC = new FinderPath(
+			OAuth2ApplicationModelImpl.ENTITY_CACHE_ENABLED,
+			OAuth2ApplicationModelImpl.FINDER_CACHE_ENABLED,
+			OAuth2ApplicationImpl.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByC",
+			new String[] {Long.class.getName()},
+			OAuth2ApplicationModelImpl.COMPANYID_COLUMN_BITMASK);
+
+		_finderPathCountByC = new FinderPath(
+			OAuth2ApplicationModelImpl.ENTITY_CACHE_ENABLED,
+			OAuth2ApplicationModelImpl.FINDER_CACHE_ENABLED, Long.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByC",
+			new String[] {Long.class.getName()});
+
+		_finderPathFetchByC_C = new FinderPath(
+			OAuth2ApplicationModelImpl.ENTITY_CACHE_ENABLED,
+			OAuth2ApplicationModelImpl.FINDER_CACHE_ENABLED,
+			OAuth2ApplicationImpl.class, FINDER_CLASS_NAME_ENTITY, "fetchByC_C",
+			new String[] {Long.class.getName(), String.class.getName()},
+			OAuth2ApplicationModelImpl.COMPANYID_COLUMN_BITMASK |
+			OAuth2ApplicationModelImpl.CLIENTID_COLUMN_BITMASK);
+
+		_finderPathCountByC_C = new FinderPath(
+			OAuth2ApplicationModelImpl.ENTITY_CACHE_ENABLED,
+			OAuth2ApplicationModelImpl.FINDER_CACHE_ENABLED, Long.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByC_C",
+			new String[] {Long.class.getName(), String.class.getName()});
 	}
 
 	public void destroy() {
@@ -1992,30 +2108,63 @@ public class OAuth2ApplicationPersistenceImpl extends BasePersistenceImpl<OAuth2
 
 	@ServiceReference(type = CompanyProviderWrapper.class)
 	protected CompanyProvider companyProvider;
+
 	@ServiceReference(type = EntityCache.class)
 	protected EntityCache entityCache;
+
 	@ServiceReference(type = FinderCache.class)
 	protected FinderCache finderCache;
-	private static final String _SQL_SELECT_OAUTH2APPLICATION = "SELECT oAuth2Application FROM OAuth2Application oAuth2Application";
-	private static final String _SQL_SELECT_OAUTH2APPLICATION_WHERE_PKS_IN = "SELECT oAuth2Application FROM OAuth2Application oAuth2Application WHERE oAuth2ApplicationId IN (";
-	private static final String _SQL_SELECT_OAUTH2APPLICATION_WHERE = "SELECT oAuth2Application FROM OAuth2Application oAuth2Application WHERE ";
-	private static final String _SQL_COUNT_OAUTH2APPLICATION = "SELECT COUNT(oAuth2Application) FROM OAuth2Application oAuth2Application";
-	private static final String _SQL_COUNT_OAUTH2APPLICATION_WHERE = "SELECT COUNT(oAuth2Application) FROM OAuth2Application oAuth2Application WHERE ";
-	private static final String _FILTER_ENTITY_TABLE_FILTER_PK_COLUMN = "oAuth2Application.oAuth2ApplicationId";
-	private static final String _FILTER_SQL_SELECT_OAUTH2APPLICATION_WHERE = "SELECT DISTINCT {oAuth2Application.*} FROM OAuth2Application oAuth2Application WHERE ";
-	private static final String _FILTER_SQL_SELECT_OAUTH2APPLICATION_NO_INLINE_DISTINCT_WHERE_1 =
-		"SELECT {OAuth2Application.*} FROM (SELECT DISTINCT oAuth2Application.oAuth2ApplicationId FROM OAuth2Application oAuth2Application WHERE ";
-	private static final String _FILTER_SQL_SELECT_OAUTH2APPLICATION_NO_INLINE_DISTINCT_WHERE_2 =
-		") TEMP_TABLE INNER JOIN OAuth2Application ON TEMP_TABLE.oAuth2ApplicationId = OAuth2Application.oAuth2ApplicationId";
-	private static final String _FILTER_SQL_COUNT_OAUTH2APPLICATION_WHERE = "SELECT COUNT(DISTINCT oAuth2Application.oAuth2ApplicationId) AS COUNT_VALUE FROM OAuth2Application oAuth2Application WHERE ";
+
+	private static final String _SQL_SELECT_OAUTH2APPLICATION =
+		"SELECT oAuth2Application FROM OAuth2Application oAuth2Application";
+
+	private static final String _SQL_SELECT_OAUTH2APPLICATION_WHERE_PKS_IN =
+		"SELECT oAuth2Application FROM OAuth2Application oAuth2Application WHERE oAuth2ApplicationId IN (";
+
+	private static final String _SQL_SELECT_OAUTH2APPLICATION_WHERE =
+		"SELECT oAuth2Application FROM OAuth2Application oAuth2Application WHERE ";
+
+	private static final String _SQL_COUNT_OAUTH2APPLICATION =
+		"SELECT COUNT(oAuth2Application) FROM OAuth2Application oAuth2Application";
+
+	private static final String _SQL_COUNT_OAUTH2APPLICATION_WHERE =
+		"SELECT COUNT(oAuth2Application) FROM OAuth2Application oAuth2Application WHERE ";
+
+	private static final String _FILTER_ENTITY_TABLE_FILTER_PK_COLUMN =
+		"oAuth2Application.oAuth2ApplicationId";
+
+	private static final String _FILTER_SQL_SELECT_OAUTH2APPLICATION_WHERE =
+		"SELECT DISTINCT {oAuth2Application.*} FROM OAuth2Application oAuth2Application WHERE ";
+
+	private static final String
+		_FILTER_SQL_SELECT_OAUTH2APPLICATION_NO_INLINE_DISTINCT_WHERE_1 =
+			"SELECT {OAuth2Application.*} FROM (SELECT DISTINCT oAuth2Application.oAuth2ApplicationId FROM OAuth2Application oAuth2Application WHERE ";
+
+	private static final String
+		_FILTER_SQL_SELECT_OAUTH2APPLICATION_NO_INLINE_DISTINCT_WHERE_2 =
+			") TEMP_TABLE INNER JOIN OAuth2Application ON TEMP_TABLE.oAuth2ApplicationId = OAuth2Application.oAuth2ApplicationId";
+
+	private static final String _FILTER_SQL_COUNT_OAUTH2APPLICATION_WHERE =
+		"SELECT COUNT(DISTINCT oAuth2Application.oAuth2ApplicationId) AS COUNT_VALUE FROM OAuth2Application oAuth2Application WHERE ";
+
 	private static final String _FILTER_ENTITY_ALIAS = "oAuth2Application";
+
 	private static final String _FILTER_ENTITY_TABLE = "OAuth2Application";
+
 	private static final String _ORDER_BY_ENTITY_ALIAS = "oAuth2Application.";
+
 	private static final String _ORDER_BY_ENTITY_TABLE = "OAuth2Application.";
-	private static final String _NO_SUCH_ENTITY_WITH_PRIMARY_KEY = "No OAuth2Application exists with the primary key ";
-	private static final String _NO_SUCH_ENTITY_WITH_KEY = "No OAuth2Application exists with the key {";
-	private static final Log _log = LogFactoryUtil.getLog(OAuth2ApplicationPersistenceImpl.class);
-	private static final Set<String> _badColumnNames = SetUtil.fromArray(new String[] {
-				"oAuth2ApplicationScopeAliasesId"
-			});
+
+	private static final String _NO_SUCH_ENTITY_WITH_PRIMARY_KEY =
+		"No OAuth2Application exists with the primary key ";
+
+	private static final String _NO_SUCH_ENTITY_WITH_KEY =
+		"No OAuth2Application exists with the key {";
+
+	private static final Log _log = LogFactoryUtil.getLog(
+		OAuth2ApplicationPersistenceImpl.class);
+
+	private static final Set<String> _badColumnNames = SetUtil.fromArray(
+		new String[] {"oAuth2ApplicationScopeAliasesId"});
+
 }

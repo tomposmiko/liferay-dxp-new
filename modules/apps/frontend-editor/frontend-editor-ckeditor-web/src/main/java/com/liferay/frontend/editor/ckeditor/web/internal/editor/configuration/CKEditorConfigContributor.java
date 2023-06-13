@@ -42,7 +42,7 @@ import org.osgi.service.component.annotations.ReferencePolicy;
 import org.osgi.service.component.annotations.ReferencePolicyOption;
 
 /**
- * @author Ambrin Chaudhary
+ * @author Ambrín Chaudhary
  */
 @Component(
 	property = "editor.name=ckeditor", service = EditorConfigContributor.class
@@ -59,7 +59,6 @@ public class CKEditorConfigContributor extends BaseCKEditorConfigContributor {
 			jsonObject, inputEditorTaglibAttributes, themeDisplay,
 			requestBackedPortletURLFactory);
 
-		jsonObject.put("autoParagraph", Boolean.FALSE);
 		jsonObject.put("autoSaveTimeout", 3000);
 
 		ColorScheme colorScheme = themeDisplay.getColorScheme();

@@ -45,8 +45,6 @@ definition {
 	macro configureDefaultPG {
 		SetupWizard.viewDefaultPortalNamePG();
 
-		SetupWizard.configureSampleDataPG(addSampleData = "${addSampleData}");
-
 		SetupWizard.viewDefaultAdministratorUserPG();
 
 		SetupWizard.viewDefaultDatabasePG();
@@ -83,8 +81,6 @@ definition {
 
 	@summary = "Configure JDBC to ${databaseType} for Liferay with the Setup Wizard"
 	macro configurePG {
-		SetupWizard.configureSampleDataPG(addSampleData = "${addSampleData}");
-
 		if (isSet(portalName)) {
 			SetupWizard.configurePortalNamePG(portalName = "${portalName}");
 		}
@@ -106,6 +102,8 @@ definition {
 			jdbcDriverClassName = "${jdbcDriverClassName}",
 			jdbcURL = "${jdbcURL}"
 		);
+
+		SetupWizard.configureSampleDataPG(addSampleData = "${addSampleData}");
 
 		SetupWizard.finishConfigurationPG();
 
@@ -144,6 +142,17 @@ definition {
 	}
 
 	macro configureSampleDataPG {
+		if (IsElementNotPresent(locator1 = "SetupWizard#DATABASE_CHANGE_USE_CONFIGURED_DATABASE_LINK")) {
+			AssertClick(
+				locator1 = "SetupWizard#DATABASE_CHANGE_LINK",
+				value1 ="(Change)"
+			);
+		}
+
+		if ("${addSampleData}" == "true") {
+			Check(locator1 = "Checkbox#ADD_SAMPLE_DATA");
+		}
+
 		if ("${addSampleData}" == "false") {
 			Uncheck(locator1 = "Checkbox#ADD_SAMPLE_DATA");
 		}
@@ -261,12 +270,12 @@ definition {
 
 			AssertTextEquals.assertText(
 				locator1 = "SetupWizard#DATABASE_CHANGE_JDBC_URL_LABEL",
-				value1 = "JDBC URL asterisk Required"
+				value1 = "JDBC URL Required"
 			);
 
 			AssertTextEquals.assertText(
 				locator1 = "SetupWizard#DATABASE_CHANGE_JDBC_DRIVER_CLASS_NAME_LABEL",
-				value1 = "JDBC Driver Class Name asterisk Required"
+				value1 = "JDBC Driver Class Name Required"
 			);
 
 			AssertTextEquals.assertText(
@@ -295,6 +304,89 @@ definition {
 				locator1 = "TextInput#PORTAL_NAME",
 				value1 = "Liferay"
 			);
+		}
+	}
+
+	macro viewPopulatedSampleData {
+		AssertConsoleTextPresent(value1 = "Finished adding data");
+
+		ProductMenu.gotoPortlet(
+			category = "Configuration",
+			panel = "Control Panel",
+			portlet = "Search"
+		);
+
+		SearchAdministration.executeSearchActions(
+			actionsDescription = "Reindex all search indexes."
+		);
+
+		ProductMenu.gotoPortlet(
+			category = "Users",
+			panel = "Control Panel",
+			portlet = "Users and Organizations"
+		);
+
+		Pagination.viewResults(results = "Showing 1 to 20 of 101 entries.");
+
+		User.viewCP(
+			userEmailAddress = "default.dlc.1@liferay.com",
+			userFirstName = "Test",
+			userLastName = "DLC 1",
+			userScreenName = "default.dlc.1"
+		);
+
+		Navigator.gotoBack();
+
+		UsersAndOrganizationsNavigator.gotoOrganizations();
+
+		Organization.viewCP(orgName = "Liferay, Inc.", orgType = "Organization");
+
+		Navigator.gotoBack();
+
+		Organization.gotoCP(orgName = "Liferay, Inc.", searchToken = "Liferay, Inc.");
+
+		User.searchCP(searchTerm = "Test DLC 1");
+
+		Organization.viewAssignMemberCP(
+			userName = "Test DLC 1"
+		);
+
+		Search.searchCP(searchTerm = "LiferayChicago");
+
+		var key_suborgName = "LiferayChicago";
+
+		AssertTextEquals(
+			locator1 = "UsersAndOrganizationsOrganization#SUBORGANIZATION_TABLE_NAME",
+			value1 = "LiferayChicago"
+		);
+
+		AssertTextEquals(
+			locator1 = "UsersAndOrganizationsOrganization#SUBORGANIZATION_TABLE_TYPE",
+			value1 = "Organization"
+		);
+
+		ProductMenu.gotoPortlet(
+			category = "Sites",
+			panel = "Control Panel",
+			portlet = "Sites"
+		);
+
+		AssertTextEquals.assertPartialText(
+			locator1 = "Sites#SITE_TABLE_NAME",
+			value1 = "Liferay, Inc.",
+			key_siteName = "Liferay, Inc."
+		);
+	}
+
+	macro viewSampleDataEnabledInPropertiesFile {
+		var liferayHome = PropsUtil.get("liferay.home.dir.name");
+		var fileContent = FileUtil.read("${liferayHome}/portal-setup-wizard.properties");
+
+		if (contains("${fileContent}", "setup.wizard.add.sample.data=on")) {
+			echo("The Sample Data property was saved successfully in portal-setup-wizard.properties!");
+		}
+		else {
+			fail("Fail to save the Sample Data property in portal-setup-wizard.properties.");
 		}
 	}
 }

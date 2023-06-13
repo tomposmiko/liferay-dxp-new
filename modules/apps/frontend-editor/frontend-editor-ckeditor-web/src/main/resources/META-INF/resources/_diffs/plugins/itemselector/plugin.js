@@ -1,4 +1,6 @@
 (function() {
+	var IE9AndLater = AUI.Env.UA.ie >= 9;
+
 	var STR_FILE_ENTRY_RETURN_TYPE = 'com.liferay.item.selector.criteria.FileEntryItemSelectorReturnType';
 
 	var TPL_AUDIO_SCRIPT = 'boundingBox: "#" + mediaId,' +
@@ -11,8 +13,6 @@
 		'poster: "{poster}",' +
 		'url: "{url}",' +
 		'width: {width}';
-
-	var IE9 = AUI.Env.UA.ie >= 9;
 
 	var defaultVideoHeight = 300;
 	var defaultVideoWidth = 400;
@@ -351,7 +351,7 @@
 					try {
 						var itemValue = JSON.parse(selectedItem.value);
 
-						itemSrc = editor.config.attachmentURLPrefix ? editor.config.attachmentURLPrefix + itemValue.title : itemValue.url;
+						itemSrc = editor.config.attachmentURLPrefix ? editor.config.attachmentURLPrefix + encodeURIComponent(itemValue.title) : itemValue.url;
 					}
 					catch (e) {
 					}
@@ -365,7 +365,7 @@
 
 				var ranges = selection.getRanges();
 
-				return selection.getType() === CKEDITOR.SELECTION_NONE || (ranges.length === 1 && (ranges[0].collapsed || IE9));
+				return selection.getType() === CKEDITOR.SELECTION_NONE || (ranges.length === 1 && (ranges[0].collapsed || IE9AndLater));
 			},
 
 			_onSelectedAudioChange: function(editor, callback, event) {
@@ -404,11 +404,21 @@
 									callback(imageSrc, selectedItem);
 								}
 								else {
-									editor.insertHtml('<img src="' + imageSrc + '">');
+									var elementOuterHtml = '<img src="' + imageSrc + '">';
+
+									editor.insertHtml(elementOuterHtml);
 
 									if (instance._isEmptySelection(editor)) {
-										if (IE9) {
-											editor.insertHtml('<img src="' + imageSrc + '">' + ' <br /> ');
+										if (IE9AndLater) {
+											var emptySelectionMarkup = '<br />';
+
+											var usingAlloyEditor = typeof AlloyEditor == 'undefined';
+
+											if (!usingAlloyEditor) {
+												emptySelectionMarkup = elementOuterHtml + emptySelectionMarkup;
+											}
+
+											editor.insertHtml(emptySelectionMarkup);
 										}
 										else {
 											editor.execCommand('enter');

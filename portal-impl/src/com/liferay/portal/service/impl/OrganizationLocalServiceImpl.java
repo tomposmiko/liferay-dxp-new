@@ -417,13 +417,13 @@ public class OrganizationLocalServiceImpl
 			params.put(
 				"usersOrgs", Long.valueOf(organization.getOrganizationId()));
 
-			if ((organizationPersistence.countByC_P(
-					organization.getCompanyId(),
-					organization.getOrganizationId()) > 0) ||
-				(userFinder.countByKeywords(
-					organization.getCompanyId(), null,
-					WorkflowConstants.STATUS_APPROVED, params) > 0)) {
+			int count1 = organizationPersistence.countByC_P(
+				organization.getCompanyId(), organization.getOrganizationId());
+			int count2 = userFinder.countByKeywords(
+				organization.getCompanyId(), null,
+				WorkflowConstants.STATUS_APPROVED, params);
 
+			if ((count1 > 0) || (count2 > 0)) {
 				throw new RequiredOrganizationException();
 			}
 		}
@@ -2490,19 +2490,18 @@ public class OrganizationLocalServiceImpl
 		if (Validator.isNull(name)) {
 			throw new OrganizationNameException();
 		}
-		else {
-			Organization organization = organizationPersistence.fetchByC_N(
-				companyId, name);
 
-			if ((organization != null) &&
-				StringUtil.equalsIgnoreCase(organization.getName(), name)) {
+		Organization organization = organizationPersistence.fetchByC_N(
+			companyId, name);
 
-				if ((organizationId <= 0) ||
-					(organization.getOrganizationId() != organizationId)) {
+		if ((organization != null) &&
+			StringUtil.equalsIgnoreCase(organization.getName(), name)) {
 
-					throw new DuplicateOrganizationException(
-						"There is another organization named " + name);
-				}
+			if ((organizationId <= 0) ||
+				(organization.getOrganizationId() != organizationId)) {
+
+				throw new DuplicateOrganizationException(
+					"There is another organization named " + name);
 			}
 		}
 

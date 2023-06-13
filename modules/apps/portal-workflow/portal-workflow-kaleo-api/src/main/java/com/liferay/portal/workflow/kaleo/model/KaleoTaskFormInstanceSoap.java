@@ -30,21 +30,26 @@ import java.util.List;
  */
 @ProviderType
 public class KaleoTaskFormInstanceSoap implements Serializable {
+
 	public static KaleoTaskFormInstanceSoap toSoapModel(
 		KaleoTaskFormInstance model) {
+
 		KaleoTaskFormInstanceSoap soapModel = new KaleoTaskFormInstanceSoap();
 
-		soapModel.setKaleoTaskFormInstanceId(model.getKaleoTaskFormInstanceId());
+		soapModel.setKaleoTaskFormInstanceId(
+			model.getKaleoTaskFormInstanceId());
 		soapModel.setGroupId(model.getGroupId());
 		soapModel.setCompanyId(model.getCompanyId());
 		soapModel.setUserId(model.getUserId());
 		soapModel.setUserName(model.getUserName());
 		soapModel.setCreateDate(model.getCreateDate());
 		soapModel.setModifiedDate(model.getModifiedDate());
-		soapModel.setKaleoDefinitionVersionId(model.getKaleoDefinitionVersionId());
+		soapModel.setKaleoDefinitionVersionId(
+			model.getKaleoDefinitionVersionId());
 		soapModel.setKaleoInstanceId(model.getKaleoInstanceId());
 		soapModel.setKaleoTaskId(model.getKaleoTaskId());
-		soapModel.setKaleoTaskInstanceTokenId(model.getKaleoTaskInstanceTokenId());
+		soapModel.setKaleoTaskInstanceTokenId(
+			model.getKaleoTaskInstanceTokenId());
 		soapModel.setKaleoTaskFormId(model.getKaleoTaskFormId());
 		soapModel.setFormValues(model.getFormValues());
 		soapModel.setFormValueEntryGroupId(model.getFormValueEntryGroupId());
@@ -57,7 +62,9 @@ public class KaleoTaskFormInstanceSoap implements Serializable {
 
 	public static KaleoTaskFormInstanceSoap[] toSoapModels(
 		KaleoTaskFormInstance[] models) {
-		KaleoTaskFormInstanceSoap[] soapModels = new KaleoTaskFormInstanceSoap[models.length];
+
+		KaleoTaskFormInstanceSoap[] soapModels =
+			new KaleoTaskFormInstanceSoap[models.length];
 
 		for (int i = 0; i < models.length; i++) {
 			soapModels[i] = toSoapModel(models[i]);
@@ -68,10 +75,12 @@ public class KaleoTaskFormInstanceSoap implements Serializable {
 
 	public static KaleoTaskFormInstanceSoap[][] toSoapModels(
 		KaleoTaskFormInstance[][] models) {
+
 		KaleoTaskFormInstanceSoap[][] soapModels = null;
 
 		if (models.length > 0) {
-			soapModels = new KaleoTaskFormInstanceSoap[models.length][models[0].length];
+			soapModels =
+				new KaleoTaskFormInstanceSoap[models.length][models[0].length];
 		}
 		else {
 			soapModels = new KaleoTaskFormInstanceSoap[0][0];
@@ -86,13 +95,16 @@ public class KaleoTaskFormInstanceSoap implements Serializable {
 
 	public static KaleoTaskFormInstanceSoap[] toSoapModels(
 		List<KaleoTaskFormInstance> models) {
-		List<KaleoTaskFormInstanceSoap> soapModels = new ArrayList<KaleoTaskFormInstanceSoap>(models.size());
+
+		List<KaleoTaskFormInstanceSoap> soapModels =
+			new ArrayList<KaleoTaskFormInstanceSoap>(models.size());
 
 		for (KaleoTaskFormInstance model : models) {
 			soapModels.add(toSoapModel(model));
 		}
 
-		return soapModels.toArray(new KaleoTaskFormInstanceSoap[soapModels.size()]);
+		return soapModels.toArray(
+			new KaleoTaskFormInstanceSoap[soapModels.size()]);
 	}
 
 	public KaleoTaskFormInstanceSoap() {
@@ -259,4 +271,5 @@ public class KaleoTaskFormInstanceSoap implements Serializable {
 	private long _formValueEntryId;
 	private String _formValueEntryUuid;
 	private String _metadata;
+
 }

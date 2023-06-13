@@ -33,6 +33,7 @@ import com.liferay.dynamic.data.mapping.model.LocalizedValue;
 		@DDMFormRule(
 			actions = {
 				"setRequired('text', true)", "setVisible('dataType', false)",
+				"setVisible('indexType', false)",
 				"setVisible('predefinedValue', false)",
 				"setVisible('repeatable', false)",
 				"setVisible('required', false)",
@@ -92,7 +93,7 @@ public interface ParagraphDDMFormFieldTypeSettings
 		dataType = "string", label = "%body-text",
 		properties = "placeholder=%enter-body-text", type = "editor"
 	)
-	public String text();
+	public LocalizedValue text();
 
 	@DDMFormField(dataType = "string", type = "validation")
 	@Override

@@ -70,7 +70,7 @@ import javax.mail.internet.InternetAddress;
 
 /**
  * @author Brian Wing Shun Chan
- * @author Mate Thurzo
+ * @author Máté Thurzó
  * @author Raymond Augé
  * @author Sergio González
  * @author Roberto Díaz
@@ -623,15 +623,14 @@ public class SubscriptionSender implements Serializable {
 
 			return;
 		}
-		else {
-			if (_log.isDebugEnabled()) {
-				_log.debug(
-					"Add " + emailAddress +
-						" to the list of users who have received an email");
-			}
 
-			_sentEmailAddresses.add(emailAddress);
+		if (_log.isDebugEnabled()) {
+			_log.debug(
+				"Add " + emailAddress +
+					" to the list of users who have received an email");
 		}
+
+		_sentEmailAddresses.add(emailAddress);
 
 		if (!user.isActive()) {
 			if (_log.isDebugEnabled()) {

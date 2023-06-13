@@ -29,12 +29,16 @@ import java.util.List;
  */
 @ProviderType
 public class FriendlyURLEntryLocalizationSoap implements Serializable {
+
 	public static FriendlyURLEntryLocalizationSoap toSoapModel(
 		FriendlyURLEntryLocalization model) {
-		FriendlyURLEntryLocalizationSoap soapModel = new FriendlyURLEntryLocalizationSoap();
+
+		FriendlyURLEntryLocalizationSoap soapModel =
+			new FriendlyURLEntryLocalizationSoap();
 
 		soapModel.setMvccVersion(model.getMvccVersion());
-		soapModel.setFriendlyURLEntryLocalizationId(model.getFriendlyURLEntryLocalizationId());
+		soapModel.setFriendlyURLEntryLocalizationId(
+			model.getFriendlyURLEntryLocalizationId());
 		soapModel.setCompanyId(model.getCompanyId());
 		soapModel.setFriendlyURLEntryId(model.getFriendlyURLEntryId());
 		soapModel.setLanguageId(model.getLanguageId());
@@ -48,7 +52,9 @@ public class FriendlyURLEntryLocalizationSoap implements Serializable {
 
 	public static FriendlyURLEntryLocalizationSoap[] toSoapModels(
 		FriendlyURLEntryLocalization[] models) {
-		FriendlyURLEntryLocalizationSoap[] soapModels = new FriendlyURLEntryLocalizationSoap[models.length];
+
+		FriendlyURLEntryLocalizationSoap[] soapModels =
+			new FriendlyURLEntryLocalizationSoap[models.length];
 
 		for (int i = 0; i < models.length; i++) {
 			soapModels[i] = toSoapModel(models[i]);
@@ -59,10 +65,12 @@ public class FriendlyURLEntryLocalizationSoap implements Serializable {
 
 	public static FriendlyURLEntryLocalizationSoap[][] toSoapModels(
 		FriendlyURLEntryLocalization[][] models) {
+
 		FriendlyURLEntryLocalizationSoap[][] soapModels = null;
 
 		if (models.length > 0) {
-			soapModels = new FriendlyURLEntryLocalizationSoap[models.length][models[0].length];
+			soapModels = new FriendlyURLEntryLocalizationSoap
+				[models.length][models[0].length];
 		}
 		else {
 			soapModels = new FriendlyURLEntryLocalizationSoap[0][0];
@@ -77,13 +85,16 @@ public class FriendlyURLEntryLocalizationSoap implements Serializable {
 
 	public static FriendlyURLEntryLocalizationSoap[] toSoapModels(
 		List<FriendlyURLEntryLocalization> models) {
-		List<FriendlyURLEntryLocalizationSoap> soapModels = new ArrayList<FriendlyURLEntryLocalizationSoap>(models.size());
+
+		List<FriendlyURLEntryLocalizationSoap> soapModels =
+			new ArrayList<FriendlyURLEntryLocalizationSoap>(models.size());
 
 		for (FriendlyURLEntryLocalization model : models) {
 			soapModels.add(toSoapModel(model));
 		}
 
-		return soapModels.toArray(new FriendlyURLEntryLocalizationSoap[soapModels.size()]);
+		return soapModels.toArray(
+			new FriendlyURLEntryLocalizationSoap[soapModels.size()]);
 	}
 
 	public FriendlyURLEntryLocalizationSoap() {
@@ -111,6 +122,7 @@ public class FriendlyURLEntryLocalizationSoap implements Serializable {
 
 	public void setFriendlyURLEntryLocalizationId(
 		long friendlyURLEntryLocalizationId) {
+
 		_friendlyURLEntryLocalizationId = friendlyURLEntryLocalizationId;
 	}
 
@@ -179,4 +191,5 @@ public class FriendlyURLEntryLocalizationSoap implements Serializable {
 	private long _groupId;
 	private long _classNameId;
 	private long _classPK;
+
 }

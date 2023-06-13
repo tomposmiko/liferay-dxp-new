@@ -25,11 +25,11 @@ import java.util.List;
  * This class is used by SOAP remote services, specifically {@link com.liferay.portal.service.http.OrgLaborServiceSoap}.
  *
  * @author Brian Wing Shun Chan
- * @see com.liferay.portal.service.http.OrgLaborServiceSoap
  * @generated
  */
 @ProviderType
 public class OrgLaborSoap implements Serializable {
+
 	public static OrgLaborSoap toSoapModel(OrgLabor model) {
 		OrgLaborSoap soapModel = new OrgLaborSoap();
 
@@ -84,7 +84,8 @@ public class OrgLaborSoap implements Serializable {
 	}
 
 	public static OrgLaborSoap[] toSoapModels(List<OrgLabor> models) {
-		List<OrgLaborSoap> soapModels = new ArrayList<OrgLaborSoap>(models.size());
+		List<OrgLaborSoap> soapModels = new ArrayList<OrgLaborSoap>(
+			models.size());
 
 		for (OrgLabor model : models) {
 			soapModels.add(toSoapModel(model));
@@ -275,4 +276,5 @@ public class OrgLaborSoap implements Serializable {
 	private int _friClose;
 	private int _satOpen;
 	private int _satClose;
+
 }

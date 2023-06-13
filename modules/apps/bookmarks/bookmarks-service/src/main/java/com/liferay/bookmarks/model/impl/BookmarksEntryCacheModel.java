@@ -17,7 +17,6 @@ package com.liferay.bookmarks.model.impl;
 import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.bookmarks.model.BookmarksEntry;
-
 import com.liferay.portal.kernel.model.CacheModel;
 import com.liferay.portal.kernel.util.HashUtil;
 import com.liferay.portal.kernel.util.StringBundler;
@@ -33,12 +32,12 @@ import java.util.Date;
  * The cache model class for representing BookmarksEntry in entity cache.
  *
  * @author Brian Wing Shun Chan
- * @see BookmarksEntry
  * @generated
  */
 @ProviderType
-public class BookmarksEntryCacheModel implements CacheModel<BookmarksEntry>,
-	Externalizable {
+public class BookmarksEntryCacheModel
+	implements CacheModel<BookmarksEntry>, Externalizable {
+
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj) {
@@ -49,7 +48,8 @@ public class BookmarksEntryCacheModel implements CacheModel<BookmarksEntry>,
 			return false;
 		}
 
-		BookmarksEntryCacheModel bookmarksEntryCacheModel = (BookmarksEntryCacheModel)obj;
+		BookmarksEntryCacheModel bookmarksEntryCacheModel =
+			(BookmarksEntryCacheModel)obj;
 
 		if (entryId == bookmarksEntryCacheModel.entryId) {
 			return true;
@@ -245,8 +245,7 @@ public class BookmarksEntryCacheModel implements CacheModel<BookmarksEntry>,
 	}
 
 	@Override
-	public void writeExternal(ObjectOutput objectOutput)
-		throws IOException {
+	public void writeExternal(ObjectOutput objectOutput) throws IOException {
 		if (uuid == null) {
 			objectOutput.writeUTF("");
 		}
@@ -341,4 +340,5 @@ public class BookmarksEntryCacheModel implements CacheModel<BookmarksEntry>,
 	public long statusByUserId;
 	public String statusByUserName;
 	public long statusDate;
+
 }

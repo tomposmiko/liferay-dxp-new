@@ -55,7 +55,11 @@ definition {
 			key_text = "authorizationTokenEndpoint"
 		);
 
-		Type(locator1 = "TextArea#ANY", value1 = "${clientId}", key_text = "clientId");
+		Type(
+			locator1 = "TextArea#ANY",
+			value1 = "${clientId}",
+			key_text = "clientId"
+		);
 
 		Type(
 			locator1 = "TextArea#ANY",
@@ -69,7 +73,11 @@ definition {
 			key_text = "scope"
 		);
 
-		Type(locator1 = "TextArea#ANY", value1 = "${tenantId}", key_text = "tenantId");
+		Type(
+			locator1 = "TextArea#ANY",
+			value1 = "${tenantId}",
+			key_text = "tenantId"
+		);
 
 		Type(
 			locator1 = "TextArea#ANY",

@@ -36,18 +36,22 @@ import com.liferay.asset.kernel.service.AssetCategoryPropertyLocalServiceUtil;
 @ProviderType
 public abstract class AssetCategoryPropertyBaseImpl
 	extends AssetCategoryPropertyModelImpl implements AssetCategoryProperty {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
-	 * Never modify or reference this class directly. All methods that expect a asset category property model instance should use the {@link AssetCategoryProperty} interface instead.
+	 * Never modify or reference this class directly. All methods that expect a asset category property model instance should use the <code>AssetCategoryProperty</code> interface instead.
 	 */
 	@Override
 	public void persist() {
 		if (this.isNew()) {
-			AssetCategoryPropertyLocalServiceUtil.addAssetCategoryProperty(this);
+			AssetCategoryPropertyLocalServiceUtil.addAssetCategoryProperty(
+				this);
 		}
 		else {
-			AssetCategoryPropertyLocalServiceUtil.updateAssetCategoryProperty(this);
+			AssetCategoryPropertyLocalServiceUtil.updateAssetCategoryProperty(
+				this);
 		}
 	}
+
 }

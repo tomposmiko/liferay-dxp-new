@@ -44,20 +44,6 @@ definition {
 
 	@priority = "4"
 	test DisplayPrivatePageWithChildPage {
-		ProductMenu.gotoPortlet(
-			category = "Build",
-			panel = "Site Administration",
-			portlet = "Navigation Menus"
-		);
-
-		LexiconEntry.gotoEntry(rowEntry = "Default Private");
-
-		NavigationMenusAdmin.addItem(
-			item = "Page",
-			pageNames = "Child Page Name",
-			privacy = "Private Pages"
-		);
-
 		Navigator.gotoPrivateSitePage(
 			pageName = "Child Page Name",
 			siteName = "Site Name"

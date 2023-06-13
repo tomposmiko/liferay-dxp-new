@@ -33,12 +33,12 @@ import java.util.Date;
  * The cache model class for representing UserTrackerPath in entity cache.
  *
  * @author Brian Wing Shun Chan
- * @see UserTrackerPath
  * @generated
  */
 @ProviderType
-public class UserTrackerPathCacheModel implements CacheModel<UserTrackerPath>,
-	Externalizable, MVCCModel {
+public class UserTrackerPathCacheModel
+	implements CacheModel<UserTrackerPath>, Externalizable, MVCCModel {
+
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj) {
@@ -49,10 +49,13 @@ public class UserTrackerPathCacheModel implements CacheModel<UserTrackerPath>,
 			return false;
 		}
 
-		UserTrackerPathCacheModel userTrackerPathCacheModel = (UserTrackerPathCacheModel)obj;
+		UserTrackerPathCacheModel userTrackerPathCacheModel =
+			(UserTrackerPathCacheModel)obj;
 
-		if ((userTrackerPathId == userTrackerPathCacheModel.userTrackerPathId) &&
-				(mvccVersion == userTrackerPathCacheModel.mvccVersion)) {
+		if ((userTrackerPathId ==
+				userTrackerPathCacheModel.userTrackerPathId) &&
+			(mvccVersion == userTrackerPathCacheModel.mvccVersion)) {
+
 			return true;
 		}
 
@@ -139,8 +142,7 @@ public class UserTrackerPathCacheModel implements CacheModel<UserTrackerPath>,
 	}
 
 	@Override
-	public void writeExternal(ObjectOutput objectOutput)
-		throws IOException {
+	public void writeExternal(ObjectOutput objectOutput) throws IOException {
 		objectOutput.writeLong(mvccVersion);
 
 		objectOutput.writeLong(userTrackerPathId);
@@ -165,4 +167,5 @@ public class UserTrackerPathCacheModel implements CacheModel<UserTrackerPath>,
 	public long userTrackerId;
 	public String path;
 	public long pathDate;
+
 }

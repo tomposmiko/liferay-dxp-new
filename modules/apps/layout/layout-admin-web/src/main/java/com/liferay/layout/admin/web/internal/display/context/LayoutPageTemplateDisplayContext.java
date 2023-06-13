@@ -156,22 +156,26 @@ public class LayoutPageTemplateDisplayContext {
 						dropdownItem.putData(
 							"addPageTemplateURL",
 							_getAddLayoutPageTemplateEntryURL());
-						dropdownItem.setHref("#");
 						dropdownItem.setLabel(
 							LanguageUtil.get(
 								_request, "content-page-template"));
 					});
 
-				addPrimaryDropdownItem(
-					dropdownItem -> {
-						dropdownItem.putData(
-							"action", "addLayoutPageTemplateEntry");
-						dropdownItem.putData(
-							"addPageTemplateURL", _getAddLayoutPrototypeURL());
-						dropdownItem.setHref("#");
-						dropdownItem.setLabel(
-							LanguageUtil.get(_request, "widget-page-template"));
-					});
+				Group scopeGroup = _themeDisplay.getScopeGroup();
+
+				if (!scopeGroup.isLayoutSetPrototype()) {
+					addPrimaryDropdownItem(
+						dropdownItem -> {
+							dropdownItem.putData(
+								"action", "addLayoutPageTemplateEntry");
+							dropdownItem.putData(
+								"addPageTemplateURL",
+								_getAddLayoutPrototypeURL());
+							dropdownItem.setLabel(
+								LanguageUtil.get(
+									_request, "widget-page-template"));
+						});
+				}
 			}
 		};
 	}

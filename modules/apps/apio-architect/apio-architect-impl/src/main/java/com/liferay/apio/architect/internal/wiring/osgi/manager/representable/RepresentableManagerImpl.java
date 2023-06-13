@@ -65,7 +65,7 @@ import org.slf4j.Logger;
 )
 public class RepresentableManagerImpl
 	extends BaseManager<Representable, Class<Identifier>>
-	implements NameManager, IdentifierClassManager, RepresentableManager {
+	implements IdentifierClassManager, NameManager, RepresentableManager {
 
 	public RepresentableManagerImpl() {
 		super(Representable.class);

@@ -25,38 +25,46 @@ import com.liferay.portal.kernel.util.Accessor;
  *
  * @author Brian Wing Shun Chan
  * @see LayoutPageTemplateEntryModel
- * @see com.liferay.layout.page.template.model.impl.LayoutPageTemplateEntryImpl
- * @see com.liferay.layout.page.template.model.impl.LayoutPageTemplateEntryModelImpl
  * @generated
  */
-@ImplementationClassName("com.liferay.layout.page.template.model.impl.LayoutPageTemplateEntryImpl")
+@ImplementationClassName(
+	"com.liferay.layout.page.template.model.impl.LayoutPageTemplateEntryImpl"
+)
 @ProviderType
-public interface LayoutPageTemplateEntry extends LayoutPageTemplateEntryModel,
-	PersistedModel {
+public interface LayoutPageTemplateEntry
+	extends LayoutPageTemplateEntryModel, PersistedModel {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
-	 * Never modify this interface directly. Add methods to {@link com.liferay.layout.page.template.model.impl.LayoutPageTemplateEntryImpl} and rerun ServiceBuilder to automatically copy the method declarations to this interface.
+	 * Never modify this interface directly. Add methods to <code>com.liferay.layout.page.template.model.impl.LayoutPageTemplateEntryImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
 	 */
-	public static final Accessor<LayoutPageTemplateEntry, Long> LAYOUT_PAGE_TEMPLATE_ENTRY_ID_ACCESSOR =
-		new Accessor<LayoutPageTemplateEntry, Long>() {
-			@Override
-			public Long get(LayoutPageTemplateEntry layoutPageTemplateEntry) {
-				return layoutPageTemplateEntry.getLayoutPageTemplateEntryId();
-			}
+	public static final Accessor<LayoutPageTemplateEntry, Long>
+		LAYOUT_PAGE_TEMPLATE_ENTRY_ID_ACCESSOR =
+			new Accessor<LayoutPageTemplateEntry, Long>() {
 
-			@Override
-			public Class<Long> getAttributeClass() {
-				return Long.class;
-			}
+				@Override
+				public Long get(
+					LayoutPageTemplateEntry layoutPageTemplateEntry) {
 
-			@Override
-			public Class<LayoutPageTemplateEntry> getTypeClass() {
-				return LayoutPageTemplateEntry.class;
-			}
-		};
+					return layoutPageTemplateEntry.
+						getLayoutPageTemplateEntryId();
+				}
 
-	public static final Accessor<LayoutPageTemplateEntry, String> NAME_ACCESSOR = new Accessor<LayoutPageTemplateEntry, String>() {
+				@Override
+				public Class<Long> getAttributeClass() {
+					return Long.class;
+				}
+
+				@Override
+				public Class<LayoutPageTemplateEntry> getTypeClass() {
+					return LayoutPageTemplateEntry.class;
+				}
+
+			};
+	public static final Accessor<LayoutPageTemplateEntry, String>
+		NAME_ACCESSOR = new Accessor<LayoutPageTemplateEntry, String>() {
+
 			@Override
 			public String get(LayoutPageTemplateEntry layoutPageTemplateEntry) {
 				return layoutPageTemplateEntry.getName();
@@ -71,6 +79,7 @@ public interface LayoutPageTemplateEntry extends LayoutPageTemplateEntryModel,
 			public Class<LayoutPageTemplateEntry> getTypeClass() {
 				return LayoutPageTemplateEntry.class;
 			}
+
 		};
 
 	public String getContent()
@@ -78,4 +87,5 @@ public interface LayoutPageTemplateEntry extends LayoutPageTemplateEntryModel,
 
 	public String getImagePreviewURL(
 		com.liferay.portal.kernel.theme.ThemeDisplay themeDisplay);
+
 }

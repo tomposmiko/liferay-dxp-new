@@ -72,6 +72,7 @@ import com.liferay.portal.kernel.trash.TrashHandler;
 import com.liferay.portal.kernel.util.CalendarFactoryUtil;
 import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.Http;
 import com.liferay.portal.kernel.util.LocalizationUtil;
 import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.Portal;
@@ -88,6 +89,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 
@@ -98,7 +100,7 @@ import org.osgi.service.component.annotations.ReferencePolicyOption;
 
 /**
  * @author Daniel Kocsis
- * @author Mate Thurzo
+ * @author Máté Thurzó
  */
 @Component(
 	immediate = true,
@@ -277,8 +279,8 @@ public class JournalArticleStagedModelDataHandler
 	protected boolean countStagedModel(
 		PortletDataContext portletDataContext, JournalArticle article) {
 
-		if (article.getClassNameId() ==
-				_portal.getClassNameId(DDMStructure.class)) {
+		if (article.getClassNameId() == _portal.getClassNameId(
+				DDMStructure.class)) {
 
 			return false;
 		}
@@ -354,8 +356,8 @@ public class JournalArticleStagedModelDataHandler
 			portletDataContext, article, ddmStructure,
 			PortletDataContext.REFERENCE_TYPE_STRONG);
 
-		if (article.getClassNameId() !=
-				_portal.getClassNameId(DDMStructure.class)) {
+		if (article.getClassNameId() != _portal.getClassNameId(
+				DDMStructure.class)) {
 
 			DDMTemplate ddmTemplate = _ddmTemplateLocalService.getTemplate(
 				article.getGroupId(),
@@ -372,7 +374,7 @@ public class JournalArticleStagedModelDataHandler
 		if (layout != null) {
 			portletDataContext.addReferenceElement(
 				article, articleElement, layout,
-				PortletDataContext.REFERENCE_TYPE_DEPENDENCY, true);
+				PortletDataContext.REFERENCE_TYPE_DEPENDENCY_DISPOSABLE, true);
 		}
 
 		if (article.isSmallImage()) {
@@ -789,6 +791,12 @@ public class JournalArticleStagedModelDataHandler
 				}
 			}
 
+			Map<Locale, String> friendlyURLMap = article.getFriendlyURLMap();
+
+			friendlyURLMap.forEach(
+				(locale, url) -> friendlyURLMap.replace(
+					locale, _http.decodeURL(url)));
+
 			String articleURL = null;
 
 			boolean addGroupPermissions =
@@ -860,7 +868,7 @@ public class JournalArticleStagedModelDataHandler
 						article.getClassNameId(), ddmStructureId, articleId,
 						autoArticleId, article.getVersion(),
 						article.getTitleMap(), article.getDescriptionMap(),
-						article.getFriendlyURLMap(), article.getContent(),
+						friendlyURLMap, article.getContent(),
 						parentDDMStructureKey, parentDDMTemplateKey,
 						article.getLayoutUuid(), displayDateMonth,
 						displayDateDay, displayDateYear, displayDateHour,
@@ -878,7 +886,7 @@ public class JournalArticleStagedModelDataHandler
 						userId, existingArticle.getGroupId(), folderId,
 						existingArticle.getArticleId(), article.getVersion(),
 						article.getTitleMap(), article.getDescriptionMap(),
-						article.getFriendlyURLMap(), article.getContent(),
+						friendlyURLMap, article.getContent(),
 						parentDDMStructureKey, parentDDMTemplateKey,
 						article.getLayoutUuid(), displayDateMonth,
 						displayDateDay, displayDateYear, displayDateHour,
@@ -907,7 +915,7 @@ public class JournalArticleStagedModelDataHandler
 					userId, portletDataContext.getScopeGroupId(), folderId,
 					article.getClassNameId(), ddmStructureId, articleId,
 					autoArticleId, article.getVersion(), article.getTitleMap(),
-					article.getDescriptionMap(), article.getFriendlyURLMap(),
+					article.getDescriptionMap(), friendlyURLMap,
 					article.getContent(), parentDDMStructureKey,
 					parentDDMTemplateKey, article.getLayoutUuid(),
 					displayDateMonth, displayDateDay, displayDateYear,
@@ -1085,11 +1093,15 @@ public class JournalArticleStagedModelDataHandler
 
 		Group group = _groupLocalService.fetchGroup(groupId);
 
+		if (group == null) {
+			return null;
+		}
+
 		long companyId = group.getCompanyId();
 
 		while (group != null) {
 			JournalArticle article = fetchExistingArticle(
-				articleUuid, articleResourceUuid, groupId, articleId,
+				articleUuid, articleResourceUuid, group.getGroupId(), articleId,
 				newArticleId, version, preloaded);
 
 			if (article != null) {
@@ -1361,6 +1373,9 @@ public class JournalArticleStagedModelDataHandler
 
 	@Reference
 	private GroupLocalService _groupLocalService;
+
+	@Reference
+	private Http _http;
 
 	private ImageLocalService _imageLocalService;
 

@@ -1,3 +1,4 @@
+import com.liferay.gradle.plugins.node.tasks.NpmRunTask
 import com.liferay.gradle.util.copy.StripPathSegmentsAction
 
 task buildClay(type: Copy)
@@ -8,6 +9,10 @@ task buildLodash(type: Copy)
 task buildSvg4everybody(type: Copy)
 
 File jsDestinationDir = file("tmp/META-INF/resources")
+
+tasks.withType(NpmRunTask) {
+	exclude "**/*.soy.js"
+}
 
 buildClay {
 	File clayDestinationDir = new File(jsDestinationDir, "clay")
@@ -130,6 +135,7 @@ clean {
 
 dependencies {
 	compileOnly group: "com.liferay", name: "com.liferay.petra.lang", version: "2.0.0"
+	compileOnly group: "com.liferay", name: "com.liferay.portal.url.builder.api", version: "1.0.0"
 	compileOnly group: "com.liferay.portal", name: "com.liferay.portal.impl", version: "3.0.0"
 	compileOnly group: "com.liferay.portal", name: "com.liferay.portal.kernel", version: "3.0.0"
 	compileOnly group: "com.liferay.portal", name: "com.liferay.util.taglib", version: "3.0.0"

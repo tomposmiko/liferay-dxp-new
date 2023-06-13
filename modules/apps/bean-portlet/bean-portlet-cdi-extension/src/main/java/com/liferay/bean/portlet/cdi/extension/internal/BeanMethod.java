@@ -15,6 +15,7 @@
 package com.liferay.bean.portlet.cdi.extension.internal;
 
 import com.liferay.petra.lang.HashUtil;
+import com.liferay.portal.kernel.util.Validator;
 
 import java.lang.reflect.Method;
 
@@ -28,8 +29,10 @@ import javax.portlet.ProcessAction;
 import javax.portlet.RenderMode;
 import javax.portlet.annotations.ActionMethod;
 import javax.portlet.annotations.EventMethod;
+import javax.portlet.annotations.HeaderMethod;
 import javax.portlet.annotations.PortletQName;
 import javax.portlet.annotations.RenderMethod;
+import javax.portlet.annotations.ServeResourceMethod;
 
 import javax.xml.namespace.QName;
 
@@ -83,7 +86,7 @@ public class BeanMethod implements Comparable<BeanMethod> {
 		if (actionMethod != null) {
 			String actionName = actionMethod.actionName();
 
-			if (actionName != null) {
+			if (Validator.isNotNull(actionName)) {
 				return actionName;
 			}
 		}
@@ -107,14 +110,28 @@ public class BeanMethod implements Comparable<BeanMethod> {
 	}
 
 	public PortletMode getPortletMode() {
+		HeaderMethod headerMethod = _method.getAnnotation(HeaderMethod.class);
+
+		if (headerMethod != null) {
+			String portletMode = headerMethod.portletMode();
+
+			if (Validator.isNull(portletMode)) {
+				return null;
+			}
+
+			return new PortletMode(portletMode);
+		}
+
 		RenderMethod renderMethod = _method.getAnnotation(RenderMethod.class);
 
 		if (renderMethod != null) {
 			String portletMode = renderMethod.portletMode();
 
-			if (portletMode != null) {
-				return new PortletMode(portletMode);
+			if (Validator.isNull(portletMode)) {
+				return null;
 			}
+
+			return new PortletMode(portletMode);
 		}
 
 		RenderMode renderMode = _method.getAnnotation(RenderMode.class);
@@ -123,7 +140,28 @@ public class BeanMethod implements Comparable<BeanMethod> {
 			return null;
 		}
 
-		return new PortletMode(renderMode.name());
+		String name = renderMode.name();
+
+		if (Validator.isNull(name)) {
+			return null;
+		}
+
+		return new PortletMode(name);
+	}
+
+	public String getResourceID() {
+		ServeResourceMethod serveResourceMethod = _method.getAnnotation(
+			ServeResourceMethod.class);
+
+		if (serveResourceMethod != null) {
+			String resourceID = serveResourceMethod.resourceID();
+
+			if (Validator.isNotNull(resourceID)) {
+				return resourceID;
+			}
+		}
+
+		return null;
 	}
 
 	@Override

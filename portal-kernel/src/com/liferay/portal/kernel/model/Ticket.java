@@ -24,19 +24,20 @@ import com.liferay.portal.kernel.util.Accessor;
  *
  * @author Brian Wing Shun Chan
  * @see TicketModel
- * @see com.liferay.portal.model.impl.TicketImpl
- * @see com.liferay.portal.model.impl.TicketModelImpl
  * @generated
  */
 @ImplementationClassName("com.liferay.portal.model.impl.TicketImpl")
 @ProviderType
-public interface Ticket extends TicketModel, PersistedModel {
+public interface Ticket extends PersistedModel, TicketModel {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
-	 * Never modify this interface directly. Add methods to {@link com.liferay.portal.model.impl.TicketImpl} and rerun ServiceBuilder to automatically copy the method declarations to this interface.
+	 * Never modify this interface directly. Add methods to <code>com.liferay.portal.model.impl.TicketImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
 	 */
-	public static final Accessor<Ticket, Long> TICKET_ID_ACCESSOR = new Accessor<Ticket, Long>() {
+	public static final Accessor<Ticket, Long> TICKET_ID_ACCESSOR =
+		new Accessor<Ticket, Long>() {
+
 			@Override
 			public Long get(Ticket ticket) {
 				return ticket.getTicketId();
@@ -51,7 +52,9 @@ public interface Ticket extends TicketModel, PersistedModel {
 			public Class<Ticket> getTypeClass() {
 				return Ticket.class;
 			}
+
 		};
 
 	public boolean isExpired();
+
 }

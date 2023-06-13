@@ -76,9 +76,7 @@ definition {
 		if (isSet(uncheckContent)) {
 			var key_contentName = "${uncheckContent}";
 
-			Uncheck.uncheckHiddenToggleSwitch(
-				locator1 = "SiteSettingsStaging#CONTENT_CHECKBOX"
-			);
+			Click(locator1 = "SiteSettingsStaging#CONTENT_CHECKBOX");
 		}
 
 		if (isSet(isNotEditable)) {
@@ -783,6 +781,12 @@ definition {
 
 		SelectFrame(locator1 = "IFrame#CONFIGURATION_DIALOG");
 
+		if ("${replicateIndividualDeletions}" == "true") {
+			AssertVisible(locator1 = "Staging#STAGING_CONTENT_DELETIONS");
+
+			Click(locator1 = "Staging#REPLICATE_INDIVIDUAL_DELETIONS");
+		}
+
 		AssertClickNoError(
 			locator1 = "Staging#STAGING_PUBLISH_TO_LIVE_BUTTON",
 			value1 = "Publish to Live"
@@ -886,6 +890,27 @@ definition {
 		else {
 			AssertTextEquals(locator1 = "Staging#PROCESS_SUCCESSFUL", value1 = "Successful");
 		}
+	}
+
+	macro publishToRemoteUncheckContentViaCustomPublication {
+		LexiconEntry.gotoAdd();
+
+		var key_contentName = "${contentName}";
+
+		Uncheck(locator1 = "Staging#STAGING_CONTENT_CHECKBOX");
+
+		AssertNotChecked(
+			locator1 = "Staging#STAGING_CONTENT_CHECKBOX"
+		);
+
+		AssertClickNoError(
+			locator1 = "Staging#STAGING_PUBLISH_TO_REMOTE_LIVE_BUTTON",
+			value1 = "Publish to Remote Live"
+		);
+
+		Pause(locator1 = "5000");
+
+		AssertTextEquals(locator1 = "Staging#PROCESS_RESULT", value1 = "SUCCESSFUL");
 	}
 
 	macro publishViaSAP {
@@ -994,7 +1019,7 @@ definition {
 		var displayDateAMPM = StringUtil.replace("${displayDateAMPM}", "0", "AM");
 		var displayDateAMPM = StringUtil.replace("${displayDateAMPM}", "1", "PM");
 		var displayDateMinute = selenium.getAttribute("//input[contains(@id,'schedulerStartDateMinute')]@value");
-		var displayDateMinuteFuture = MathUtil.sum("${displayDateMinute}", "2");
+		var displayDateMinuteFuture = MathUtil.sum("${displayDateMinute}", "3");
 		var displayDateMinuteFutureLength = StringUtil.length("${displayDateMinuteFuture}");
 
 		if ("${displayDateMinuteFutureLength}" == "1") {

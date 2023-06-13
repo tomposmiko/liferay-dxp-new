@@ -31,12 +31,12 @@ import java.io.ObjectOutput;
  * The cache model class for representing ClusterGroup in entity cache.
  *
  * @author Brian Wing Shun Chan
- * @see ClusterGroup
  * @generated
  */
 @ProviderType
-public class ClusterGroupCacheModel implements CacheModel<ClusterGroup>,
-	Externalizable, MVCCModel {
+public class ClusterGroupCacheModel
+	implements CacheModel<ClusterGroup>, Externalizable, MVCCModel {
+
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj) {
@@ -47,10 +47,12 @@ public class ClusterGroupCacheModel implements CacheModel<ClusterGroup>,
 			return false;
 		}
 
-		ClusterGroupCacheModel clusterGroupCacheModel = (ClusterGroupCacheModel)obj;
+		ClusterGroupCacheModel clusterGroupCacheModel =
+			(ClusterGroupCacheModel)obj;
 
 		if ((clusterGroupId == clusterGroupCacheModel.clusterGroupId) &&
-				(mvccVersion == clusterGroupCacheModel.mvccVersion)) {
+			(mvccVersion == clusterGroupCacheModel.mvccVersion)) {
+
 			return true;
 		}
 
@@ -133,8 +135,7 @@ public class ClusterGroupCacheModel implements CacheModel<ClusterGroup>,
 	}
 
 	@Override
-	public void writeExternal(ObjectOutput objectOutput)
-		throws IOException {
+	public void writeExternal(ObjectOutput objectOutput) throws IOException {
 		objectOutput.writeLong(mvccVersion);
 
 		objectOutput.writeLong(clusterGroupId);
@@ -161,4 +162,5 @@ public class ClusterGroupCacheModel implements CacheModel<ClusterGroup>,
 	public String name;
 	public String clusterNodeIds;
 	public boolean wholeCluster;
+
 }

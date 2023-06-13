@@ -32,12 +32,12 @@ import java.util.Date;
  * The cache model class for representing KaleoTimer in entity cache.
  *
  * @author Brian Wing Shun Chan
- * @see KaleoTimer
  * @generated
  */
 @ProviderType
-public class KaleoTimerCacheModel implements CacheModel<KaleoTimer>,
-	Externalizable {
+public class KaleoTimerCacheModel
+	implements CacheModel<KaleoTimer>, Externalizable {
+
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj) {
@@ -214,8 +214,7 @@ public class KaleoTimerCacheModel implements CacheModel<KaleoTimer>,
 	}
 
 	@Override
-	public void writeExternal(ObjectOutput objectOutput)
-		throws IOException {
+	public void writeExternal(ObjectOutput objectOutput) throws IOException {
 		objectOutput.writeLong(kaleoTimerId);
 
 		objectOutput.writeLong(groupId);
@@ -297,4 +296,5 @@ public class KaleoTimerCacheModel implements CacheModel<KaleoTimer>,
 	public String scale;
 	public double recurrenceDuration;
 	public String recurrenceScale;
+
 }

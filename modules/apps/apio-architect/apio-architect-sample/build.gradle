@@ -1,9 +1,9 @@
-import aQute.bnd.gradle.Export
+import aQute.bnd.gradle.Bndrun
 import aQute.bnd.gradle.Resolve
 
 buildscript {
 	dependencies {
-		classpath group: "biz.aQute.bnd", name: "biz.aQute.bnd.gradle", version: "4.0.0"
+		classpath group: "biz.aQute.bnd", name: "biz.aQute.bnd.gradle", version: "4.1.0"
 	}
 
 	repositories {
@@ -11,9 +11,8 @@ buildscript {
 	}
 }
 
-task export(type: Export)
 task resolve(type: Resolve)
-task run(type: JavaExec)
+task run(type: Bndrun)
 
 dependencies {
 	compileInclude group: "com.github.javafaker", name: "javafaker", version: "0.13"
@@ -21,8 +20,13 @@ dependencies {
 	compileInclude group: "dk.brics.automaton", name: "automaton", version: "1.11-8"
 	compileInclude group: "org.apache.commons", name: "commons-lang3", version: "3.5"
 
+	compileOnly group: "com.liferay", name: "com.liferay.apio.architect.api", version: "1.10.0"
+	compileOnly group: "com.liferay", name: "com.liferay.apio.architect.exception.mapper.impl", version: "1.0.0"
+	compileOnly group: "com.liferay", name: "com.liferay.apio.architect.impl", version: "1.0.0"
+	compileOnly group: "com.liferay", name: "com.liferay.apio.architect.uri.mapper.impl", version: "1.0.0"
+	compileOnly group: "io.vavr", name: "vavr", version: "0.9.3"
 	compileOnly group: "javax.servlet", name: "javax.servlet-api", version: "3.0.1"
-	compileOnly group: "org.apache.aries.spec", name: "org.apache.aries.javax.jax.rs-api", version: "1.0.0"
+	compileOnly group: "org.apache.aries.spec", name: "org.apache.aries.javax.jax.rs-api", version: "1.0.1"
 	compileOnly group: "org.apache.felix", name: "org.apache.felix.gogo.command", version: "1.0.2"
 	compileOnly group: "org.apache.felix", name: "org.apache.felix.gogo.runtime", version: "1.0.6"
 	compileOnly group: "org.apache.felix", name: "org.apache.felix.gogo.shell", version: "1.0.0"
@@ -34,13 +38,9 @@ dependencies {
 	compileOnly group: "org.osgi", name: "org.osgi.service.jaxrs", version: "1.0.0"
 	compileOnly group: "org.osgi", name: "org.osgi.util.function", version: "1.1.0"
 	compileOnly group: "org.osgi", name: "org.osgi.util.promise", version: "1.1.0"
-	compileOnly group: "com.liferay", name: "com.liferay.apio.architect.api", version: "1.8.0"
-	compileOnly group: "com.liferay", name: "com.liferay.apio.architect.exception.mapper.impl", version: "1.0.0"
-	compileOnly group: "com.liferay", name: "com.liferay.apio.architect.impl", version: "1.0.0"
-	compileOnly group: "com.liferay", name: "com.liferay.apio.architect.uri.mapper.impl", version: "1.0.0"
 
 	runtime group: "ch.qos.logback", name: "logback-classic", version: "1.2.3"
-	runtime group: "org.apache.aries.jax.rs", name: "org.apache.aries.jax.rs.whiteboard", version: "1.0.0"
+	runtime group: "org.apache.aries.jax.rs", name: "org.apache.aries.jax.rs.whiteboard", version: "1.0.1"
 	runtime group: "org.apache.felix", name: "org.apache.felix.configadmin", version: "1.8.14"
 	runtime group: "org.apache.felix", name: "org.apache.felix.eventadmin", version: "1.4.8"
 	runtime group: "org.apache.felix", name: "org.apache.felix.http.jetty", version: "3.4.0"
@@ -50,21 +50,10 @@ dependencies {
 	testCompile group: "com.openpojo", name: "openpojo", version: "0.8.10"
 	testCompile group: "org.exparity", name: "hamcrest-date", version: "2.0.4"
 	testCompile group: "org.glassfish.jersey.core", name: "jersey-common", version: "2.26"
-	testCompile project(":apps:apio-architect:apio-architect-test-util")
 }
 
 deploy {
 	enabled = false
-}
-
-export {
-	description 'Exports the sample.bndrun into a runnable jar.'
-
-	group 'sample'
-
-	bndrun 'sample.bndrun'
-
-	bundles configurations.compileOnly
 }
 
 resolve {
@@ -78,9 +67,13 @@ resolve {
 }
 
 run {
-	dependsOn export
+	description 'Runs the sample.bndrun.'
 
-	main = "-jar"
+	dependsOn resolve
 
-	args 'build/distributions/executable/sample.jar'
+	group 'sample'
+
+	bndrun 'sample.bndrun'
+
+	bundles configurations.compileOnly
 }

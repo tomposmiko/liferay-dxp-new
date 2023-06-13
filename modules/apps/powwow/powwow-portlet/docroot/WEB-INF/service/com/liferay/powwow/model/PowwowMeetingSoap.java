@@ -26,11 +26,11 @@ import java.util.List;
  * This class is used by SOAP remote services, specifically {@link com.liferay.powwow.service.http.PowwowMeetingServiceSoap}.
  *
  * @author Shinn Lok
- * @see com.liferay.powwow.service.http.PowwowMeetingServiceSoap
  * @generated
  */
 @ProviderType
 public class PowwowMeetingSoap implements Serializable {
+
 	public static PowwowMeetingSoap toSoapModel(PowwowMeeting model) {
 		PowwowMeetingSoap soapModel = new PowwowMeetingSoap();
 
@@ -81,7 +81,8 @@ public class PowwowMeetingSoap implements Serializable {
 	}
 
 	public static PowwowMeetingSoap[] toSoapModels(List<PowwowMeeting> models) {
-		List<PowwowMeetingSoap> soapModels = new ArrayList<PowwowMeetingSoap>(models.size());
+		List<PowwowMeetingSoap> soapModels = new ArrayList<PowwowMeetingSoap>(
+			models.size());
 
 		for (PowwowMeeting model : models) {
 			soapModels.add(toSoapModel(model));
@@ -236,4 +237,5 @@ public class PowwowMeetingSoap implements Serializable {
 	private String _languageId;
 	private long _calendarBookingId;
 	private int _status;
+
 }

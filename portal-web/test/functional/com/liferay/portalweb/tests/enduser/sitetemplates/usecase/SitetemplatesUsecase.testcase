@@ -64,7 +64,23 @@ definition {
 
 		Navigator.gotoNavNested(navNested = "Page Template Collection");
 
-		PageTemplatesAdmin.add(pageTemplateName = "Test");
+		PageTemplatesAdmin.add(
+			pageTemplateName = "Test",
+			siteTemplate = "true"
+		);
+
+		Navigator.openURL();
+
+		ProductMenu.gotoPortlet(
+			category = "Sites",
+			panel = "Control Panel",
+			portlet = "Site Templates"
+		);
+
+		LexiconEntry.gotoEntryMenuItem(
+			menuItem = "Manage",
+			rowEntry = "Site Template Name"
+		);
 
 		ProductMenu.gotoPortlet(
 			category = "Build",
@@ -78,7 +94,7 @@ definition {
 
 		PageTemplatesAdmin.add(
 			pageTemplateName = "Test",
-			pageTemplateType = "Widget Page Template"
+			siteTemplate = "true"
 		);
 
 		AssertTextEquals(
@@ -440,8 +456,103 @@ definition {
 		User.firstLoginPG(password = "test", userEmailAddress = "test@liferay.com");
 	}
 
+	@description = "This is a use case for LPS-86487."
+	@priority = "4"
+	test SiteTemplatePageLinkInWebContentRedirectCorrectly {
+		var portalURL = PropsUtil.get("portal.url");
+		var siteName = TestCase.getSiteName(siteName = "${siteName}");
+
+		ProductMenu.gotoPortlet(
+			category = "Sites",
+			panel = "Control Panel",
+			portlet = "Site Templates"
+		);
+
+		SiteTemplates.addCP(siteTemplateName = "Template Site");
+
+		ProductMenu.gotoPortlet(
+			category = "Sites",
+			panel = "Control Panel",
+			portlet = "Site Templates"
+		);
+
+		SiteTemplates.addSitePageViaSiteTemplateCP(
+			pageName = "Page1 Name",
+			siteTemplateName = "Template Site"
+		);
+
+		Navigator.openURL();
+
+		ProductMenu.gotoPortlet(
+			category = "Sites",
+			panel = "Control Panel",
+			portlet = "Site Templates"
+		);
+
+		SiteTemplates.addSitePageViaSiteTemplateCP(
+			pageName = "Page2 Name",
+			siteTemplateName = "Template Site"
+		);
+
+		ProductMenu.gotoPortlet(
+			category = "Sites",
+			panel = "Control Panel",
+			portlet = "Site Templates"
+		);
+
+		SiteTemplatesNavigator.gotoSiteTemplatesPage(
+			pageName = "Page2 Name",
+			siteName = "${siteName}",
+			siteTemplateName = "Template Site"
+		);
+
+		var page2URL = Navigator.getCurrentURL();
+
+		ProductMenu.gotoPortlet(
+			category = "Content",
+			panel = "Site Administration",
+			portlet = "Web Content"
+		);
+
+		WebContentNavigator.gotoAddCP();
+
+		WebContent.addCP(
+			webContentTitle = "Web Content Title",
+			webContentContent ='''<a href="${page2URL}">${page2URL}</a>'''
+		);
+
+		PortletEntry.publish();
+
+		ProductMenu.gotoPortlet(
+			category = "Sites",
+			panel = "Control Panel",
+			portlet = "Sites"
+		);
+
+		Site.addCP(siteName = "Site Name", siteType = "Template");
+
+		Navigator.gotoSitePage(pageName = "Page1 Name", siteName = "Site Name");
+
+		Portlet.addPG(portletName = "Web Content Display");
+
+		WebContentDisplayPortlet.selectWebContent(
+			portletName = "Web Content Display",
+			webContentTitle = "Web Content Title"
+		);
+
+		Navigator.gotoSitePage(pageName = "Page1 Name", siteName = "Site Name");
+
+		Click(locator1 = "WCD#WEB_CONTENT_LINK");
+
+		Pause(locator1 = "5000");
+
+		AssertLocation(value1 = "${portalURL}/web/site-name/page2-name");
+	}
+
 	@priority = "3"
 	test SitesTemplateResourceInheritance {
+		property portal.release = "false";
+
 		var siteName = TestCase.getSiteName(siteName = "${siteName}");
 
 		ProductMenu.gotoPortlet(
@@ -544,6 +655,106 @@ definition {
 		);
 
 		User.firstLoginPG(password = "test", userEmailAddress = "test@liferay.com");
+	}
+
+	@description = "This is a use case for LPS-74081."
+	@priority = "4"
+	test ViewImportedSitePageWithNumericFriendlyURL {
+		var portalURL = PropsUtil.get("portal.url");
+
+		ProductMenu.gotoPortlet(
+			category = "Sites",
+			panel = "Control Panel",
+			portlet = "Sites"
+		);
+
+		Site.addCP(siteName = "Export", siteType = "Blank");
+
+		ProductMenu.gotoPortlet(
+			category = "Build",
+			panel = "Site Administration",
+			portlet = "Pages"
+		);
+
+		SitePages.addPublicPage(pageName = "1");
+
+		SitePages.gotoPageMenuItem(menuItem = "Configure", pageName = "1");
+
+		AssertTextEquals(locator1 = "TextInput#FRIENDLY_URL", value1 = "/1");
+
+		ProductMenu.gotoPortlet(
+			category = "Build",
+			panel = "Site Administration",
+			portlet = "Pages"
+		);
+
+		SitePages.addPublicPage(pageName = "2");
+
+		SitePages.gotoPageMenuItem(menuItem = "Configure", pageName = "2");
+
+		AssertTextEquals(locator1 = "TextInput#FRIENDLY_URL", value1 = "/2");
+
+		ProductMenu.gotoPortlet(
+			category = "Build",
+			panel = "Site Administration",
+			portlet = "Pages"
+		);
+
+		SitePages.addPublicPage(pageName = "Hello");
+
+		SitePages.gotoPageMenuItem(menuItem = "Configure", pageName = "Hello");
+
+		AssertTextEquals(locator1 = "TextInput#FRIENDLY_URL", value1 = "/hello");
+
+		ProductMenu.gotoPortlet(
+			category = "Publishing",
+			panel = "Site Administration",
+			portlet = "Export"
+		);
+
+		LAR.exportSiteCP(larFileName = "Export");
+
+		Pause(locator1 = "3000");
+
+		var larFileName = LAR.getLarFileName();
+
+		LAR.downloadLar();
+
+		Refresh();
+
+		ProductMenu.gotoPortlet(
+			category = "Sites",
+			panel = "Control Panel",
+			portlet = "Site Templates"
+		);
+
+		SiteTemplates.addCP(siteTemplateName = "Template Site");
+
+		ProductMenu.gotoPortlet(
+			category = "Sites",
+			panel = "Control Panel",
+			portlet = "Sites"
+		);
+
+		Site.addCP(siteName = "New Site", siteType = "Template");
+
+		LAR.importSiteCP(
+			larFileName = "${larFileName}",
+			siteName = "New Site"
+		);
+
+		ProductMenu.gotoPortlet(
+			category = "Build",
+			panel = "Site Administration",
+			portlet = "Pages"
+		);
+
+		Page.viewPagesOrder(
+			pageName1 = "Home",
+			pageName2 = "1",
+			pageName3 = "2",
+			pageName4 = "Hello"
+		);
 	}
 
 	@priority = "3"

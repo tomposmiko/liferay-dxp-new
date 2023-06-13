@@ -20,16 +20,26 @@ import com.liferay.dynamic.data.mapping.model.DDMFormField;
 import com.liferay.dynamic.data.mapping.model.DDMFormRule;
 import com.liferay.dynamic.data.mapping.model.LocalizedValue;
 import com.liferay.dynamic.data.mapping.util.DDMFormFactory;
+import com.liferay.portal.kernel.language.Language;
+import com.liferay.portal.kernel.language.LanguageUtil;
+import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.PortalClassLoaderUtil;
+import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.ResourceBundleUtil;
 
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
+import java.util.ResourceBundle;
 
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import org.mockito.Matchers;
+
+import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
@@ -40,6 +50,13 @@ import org.powermock.modules.junit4.PowerMockRunner;
 @RunWith(PowerMockRunner.class)
 public class NumericDDMFormFieldTypeSettingsTest
 	extends BaseDDMFormFieldTypeSettingsTestCase {
+
+	@Before
+	public void setUp() {
+		setUpLanguageUtil();
+		setUpPortalUtil();
+		setUpResourceBundleUtil();
+	}
 
 	@Test
 	public void testCreateNumericDDMFormFieldTypeSettingsDDMForm() {
@@ -79,6 +96,12 @@ public class NumericDDMFormFieldTypeSettingsTest
 		Assert.assertNotNull(validationDDMFormField);
 		Assert.assertEquals("numeric", validationDDMFormField.getDataType());
 
+		DDMFormField indexTypeDDMFormField = ddmFormFieldsMap.get("indexType");
+
+		Assert.assertNotNull(indexTypeDDMFormField);
+		Assert.assertNotNull(indexTypeDDMFormField.getLabel());
+		Assert.assertEquals("radio", indexTypeDDMFormField.getType());
+
 		List<DDMFormRule> ddmFormRules = ddmForm.getDDMFormRules();
 
 		Assert.assertEquals(ddmFormRules.toString(), 1, ddmFormRules.size());
@@ -102,6 +125,42 @@ public class NumericDDMFormFieldTypeSettingsTest
 			actions.toString(),
 			actions.contains(
 				"setValidationDataType('validation', getValue('dataType'))"));
+	}
+
+	protected void setUpLanguageUtil() {
+		LanguageUtil languageUtil = new LanguageUtil();
+
+		Language language = PowerMockito.mock(Language.class);
+
+		languageUtil.setLanguage(language);
+	}
+
+	protected void setUpPortalUtil() {
+		PortalUtil portalUtil = new PortalUtil();
+
+		Portal portal = mock(Portal.class);
+
+		ResourceBundle resourceBundle = mock(ResourceBundle.class);
+
+		when(
+			portal.getResourceBundle(Matchers.any(Locale.class))
+		).thenReturn(
+			resourceBundle
+		);
+
+		portalUtil.setPortal(portal);
+	}
+
+	protected void setUpResourceBundleUtil() {
+		PowerMockito.mockStatic(ResourceBundleUtil.class);
+
+		PowerMockito.when(
+			ResourceBundleUtil.getBundle(
+				Matchers.anyString(), Matchers.any(Locale.class),
+				Matchers.any(ClassLoader.class))
+		).thenReturn(
+			ResourceBundleUtil.EMPTY_RESOURCE_BUNDLE
+		);
 	}
 
 }

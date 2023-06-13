@@ -206,6 +206,8 @@ definition {
 
 		DDLRecord.addPGViaAP(ddlRecordFieldData = "Text Field", fieldName = "Text");
 
+		Navigator.gotoPage(pageName = "Asset Publisher Page");
+
 		DDLRecord.viewPGViaAP(
 			ddlListName = "New Data Definition for List: List Name",
 			ddlRecordFieldData = "Text Field"
@@ -310,7 +312,7 @@ definition {
 	@priority = "4"
 	test ConfigureAPPortletDisplaytemplateWithBookmarks {
 		property portal.release = "false";
-		property testray.component.names = "Asset Publisher,Bookmarks,Content and Display Templates";
+		property testray.component.names = "Asset Publisher,Bookmarks,Content and Display Templates,Training";
 
 		ProductMenu.gotoPortlet(
 			category = "Build",
@@ -515,15 +517,19 @@ definition {
 	@priority = "5"
 	test ConfigureAPPortletSelectedWebContent {
 		property portal.acceptance = "true";
-		property testray.component.names = "Asset Publisher";
+		property testray.component.names = "Asset Publisher,Training";
 
-		AssetPublisherPortlet.configureSelectedPG(selectedAsset = "Web Content Article");
+		AssetPublisherPortlet.configureAssetTypePG(
+			assetSubtype = "Basic Web Content",
+			selectedAsset = "Web Content Article"
+		);
 
 		Navigator.gotoPage(pageName = "Asset Publisher Page");
 
 		AssetPublisherPortlet.viewSelectedPG(
 			selectedAsset = "Basic Web Content",
-			selectedAssetConfiguration = "Web Content Article"
+			selectedAssetConfiguration = "Web Content Article",
+			assetSubtypeConfiguration = "Basic Web Content"
 		);
 	}
 
@@ -664,7 +670,6 @@ definition {
 
 		DMDocument.addCP(
 			dmDocumentFile = "Document_1.txt",
-			dmDocumentSize = "0KB",
 			dmDocumentTitle = "DM Document Title",
 			tagNameList = "first tag"
 		);
@@ -927,7 +932,7 @@ definition {
 
 	@priority = "3"
 	test OrderWCByPublishDateViaAP {
-		property testray.component.names = "Asset Publisher";
+		property testray.component.names = "Asset Publisher,Training";
 
 		Navigator.gotoPage(pageName = "Asset Publisher Page");
 
@@ -975,6 +980,14 @@ definition {
 			assetTitle2 = "WebContent Title 2",
 			assetTitle3 = "WebContent Title 3"
 		);
+
+		Navigator.gotoPage(pageName = "Asset Publisher Page");
+
+		Portlet.configureCustomTitlePG(portletTitleName = "Asset Publisher");
+
+		Navigator.gotoPage(pageName = "Asset Publisher Page");
+
+		Portlet.viewSpecificPG(portletName = "Asset Publisher Custom");
 	}
 
 	@priority = "5"

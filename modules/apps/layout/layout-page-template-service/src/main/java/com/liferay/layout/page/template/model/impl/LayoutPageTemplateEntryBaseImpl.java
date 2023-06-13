@@ -33,19 +33,24 @@ import com.liferay.layout.page.template.service.LayoutPageTemplateEntryLocalServ
  */
 @ProviderType
 public abstract class LayoutPageTemplateEntryBaseImpl
-	extends LayoutPageTemplateEntryModelImpl implements LayoutPageTemplateEntry {
+	extends LayoutPageTemplateEntryModelImpl
+	implements LayoutPageTemplateEntry {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
-	 * Never modify or reference this class directly. All methods that expect a layout page template entry model instance should use the {@link LayoutPageTemplateEntry} interface instead.
+	 * Never modify or reference this class directly. All methods that expect a layout page template entry model instance should use the <code>LayoutPageTemplateEntry</code> interface instead.
 	 */
 	@Override
 	public void persist() {
 		if (this.isNew()) {
-			LayoutPageTemplateEntryLocalServiceUtil.addLayoutPageTemplateEntry(this);
+			LayoutPageTemplateEntryLocalServiceUtil.addLayoutPageTemplateEntry(
+				this);
 		}
 		else {
-			LayoutPageTemplateEntryLocalServiceUtil.updateLayoutPageTemplateEntry(this);
+			LayoutPageTemplateEntryLocalServiceUtil.
+				updateLayoutPageTemplateEntry(this);
 		}
 	}
+
 }

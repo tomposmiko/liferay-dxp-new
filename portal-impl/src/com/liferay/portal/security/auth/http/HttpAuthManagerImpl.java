@@ -313,8 +313,11 @@ public class HttpAuthManagerImpl implements HttpAuthManager {
 		String queryString = httpServletRequest.getQueryString();
 
 		if (Validator.isNotNull(queryString)) {
-			requestURI = requestURI.concat(StringPool.QUESTION).concat(
-				queryString);
+			requestURI = requestURI.concat(
+				StringPool.QUESTION
+			).concat(
+				queryString
+			);
 		}
 
 		if (!realm.equals(Portal.PORTAL_REALM) || !uri.equals(requestURI)) {
@@ -340,15 +343,22 @@ public class HttpAuthManagerImpl implements HttpAuthManager {
 
 		String credentials = new String(Base64.decode(authorizationParts[1]));
 
-		String[] loginAndPassword = StringUtil.split(
-			credentials, CharPool.COLON);
-
-		String login = HttpUtil.decodeURL(loginAndPassword[0].trim());
-
+		String login = null;
 		String password = null;
 
-		if (loginAndPassword.length > 1) {
-			password = loginAndPassword[1].trim();
+		int index = credentials.indexOf(CharPool.COLON);
+
+		if (index > -1) {
+			login = credentials.substring(0, index);
+
+			login = HttpUtil.decodeURL(login.trim());
+
+			password = credentials.substring(index + 1);
+
+			password = password.trim();
+		}
+		else {
+			login = credentials.trim();
 		}
 
 		HttpAuthorizationHeader httpAuthorizationHeader =

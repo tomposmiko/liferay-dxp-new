@@ -40,11 +40,14 @@ import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.MapUtil;
+import com.liferay.portal.kernel.util.Portal;
+import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.ResourceBundleLoader;
 import com.liferay.portal.kernel.util.ResourceBundleLoaderUtil;
 import com.liferay.portal.kernel.util.ResourceBundleUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.WebKeys;
+import com.liferay.portal.language.LanguageResources;
 import com.liferay.portal.util.HtmlImpl;
 import com.liferay.registry.BasicRegistryImpl;
 import com.liferay.registry.RegistryUtil;
@@ -55,6 +58,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.ResourceBundle;
+
+import javax.portlet.PortletRequest;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -87,7 +92,10 @@ public class DDMFormPagesTemplateContextFactoryTest extends PowerMockito {
 		RegistryUtil.setRegistry(new BasicRegistryImpl());
 
 		setUpHtmlUtil();
+		setUpLanguageResources();
 		setUpLanguageUtil();
+		setUpPortalUtil();
+		setUpResourceBundle();
 		setUpResourceBundleLoaderUtil();
 		setUpResourceBundleUtil();
 		setUpDDMFormTemplateContextFactoryUtil();
@@ -964,6 +972,12 @@ public class DDMFormPagesTemplateContextFactoryTest extends PowerMockito {
 		htmlUtil.setHtml(new HtmlImpl());
 	}
 
+	protected void setUpLanguageResources() {
+		LanguageResources languageResources = new LanguageResources();
+
+		languageResources.setConfig(StringPool.BLANK);
+	}
+
 	protected void setUpLanguageUtil() {
 		Language language = mock(Language.class);
 
@@ -974,6 +988,46 @@ public class DDMFormPagesTemplateContextFactoryTest extends PowerMockito {
 		LanguageUtil languageUtil = new LanguageUtil();
 
 		languageUtil.setLanguage(language);
+	}
+
+	protected void setUpPortalUtil() {
+		PortalUtil portalUtil = new PortalUtil();
+
+		Portal portal = mock(Portal.class);
+
+		ResourceBundle resourceBundle = mock(ResourceBundle.class);
+
+		when(
+			portal.getCompanyId(Matchers.any(PortletRequest.class))
+		).thenReturn(
+			1L
+		);
+
+		when(
+			portal.getUserId(Matchers.any(PortletRequest.class))
+		).thenReturn(
+			1L
+		);
+
+		when(
+			portal.getResourceBundle(Matchers.any(Locale.class))
+		).thenReturn(
+			resourceBundle
+		);
+
+		portalUtil.setPortal(portal);
+	}
+
+	protected void setUpResourceBundle() {
+		Portal portal = mock(Portal.class);
+
+		ResourceBundle resourceBundle = mock(ResourceBundle.class);
+
+		when(
+			portal.getResourceBundle(Matchers.any(Locale.class))
+		).thenReturn(
+			resourceBundle
+		);
 	}
 
 	protected void setUpResourceBundleLoaderUtil() {

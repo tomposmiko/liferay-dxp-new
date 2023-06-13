@@ -22,8 +22,10 @@ import com.liferay.apio.architect.annotation.Actions.Remove;
 import com.liferay.apio.architect.annotation.Actions.Replace;
 import com.liferay.apio.architect.annotation.Actions.Retrieve;
 import com.liferay.apio.architect.annotation.Body;
+import com.liferay.apio.architect.annotation.GenericParentId;
 import com.liferay.apio.architect.annotation.Id;
 import com.liferay.apio.architect.annotation.ParentId;
+import com.liferay.apio.architect.annotation.Permissions.CanRetrieve;
 import com.liferay.apio.architect.credentials.Credentials;
 import com.liferay.apio.architect.pagination.PageItems;
 import com.liferay.apio.architect.pagination.Pagination;
@@ -31,6 +33,7 @@ import com.liferay.apio.architect.router.ActionRouter;
 import com.liferay.apio.architect.sample.internal.converter.CommentConverter;
 import com.liferay.apio.architect.sample.internal.dao.BlogPostingCommentModelService;
 import com.liferay.apio.architect.sample.internal.dto.BlogPostingCommentModel;
+import com.liferay.apio.architect.sample.internal.identifier.ModelNameModelIdIdentifier;
 import com.liferay.apio.architect.sample.internal.type.BlogPosting;
 import com.liferay.apio.architect.sample.internal.type.Comment;
 
@@ -57,6 +60,15 @@ import org.osgi.service.component.annotations.Reference;
 	service = {ActionRouter.class, BlogPostingCommentActionRouter.class}
 )
 public class BlogPostingCommentActionRouter implements ActionRouter<Comment> {
+
+	@CanRetrieve
+	public boolean canRetrieve(Credentials credentials, @Id long id) {
+		if (hasPermission(credentials)) {
+			return true;
+		}
+
+		return false;
+	}
 
 	@Create
 	public Comment create(
@@ -113,6 +125,27 @@ public class BlogPostingCommentActionRouter implements ActionRouter<Comment> {
 			() -> new NotFoundException(
 				"Unable to get blog posting comment " + id)
 		);
+	}
+
+	@Retrieve
+	public PageItems<Comment> retrieveCommentsForAModel(
+		@GenericParentId
+			ModelNameModelIdIdentifier modelNameModelIdIdentifier) {
+
+		List<BlogPostingCommentModel> blogPostingCommentModels =
+			_blogPostingCommentModelService.getPage(
+				modelNameModelIdIdentifier.getModelId(), 0, Integer.MAX_VALUE);
+
+		Stream<BlogPostingCommentModel> stream =
+			blogPostingCommentModels.stream();
+
+		List<Comment> blogPostingComments = stream.map(
+			CommentConverter::toComment
+		).collect(
+			Collectors.toList()
+		);
+
+		return new PageItems<>(blogPostingComments, blogPostingComments.size());
 	}
 
 	@Retrieve

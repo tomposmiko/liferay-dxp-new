@@ -33,7 +33,7 @@ import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
 /**
- * @author Ambrin Chaudhary
+ * @author Ambrín Chaudhary
  */
 @Component(immediate = true, service = DynamicInclude.class)
 public class AMPictureTopHeadDynamicInclude extends BaseDynamicInclude {
@@ -74,8 +74,7 @@ public class AMPictureTopHeadDynamicInclude extends BaseDynamicInclude {
 	private Portal _portal;
 
 	@Reference(
-		target = "(osgi.web.symbolicname=com.liferay.adaptive.media.image.web)",
-		unbind = "-"
+		target = "(osgi.web.symbolicname=com.liferay.adaptive.media.image.web)"
 	)
 	private ServletContext _servletContext;
 

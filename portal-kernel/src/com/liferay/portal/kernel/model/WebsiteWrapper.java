@@ -17,9 +17,7 @@ package com.liferay.portal.kernel.model;
 import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.expando.kernel.model.ExpandoBridge;
-
 import com.liferay.exportimport.kernel.lar.StagedModelType;
-
 import com.liferay.portal.kernel.service.ServiceContext;
 
 import java.io.Serializable;
@@ -40,6 +38,7 @@ import java.util.Objects;
  */
 @ProviderType
 public class WebsiteWrapper implements Website, ModelWrapper<Website> {
+
 	public WebsiteWrapper(Website website) {
 		_website = website;
 	}
@@ -174,50 +173,50 @@ public class WebsiteWrapper implements Website, ModelWrapper<Website> {
 	}
 
 	/**
-	* Returns the fully qualified class name of this website.
-	*
-	* @return the fully qualified class name of this website
-	*/
+	 * Returns the fully qualified class name of this website.
+	 *
+	 * @return the fully qualified class name of this website
+	 */
 	@Override
 	public String getClassName() {
 		return _website.getClassName();
 	}
 
 	/**
-	* Returns the class name ID of this website.
-	*
-	* @return the class name ID of this website
-	*/
+	 * Returns the class name ID of this website.
+	 *
+	 * @return the class name ID of this website
+	 */
 	@Override
 	public long getClassNameId() {
 		return _website.getClassNameId();
 	}
 
 	/**
-	* Returns the class pk of this website.
-	*
-	* @return the class pk of this website
-	*/
+	 * Returns the class pk of this website.
+	 *
+	 * @return the class pk of this website
+	 */
 	@Override
 	public long getClassPK() {
 		return _website.getClassPK();
 	}
 
 	/**
-	* Returns the company ID of this website.
-	*
-	* @return the company ID of this website
-	*/
+	 * Returns the company ID of this website.
+	 *
+	 * @return the company ID of this website
+	 */
 	@Override
 	public long getCompanyId() {
 		return _website.getCompanyId();
 	}
 
 	/**
-	* Returns the create date of this website.
-	*
-	* @return the create date of this website
-	*/
+	 * Returns the create date of this website.
+	 *
+	 * @return the create date of this website
+	 */
 	@Override
 	public Date getCreateDate() {
 		return _website.getCreateDate();
@@ -229,50 +228,50 @@ public class WebsiteWrapper implements Website, ModelWrapper<Website> {
 	}
 
 	/**
-	* Returns the last publish date of this website.
-	*
-	* @return the last publish date of this website
-	*/
+	 * Returns the last publish date of this website.
+	 *
+	 * @return the last publish date of this website
+	 */
 	@Override
 	public Date getLastPublishDate() {
 		return _website.getLastPublishDate();
 	}
 
 	/**
-	* Returns the modified date of this website.
-	*
-	* @return the modified date of this website
-	*/
+	 * Returns the modified date of this website.
+	 *
+	 * @return the modified date of this website
+	 */
 	@Override
 	public Date getModifiedDate() {
 		return _website.getModifiedDate();
 	}
 
 	/**
-	* Returns the mvcc version of this website.
-	*
-	* @return the mvcc version of this website
-	*/
+	 * Returns the mvcc version of this website.
+	 *
+	 * @return the mvcc version of this website
+	 */
 	@Override
 	public long getMvccVersion() {
 		return _website.getMvccVersion();
 	}
 
 	/**
-	* Returns the primary of this website.
-	*
-	* @return the primary of this website
-	*/
+	 * Returns the primary of this website.
+	 *
+	 * @return the primary of this website
+	 */
 	@Override
 	public boolean getPrimary() {
 		return _website.getPrimary();
 	}
 
 	/**
-	* Returns the primary key of this website.
-	*
-	* @return the primary key of this website
-	*/
+	 * Returns the primary key of this website.
+	 *
+	 * @return the primary key of this website
+	 */
 	@Override
 	public long getPrimaryKey() {
 		return _website.getPrimaryKey();
@@ -286,74 +285,75 @@ public class WebsiteWrapper implements Website, ModelWrapper<Website> {
 	@Override
 	public ListType getType()
 		throws com.liferay.portal.kernel.exception.PortalException {
+
 		return _website.getType();
 	}
 
 	/**
-	* Returns the type ID of this website.
-	*
-	* @return the type ID of this website
-	*/
+	 * Returns the type ID of this website.
+	 *
+	 * @return the type ID of this website
+	 */
 	@Override
 	public long getTypeId() {
 		return _website.getTypeId();
 	}
 
 	/**
-	* Returns the url of this website.
-	*
-	* @return the url of this website
-	*/
+	 * Returns the url of this website.
+	 *
+	 * @return the url of this website
+	 */
 	@Override
 	public String getUrl() {
 		return _website.getUrl();
 	}
 
 	/**
-	* Returns the user ID of this website.
-	*
-	* @return the user ID of this website
-	*/
+	 * Returns the user ID of this website.
+	 *
+	 * @return the user ID of this website
+	 */
 	@Override
 	public long getUserId() {
 		return _website.getUserId();
 	}
 
 	/**
-	* Returns the user name of this website.
-	*
-	* @return the user name of this website
-	*/
+	 * Returns the user name of this website.
+	 *
+	 * @return the user name of this website
+	 */
 	@Override
 	public String getUserName() {
 		return _website.getUserName();
 	}
 
 	/**
-	* Returns the user uuid of this website.
-	*
-	* @return the user uuid of this website
-	*/
+	 * Returns the user uuid of this website.
+	 *
+	 * @return the user uuid of this website
+	 */
 	@Override
 	public String getUserUuid() {
 		return _website.getUserUuid();
 	}
 
 	/**
-	* Returns the uuid of this website.
-	*
-	* @return the uuid of this website
-	*/
+	 * Returns the uuid of this website.
+	 *
+	 * @return the uuid of this website
+	 */
 	@Override
 	public String getUuid() {
 		return _website.getUuid();
 	}
 
 	/**
-	* Returns the website ID of this website.
-	*
-	* @return the website ID of this website
-	*/
+	 * Returns the website ID of this website.
+	 *
+	 * @return the website ID of this website
+	 */
 	@Override
 	public long getWebsiteId() {
 		return _website.getWebsiteId();
@@ -380,10 +380,10 @@ public class WebsiteWrapper implements Website, ModelWrapper<Website> {
 	}
 
 	/**
-	* Returns <code>true</code> if this website is primary.
-	*
-	* @return <code>true</code> if this website is primary; <code>false</code> otherwise
-	*/
+	 * Returns <code>true</code> if this website is primary.
+	 *
+	 * @return <code>true</code> if this website is primary; <code>false</code> otherwise
+	 */
 	@Override
 	public boolean isPrimary() {
 		return _website.isPrimary();
@@ -405,40 +405,40 @@ public class WebsiteWrapper implements Website, ModelWrapper<Website> {
 	}
 
 	/**
-	* Sets the class name ID of this website.
-	*
-	* @param classNameId the class name ID of this website
-	*/
+	 * Sets the class name ID of this website.
+	 *
+	 * @param classNameId the class name ID of this website
+	 */
 	@Override
 	public void setClassNameId(long classNameId) {
 		_website.setClassNameId(classNameId);
 	}
 
 	/**
-	* Sets the class pk of this website.
-	*
-	* @param classPK the class pk of this website
-	*/
+	 * Sets the class pk of this website.
+	 *
+	 * @param classPK the class pk of this website
+	 */
 	@Override
 	public void setClassPK(long classPK) {
 		_website.setClassPK(classPK);
 	}
 
 	/**
-	* Sets the company ID of this website.
-	*
-	* @param companyId the company ID of this website
-	*/
+	 * Sets the company ID of this website.
+	 *
+	 * @param companyId the company ID of this website
+	 */
 	@Override
 	public void setCompanyId(long companyId) {
 		_website.setCompanyId(companyId);
 	}
 
 	/**
-	* Sets the create date of this website.
-	*
-	* @param createDate the create date of this website
-	*/
+	 * Sets the create date of this website.
+	 *
+	 * @param createDate the create date of this website
+	 */
 	@Override
 	public void setCreateDate(Date createDate) {
 		_website.setCreateDate(createDate);
@@ -460,30 +460,30 @@ public class WebsiteWrapper implements Website, ModelWrapper<Website> {
 	}
 
 	/**
-	* Sets the last publish date of this website.
-	*
-	* @param lastPublishDate the last publish date of this website
-	*/
+	 * Sets the last publish date of this website.
+	 *
+	 * @param lastPublishDate the last publish date of this website
+	 */
 	@Override
 	public void setLastPublishDate(Date lastPublishDate) {
 		_website.setLastPublishDate(lastPublishDate);
 	}
 
 	/**
-	* Sets the modified date of this website.
-	*
-	* @param modifiedDate the modified date of this website
-	*/
+	 * Sets the modified date of this website.
+	 *
+	 * @param modifiedDate the modified date of this website
+	 */
 	@Override
 	public void setModifiedDate(Date modifiedDate) {
 		_website.setModifiedDate(modifiedDate);
 	}
 
 	/**
-	* Sets the mvcc version of this website.
-	*
-	* @param mvccVersion the mvcc version of this website
-	*/
+	 * Sets the mvcc version of this website.
+	 *
+	 * @param mvccVersion the mvcc version of this website
+	 */
 	@Override
 	public void setMvccVersion(long mvccVersion) {
 		_website.setMvccVersion(mvccVersion);
@@ -495,20 +495,20 @@ public class WebsiteWrapper implements Website, ModelWrapper<Website> {
 	}
 
 	/**
-	* Sets whether this website is primary.
-	*
-	* @param primary the primary of this website
-	*/
+	 * Sets whether this website is primary.
+	 *
+	 * @param primary the primary of this website
+	 */
 	@Override
 	public void setPrimary(boolean primary) {
 		_website.setPrimary(primary);
 	}
 
 	/**
-	* Sets the primary key of this website.
-	*
-	* @param primaryKey the primary key of this website
-	*/
+	 * Sets the primary key of this website.
+	 *
+	 * @param primaryKey the primary key of this website
+	 */
 	@Override
 	public void setPrimaryKey(long primaryKey) {
 		_website.setPrimaryKey(primaryKey);
@@ -520,70 +520,70 @@ public class WebsiteWrapper implements Website, ModelWrapper<Website> {
 	}
 
 	/**
-	* Sets the type ID of this website.
-	*
-	* @param typeId the type ID of this website
-	*/
+	 * Sets the type ID of this website.
+	 *
+	 * @param typeId the type ID of this website
+	 */
 	@Override
 	public void setTypeId(long typeId) {
 		_website.setTypeId(typeId);
 	}
 
 	/**
-	* Sets the url of this website.
-	*
-	* @param url the url of this website
-	*/
+	 * Sets the url of this website.
+	 *
+	 * @param url the url of this website
+	 */
 	@Override
 	public void setUrl(String url) {
 		_website.setUrl(url);
 	}
 
 	/**
-	* Sets the user ID of this website.
-	*
-	* @param userId the user ID of this website
-	*/
+	 * Sets the user ID of this website.
+	 *
+	 * @param userId the user ID of this website
+	 */
 	@Override
 	public void setUserId(long userId) {
 		_website.setUserId(userId);
 	}
 
 	/**
-	* Sets the user name of this website.
-	*
-	* @param userName the user name of this website
-	*/
+	 * Sets the user name of this website.
+	 *
+	 * @param userName the user name of this website
+	 */
 	@Override
 	public void setUserName(String userName) {
 		_website.setUserName(userName);
 	}
 
 	/**
-	* Sets the user uuid of this website.
-	*
-	* @param userUuid the user uuid of this website
-	*/
+	 * Sets the user uuid of this website.
+	 *
+	 * @param userUuid the user uuid of this website
+	 */
 	@Override
 	public void setUserUuid(String userUuid) {
 		_website.setUserUuid(userUuid);
 	}
 
 	/**
-	* Sets the uuid of this website.
-	*
-	* @param uuid the uuid of this website
-	*/
+	 * Sets the uuid of this website.
+	 *
+	 * @param uuid the uuid of this website
+	 */
 	@Override
 	public void setUuid(String uuid) {
 		_website.setUuid(uuid);
 	}
 
 	/**
-	* Sets the website ID of this website.
-	*
-	* @param websiteId the website ID of this website
-	*/
+	 * Sets the website ID of this website.
+	 *
+	 * @param websiteId the website ID of this website
+	 */
 	@Override
 	public void setWebsiteId(long websiteId) {
 		_website.setWebsiteId(websiteId);
@@ -659,4 +659,5 @@ public class WebsiteWrapper implements Website, ModelWrapper<Website> {
 	}
 
 	private final Website _website;
+
 }

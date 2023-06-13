@@ -33,12 +33,12 @@ import java.util.Date;
  * The cache model class for representing PasswordPolicy in entity cache.
  *
  * @author Brian Wing Shun Chan
- * @see PasswordPolicy
  * @generated
  */
 @ProviderType
-public class PasswordPolicyCacheModel implements CacheModel<PasswordPolicy>,
-	Externalizable, MVCCModel {
+public class PasswordPolicyCacheModel
+	implements CacheModel<PasswordPolicy>, Externalizable, MVCCModel {
+
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj) {
@@ -49,10 +49,12 @@ public class PasswordPolicyCacheModel implements CacheModel<PasswordPolicy>,
 			return false;
 		}
 
-		PasswordPolicyCacheModel passwordPolicyCacheModel = (PasswordPolicyCacheModel)obj;
+		PasswordPolicyCacheModel passwordPolicyCacheModel =
+			(PasswordPolicyCacheModel)obj;
 
 		if ((passwordPolicyId == passwordPolicyCacheModel.passwordPolicyId) &&
-				(mvccVersion == passwordPolicyCacheModel.mvccVersion)) {
+			(mvccVersion == passwordPolicyCacheModel.mvccVersion)) {
+
 			return true;
 		}
 
@@ -313,8 +315,7 @@ public class PasswordPolicyCacheModel implements CacheModel<PasswordPolicy>,
 	}
 
 	@Override
-	public void writeExternal(ObjectOutput objectOutput)
-		throws IOException {
+	public void writeExternal(ObjectOutput objectOutput) throws IOException {
 		objectOutput.writeLong(mvccVersion);
 
 		if (uuid == null) {
@@ -445,4 +446,5 @@ public class PasswordPolicyCacheModel implements CacheModel<PasswordPolicy>,
 	public boolean requireUnlock;
 	public long resetFailureCount;
 	public long resetTicketMaxAge;
+
 }

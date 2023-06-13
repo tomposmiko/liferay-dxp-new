@@ -17,7 +17,6 @@ package com.liferay.adaptive.media.image.model;
 import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.expando.kernel.model.ExpandoBridge;
-
 import com.liferay.portal.kernel.model.ModelWrapper;
 import com.liferay.portal.kernel.service.ServiceContext;
 
@@ -38,8 +37,9 @@ import java.util.Objects;
  * @generated
  */
 @ProviderType
-public class AMImageEntryWrapper implements AMImageEntry,
-	ModelWrapper<AMImageEntry> {
+public class AMImageEntryWrapper
+	implements AMImageEntry, ModelWrapper<AMImageEntry> {
+
 	public AMImageEntryWrapper(AMImageEntry amImageEntry) {
 		_amImageEntry = amImageEntry;
 	}
@@ -153,40 +153,40 @@ public class AMImageEntryWrapper implements AMImageEntry,
 	}
 
 	/**
-	* Returns the am image entry ID of this am image entry.
-	*
-	* @return the am image entry ID of this am image entry
-	*/
+	 * Returns the am image entry ID of this am image entry.
+	 *
+	 * @return the am image entry ID of this am image entry
+	 */
 	@Override
 	public long getAmImageEntryId() {
 		return _amImageEntry.getAmImageEntryId();
 	}
 
 	/**
-	* Returns the company ID of this am image entry.
-	*
-	* @return the company ID of this am image entry
-	*/
+	 * Returns the company ID of this am image entry.
+	 *
+	 * @return the company ID of this am image entry
+	 */
 	@Override
 	public long getCompanyId() {
 		return _amImageEntry.getCompanyId();
 	}
 
 	/**
-	* Returns the configuration uuid of this am image entry.
-	*
-	* @return the configuration uuid of this am image entry
-	*/
+	 * Returns the configuration uuid of this am image entry.
+	 *
+	 * @return the configuration uuid of this am image entry
+	 */
 	@Override
 	public String getConfigurationUuid() {
 		return _amImageEntry.getConfigurationUuid();
 	}
 
 	/**
-	* Returns the create date of this am image entry.
-	*
-	* @return the create date of this am image entry
-	*/
+	 * Returns the create date of this am image entry.
+	 *
+	 * @return the create date of this am image entry
+	 */
 	@Override
 	public Date getCreateDate() {
 		return _amImageEntry.getCreateDate();
@@ -198,50 +198,50 @@ public class AMImageEntryWrapper implements AMImageEntry,
 	}
 
 	/**
-	* Returns the file version ID of this am image entry.
-	*
-	* @return the file version ID of this am image entry
-	*/
+	 * Returns the file version ID of this am image entry.
+	 *
+	 * @return the file version ID of this am image entry
+	 */
 	@Override
 	public long getFileVersionId() {
 		return _amImageEntry.getFileVersionId();
 	}
 
 	/**
-	* Returns the group ID of this am image entry.
-	*
-	* @return the group ID of this am image entry
-	*/
+	 * Returns the group ID of this am image entry.
+	 *
+	 * @return the group ID of this am image entry
+	 */
 	@Override
 	public long getGroupId() {
 		return _amImageEntry.getGroupId();
 	}
 
 	/**
-	* Returns the height of this am image entry.
-	*
-	* @return the height of this am image entry
-	*/
+	 * Returns the height of this am image entry.
+	 *
+	 * @return the height of this am image entry
+	 */
 	@Override
 	public int getHeight() {
 		return _amImageEntry.getHeight();
 	}
 
 	/**
-	* Returns the mime type of this am image entry.
-	*
-	* @return the mime type of this am image entry
-	*/
+	 * Returns the mime type of this am image entry.
+	 *
+	 * @return the mime type of this am image entry
+	 */
 	@Override
 	public String getMimeType() {
 		return _amImageEntry.getMimeType();
 	}
 
 	/**
-	* Returns the primary key of this am image entry.
-	*
-	* @return the primary key of this am image entry
-	*/
+	 * Returns the primary key of this am image entry.
+	 *
+	 * @return the primary key of this am image entry
+	 */
 	@Override
 	public long getPrimaryKey() {
 		return _amImageEntry.getPrimaryKey();
@@ -253,30 +253,30 @@ public class AMImageEntryWrapper implements AMImageEntry,
 	}
 
 	/**
-	* Returns the size of this am image entry.
-	*
-	* @return the size of this am image entry
-	*/
+	 * Returns the size of this am image entry.
+	 *
+	 * @return the size of this am image entry
+	 */
 	@Override
 	public long getSize() {
 		return _amImageEntry.getSize();
 	}
 
 	/**
-	* Returns the uuid of this am image entry.
-	*
-	* @return the uuid of this am image entry
-	*/
+	 * Returns the uuid of this am image entry.
+	 *
+	 * @return the uuid of this am image entry
+	 */
 	@Override
 	public String getUuid() {
 		return _amImageEntry.getUuid();
 	}
 
 	/**
-	* Returns the width of this am image entry.
-	*
-	* @return the width of this am image entry
-	*/
+	 * Returns the width of this am image entry.
+	 *
+	 * @return the width of this am image entry
+	 */
 	@Override
 	public int getWidth() {
 		return _amImageEntry.getWidth();
@@ -308,10 +308,10 @@ public class AMImageEntryWrapper implements AMImageEntry,
 	}
 
 	/**
-	* Sets the am image entry ID of this am image entry.
-	*
-	* @param amImageEntryId the am image entry ID of this am image entry
-	*/
+	 * Sets the am image entry ID of this am image entry.
+	 *
+	 * @param amImageEntryId the am image entry ID of this am image entry
+	 */
 	@Override
 	public void setAmImageEntryId(long amImageEntryId) {
 		_amImageEntry.setAmImageEntryId(amImageEntryId);
@@ -323,30 +323,30 @@ public class AMImageEntryWrapper implements AMImageEntry,
 	}
 
 	/**
-	* Sets the company ID of this am image entry.
-	*
-	* @param companyId the company ID of this am image entry
-	*/
+	 * Sets the company ID of this am image entry.
+	 *
+	 * @param companyId the company ID of this am image entry
+	 */
 	@Override
 	public void setCompanyId(long companyId) {
 		_amImageEntry.setCompanyId(companyId);
 	}
 
 	/**
-	* Sets the configuration uuid of this am image entry.
-	*
-	* @param configurationUuid the configuration uuid of this am image entry
-	*/
+	 * Sets the configuration uuid of this am image entry.
+	 *
+	 * @param configurationUuid the configuration uuid of this am image entry
+	 */
 	@Override
 	public void setConfigurationUuid(String configurationUuid) {
 		_amImageEntry.setConfigurationUuid(configurationUuid);
 	}
 
 	/**
-	* Sets the create date of this am image entry.
-	*
-	* @param createDate the create date of this am image entry
-	*/
+	 * Sets the create date of this am image entry.
+	 *
+	 * @param createDate the create date of this am image entry
+	 */
 	@Override
 	public void setCreateDate(Date createDate) {
 		_amImageEntry.setCreateDate(createDate);
@@ -355,6 +355,7 @@ public class AMImageEntryWrapper implements AMImageEntry,
 	@Override
 	public void setExpandoBridgeAttributes(
 		com.liferay.portal.kernel.model.BaseModel<?> baseModel) {
+
 		_amImageEntry.setExpandoBridgeAttributes(baseModel);
 	}
 
@@ -369,40 +370,40 @@ public class AMImageEntryWrapper implements AMImageEntry,
 	}
 
 	/**
-	* Sets the file version ID of this am image entry.
-	*
-	* @param fileVersionId the file version ID of this am image entry
-	*/
+	 * Sets the file version ID of this am image entry.
+	 *
+	 * @param fileVersionId the file version ID of this am image entry
+	 */
 	@Override
 	public void setFileVersionId(long fileVersionId) {
 		_amImageEntry.setFileVersionId(fileVersionId);
 	}
 
 	/**
-	* Sets the group ID of this am image entry.
-	*
-	* @param groupId the group ID of this am image entry
-	*/
+	 * Sets the group ID of this am image entry.
+	 *
+	 * @param groupId the group ID of this am image entry
+	 */
 	@Override
 	public void setGroupId(long groupId) {
 		_amImageEntry.setGroupId(groupId);
 	}
 
 	/**
-	* Sets the height of this am image entry.
-	*
-	* @param height the height of this am image entry
-	*/
+	 * Sets the height of this am image entry.
+	 *
+	 * @param height the height of this am image entry
+	 */
 	@Override
 	public void setHeight(int height) {
 		_amImageEntry.setHeight(height);
 	}
 
 	/**
-	* Sets the mime type of this am image entry.
-	*
-	* @param mimeType the mime type of this am image entry
-	*/
+	 * Sets the mime type of this am image entry.
+	 *
+	 * @param mimeType the mime type of this am image entry
+	 */
 	@Override
 	public void setMimeType(String mimeType) {
 		_amImageEntry.setMimeType(mimeType);
@@ -414,10 +415,10 @@ public class AMImageEntryWrapper implements AMImageEntry,
 	}
 
 	/**
-	* Sets the primary key of this am image entry.
-	*
-	* @param primaryKey the primary key of this am image entry
-	*/
+	 * Sets the primary key of this am image entry.
+	 *
+	 * @param primaryKey the primary key of this am image entry
+	 */
 	@Override
 	public void setPrimaryKey(long primaryKey) {
 		_amImageEntry.setPrimaryKey(primaryKey);
@@ -429,37 +430,39 @@ public class AMImageEntryWrapper implements AMImageEntry,
 	}
 
 	/**
-	* Sets the size of this am image entry.
-	*
-	* @param size the size of this am image entry
-	*/
+	 * Sets the size of this am image entry.
+	 *
+	 * @param size the size of this am image entry
+	 */
 	@Override
 	public void setSize(long size) {
 		_amImageEntry.setSize(size);
 	}
 
 	/**
-	* Sets the uuid of this am image entry.
-	*
-	* @param uuid the uuid of this am image entry
-	*/
+	 * Sets the uuid of this am image entry.
+	 *
+	 * @param uuid the uuid of this am image entry
+	 */
 	@Override
 	public void setUuid(String uuid) {
 		_amImageEntry.setUuid(uuid);
 	}
 
 	/**
-	* Sets the width of this am image entry.
-	*
-	* @param width the width of this am image entry
-	*/
+	 * Sets the width of this am image entry.
+	 *
+	 * @param width the width of this am image entry
+	 */
 	@Override
 	public void setWidth(int width) {
 		_amImageEntry.setWidth(width);
 	}
 
 	@Override
-	public com.liferay.portal.kernel.model.CacheModel<AMImageEntry> toCacheModel() {
+	public com.liferay.portal.kernel.model.CacheModel<AMImageEntry>
+		toCacheModel() {
+
 		return _amImageEntry.toCacheModel();
 	}
 
@@ -523,4 +526,5 @@ public class AMImageEntryWrapper implements AMImageEntry,
 	}
 
 	private final AMImageEntry _amImageEntry;
+
 }

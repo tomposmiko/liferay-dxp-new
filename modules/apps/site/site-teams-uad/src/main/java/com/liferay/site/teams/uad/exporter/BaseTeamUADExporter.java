@@ -18,9 +18,7 @@ import com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery;
 import com.liferay.portal.kernel.model.Team;
 import com.liferay.portal.kernel.service.TeamLocalService;
 import com.liferay.portal.kernel.util.StringBundler;
-
 import com.liferay.site.teams.uad.constants.SiteTeamsUADConstants;
-
 import com.liferay.user.associated.data.exporter.DynamicQueryUADExporter;
 
 import org.osgi.service.component.annotations.Reference;
@@ -37,7 +35,9 @@ import org.osgi.service.component.annotations.Reference;
  * @author Brian Wing Shun Chan
  * @generated
  */
-public abstract class BaseTeamUADExporter extends DynamicQueryUADExporter<Team> {
+public abstract class BaseTeamUADExporter
+	extends DynamicQueryUADExporter<Team> {
+
 	@Override
 	public Class<Team> getTypeClass() {
 		return Team.class;
@@ -81,4 +81,5 @@ public abstract class BaseTeamUADExporter extends DynamicQueryUADExporter<Team> 
 
 	@Reference
 	protected TeamLocalService teamLocalService;
+
 }

@@ -17,7 +17,6 @@ package com.liferay.dynamic.data.mapping.service.http;
 import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.dynamic.data.mapping.service.DDMFormInstanceRecordVersionServiceUtil;
-
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.security.auth.HttpPrincipal;
@@ -27,10 +26,11 @@ import com.liferay.portal.kernel.util.MethodKey;
 
 /**
  * Provides the HTTP utility for the
- * {@link DDMFormInstanceRecordVersionServiceUtil} service utility. The
+ * <code>DDMFormInstanceRecordVersionServiceUtil</code> service
+ * utility. The
  * static methods of this class calls the same methods of the service utility.
  * However, the signatures are different because it requires an additional
- * {@link HttpPrincipal} parameter.
+ * <code>HttpPrincipal</code> parameter.
  *
  * <p>
  * The benefits of using the HTTP utility is that it is fast and allows for
@@ -49,23 +49,26 @@ import com.liferay.portal.kernel.util.MethodKey;
  *
  * @author Brian Wing Shun Chan
  * @see DDMFormInstanceRecordVersionServiceSoap
- * @see HttpPrincipal
- * @see DDMFormInstanceRecordVersionServiceUtil
  * @generated
  */
 @ProviderType
 public class DDMFormInstanceRecordVersionServiceHttp {
-	public static com.liferay.dynamic.data.mapping.model.DDMFormInstanceRecordVersion fetchLatestFormInstanceRecordVersion(
-		HttpPrincipal httpPrincipal, long userId, long formInstanceId,
-		String formInstanceVersion, int status)
-		throws com.liferay.portal.kernel.exception.PortalException {
-		try {
-			MethodKey methodKey = new MethodKey(DDMFormInstanceRecordVersionServiceUtil.class,
-					"fetchLatestFormInstanceRecordVersion",
-					_fetchLatestFormInstanceRecordVersionParameterTypes0);
 
-			MethodHandler methodHandler = new MethodHandler(methodKey, userId,
-					formInstanceId, formInstanceVersion, status);
+	public static
+		com.liferay.dynamic.data.mapping.model.DDMFormInstanceRecordVersion
+				fetchLatestFormInstanceRecordVersion(
+					HttpPrincipal httpPrincipal, long userId,
+					long formInstanceId, String formInstanceVersion, int status)
+			throws com.liferay.portal.kernel.exception.PortalException {
+
+		try {
+			MethodKey methodKey = new MethodKey(
+				DDMFormInstanceRecordVersionServiceUtil.class,
+				"fetchLatestFormInstanceRecordVersion",
+				_fetchLatestFormInstanceRecordVersionParameterTypes0);
+
+			MethodHandler methodHandler = new MethodHandler(
+				methodKey, userId, formInstanceId, formInstanceVersion, status);
 
 			Object returnObj = null;
 
@@ -73,14 +76,19 @@ public class DDMFormInstanceRecordVersionServiceHttp {
 				returnObj = TunnelUtil.invoke(httpPrincipal, methodHandler);
 			}
 			catch (Exception e) {
-				if (e instanceof com.liferay.portal.kernel.exception.PortalException) {
-					throw (com.liferay.portal.kernel.exception.PortalException)e;
+				if (e instanceof
+						com.liferay.portal.kernel.exception.PortalException) {
+
+					throw (com.liferay.portal.kernel.exception.PortalException)
+						e;
 				}
 
-				throw new com.liferay.portal.kernel.exception.SystemException(e);
+				throw new com.liferay.portal.kernel.exception.SystemException(
+					e);
 			}
 
-			return (com.liferay.dynamic.data.mapping.model.DDMFormInstanceRecordVersion)returnObj;
+			return (com.liferay.dynamic.data.mapping.model.
+				DDMFormInstanceRecordVersion)returnObj;
 		}
 		catch (com.liferay.portal.kernel.exception.SystemException se) {
 			_log.error(se, se);
@@ -89,16 +97,21 @@ public class DDMFormInstanceRecordVersionServiceHttp {
 		}
 	}
 
-	public static com.liferay.dynamic.data.mapping.model.DDMFormInstanceRecordVersion getFormInstanceRecordVersion(
-		HttpPrincipal httpPrincipal, long ddmFormInstanceRecordVersionId)
-		throws com.liferay.portal.kernel.exception.PortalException {
-		try {
-			MethodKey methodKey = new MethodKey(DDMFormInstanceRecordVersionServiceUtil.class,
-					"getFormInstanceRecordVersion",
-					_getFormInstanceRecordVersionParameterTypes1);
+	public static
+		com.liferay.dynamic.data.mapping.model.DDMFormInstanceRecordVersion
+				getFormInstanceRecordVersion(
+					HttpPrincipal httpPrincipal,
+					long ddmFormInstanceRecordVersionId)
+			throws com.liferay.portal.kernel.exception.PortalException {
 
-			MethodHandler methodHandler = new MethodHandler(methodKey,
-					ddmFormInstanceRecordVersionId);
+		try {
+			MethodKey methodKey = new MethodKey(
+				DDMFormInstanceRecordVersionServiceUtil.class,
+				"getFormInstanceRecordVersion",
+				_getFormInstanceRecordVersionParameterTypes1);
+
+			MethodHandler methodHandler = new MethodHandler(
+				methodKey, ddmFormInstanceRecordVersionId);
 
 			Object returnObj = null;
 
@@ -106,14 +119,19 @@ public class DDMFormInstanceRecordVersionServiceHttp {
 				returnObj = TunnelUtil.invoke(httpPrincipal, methodHandler);
 			}
 			catch (Exception e) {
-				if (e instanceof com.liferay.portal.kernel.exception.PortalException) {
-					throw (com.liferay.portal.kernel.exception.PortalException)e;
+				if (e instanceof
+						com.liferay.portal.kernel.exception.PortalException) {
+
+					throw (com.liferay.portal.kernel.exception.PortalException)
+						e;
 				}
 
-				throw new com.liferay.portal.kernel.exception.SystemException(e);
+				throw new com.liferay.portal.kernel.exception.SystemException(
+					e);
 			}
 
-			return (com.liferay.dynamic.data.mapping.model.DDMFormInstanceRecordVersion)returnObj;
+			return (com.liferay.dynamic.data.mapping.model.
+				DDMFormInstanceRecordVersion)returnObj;
 		}
 		catch (com.liferay.portal.kernel.exception.SystemException se) {
 			_log.error(se, se);
@@ -122,17 +140,21 @@ public class DDMFormInstanceRecordVersionServiceHttp {
 		}
 	}
 
-	public static com.liferay.dynamic.data.mapping.model.DDMFormInstanceRecordVersion getFormInstanceRecordVersion(
-		HttpPrincipal httpPrincipal, long ddmFormInstanceRecordId,
-		String version)
-		throws com.liferay.portal.kernel.exception.PortalException {
-		try {
-			MethodKey methodKey = new MethodKey(DDMFormInstanceRecordVersionServiceUtil.class,
-					"getFormInstanceRecordVersion",
-					_getFormInstanceRecordVersionParameterTypes2);
+	public static
+		com.liferay.dynamic.data.mapping.model.DDMFormInstanceRecordVersion
+				getFormInstanceRecordVersion(
+					HttpPrincipal httpPrincipal, long ddmFormInstanceRecordId,
+					String version)
+			throws com.liferay.portal.kernel.exception.PortalException {
 
-			MethodHandler methodHandler = new MethodHandler(methodKey,
-					ddmFormInstanceRecordId, version);
+		try {
+			MethodKey methodKey = new MethodKey(
+				DDMFormInstanceRecordVersionServiceUtil.class,
+				"getFormInstanceRecordVersion",
+				_getFormInstanceRecordVersionParameterTypes2);
+
+			MethodHandler methodHandler = new MethodHandler(
+				methodKey, ddmFormInstanceRecordId, version);
 
 			Object returnObj = null;
 
@@ -140,14 +162,19 @@ public class DDMFormInstanceRecordVersionServiceHttp {
 				returnObj = TunnelUtil.invoke(httpPrincipal, methodHandler);
 			}
 			catch (Exception e) {
-				if (e instanceof com.liferay.portal.kernel.exception.PortalException) {
-					throw (com.liferay.portal.kernel.exception.PortalException)e;
+				if (e instanceof
+						com.liferay.portal.kernel.exception.PortalException) {
+
+					throw (com.liferay.portal.kernel.exception.PortalException)
+						e;
 				}
 
-				throw new com.liferay.portal.kernel.exception.SystemException(e);
+				throw new com.liferay.portal.kernel.exception.SystemException(
+					e);
 			}
 
-			return (com.liferay.dynamic.data.mapping.model.DDMFormInstanceRecordVersion)returnObj;
+			return (com.liferay.dynamic.data.mapping.model.
+				DDMFormInstanceRecordVersion)returnObj;
 		}
 		catch (com.liferay.portal.kernel.exception.SystemException se) {
 			_log.error(se, se);
@@ -156,16 +183,20 @@ public class DDMFormInstanceRecordVersionServiceHttp {
 		}
 	}
 
-	public static java.util.List<com.liferay.dynamic.data.mapping.model.DDMFormInstanceRecordVersion> getFormInstanceRecordVersions(
-		HttpPrincipal httpPrincipal, long ddmFormInstanceRecordId)
-		throws com.liferay.portal.kernel.exception.PortalException {
-		try {
-			MethodKey methodKey = new MethodKey(DDMFormInstanceRecordVersionServiceUtil.class,
-					"getFormInstanceRecordVersions",
-					_getFormInstanceRecordVersionsParameterTypes3);
+	public static java.util.List
+		<com.liferay.dynamic.data.mapping.model.DDMFormInstanceRecordVersion>
+				getFormInstanceRecordVersions(
+					HttpPrincipal httpPrincipal, long ddmFormInstanceRecordId)
+			throws com.liferay.portal.kernel.exception.PortalException {
 
-			MethodHandler methodHandler = new MethodHandler(methodKey,
-					ddmFormInstanceRecordId);
+		try {
+			MethodKey methodKey = new MethodKey(
+				DDMFormInstanceRecordVersionServiceUtil.class,
+				"getFormInstanceRecordVersions",
+				_getFormInstanceRecordVersionsParameterTypes3);
+
+			MethodHandler methodHandler = new MethodHandler(
+				methodKey, ddmFormInstanceRecordId);
 
 			Object returnObj = null;
 
@@ -173,14 +204,20 @@ public class DDMFormInstanceRecordVersionServiceHttp {
 				returnObj = TunnelUtil.invoke(httpPrincipal, methodHandler);
 			}
 			catch (Exception e) {
-				if (e instanceof com.liferay.portal.kernel.exception.PortalException) {
-					throw (com.liferay.portal.kernel.exception.PortalException)e;
+				if (e instanceof
+						com.liferay.portal.kernel.exception.PortalException) {
+
+					throw (com.liferay.portal.kernel.exception.PortalException)
+						e;
 				}
 
-				throw new com.liferay.portal.kernel.exception.SystemException(e);
+				throw new com.liferay.portal.kernel.exception.SystemException(
+					e);
 			}
 
-			return (java.util.List<com.liferay.dynamic.data.mapping.model.DDMFormInstanceRecordVersion>)returnObj;
+			return (java.util.List
+				<com.liferay.dynamic.data.mapping.model.
+					DDMFormInstanceRecordVersion>)returnObj;
 		}
 		catch (com.liferay.portal.kernel.exception.SystemException se) {
 			_log.error(se, se);
@@ -189,18 +226,25 @@ public class DDMFormInstanceRecordVersionServiceHttp {
 		}
 	}
 
-	public static java.util.List<com.liferay.dynamic.data.mapping.model.DDMFormInstanceRecordVersion> getFormInstanceRecordVersions(
-		HttpPrincipal httpPrincipal, long ddmFormInstanceRecordId, int start,
-		int end,
-		com.liferay.portal.kernel.util.OrderByComparator<com.liferay.dynamic.data.mapping.model.DDMFormInstanceRecordVersion> orderByComparator)
-		throws com.liferay.portal.kernel.exception.PortalException {
-		try {
-			MethodKey methodKey = new MethodKey(DDMFormInstanceRecordVersionServiceUtil.class,
-					"getFormInstanceRecordVersions",
-					_getFormInstanceRecordVersionsParameterTypes4);
+	public static java.util.List
+		<com.liferay.dynamic.data.mapping.model.DDMFormInstanceRecordVersion>
+				getFormInstanceRecordVersions(
+					HttpPrincipal httpPrincipal, long ddmFormInstanceRecordId,
+					int start, int end,
+					com.liferay.portal.kernel.util.OrderByComparator
+						<com.liferay.dynamic.data.mapping.model.
+							DDMFormInstanceRecordVersion> orderByComparator)
+			throws com.liferay.portal.kernel.exception.PortalException {
 
-			MethodHandler methodHandler = new MethodHandler(methodKey,
-					ddmFormInstanceRecordId, start, end, orderByComparator);
+		try {
+			MethodKey methodKey = new MethodKey(
+				DDMFormInstanceRecordVersionServiceUtil.class,
+				"getFormInstanceRecordVersions",
+				_getFormInstanceRecordVersionsParameterTypes4);
+
+			MethodHandler methodHandler = new MethodHandler(
+				methodKey, ddmFormInstanceRecordId, start, end,
+				orderByComparator);
 
 			Object returnObj = null;
 
@@ -208,14 +252,20 @@ public class DDMFormInstanceRecordVersionServiceHttp {
 				returnObj = TunnelUtil.invoke(httpPrincipal, methodHandler);
 			}
 			catch (Exception e) {
-				if (e instanceof com.liferay.portal.kernel.exception.PortalException) {
-					throw (com.liferay.portal.kernel.exception.PortalException)e;
+				if (e instanceof
+						com.liferay.portal.kernel.exception.PortalException) {
+
+					throw (com.liferay.portal.kernel.exception.PortalException)
+						e;
 				}
 
-				throw new com.liferay.portal.kernel.exception.SystemException(e);
+				throw new com.liferay.portal.kernel.exception.SystemException(
+					e);
 			}
 
-			return (java.util.List<com.liferay.dynamic.data.mapping.model.DDMFormInstanceRecordVersion>)returnObj;
+			return (java.util.List
+				<com.liferay.dynamic.data.mapping.model.
+					DDMFormInstanceRecordVersion>)returnObj;
 		}
 		catch (com.liferay.portal.kernel.exception.SystemException se) {
 			_log.error(se, se);
@@ -225,15 +275,17 @@ public class DDMFormInstanceRecordVersionServiceHttp {
 	}
 
 	public static int getFormInstanceRecordVersionsCount(
-		HttpPrincipal httpPrincipal, long ddmFormInstanceRecordId)
+			HttpPrincipal httpPrincipal, long ddmFormInstanceRecordId)
 		throws com.liferay.portal.kernel.exception.PortalException {
-		try {
-			MethodKey methodKey = new MethodKey(DDMFormInstanceRecordVersionServiceUtil.class,
-					"getFormInstanceRecordVersionsCount",
-					_getFormInstanceRecordVersionsCountParameterTypes5);
 
-			MethodHandler methodHandler = new MethodHandler(methodKey,
-					ddmFormInstanceRecordId);
+		try {
+			MethodKey methodKey = new MethodKey(
+				DDMFormInstanceRecordVersionServiceUtil.class,
+				"getFormInstanceRecordVersionsCount",
+				_getFormInstanceRecordVersionsCountParameterTypes5);
+
+			MethodHandler methodHandler = new MethodHandler(
+				methodKey, ddmFormInstanceRecordId);
 
 			Object returnObj = null;
 
@@ -241,11 +293,15 @@ public class DDMFormInstanceRecordVersionServiceHttp {
 				returnObj = TunnelUtil.invoke(httpPrincipal, methodHandler);
 			}
 			catch (Exception e) {
-				if (e instanceof com.liferay.portal.kernel.exception.PortalException) {
-					throw (com.liferay.portal.kernel.exception.PortalException)e;
+				if (e instanceof
+						com.liferay.portal.kernel.exception.PortalException) {
+
+					throw (com.liferay.portal.kernel.exception.PortalException)
+						e;
 				}
 
-				throw new com.liferay.portal.kernel.exception.SystemException(e);
+				throw new com.liferay.portal.kernel.exception.SystemException(
+					e);
 			}
 
 			return ((Integer)returnObj).intValue();
@@ -257,20 +313,31 @@ public class DDMFormInstanceRecordVersionServiceHttp {
 		}
 	}
 
-	private static Log _log = LogFactoryUtil.getLog(DDMFormInstanceRecordVersionServiceHttp.class);
-	private static final Class<?>[] _fetchLatestFormInstanceRecordVersionParameterTypes0 =
-		new Class[] { long.class, long.class, String.class, int.class };
-	private static final Class<?>[] _getFormInstanceRecordVersionParameterTypes1 =
-		new Class[] { long.class };
-	private static final Class<?>[] _getFormInstanceRecordVersionParameterTypes2 =
-		new Class[] { long.class, String.class };
-	private static final Class<?>[] _getFormInstanceRecordVersionsParameterTypes3 =
-		new Class[] { long.class };
-	private static final Class<?>[] _getFormInstanceRecordVersionsParameterTypes4 =
-		new Class[] {
+	private static Log _log = LogFactoryUtil.getLog(
+		DDMFormInstanceRecordVersionServiceHttp.class);
+
+	private static final Class<?>[]
+		_fetchLatestFormInstanceRecordVersionParameterTypes0 = new Class[] {
+			long.class, long.class, String.class, int.class
+		};
+	private static final Class<?>[]
+		_getFormInstanceRecordVersionParameterTypes1 = new Class[] {long.class};
+	private static final Class<?>[]
+		_getFormInstanceRecordVersionParameterTypes2 = new Class[] {
+			long.class, String.class
+		};
+	private static final Class<?>[]
+		_getFormInstanceRecordVersionsParameterTypes3 = new Class[] {
+			long.class
+		};
+	private static final Class<?>[]
+		_getFormInstanceRecordVersionsParameterTypes4 = new Class[] {
 			long.class, int.class, int.class,
 			com.liferay.portal.kernel.util.OrderByComparator.class
 		};
-	private static final Class<?>[] _getFormInstanceRecordVersionsCountParameterTypes5 =
-		new Class[] { long.class };
+	private static final Class<?>[]
+		_getFormInstanceRecordVersionsCountParameterTypes5 = new Class[] {
+			long.class
+		};
+
 }

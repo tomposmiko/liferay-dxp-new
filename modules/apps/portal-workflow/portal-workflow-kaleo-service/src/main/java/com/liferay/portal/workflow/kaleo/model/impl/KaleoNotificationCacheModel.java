@@ -32,12 +32,12 @@ import java.util.Date;
  * The cache model class for representing KaleoNotification in entity cache.
  *
  * @author Brian Wing Shun Chan
- * @see KaleoNotification
  * @generated
  */
 @ProviderType
-public class KaleoNotificationCacheModel implements CacheModel<KaleoNotification>,
-	Externalizable {
+public class KaleoNotificationCacheModel
+	implements CacheModel<KaleoNotification>, Externalizable {
+
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj) {
@@ -48,9 +48,12 @@ public class KaleoNotificationCacheModel implements CacheModel<KaleoNotification
 			return false;
 		}
 
-		KaleoNotificationCacheModel kaleoNotificationCacheModel = (KaleoNotificationCacheModel)obj;
+		KaleoNotificationCacheModel kaleoNotificationCacheModel =
+			(KaleoNotificationCacheModel)obj;
 
-		if (kaleoNotificationId == kaleoNotificationCacheModel.kaleoNotificationId) {
+		if (kaleoNotificationId ==
+				kaleoNotificationCacheModel.kaleoNotificationId) {
+
 			return true;
 		}
 
@@ -107,7 +110,8 @@ public class KaleoNotificationCacheModel implements CacheModel<KaleoNotification
 
 	@Override
 	public KaleoNotification toEntityModel() {
-		KaleoNotificationImpl kaleoNotificationImpl = new KaleoNotificationImpl();
+		KaleoNotificationImpl kaleoNotificationImpl =
+			new KaleoNotificationImpl();
 
 		kaleoNotificationImpl.setKaleoNotificationId(kaleoNotificationId);
 		kaleoNotificationImpl.setGroupId(groupId);
@@ -143,7 +147,8 @@ public class KaleoNotificationCacheModel implements CacheModel<KaleoNotification
 		}
 
 		kaleoNotificationImpl.setKaleoClassPK(kaleoClassPK);
-		kaleoNotificationImpl.setKaleoDefinitionVersionId(kaleoDefinitionVersionId);
+		kaleoNotificationImpl.setKaleoDefinitionVersionId(
+			kaleoDefinitionVersionId);
 
 		if (kaleoNodeName == null) {
 			kaleoNotificationImpl.setKaleoNodeName("");
@@ -226,8 +231,7 @@ public class KaleoNotificationCacheModel implements CacheModel<KaleoNotification
 	}
 
 	@Override
-	public void writeExternal(ObjectOutput objectOutput)
-		throws IOException {
+	public void writeExternal(ObjectOutput objectOutput) throws IOException {
 		objectOutput.writeLong(kaleoNotificationId);
 
 		objectOutput.writeLong(groupId);
@@ -324,4 +328,5 @@ public class KaleoNotificationCacheModel implements CacheModel<KaleoNotification
 	public String template;
 	public String templateLanguage;
 	public String notificationTypes;
+
 }

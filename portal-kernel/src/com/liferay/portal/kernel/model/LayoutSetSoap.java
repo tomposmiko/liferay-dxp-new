@@ -26,11 +26,11 @@ import java.util.List;
  * This class is used by SOAP remote services, specifically {@link com.liferay.portal.service.http.LayoutSetServiceSoap}.
  *
  * @author Brian Wing Shun Chan
- * @see com.liferay.portal.service.http.LayoutSetServiceSoap
  * @generated
  */
 @ProviderType
 public class LayoutSetSoap implements Serializable {
+
 	public static LayoutSetSoap toSoapModel(LayoutSet model) {
 		LayoutSetSoap soapModel = new LayoutSetSoap();
 
@@ -48,7 +48,8 @@ public class LayoutSetSoap implements Serializable {
 		soapModel.setPageCount(model.getPageCount());
 		soapModel.setSettings(model.getSettings());
 		soapModel.setLayoutSetPrototypeUuid(model.getLayoutSetPrototypeUuid());
-		soapModel.setLayoutSetPrototypeLinkEnabled(model.isLayoutSetPrototypeLinkEnabled());
+		soapModel.setLayoutSetPrototypeLinkEnabled(
+			model.isLayoutSetPrototypeLinkEnabled());
 
 		return soapModel;
 	}
@@ -81,7 +82,8 @@ public class LayoutSetSoap implements Serializable {
 	}
 
 	public static LayoutSetSoap[] toSoapModels(List<LayoutSet> models) {
-		List<LayoutSetSoap> soapModels = new ArrayList<LayoutSetSoap>(models.size());
+		List<LayoutSetSoap> soapModels = new ArrayList<LayoutSetSoap>(
+			models.size());
 
 		for (LayoutSet model : models) {
 			soapModels.add(toSoapModel(model));
@@ -227,6 +229,7 @@ public class LayoutSetSoap implements Serializable {
 
 	public void setLayoutSetPrototypeLinkEnabled(
 		boolean layoutSetPrototypeLinkEnabled) {
+
 		_layoutSetPrototypeLinkEnabled = layoutSetPrototypeLinkEnabled;
 	}
 
@@ -245,4 +248,5 @@ public class LayoutSetSoap implements Serializable {
 	private String _settings;
 	private String _layoutSetPrototypeUuid;
 	private boolean _layoutSetPrototypeLinkEnabled;
+
 }

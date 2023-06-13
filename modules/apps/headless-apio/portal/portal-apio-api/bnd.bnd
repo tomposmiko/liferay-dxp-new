@@ -1,6 +1,6 @@
 Bundle-Name: Liferay Portal Apio API
 Bundle-SymbolicName: com.liferay.portal.apio.api
-Bundle-Version: 1.2.2
+Bundle-Version: 1.2.3
 Export-Package:\
 	com.liferay.portal.apio.exception,\
 	com.liferay.portal.apio.idempotent,\

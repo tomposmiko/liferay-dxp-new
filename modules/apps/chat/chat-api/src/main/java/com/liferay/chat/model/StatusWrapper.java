@@ -17,7 +17,6 @@ package com.liferay.chat.model;
 import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.expando.kernel.model.ExpandoBridge;
-
 import com.liferay.portal.kernel.model.ModelWrapper;
 import com.liferay.portal.kernel.service.ServiceContext;
 
@@ -38,6 +37,7 @@ import java.util.Objects;
  */
 @ProviderType
 public class StatusWrapper implements Status, ModelWrapper<Status> {
+
 	public StatusWrapper(Status status) {
 		_status = status;
 	}
@@ -130,20 +130,20 @@ public class StatusWrapper implements Status, ModelWrapper<Status> {
 	}
 
 	/**
-	* Returns the active panel IDs of this status.
-	*
-	* @return the active panel IDs of this status
-	*/
+	 * Returns the active panel IDs of this status.
+	 *
+	 * @return the active panel IDs of this status
+	 */
 	@Override
 	public String getActivePanelIds() {
 		return _status.getActivePanelIds();
 	}
 
 	/**
-	* Returns the awake of this status.
-	*
-	* @return the awake of this status
-	*/
+	 * Returns the awake of this status.
+	 *
+	 * @return the awake of this status
+	 */
 	@Override
 	public boolean getAwake() {
 		return _status.getAwake();
@@ -155,50 +155,50 @@ public class StatusWrapper implements Status, ModelWrapper<Status> {
 	}
 
 	/**
-	* Returns the message of this status.
-	*
-	* @return the message of this status
-	*/
+	 * Returns the message of this status.
+	 *
+	 * @return the message of this status
+	 */
 	@Override
 	public String getMessage() {
 		return _status.getMessage();
 	}
 
 	/**
-	* Returns the modified date of this status.
-	*
-	* @return the modified date of this status
-	*/
+	 * Returns the modified date of this status.
+	 *
+	 * @return the modified date of this status
+	 */
 	@Override
 	public long getModifiedDate() {
 		return _status.getModifiedDate();
 	}
 
 	/**
-	* Returns the online of this status.
-	*
-	* @return the online of this status
-	*/
+	 * Returns the online of this status.
+	 *
+	 * @return the online of this status
+	 */
 	@Override
 	public boolean getOnline() {
 		return _status.getOnline();
 	}
 
 	/**
-	* Returns the play sound of this status.
-	*
-	* @return the play sound of this status
-	*/
+	 * Returns the play sound of this status.
+	 *
+	 * @return the play sound of this status
+	 */
 	@Override
 	public boolean getPlaySound() {
 		return _status.getPlaySound();
 	}
 
 	/**
-	* Returns the primary key of this status.
-	*
-	* @return the primary key of this status
-	*/
+	 * Returns the primary key of this status.
+	 *
+	 * @return the primary key of this status
+	 */
 	@Override
 	public long getPrimaryKey() {
 		return _status.getPrimaryKey();
@@ -210,30 +210,30 @@ public class StatusWrapper implements Status, ModelWrapper<Status> {
 	}
 
 	/**
-	* Returns the status ID of this status.
-	*
-	* @return the status ID of this status
-	*/
+	 * Returns the status ID of this status.
+	 *
+	 * @return the status ID of this status
+	 */
 	@Override
 	public long getStatusId() {
 		return _status.getStatusId();
 	}
 
 	/**
-	* Returns the user ID of this status.
-	*
-	* @return the user ID of this status
-	*/
+	 * Returns the user ID of this status.
+	 *
+	 * @return the user ID of this status
+	 */
 	@Override
 	public long getUserId() {
 		return _status.getUserId();
 	}
 
 	/**
-	* Returns the user uuid of this status.
-	*
-	* @return the user uuid of this status
-	*/
+	 * Returns the user uuid of this status.
+	 *
+	 * @return the user uuid of this status
+	 */
 	@Override
 	public String getUserUuid() {
 		return _status.getUserUuid();
@@ -245,10 +245,10 @@ public class StatusWrapper implements Status, ModelWrapper<Status> {
 	}
 
 	/**
-	* Returns <code>true</code> if this status is awake.
-	*
-	* @return <code>true</code> if this status is awake; <code>false</code> otherwise
-	*/
+	 * Returns <code>true</code> if this status is awake.
+	 *
+	 * @return <code>true</code> if this status is awake; <code>false</code> otherwise
+	 */
 	@Override
 	public boolean isAwake() {
 		return _status.isAwake();
@@ -270,20 +270,20 @@ public class StatusWrapper implements Status, ModelWrapper<Status> {
 	}
 
 	/**
-	* Returns <code>true</code> if this status is online.
-	*
-	* @return <code>true</code> if this status is online; <code>false</code> otherwise
-	*/
+	 * Returns <code>true</code> if this status is online.
+	 *
+	 * @return <code>true</code> if this status is online; <code>false</code> otherwise
+	 */
 	@Override
 	public boolean isOnline() {
 		return _status.isOnline();
 	}
 
 	/**
-	* Returns <code>true</code> if this status is play sound.
-	*
-	* @return <code>true</code> if this status is play sound; <code>false</code> otherwise
-	*/
+	 * Returns <code>true</code> if this status is play sound.
+	 *
+	 * @return <code>true</code> if this status is play sound; <code>false</code> otherwise
+	 */
 	@Override
 	public boolean isPlaySound() {
 		return _status.isPlaySound();
@@ -295,20 +295,20 @@ public class StatusWrapper implements Status, ModelWrapper<Status> {
 	}
 
 	/**
-	* Sets the active panel IDs of this status.
-	*
-	* @param activePanelIds the active panel IDs of this status
-	*/
+	 * Sets the active panel IDs of this status.
+	 *
+	 * @param activePanelIds the active panel IDs of this status
+	 */
 	@Override
 	public void setActivePanelIds(String activePanelIds) {
 		_status.setActivePanelIds(activePanelIds);
 	}
 
 	/**
-	* Sets whether this status is awake.
-	*
-	* @param awake the awake of this status
-	*/
+	 * Sets whether this status is awake.
+	 *
+	 * @param awake the awake of this status
+	 */
 	@Override
 	public void setAwake(boolean awake) {
 		_status.setAwake(awake);
@@ -322,6 +322,7 @@ public class StatusWrapper implements Status, ModelWrapper<Status> {
 	@Override
 	public void setExpandoBridgeAttributes(
 		com.liferay.portal.kernel.model.BaseModel<?> baseModel) {
+
 		_status.setExpandoBridgeAttributes(baseModel);
 	}
 
@@ -336,20 +337,20 @@ public class StatusWrapper implements Status, ModelWrapper<Status> {
 	}
 
 	/**
-	* Sets the message of this status.
-	*
-	* @param message the message of this status
-	*/
+	 * Sets the message of this status.
+	 *
+	 * @param message the message of this status
+	 */
 	@Override
 	public void setMessage(String message) {
 		_status.setMessage(message);
 	}
 
 	/**
-	* Sets the modified date of this status.
-	*
-	* @param modifiedDate the modified date of this status
-	*/
+	 * Sets the modified date of this status.
+	 *
+	 * @param modifiedDate the modified date of this status
+	 */
 	@Override
 	public void setModifiedDate(long modifiedDate) {
 		_status.setModifiedDate(modifiedDate);
@@ -361,30 +362,30 @@ public class StatusWrapper implements Status, ModelWrapper<Status> {
 	}
 
 	/**
-	* Sets whether this status is online.
-	*
-	* @param online the online of this status
-	*/
+	 * Sets whether this status is online.
+	 *
+	 * @param online the online of this status
+	 */
 	@Override
 	public void setOnline(boolean online) {
 		_status.setOnline(online);
 	}
 
 	/**
-	* Sets whether this status is play sound.
-	*
-	* @param playSound the play sound of this status
-	*/
+	 * Sets whether this status is play sound.
+	 *
+	 * @param playSound the play sound of this status
+	 */
 	@Override
 	public void setPlaySound(boolean playSound) {
 		_status.setPlaySound(playSound);
 	}
 
 	/**
-	* Sets the primary key of this status.
-	*
-	* @param primaryKey the primary key of this status
-	*/
+	 * Sets the primary key of this status.
+	 *
+	 * @param primaryKey the primary key of this status
+	 */
 	@Override
 	public void setPrimaryKey(long primaryKey) {
 		_status.setPrimaryKey(primaryKey);
@@ -396,30 +397,30 @@ public class StatusWrapper implements Status, ModelWrapper<Status> {
 	}
 
 	/**
-	* Sets the status ID of this status.
-	*
-	* @param statusId the status ID of this status
-	*/
+	 * Sets the status ID of this status.
+	 *
+	 * @param statusId the status ID of this status
+	 */
 	@Override
 	public void setStatusId(long statusId) {
 		_status.setStatusId(statusId);
 	}
 
 	/**
-	* Sets the user ID of this status.
-	*
-	* @param userId the user ID of this status
-	*/
+	 * Sets the user ID of this status.
+	 *
+	 * @param userId the user ID of this status
+	 */
 	@Override
 	public void setUserId(long userId) {
 		_status.setUserId(userId);
 	}
 
 	/**
-	* Sets the user uuid of this status.
-	*
-	* @param userUuid the user uuid of this status
-	*/
+	 * Sets the user uuid of this status.
+	 *
+	 * @param userUuid the user uuid of this status
+	 */
 	@Override
 	public void setUserUuid(String userUuid) {
 		_status.setUserUuid(userUuid);
@@ -490,4 +491,5 @@ public class StatusWrapper implements Status, ModelWrapper<Status> {
 	}
 
 	private final Status _status;
+
 }

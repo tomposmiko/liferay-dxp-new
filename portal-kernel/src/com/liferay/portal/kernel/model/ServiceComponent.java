@@ -24,20 +24,21 @@ import com.liferay.portal.kernel.util.Accessor;
  *
  * @author Brian Wing Shun Chan
  * @see ServiceComponentModel
- * @see com.liferay.portal.model.impl.ServiceComponentImpl
- * @see com.liferay.portal.model.impl.ServiceComponentModelImpl
  * @generated
  */
 @ImplementationClassName("com.liferay.portal.model.impl.ServiceComponentImpl")
 @ProviderType
-public interface ServiceComponent extends ServiceComponentModel, PersistedModel {
+public interface ServiceComponent
+	extends PersistedModel, ServiceComponentModel {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
-	 * Never modify this interface directly. Add methods to {@link com.liferay.portal.model.impl.ServiceComponentImpl} and rerun ServiceBuilder to automatically copy the method declarations to this interface.
+	 * Never modify this interface directly. Add methods to <code>com.liferay.portal.model.impl.ServiceComponentImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
 	 */
-	public static final Accessor<ServiceComponent, Long> SERVICE_COMPONENT_ID_ACCESSOR =
-		new Accessor<ServiceComponent, Long>() {
+	public static final Accessor<ServiceComponent, Long>
+		SERVICE_COMPONENT_ID_ACCESSOR = new Accessor<ServiceComponent, Long>() {
+
 			@Override
 			public Long get(ServiceComponent serviceComponent) {
 				return serviceComponent.getServiceComponentId();
@@ -52,6 +53,7 @@ public interface ServiceComponent extends ServiceComponentModel, PersistedModel 
 			public Class<ServiceComponent> getTypeClass() {
 				return ServiceComponent.class;
 			}
+
 		};
 
 	public String getIndexesSQL();
@@ -59,4 +61,5 @@ public interface ServiceComponent extends ServiceComponentModel, PersistedModel 
 	public String getSequencesSQL();
 
 	public String getTablesSQL();
+
 }

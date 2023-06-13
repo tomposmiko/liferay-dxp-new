@@ -163,15 +163,6 @@
 		${printURL.setParameter("assetEntryId", entry.getEntryId()?string)}
 		${printURL.setParameter("viewMode", "print")}
 		${printURL.setParameter("type", entry.getAssetRendererFactory().getType())}
-
-		<#if (assetRenderer.getUrlTitle()??) && validator.isNotNull(assetRenderer.getUrlTitle())>
-			<#if assetRenderer.getGroupId() != themeDisplay.getScopeGroupId()>
-				${printURL.setParameter("groupId", assetRenderer.getGroupId()?string)}
-			</#if>
-
-			${printURL.setParameter("urlTitle", assetRenderer.getUrlTitle())}
-		</#if>
-
 		${printURL.setWindowState("pop_up")}
 
 		<@liferay_ui["icon"]

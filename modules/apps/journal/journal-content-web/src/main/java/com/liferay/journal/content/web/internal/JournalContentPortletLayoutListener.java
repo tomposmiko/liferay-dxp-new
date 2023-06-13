@@ -36,6 +36,7 @@ import com.liferay.portal.kernel.service.GroupLocalService;
 import com.liferay.portal.kernel.service.LayoutLocalService;
 import com.liferay.portal.kernel.service.PortletLocalService;
 import com.liferay.portal.kernel.util.Portal;
+import com.liferay.portal.kernel.util.PortletKeys;
 import com.liferay.portal.kernel.util.UnicodeProperties;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.xml.Document;
@@ -75,11 +76,7 @@ public class JournalContentPortletLayoutListener
 		try {
 			Layout layout = _layoutLocalService.getLayout(plid);
 
-			PortletPreferences portletPreferences =
-				PortletPreferencesFactoryUtil.getPortletSetup(
-					layout, portletId, StringPool.BLANK);
-
-			String articleId = portletPreferences.getValue("articleId", null);
+			String articleId = _getArticleId(layout, portletId);
 
 			if (Validator.isNull(articleId)) {
 				return;
@@ -117,11 +114,7 @@ public class JournalContentPortletLayoutListener
 		try {
 			Layout layout = _layoutLocalService.getLayout(plid);
 
-			PortletPreferences portletPreferences =
-				PortletPreferencesFactoryUtil.getPortletSetup(
-					layout, portletId, StringPool.BLANK);
-
-			String articleId = portletPreferences.getValue("articleId", null);
+			String articleId = _getArticleId(layout, portletId);
 
 			if (Validator.isNull(articleId)) {
 				return;
@@ -157,11 +150,7 @@ public class JournalContentPortletLayoutListener
 		try {
 			Layout layout = _layoutLocalService.getLayout(plid);
 
-			PortletPreferences portletPreferences =
-				PortletPreferencesFactoryUtil.getPortletSetup(
-					layout, portletId, StringPool.BLANK);
-
-			String articleId = portletPreferences.getValue("articleId", null);
+			String articleId = _getArticleId(layout, portletId);
 
 			if (Validator.isNull(articleId)) {
 				_journalContentSearchLocalService.deleteArticleContentSearch(
@@ -270,6 +259,28 @@ public class JournalContentPortletLayoutListener
 		}
 
 		return portletIds;
+	}
+
+	private String _getArticleId(Layout layout, String portletId) {
+		PortletPreferences portletPreferences = null;
+
+		if (layout.isPortletEmbedded(portletId, layout.getGroupId())) {
+			portletPreferences =
+				PortletPreferencesFactoryUtil.getLayoutPortletSetup(
+					layout.getCompanyId(), layout.getGroupId(),
+					PortletKeys.PREFS_OWNER_TYPE_LAYOUT,
+					PortletKeys.PREFS_PLID_SHARED, portletId, null);
+		}
+		else {
+			portletPreferences = PortletPreferencesFactoryUtil.getPortletSetup(
+				layout, portletId, StringPool.BLANK);
+		}
+
+		if (portletPreferences != null) {
+			return portletPreferences.getValue("articleId", null);
+		}
+
+		return null;
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(

@@ -121,6 +121,8 @@ definition {
 
 		Button.clickSave();
 
+		Alert.viewSuccessMessage();
+
 		ProductMenu.gotoPortlet(
 			category = "Content",
 			panel = "Site Administration",

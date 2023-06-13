@@ -15,10 +15,13 @@
 package com.liferay.dynamic.data.mapping.form.web.internal.display.context;
 
 import com.liferay.dynamic.data.mapping.constants.DDMActionKeys;
+import com.liferay.dynamic.data.mapping.form.field.type.DDMFormFieldType;
+import com.liferay.dynamic.data.mapping.form.field.type.DDMFormFieldTypeServicesTracker;
 import com.liferay.dynamic.data.mapping.form.renderer.DDMFormRenderer;
 import com.liferay.dynamic.data.mapping.form.renderer.DDMFormRenderingContext;
 import com.liferay.dynamic.data.mapping.form.values.factory.DDMFormValuesFactory;
 import com.liferay.dynamic.data.mapping.form.web.internal.security.permission.resource.DDMFormInstancePermission;
+import com.liferay.dynamic.data.mapping.io.DDMFormFieldTypesJSONSerializer;
 import com.liferay.dynamic.data.mapping.model.DDMForm;
 import com.liferay.dynamic.data.mapping.model.DDMFormField;
 import com.liferay.dynamic.data.mapping.model.DDMFormInstance;
@@ -40,11 +43,15 @@ import com.liferay.dynamic.data.mapping.storage.DDMFormValues;
 import com.liferay.dynamic.data.mapping.util.DDMFormValuesMerger;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.json.JSONArray;
+import com.liferay.portal.kernel.json.JSONFactory;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Group;
+import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.model.User;
+import com.liferay.portal.kernel.portlet.LiferayPortletURL;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.service.GroupLocalService;
 import com.liferay.portal.kernel.service.WorkflowDefinitionLinkLocalService;
@@ -56,10 +63,9 @@ import com.liferay.portal.kernel.util.AggregateResourceBundle;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
+import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.PrefsParamUtil;
-import com.liferay.portal.kernel.util.ResourceBundleLoader;
-import com.liferay.portal.kernel.util.ResourceBundleLoaderUtil;
 import com.liferay.portal.kernel.util.ResourceBundleUtil;
 import com.liferay.portal.kernel.util.SessionParamUtil;
 import com.liferay.portal.kernel.util.StringUtil;
@@ -69,6 +75,7 @@ import com.liferay.portal.kernel.workflow.WorkflowConstants;
 
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.stream.Stream;
@@ -76,7 +83,6 @@ import java.util.stream.Stream;
 import javax.portlet.PortletSession;
 import javax.portlet.RenderRequest;
 import javax.portlet.RenderResponse;
-import javax.portlet.ResourceURL;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -87,6 +93,8 @@ public class DDMFormDisplayContext {
 
 	public DDMFormDisplayContext(
 			RenderRequest renderRequest, RenderResponse renderResponse,
+			DDMFormFieldTypesJSONSerializer ddmFormFieldTypesJSONSerializer,
+			DDMFormFieldTypeServicesTracker ddmFormFieldTypeServicesTracker,
 			DDMFormInstanceLocalService ddmFormInstanceLocalService,
 			DDMFormInstanceRecordVersionLocalService
 				ddmFormInstanceRecordVersionLocalService,
@@ -96,13 +104,16 @@ public class DDMFormDisplayContext {
 			DDMFormRenderer ddmFormRenderer,
 			DDMFormValuesFactory ddmFormValuesFactory,
 			DDMFormValuesMerger ddmFormValuesMerger,
-			GroupLocalService groupLocalService,
+			GroupLocalService groupLocalService, JSONFactory jsonFactory,
 			WorkflowDefinitionLinkLocalService
-				workflowDefinitionLinkLocalService)
+				workflowDefinitionLinkLocalService,
+			Portal portal)
 		throws PortalException {
 
 		_renderRequest = renderRequest;
 		_renderResponse = renderResponse;
+		_ddmFormFieldTypesJSONSerializer = ddmFormFieldTypesJSONSerializer;
+		_ddmFormFieldTypeServicesTracker = ddmFormFieldTypeServicesTracker;
 		_ddmFormInstanceLocalService = ddmFormInstanceLocalService;
 		_ddmFormInstanceRecordVersionLocalService =
 			ddmFormInstanceRecordVersionLocalService;
@@ -113,8 +124,10 @@ public class DDMFormDisplayContext {
 		_ddmFormValuesFactory = ddmFormValuesFactory;
 		_ddmFormValuesMerger = ddmFormValuesMerger;
 		_groupLocalService = groupLocalService;
+		_jsonFactory = jsonFactory;
 		_workflowDefinitionLinkLocalService =
 			workflowDefinitionLinkLocalService;
+		_portal = portal;
 
 		_containerId = StringUtil.randomString();
 
@@ -155,6 +168,16 @@ public class DDMFormDisplayContext {
 
 	public String getContainerId() {
 		return _containerId;
+	}
+
+	public JSONArray getDDMFormFieldTypesJSONArray() throws PortalException {
+		List<DDMFormFieldType> formFieldTypes =
+			_ddmFormFieldTypeServicesTracker.getDDMFormFieldTypes();
+
+		String serializedFormFieldTypes =
+			_ddmFormFieldTypesJSONSerializer.serialize(formFieldTypes);
+
+		return _jsonFactory.createJSONArray(serializedFormFieldTypes);
 	}
 
 	public String getDDMFormHTML() throws PortalException {
@@ -315,6 +338,18 @@ public class DDMFormDisplayContext {
 		return _autosaveEnabled;
 	}
 
+	public boolean isContentPage() {
+		ThemeDisplay themeDisplay = getThemeDisplay();
+
+		Layout layout = themeDisplay.getLayout();
+
+		if (Objects.equals(layout.getType(), "content")) {
+			return true;
+		}
+
+		return false;
+	}
+
 	public boolean isFormAvailable() throws PortalException {
 		if (isPreview()) {
 			return true;
@@ -326,7 +361,12 @@ public class DDMFormDisplayContext {
 			Group group = _groupLocalService.getGroup(
 				formInstance.getGroupId());
 
-			if ((group != null) && group.isStagingGroup()) {
+			Group scopeGroup = _groupLocalService.getGroup(
+				_portal.getScopeGroupId(_renderRequest));
+
+			if ((group != null) && (scopeGroup != null) &&
+				group.isStagingGroup() && !scopeGroup.isStagingGroup()) {
+
 				return false;
 			}
 		}
@@ -375,7 +415,9 @@ public class DDMFormDisplayContext {
 			return _showConfigurationIcon;
 		}
 
-		if (isPreview() || (isSharedURL() && isFormShared())) {
+		if (isContentPage() || isPreview() ||
+			(isSharedURL() && isFormShared())) {
+
 			_showConfigurationIcon = false;
 
 			return _showConfigurationIcon;
@@ -402,11 +444,13 @@ public class DDMFormDisplayContext {
 	}
 
 	protected String createCaptchaResourceURL() {
-		ResourceURL resourceURL = _renderResponse.createResourceURL();
+		LiferayPortletURL liferayPortletURL =
+			(LiferayPortletURL)_renderResponse.createResourceURL();
 
-		resourceURL.setResourceID("captcha");
+		liferayPortletURL.setCopyCurrentRenderParameters(false);
+		liferayPortletURL.setResourceID("captcha");
 
-		return resourceURL.toString();
+		return liferayPortletURL.toString();
 	}
 
 	protected DDMFormRenderingContext createDDMFormRenderingContext(
@@ -587,11 +631,7 @@ public class DDMFormDisplayContext {
 	}
 
 	protected ResourceBundle getResourceBundle(Locale locale) {
-		ResourceBundleLoader portalResourceBundleLoader =
-			ResourceBundleLoaderUtil.getPortalResourceBundleLoader();
-
-		ResourceBundle portalResourceBundle =
-			portalResourceBundleLoader.loadResourceBundle(locale);
+		ResourceBundle portalResourceBundle = _portal.getResourceBundle(locale);
 
 		ResourceBundle moduleResourceBundle = ResourceBundleUtil.getBundle(
 			"content.Language", locale, getClass());
@@ -618,10 +658,7 @@ public class DDMFormDisplayContext {
 	}
 
 	protected ThemeDisplay getThemeDisplay() {
-		ThemeDisplay themeDisplay = (ThemeDisplay)_renderRequest.getAttribute(
-			WebKeys.THEME_DISPLAY);
-
-		return themeDisplay;
+		return (ThemeDisplay)_renderRequest.getAttribute(WebKeys.THEME_DISPLAY);
 	}
 
 	protected User getUser() {
@@ -718,6 +755,10 @@ public class DDMFormDisplayContext {
 
 	private Boolean _autosaveEnabled;
 	private final String _containerId;
+	private final DDMFormFieldTypeServicesTracker
+		_ddmFormFieldTypeServicesTracker;
+	private final DDMFormFieldTypesJSONSerializer
+		_ddmFormFieldTypesJSONSerializer;
 	private DDMFormInstance _ddmFormInstance;
 	private long _ddmFormInstanceId;
 	private final DDMFormInstanceLocalService _ddmFormInstanceLocalService;
@@ -732,6 +773,8 @@ public class DDMFormDisplayContext {
 	private final GroupLocalService _groupLocalService;
 	private Boolean _hasAddFormInstanceRecordPermission;
 	private Boolean _hasViewPermission;
+	private final JSONFactory _jsonFactory;
+	private final Portal _portal;
 	private final RenderRequest _renderRequest;
 	private final RenderResponse _renderResponse;
 	private Boolean _showConfigurationIcon;

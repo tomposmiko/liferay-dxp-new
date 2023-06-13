@@ -32,12 +32,12 @@ import java.util.Date;
  * The cache model class for representing KaleoDefinitionVersion in entity cache.
  *
  * @author Brian Wing Shun Chan
- * @see KaleoDefinitionVersion
  * @generated
  */
 @ProviderType
-public class KaleoDefinitionVersionCacheModel implements CacheModel<KaleoDefinitionVersion>,
-	Externalizable {
+public class KaleoDefinitionVersionCacheModel
+	implements CacheModel<KaleoDefinitionVersion>, Externalizable {
+
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj) {
@@ -48,9 +48,12 @@ public class KaleoDefinitionVersionCacheModel implements CacheModel<KaleoDefinit
 			return false;
 		}
 
-		KaleoDefinitionVersionCacheModel kaleoDefinitionVersionCacheModel = (KaleoDefinitionVersionCacheModel)obj;
+		KaleoDefinitionVersionCacheModel kaleoDefinitionVersionCacheModel =
+			(KaleoDefinitionVersionCacheModel)obj;
 
-		if (kaleoDefinitionVersionId == kaleoDefinitionVersionCacheModel.kaleoDefinitionVersionId) {
+		if (kaleoDefinitionVersionId ==
+				kaleoDefinitionVersionCacheModel.kaleoDefinitionVersionId) {
+
 			return true;
 		}
 
@@ -107,9 +110,11 @@ public class KaleoDefinitionVersionCacheModel implements CacheModel<KaleoDefinit
 
 	@Override
 	public KaleoDefinitionVersion toEntityModel() {
-		KaleoDefinitionVersionImpl kaleoDefinitionVersionImpl = new KaleoDefinitionVersionImpl();
+		KaleoDefinitionVersionImpl kaleoDefinitionVersionImpl =
+			new KaleoDefinitionVersionImpl();
 
-		kaleoDefinitionVersionImpl.setKaleoDefinitionVersionId(kaleoDefinitionVersionId);
+		kaleoDefinitionVersionImpl.setKaleoDefinitionVersionId(
+			kaleoDefinitionVersionId);
 		kaleoDefinitionVersionImpl.setGroupId(groupId);
 		kaleoDefinitionVersionImpl.setCompanyId(companyId);
 		kaleoDefinitionVersionImpl.setUserId(userId);
@@ -222,8 +227,7 @@ public class KaleoDefinitionVersionCacheModel implements CacheModel<KaleoDefinit
 	}
 
 	@Override
-	public void writeExternal(ObjectOutput objectOutput)
-		throws IOException {
+	public void writeExternal(ObjectOutput objectOutput) throws IOException {
 		objectOutput.writeLong(kaleoDefinitionVersionId);
 
 		objectOutput.writeLong(groupId);
@@ -309,4 +313,5 @@ public class KaleoDefinitionVersionCacheModel implements CacheModel<KaleoDefinit
 	public String version;
 	public long startKaleoNodeId;
 	public int status;
+
 }

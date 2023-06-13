@@ -17,9 +17,7 @@ package com.liferay.layout.page.template.model;
 import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.expando.kernel.model.ExpandoBridge;
-
 import com.liferay.exportimport.kernel.lar.StagedModelType;
-
 import com.liferay.portal.kernel.model.ModelWrapper;
 import com.liferay.portal.kernel.service.ServiceContext;
 
@@ -42,9 +40,11 @@ import java.util.Objects;
 @ProviderType
 public class LayoutPageTemplateCollectionWrapper
 	implements LayoutPageTemplateCollection,
-		ModelWrapper<LayoutPageTemplateCollection> {
+			   ModelWrapper<LayoutPageTemplateCollection> {
+
 	public LayoutPageTemplateCollectionWrapper(
 		LayoutPageTemplateCollection layoutPageTemplateCollection) {
+
 		_layoutPageTemplateCollection = layoutPageTemplateCollection;
 	}
 
@@ -63,7 +63,8 @@ public class LayoutPageTemplateCollectionWrapper
 		Map<String, Object> attributes = new HashMap<String, Object>();
 
 		attributes.put("uuid", getUuid());
-		attributes.put("layoutPageTemplateCollectionId",
+		attributes.put(
+			"layoutPageTemplateCollectionId",
 			getLayoutPageTemplateCollectionId());
 		attributes.put("groupId", getGroupId());
 		attributes.put("companyId", getCompanyId());
@@ -87,7 +88,7 @@ public class LayoutPageTemplateCollectionWrapper
 		}
 
 		Long layoutPageTemplateCollectionId = (Long)attributes.get(
-				"layoutPageTemplateCollectionId");
+			"layoutPageTemplateCollectionId");
 
 		if (layoutPageTemplateCollectionId != null) {
 			setLayoutPageTemplateCollectionId(layoutPageTemplateCollectionId);
@@ -150,40 +151,44 @@ public class LayoutPageTemplateCollectionWrapper
 
 	@Override
 	public Object clone() {
-		return new LayoutPageTemplateCollectionWrapper((LayoutPageTemplateCollection)_layoutPageTemplateCollection.clone());
+		return new LayoutPageTemplateCollectionWrapper(
+			(LayoutPageTemplateCollection)
+				_layoutPageTemplateCollection.clone());
 	}
 
 	@Override
 	public int compareTo(
 		LayoutPageTemplateCollection layoutPageTemplateCollection) {
-		return _layoutPageTemplateCollection.compareTo(layoutPageTemplateCollection);
+
+		return _layoutPageTemplateCollection.compareTo(
+			layoutPageTemplateCollection);
 	}
 
 	/**
-	* Returns the company ID of this layout page template collection.
-	*
-	* @return the company ID of this layout page template collection
-	*/
+	 * Returns the company ID of this layout page template collection.
+	 *
+	 * @return the company ID of this layout page template collection
+	 */
 	@Override
 	public long getCompanyId() {
 		return _layoutPageTemplateCollection.getCompanyId();
 	}
 
 	/**
-	* Returns the create date of this layout page template collection.
-	*
-	* @return the create date of this layout page template collection
-	*/
+	 * Returns the create date of this layout page template collection.
+	 *
+	 * @return the create date of this layout page template collection
+	 */
 	@Override
 	public Date getCreateDate() {
 		return _layoutPageTemplateCollection.getCreateDate();
 	}
 
 	/**
-	* Returns the description of this layout page template collection.
-	*
-	* @return the description of this layout page template collection
-	*/
+	 * Returns the description of this layout page template collection.
+	 *
+	 * @return the description of this layout page template collection
+	 */
 	@Override
 	public String getDescription() {
 		return _layoutPageTemplateCollection.getDescription();
@@ -195,60 +200,61 @@ public class LayoutPageTemplateCollectionWrapper
 	}
 
 	/**
-	* Returns the group ID of this layout page template collection.
-	*
-	* @return the group ID of this layout page template collection
-	*/
+	 * Returns the group ID of this layout page template collection.
+	 *
+	 * @return the group ID of this layout page template collection
+	 */
 	@Override
 	public long getGroupId() {
 		return _layoutPageTemplateCollection.getGroupId();
 	}
 
 	/**
-	* Returns the last publish date of this layout page template collection.
-	*
-	* @return the last publish date of this layout page template collection
-	*/
+	 * Returns the last publish date of this layout page template collection.
+	 *
+	 * @return the last publish date of this layout page template collection
+	 */
 	@Override
 	public Date getLastPublishDate() {
 		return _layoutPageTemplateCollection.getLastPublishDate();
 	}
 
 	/**
-	* Returns the layout page template collection ID of this layout page template collection.
-	*
-	* @return the layout page template collection ID of this layout page template collection
-	*/
+	 * Returns the layout page template collection ID of this layout page template collection.
+	 *
+	 * @return the layout page template collection ID of this layout page template collection
+	 */
 	@Override
 	public long getLayoutPageTemplateCollectionId() {
-		return _layoutPageTemplateCollection.getLayoutPageTemplateCollectionId();
+		return _layoutPageTemplateCollection.
+			getLayoutPageTemplateCollectionId();
 	}
 
 	/**
-	* Returns the modified date of this layout page template collection.
-	*
-	* @return the modified date of this layout page template collection
-	*/
+	 * Returns the modified date of this layout page template collection.
+	 *
+	 * @return the modified date of this layout page template collection
+	 */
 	@Override
 	public Date getModifiedDate() {
 		return _layoutPageTemplateCollection.getModifiedDate();
 	}
 
 	/**
-	* Returns the name of this layout page template collection.
-	*
-	* @return the name of this layout page template collection
-	*/
+	 * Returns the name of this layout page template collection.
+	 *
+	 * @return the name of this layout page template collection
+	 */
 	@Override
 	public String getName() {
 		return _layoutPageTemplateCollection.getName();
 	}
 
 	/**
-	* Returns the primary key of this layout page template collection.
-	*
-	* @return the primary key of this layout page template collection
-	*/
+	 * Returns the primary key of this layout page template collection.
+	 *
+	 * @return the primary key of this layout page template collection
+	 */
 	@Override
 	public long getPrimaryKey() {
 		return _layoutPageTemplateCollection.getPrimaryKey();
@@ -260,40 +266,40 @@ public class LayoutPageTemplateCollectionWrapper
 	}
 
 	/**
-	* Returns the user ID of this layout page template collection.
-	*
-	* @return the user ID of this layout page template collection
-	*/
+	 * Returns the user ID of this layout page template collection.
+	 *
+	 * @return the user ID of this layout page template collection
+	 */
 	@Override
 	public long getUserId() {
 		return _layoutPageTemplateCollection.getUserId();
 	}
 
 	/**
-	* Returns the user name of this layout page template collection.
-	*
-	* @return the user name of this layout page template collection
-	*/
+	 * Returns the user name of this layout page template collection.
+	 *
+	 * @return the user name of this layout page template collection
+	 */
 	@Override
 	public String getUserName() {
 		return _layoutPageTemplateCollection.getUserName();
 	}
 
 	/**
-	* Returns the user uuid of this layout page template collection.
-	*
-	* @return the user uuid of this layout page template collection
-	*/
+	 * Returns the user uuid of this layout page template collection.
+	 *
+	 * @return the user uuid of this layout page template collection
+	 */
 	@Override
 	public String getUserUuid() {
 		return _layoutPageTemplateCollection.getUserUuid();
 	}
 
 	/**
-	* Returns the uuid of this layout page template collection.
-	*
-	* @return the uuid of this layout page template collection
-	*/
+	 * Returns the uuid of this layout page template collection.
+	 *
+	 * @return the uuid of this layout page template collection
+	 */
 	@Override
 	public String getUuid() {
 		return _layoutPageTemplateCollection.getUuid();
@@ -330,30 +336,30 @@ public class LayoutPageTemplateCollectionWrapper
 	}
 
 	/**
-	* Sets the company ID of this layout page template collection.
-	*
-	* @param companyId the company ID of this layout page template collection
-	*/
+	 * Sets the company ID of this layout page template collection.
+	 *
+	 * @param companyId the company ID of this layout page template collection
+	 */
 	@Override
 	public void setCompanyId(long companyId) {
 		_layoutPageTemplateCollection.setCompanyId(companyId);
 	}
 
 	/**
-	* Sets the create date of this layout page template collection.
-	*
-	* @param createDate the create date of this layout page template collection
-	*/
+	 * Sets the create date of this layout page template collection.
+	 *
+	 * @param createDate the create date of this layout page template collection
+	 */
 	@Override
 	public void setCreateDate(Date createDate) {
 		_layoutPageTemplateCollection.setCreateDate(createDate);
 	}
 
 	/**
-	* Sets the description of this layout page template collection.
-	*
-	* @param description the description of this layout page template collection
-	*/
+	 * Sets the description of this layout page template collection.
+	 *
+	 * @param description the description of this layout page template collection
+	 */
 	@Override
 	public void setDescription(String description) {
 		_layoutPageTemplateCollection.setDescription(description);
@@ -362,6 +368,7 @@ public class LayoutPageTemplateCollectionWrapper
 	@Override
 	public void setExpandoBridgeAttributes(
 		com.liferay.portal.kernel.model.BaseModel<?> baseModel) {
+
 		_layoutPageTemplateCollection.setExpandoBridgeAttributes(baseModel);
 	}
 
@@ -372,55 +379,58 @@ public class LayoutPageTemplateCollectionWrapper
 
 	@Override
 	public void setExpandoBridgeAttributes(ServiceContext serviceContext) {
-		_layoutPageTemplateCollection.setExpandoBridgeAttributes(serviceContext);
+		_layoutPageTemplateCollection.setExpandoBridgeAttributes(
+			serviceContext);
 	}
 
 	/**
-	* Sets the group ID of this layout page template collection.
-	*
-	* @param groupId the group ID of this layout page template collection
-	*/
+	 * Sets the group ID of this layout page template collection.
+	 *
+	 * @param groupId the group ID of this layout page template collection
+	 */
 	@Override
 	public void setGroupId(long groupId) {
 		_layoutPageTemplateCollection.setGroupId(groupId);
 	}
 
 	/**
-	* Sets the last publish date of this layout page template collection.
-	*
-	* @param lastPublishDate the last publish date of this layout page template collection
-	*/
+	 * Sets the last publish date of this layout page template collection.
+	 *
+	 * @param lastPublishDate the last publish date of this layout page template collection
+	 */
 	@Override
 	public void setLastPublishDate(Date lastPublishDate) {
 		_layoutPageTemplateCollection.setLastPublishDate(lastPublishDate);
 	}
 
 	/**
-	* Sets the layout page template collection ID of this layout page template collection.
-	*
-	* @param layoutPageTemplateCollectionId the layout page template collection ID of this layout page template collection
-	*/
+	 * Sets the layout page template collection ID of this layout page template collection.
+	 *
+	 * @param layoutPageTemplateCollectionId the layout page template collection ID of this layout page template collection
+	 */
 	@Override
 	public void setLayoutPageTemplateCollectionId(
 		long layoutPageTemplateCollectionId) {
-		_layoutPageTemplateCollection.setLayoutPageTemplateCollectionId(layoutPageTemplateCollectionId);
+
+		_layoutPageTemplateCollection.setLayoutPageTemplateCollectionId(
+			layoutPageTemplateCollectionId);
 	}
 
 	/**
-	* Sets the modified date of this layout page template collection.
-	*
-	* @param modifiedDate the modified date of this layout page template collection
-	*/
+	 * Sets the modified date of this layout page template collection.
+	 *
+	 * @param modifiedDate the modified date of this layout page template collection
+	 */
 	@Override
 	public void setModifiedDate(Date modifiedDate) {
 		_layoutPageTemplateCollection.setModifiedDate(modifiedDate);
 	}
 
 	/**
-	* Sets the name of this layout page template collection.
-	*
-	* @param name the name of this layout page template collection
-	*/
+	 * Sets the name of this layout page template collection.
+	 *
+	 * @param name the name of this layout page template collection
+	 */
 	@Override
 	public void setName(String name) {
 		_layoutPageTemplateCollection.setName(name);
@@ -432,10 +442,10 @@ public class LayoutPageTemplateCollectionWrapper
 	}
 
 	/**
-	* Sets the primary key of this layout page template collection.
-	*
-	* @param primaryKey the primary key of this layout page template collection
-	*/
+	 * Sets the primary key of this layout page template collection.
+	 *
+	 * @param primaryKey the primary key of this layout page template collection
+	 */
 	@Override
 	public void setPrimaryKey(long primaryKey) {
 		_layoutPageTemplateCollection.setPrimaryKey(primaryKey);
@@ -447,53 +457,56 @@ public class LayoutPageTemplateCollectionWrapper
 	}
 
 	/**
-	* Sets the user ID of this layout page template collection.
-	*
-	* @param userId the user ID of this layout page template collection
-	*/
+	 * Sets the user ID of this layout page template collection.
+	 *
+	 * @param userId the user ID of this layout page template collection
+	 */
 	@Override
 	public void setUserId(long userId) {
 		_layoutPageTemplateCollection.setUserId(userId);
 	}
 
 	/**
-	* Sets the user name of this layout page template collection.
-	*
-	* @param userName the user name of this layout page template collection
-	*/
+	 * Sets the user name of this layout page template collection.
+	 *
+	 * @param userName the user name of this layout page template collection
+	 */
 	@Override
 	public void setUserName(String userName) {
 		_layoutPageTemplateCollection.setUserName(userName);
 	}
 
 	/**
-	* Sets the user uuid of this layout page template collection.
-	*
-	* @param userUuid the user uuid of this layout page template collection
-	*/
+	 * Sets the user uuid of this layout page template collection.
+	 *
+	 * @param userUuid the user uuid of this layout page template collection
+	 */
 	@Override
 	public void setUserUuid(String userUuid) {
 		_layoutPageTemplateCollection.setUserUuid(userUuid);
 	}
 
 	/**
-	* Sets the uuid of this layout page template collection.
-	*
-	* @param uuid the uuid of this layout page template collection
-	*/
+	 * Sets the uuid of this layout page template collection.
+	 *
+	 * @param uuid the uuid of this layout page template collection
+	 */
 	@Override
 	public void setUuid(String uuid) {
 		_layoutPageTemplateCollection.setUuid(uuid);
 	}
 
 	@Override
-	public com.liferay.portal.kernel.model.CacheModel<LayoutPageTemplateCollection> toCacheModel() {
+	public com.liferay.portal.kernel.model.CacheModel
+		<LayoutPageTemplateCollection> toCacheModel() {
+
 		return _layoutPageTemplateCollection.toCacheModel();
 	}
 
 	@Override
 	public LayoutPageTemplateCollection toEscapedModel() {
-		return new LayoutPageTemplateCollectionWrapper(_layoutPageTemplateCollection.toEscapedModel());
+		return new LayoutPageTemplateCollectionWrapper(
+			_layoutPageTemplateCollection.toEscapedModel());
 	}
 
 	@Override
@@ -503,7 +516,8 @@ public class LayoutPageTemplateCollectionWrapper
 
 	@Override
 	public LayoutPageTemplateCollection toUnescapedModel() {
-		return new LayoutPageTemplateCollectionWrapper(_layoutPageTemplateCollection.toUnescapedModel());
+		return new LayoutPageTemplateCollectionWrapper(
+			_layoutPageTemplateCollection.toUnescapedModel());
 	}
 
 	@Override
@@ -521,10 +535,15 @@ public class LayoutPageTemplateCollectionWrapper
 			return false;
 		}
 
-		LayoutPageTemplateCollectionWrapper layoutPageTemplateCollectionWrapper = (LayoutPageTemplateCollectionWrapper)obj;
+		LayoutPageTemplateCollectionWrapper
+			layoutPageTemplateCollectionWrapper =
+				(LayoutPageTemplateCollectionWrapper)obj;
 
-		if (Objects.equals(_layoutPageTemplateCollection,
-					layoutPageTemplateCollectionWrapper._layoutPageTemplateCollection)) {
+		if (Objects.equals(
+				_layoutPageTemplateCollection,
+				layoutPageTemplateCollectionWrapper.
+					_layoutPageTemplateCollection)) {
+
 			return true;
 		}
 
@@ -557,4 +576,5 @@ public class LayoutPageTemplateCollectionWrapper
 	}
 
 	private final LayoutPageTemplateCollection _layoutPageTemplateCollection;
+
 }

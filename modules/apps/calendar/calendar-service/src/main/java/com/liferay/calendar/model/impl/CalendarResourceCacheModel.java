@@ -17,7 +17,6 @@ package com.liferay.calendar.model.impl;
 import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.calendar.model.CalendarResource;
-
 import com.liferay.portal.kernel.model.CacheModel;
 import com.liferay.portal.kernel.util.HashUtil;
 import com.liferay.portal.kernel.util.StringBundler;
@@ -33,12 +32,12 @@ import java.util.Date;
  * The cache model class for representing CalendarResource in entity cache.
  *
  * @author Eduardo Lundgren
- * @see CalendarResource
  * @generated
  */
 @ProviderType
-public class CalendarResourceCacheModel implements CacheModel<CalendarResource>,
-	Externalizable {
+public class CalendarResourceCacheModel
+	implements CacheModel<CalendarResource>, Externalizable {
+
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj) {
@@ -49,9 +48,12 @@ public class CalendarResourceCacheModel implements CacheModel<CalendarResource>,
 			return false;
 		}
 
-		CalendarResourceCacheModel calendarResourceCacheModel = (CalendarResourceCacheModel)obj;
+		CalendarResourceCacheModel calendarResourceCacheModel =
+			(CalendarResourceCacheModel)obj;
 
-		if (calendarResourceId == calendarResourceCacheModel.calendarResourceId) {
+		if (calendarResourceId ==
+				calendarResourceCacheModel.calendarResourceId) {
+
 			return true;
 		}
 
@@ -214,8 +216,7 @@ public class CalendarResourceCacheModel implements CacheModel<CalendarResource>,
 	}
 
 	@Override
-	public void writeExternal(ObjectOutput objectOutput)
-		throws IOException {
+	public void writeExternal(ObjectOutput objectOutput) throws IOException {
 		if (uuid == null) {
 			objectOutput.writeUTF("");
 		}
@@ -293,4 +294,5 @@ public class CalendarResourceCacheModel implements CacheModel<CalendarResource>,
 	public String description;
 	public boolean active;
 	public long lastPublishDate;
+
 }

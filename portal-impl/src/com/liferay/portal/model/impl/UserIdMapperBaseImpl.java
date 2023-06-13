@@ -32,12 +32,13 @@ import com.liferay.portal.kernel.service.UserIdMapperLocalServiceUtil;
  * @generated
  */
 @ProviderType
-public abstract class UserIdMapperBaseImpl extends UserIdMapperModelImpl
-	implements UserIdMapper {
+public abstract class UserIdMapperBaseImpl
+	extends UserIdMapperModelImpl implements UserIdMapper {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
-	 * Never modify or reference this class directly. All methods that expect a user ID mapper model instance should use the {@link UserIdMapper} interface instead.
+	 * Never modify or reference this class directly. All methods that expect a user ID mapper model instance should use the <code>UserIdMapper</code> interface instead.
 	 */
 	@Override
 	public void persist() {
@@ -48,4 +49,5 @@ public abstract class UserIdMapperBaseImpl extends UserIdMapperModelImpl
 			UserIdMapperLocalServiceUtil.updateUserIdMapper(this);
 		}
 	}
+
 }

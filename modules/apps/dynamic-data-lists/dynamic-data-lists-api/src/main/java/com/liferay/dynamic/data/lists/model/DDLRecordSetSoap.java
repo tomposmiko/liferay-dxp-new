@@ -26,11 +26,11 @@ import java.util.List;
  * This class is used by SOAP remote services, specifically {@link com.liferay.dynamic.data.lists.service.http.DDLRecordSetServiceSoap}.
  *
  * @author Brian Wing Shun Chan
- * @see com.liferay.dynamic.data.lists.service.http.DDLRecordSetServiceSoap
  * @generated
  */
 @ProviderType
 public class DDLRecordSetSoap implements Serializable {
+
 	public static DDLRecordSetSoap toSoapModel(DDLRecordSet model) {
 		DDLRecordSetSoap soapModel = new DDLRecordSetSoap();
 
@@ -85,7 +85,8 @@ public class DDLRecordSetSoap implements Serializable {
 	}
 
 	public static DDLRecordSetSoap[] toSoapModels(List<DDLRecordSet> models) {
-		List<DDLRecordSetSoap> soapModels = new ArrayList<DDLRecordSetSoap>(models.size());
+		List<DDLRecordSetSoap> soapModels = new ArrayList<DDLRecordSetSoap>(
+			models.size());
 
 		for (DDLRecordSet model : models) {
 			soapModels.add(toSoapModel(model));
@@ -276,4 +277,5 @@ public class DDLRecordSetSoap implements Serializable {
 	private int _scope;
 	private String _settings;
 	private Date _lastPublishDate;
+
 }

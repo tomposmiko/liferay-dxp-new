@@ -700,6 +700,10 @@ definition {
 			title = "${kbArticleTitleEdit}"
 		);
 
+		if (IsElementPresent(locator1 = "Home#PORTAL_LOCALIZATION_TRANSLATION_LANGUAGE_MESSAGE")) {
+			Click(locator1 = "Home#PORTAL_LOCALIZATION_IGNORE_BUTTON");
+		}
+
 		AssertClick(locator1 = "Button#PUBLISH_LOCALIZED", value1 = "Publicar");
 
 		AssertElementPresent(locator1 = "Message#SUCCESS");
@@ -990,10 +994,10 @@ definition {
 			Click(locator1 = "KnowledgeBaseArticle#ATTACHMENTS_HEADER_COLLAPSED");
 		}
 
-		AssertClick(locator1 = "Button#SELECT_FILES", value1 = "Select Files");
+		AssertElementPresent(locator1 = "Button#SELECT_FILES");
 
-		SikuliUploadCommonFile(
-			locator1 = "OS#FILE_DIALOG_BOX_FILE_NAME_FIELD_PNG",
+		UploadCommonFile.uploadCommonFileHiddenNoMouseOver(
+			locator1 = "TextInput#FILE",
 			value1 = "${kbArticleAttachment}"
 		);
 	}

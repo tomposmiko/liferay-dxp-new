@@ -14,6 +14,7 @@
 
 package com.liferay.site.navigation.admin.web.internal.portlet;
 
+import com.liferay.frontend.js.loader.modules.extender.npm.NPMResolver;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCPortlet;
 import com.liferay.site.navigation.admin.constants.SiteNavigationAdminPortletKeys;
 import com.liferay.site.navigation.admin.web.internal.constants.SiteNavigationAdminWebKeys;
@@ -64,11 +65,18 @@ public class SiteNavigationAdminPortlet extends MVCPortlet {
 		throws IOException, PortletException {
 
 		renderRequest.setAttribute(
+			"npmResolvedPackageName",
+			_npmResolver.resolveModuleName("site-navigation-menu-web"));
+
+		renderRequest.setAttribute(
 			SiteNavigationAdminWebKeys.SITE_NAVIGATION_MENU_ITEM_TYPE_REGISTRY,
 			_siteNavigationMenuItemTypeRegistry);
 
 		super.doDispatch(renderRequest, renderResponse);
 	}
+
+	@Reference
+	private NPMResolver _npmResolver;
 
 	@Reference
 	private SiteNavigationMenuItemTypeRegistry

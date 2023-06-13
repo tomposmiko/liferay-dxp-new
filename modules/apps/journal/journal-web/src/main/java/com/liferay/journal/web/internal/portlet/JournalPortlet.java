@@ -163,7 +163,7 @@ import org.osgi.service.component.annotations.Modified;
 import org.osgi.service.component.annotations.Reference;
 
 /**
- * @author Eduardo Garcia
+ * @author Eduardo García
  */
 @Component(
 	configurationPid = "com.liferay.journal.web.configuration.JournalWebConfiguration",
@@ -227,12 +227,6 @@ public class JournalPortlet extends MVCPortlet {
 		portalPreferences.setValues(
 			JournalPortletKeys.JOURNAL, key,
 			ArrayUtil.append(addMenuFavItems, ddmStructureKey));
-
-		SessionMessages.add(
-			actionRequest,
-			_portal.getPortletId(actionRequest) +
-				SessionMessages.KEY_SUFFIX_REFRESH_PORTLET,
-			JournalPortletKeys.JOURNAL);
 	}
 
 	public void addArticle(
@@ -461,12 +455,6 @@ public class JournalPortlet extends MVCPortlet {
 		portalPreferences.setValues(
 			JournalPortletKeys.JOURNAL, key,
 			ArrayUtil.remove(addMenuFavItems, ddmStructureKey));
-
-		SessionMessages.add(
-			actionRequest,
-			_portal.getPortletId(actionRequest) +
-				SessionMessages.KEY_SUFFIX_REFRESH_PORTLET,
-			JournalPortletKeys.JOURNAL);
 	}
 
 	@Override
@@ -753,7 +741,21 @@ public class JournalPortlet extends MVCPortlet {
 			Layout targetLayout = _journalHelper.getArticleLayout(
 				layoutUuid, groupId);
 
-			if ((assetDisplayPageId != 0) || (targetLayout == null)) {
+			JournalArticle latestArticle = _journalArticleService.fetchArticle(
+				groupId, articleId);
+
+			if ((displayPageType == AssetDisplayPageConstants.TYPE_SPECIFIC) &&
+				(targetLayout == null) && (latestArticle != null) &&
+				Validator.isNotNull(latestArticle.getLayoutUuid())) {
+
+				Layout latestTargetLayout = _journalHelper.getArticleLayout(
+					latestArticle.getLayoutUuid(), groupId);
+
+				if (latestTargetLayout == null) {
+					layoutUuid = latestArticle.getLayoutUuid();
+				}
+			}
+			else if ((assetDisplayPageId != 0) || (targetLayout == null)) {
 				layoutUuid = null;
 			}
 		}
@@ -793,7 +795,7 @@ public class JournalPortlet extends MVCPortlet {
 			uploadPortletRequest, "expirationDateAmPm");
 
 		boolean neverExpire = ParamUtil.getBoolean(
-			uploadPortletRequest, "neverExpire");
+			uploadPortletRequest, "neverExpire", displayDateYear == 0);
 
 		if (!PropsValues.SCHEDULER_ENABLED) {
 			neverExpire = true;
@@ -817,7 +819,7 @@ public class JournalPortlet extends MVCPortlet {
 			uploadPortletRequest, "reviewDateAmPm");
 
 		boolean neverReview = ParamUtil.getBoolean(
-			uploadPortletRequest, "neverReview");
+			uploadPortletRequest, "neverReview", displayDateYear == 0);
 
 		if (!PropsValues.SCHEDULER_ENABLED) {
 			neverReview = true;
@@ -867,7 +869,9 @@ public class JournalPortlet extends MVCPortlet {
 
 			String tempOldUrlTitle = article.getUrlTitle();
 
-			if (actionName.equals("updateArticle")) {
+			if (actionName.equals("previewArticle") ||
+				actionName.equals("updateArticle")) {
+
 				article = _journalArticleService.updateArticle(
 					groupId, folderId, articleId, version, titleMap,
 					descriptionMap, friendlyURLMap, content, ddmStructureKey,
@@ -895,10 +899,10 @@ public class JournalPortlet extends MVCPortlet {
 		String portletResource = ParamUtil.getString(
 			actionRequest, "portletResource");
 
-		long referringPlid = ParamUtil.getLong(actionRequest, "referringPlid");
+		long refererPlid = ParamUtil.getLong(actionRequest, "refererPlid");
 
-		if (Validator.isNotNull(portletResource) && (referringPlid > 0)) {
-			Layout layout = _layoutLocalService.getLayout(referringPlid);
+		if (Validator.isNotNull(portletResource) && (refererPlid > 0)) {
+			Layout layout = _layoutLocalService.getLayout(refererPlid);
 
 			PortletPreferences portletPreferences =
 				PortletPreferencesFactoryUtil.getStrictPortletSetup(
@@ -1245,14 +1249,15 @@ public class JournalPortlet extends MVCPortlet {
 		throws IOException, PortletException {
 
 		try {
-			ActionUtil.getFolder(renderRequest);
-
 			String path = getPath(renderRequest, renderResponse);
 
 			if (Objects.equals(path, "/edit_article.jsp") ||
 				Objects.equals(path, "/view_article_history.jsp")) {
 
 				ActionUtil.getArticle(renderRequest);
+			}
+			else {
+				ActionUtil.getFolder(renderRequest);
 			}
 		}
 		catch (Exception e) {
@@ -1481,10 +1486,10 @@ public class JournalPortlet extends MVCPortlet {
 
 		Layout layout = themeDisplay.getLayout();
 
-		long referringPlid = ParamUtil.getLong(actionRequest, "referringPlid");
+		long refererPlid = ParamUtil.getLong(actionRequest, "refererPlid");
 
-		if (referringPlid > 0) {
-			layout = _layoutLocalService.fetchLayout(referringPlid);
+		if (refererPlid > 0) {
+			layout = _layoutLocalService.fetchLayout(refererPlid);
 		}
 
 		_journalContentSearchLocalService.updateContentSearch(

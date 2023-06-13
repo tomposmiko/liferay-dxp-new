@@ -26,11 +26,11 @@ import java.util.List;
  * This class is used by SOAP remote services, specifically {@link com.liferay.blogs.service.http.BlogsEntryServiceSoap}.
  *
  * @author Brian Wing Shun Chan
- * @see com.liferay.blogs.service.http.BlogsEntryServiceSoap
  * @generated
  */
 @ProviderType
 public class BlogsEntrySoap implements Serializable {
+
 	public static BlogsEntrySoap toSoapModel(BlogsEntry model) {
 		BlogsEntrySoap soapModel = new BlogsEntrySoap();
 
@@ -95,7 +95,8 @@ public class BlogsEntrySoap implements Serializable {
 	}
 
 	public static BlogsEntrySoap[] toSoapModels(List<BlogsEntry> models) {
-		List<BlogsEntrySoap> soapModels = new ArrayList<BlogsEntrySoap>(models.size());
+		List<BlogsEntrySoap> soapModels = new ArrayList<BlogsEntrySoap>(
+			models.size());
 
 		for (BlogsEntry model : models) {
 			soapModels.add(toSoapModel(model));
@@ -388,4 +389,5 @@ public class BlogsEntrySoap implements Serializable {
 	private long _statusByUserId;
 	private String _statusByUserName;
 	private Date _statusDate;
+
 }

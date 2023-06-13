@@ -73,7 +73,7 @@
 				<c:choose>
 					<c:when test='<%= SessionMessages.contains(request, "passwordSent") %>'>
 						<div class="alert alert-success">
-							<liferay-ui:message key="An-email-has-been-sent-to-the-provided-email-address" />
+							<liferay-ui:message key="an-email-has-been-sent-to-the-provided-email-address" />
 						</div>
 					</c:when>
 					<c:when test='<%= SessionMessages.contains(request, "userAdded") %>'>
@@ -133,7 +133,12 @@
 							<liferay-ui:message key="this-account-is-locked" />
 						</c:when>
 						<c:otherwise>
-							<liferay-ui:message arguments="<%= ule.user.getUnlockDate() %>" key="this-account-is-locked-until-x" translateArguments="<%= false %>" />
+
+							<%
+							Format dateFormat = FastDateFormatFactoryUtil.getDateTime(FastDateFormatConstants.SHORT, FastDateFormatConstants.LONG, locale, TimeZone.getTimeZone(ule.user.getTimeZoneId()));
+							%>
+
+							<liferay-ui:message arguments="<%= dateFormat.format(ule.user.getUnlockDate()) %>" key="this-account-is-locked-until-x" translateArguments="<%= false %>" />
 						</c:otherwise>
 					</c:choose>
 				</liferay-ui:error>

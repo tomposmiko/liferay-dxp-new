@@ -14,8 +14,6 @@
 
 package com.liferay.portal.tools;
 
-import aQute.bnd.version.Version;
-
 import com.liferay.portal.dao.orm.common.SQLTransformer;
 import com.liferay.portal.events.StartupHelperUtil;
 import com.liferay.portal.kernel.cache.CacheRegistryUtil;
@@ -37,6 +35,7 @@ import com.liferay.portal.kernel.service.ResourceActionLocalServiceUtil;
 import com.liferay.portal.kernel.util.ReleaseInfo;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.Time;
+import com.liferay.portal.kernel.version.Version;
 import com.liferay.portal.transaction.TransactionsUtil;
 import com.liferay.portal.upgrade.PortalUpgradeProcess;
 import com.liferay.portal.util.InitUtil;
@@ -417,9 +416,7 @@ public class DBUpgrader {
 			rs = ps.executeQuery();
 
 			if (rs.next()) {
-				int count = rs.getInt(1);
-
-				return count;
+				return rs.getInt(1);
 			}
 
 			return 0;
@@ -478,7 +475,7 @@ public class DBUpgrader {
 		}
 	}
 
-	private static final Version _VERSION_7010 = new Version("0.0.6");
+	private static final Version _VERSION_7010 = new Version(0, 0, 6);
 
 	private static final Log _log = LogFactoryUtil.getLog(DBUpgrader.class);
 

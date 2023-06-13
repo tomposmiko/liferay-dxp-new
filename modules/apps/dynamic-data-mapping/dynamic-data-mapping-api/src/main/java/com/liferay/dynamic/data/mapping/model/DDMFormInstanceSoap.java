@@ -26,11 +26,11 @@ import java.util.List;
  * This class is used by SOAP remote services, specifically {@link com.liferay.dynamic.data.mapping.service.http.DDMFormInstanceServiceSoap}.
  *
  * @author Brian Wing Shun Chan
- * @see com.liferay.dynamic.data.mapping.service.http.DDMFormInstanceServiceSoap
  * @generated
  */
 @ProviderType
 public class DDMFormInstanceSoap implements Serializable {
+
 	public static DDMFormInstanceSoap toSoapModel(DDMFormInstance model) {
 		DDMFormInstanceSoap soapModel = new DDMFormInstanceSoap();
 
@@ -55,7 +55,8 @@ public class DDMFormInstanceSoap implements Serializable {
 	}
 
 	public static DDMFormInstanceSoap[] toSoapModels(DDMFormInstance[] models) {
-		DDMFormInstanceSoap[] soapModels = new DDMFormInstanceSoap[models.length];
+		DDMFormInstanceSoap[] soapModels =
+			new DDMFormInstanceSoap[models.length];
 
 		for (int i = 0; i < models.length; i++) {
 			soapModels[i] = toSoapModel(models[i]);
@@ -66,10 +67,12 @@ public class DDMFormInstanceSoap implements Serializable {
 
 	public static DDMFormInstanceSoap[][] toSoapModels(
 		DDMFormInstance[][] models) {
+
 		DDMFormInstanceSoap[][] soapModels = null;
 
 		if (models.length > 0) {
-			soapModels = new DDMFormInstanceSoap[models.length][models[0].length];
+			soapModels =
+				new DDMFormInstanceSoap[models.length][models[0].length];
 		}
 		else {
 			soapModels = new DDMFormInstanceSoap[0][0];
@@ -84,7 +87,9 @@ public class DDMFormInstanceSoap implements Serializable {
 
 	public static DDMFormInstanceSoap[] toSoapModels(
 		List<DDMFormInstance> models) {
-		List<DDMFormInstanceSoap> soapModels = new ArrayList<DDMFormInstanceSoap>(models.size());
+
+		List<DDMFormInstanceSoap> soapModels =
+			new ArrayList<DDMFormInstanceSoap>(models.size());
 
 		for (DDMFormInstance model : models) {
 			soapModels.add(toSoapModel(model));
@@ -248,4 +253,5 @@ public class DDMFormInstanceSoap implements Serializable {
 	private String _description;
 	private String _settings;
 	private Date _lastPublishDate;
+
 }

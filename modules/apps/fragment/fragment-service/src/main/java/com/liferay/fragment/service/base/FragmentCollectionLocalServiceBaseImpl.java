@@ -21,12 +21,10 @@ import com.liferay.exportimport.kernel.lar.ManifestSummary;
 import com.liferay.exportimport.kernel.lar.PortletDataContext;
 import com.liferay.exportimport.kernel.lar.StagedModelDataHandlerUtil;
 import com.liferay.exportimport.kernel.lar.StagedModelType;
-
 import com.liferay.fragment.model.FragmentCollection;
 import com.liferay.fragment.service.FragmentCollectionLocalService;
 import com.liferay.fragment.service.persistence.FragmentCollectionPersistence;
 import com.liferay.fragment.service.persistence.FragmentEntryPersistence;
-
 import com.liferay.portal.kernel.bean.BeanReference;
 import com.liferay.portal.kernel.dao.db.DB;
 import com.liferay.portal.kernel.dao.db.DBManagerUtil;
@@ -68,17 +66,17 @@ import javax.sql.DataSource;
  *
  * @author Brian Wing Shun Chan
  * @see com.liferay.fragment.service.impl.FragmentCollectionLocalServiceImpl
- * @see com.liferay.fragment.service.FragmentCollectionLocalServiceUtil
  * @generated
  */
 @ProviderType
 public abstract class FragmentCollectionLocalServiceBaseImpl
-	extends BaseLocalServiceImpl implements FragmentCollectionLocalService,
-		IdentifiableOSGiService {
+	extends BaseLocalServiceImpl
+	implements FragmentCollectionLocalService, IdentifiableOSGiService {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
-	 * Never modify or reference this class directly. Always use {@link com.liferay.fragment.service.FragmentCollectionLocalServiceUtil} to access the fragment collection local service.
+	 * Never modify or reference this class directly. Use <code>FragmentCollectionLocalService</code> via injection or a <code>org.osgi.util.tracker.ServiceTracker</code> or use <code>com.liferay.fragment.service.FragmentCollectionLocalServiceUtil</code>.
 	 */
 
 	/**
@@ -91,6 +89,7 @@ public abstract class FragmentCollectionLocalServiceBaseImpl
 	@Override
 	public FragmentCollection addFragmentCollection(
 		FragmentCollection fragmentCollection) {
+
 		fragmentCollection.setNew(true);
 
 		return fragmentCollectionPersistence.update(fragmentCollection);
@@ -106,6 +105,7 @@ public abstract class FragmentCollectionLocalServiceBaseImpl
 	@Transactional(enabled = false)
 	public FragmentCollection createFragmentCollection(
 		long fragmentCollectionId) {
+
 		return fragmentCollectionPersistence.create(fragmentCollectionId);
 	}
 
@@ -119,7 +119,9 @@ public abstract class FragmentCollectionLocalServiceBaseImpl
 	@Indexable(type = IndexableType.DELETE)
 	@Override
 	public FragmentCollection deleteFragmentCollection(
-		long fragmentCollectionId) throws PortalException {
+			long fragmentCollectionId)
+		throws PortalException {
+
 		return fragmentCollectionPersistence.remove(fragmentCollectionId);
 	}
 
@@ -133,7 +135,9 @@ public abstract class FragmentCollectionLocalServiceBaseImpl
 	@Indexable(type = IndexableType.DELETE)
 	@Override
 	public FragmentCollection deleteFragmentCollection(
-		FragmentCollection fragmentCollection) throws PortalException {
+			FragmentCollection fragmentCollection)
+		throws PortalException {
+
 		return fragmentCollectionPersistence.remove(fragmentCollection);
 	}
 
@@ -141,8 +145,8 @@ public abstract class FragmentCollectionLocalServiceBaseImpl
 	public DynamicQuery dynamicQuery() {
 		Class<?> clazz = getClass();
 
-		return DynamicQueryFactoryUtil.forClass(FragmentCollection.class,
-			clazz.getClassLoader());
+		return DynamicQueryFactoryUtil.forClass(
+			FragmentCollection.class, clazz.getClassLoader());
 	}
 
 	/**
@@ -160,7 +164,7 @@ public abstract class FragmentCollectionLocalServiceBaseImpl
 	 * Performs a dynamic query on the database and returns a range of the matching rows.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link com.liferay.fragment.model.impl.FragmentCollectionModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>com.liferay.fragment.model.impl.FragmentCollectionModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param dynamicQuery the dynamic query
@@ -169,17 +173,18 @@ public abstract class FragmentCollectionLocalServiceBaseImpl
 	 * @return the range of matching rows
 	 */
 	@Override
-	public <T> List<T> dynamicQuery(DynamicQuery dynamicQuery, int start,
-		int end) {
-		return fragmentCollectionPersistence.findWithDynamicQuery(dynamicQuery,
-			start, end);
+	public <T> List<T> dynamicQuery(
+		DynamicQuery dynamicQuery, int start, int end) {
+
+		return fragmentCollectionPersistence.findWithDynamicQuery(
+			dynamicQuery, start, end);
 	}
 
 	/**
 	 * Performs a dynamic query on the database and returns an ordered range of the matching rows.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link com.liferay.fragment.model.impl.FragmentCollectionModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>com.liferay.fragment.model.impl.FragmentCollectionModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param dynamicQuery the dynamic query
@@ -189,10 +194,12 @@ public abstract class FragmentCollectionLocalServiceBaseImpl
 	 * @return the ordered range of matching rows
 	 */
 	@Override
-	public <T> List<T> dynamicQuery(DynamicQuery dynamicQuery, int start,
-		int end, OrderByComparator<T> orderByComparator) {
-		return fragmentCollectionPersistence.findWithDynamicQuery(dynamicQuery,
-			start, end, orderByComparator);
+	public <T> List<T> dynamicQuery(
+		DynamicQuery dynamicQuery, int start, int end,
+		OrderByComparator<T> orderByComparator) {
+
+		return fragmentCollectionPersistence.findWithDynamicQuery(
+			dynamicQuery, start, end, orderByComparator);
 	}
 
 	/**
@@ -203,7 +210,8 @@ public abstract class FragmentCollectionLocalServiceBaseImpl
 	 */
 	@Override
 	public long dynamicQueryCount(DynamicQuery dynamicQuery) {
-		return fragmentCollectionPersistence.countWithDynamicQuery(dynamicQuery);
+		return fragmentCollectionPersistence.countWithDynamicQuery(
+			dynamicQuery);
 	}
 
 	/**
@@ -214,15 +222,19 @@ public abstract class FragmentCollectionLocalServiceBaseImpl
 	 * @return the number of rows matching the dynamic query
 	 */
 	@Override
-	public long dynamicQueryCount(DynamicQuery dynamicQuery,
-		Projection projection) {
-		return fragmentCollectionPersistence.countWithDynamicQuery(dynamicQuery,
-			projection);
+	public long dynamicQueryCount(
+		DynamicQuery dynamicQuery, Projection projection) {
+
+		return fragmentCollectionPersistence.countWithDynamicQuery(
+			dynamicQuery, projection);
 	}
 
 	@Override
-	public FragmentCollection fetchFragmentCollection(long fragmentCollectionId) {
-		return fragmentCollectionPersistence.fetchByPrimaryKey(fragmentCollectionId);
+	public FragmentCollection fetchFragmentCollection(
+		long fragmentCollectionId) {
+
+		return fragmentCollectionPersistence.fetchByPrimaryKey(
+			fragmentCollectionId);
 	}
 
 	/**
@@ -235,6 +247,7 @@ public abstract class FragmentCollectionLocalServiceBaseImpl
 	@Override
 	public FragmentCollection fetchFragmentCollectionByUuidAndGroupId(
 		String uuid, long groupId) {
+
 		return fragmentCollectionPersistence.fetchByUUID_G(uuid, groupId);
 	}
 
@@ -248,27 +261,36 @@ public abstract class FragmentCollectionLocalServiceBaseImpl
 	@Override
 	public FragmentCollection getFragmentCollection(long fragmentCollectionId)
 		throws PortalException {
-		return fragmentCollectionPersistence.findByPrimaryKey(fragmentCollectionId);
+
+		return fragmentCollectionPersistence.findByPrimaryKey(
+			fragmentCollectionId);
 	}
 
 	@Override
 	public ActionableDynamicQuery getActionableDynamicQuery() {
-		ActionableDynamicQuery actionableDynamicQuery = new DefaultActionableDynamicQuery();
+		ActionableDynamicQuery actionableDynamicQuery =
+			new DefaultActionableDynamicQuery();
 
-		actionableDynamicQuery.setBaseLocalService(fragmentCollectionLocalService);
+		actionableDynamicQuery.setBaseLocalService(
+			fragmentCollectionLocalService);
 		actionableDynamicQuery.setClassLoader(getClassLoader());
 		actionableDynamicQuery.setModelClass(FragmentCollection.class);
 
-		actionableDynamicQuery.setPrimaryKeyPropertyName("fragmentCollectionId");
+		actionableDynamicQuery.setPrimaryKeyPropertyName(
+			"fragmentCollectionId");
 
 		return actionableDynamicQuery;
 	}
 
 	@Override
-	public IndexableActionableDynamicQuery getIndexableActionableDynamicQuery() {
-		IndexableActionableDynamicQuery indexableActionableDynamicQuery = new IndexableActionableDynamicQuery();
+	public IndexableActionableDynamicQuery
+		getIndexableActionableDynamicQuery() {
 
-		indexableActionableDynamicQuery.setBaseLocalService(fragmentCollectionLocalService);
+		IndexableActionableDynamicQuery indexableActionableDynamicQuery =
+			new IndexableActionableDynamicQuery();
+
+		indexableActionableDynamicQuery.setBaseLocalService(
+			fragmentCollectionLocalService);
 		indexableActionableDynamicQuery.setClassLoader(getClassLoader());
 		indexableActionableDynamicQuery.setModelClass(FragmentCollection.class);
 
@@ -280,61 +302,81 @@ public abstract class FragmentCollectionLocalServiceBaseImpl
 
 	protected void initActionableDynamicQuery(
 		ActionableDynamicQuery actionableDynamicQuery) {
-		actionableDynamicQuery.setBaseLocalService(fragmentCollectionLocalService);
+
+		actionableDynamicQuery.setBaseLocalService(
+			fragmentCollectionLocalService);
 		actionableDynamicQuery.setClassLoader(getClassLoader());
 		actionableDynamicQuery.setModelClass(FragmentCollection.class);
 
-		actionableDynamicQuery.setPrimaryKeyPropertyName("fragmentCollectionId");
+		actionableDynamicQuery.setPrimaryKeyPropertyName(
+			"fragmentCollectionId");
 	}
 
 	@Override
 	public ExportActionableDynamicQuery getExportActionableDynamicQuery(
 		final PortletDataContext portletDataContext) {
-		final ExportActionableDynamicQuery exportActionableDynamicQuery = new ExportActionableDynamicQuery() {
+
+		final ExportActionableDynamicQuery exportActionableDynamicQuery =
+			new ExportActionableDynamicQuery() {
+
 				@Override
 				public long performCount() throws PortalException {
-					ManifestSummary manifestSummary = portletDataContext.getManifestSummary();
+					ManifestSummary manifestSummary =
+						portletDataContext.getManifestSummary();
 
 					StagedModelType stagedModelType = getStagedModelType();
 
 					long modelAdditionCount = super.performCount();
 
-					manifestSummary.addModelAdditionCount(stagedModelType,
-						modelAdditionCount);
+					manifestSummary.addModelAdditionCount(
+						stagedModelType, modelAdditionCount);
 
-					long modelDeletionCount = ExportImportHelperUtil.getModelDeletionCount(portletDataContext,
-							stagedModelType);
+					long modelDeletionCount =
+						ExportImportHelperUtil.getModelDeletionCount(
+							portletDataContext, stagedModelType);
 
-					manifestSummary.addModelDeletionCount(stagedModelType,
-						modelDeletionCount);
+					manifestSummary.addModelDeletionCount(
+						stagedModelType, modelDeletionCount);
 
 					return modelAdditionCount;
 				}
+
 			};
 
 		initActionableDynamicQuery(exportActionableDynamicQuery);
 
-		exportActionableDynamicQuery.setAddCriteriaMethod(new ActionableDynamicQuery.AddCriteriaMethod() {
+		exportActionableDynamicQuery.setAddCriteriaMethod(
+			new ActionableDynamicQuery.AddCriteriaMethod() {
+
 				@Override
 				public void addCriteria(DynamicQuery dynamicQuery) {
-					portletDataContext.addDateRangeCriteria(dynamicQuery,
-						"modifiedDate");
+					portletDataContext.addDateRangeCriteria(
+						dynamicQuery, "modifiedDate");
 				}
+
 			});
 
-		exportActionableDynamicQuery.setCompanyId(portletDataContext.getCompanyId());
+		exportActionableDynamicQuery.setCompanyId(
+			portletDataContext.getCompanyId());
 
-		exportActionableDynamicQuery.setGroupId(portletDataContext.getScopeGroupId());
+		exportActionableDynamicQuery.setGroupId(
+			portletDataContext.getScopeGroupId());
 
-		exportActionableDynamicQuery.setPerformActionMethod(new ActionableDynamicQuery.PerformActionMethod<FragmentCollection>() {
+		exportActionableDynamicQuery.setPerformActionMethod(
+			new ActionableDynamicQuery.PerformActionMethod
+				<FragmentCollection>() {
+
 				@Override
 				public void performAction(FragmentCollection fragmentCollection)
 					throws PortalException {
-					StagedModelDataHandlerUtil.exportStagedModel(portletDataContext,
-						fragmentCollection);
+
+					StagedModelDataHandlerUtil.exportStagedModel(
+						portletDataContext, fragmentCollection);
 				}
+
 			});
-		exportActionableDynamicQuery.setStagedModelType(new StagedModelType(
+		exportActionableDynamicQuery.setStagedModelType(
+			new StagedModelType(
 				PortalUtil.getClassNameId(FragmentCollection.class.getName())));
 
 		return exportActionableDynamicQuery;
@@ -346,12 +388,15 @@ public abstract class FragmentCollectionLocalServiceBaseImpl
 	@Override
 	public PersistedModel deletePersistedModel(PersistedModel persistedModel)
 		throws PortalException {
-		return fragmentCollectionLocalService.deleteFragmentCollection((FragmentCollection)persistedModel);
+
+		return fragmentCollectionLocalService.deleteFragmentCollection(
+			(FragmentCollection)persistedModel);
 	}
 
 	@Override
 	public PersistedModel getPersistedModel(Serializable primaryKeyObj)
 		throws PortalException {
+
 		return fragmentCollectionPersistence.findByPrimaryKey(primaryKeyObj);
 	}
 
@@ -365,6 +410,7 @@ public abstract class FragmentCollectionLocalServiceBaseImpl
 	@Override
 	public List<FragmentCollection> getFragmentCollectionsByUuidAndCompanyId(
 		String uuid, long companyId) {
+
 		return fragmentCollectionPersistence.findByUuid_C(uuid, companyId);
 	}
 
@@ -382,8 +428,9 @@ public abstract class FragmentCollectionLocalServiceBaseImpl
 	public List<FragmentCollection> getFragmentCollectionsByUuidAndCompanyId(
 		String uuid, long companyId, int start, int end,
 		OrderByComparator<FragmentCollection> orderByComparator) {
-		return fragmentCollectionPersistence.findByUuid_C(uuid, companyId,
-			start, end, orderByComparator);
+
+		return fragmentCollectionPersistence.findByUuid_C(
+			uuid, companyId, start, end, orderByComparator);
 	}
 
 	/**
@@ -396,7 +443,9 @@ public abstract class FragmentCollectionLocalServiceBaseImpl
 	 */
 	@Override
 	public FragmentCollection getFragmentCollectionByUuidAndGroupId(
-		String uuid, long groupId) throws PortalException {
+			String uuid, long groupId)
+		throws PortalException {
+
 		return fragmentCollectionPersistence.findByUUID_G(uuid, groupId);
 	}
 
@@ -404,7 +453,7 @@ public abstract class FragmentCollectionLocalServiceBaseImpl
 	 * Returns a range of all the fragment collections.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link com.liferay.fragment.model.impl.FragmentCollectionModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>com.liferay.fragment.model.impl.FragmentCollectionModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param start the lower bound of the range of fragment collections
@@ -436,6 +485,7 @@ public abstract class FragmentCollectionLocalServiceBaseImpl
 	@Override
 	public FragmentCollection updateFragmentCollection(
 		FragmentCollection fragmentCollection) {
+
 		return fragmentCollectionPersistence.update(fragmentCollection);
 	}
 
@@ -455,6 +505,7 @@ public abstract class FragmentCollectionLocalServiceBaseImpl
 	 */
 	public void setFragmentCollectionLocalService(
 		FragmentCollectionLocalService fragmentCollectionLocalService) {
+
 		this.fragmentCollectionLocalService = fragmentCollectionLocalService;
 	}
 
@@ -474,6 +525,7 @@ public abstract class FragmentCollectionLocalServiceBaseImpl
 	 */
 	public void setFragmentCollectionPersistence(
 		FragmentCollectionPersistence fragmentCollectionPersistence) {
+
 		this.fragmentCollectionPersistence = fragmentCollectionPersistence;
 	}
 
@@ -482,7 +534,9 @@ public abstract class FragmentCollectionLocalServiceBaseImpl
 	 *
 	 * @return the counter local service
 	 */
-	public com.liferay.counter.kernel.service.CounterLocalService getCounterLocalService() {
+	public com.liferay.counter.kernel.service.CounterLocalService
+		getCounterLocalService() {
+
 		return counterLocalService;
 	}
 
@@ -492,7 +546,9 @@ public abstract class FragmentCollectionLocalServiceBaseImpl
 	 * @param counterLocalService the counter local service
 	 */
 	public void setCounterLocalService(
-		com.liferay.counter.kernel.service.CounterLocalService counterLocalService) {
+		com.liferay.counter.kernel.service.CounterLocalService
+			counterLocalService) {
+
 		this.counterLocalService = counterLocalService;
 	}
 
@@ -501,7 +557,9 @@ public abstract class FragmentCollectionLocalServiceBaseImpl
 	 *
 	 * @return the user local service
 	 */
-	public com.liferay.portal.kernel.service.UserLocalService getUserLocalService() {
+	public com.liferay.portal.kernel.service.UserLocalService
+		getUserLocalService() {
+
 		return userLocalService;
 	}
 
@@ -512,6 +570,7 @@ public abstract class FragmentCollectionLocalServiceBaseImpl
 	 */
 	public void setUserLocalService(
 		com.liferay.portal.kernel.service.UserLocalService userLocalService) {
+
 		this.userLocalService = userLocalService;
 	}
 
@@ -538,7 +597,9 @@ public abstract class FragmentCollectionLocalServiceBaseImpl
 	 *
 	 * @return the fragment entry local service
 	 */
-	public com.liferay.fragment.service.FragmentEntryLocalService getFragmentEntryLocalService() {
+	public com.liferay.fragment.service.FragmentEntryLocalService
+		getFragmentEntryLocalService() {
+
 		return fragmentEntryLocalService;
 	}
 
@@ -548,7 +609,9 @@ public abstract class FragmentCollectionLocalServiceBaseImpl
 	 * @param fragmentEntryLocalService the fragment entry local service
 	 */
 	public void setFragmentEntryLocalService(
-		com.liferay.fragment.service.FragmentEntryLocalService fragmentEntryLocalService) {
+		com.liferay.fragment.service.FragmentEntryLocalService
+			fragmentEntryLocalService) {
+
 		this.fragmentEntryLocalService = fragmentEntryLocalService;
 	}
 
@@ -568,11 +631,13 @@ public abstract class FragmentCollectionLocalServiceBaseImpl
 	 */
 	public void setFragmentEntryPersistence(
 		FragmentEntryPersistence fragmentEntryPersistence) {
+
 		this.fragmentEntryPersistence = fragmentEntryPersistence;
 	}
 
 	public void afterPropertiesSet() {
-		persistedModelLocalServiceRegistry.register("com.liferay.fragment.model.FragmentCollection",
+		persistedModelLocalServiceRegistry.register(
+			"com.liferay.fragment.model.FragmentCollection",
 			fragmentCollectionLocalService);
 	}
 
@@ -606,15 +671,16 @@ public abstract class FragmentCollectionLocalServiceBaseImpl
 	 */
 	protected void runSQL(String sql) {
 		try {
-			DataSource dataSource = fragmentCollectionPersistence.getDataSource();
+			DataSource dataSource =
+				fragmentCollectionPersistence.getDataSource();
 
 			DB db = DBManagerUtil.getDB();
 
 			sql = db.buildSQL(sql);
 			sql = PortalUtil.transformSQL(sql);
 
-			SqlUpdate sqlUpdate = SqlUpdateFactoryUtil.getSqlUpdate(dataSource,
-					sql);
+			SqlUpdate sqlUpdate = SqlUpdateFactoryUtil.getSqlUpdate(
+				dataSource, sql);
 
 			sqlUpdate.update();
 		}
@@ -625,18 +691,36 @@ public abstract class FragmentCollectionLocalServiceBaseImpl
 
 	@BeanReference(type = FragmentCollectionLocalService.class)
 	protected FragmentCollectionLocalService fragmentCollectionLocalService;
+
 	@BeanReference(type = FragmentCollectionPersistence.class)
 	protected FragmentCollectionPersistence fragmentCollectionPersistence;
-	@ServiceReference(type = com.liferay.counter.kernel.service.CounterLocalService.class)
-	protected com.liferay.counter.kernel.service.CounterLocalService counterLocalService;
-	@ServiceReference(type = com.liferay.portal.kernel.service.UserLocalService.class)
-	protected com.liferay.portal.kernel.service.UserLocalService userLocalService;
+
+	@ServiceReference(
+		type = com.liferay.counter.kernel.service.CounterLocalService.class
+	)
+	protected com.liferay.counter.kernel.service.CounterLocalService
+		counterLocalService;
+
+	@ServiceReference(
+		type = com.liferay.portal.kernel.service.UserLocalService.class
+	)
+	protected com.liferay.portal.kernel.service.UserLocalService
+		userLocalService;
+
 	@ServiceReference(type = UserPersistence.class)
 	protected UserPersistence userPersistence;
-	@BeanReference(type = com.liferay.fragment.service.FragmentEntryLocalService.class)
-	protected com.liferay.fragment.service.FragmentEntryLocalService fragmentEntryLocalService;
+
+	@BeanReference(
+		type = com.liferay.fragment.service.FragmentEntryLocalService.class
+	)
+	protected com.liferay.fragment.service.FragmentEntryLocalService
+		fragmentEntryLocalService;
+
 	@BeanReference(type = FragmentEntryPersistence.class)
 	protected FragmentEntryPersistence fragmentEntryPersistence;
+
 	@ServiceReference(type = PersistedModelLocalServiceRegistry.class)
-	protected PersistedModelLocalServiceRegistry persistedModelLocalServiceRegistry;
+	protected PersistedModelLocalServiceRegistry
+		persistedModelLocalServiceRegistry;
+
 }

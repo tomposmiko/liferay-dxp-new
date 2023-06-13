@@ -17,7 +17,6 @@ package com.liferay.friendly.url.model;
 import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.expando.kernel.model.ExpandoBridge;
-
 import com.liferay.portal.kernel.model.ModelWrapper;
 import com.liferay.portal.kernel.service.ServiceContext;
 
@@ -39,9 +38,11 @@ import java.util.Objects;
 @ProviderType
 public class FriendlyURLEntryLocalizationWrapper
 	implements FriendlyURLEntryLocalization,
-		ModelWrapper<FriendlyURLEntryLocalization> {
+			   ModelWrapper<FriendlyURLEntryLocalization> {
+
 	public FriendlyURLEntryLocalizationWrapper(
 		FriendlyURLEntryLocalization friendlyURLEntryLocalization) {
+
 		_friendlyURLEntryLocalization = friendlyURLEntryLocalization;
 	}
 
@@ -60,7 +61,8 @@ public class FriendlyURLEntryLocalizationWrapper
 		Map<String, Object> attributes = new HashMap<String, Object>();
 
 		attributes.put("mvccVersion", getMvccVersion());
-		attributes.put("friendlyURLEntryLocalizationId",
+		attributes.put(
+			"friendlyURLEntryLocalizationId",
 			getFriendlyURLEntryLocalizationId());
 		attributes.put("companyId", getCompanyId());
 		attributes.put("friendlyURLEntryId", getFriendlyURLEntryId());
@@ -82,7 +84,7 @@ public class FriendlyURLEntryLocalizationWrapper
 		}
 
 		Long friendlyURLEntryLocalizationId = (Long)attributes.get(
-				"friendlyURLEntryLocalizationId");
+			"friendlyURLEntryLocalizationId");
 
 		if (friendlyURLEntryLocalizationId != null) {
 			setFriendlyURLEntryLocalizationId(friendlyURLEntryLocalizationId);
@@ -133,50 +135,54 @@ public class FriendlyURLEntryLocalizationWrapper
 
 	@Override
 	public Object clone() {
-		return new FriendlyURLEntryLocalizationWrapper((FriendlyURLEntryLocalization)_friendlyURLEntryLocalization.clone());
+		return new FriendlyURLEntryLocalizationWrapper(
+			(FriendlyURLEntryLocalization)
+				_friendlyURLEntryLocalization.clone());
 	}
 
 	@Override
 	public int compareTo(
 		FriendlyURLEntryLocalization friendlyURLEntryLocalization) {
-		return _friendlyURLEntryLocalization.compareTo(friendlyURLEntryLocalization);
+
+		return _friendlyURLEntryLocalization.compareTo(
+			friendlyURLEntryLocalization);
 	}
 
 	/**
-	* Returns the fully qualified class name of this friendly url entry localization.
-	*
-	* @return the fully qualified class name of this friendly url entry localization
-	*/
+	 * Returns the fully qualified class name of this friendly url entry localization.
+	 *
+	 * @return the fully qualified class name of this friendly url entry localization
+	 */
 	@Override
 	public String getClassName() {
 		return _friendlyURLEntryLocalization.getClassName();
 	}
 
 	/**
-	* Returns the class name ID of this friendly url entry localization.
-	*
-	* @return the class name ID of this friendly url entry localization
-	*/
+	 * Returns the class name ID of this friendly url entry localization.
+	 *
+	 * @return the class name ID of this friendly url entry localization
+	 */
 	@Override
 	public long getClassNameId() {
 		return _friendlyURLEntryLocalization.getClassNameId();
 	}
 
 	/**
-	* Returns the class pk of this friendly url entry localization.
-	*
-	* @return the class pk of this friendly url entry localization
-	*/
+	 * Returns the class pk of this friendly url entry localization.
+	 *
+	 * @return the class pk of this friendly url entry localization
+	 */
 	@Override
 	public long getClassPK() {
 		return _friendlyURLEntryLocalization.getClassPK();
 	}
 
 	/**
-	* Returns the company ID of this friendly url entry localization.
-	*
-	* @return the company ID of this friendly url entry localization
-	*/
+	 * Returns the company ID of this friendly url entry localization.
+	 *
+	 * @return the company ID of this friendly url entry localization
+	 */
 	@Override
 	public long getCompanyId() {
 		return _friendlyURLEntryLocalization.getCompanyId();
@@ -188,60 +194,61 @@ public class FriendlyURLEntryLocalizationWrapper
 	}
 
 	/**
-	* Returns the friendly url entry ID of this friendly url entry localization.
-	*
-	* @return the friendly url entry ID of this friendly url entry localization
-	*/
+	 * Returns the friendly url entry ID of this friendly url entry localization.
+	 *
+	 * @return the friendly url entry ID of this friendly url entry localization
+	 */
 	@Override
 	public long getFriendlyURLEntryId() {
 		return _friendlyURLEntryLocalization.getFriendlyURLEntryId();
 	}
 
 	/**
-	* Returns the friendly url entry localization ID of this friendly url entry localization.
-	*
-	* @return the friendly url entry localization ID of this friendly url entry localization
-	*/
+	 * Returns the friendly url entry localization ID of this friendly url entry localization.
+	 *
+	 * @return the friendly url entry localization ID of this friendly url entry localization
+	 */
 	@Override
 	public long getFriendlyURLEntryLocalizationId() {
-		return _friendlyURLEntryLocalization.getFriendlyURLEntryLocalizationId();
+		return _friendlyURLEntryLocalization.
+			getFriendlyURLEntryLocalizationId();
 	}
 
 	/**
-	* Returns the group ID of this friendly url entry localization.
-	*
-	* @return the group ID of this friendly url entry localization
-	*/
+	 * Returns the group ID of this friendly url entry localization.
+	 *
+	 * @return the group ID of this friendly url entry localization
+	 */
 	@Override
 	public long getGroupId() {
 		return _friendlyURLEntryLocalization.getGroupId();
 	}
 
 	/**
-	* Returns the language ID of this friendly url entry localization.
-	*
-	* @return the language ID of this friendly url entry localization
-	*/
+	 * Returns the language ID of this friendly url entry localization.
+	 *
+	 * @return the language ID of this friendly url entry localization
+	 */
 	@Override
 	public String getLanguageId() {
 		return _friendlyURLEntryLocalization.getLanguageId();
 	}
 
 	/**
-	* Returns the mvcc version of this friendly url entry localization.
-	*
-	* @return the mvcc version of this friendly url entry localization
-	*/
+	 * Returns the mvcc version of this friendly url entry localization.
+	 *
+	 * @return the mvcc version of this friendly url entry localization
+	 */
 	@Override
 	public long getMvccVersion() {
 		return _friendlyURLEntryLocalization.getMvccVersion();
 	}
 
 	/**
-	* Returns the primary key of this friendly url entry localization.
-	*
-	* @return the primary key of this friendly url entry localization
-	*/
+	 * Returns the primary key of this friendly url entry localization.
+	 *
+	 * @return the primary key of this friendly url entry localization
+	 */
 	@Override
 	public long getPrimaryKey() {
 		return _friendlyURLEntryLocalization.getPrimaryKey();
@@ -253,10 +260,10 @@ public class FriendlyURLEntryLocalizationWrapper
 	}
 
 	/**
-	* Returns the url title of this friendly url entry localization.
-	*
-	* @return the url title of this friendly url entry localization
-	*/
+	 * Returns the url title of this friendly url entry localization.
+	 *
+	 * @return the url title of this friendly url entry localization
+	 */
 	@Override
 	public String getUrlTitle() {
 		return _friendlyURLEntryLocalization.getUrlTitle();
@@ -293,30 +300,30 @@ public class FriendlyURLEntryLocalizationWrapper
 	}
 
 	/**
-	* Sets the class name ID of this friendly url entry localization.
-	*
-	* @param classNameId the class name ID of this friendly url entry localization
-	*/
+	 * Sets the class name ID of this friendly url entry localization.
+	 *
+	 * @param classNameId the class name ID of this friendly url entry localization
+	 */
 	@Override
 	public void setClassNameId(long classNameId) {
 		_friendlyURLEntryLocalization.setClassNameId(classNameId);
 	}
 
 	/**
-	* Sets the class pk of this friendly url entry localization.
-	*
-	* @param classPK the class pk of this friendly url entry localization
-	*/
+	 * Sets the class pk of this friendly url entry localization.
+	 *
+	 * @param classPK the class pk of this friendly url entry localization
+	 */
 	@Override
 	public void setClassPK(long classPK) {
 		_friendlyURLEntryLocalization.setClassPK(classPK);
 	}
 
 	/**
-	* Sets the company ID of this friendly url entry localization.
-	*
-	* @param companyId the company ID of this friendly url entry localization
-	*/
+	 * Sets the company ID of this friendly url entry localization.
+	 *
+	 * @param companyId the company ID of this friendly url entry localization
+	 */
 	@Override
 	public void setCompanyId(long companyId) {
 		_friendlyURLEntryLocalization.setCompanyId(companyId);
@@ -325,6 +332,7 @@ public class FriendlyURLEntryLocalizationWrapper
 	@Override
 	public void setExpandoBridgeAttributes(
 		com.liferay.portal.kernel.model.BaseModel<?> baseModel) {
+
 		_friendlyURLEntryLocalization.setExpandoBridgeAttributes(baseModel);
 	}
 
@@ -335,55 +343,58 @@ public class FriendlyURLEntryLocalizationWrapper
 
 	@Override
 	public void setExpandoBridgeAttributes(ServiceContext serviceContext) {
-		_friendlyURLEntryLocalization.setExpandoBridgeAttributes(serviceContext);
+		_friendlyURLEntryLocalization.setExpandoBridgeAttributes(
+			serviceContext);
 	}
 
 	/**
-	* Sets the friendly url entry ID of this friendly url entry localization.
-	*
-	* @param friendlyURLEntryId the friendly url entry ID of this friendly url entry localization
-	*/
+	 * Sets the friendly url entry ID of this friendly url entry localization.
+	 *
+	 * @param friendlyURLEntryId the friendly url entry ID of this friendly url entry localization
+	 */
 	@Override
 	public void setFriendlyURLEntryId(long friendlyURLEntryId) {
 		_friendlyURLEntryLocalization.setFriendlyURLEntryId(friendlyURLEntryId);
 	}
 
 	/**
-	* Sets the friendly url entry localization ID of this friendly url entry localization.
-	*
-	* @param friendlyURLEntryLocalizationId the friendly url entry localization ID of this friendly url entry localization
-	*/
+	 * Sets the friendly url entry localization ID of this friendly url entry localization.
+	 *
+	 * @param friendlyURLEntryLocalizationId the friendly url entry localization ID of this friendly url entry localization
+	 */
 	@Override
 	public void setFriendlyURLEntryLocalizationId(
 		long friendlyURLEntryLocalizationId) {
-		_friendlyURLEntryLocalization.setFriendlyURLEntryLocalizationId(friendlyURLEntryLocalizationId);
+
+		_friendlyURLEntryLocalization.setFriendlyURLEntryLocalizationId(
+			friendlyURLEntryLocalizationId);
 	}
 
 	/**
-	* Sets the group ID of this friendly url entry localization.
-	*
-	* @param groupId the group ID of this friendly url entry localization
-	*/
+	 * Sets the group ID of this friendly url entry localization.
+	 *
+	 * @param groupId the group ID of this friendly url entry localization
+	 */
 	@Override
 	public void setGroupId(long groupId) {
 		_friendlyURLEntryLocalization.setGroupId(groupId);
 	}
 
 	/**
-	* Sets the language ID of this friendly url entry localization.
-	*
-	* @param languageId the language ID of this friendly url entry localization
-	*/
+	 * Sets the language ID of this friendly url entry localization.
+	 *
+	 * @param languageId the language ID of this friendly url entry localization
+	 */
 	@Override
 	public void setLanguageId(String languageId) {
 		_friendlyURLEntryLocalization.setLanguageId(languageId);
 	}
 
 	/**
-	* Sets the mvcc version of this friendly url entry localization.
-	*
-	* @param mvccVersion the mvcc version of this friendly url entry localization
-	*/
+	 * Sets the mvcc version of this friendly url entry localization.
+	 *
+	 * @param mvccVersion the mvcc version of this friendly url entry localization
+	 */
 	@Override
 	public void setMvccVersion(long mvccVersion) {
 		_friendlyURLEntryLocalization.setMvccVersion(mvccVersion);
@@ -395,10 +406,10 @@ public class FriendlyURLEntryLocalizationWrapper
 	}
 
 	/**
-	* Sets the primary key of this friendly url entry localization.
-	*
-	* @param primaryKey the primary key of this friendly url entry localization
-	*/
+	 * Sets the primary key of this friendly url entry localization.
+	 *
+	 * @param primaryKey the primary key of this friendly url entry localization
+	 */
 	@Override
 	public void setPrimaryKey(long primaryKey) {
 		_friendlyURLEntryLocalization.setPrimaryKey(primaryKey);
@@ -410,23 +421,26 @@ public class FriendlyURLEntryLocalizationWrapper
 	}
 
 	/**
-	* Sets the url title of this friendly url entry localization.
-	*
-	* @param urlTitle the url title of this friendly url entry localization
-	*/
+	 * Sets the url title of this friendly url entry localization.
+	 *
+	 * @param urlTitle the url title of this friendly url entry localization
+	 */
 	@Override
 	public void setUrlTitle(String urlTitle) {
 		_friendlyURLEntryLocalization.setUrlTitle(urlTitle);
 	}
 
 	@Override
-	public com.liferay.portal.kernel.model.CacheModel<FriendlyURLEntryLocalization> toCacheModel() {
+	public com.liferay.portal.kernel.model.CacheModel
+		<FriendlyURLEntryLocalization> toCacheModel() {
+
 		return _friendlyURLEntryLocalization.toCacheModel();
 	}
 
 	@Override
 	public FriendlyURLEntryLocalization toEscapedModel() {
-		return new FriendlyURLEntryLocalizationWrapper(_friendlyURLEntryLocalization.toEscapedModel());
+		return new FriendlyURLEntryLocalizationWrapper(
+			_friendlyURLEntryLocalization.toEscapedModel());
 	}
 
 	@Override
@@ -436,7 +450,8 @@ public class FriendlyURLEntryLocalizationWrapper
 
 	@Override
 	public FriendlyURLEntryLocalization toUnescapedModel() {
-		return new FriendlyURLEntryLocalizationWrapper(_friendlyURLEntryLocalization.toUnescapedModel());
+		return new FriendlyURLEntryLocalizationWrapper(
+			_friendlyURLEntryLocalization.toUnescapedModel());
 	}
 
 	@Override
@@ -454,10 +469,15 @@ public class FriendlyURLEntryLocalizationWrapper
 			return false;
 		}
 
-		FriendlyURLEntryLocalizationWrapper friendlyURLEntryLocalizationWrapper = (FriendlyURLEntryLocalizationWrapper)obj;
+		FriendlyURLEntryLocalizationWrapper
+			friendlyURLEntryLocalizationWrapper =
+				(FriendlyURLEntryLocalizationWrapper)obj;
 
-		if (Objects.equals(_friendlyURLEntryLocalization,
-					friendlyURLEntryLocalizationWrapper._friendlyURLEntryLocalization)) {
+		if (Objects.equals(
+				_friendlyURLEntryLocalization,
+				friendlyURLEntryLocalizationWrapper.
+					_friendlyURLEntryLocalization)) {
+
 			return true;
 		}
 
@@ -485,4 +505,5 @@ public class FriendlyURLEntryLocalizationWrapper
 	}
 
 	private final FriendlyURLEntryLocalization _friendlyURLEntryLocalization;
+
 }

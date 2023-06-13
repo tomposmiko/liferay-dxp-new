@@ -77,10 +77,8 @@ public class SearchRequestImpl implements SearchRequest {
 
 		searchContainer.setTotal(hits.getLength());
 
-		SearchResponseImpl searchResponseImpl = buildSearchResponse(
+		return buildSearchResponse(
 			hits, searchContext, searchContainer, searchSettingsImpl);
-
-		return searchResponseImpl;
 	}
 
 	protected SearchContainer<Document> buildSearchContainer(

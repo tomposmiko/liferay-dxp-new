@@ -61,52 +61,32 @@ import java.util.Set;
  * </p>
  *
  * @author Brian Wing Shun Chan
- * @see PortletPersistence
- * @see com.liferay.portal.kernel.service.persistence.PortletUtil
  * @generated
  */
 @ProviderType
-public class PortletPersistenceImpl extends BasePersistenceImpl<Portlet>
-	implements PortletPersistence {
+public class PortletPersistenceImpl
+	extends BasePersistenceImpl<Portlet> implements PortletPersistence {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
-	 * Never modify or reference this class directly. Always use {@link PortletUtil} to access the portlet persistence. Modify <code>service.xml</code> and rerun ServiceBuilder to regenerate this class.
+	 * Never modify or reference this class directly. Always use <code>PortletUtil</code> to access the portlet persistence. Modify <code>service.xml</code> and rerun ServiceBuilder to regenerate this class.
 	 */
-	public static final String FINDER_CLASS_NAME_ENTITY = PortletImpl.class.getName();
-	public static final String FINDER_CLASS_NAME_LIST_WITH_PAGINATION = FINDER_CLASS_NAME_ENTITY +
-		".List1";
-	public static final String FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION = FINDER_CLASS_NAME_ENTITY +
-		".List2";
-	public static final FinderPath FINDER_PATH_WITH_PAGINATION_FIND_ALL = new FinderPath(PortletModelImpl.ENTITY_CACHE_ENABLED,
-			PortletModelImpl.FINDER_CACHE_ENABLED, PortletImpl.class,
-			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findAll", new String[0]);
-	public static final FinderPath FINDER_PATH_WITHOUT_PAGINATION_FIND_ALL = new FinderPath(PortletModelImpl.ENTITY_CACHE_ENABLED,
-			PortletModelImpl.FINDER_CACHE_ENABLED, PortletImpl.class,
-			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findAll", new String[0]);
-	public static final FinderPath FINDER_PATH_COUNT_ALL = new FinderPath(PortletModelImpl.ENTITY_CACHE_ENABLED,
-			PortletModelImpl.FINDER_CACHE_ENABLED, Long.class,
-			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countAll", new String[0]);
-	public static final FinderPath FINDER_PATH_WITH_PAGINATION_FIND_BY_COMPANYID =
-		new FinderPath(PortletModelImpl.ENTITY_CACHE_ENABLED,
-			PortletModelImpl.FINDER_CACHE_ENABLED, PortletImpl.class,
-			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByCompanyId",
-			new String[] {
-				Long.class.getName(),
-				
-			Integer.class.getName(), Integer.class.getName(),
-				OrderByComparator.class.getName()
-			});
-	public static final FinderPath FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_COMPANYID =
-		new FinderPath(PortletModelImpl.ENTITY_CACHE_ENABLED,
-			PortletModelImpl.FINDER_CACHE_ENABLED, PortletImpl.class,
-			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByCompanyId",
-			new String[] { Long.class.getName() },
-			PortletModelImpl.COMPANYID_COLUMN_BITMASK);
-	public static final FinderPath FINDER_PATH_COUNT_BY_COMPANYID = new FinderPath(PortletModelImpl.ENTITY_CACHE_ENABLED,
-			PortletModelImpl.FINDER_CACHE_ENABLED, Long.class,
-			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByCompanyId",
-			new String[] { Long.class.getName() });
+	public static final String FINDER_CLASS_NAME_ENTITY =
+		PortletImpl.class.getName();
+
+	public static final String FINDER_CLASS_NAME_LIST_WITH_PAGINATION =
+		FINDER_CLASS_NAME_ENTITY + ".List1";
+
+	public static final String FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION =
+		FINDER_CLASS_NAME_ENTITY + ".List2";
+
+	private FinderPath _finderPathWithPaginationFindAll;
+	private FinderPath _finderPathWithoutPaginationFindAll;
+	private FinderPath _finderPathCountAll;
+	private FinderPath _finderPathWithPaginationFindByCompanyId;
+	private FinderPath _finderPathWithoutPaginationFindByCompanyId;
+	private FinderPath _finderPathCountByCompanyId;
 
 	/**
 	 * Returns all the portlets where companyId = &#63;.
@@ -116,15 +96,15 @@ public class PortletPersistenceImpl extends BasePersistenceImpl<Portlet>
 	 */
 	@Override
 	public List<Portlet> findByCompanyId(long companyId) {
-		return findByCompanyId(companyId, QueryUtil.ALL_POS, QueryUtil.ALL_POS,
-			null);
+		return findByCompanyId(
+			companyId, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
 	}
 
 	/**
 	 * Returns a range of all the portlets where companyId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link PortletModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>PortletModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param companyId the company ID
@@ -141,7 +121,7 @@ public class PortletPersistenceImpl extends BasePersistenceImpl<Portlet>
 	 * Returns an ordered range of all the portlets where companyId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link PortletModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>PortletModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param companyId the company ID
@@ -151,8 +131,10 @@ public class PortletPersistenceImpl extends BasePersistenceImpl<Portlet>
 	 * @return the ordered range of matching portlets
 	 */
 	@Override
-	public List<Portlet> findByCompanyId(long companyId, int start, int end,
+	public List<Portlet> findByCompanyId(
+		long companyId, int start, int end,
 		OrderByComparator<Portlet> orderByComparator) {
+
 		return findByCompanyId(companyId, start, end, orderByComparator, true);
 	}
 
@@ -160,7 +142,7 @@ public class PortletPersistenceImpl extends BasePersistenceImpl<Portlet>
 	 * Returns an ordered range of all the portlets where companyId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link PortletModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>PortletModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param companyId the company ID
@@ -171,28 +153,34 @@ public class PortletPersistenceImpl extends BasePersistenceImpl<Portlet>
 	 * @return the ordered range of matching portlets
 	 */
 	@Override
-	public List<Portlet> findByCompanyId(long companyId, int start, int end,
-		OrderByComparator<Portlet> orderByComparator, boolean retrieveFromCache) {
+	public List<Portlet> findByCompanyId(
+		long companyId, int start, int end,
+		OrderByComparator<Portlet> orderByComparator,
+		boolean retrieveFromCache) {
+
 		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
-				(orderByComparator == null)) {
+			(orderByComparator == null)) {
+
 			pagination = false;
-			finderPath = FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_COMPANYID;
-			finderArgs = new Object[] { companyId };
+			finderPath = _finderPathWithoutPaginationFindByCompanyId;
+			finderArgs = new Object[] {companyId};
 		}
 		else {
-			finderPath = FINDER_PATH_WITH_PAGINATION_FIND_BY_COMPANYID;
-			finderArgs = new Object[] { companyId, start, end, orderByComparator };
+			finderPath = _finderPathWithPaginationFindByCompanyId;
+			finderArgs = new Object[] {
+				companyId, start, end, orderByComparator
+			};
 		}
 
 		List<Portlet> list = null;
 
 		if (retrieveFromCache) {
-			list = (List<Portlet>)FinderCacheUtil.getResult(finderPath,
-					finderArgs, this);
+			list = (List<Portlet>)FinderCacheUtil.getResult(
+				finderPath, finderArgs, this);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (Portlet portlet : list) {
@@ -209,8 +197,8 @@ public class PortletPersistenceImpl extends BasePersistenceImpl<Portlet>
 			StringBundler query = null;
 
 			if (orderByComparator != null) {
-				query = new StringBundler(3 +
-						(orderByComparator.getOrderByFields().length * 2));
+				query = new StringBundler(
+					3 + (orderByComparator.getOrderByFields().length * 2));
 			}
 			else {
 				query = new StringBundler(3);
@@ -221,11 +209,10 @@ public class PortletPersistenceImpl extends BasePersistenceImpl<Portlet>
 			query.append(_FINDER_COLUMN_COMPANYID_COMPANYID_2);
 
 			if (orderByComparator != null) {
-				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
-					orderByComparator);
+				appendOrderByComparator(
+					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
 			}
-			else
-			 if (pagination) {
+			else if (pagination) {
 				query.append(PortletModelImpl.ORDER_BY_JPQL);
 			}
 
@@ -243,16 +230,16 @@ public class PortletPersistenceImpl extends BasePersistenceImpl<Portlet>
 				qPos.add(companyId);
 
 				if (!pagination) {
-					list = (List<Portlet>)QueryUtil.list(q, getDialect(),
-							start, end, false);
+					list = (List<Portlet>)QueryUtil.list(
+						q, getDialect(), start, end, false);
 
 					Collections.sort(list);
 
 					list = Collections.unmodifiableList(list);
 				}
 				else {
-					list = (List<Portlet>)QueryUtil.list(q, getDialect(),
-							start, end);
+					list = (List<Portlet>)QueryUtil.list(
+						q, getDialect(), start, end);
 				}
 
 				cacheResult(list);
@@ -281,9 +268,10 @@ public class PortletPersistenceImpl extends BasePersistenceImpl<Portlet>
 	 * @throws NoSuchPortletException if a matching portlet could not be found
 	 */
 	@Override
-	public Portlet findByCompanyId_First(long companyId,
-		OrderByComparator<Portlet> orderByComparator)
+	public Portlet findByCompanyId_First(
+			long companyId, OrderByComparator<Portlet> orderByComparator)
 		throws NoSuchPortletException {
+
 		Portlet portlet = fetchByCompanyId_First(companyId, orderByComparator);
 
 		if (portlet != null) {
@@ -310,9 +298,11 @@ public class PortletPersistenceImpl extends BasePersistenceImpl<Portlet>
 	 * @return the first matching portlet, or <code>null</code> if a matching portlet could not be found
 	 */
 	@Override
-	public Portlet fetchByCompanyId_First(long companyId,
-		OrderByComparator<Portlet> orderByComparator) {
-		List<Portlet> list = findByCompanyId(companyId, 0, 1, orderByComparator);
+	public Portlet fetchByCompanyId_First(
+		long companyId, OrderByComparator<Portlet> orderByComparator) {
+
+		List<Portlet> list = findByCompanyId(
+			companyId, 0, 1, orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -330,9 +320,10 @@ public class PortletPersistenceImpl extends BasePersistenceImpl<Portlet>
 	 * @throws NoSuchPortletException if a matching portlet could not be found
 	 */
 	@Override
-	public Portlet findByCompanyId_Last(long companyId,
-		OrderByComparator<Portlet> orderByComparator)
+	public Portlet findByCompanyId_Last(
+			long companyId, OrderByComparator<Portlet> orderByComparator)
 		throws NoSuchPortletException {
+
 		Portlet portlet = fetchByCompanyId_Last(companyId, orderByComparator);
 
 		if (portlet != null) {
@@ -359,16 +350,17 @@ public class PortletPersistenceImpl extends BasePersistenceImpl<Portlet>
 	 * @return the last matching portlet, or <code>null</code> if a matching portlet could not be found
 	 */
 	@Override
-	public Portlet fetchByCompanyId_Last(long companyId,
-		OrderByComparator<Portlet> orderByComparator) {
+	public Portlet fetchByCompanyId_Last(
+		long companyId, OrderByComparator<Portlet> orderByComparator) {
+
 		int count = countByCompanyId(companyId);
 
 		if (count == 0) {
 			return null;
 		}
 
-		List<Portlet> list = findByCompanyId(companyId, count - 1, count,
-				orderByComparator);
+		List<Portlet> list = findByCompanyId(
+			companyId, count - 1, count, orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -387,9 +379,11 @@ public class PortletPersistenceImpl extends BasePersistenceImpl<Portlet>
 	 * @throws NoSuchPortletException if a portlet with the primary key could not be found
 	 */
 	@Override
-	public Portlet[] findByCompanyId_PrevAndNext(long id, long companyId,
-		OrderByComparator<Portlet> orderByComparator)
+	public Portlet[] findByCompanyId_PrevAndNext(
+			long id, long companyId,
+			OrderByComparator<Portlet> orderByComparator)
 		throws NoSuchPortletException {
+
 		Portlet portlet = findByPrimaryKey(id);
 
 		Session session = null;
@@ -399,13 +393,13 @@ public class PortletPersistenceImpl extends BasePersistenceImpl<Portlet>
 
 			Portlet[] array = new PortletImpl[3];
 
-			array[0] = getByCompanyId_PrevAndNext(session, portlet, companyId,
-					orderByComparator, true);
+			array[0] = getByCompanyId_PrevAndNext(
+				session, portlet, companyId, orderByComparator, true);
 
 			array[1] = portlet;
 
-			array[2] = getByCompanyId_PrevAndNext(session, portlet, companyId,
-					orderByComparator, false);
+			array[2] = getByCompanyId_PrevAndNext(
+				session, portlet, companyId, orderByComparator, false);
 
 			return array;
 		}
@@ -417,14 +411,15 @@ public class PortletPersistenceImpl extends BasePersistenceImpl<Portlet>
 		}
 	}
 
-	protected Portlet getByCompanyId_PrevAndNext(Session session,
-		Portlet portlet, long companyId,
+	protected Portlet getByCompanyId_PrevAndNext(
+		Session session, Portlet portlet, long companyId,
 		OrderByComparator<Portlet> orderByComparator, boolean previous) {
+
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(4 +
-					(orderByComparator.getOrderByConditionFields().length * 3) +
+			query = new StringBundler(
+				4 + (orderByComparator.getOrderByConditionFields().length * 3) +
 					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
@@ -436,7 +431,8 @@ public class PortletPersistenceImpl extends BasePersistenceImpl<Portlet>
 		query.append(_FINDER_COLUMN_COMPANYID_COMPANYID_2);
 
 		if (orderByComparator != null) {
-			String[] orderByConditionFields = orderByComparator.getOrderByConditionFields();
+			String[] orderByConditionFields =
+				orderByComparator.getOrderByConditionFields();
 
 			if (orderByConditionFields.length > 0) {
 				query.append(WHERE_AND);
@@ -506,10 +502,10 @@ public class PortletPersistenceImpl extends BasePersistenceImpl<Portlet>
 		qPos.add(companyId);
 
 		if (orderByComparator != null) {
-			Object[] values = orderByComparator.getOrderByConditionValues(portlet);
+			for (Object orderByConditionValue :
+					orderByComparator.getOrderByConditionValues(portlet)) {
 
-			for (Object value : values) {
-				qPos.add(value);
+				qPos.add(orderByConditionValue);
 			}
 		}
 
@@ -530,8 +526,10 @@ public class PortletPersistenceImpl extends BasePersistenceImpl<Portlet>
 	 */
 	@Override
 	public void removeByCompanyId(long companyId) {
-		for (Portlet portlet : findByCompanyId(companyId, QueryUtil.ALL_POS,
-				QueryUtil.ALL_POS, null)) {
+		for (Portlet portlet :
+				findByCompanyId(
+					companyId, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null)) {
+
 			remove(portlet);
 		}
 	}
@@ -544,12 +542,12 @@ public class PortletPersistenceImpl extends BasePersistenceImpl<Portlet>
 	 */
 	@Override
 	public int countByCompanyId(long companyId) {
-		FinderPath finderPath = FINDER_PATH_COUNT_BY_COMPANYID;
+		FinderPath finderPath = _finderPathCountByCompanyId;
 
-		Object[] finderArgs = new Object[] { companyId };
+		Object[] finderArgs = new Object[] {companyId};
 
-		Long count = (Long)FinderCacheUtil.getResult(finderPath, finderArgs,
-				this);
+		Long count = (Long)FinderCacheUtil.getResult(
+			finderPath, finderArgs, this);
 
 		if (count == null) {
 			StringBundler query = new StringBundler(2);
@@ -588,20 +586,14 @@ public class PortletPersistenceImpl extends BasePersistenceImpl<Portlet>
 		return count.intValue();
 	}
 
-	private static final String _FINDER_COLUMN_COMPANYID_COMPANYID_2 = "portlet.companyId = ?";
-	public static final FinderPath FINDER_PATH_FETCH_BY_C_P = new FinderPath(PortletModelImpl.ENTITY_CACHE_ENABLED,
-			PortletModelImpl.FINDER_CACHE_ENABLED, PortletImpl.class,
-			FINDER_CLASS_NAME_ENTITY, "fetchByC_P",
-			new String[] { Long.class.getName(), String.class.getName() },
-			PortletModelImpl.COMPANYID_COLUMN_BITMASK |
-			PortletModelImpl.PORTLETID_COLUMN_BITMASK);
-	public static final FinderPath FINDER_PATH_COUNT_BY_C_P = new FinderPath(PortletModelImpl.ENTITY_CACHE_ENABLED,
-			PortletModelImpl.FINDER_CACHE_ENABLED, Long.class,
-			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByC_P",
-			new String[] { Long.class.getName(), String.class.getName() });
+	private static final String _FINDER_COLUMN_COMPANYID_COMPANYID_2 =
+		"portlet.companyId = ?";
+
+	private FinderPath _finderPathFetchByC_P;
+	private FinderPath _finderPathCountByC_P;
 
 	/**
-	 * Returns the portlet where companyId = &#63; and portletId = &#63; or throws a {@link NoSuchPortletException} if it could not be found.
+	 * Returns the portlet where companyId = &#63; and portletId = &#63; or throws a <code>NoSuchPortletException</code> if it could not be found.
 	 *
 	 * @param companyId the company ID
 	 * @param portletId the portlet ID
@@ -611,6 +603,7 @@ public class PortletPersistenceImpl extends BasePersistenceImpl<Portlet>
 	@Override
 	public Portlet findByC_P(long companyId, String portletId)
 		throws NoSuchPortletException {
+
 		Portlet portlet = fetchByC_P(companyId, portletId);
 
 		if (portlet == null) {
@@ -657,24 +650,26 @@ public class PortletPersistenceImpl extends BasePersistenceImpl<Portlet>
 	 * @return the matching portlet, or <code>null</code> if a matching portlet could not be found
 	 */
 	@Override
-	public Portlet fetchByC_P(long companyId, String portletId,
-		boolean retrieveFromCache) {
+	public Portlet fetchByC_P(
+		long companyId, String portletId, boolean retrieveFromCache) {
+
 		portletId = Objects.toString(portletId, "");
 
-		Object[] finderArgs = new Object[] { companyId, portletId };
+		Object[] finderArgs = new Object[] {companyId, portletId};
 
 		Object result = null;
 
 		if (retrieveFromCache) {
-			result = FinderCacheUtil.getResult(FINDER_PATH_FETCH_BY_C_P,
-					finderArgs, this);
+			result = FinderCacheUtil.getResult(
+				_finderPathFetchByC_P, finderArgs, this);
 		}
 
 		if (result instanceof Portlet) {
 			Portlet portlet = (Portlet)result;
 
 			if ((companyId != portlet.getCompanyId()) ||
-					!Objects.equals(portletId, portlet.getPortletId())) {
+				!Objects.equals(portletId, portlet.getPortletId())) {
+
 				result = null;
 			}
 		}
@@ -717,8 +712,8 @@ public class PortletPersistenceImpl extends BasePersistenceImpl<Portlet>
 				List<Portlet> list = q.list();
 
 				if (list.isEmpty()) {
-					FinderCacheUtil.putResult(FINDER_PATH_FETCH_BY_C_P,
-						finderArgs, list);
+					FinderCacheUtil.putResult(
+						_finderPathFetchByC_P, finderArgs, list);
 				}
 				else {
 					Portlet portlet = list.get(0);
@@ -729,8 +724,7 @@ public class PortletPersistenceImpl extends BasePersistenceImpl<Portlet>
 				}
 			}
 			catch (Exception e) {
-				FinderCacheUtil.removeResult(FINDER_PATH_FETCH_BY_C_P,
-					finderArgs);
+				FinderCacheUtil.removeResult(_finderPathFetchByC_P, finderArgs);
 
 				throw processException(e);
 			}
@@ -757,6 +751,7 @@ public class PortletPersistenceImpl extends BasePersistenceImpl<Portlet>
 	@Override
 	public Portlet removeByC_P(long companyId, String portletId)
 		throws NoSuchPortletException {
+
 		Portlet portlet = findByC_P(companyId, portletId);
 
 		return remove(portlet);
@@ -773,12 +768,12 @@ public class PortletPersistenceImpl extends BasePersistenceImpl<Portlet>
 	public int countByC_P(long companyId, String portletId) {
 		portletId = Objects.toString(portletId, "");
 
-		FinderPath finderPath = FINDER_PATH_COUNT_BY_C_P;
+		FinderPath finderPath = _finderPathCountByC_P;
 
-		Object[] finderArgs = new Object[] { companyId, portletId };
+		Object[] finderArgs = new Object[] {companyId, portletId};
 
-		Long count = (Long)FinderCacheUtil.getResult(finderPath, finderArgs,
-				this);
+		Long count = (Long)FinderCacheUtil.getResult(
+			finderPath, finderArgs, this);
 
 		if (count == null) {
 			StringBundler query = new StringBundler(3);
@@ -832,23 +827,28 @@ public class PortletPersistenceImpl extends BasePersistenceImpl<Portlet>
 		return count.intValue();
 	}
 
-	private static final String _FINDER_COLUMN_C_P_COMPANYID_2 = "portlet.companyId = ? AND ";
-	private static final String _FINDER_COLUMN_C_P_PORTLETID_2 = "portlet.portletId = ?";
-	private static final String _FINDER_COLUMN_C_P_PORTLETID_3 = "(portlet.portletId IS NULL OR portlet.portletId = '')";
+	private static final String _FINDER_COLUMN_C_P_COMPANYID_2 =
+		"portlet.companyId = ? AND ";
+
+	private static final String _FINDER_COLUMN_C_P_PORTLETID_2 =
+		"portlet.portletId = ?";
+
+	private static final String _FINDER_COLUMN_C_P_PORTLETID_3 =
+		"(portlet.portletId IS NULL OR portlet.portletId = '')";
 
 	public PortletPersistenceImpl() {
 		setModelClass(Portlet.class);
 
+		Map<String, String> dbColumnNames = new HashMap<String, String>();
+
+		dbColumnNames.put("id", "id_");
+		dbColumnNames.put("active", "active_");
+
 		try {
 			Field field = BasePersistenceImpl.class.getDeclaredField(
-					"_dbColumnNames");
+				"_dbColumnNames");
 
 			field.setAccessible(true);
-
-			Map<String, String> dbColumnNames = new HashMap<String, String>();
-
-			dbColumnNames.put("id", "id_");
-			dbColumnNames.put("active", "active_");
 
 			field.set(this, dbColumnNames);
 		}
@@ -866,11 +866,13 @@ public class PortletPersistenceImpl extends BasePersistenceImpl<Portlet>
 	 */
 	@Override
 	public void cacheResult(Portlet portlet) {
-		EntityCacheUtil.putResult(PortletModelImpl.ENTITY_CACHE_ENABLED,
-			PortletImpl.class, portlet.getPrimaryKey(), portlet);
+		EntityCacheUtil.putResult(
+			PortletModelImpl.ENTITY_CACHE_ENABLED, PortletImpl.class,
+			portlet.getPrimaryKey(), portlet);
 
-		FinderCacheUtil.putResult(FINDER_PATH_FETCH_BY_C_P,
-			new Object[] { portlet.getCompanyId(), portlet.getPortletId() },
+		FinderCacheUtil.putResult(
+			_finderPathFetchByC_P,
+			new Object[] {portlet.getCompanyId(), portlet.getPortletId()},
 			portlet);
 
 		portlet.resetOriginalValues();
@@ -885,8 +887,9 @@ public class PortletPersistenceImpl extends BasePersistenceImpl<Portlet>
 	public void cacheResult(List<Portlet> portlets) {
 		for (Portlet portlet : portlets) {
 			if (EntityCacheUtil.getResult(
-						PortletModelImpl.ENTITY_CACHE_ENABLED,
-						PortletImpl.class, portlet.getPrimaryKey()) == null) {
+					PortletModelImpl.ENTITY_CACHE_ENABLED, PortletImpl.class,
+					portlet.getPrimaryKey()) == null) {
+
 				cacheResult(portlet);
 			}
 			else {
@@ -899,7 +902,7 @@ public class PortletPersistenceImpl extends BasePersistenceImpl<Portlet>
 	 * Clears the cache for all portlets.
 	 *
 	 * <p>
-	 * The {@link com.liferay.portal.kernel.dao.orm.EntityCache} and {@link com.liferay.portal.kernel.dao.orm.FinderCache} are both cleared by this method.
+	 * The <code>com.liferay.portal.kernel.dao.orm.EntityCache</code> and <code>com.liferay.portal.kernel.dao.orm.FinderCache</code> are both cleared by this method.
 	 * </p>
 	 */
 	@Override
@@ -915,13 +918,14 @@ public class PortletPersistenceImpl extends BasePersistenceImpl<Portlet>
 	 * Clears the cache for the portlet.
 	 *
 	 * <p>
-	 * The {@link com.liferay.portal.kernel.dao.orm.EntityCache} and {@link com.liferay.portal.kernel.dao.orm.FinderCache} are both cleared by this method.
+	 * The <code>com.liferay.portal.kernel.dao.orm.EntityCache</code> and <code>com.liferay.portal.kernel.dao.orm.FinderCache</code> are both cleared by this method.
 	 * </p>
 	 */
 	@Override
 	public void clearCache(Portlet portlet) {
-		EntityCacheUtil.removeResult(PortletModelImpl.ENTITY_CACHE_ENABLED,
-			PortletImpl.class, portlet.getPrimaryKey());
+		EntityCacheUtil.removeResult(
+			PortletModelImpl.ENTITY_CACHE_ENABLED, PortletImpl.class,
+			portlet.getPrimaryKey());
 
 		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
 		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
@@ -935,8 +939,9 @@ public class PortletPersistenceImpl extends BasePersistenceImpl<Portlet>
 		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
 
 		for (Portlet portlet : portlets) {
-			EntityCacheUtil.removeResult(PortletModelImpl.ENTITY_CACHE_ENABLED,
-				PortletImpl.class, portlet.getPrimaryKey());
+			EntityCacheUtil.removeResult(
+				PortletModelImpl.ENTITY_CACHE_ENABLED, PortletImpl.class,
+				portlet.getPrimaryKey());
 
 			clearUniqueFindersCache((PortletModelImpl)portlet, true);
 		}
@@ -944,36 +949,37 @@ public class PortletPersistenceImpl extends BasePersistenceImpl<Portlet>
 
 	protected void cacheUniqueFindersCache(PortletModelImpl portletModelImpl) {
 		Object[] args = new Object[] {
+			portletModelImpl.getCompanyId(), portletModelImpl.getPortletId()
+		};
+
+		FinderCacheUtil.putResult(
+			_finderPathCountByC_P, args, Long.valueOf(1), false);
+		FinderCacheUtil.putResult(
+			_finderPathFetchByC_P, args, portletModelImpl, false);
+	}
+
+	protected void clearUniqueFindersCache(
+		PortletModelImpl portletModelImpl, boolean clearCurrent) {
+
+		if (clearCurrent) {
+			Object[] args = new Object[] {
 				portletModelImpl.getCompanyId(), portletModelImpl.getPortletId()
 			};
 
-		FinderCacheUtil.putResult(FINDER_PATH_COUNT_BY_C_P, args,
-			Long.valueOf(1), false);
-		FinderCacheUtil.putResult(FINDER_PATH_FETCH_BY_C_P, args,
-			portletModelImpl, false);
-	}
-
-	protected void clearUniqueFindersCache(PortletModelImpl portletModelImpl,
-		boolean clearCurrent) {
-		if (clearCurrent) {
-			Object[] args = new Object[] {
-					portletModelImpl.getCompanyId(),
-					portletModelImpl.getPortletId()
-				};
-
-			FinderCacheUtil.removeResult(FINDER_PATH_COUNT_BY_C_P, args);
-			FinderCacheUtil.removeResult(FINDER_PATH_FETCH_BY_C_P, args);
+			FinderCacheUtil.removeResult(_finderPathCountByC_P, args);
+			FinderCacheUtil.removeResult(_finderPathFetchByC_P, args);
 		}
 
 		if ((portletModelImpl.getColumnBitmask() &
-				FINDER_PATH_FETCH_BY_C_P.getColumnBitmask()) != 0) {
-			Object[] args = new Object[] {
-					portletModelImpl.getOriginalCompanyId(),
-					portletModelImpl.getOriginalPortletId()
-				};
+			 _finderPathFetchByC_P.getColumnBitmask()) != 0) {
 
-			FinderCacheUtil.removeResult(FINDER_PATH_COUNT_BY_C_P, args);
-			FinderCacheUtil.removeResult(FINDER_PATH_FETCH_BY_C_P, args);
+			Object[] args = new Object[] {
+				portletModelImpl.getOriginalCompanyId(),
+				portletModelImpl.getOriginalPortletId()
+			};
+
+			FinderCacheUtil.removeResult(_finderPathCountByC_P, args);
+			FinderCacheUtil.removeResult(_finderPathFetchByC_P, args);
 		}
 	}
 
@@ -1017,20 +1023,22 @@ public class PortletPersistenceImpl extends BasePersistenceImpl<Portlet>
 	@Override
 	public Portlet remove(Serializable primaryKey)
 		throws NoSuchPortletException {
+
 		Session session = null;
 
 		try {
 			session = openSession();
 
-			Portlet portlet = (Portlet)session.get(PortletImpl.class, primaryKey);
+			Portlet portlet = (Portlet)session.get(
+				PortletImpl.class, primaryKey);
 
 			if (portlet == null) {
 				if (_log.isDebugEnabled()) {
 					_log.debug(_NO_SUCH_ENTITY_WITH_PRIMARY_KEY + primaryKey);
 				}
 
-				throw new NoSuchPortletException(_NO_SUCH_ENTITY_WITH_PRIMARY_KEY +
-					primaryKey);
+				throw new NoSuchPortletException(
+					_NO_SUCH_ENTITY_WITH_PRIMARY_KEY + primaryKey);
 			}
 
 			return remove(portlet);
@@ -1054,8 +1062,8 @@ public class PortletPersistenceImpl extends BasePersistenceImpl<Portlet>
 			session = openSession();
 
 			if (!session.contains(portlet)) {
-				portlet = (Portlet)session.get(PortletImpl.class,
-						portlet.getPrimaryKeyObj());
+				portlet = (Portlet)session.get(
+					PortletImpl.class, portlet.getPrimaryKeyObj());
 			}
 
 			if (portlet != null) {
@@ -1088,12 +1096,12 @@ public class PortletPersistenceImpl extends BasePersistenceImpl<Portlet>
 
 				throw new IllegalArgumentException(
 					"Implement ModelWrapper in portlet proxy " +
-					invocationHandler.getClass());
+						invocationHandler.getClass());
 			}
 
 			throw new IllegalArgumentException(
 				"Implement ModelWrapper in custom Portlet implementation " +
-				portlet.getClass());
+					portlet.getClass());
 		}
 
 		PortletModelImpl portletModelImpl = (PortletModelImpl)portlet;
@@ -1122,45 +1130,45 @@ public class PortletPersistenceImpl extends BasePersistenceImpl<Portlet>
 		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
 
 		if (!PortletModelImpl.COLUMN_BITMASK_ENABLED) {
-			FinderCacheUtil.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
+			FinderCacheUtil.clearCache(
+				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
 		}
-		else
-		 if (isNew) {
-			Object[] args = new Object[] { portletModelImpl.getCompanyId() };
+		else if (isNew) {
+			Object[] args = new Object[] {portletModelImpl.getCompanyId()};
 
-			FinderCacheUtil.removeResult(FINDER_PATH_COUNT_BY_COMPANYID, args);
-			FinderCacheUtil.removeResult(FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_COMPANYID,
-				args);
+			FinderCacheUtil.removeResult(_finderPathCountByCompanyId, args);
+			FinderCacheUtil.removeResult(
+				_finderPathWithoutPaginationFindByCompanyId, args);
 
-			FinderCacheUtil.removeResult(FINDER_PATH_COUNT_ALL,
-				FINDER_ARGS_EMPTY);
-			FinderCacheUtil.removeResult(FINDER_PATH_WITHOUT_PAGINATION_FIND_ALL,
-				FINDER_ARGS_EMPTY);
+			FinderCacheUtil.removeResult(
+				_finderPathCountAll, FINDER_ARGS_EMPTY);
+			FinderCacheUtil.removeResult(
+				_finderPathWithoutPaginationFindAll, FINDER_ARGS_EMPTY);
 		}
-
 		else {
 			if ((portletModelImpl.getColumnBitmask() &
-					FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_COMPANYID.getColumnBitmask()) != 0) {
+				 _finderPathWithoutPaginationFindByCompanyId.
+					 getColumnBitmask()) != 0) {
+
 				Object[] args = new Object[] {
-						portletModelImpl.getOriginalCompanyId()
-					};
+					portletModelImpl.getOriginalCompanyId()
+				};
 
-				FinderCacheUtil.removeResult(FINDER_PATH_COUNT_BY_COMPANYID,
-					args);
-				FinderCacheUtil.removeResult(FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_COMPANYID,
-					args);
+				FinderCacheUtil.removeResult(_finderPathCountByCompanyId, args);
+				FinderCacheUtil.removeResult(
+					_finderPathWithoutPaginationFindByCompanyId, args);
 
-				args = new Object[] { portletModelImpl.getCompanyId() };
+				args = new Object[] {portletModelImpl.getCompanyId()};
 
-				FinderCacheUtil.removeResult(FINDER_PATH_COUNT_BY_COMPANYID,
-					args);
-				FinderCacheUtil.removeResult(FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_COMPANYID,
-					args);
+				FinderCacheUtil.removeResult(_finderPathCountByCompanyId, args);
+				FinderCacheUtil.removeResult(
+					_finderPathWithoutPaginationFindByCompanyId, args);
 			}
 		}
 
-		EntityCacheUtil.putResult(PortletModelImpl.ENTITY_CACHE_ENABLED,
-			PortletImpl.class, portlet.getPrimaryKey(), portlet, false);
+		EntityCacheUtil.putResult(
+			PortletModelImpl.ENTITY_CACHE_ENABLED, PortletImpl.class,
+			portlet.getPrimaryKey(), portlet, false);
 
 		clearUniqueFindersCache(portletModelImpl, false);
 		cacheUniqueFindersCache(portletModelImpl);
@@ -1171,7 +1179,7 @@ public class PortletPersistenceImpl extends BasePersistenceImpl<Portlet>
 	}
 
 	/**
-	 * Returns the portlet with the primary key or throws a {@link com.liferay.portal.kernel.exception.NoSuchModelException} if it could not be found.
+	 * Returns the portlet with the primary key or throws a <code>com.liferay.portal.kernel.exception.NoSuchModelException</code> if it could not be found.
 	 *
 	 * @param primaryKey the primary key of the portlet
 	 * @return the portlet
@@ -1180,6 +1188,7 @@ public class PortletPersistenceImpl extends BasePersistenceImpl<Portlet>
 	@Override
 	public Portlet findByPrimaryKey(Serializable primaryKey)
 		throws NoSuchPortletException {
+
 		Portlet portlet = fetchByPrimaryKey(primaryKey);
 
 		if (portlet == null) {
@@ -1187,15 +1196,15 @@ public class PortletPersistenceImpl extends BasePersistenceImpl<Portlet>
 				_log.debug(_NO_SUCH_ENTITY_WITH_PRIMARY_KEY + primaryKey);
 			}
 
-			throw new NoSuchPortletException(_NO_SUCH_ENTITY_WITH_PRIMARY_KEY +
-				primaryKey);
+			throw new NoSuchPortletException(
+				_NO_SUCH_ENTITY_WITH_PRIMARY_KEY + primaryKey);
 		}
 
 		return portlet;
 	}
 
 	/**
-	 * Returns the portlet with the primary key or throws a {@link NoSuchPortletException} if it could not be found.
+	 * Returns the portlet with the primary key or throws a <code>NoSuchPortletException</code> if it could not be found.
 	 *
 	 * @param id the primary key of the portlet
 	 * @return the portlet
@@ -1214,8 +1223,9 @@ public class PortletPersistenceImpl extends BasePersistenceImpl<Portlet>
 	 */
 	@Override
 	public Portlet fetchByPrimaryKey(Serializable primaryKey) {
-		Serializable serializable = EntityCacheUtil.getResult(PortletModelImpl.ENTITY_CACHE_ENABLED,
-				PortletImpl.class, primaryKey);
+		Serializable serializable = EntityCacheUtil.getResult(
+			PortletModelImpl.ENTITY_CACHE_ENABLED, PortletImpl.class,
+			primaryKey);
 
 		if (serializable == nullModel) {
 			return null;
@@ -1235,13 +1245,15 @@ public class PortletPersistenceImpl extends BasePersistenceImpl<Portlet>
 					cacheResult(portlet);
 				}
 				else {
-					EntityCacheUtil.putResult(PortletModelImpl.ENTITY_CACHE_ENABLED,
+					EntityCacheUtil.putResult(
+						PortletModelImpl.ENTITY_CACHE_ENABLED,
 						PortletImpl.class, primaryKey, nullModel);
 				}
 			}
 			catch (Exception e) {
-				EntityCacheUtil.removeResult(PortletModelImpl.ENTITY_CACHE_ENABLED,
-					PortletImpl.class, primaryKey);
+				EntityCacheUtil.removeResult(
+					PortletModelImpl.ENTITY_CACHE_ENABLED, PortletImpl.class,
+					primaryKey);
 
 				throw processException(e);
 			}
@@ -1267,6 +1279,7 @@ public class PortletPersistenceImpl extends BasePersistenceImpl<Portlet>
 	@Override
 	public Map<Serializable, Portlet> fetchByPrimaryKeys(
 		Set<Serializable> primaryKeys) {
+
 		if (primaryKeys.isEmpty()) {
 			return Collections.emptyMap();
 		}
@@ -1290,8 +1303,9 @@ public class PortletPersistenceImpl extends BasePersistenceImpl<Portlet>
 		Set<Serializable> uncachedPrimaryKeys = null;
 
 		for (Serializable primaryKey : primaryKeys) {
-			Serializable serializable = EntityCacheUtil.getResult(PortletModelImpl.ENTITY_CACHE_ENABLED,
-					PortletImpl.class, primaryKey);
+			Serializable serializable = EntityCacheUtil.getResult(
+				PortletModelImpl.ENTITY_CACHE_ENABLED, PortletImpl.class,
+				primaryKey);
 
 			if (serializable != nullModel) {
 				if (serializable == null) {
@@ -1311,8 +1325,8 @@ public class PortletPersistenceImpl extends BasePersistenceImpl<Portlet>
 			return map;
 		}
 
-		StringBundler query = new StringBundler((uncachedPrimaryKeys.size() * 2) +
-				1);
+		StringBundler query = new StringBundler(
+			uncachedPrimaryKeys.size() * 2 + 1);
 
 		query.append(_SQL_SELECT_PORTLET_WHERE_PKS_IN);
 
@@ -1344,8 +1358,9 @@ public class PortletPersistenceImpl extends BasePersistenceImpl<Portlet>
 			}
 
 			for (Serializable primaryKey : uncachedPrimaryKeys) {
-				EntityCacheUtil.putResult(PortletModelImpl.ENTITY_CACHE_ENABLED,
-					PortletImpl.class, primaryKey, nullModel);
+				EntityCacheUtil.putResult(
+					PortletModelImpl.ENTITY_CACHE_ENABLED, PortletImpl.class,
+					primaryKey, nullModel);
 			}
 		}
 		catch (Exception e) {
@@ -1372,7 +1387,7 @@ public class PortletPersistenceImpl extends BasePersistenceImpl<Portlet>
 	 * Returns a range of all the portlets.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link PortletModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>PortletModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param start the lower bound of the range of portlets
@@ -1388,7 +1403,7 @@ public class PortletPersistenceImpl extends BasePersistenceImpl<Portlet>
 	 * Returns an ordered range of all the portlets.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link PortletModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>PortletModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param start the lower bound of the range of portlets
@@ -1397,8 +1412,9 @@ public class PortletPersistenceImpl extends BasePersistenceImpl<Portlet>
 	 * @return the ordered range of portlets
 	 */
 	@Override
-	public List<Portlet> findAll(int start, int end,
-		OrderByComparator<Portlet> orderByComparator) {
+	public List<Portlet> findAll(
+		int start, int end, OrderByComparator<Portlet> orderByComparator) {
+
 		return findAll(start, end, orderByComparator, true);
 	}
 
@@ -1406,7 +1422,7 @@ public class PortletPersistenceImpl extends BasePersistenceImpl<Portlet>
 	 * Returns an ordered range of all the portlets.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link PortletModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>PortletModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param start the lower bound of the range of portlets
@@ -1416,28 +1432,31 @@ public class PortletPersistenceImpl extends BasePersistenceImpl<Portlet>
 	 * @return the ordered range of portlets
 	 */
 	@Override
-	public List<Portlet> findAll(int start, int end,
-		OrderByComparator<Portlet> orderByComparator, boolean retrieveFromCache) {
+	public List<Portlet> findAll(
+		int start, int end, OrderByComparator<Portlet> orderByComparator,
+		boolean retrieveFromCache) {
+
 		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
-				(orderByComparator == null)) {
+			(orderByComparator == null)) {
+
 			pagination = false;
-			finderPath = FINDER_PATH_WITHOUT_PAGINATION_FIND_ALL;
+			finderPath = _finderPathWithoutPaginationFindAll;
 			finderArgs = FINDER_ARGS_EMPTY;
 		}
 		else {
-			finderPath = FINDER_PATH_WITH_PAGINATION_FIND_ALL;
-			finderArgs = new Object[] { start, end, orderByComparator };
+			finderPath = _finderPathWithPaginationFindAll;
+			finderArgs = new Object[] {start, end, orderByComparator};
 		}
 
 		List<Portlet> list = null;
 
 		if (retrieveFromCache) {
-			list = (List<Portlet>)FinderCacheUtil.getResult(finderPath,
-					finderArgs, this);
+			list = (List<Portlet>)FinderCacheUtil.getResult(
+				finderPath, finderArgs, this);
 		}
 
 		if (list == null) {
@@ -1445,13 +1464,13 @@ public class PortletPersistenceImpl extends BasePersistenceImpl<Portlet>
 			String sql = null;
 
 			if (orderByComparator != null) {
-				query = new StringBundler(2 +
-						(orderByComparator.getOrderByFields().length * 2));
+				query = new StringBundler(
+					2 + (orderByComparator.getOrderByFields().length * 2));
 
 				query.append(_SQL_SELECT_PORTLET);
 
-				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
-					orderByComparator);
+				appendOrderByComparator(
+					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
 
 				sql = query.toString();
 			}
@@ -1471,16 +1490,16 @@ public class PortletPersistenceImpl extends BasePersistenceImpl<Portlet>
 				Query q = session.createQuery(sql);
 
 				if (!pagination) {
-					list = (List<Portlet>)QueryUtil.list(q, getDialect(),
-							start, end, false);
+					list = (List<Portlet>)QueryUtil.list(
+						q, getDialect(), start, end, false);
 
 					Collections.sort(list);
 
 					list = Collections.unmodifiableList(list);
 				}
 				else {
-					list = (List<Portlet>)QueryUtil.list(q, getDialect(),
-							start, end);
+					list = (List<Portlet>)QueryUtil.list(
+						q, getDialect(), start, end);
 				}
 
 				cacheResult(list);
@@ -1518,8 +1537,8 @@ public class PortletPersistenceImpl extends BasePersistenceImpl<Portlet>
 	 */
 	@Override
 	public int countAll() {
-		Long count = (Long)FinderCacheUtil.getResult(FINDER_PATH_COUNT_ALL,
-				FINDER_ARGS_EMPTY, this);
+		Long count = (Long)FinderCacheUtil.getResult(
+			_finderPathCountAll, FINDER_ARGS_EMPTY, this);
 
 		if (count == null) {
 			Session session = null;
@@ -1531,12 +1550,12 @@ public class PortletPersistenceImpl extends BasePersistenceImpl<Portlet>
 
 				count = (Long)q.uniqueResult();
 
-				FinderCacheUtil.putResult(FINDER_PATH_COUNT_ALL,
-					FINDER_ARGS_EMPTY, count);
+				FinderCacheUtil.putResult(
+					_finderPathCountAll, FINDER_ARGS_EMPTY, count);
 			}
 			catch (Exception e) {
-				FinderCacheUtil.removeResult(FINDER_PATH_COUNT_ALL,
-					FINDER_ARGS_EMPTY);
+				FinderCacheUtil.removeResult(
+					_finderPathCountAll, FINDER_ARGS_EMPTY);
 
 				throw processException(e);
 			}
@@ -1562,6 +1581,58 @@ public class PortletPersistenceImpl extends BasePersistenceImpl<Portlet>
 	 * Initializes the portlet persistence.
 	 */
 	public void afterPropertiesSet() {
+		_finderPathWithPaginationFindAll = new FinderPath(
+			PortletModelImpl.ENTITY_CACHE_ENABLED,
+			PortletModelImpl.FINDER_CACHE_ENABLED, PortletImpl.class,
+			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findAll", new String[0]);
+
+		_finderPathWithoutPaginationFindAll = new FinderPath(
+			PortletModelImpl.ENTITY_CACHE_ENABLED,
+			PortletModelImpl.FINDER_CACHE_ENABLED, PortletImpl.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findAll",
+			new String[0]);
+
+		_finderPathCountAll = new FinderPath(
+			PortletModelImpl.ENTITY_CACHE_ENABLED,
+			PortletModelImpl.FINDER_CACHE_ENABLED, Long.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countAll",
+			new String[0]);
+
+		_finderPathWithPaginationFindByCompanyId = new FinderPath(
+			PortletModelImpl.ENTITY_CACHE_ENABLED,
+			PortletModelImpl.FINDER_CACHE_ENABLED, PortletImpl.class,
+			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByCompanyId",
+			new String[] {
+				Long.class.getName(), Integer.class.getName(),
+				Integer.class.getName(), OrderByComparator.class.getName()
+			});
+
+		_finderPathWithoutPaginationFindByCompanyId = new FinderPath(
+			PortletModelImpl.ENTITY_CACHE_ENABLED,
+			PortletModelImpl.FINDER_CACHE_ENABLED, PortletImpl.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByCompanyId",
+			new String[] {Long.class.getName()},
+			PortletModelImpl.COMPANYID_COLUMN_BITMASK);
+
+		_finderPathCountByCompanyId = new FinderPath(
+			PortletModelImpl.ENTITY_CACHE_ENABLED,
+			PortletModelImpl.FINDER_CACHE_ENABLED, Long.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByCompanyId",
+			new String[] {Long.class.getName()});
+
+		_finderPathFetchByC_P = new FinderPath(
+			PortletModelImpl.ENTITY_CACHE_ENABLED,
+			PortletModelImpl.FINDER_CACHE_ENABLED, PortletImpl.class,
+			FINDER_CLASS_NAME_ENTITY, "fetchByC_P",
+			new String[] {Long.class.getName(), String.class.getName()},
+			PortletModelImpl.COMPANYID_COLUMN_BITMASK |
+			PortletModelImpl.PORTLETID_COLUMN_BITMASK);
+
+		_finderPathCountByC_P = new FinderPath(
+			PortletModelImpl.ENTITY_CACHE_ENABLED,
+			PortletModelImpl.FINDER_CACHE_ENABLED, Long.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByC_P",
+			new String[] {Long.class.getName(), String.class.getName()});
 	}
 
 	public void destroy() {
@@ -1573,16 +1644,34 @@ public class PortletPersistenceImpl extends BasePersistenceImpl<Portlet>
 
 	@BeanReference(type = CompanyProviderWrapper.class)
 	protected CompanyProvider companyProvider;
-	private static final String _SQL_SELECT_PORTLET = "SELECT portlet FROM Portlet portlet";
-	private static final String _SQL_SELECT_PORTLET_WHERE_PKS_IN = "SELECT portlet FROM Portlet portlet WHERE id_ IN (";
-	private static final String _SQL_SELECT_PORTLET_WHERE = "SELECT portlet FROM Portlet portlet WHERE ";
-	private static final String _SQL_COUNT_PORTLET = "SELECT COUNT(portlet) FROM Portlet portlet";
-	private static final String _SQL_COUNT_PORTLET_WHERE = "SELECT COUNT(portlet) FROM Portlet portlet WHERE ";
+
+	private static final String _SQL_SELECT_PORTLET =
+		"SELECT portlet FROM Portlet portlet";
+
+	private static final String _SQL_SELECT_PORTLET_WHERE_PKS_IN =
+		"SELECT portlet FROM Portlet portlet WHERE id_ IN (";
+
+	private static final String _SQL_SELECT_PORTLET_WHERE =
+		"SELECT portlet FROM Portlet portlet WHERE ";
+
+	private static final String _SQL_COUNT_PORTLET =
+		"SELECT COUNT(portlet) FROM Portlet portlet";
+
+	private static final String _SQL_COUNT_PORTLET_WHERE =
+		"SELECT COUNT(portlet) FROM Portlet portlet WHERE ";
+
 	private static final String _ORDER_BY_ENTITY_ALIAS = "portlet.";
-	private static final String _NO_SUCH_ENTITY_WITH_PRIMARY_KEY = "No Portlet exists with the primary key ";
-	private static final String _NO_SUCH_ENTITY_WITH_KEY = "No Portlet exists with the key {";
-	private static final Log _log = LogFactoryUtil.getLog(PortletPersistenceImpl.class);
-	private static final Set<String> _badColumnNames = SetUtil.fromArray(new String[] {
-				"id", "active"
-			});
+
+	private static final String _NO_SUCH_ENTITY_WITH_PRIMARY_KEY =
+		"No Portlet exists with the primary key ";
+
+	private static final String _NO_SUCH_ENTITY_WITH_KEY =
+		"No Portlet exists with the key {";
+
+	private static final Log _log = LogFactoryUtil.getLog(
+		PortletPersistenceImpl.class);
+
+	private static final Set<String> _badColumnNames = SetUtil.fromArray(
+		new String[] {"id", "active"});
+
 }

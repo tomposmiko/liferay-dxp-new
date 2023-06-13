@@ -51,8 +51,7 @@ import com.liferay.portal.kernel.util.Constants;
 import com.liferay.portal.kernel.util.ContentTypes;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
-import com.liferay.portal.kernel.util.ResourceBundleLoader;
-import com.liferay.portal.kernel.util.ResourceBundleLoaderUtil;
+import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.kernel.workflow.WorkflowHandlerRegistryUtil;
@@ -456,10 +455,11 @@ public class DDMFormInstanceRecordLocalServiceImpl
 				formInstanceRecordVersion.getFormInstanceRecordId());
 
 		if (status == WorkflowConstants.STATUS_APPROVED) {
-			if (DLUtil.compareVersions(
-					formInstanceRecord.getVersion(),
-					formInstanceRecordVersion.getVersion()) <= 0) {
+			int value = DLUtil.compareVersions(
+				formInstanceRecord.getVersion(),
+				formInstanceRecordVersion.getVersion());
 
+			if (value <= 0) {
 				formInstanceRecord.setVersionUserId(
 					formInstanceRecordVersion.getUserId());
 				formInstanceRecord.setVersionUserName(
@@ -552,10 +552,7 @@ public class DDMFormInstanceRecordLocalServiceImpl
 	}
 
 	protected Indexer<DDMFormInstanceRecord> getDDMFormInstanceRecordIndexer() {
-		Indexer<DDMFormInstanceRecord> indexer =
-			indexerRegistry.nullSafeGetIndexer(DDMFormInstanceRecord.class);
-
-		return indexer;
+		return indexerRegistry.nullSafeGetIndexer(DDMFormInstanceRecord.class);
 	}
 
 	protected List<DDMFormInstanceRecord> getFormInstanceRecords(Hits hits)
@@ -615,10 +612,7 @@ public class DDMFormInstanceRecordLocalServiceImpl
 	}
 
 	protected ResourceBundle getResourceBundle(Locale defaultLocale) {
-		ResourceBundleLoader portalResourceBundleLoader =
-			ResourceBundleLoaderUtil.getPortalResourceBundleLoader();
-
-		return portalResourceBundleLoader.loadResourceBundle(defaultLocale);
+		return PortalUtil.getResourceBundle(defaultLocale);
 	}
 
 	protected boolean isEmailNotificationEnabled(

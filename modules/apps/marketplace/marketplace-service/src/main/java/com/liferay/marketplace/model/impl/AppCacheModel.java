@@ -17,7 +17,6 @@ package com.liferay.marketplace.model.impl;
 import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.marketplace.model.App;
-
 import com.liferay.portal.kernel.model.CacheModel;
 import com.liferay.portal.kernel.util.HashUtil;
 import com.liferay.portal.kernel.util.StringBundler;
@@ -33,11 +32,11 @@ import java.util.Date;
  * The cache model class for representing App in entity cache.
  *
  * @author Ryan Park
- * @see App
  * @generated
  */
 @ProviderType
 public class AppCacheModel implements CacheModel<App>, Externalizable {
+
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj) {
@@ -203,8 +202,7 @@ public class AppCacheModel implements CacheModel<App>, Externalizable {
 	}
 
 	@Override
-	public void writeExternal(ObjectOutput objectOutput)
-		throws IOException {
+	public void writeExternal(ObjectOutput objectOutput) throws IOException {
 		if (uuid == null) {
 			objectOutput.writeUTF("");
 		}
@@ -282,4 +280,5 @@ public class AppCacheModel implements CacheModel<App>, Externalizable {
 	public String iconURL;
 	public String version;
 	public boolean required;
+
 }

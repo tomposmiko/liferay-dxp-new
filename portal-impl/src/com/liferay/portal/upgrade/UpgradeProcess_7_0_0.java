@@ -43,7 +43,7 @@ import com.liferay.portal.upgrade.v7_0_0.UpgradeOrganization;
 import com.liferay.portal.upgrade.v7_0_0.UpgradePhone;
 import com.liferay.portal.upgrade.v7_0_0.UpgradePortalPreferences;
 import com.liferay.portal.upgrade.v7_0_0.UpgradePortletDisplayTemplatePreferences;
-import com.liferay.portal.upgrade.v7_0_0.UpgradePortletId;
+import com.liferay.portal.upgrade.v7_0_0.UpgradePortletIds;
 import com.liferay.portal.upgrade.v7_0_0.UpgradePostgreSQL;
 import com.liferay.portal.upgrade.v7_0_0.UpgradeRatings;
 import com.liferay.portal.upgrade.v7_0_0.UpgradeRelease;
@@ -73,11 +73,11 @@ public class UpgradeProcess_7_0_0 extends UpgradeProcess {
 
 	@Override
 	protected void doUpgrade() throws Exception {
+		upgrade(new UpgradeSharding());
+
 		upgrade(new UpgradeSchema());
 
 		upgrade(new UpgradeKernelPackage());
-
-		upgrade(new UpgradeSharding());
 
 		upgrade(new UpgradeAddress());
 		upgrade(new UpgradeAsset());
@@ -103,7 +103,7 @@ public class UpgradeProcess_7_0_0 extends UpgradeProcess {
 		upgrade(new UpgradePhone());
 		upgrade(new UpgradePortalPreferences());
 		upgrade(new UpgradePortletDisplayTemplatePreferences());
-		upgrade(new UpgradePortletId());
+		upgrade(new UpgradePortletIds());
 		upgrade(new UpgradePostgreSQL());
 		upgrade(new UpgradeRatings());
 		upgrade(new UpgradeRelease());

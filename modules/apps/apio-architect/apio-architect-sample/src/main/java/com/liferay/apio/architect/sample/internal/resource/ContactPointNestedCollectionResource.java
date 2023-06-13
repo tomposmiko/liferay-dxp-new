@@ -41,8 +41,8 @@ public class ContactPointNestedCollectionResource
 		NestedCollectionRoutes.Builder<ContactPoint, Long, Long> builder) {
 
 		return builder.addGetter(
-			(pagination, id) ->
-				_contactPointActionRouter.retrieve(id, pagination)
+			(pagination, id) -> _contactPointActionRouter.retrieve(
+				id, pagination)
 		).build();
 	}
 

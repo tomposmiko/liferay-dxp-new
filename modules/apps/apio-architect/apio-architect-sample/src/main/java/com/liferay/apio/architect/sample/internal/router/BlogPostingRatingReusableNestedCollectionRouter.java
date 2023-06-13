@@ -41,10 +41,10 @@ public class BlogPostingRatingReusableNestedCollectionRouter
 		<BlogPosting, Long, BlogPostingIdentifier, RatingIdentifier> {
 
 	@Override
-	public NestedCollectionRoutes
-		<BlogPosting, Long, RatingIdentifier> collectionRoutes(
-			NestedCollectionRoutes.Builder
-				<BlogPosting, Long, RatingIdentifier> builder) {
+	public NestedCollectionRoutes<BlogPosting, Long, RatingIdentifier>
+		collectionRoutes(
+			NestedCollectionRoutes.Builder<BlogPosting, Long, RatingIdentifier>
+				builder) {
 
 		return builder.addGetter(
 			(pagination, id) -> {
@@ -68,7 +68,8 @@ public class BlogPostingRatingReusableNestedCollectionRouter
 				);
 
 				return new PageItems<>(blogPostings, blogPostings.size());
-			}).build();
+			}
+		).build();
 	}
 
 	@Reference

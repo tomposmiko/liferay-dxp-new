@@ -17,7 +17,6 @@ package com.liferay.journal.model;
 import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.expando.kernel.model.ExpandoBridge;
-
 import com.liferay.portal.kernel.model.ModelWrapper;
 import com.liferay.portal.kernel.service.ServiceContext;
 
@@ -39,9 +38,11 @@ import java.util.Objects;
 @ProviderType
 public class JournalArticleLocalizationWrapper
 	implements JournalArticleLocalization,
-		ModelWrapper<JournalArticleLocalization> {
+			   ModelWrapper<JournalArticleLocalization> {
+
 	public JournalArticleLocalizationWrapper(
 		JournalArticleLocalization journalArticleLocalization) {
+
 		_journalArticleLocalization = journalArticleLocalization;
 	}
 
@@ -72,7 +73,7 @@ public class JournalArticleLocalizationWrapper
 	@Override
 	public void setModelAttributes(Map<String, Object> attributes) {
 		Long articleLocalizationId = (Long)attributes.get(
-				"articleLocalizationId");
+			"articleLocalizationId");
 
 		if (articleLocalizationId != null) {
 			setArticleLocalizationId(articleLocalizationId);
@@ -111,49 +112,53 @@ public class JournalArticleLocalizationWrapper
 
 	@Override
 	public Object clone() {
-		return new JournalArticleLocalizationWrapper((JournalArticleLocalization)_journalArticleLocalization.clone());
+		return new JournalArticleLocalizationWrapper(
+			(JournalArticleLocalization)_journalArticleLocalization.clone());
 	}
 
 	@Override
-	public int compareTo(JournalArticleLocalization journalArticleLocalization) {
-		return _journalArticleLocalization.compareTo(journalArticleLocalization);
+	public int compareTo(
+		JournalArticleLocalization journalArticleLocalization) {
+
+		return _journalArticleLocalization.compareTo(
+			journalArticleLocalization);
 	}
 
 	/**
-	* Returns the article localization ID of this journal article localization.
-	*
-	* @return the article localization ID of this journal article localization
-	*/
+	 * Returns the article localization ID of this journal article localization.
+	 *
+	 * @return the article localization ID of this journal article localization
+	 */
 	@Override
 	public long getArticleLocalizationId() {
 		return _journalArticleLocalization.getArticleLocalizationId();
 	}
 
 	/**
-	* Returns the article pk of this journal article localization.
-	*
-	* @return the article pk of this journal article localization
-	*/
+	 * Returns the article pk of this journal article localization.
+	 *
+	 * @return the article pk of this journal article localization
+	 */
 	@Override
 	public long getArticlePK() {
 		return _journalArticleLocalization.getArticlePK();
 	}
 
 	/**
-	* Returns the company ID of this journal article localization.
-	*
-	* @return the company ID of this journal article localization
-	*/
+	 * Returns the company ID of this journal article localization.
+	 *
+	 * @return the company ID of this journal article localization
+	 */
 	@Override
 	public long getCompanyId() {
 		return _journalArticleLocalization.getCompanyId();
 	}
 
 	/**
-	* Returns the description of this journal article localization.
-	*
-	* @return the description of this journal article localization
-	*/
+	 * Returns the description of this journal article localization.
+	 *
+	 * @return the description of this journal article localization
+	 */
 	@Override
 	public String getDescription() {
 		return _journalArticleLocalization.getDescription();
@@ -165,20 +170,20 @@ public class JournalArticleLocalizationWrapper
 	}
 
 	/**
-	* Returns the language ID of this journal article localization.
-	*
-	* @return the language ID of this journal article localization
-	*/
+	 * Returns the language ID of this journal article localization.
+	 *
+	 * @return the language ID of this journal article localization
+	 */
 	@Override
 	public String getLanguageId() {
 		return _journalArticleLocalization.getLanguageId();
 	}
 
 	/**
-	* Returns the primary key of this journal article localization.
-	*
-	* @return the primary key of this journal article localization
-	*/
+	 * Returns the primary key of this journal article localization.
+	 *
+	 * @return the primary key of this journal article localization
+	 */
 	@Override
 	public long getPrimaryKey() {
 		return _journalArticleLocalization.getPrimaryKey();
@@ -190,10 +195,10 @@ public class JournalArticleLocalizationWrapper
 	}
 
 	/**
-	* Returns the title of this journal article localization.
-	*
-	* @return the title of this journal article localization
-	*/
+	 * Returns the title of this journal article localization.
+	 *
+	 * @return the title of this journal article localization
+	 */
 	@Override
 	public String getTitle() {
 		return _journalArticleLocalization.getTitle();
@@ -220,20 +225,21 @@ public class JournalArticleLocalizationWrapper
 	}
 
 	/**
-	* Sets the article localization ID of this journal article localization.
-	*
-	* @param articleLocalizationId the article localization ID of this journal article localization
-	*/
+	 * Sets the article localization ID of this journal article localization.
+	 *
+	 * @param articleLocalizationId the article localization ID of this journal article localization
+	 */
 	@Override
 	public void setArticleLocalizationId(long articleLocalizationId) {
-		_journalArticleLocalization.setArticleLocalizationId(articleLocalizationId);
+		_journalArticleLocalization.setArticleLocalizationId(
+			articleLocalizationId);
 	}
 
 	/**
-	* Sets the article pk of this journal article localization.
-	*
-	* @param articlePK the article pk of this journal article localization
-	*/
+	 * Sets the article pk of this journal article localization.
+	 *
+	 * @param articlePK the article pk of this journal article localization
+	 */
 	@Override
 	public void setArticlePK(long articlePK) {
 		_journalArticleLocalization.setArticlePK(articlePK);
@@ -245,20 +251,20 @@ public class JournalArticleLocalizationWrapper
 	}
 
 	/**
-	* Sets the company ID of this journal article localization.
-	*
-	* @param companyId the company ID of this journal article localization
-	*/
+	 * Sets the company ID of this journal article localization.
+	 *
+	 * @param companyId the company ID of this journal article localization
+	 */
 	@Override
 	public void setCompanyId(long companyId) {
 		_journalArticleLocalization.setCompanyId(companyId);
 	}
 
 	/**
-	* Sets the description of this journal article localization.
-	*
-	* @param description the description of this journal article localization
-	*/
+	 * Sets the description of this journal article localization.
+	 *
+	 * @param description the description of this journal article localization
+	 */
 	@Override
 	public void setDescription(String description) {
 		_journalArticleLocalization.setDescription(description);
@@ -267,6 +273,7 @@ public class JournalArticleLocalizationWrapper
 	@Override
 	public void setExpandoBridgeAttributes(
 		com.liferay.portal.kernel.model.BaseModel<?> baseModel) {
+
 		_journalArticleLocalization.setExpandoBridgeAttributes(baseModel);
 	}
 
@@ -281,10 +288,10 @@ public class JournalArticleLocalizationWrapper
 	}
 
 	/**
-	* Sets the language ID of this journal article localization.
-	*
-	* @param languageId the language ID of this journal article localization
-	*/
+	 * Sets the language ID of this journal article localization.
+	 *
+	 * @param languageId the language ID of this journal article localization
+	 */
 	@Override
 	public void setLanguageId(String languageId) {
 		_journalArticleLocalization.setLanguageId(languageId);
@@ -296,10 +303,10 @@ public class JournalArticleLocalizationWrapper
 	}
 
 	/**
-	* Sets the primary key of this journal article localization.
-	*
-	* @param primaryKey the primary key of this journal article localization
-	*/
+	 * Sets the primary key of this journal article localization.
+	 *
+	 * @param primaryKey the primary key of this journal article localization
+	 */
 	@Override
 	public void setPrimaryKey(long primaryKey) {
 		_journalArticleLocalization.setPrimaryKey(primaryKey);
@@ -311,23 +318,26 @@ public class JournalArticleLocalizationWrapper
 	}
 
 	/**
-	* Sets the title of this journal article localization.
-	*
-	* @param title the title of this journal article localization
-	*/
+	 * Sets the title of this journal article localization.
+	 *
+	 * @param title the title of this journal article localization
+	 */
 	@Override
 	public void setTitle(String title) {
 		_journalArticleLocalization.setTitle(title);
 	}
 
 	@Override
-	public com.liferay.portal.kernel.model.CacheModel<JournalArticleLocalization> toCacheModel() {
+	public com.liferay.portal.kernel.model.CacheModel
+		<JournalArticleLocalization> toCacheModel() {
+
 		return _journalArticleLocalization.toCacheModel();
 	}
 
 	@Override
 	public JournalArticleLocalization toEscapedModel() {
-		return new JournalArticleLocalizationWrapper(_journalArticleLocalization.toEscapedModel());
+		return new JournalArticleLocalizationWrapper(
+			_journalArticleLocalization.toEscapedModel());
 	}
 
 	@Override
@@ -337,7 +347,8 @@ public class JournalArticleLocalizationWrapper
 
 	@Override
 	public JournalArticleLocalization toUnescapedModel() {
-		return new JournalArticleLocalizationWrapper(_journalArticleLocalization.toUnescapedModel());
+		return new JournalArticleLocalizationWrapper(
+			_journalArticleLocalization.toUnescapedModel());
 	}
 
 	@Override
@@ -355,10 +366,14 @@ public class JournalArticleLocalizationWrapper
 			return false;
 		}
 
-		JournalArticleLocalizationWrapper journalArticleLocalizationWrapper = (JournalArticleLocalizationWrapper)obj;
+		JournalArticleLocalizationWrapper journalArticleLocalizationWrapper =
+			(JournalArticleLocalizationWrapper)obj;
 
-		if (Objects.equals(_journalArticleLocalization,
-					journalArticleLocalizationWrapper._journalArticleLocalization)) {
+		if (Objects.equals(
+				_journalArticleLocalization,
+				journalArticleLocalizationWrapper.
+					_journalArticleLocalization)) {
+
 			return true;
 		}
 
@@ -386,4 +401,5 @@ public class JournalArticleLocalizationWrapper
 	}
 
 	private final JournalArticleLocalization _journalArticleLocalization;
+
 }

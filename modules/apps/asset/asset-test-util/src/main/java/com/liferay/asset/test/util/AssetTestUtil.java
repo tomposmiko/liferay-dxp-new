@@ -39,7 +39,7 @@ import java.util.Locale;
 import java.util.Map;
 
 /**
- * @author Mate Thurzo
+ * @author Máté Thurzó
  */
 public class AssetTestUtil {
 
@@ -149,11 +149,9 @@ public class AssetTestUtil {
 			ServiceContextTestUtil.getServiceContext(
 				groupId, TestPropsValues.getUserId());
 
-		AssetVocabulary vocabulary = AssetVocabularyServiceUtil.addVocabulary(
+		return AssetVocabularyServiceUtil.addVocabulary(
 			groupId, RandomTestUtil.randomString(), titleMap, descriptionMap,
 			vocabularySettingsHelper.toString(), serviceContext);
-
-		return vocabulary;
 	}
 
 }

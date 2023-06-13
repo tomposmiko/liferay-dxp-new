@@ -24,20 +24,20 @@ import com.liferay.portal.kernel.util.Accessor;
  *
  * @author Brian Wing Shun Chan
  * @see LayoutRevisionModel
- * @see com.liferay.portal.model.impl.LayoutRevisionImpl
- * @see com.liferay.portal.model.impl.LayoutRevisionModelImpl
  * @generated
  */
 @ImplementationClassName("com.liferay.portal.model.impl.LayoutRevisionImpl")
 @ProviderType
 public interface LayoutRevision extends LayoutRevisionModel, PersistedModel {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
-	 * Never modify this interface directly. Add methods to {@link com.liferay.portal.model.impl.LayoutRevisionImpl} and rerun ServiceBuilder to automatically copy the method declarations to this interface.
+	 * Never modify this interface directly. Add methods to <code>com.liferay.portal.model.impl.LayoutRevisionImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
 	 */
-	public static final Accessor<LayoutRevision, Long> LAYOUT_REVISION_ID_ACCESSOR =
-		new Accessor<LayoutRevision, Long>() {
+	public static final Accessor<LayoutRevision, Long>
+		LAYOUT_REVISION_ID_ACCESSOR = new Accessor<LayoutRevision, Long>() {
+
 			@Override
 			public Long get(LayoutRevision layoutRevision) {
 				return layoutRevision.getLayoutRevisionId();
@@ -52,6 +52,7 @@ public interface LayoutRevision extends LayoutRevisionModel, PersistedModel {
 			public Class<LayoutRevision> getTypeClass() {
 				return LayoutRevision.class;
 			}
+
 		};
 
 	public java.util.List<LayoutRevision> getChildren();
@@ -82,7 +83,8 @@ public interface LayoutRevision extends LayoutRevisionModel, PersistedModel {
 
 	public String getThemeSetting(String key, String device);
 
-	public com.liferay.portal.kernel.util.UnicodeProperties getTypeSettingsProperties();
+	public com.liferay.portal.kernel.util.UnicodeProperties
+		getTypeSettingsProperties();
 
 	public String getTypeSettingsProperty(String key);
 
@@ -97,5 +99,7 @@ public interface LayoutRevision extends LayoutRevisionModel, PersistedModel {
 	public boolean isInheritLookAndFeel();
 
 	public void setTypeSettingsProperties(
-		com.liferay.portal.kernel.util.UnicodeProperties typeSettingsProperties);
+		com.liferay.portal.kernel.util.UnicodeProperties
+			typeSettingsProperties);
+
 }

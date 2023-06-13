@@ -43,9 +43,7 @@ public class UpgradeLayout extends UpgradeProcess {
 
 			try (ResultSet rs = ps.executeQuery()) {
 				while (rs.next()) {
-					long groupId = rs.getLong("groupId");
-
-					return groupId;
+					return rs.getLong("groupId");
 				}
 			}
 		}

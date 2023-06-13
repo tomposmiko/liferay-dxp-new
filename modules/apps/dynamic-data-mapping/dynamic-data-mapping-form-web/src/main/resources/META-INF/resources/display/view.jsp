@@ -24,9 +24,11 @@ long formInstanceId = ddmFormDisplayContext.getFormInstanceId();
 
 <c:choose>
 	<c:when test="<%= formInstanceId == 0 %>">
-		<div class="alert alert-info">
-			<liferay-ui:message key="select-an-existing-form-or-add-a-form-to-be-displayed-in-this-application" />
-		</div>
+		<c:if test="<%= !ddmFormDisplayContext.isContentPage() %>">
+			<div class="alert alert-info">
+				<liferay-ui:message key="select-an-existing-form-or-add-a-form-to-be-displayed-in-this-application" />
+			</div>
+		</c:if>
 	</c:when>
 	<c:otherwise>
 

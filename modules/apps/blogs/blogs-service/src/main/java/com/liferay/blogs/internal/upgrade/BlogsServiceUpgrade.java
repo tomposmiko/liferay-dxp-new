@@ -19,6 +19,7 @@ import com.liferay.blogs.internal.upgrade.v1_1_0.UpgradeFriendlyURL;
 import com.liferay.blogs.internal.upgrade.v1_1_1.UpgradeUrlTitle;
 import com.liferay.blogs.internal.upgrade.v1_1_2.UpgradeBlogsImages;
 import com.liferay.friendly.url.service.FriendlyURLEntryLocalService;
+import com.liferay.portal.kernel.module.framework.ModuleServiceLifecycle;
 import com.liferay.portal.kernel.portletfilerepository.PortletFileRepository;
 import com.liferay.portal.kernel.service.ImageLocalService;
 import com.liferay.portal.upgrade.registry.UpgradeStepRegistrator;
@@ -52,6 +53,9 @@ public class BlogsServiceUpgrade implements UpgradeStepRegistrator {
 
 	@Reference
 	private ImageLocalService _imageLocalService;
+
+	@Reference(target = ModuleServiceLifecycle.PORTAL_INITIALIZED, unbind = "-")
+	private ModuleServiceLifecycle _moduleServiceLifecycle;
 
 	@Reference
 	private PortletFileRepository _portletFileRepository;

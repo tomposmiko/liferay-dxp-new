@@ -33,7 +33,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 /**
- * @author Eduardo Perez
+ * @author Eduardo Pérez
  */
 @RunWith(Arquillian.class)
 public class AssetTagPersistenceTest {

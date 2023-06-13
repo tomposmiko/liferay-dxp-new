@@ -32,34 +32,39 @@ import com.liferay.portal.kernel.transaction.Transactional;
  *
  * @author Brian Wing Shun Chan
  * @see DLTrashLocalServiceUtil
- * @see com.liferay.portlet.documentlibrary.service.base.DLTrashLocalServiceBaseImpl
- * @see com.liferay.portlet.documentlibrary.service.impl.DLTrashLocalServiceImpl
  * @generated
  */
 @ProviderType
-@Transactional(isolation = Isolation.PORTAL, rollbackFor =  {
-	PortalException.class, SystemException.class})
+@Transactional(
+	isolation = Isolation.PORTAL,
+	rollbackFor = {PortalException.class, SystemException.class}
+)
 public interface DLTrashLocalService extends BaseLocalService {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
-	 * Never modify or reference this interface directly. Always use {@link DLTrashLocalServiceUtil} to access the dl trash local service. Add custom service methods to {@link com.liferay.portlet.documentlibrary.service.impl.DLTrashLocalServiceImpl} and rerun ServiceBuilder to automatically copy the method declarations to this interface.
+	 * Never modify or reference this interface directly. Always use {@link DLTrashLocalServiceUtil} to access the dl trash local service. Add custom service methods to <code>com.liferay.portlet.documentlibrary.service.impl.DLTrashLocalServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
 	 */
 
 	/**
-	* Returns the OSGi service identifier.
-	*
-	* @return the OSGi service identifier
-	*/
+	 * Returns the OSGi service identifier.
+	 *
+	 * @return the OSGi service identifier
+	 */
 	public String getOSGiServiceIdentifier();
 
-	public FileEntry moveFileEntryFromTrash(long userId, long repositoryId,
-		long fileEntryId, long newFolderId, ServiceContext serviceContext)
+	public FileEntry moveFileEntryFromTrash(
+			long userId, long repositoryId, long fileEntryId, long newFolderId,
+			ServiceContext serviceContext)
 		throws PortalException;
 
-	public FileEntry moveFileEntryToTrash(long userId, long repositoryId,
-		long fileEntryId) throws PortalException;
+	public FileEntry moveFileEntryToTrash(
+			long userId, long repositoryId, long fileEntryId)
+		throws PortalException;
 
-	public void restoreFileEntryFromTrash(long userId, long repositoryId,
-		long fileEntryId) throws PortalException;
+	public void restoreFileEntryFromTrash(
+			long userId, long repositoryId, long fileEntryId)
+		throws PortalException;
+
 }

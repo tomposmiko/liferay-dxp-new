@@ -32,12 +32,13 @@ import com.liferay.mail.reader.service.MessageLocalServiceUtil;
  * @generated
  */
 @ProviderType
-public abstract class MessageBaseImpl extends MessageModelImpl
-	implements Message {
+public abstract class MessageBaseImpl
+	extends MessageModelImpl implements Message {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
-	 * Never modify or reference this class directly. All methods that expect a message model instance should use the {@link Message} interface instead.
+	 * Never modify or reference this class directly. All methods that expect a message model instance should use the <code>Message</code> interface instead.
 	 */
 	@Override
 	public void persist() {
@@ -48,4 +49,5 @@ public abstract class MessageBaseImpl extends MessageModelImpl
 			MessageLocalServiceUtil.updateMessage(this);
 		}
 	}
+
 }

@@ -58,7 +58,15 @@
 					dir="${modules.dir}"
 				>
 					<include name="apps/*" />
+					<include name="private/apps/*" />
 					<exclude name="${build.exclude.dirs}" />
+					<present targetdir="${modules.dir}">
+						<mapper
+							from="*"
+							to="*/app.bnd"
+							type="glob"
+						/>
+					</present>
 				</dirset>
 			</path>
 
@@ -71,9 +79,12 @@
 				<property file="@{app.dir}/app.bnd" />
 
 				<if>
-					<not>
-						<equals arg1="${Liferay-Releng-Bundle}" arg2="true" />
-					</not>
+					<and>
+						<available file="@{app.dir}/app.bnd" />
+						<not>
+							<equals arg1="${Liferay-Releng-Bundle}" arg2="true" />
+						</not>
+					</and>
 					<then>
 						<ant inheritAll="false" target="delete-app">
 							<property name="app.name" value="${app.name}" />
@@ -477,6 +488,7 @@
 					<filetokenizer />
 					<replacestring from="${line.separator}" to=" " />
 					<replaceregex pattern="^ | $" replace="" />
+					<replaceregex pattern=".*(.{1000})" replace="[[trimmed]]\1" />
 				</tokenfilter>
 			</filterchain>
 		</loadfile>
@@ -502,12 +514,16 @@
 	</target>
 
 	<target depends="get-app-names-core" name="get-app-names" unless="app.names">
+		<condition else="Liferay-Releng-Suite:\s*[\w-]+$" property="liferay.releng.suite.pattern" value=".">
+			<istrue value="${include.standalone.apps}" />
+		</condition>
+
 		<pathconvert pathsep="," property="app.names">
 			<fileset
 				dir="${modules.dir}"
 			>
 				<contains casesensitive="false" ignorewhitespace="true" text="Liferay-Releng-Bundle: true" />
-				<containsregexp casesensitive="false" expression="Liferay-Releng-Suite:\s*[\w-]+$" multiline="true" />
+				<containsregexp casesensitive="false" expression="${liferay.releng.suite.pattern}" multiline="true" />
 				<include name="apps/**/app.bnd" />
 				<include name="private/apps/**/app.bnd" />
 				<present targetdir="${modules.dir}/.releng">
@@ -1036,12 +1052,21 @@
 		<echo append="true" file="${lpkg.dir}/liferay-marketplace.properties" message="icon-url=https://www.liferay.com/web/guest/marketplace/-/mp/asset/icon/71985553" />
 	</target>
 
-	<target depends="dist-module-artifacts,get-app-change-log" if="app.ticket.list" name="zip-app-sources">
+	<target depends="dist-module-artifacts,get-app-change-log,zip-app-sources-init" if="zip.app.sources" name="zip-app-sources">
 		<zip
 			basedir="${dist.dir}/sources"
 			destfile="${dist.dir}/${app.name}-${app.version}-sources.zip"
 		/>
 
 		<delete dir="${dist.dir}/sources" />
+	</target>
+
+	<target depends="get-app-change-log,init-build-app" name="zip-app-sources-init">
+		<condition property="zip.app.sources">
+			<and>
+				<isset property="app.ticket.list" />
+				<istrue value="${download.app.sources}" />
+			</and>
+		</condition>
 	</target>
 </project>

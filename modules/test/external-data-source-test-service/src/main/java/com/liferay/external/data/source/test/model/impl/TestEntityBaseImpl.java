@@ -32,12 +32,13 @@ import com.liferay.external.data.source.test.service.TestEntityLocalServiceUtil;
  * @generated
  */
 @ProviderType
-public abstract class TestEntityBaseImpl extends TestEntityModelImpl
-	implements TestEntity {
+public abstract class TestEntityBaseImpl
+	extends TestEntityModelImpl implements TestEntity {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
-	 * Never modify or reference this class directly. All methods that expect a test entity model instance should use the {@link TestEntity} interface instead.
+	 * Never modify or reference this class directly. All methods that expect a test entity model instance should use the <code>TestEntity</code> interface instead.
 	 */
 	@Override
 	public void persist() {
@@ -48,4 +49,5 @@ public abstract class TestEntityBaseImpl extends TestEntityModelImpl
 			TestEntityLocalServiceUtil.updateTestEntity(this);
 		}
 	}
+
 }

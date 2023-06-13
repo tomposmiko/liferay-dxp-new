@@ -453,24 +453,20 @@ public class MBMessageIndexer
 
 		actionableDynamicQuery.setCompanyId(companyId);
 		actionableDynamicQuery.setPerformActionMethod(
-			(MBCategory category) -> {
-				reindexMessages(
-					companyId, category.getGroupId(), category.getCategoryId());
-			});
+			(MBCategory category) -> reindexMessages(
+				companyId, category.getGroupId(), category.getCategoryId()));
 
 		actionableDynamicQuery.performActions();
 	}
 
-	protected void reindexDiscussions(final long companyId)
-		throws PortalException {
-
+	protected void reindexDiscussions(long companyId) throws PortalException {
 		DynamicQuery countDynamicQuery = _getDistinctGroupIdDynamicQuery(
 			companyId, MBCategoryConstants.DISCUSSION_CATEGORY_ID);
 
 		long distinctGroupIdsCount = mbMessageLocalService.dynamicQueryCount(
 			countDynamicQuery);
 
-		final IntervalActionProcessor<Void> intervalActionProcessor =
+		IntervalActionProcessor<Void> intervalActionProcessor =
 			new IntervalActionProcessor<>((int)distinctGroupIdsCount);
 
 		DynamicQuery dynamicQuery = _getDistinctGroupIdDynamicQuery(
@@ -486,6 +482,8 @@ public class MBMessageIndexer
 						companyId, groupId,
 						MBCategoryConstants.DISCUSSION_CATEGORY_ID);
 				}
+
+				intervalActionProcessor.incrementStart(groupIds.size());
 
 				return null;
 			});
@@ -550,14 +548,14 @@ public class MBMessageIndexer
 		indexableActionableDynamicQuery.performActions();
 	}
 
-	protected void reindexRoot(final long companyId) throws PortalException {
+	protected void reindexRoot(long companyId) throws PortalException {
 		DynamicQuery countDynamicQuery = _getDistinctGroupIdDynamicQuery(
 			companyId, MBCategoryConstants.DEFAULT_PARENT_CATEGORY_ID);
 
 		long distinctGroupIdsCount = mbMessageLocalService.dynamicQueryCount(
 			countDynamicQuery);
 
-		final IntervalActionProcessor<Void> intervalActionProcessor =
+		IntervalActionProcessor<Void> intervalActionProcessor =
 			new IntervalActionProcessor<>((int)distinctGroupIdsCount);
 
 		DynamicQuery dynamicQuery = _getDistinctGroupIdDynamicQuery(
@@ -573,6 +571,8 @@ public class MBMessageIndexer
 						companyId, groupId,
 						MBCategoryConstants.DEFAULT_PARENT_CATEGORY_ID);
 				}
+
+				intervalActionProcessor.incrementStart(groupIds.size());
 
 				return null;
 			});
@@ -599,8 +599,7 @@ public class MBMessageIndexer
 	protected MBMessageLocalService mbMessageLocalService;
 
 	private DynamicQuery _getDistinctGroupIdDynamicQuery(
-			long companyId, long categoryId)
-		throws PortalException {
+		long companyId, long categoryId) {
 
 		DynamicQuery dynamicQuery = mbMessageLocalService.dynamicQuery();
 

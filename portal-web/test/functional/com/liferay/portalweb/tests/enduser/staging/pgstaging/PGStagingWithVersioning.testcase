@@ -61,7 +61,7 @@ definition {
 
 	@priority = "5"
 	test AddPageVariation {
-		property portal.acceptance = "true";
+		property portal.acceptance = "quarantine";
 		property test.assert.warning.exceptions = "true";
 		property testray.component.names = "Training";
 
@@ -73,21 +73,6 @@ definition {
 		);
 
 		Staging.viewPageVariationPG(pageVariationName = "Page Variation Name");
-
-		Navigator.gotoStagedSitePage(
-			pageName = "Staging Test Page",
-			siteName = "Site Name"
-		);
-
-		ProductMenu.gotoPortlet(
-			category = "Build",
-			panel = "Site Administration",
-			portlet = "Navigation Menus"
-		);
-
-		LexiconEntry.gotoEntry(rowEntry = "Default");
-
-		NavigationMenusAdmin.deleteItem(itemName = "Staging Test Page");
 
 		Navigator.openStagingSiteURL(siteName = "Site Name");
 

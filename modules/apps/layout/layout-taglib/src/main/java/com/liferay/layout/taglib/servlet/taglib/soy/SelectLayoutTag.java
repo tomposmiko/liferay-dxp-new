@@ -122,6 +122,10 @@ public class SelectLayoutTag extends ComponentRendererTag {
 		putValue("privateLayout", privateLayout);
 	}
 
+	public void setShowHiddenLayouts(boolean showHiddenLayouts) {
+		putValue("showHiddenLayouts", showHiddenLayouts);
+	}
+
 	public void setViewType(String viewType) {
 		putValue("viewType", viewType);
 	}
@@ -200,7 +204,9 @@ public class SelectLayoutTag extends ComponentRendererTag {
 			groupId, privateLayout, parentLayoutId);
 
 		for (Layout layout : layouts) {
-			if (layout.isHidden() || StagingUtil.isIncomplete(layout)) {
+			if ((layout.isHidden() && !_isShowHiddenLayouts()) ||
+				StagingUtil.isIncomplete(layout)) {
+
 				continue;
 			}
 
@@ -267,6 +273,12 @@ public class SelectLayoutTag extends ComponentRendererTag {
 		Map<String, Object> context = getContext();
 
 		return GetterUtil.getBoolean(context.get("enableCurrentPage"));
+	}
+
+	private boolean _isShowHiddenLayouts() {
+		Map<String, Object> context = getContext();
+
+		return GetterUtil.getBoolean(context.get("showHiddenLayouts"));
 	}
 
 	private final TagResourceHandler _tagResourceHandler =

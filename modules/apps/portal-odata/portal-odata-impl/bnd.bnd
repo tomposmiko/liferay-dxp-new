@@ -1,6 +1,6 @@
 Bundle-Name: Liferay Portal OData Implementation
 Bundle-SymbolicName: com.liferay.portal.odata.impl
-Bundle-Version: 1.0.16
+Bundle-Version: 1.0.24
 Import-Package:\
 	!com.fasterxml.jackson.*,\
 	\

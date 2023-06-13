@@ -25,19 +25,20 @@ import com.liferay.portal.kernel.util.Accessor;
  *
  * @author Shinn Lok
  * @see PowwowServerModel
- * @see com.liferay.powwow.model.impl.PowwowServerImpl
- * @see com.liferay.powwow.model.impl.PowwowServerModelImpl
  * @generated
  */
 @ImplementationClassName("com.liferay.powwow.model.impl.PowwowServerImpl")
 @ProviderType
-public interface PowwowServer extends PowwowServerModel, PersistedModel {
+public interface PowwowServer extends PersistedModel, PowwowServerModel {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
-	 * Never modify this interface directly. Add methods to {@link com.liferay.powwow.model.impl.PowwowServerImpl} and rerun ServiceBuilder to automatically copy the method declarations to this interface.
+	 * Never modify this interface directly. Add methods to <code>com.liferay.powwow.model.impl.PowwowServerImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
 	 */
-	public static final Accessor<PowwowServer, Long> POWWOW_SERVER_ID_ACCESSOR = new Accessor<PowwowServer, Long>() {
+	public static final Accessor<PowwowServer, Long> POWWOW_SERVER_ID_ACCESSOR =
+		new Accessor<PowwowServer, Long>() {
+
 			@Override
 			public Long get(PowwowServer powwowServer) {
 				return powwowServer.getPowwowServerId();
@@ -52,5 +53,7 @@ public interface PowwowServer extends PowwowServerModel, PersistedModel {
 			public Class<PowwowServer> getTypeClass() {
 				return PowwowServer.class;
 			}
+
 		};
+
 }

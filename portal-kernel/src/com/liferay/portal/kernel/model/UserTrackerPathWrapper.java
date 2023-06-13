@@ -17,7 +17,6 @@ package com.liferay.portal.kernel.model;
 import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.expando.kernel.model.ExpandoBridge;
-
 import com.liferay.portal.kernel.service.ServiceContext;
 
 import java.io.Serializable;
@@ -37,8 +36,9 @@ import java.util.Objects;
  * @generated
  */
 @ProviderType
-public class UserTrackerPathWrapper implements UserTrackerPath,
-	ModelWrapper<UserTrackerPath> {
+public class UserTrackerPathWrapper
+	implements UserTrackerPath, ModelWrapper<UserTrackerPath> {
+
 	public UserTrackerPathWrapper(UserTrackerPath userTrackerPath) {
 		_userTrackerPath = userTrackerPath;
 	}
@@ -108,7 +108,8 @@ public class UserTrackerPathWrapper implements UserTrackerPath,
 
 	@Override
 	public Object clone() {
-		return new UserTrackerPathWrapper((UserTrackerPath)_userTrackerPath.clone());
+		return new UserTrackerPathWrapper(
+			(UserTrackerPath)_userTrackerPath.clone());
 	}
 
 	@Override
@@ -117,10 +118,10 @@ public class UserTrackerPathWrapper implements UserTrackerPath,
 	}
 
 	/**
-	* Returns the company ID of this user tracker path.
-	*
-	* @return the company ID of this user tracker path
-	*/
+	 * Returns the company ID of this user tracker path.
+	 *
+	 * @return the company ID of this user tracker path
+	 */
 	@Override
 	public long getCompanyId() {
 		return _userTrackerPath.getCompanyId();
@@ -132,40 +133,40 @@ public class UserTrackerPathWrapper implements UserTrackerPath,
 	}
 
 	/**
-	* Returns the mvcc version of this user tracker path.
-	*
-	* @return the mvcc version of this user tracker path
-	*/
+	 * Returns the mvcc version of this user tracker path.
+	 *
+	 * @return the mvcc version of this user tracker path
+	 */
 	@Override
 	public long getMvccVersion() {
 		return _userTrackerPath.getMvccVersion();
 	}
 
 	/**
-	* Returns the path of this user tracker path.
-	*
-	* @return the path of this user tracker path
-	*/
+	 * Returns the path of this user tracker path.
+	 *
+	 * @return the path of this user tracker path
+	 */
 	@Override
 	public String getPath() {
 		return _userTrackerPath.getPath();
 	}
 
 	/**
-	* Returns the path date of this user tracker path.
-	*
-	* @return the path date of this user tracker path
-	*/
+	 * Returns the path date of this user tracker path.
+	 *
+	 * @return the path date of this user tracker path
+	 */
 	@Override
 	public Date getPathDate() {
 		return _userTrackerPath.getPathDate();
 	}
 
 	/**
-	* Returns the primary key of this user tracker path.
-	*
-	* @return the primary key of this user tracker path
-	*/
+	 * Returns the primary key of this user tracker path.
+	 *
+	 * @return the primary key of this user tracker path
+	 */
 	@Override
 	public long getPrimaryKey() {
 		return _userTrackerPath.getPrimaryKey();
@@ -177,20 +178,20 @@ public class UserTrackerPathWrapper implements UserTrackerPath,
 	}
 
 	/**
-	* Returns the user tracker ID of this user tracker path.
-	*
-	* @return the user tracker ID of this user tracker path
-	*/
+	 * Returns the user tracker ID of this user tracker path.
+	 *
+	 * @return the user tracker ID of this user tracker path
+	 */
 	@Override
 	public long getUserTrackerId() {
 		return _userTrackerPath.getUserTrackerId();
 	}
 
 	/**
-	* Returns the user tracker path ID of this user tracker path.
-	*
-	* @return the user tracker path ID of this user tracker path
-	*/
+	 * Returns the user tracker path ID of this user tracker path.
+	 *
+	 * @return the user tracker path ID of this user tracker path
+	 */
 	@Override
 	public long getUserTrackerPathId() {
 		return _userTrackerPath.getUserTrackerPathId();
@@ -227,10 +228,10 @@ public class UserTrackerPathWrapper implements UserTrackerPath,
 	}
 
 	/**
-	* Sets the company ID of this user tracker path.
-	*
-	* @param companyId the company ID of this user tracker path
-	*/
+	 * Sets the company ID of this user tracker path.
+	 *
+	 * @param companyId the company ID of this user tracker path
+	 */
 	@Override
 	public void setCompanyId(long companyId) {
 		_userTrackerPath.setCompanyId(companyId);
@@ -252,10 +253,10 @@ public class UserTrackerPathWrapper implements UserTrackerPath,
 	}
 
 	/**
-	* Sets the mvcc version of this user tracker path.
-	*
-	* @param mvccVersion the mvcc version of this user tracker path
-	*/
+	 * Sets the mvcc version of this user tracker path.
+	 *
+	 * @param mvccVersion the mvcc version of this user tracker path
+	 */
 	@Override
 	public void setMvccVersion(long mvccVersion) {
 		_userTrackerPath.setMvccVersion(mvccVersion);
@@ -267,30 +268,30 @@ public class UserTrackerPathWrapper implements UserTrackerPath,
 	}
 
 	/**
-	* Sets the path of this user tracker path.
-	*
-	* @param path the path of this user tracker path
-	*/
+	 * Sets the path of this user tracker path.
+	 *
+	 * @param path the path of this user tracker path
+	 */
 	@Override
 	public void setPath(String path) {
 		_userTrackerPath.setPath(path);
 	}
 
 	/**
-	* Sets the path date of this user tracker path.
-	*
-	* @param pathDate the path date of this user tracker path
-	*/
+	 * Sets the path date of this user tracker path.
+	 *
+	 * @param pathDate the path date of this user tracker path
+	 */
 	@Override
 	public void setPathDate(Date pathDate) {
 		_userTrackerPath.setPathDate(pathDate);
 	}
 
 	/**
-	* Sets the primary key of this user tracker path.
-	*
-	* @param primaryKey the primary key of this user tracker path
-	*/
+	 * Sets the primary key of this user tracker path.
+	 *
+	 * @param primaryKey the primary key of this user tracker path
+	 */
 	@Override
 	public void setPrimaryKey(long primaryKey) {
 		_userTrackerPath.setPrimaryKey(primaryKey);
@@ -302,20 +303,20 @@ public class UserTrackerPathWrapper implements UserTrackerPath,
 	}
 
 	/**
-	* Sets the user tracker ID of this user tracker path.
-	*
-	* @param userTrackerId the user tracker ID of this user tracker path
-	*/
+	 * Sets the user tracker ID of this user tracker path.
+	 *
+	 * @param userTrackerId the user tracker ID of this user tracker path
+	 */
 	@Override
 	public void setUserTrackerId(long userTrackerId) {
 		_userTrackerPath.setUserTrackerId(userTrackerId);
 	}
 
 	/**
-	* Sets the user tracker path ID of this user tracker path.
-	*
-	* @param userTrackerPathId the user tracker path ID of this user tracker path
-	*/
+	 * Sets the user tracker path ID of this user tracker path.
+	 *
+	 * @param userTrackerPathId the user tracker path ID of this user tracker path
+	 */
 	@Override
 	public void setUserTrackerPathId(long userTrackerPathId) {
 		_userTrackerPath.setUserTrackerPathId(userTrackerPathId);
@@ -356,10 +357,12 @@ public class UserTrackerPathWrapper implements UserTrackerPath,
 			return false;
 		}
 
-		UserTrackerPathWrapper userTrackerPathWrapper = (UserTrackerPathWrapper)obj;
+		UserTrackerPathWrapper userTrackerPathWrapper =
+			(UserTrackerPathWrapper)obj;
 
-		if (Objects.equals(_userTrackerPath,
-					userTrackerPathWrapper._userTrackerPath)) {
+		if (Objects.equals(
+				_userTrackerPath, userTrackerPathWrapper._userTrackerPath)) {
+
 			return true;
 		}
 
@@ -387,4 +390,5 @@ public class UserTrackerPathWrapper implements UserTrackerPath,
 	}
 
 	private final UserTrackerPath _userTrackerPath;
+
 }

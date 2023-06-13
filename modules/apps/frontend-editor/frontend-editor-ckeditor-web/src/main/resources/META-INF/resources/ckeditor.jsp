@@ -125,7 +125,7 @@ name = HtmlUtil.escapeJS(name);
 <aui:script use="<%= modules %>">
 	var UA = A.UA;
 
-	var contents = '<%= HtmlUtil.escapeJS(contents) %>';
+	var windowNode = A.getWin();
 
 	var instanceDataReady = false;
 	var instancePendingData;
@@ -153,38 +153,65 @@ name = HtmlUtil.escapeJS(name);
 		nativeEditor.config.contentsLangDirection = contentsLanguageDir;
 	};
 
+	var preventImageDragoverHandler = windowNode.on(
+		'dragover',
+		function(event) {
+			var validDropTarget = event.target.getDOMNode().isContentEditable;
+
+			if (!validDropTarget) {
+				event.preventDefault();
+			}
+		}
+	);
+
+	var preventImageDropHandler = windowNode.on(
+		'drop',
+		function(event) {
+			var validDropTarget = event.target.getDOMNode().isContentEditable;
+
+			if (!validDropTarget) {
+				event.preventDefault();
+				event.stopImmediatePropagation();
+			}
+		}
+	);
+
 	var eventHandles = [
-		Liferay.on('inputLocalized:localeChanged', onLocaleChangedHandler)
+		Liferay.on('inputLocalized:localeChanged', onLocaleChangedHandler),
+		preventImageDragoverHandler,
+		preventImageDropHandler
 	];
 
 	window['<%= name %>'] = {
 		create: function() {
 			if (!window['<%= name %>'].instanceReady) {
-				var editorNode = A.Node.create('<%= HtmlUtil.escapeJS(editor) %>');
-
-				var editorContainer = A.one('#<%= name %>Container');
-
-				editorContainer.appendChild(editorNode);
-
 				createEditor();
 			}
 		},
 
 		destroy: function() {
-			window['<%= name %>'].dispose();
+			clearInterval(contentChangeHandle);
 
-			window['<%= name %>'] = null;
+			setTimeout(
+				function() {
+					window['<%= name %>'].dispose();
 
-			Liferay.namespace('EDITORS').ckeditor.removeInstance();
+					window['<%= name %>'] = null;
+
+					Liferay.namespace('EDITORS').ckeditor.removeInstance();
+				},
+			0);
 		},
 
 		dispose: function() {
-			var editor = CKEDITOR.instances['<%= name %>'];
+			if (CKEDITOR) {
+				var editor = CKEDITOR.instances['<%= name %>'];
 
-			if (editor) {
-				editor.destroy();
+				if (editor) {
+					editor.destroy();
 
-				window['<%= name %>'].instanceReady = false;
+					window['<%= name %>'].instanceReady = false;
+				}
 			}
 
 			(new A.EventHandle(eventHandles)).detach();
@@ -287,7 +314,7 @@ name = HtmlUtil.escapeJS(name);
 				setHTML(value);
 			}
 			else {
-				contents = value;
+				instancePendingData = value;
 			}
 		}
 	};
@@ -371,6 +398,7 @@ name = HtmlUtil.escapeJS(name);
 	</c:if>
 
 	var ckEditorContent;
+	var contentChangeHandle;
 	var currentToolbarSet;
 
 	var initialToolbarSet = '<%= TextFormatter.format(HtmlUtil.escapeJS(toolbarSet), TextFormatter.M) %>';
@@ -397,6 +425,16 @@ name = HtmlUtil.escapeJS(name);
 
 	var createEditor = function() {
 		var editorNode = A.one('#<%= name %>');
+
+		if (!editorNode) {
+			var editorContainer = A.one('#<%= name %>Container');
+
+			editorContainer.setHTML('');
+
+			editorNode = A.Node.create('<%= HtmlUtil.escapeJS(editor) %>');
+
+			editorContainer.appendChild(editorNode);
+		}
 
 		if (editorNode) {
 			editorNode.attr('contenteditable', true);
@@ -503,7 +541,6 @@ name = HtmlUtil.escapeJS(name);
 		ckEditor.on(
 			'instanceReady',
 			function() {
-
 				<c:choose>
 					<c:when test="<%= useCustomDataProcessor %>">
 						instanceReady = true;
@@ -522,7 +559,7 @@ name = HtmlUtil.escapeJS(name);
 				</c:if>
 
 				<c:if test="<%= Validator.isNotNull(onChangeMethod) %>">
-					var contentChangeHandle = setInterval(
+					contentChangeHandle = setInterval(
 						function() {
 							try {
 								window['<%= name %>'].onChangeCallback();
@@ -532,16 +569,6 @@ name = HtmlUtil.escapeJS(name);
 						},
 						300
 					);
-
-					var clearContentChangeHandle = function(event) {
-						if (event.portletId === '<%= portletId %>') {
-							clearInterval(contentChangeHandle);
-
-							Liferay.detach('destroyPortlet', clearContentChangeHandle);
-						}
-					};
-
-					Liferay.on('destroyPortlet', clearContentChangeHandle);
 				</c:if>
 
 				<c:if test="<%= Validator.isNotNull(onFocusMethod) %>">

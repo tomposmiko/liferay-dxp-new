@@ -33,10 +33,11 @@ import com.liferay.portal.kernel.service.TeamLocalServiceUtil;
  */
 @ProviderType
 public abstract class TeamBaseImpl extends TeamModelImpl implements Team {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
-	 * Never modify or reference this class directly. All methods that expect a team model instance should use the {@link Team} interface instead.
+	 * Never modify or reference this class directly. All methods that expect a team model instance should use the <code>Team</code> interface instead.
 	 */
 	@Override
 	public void persist() {
@@ -47,4 +48,5 @@ public abstract class TeamBaseImpl extends TeamModelImpl implements Team {
 			TeamLocalServiceUtil.updateTeam(this);
 		}
 	}
+
 }

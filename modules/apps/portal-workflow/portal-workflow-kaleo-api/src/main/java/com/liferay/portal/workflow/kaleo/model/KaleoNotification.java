@@ -25,33 +25,39 @@ import com.liferay.portal.kernel.util.Accessor;
  *
  * @author Brian Wing Shun Chan
  * @see KaleoNotificationModel
- * @see com.liferay.portal.workflow.kaleo.model.impl.KaleoNotificationImpl
- * @see com.liferay.portal.workflow.kaleo.model.impl.KaleoNotificationModelImpl
  * @generated
  */
-@ImplementationClassName("com.liferay.portal.workflow.kaleo.model.impl.KaleoNotificationImpl")
+@ImplementationClassName(
+	"com.liferay.portal.workflow.kaleo.model.impl.KaleoNotificationImpl"
+)
 @ProviderType
-public interface KaleoNotification extends KaleoNotificationModel, PersistedModel {
+public interface KaleoNotification
+	extends KaleoNotificationModel, PersistedModel {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
-	 * Never modify this interface directly. Add methods to {@link com.liferay.portal.workflow.kaleo.model.impl.KaleoNotificationImpl} and rerun ServiceBuilder to automatically copy the method declarations to this interface.
+	 * Never modify this interface directly. Add methods to <code>com.liferay.portal.workflow.kaleo.model.impl.KaleoNotificationImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
 	 */
-	public static final Accessor<KaleoNotification, Long> KALEO_NOTIFICATION_ID_ACCESSOR =
-		new Accessor<KaleoNotification, Long>() {
-			@Override
-			public Long get(KaleoNotification kaleoNotification) {
-				return kaleoNotification.getKaleoNotificationId();
-			}
+	public static final Accessor<KaleoNotification, Long>
+		KALEO_NOTIFICATION_ID_ACCESSOR =
+			new Accessor<KaleoNotification, Long>() {
 
-			@Override
-			public Class<Long> getAttributeClass() {
-				return Long.class;
-			}
+				@Override
+				public Long get(KaleoNotification kaleoNotification) {
+					return kaleoNotification.getKaleoNotificationId();
+				}
 
-			@Override
-			public Class<KaleoNotification> getTypeClass() {
-				return KaleoNotification.class;
-			}
-		};
+				@Override
+				public Class<Long> getAttributeClass() {
+					return Long.class;
+				}
+
+				@Override
+				public Class<KaleoNotification> getTypeClass() {
+					return KaleoNotification.class;
+				}
+
+			};
+
 }

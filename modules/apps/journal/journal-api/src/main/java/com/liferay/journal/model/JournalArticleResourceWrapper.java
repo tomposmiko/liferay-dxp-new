@@ -17,7 +17,6 @@ package com.liferay.journal.model;
 import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.expando.kernel.model.ExpandoBridge;
-
 import com.liferay.portal.kernel.model.ModelWrapper;
 import com.liferay.portal.kernel.service.ServiceContext;
 
@@ -37,10 +36,12 @@ import java.util.Objects;
  * @generated
  */
 @ProviderType
-public class JournalArticleResourceWrapper implements JournalArticleResource,
-	ModelWrapper<JournalArticleResource> {
+public class JournalArticleResourceWrapper
+	implements JournalArticleResource, ModelWrapper<JournalArticleResource> {
+
 	public JournalArticleResourceWrapper(
 		JournalArticleResource journalArticleResource) {
+
 		_journalArticleResource = journalArticleResource;
 	}
 
@@ -102,7 +103,8 @@ public class JournalArticleResourceWrapper implements JournalArticleResource,
 
 	@Override
 	public Object clone() {
-		return new JournalArticleResourceWrapper((JournalArticleResource)_journalArticleResource.clone());
+		return new JournalArticleResourceWrapper(
+			(JournalArticleResource)_journalArticleResource.clone());
 	}
 
 	@Override
@@ -111,20 +113,20 @@ public class JournalArticleResourceWrapper implements JournalArticleResource,
 	}
 
 	/**
-	* Returns the article ID of this journal article resource.
-	*
-	* @return the article ID of this journal article resource
-	*/
+	 * Returns the article ID of this journal article resource.
+	 *
+	 * @return the article ID of this journal article resource
+	 */
 	@Override
 	public String getArticleId() {
 		return _journalArticleResource.getArticleId();
 	}
 
 	/**
-	* Returns the company ID of this journal article resource.
-	*
-	* @return the company ID of this journal article resource
-	*/
+	 * Returns the company ID of this journal article resource.
+	 *
+	 * @return the company ID of this journal article resource
+	 */
 	@Override
 	public long getCompanyId() {
 		return _journalArticleResource.getCompanyId();
@@ -136,20 +138,20 @@ public class JournalArticleResourceWrapper implements JournalArticleResource,
 	}
 
 	/**
-	* Returns the group ID of this journal article resource.
-	*
-	* @return the group ID of this journal article resource
-	*/
+	 * Returns the group ID of this journal article resource.
+	 *
+	 * @return the group ID of this journal article resource
+	 */
 	@Override
 	public long getGroupId() {
 		return _journalArticleResource.getGroupId();
 	}
 
 	/**
-	* Returns the primary key of this journal article resource.
-	*
-	* @return the primary key of this journal article resource
-	*/
+	 * Returns the primary key of this journal article resource.
+	 *
+	 * @return the primary key of this journal article resource
+	 */
 	@Override
 	public long getPrimaryKey() {
 		return _journalArticleResource.getPrimaryKey();
@@ -161,20 +163,20 @@ public class JournalArticleResourceWrapper implements JournalArticleResource,
 	}
 
 	/**
-	* Returns the resource prim key of this journal article resource.
-	*
-	* @return the resource prim key of this journal article resource
-	*/
+	 * Returns the resource prim key of this journal article resource.
+	 *
+	 * @return the resource prim key of this journal article resource
+	 */
 	@Override
 	public long getResourcePrimKey() {
 		return _journalArticleResource.getResourcePrimKey();
 	}
 
 	/**
-	* Returns the uuid of this journal article resource.
-	*
-	* @return the uuid of this journal article resource
-	*/
+	 * Returns the uuid of this journal article resource.
+	 *
+	 * @return the uuid of this journal article resource
+	 */
 	@Override
 	public String getUuid() {
 		return _journalArticleResource.getUuid();
@@ -206,10 +208,10 @@ public class JournalArticleResourceWrapper implements JournalArticleResource,
 	}
 
 	/**
-	* Sets the article ID of this journal article resource.
-	*
-	* @param articleId the article ID of this journal article resource
-	*/
+	 * Sets the article ID of this journal article resource.
+	 *
+	 * @param articleId the article ID of this journal article resource
+	 */
 	@Override
 	public void setArticleId(String articleId) {
 		_journalArticleResource.setArticleId(articleId);
@@ -221,10 +223,10 @@ public class JournalArticleResourceWrapper implements JournalArticleResource,
 	}
 
 	/**
-	* Sets the company ID of this journal article resource.
-	*
-	* @param companyId the company ID of this journal article resource
-	*/
+	 * Sets the company ID of this journal article resource.
+	 *
+	 * @param companyId the company ID of this journal article resource
+	 */
 	@Override
 	public void setCompanyId(long companyId) {
 		_journalArticleResource.setCompanyId(companyId);
@@ -233,6 +235,7 @@ public class JournalArticleResourceWrapper implements JournalArticleResource,
 	@Override
 	public void setExpandoBridgeAttributes(
 		com.liferay.portal.kernel.model.BaseModel<?> baseModel) {
+
 		_journalArticleResource.setExpandoBridgeAttributes(baseModel);
 	}
 
@@ -247,10 +250,10 @@ public class JournalArticleResourceWrapper implements JournalArticleResource,
 	}
 
 	/**
-	* Sets the group ID of this journal article resource.
-	*
-	* @param groupId the group ID of this journal article resource
-	*/
+	 * Sets the group ID of this journal article resource.
+	 *
+	 * @param groupId the group ID of this journal article resource
+	 */
 	@Override
 	public void setGroupId(long groupId) {
 		_journalArticleResource.setGroupId(groupId);
@@ -262,10 +265,10 @@ public class JournalArticleResourceWrapper implements JournalArticleResource,
 	}
 
 	/**
-	* Sets the primary key of this journal article resource.
-	*
-	* @param primaryKey the primary key of this journal article resource
-	*/
+	 * Sets the primary key of this journal article resource.
+	 *
+	 * @param primaryKey the primary key of this journal article resource
+	 */
 	@Override
 	public void setPrimaryKey(long primaryKey) {
 		_journalArticleResource.setPrimaryKey(primaryKey);
@@ -277,33 +280,36 @@ public class JournalArticleResourceWrapper implements JournalArticleResource,
 	}
 
 	/**
-	* Sets the resource prim key of this journal article resource.
-	*
-	* @param resourcePrimKey the resource prim key of this journal article resource
-	*/
+	 * Sets the resource prim key of this journal article resource.
+	 *
+	 * @param resourcePrimKey the resource prim key of this journal article resource
+	 */
 	@Override
 	public void setResourcePrimKey(long resourcePrimKey) {
 		_journalArticleResource.setResourcePrimKey(resourcePrimKey);
 	}
 
 	/**
-	* Sets the uuid of this journal article resource.
-	*
-	* @param uuid the uuid of this journal article resource
-	*/
+	 * Sets the uuid of this journal article resource.
+	 *
+	 * @param uuid the uuid of this journal article resource
+	 */
 	@Override
 	public void setUuid(String uuid) {
 		_journalArticleResource.setUuid(uuid);
 	}
 
 	@Override
-	public com.liferay.portal.kernel.model.CacheModel<JournalArticleResource> toCacheModel() {
+	public com.liferay.portal.kernel.model.CacheModel<JournalArticleResource>
+		toCacheModel() {
+
 		return _journalArticleResource.toCacheModel();
 	}
 
 	@Override
 	public JournalArticleResource toEscapedModel() {
-		return new JournalArticleResourceWrapper(_journalArticleResource.toEscapedModel());
+		return new JournalArticleResourceWrapper(
+			_journalArticleResource.toEscapedModel());
 	}
 
 	@Override
@@ -313,7 +319,8 @@ public class JournalArticleResourceWrapper implements JournalArticleResource,
 
 	@Override
 	public JournalArticleResource toUnescapedModel() {
-		return new JournalArticleResourceWrapper(_journalArticleResource.toUnescapedModel());
+		return new JournalArticleResourceWrapper(
+			_journalArticleResource.toUnescapedModel());
 	}
 
 	@Override
@@ -331,10 +338,13 @@ public class JournalArticleResourceWrapper implements JournalArticleResource,
 			return false;
 		}
 
-		JournalArticleResourceWrapper journalArticleResourceWrapper = (JournalArticleResourceWrapper)obj;
+		JournalArticleResourceWrapper journalArticleResourceWrapper =
+			(JournalArticleResourceWrapper)obj;
 
-		if (Objects.equals(_journalArticleResource,
-					journalArticleResourceWrapper._journalArticleResource)) {
+		if (Objects.equals(
+				_journalArticleResource,
+				journalArticleResourceWrapper._journalArticleResource)) {
+
 			return true;
 		}
 
@@ -362,4 +372,5 @@ public class JournalArticleResourceWrapper implements JournalArticleResource,
 	}
 
 	private final JournalArticleResource _journalArticleResource;
+
 }

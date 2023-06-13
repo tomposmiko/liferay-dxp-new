@@ -14,28 +14,106 @@
 
 package com.liferay.apio.architect.internal.wiring.osgi.manager.router;
 
-import com.liferay.apio.architect.routes.ItemRoutes;
+import static com.liferay.apio.architect.internal.wiring.osgi.manager.cache.ManagerCache.INSTANCE;
 
+import static org.slf4j.LoggerFactory.getLogger;
+
+import com.liferay.apio.architect.internal.action.ActionSemantics;
+import com.liferay.apio.architect.internal.form.FormImpl;
+import com.liferay.apio.architect.internal.routes.ItemRoutesImpl;
+import com.liferay.apio.architect.internal.routes.ItemRoutesImpl.BuilderImpl;
+import com.liferay.apio.architect.internal.wiring.osgi.manager.base.ClassNameBaseManager;
+import com.liferay.apio.architect.internal.wiring.osgi.manager.representable.NameManager;
+import com.liferay.apio.architect.internal.wiring.osgi.manager.uri.mapper.PathIdentifierMapperManager;
+import com.liferay.apio.architect.resource.Resource.Item;
+import com.liferay.apio.architect.router.ItemRouter;
+import com.liferay.apio.architect.routes.ItemRoutes;
+import com.liferay.apio.architect.routes.ItemRoutes.Builder;
+
+import java.util.Collection;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Stream;
+
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
+
+import org.slf4j.Logger;
 
 /**
  * Provides methods to retrieve the routes information provided by the different
- * {@link com.liferay.apio.architect.router.ItemRouter} instances.
+ * {@link ItemRouter} instances.
  *
  * @author Alejandro Hernández
- * @see    com.liferay.apio.architect.router.ItemRouter
+ * @see    ItemRouter
  */
-public interface ItemRouterManager {
+@Component(service = ItemRouterManager.class)
+public class ItemRouterManager extends ClassNameBaseManager<ItemRouter> {
 
-	public Map<String, ItemRoutes> getItemRoutes();
+	public ItemRouterManager() {
+		super(ItemRouter.class, 2);
+	}
 
 	/**
-	 * Returns the item routes for the item resource's name.
+	 * Returns the list of {@link ActionSemantics} created by the managed
+	 * routers.
 	 *
-	 * @param  name the item resource's name
-	 * @return the item routes
+	 * @review
 	 */
-	public <T, S> Optional<ItemRoutes<T, S>> getItemRoutesOptional(String name);
+	public Stream<ActionSemantics> getActionSemantics() {
+		return Optional.ofNullable(
+			INSTANCE.getItemRoutesMap(this::_computeItemRoutes)
+		).map(
+			Map::values
+		).map(
+			Collection::stream
+		).orElseGet(
+			Stream::empty
+		).map(
+			ItemRoutesImpl.class::cast
+		).map(
+			ItemRoutesImpl::getActionSemantics
+		).flatMap(
+			Collection::stream
+		);
+	}
+
+	private void _computeItemRoutes() {
+		forEachService(
+			(className, itemRouter) -> {
+				Optional<String> nameOptional = _nameManager.getNameOptional(
+					className);
+
+				if (!nameOptional.isPresent()) {
+					_logger.warn(
+						"Unable to find a Representable for class name {}",
+						className);
+
+					return;
+				}
+
+				String name = nameOptional.get();
+
+				Builder<Object, Object> builder = new BuilderImpl<>(
+					Item.of(name),
+					() -> new FormImpl.BuilderImpl<>(
+						_pathIdentifierMapperManager::mapToIdentifierOrFail,
+						_nameManager::getNameOptional),
+					_nameManager::getNameOptional);
+
+				@SuppressWarnings("unchecked")
+				ItemRoutes itemRoutes = itemRouter.itemRoutes(builder);
+
+				INSTANCE.putItemRoutes(name, itemRoutes);
+			});
+	}
+
+	private Logger _logger = getLogger(getClass());
+
+	@Reference
+	private NameManager _nameManager;
+
+	@Reference
+	private PathIdentifierMapperManager _pathIdentifierMapperManager;
 
 }

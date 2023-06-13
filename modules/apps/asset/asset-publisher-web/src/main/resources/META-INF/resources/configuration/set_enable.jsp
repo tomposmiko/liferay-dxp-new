@@ -37,6 +37,10 @@ String helpMessage2 = "<em>" + LanguageUtil.format(request, "content-with-tag-x"
 	<aui:input helpMessage="set-as-the-default-asset-publisher-for-this-page-help" label="set-as-the-default-asset-publisher-for-this-page" name="defaultAssetPublisher" type="checkbox" value="<%= assetPublisherWebUtil.isDefaultAssetPublisher(layout, portletDisplay.getId(), assetPublisherDisplayContext.getPortletResource()) %>" />
 </c:if>
 
+<c:if test="<%= !assetPublisherDisplayContext.isEnableSetAsDefaultAssetPublisher() && !Objects.equals(layout.getType(), LayoutConstants.TYPE_PORTLET) %>">
+	<aui:input disabled="<%= true %>" helpMessage="set-as-the-default-asset-publisher-for-this-page-only-for-widget-pages-help" label="set-as-the-default-asset-publisher-for-this-page" name="defaultAssetPublisher" type="checkbox" value="<%= assetPublisherWebUtil.isDefaultAssetPublisher(layout, portletDisplay.getId(), assetPublisherDisplayContext.getPortletResource()) %>" />
+</c:if>
+
 <h4 class="sheet-tertiary-title">
 	<liferay-ui:message key="enable" />
 </h4>

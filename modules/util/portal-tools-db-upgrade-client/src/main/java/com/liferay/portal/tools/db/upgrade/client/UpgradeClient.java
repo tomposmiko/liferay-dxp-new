@@ -177,12 +177,15 @@ public class UpgradeClient {
 		commands.add("-cp");
 		commands.add(_getBootstrapClassPath());
 
-		Collections.addAll(commands, _jvmOpts.split(" "));
+		String jvmOptsCommands = _jvmOpts.concat(
+			" -Dexternal-properties=portal-upgrade.properties " +
+				"-Dserver.detector.server.id=" +
+					_appServer.getServerDetectorServerId());
 
-		commands.add("-Dexternal-properties=portal-upgrade.properties");
-		commands.add(
-			"-Dserver.detector.server.id=" +
-				_appServer.getServerDetectorServerId());
+		System.out.println("JVM arguments: " + jvmOptsCommands);
+
+		Collections.addAll(commands, jvmOptsCommands.split(" "));
+
 		commands.add(DBUpgraderLauncher.class.getName());
 
 		processBuilder.command(commands);
@@ -212,9 +215,8 @@ public class UpgradeClient {
 
 					break;
 				}
-				else {
-					System.out.println(line);
-				}
+
+				System.out.println(line);
 			}
 
 			System.out.flush();
@@ -371,11 +373,10 @@ public class UpgradeClient {
 
 			return false;
 		}
-		else {
-			System.out.println(" done.");
 
-			return true;
-		}
+		System.out.println(" done.");
+
+		return true;
 	}
 
 	private void _printHelp() {
@@ -396,9 +397,8 @@ public class UpgradeClient {
 		if (command.equals("exit") || command.equals("quit")) {
 			return false;
 		}
-		else {
-			System.out.println(gogoShellClient.send(command));
-		}
+
+		System.out.println(gogoShellClient.send(command));
 
 		return true;
 	}

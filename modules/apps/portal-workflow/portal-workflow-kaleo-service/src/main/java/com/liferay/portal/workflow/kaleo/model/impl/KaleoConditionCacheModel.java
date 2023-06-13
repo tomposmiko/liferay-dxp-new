@@ -32,12 +32,12 @@ import java.util.Date;
  * The cache model class for representing KaleoCondition in entity cache.
  *
  * @author Brian Wing Shun Chan
- * @see KaleoCondition
  * @generated
  */
 @ProviderType
-public class KaleoConditionCacheModel implements CacheModel<KaleoCondition>,
-	Externalizable {
+public class KaleoConditionCacheModel
+	implements CacheModel<KaleoCondition>, Externalizable {
+
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj) {
@@ -48,7 +48,8 @@ public class KaleoConditionCacheModel implements CacheModel<KaleoCondition>,
 			return false;
 		}
 
-		KaleoConditionCacheModel kaleoConditionCacheModel = (KaleoConditionCacheModel)obj;
+		KaleoConditionCacheModel kaleoConditionCacheModel =
+			(KaleoConditionCacheModel)obj;
 
 		if (kaleoConditionId == kaleoConditionCacheModel.kaleoConditionId) {
 			return true;
@@ -125,7 +126,8 @@ public class KaleoConditionCacheModel implements CacheModel<KaleoCondition>,
 			kaleoConditionImpl.setModifiedDate(new Date(modifiedDate));
 		}
 
-		kaleoConditionImpl.setKaleoDefinitionVersionId(kaleoDefinitionVersionId);
+		kaleoConditionImpl.setKaleoDefinitionVersionId(
+			kaleoDefinitionVersionId);
 		kaleoConditionImpl.setKaleoNodeId(kaleoNodeId);
 
 		if (script == null) {
@@ -146,7 +148,8 @@ public class KaleoConditionCacheModel implements CacheModel<KaleoCondition>,
 			kaleoConditionImpl.setScriptRequiredContexts("");
 		}
 		else {
-			kaleoConditionImpl.setScriptRequiredContexts(scriptRequiredContexts);
+			kaleoConditionImpl.setScriptRequiredContexts(
+				scriptRequiredContexts);
 		}
 
 		kaleoConditionImpl.resetOriginalValues();
@@ -176,8 +179,7 @@ public class KaleoConditionCacheModel implements CacheModel<KaleoCondition>,
 	}
 
 	@Override
-	public void writeExternal(ObjectOutput objectOutput)
-		throws IOException {
+	public void writeExternal(ObjectOutput objectOutput) throws IOException {
 		objectOutput.writeLong(kaleoConditionId);
 
 		objectOutput.writeLong(groupId);
@@ -234,4 +236,5 @@ public class KaleoConditionCacheModel implements CacheModel<KaleoCondition>,
 	public String script;
 	public String scriptLanguage;
 	public String scriptRequiredContexts;
+
 }

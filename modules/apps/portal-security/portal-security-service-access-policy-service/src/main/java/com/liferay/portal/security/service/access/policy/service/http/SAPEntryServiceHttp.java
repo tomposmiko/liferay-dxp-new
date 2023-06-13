@@ -26,10 +26,11 @@ import com.liferay.portal.security.service.access.policy.service.SAPEntryService
 
 /**
  * Provides the HTTP utility for the
- * {@link SAPEntryServiceUtil} service utility. The
+ * <code>SAPEntryServiceUtil</code> service
+ * utility. The
  * static methods of this class calls the same methods of the service utility.
  * However, the signatures are different because it requires an additional
- * {@link HttpPrincipal} parameter.
+ * <code>HttpPrincipal</code> parameter.
  *
  * <p>
  * The benefits of using the HTTP utility is that it is fast and allows for
@@ -48,25 +49,30 @@ import com.liferay.portal.security.service.access.policy.service.SAPEntryService
  *
  * @author Brian Wing Shun Chan
  * @see SAPEntryServiceSoap
- * @see HttpPrincipal
- * @see SAPEntryServiceUtil
  * @generated
  */
 @ProviderType
 public class SAPEntryServiceHttp {
-	public static com.liferay.portal.security.service.access.policy.model.SAPEntry addSAPEntry(
-		HttpPrincipal httpPrincipal, String allowedServiceSignatures,
-		boolean defaultSAPEntry, boolean enabled, String name,
-		java.util.Map<java.util.Locale, String> titleMap,
-		com.liferay.portal.kernel.service.ServiceContext serviceContext)
-		throws com.liferay.portal.kernel.exception.PortalException {
-		try {
-			MethodKey methodKey = new MethodKey(SAPEntryServiceUtil.class,
-					"addSAPEntry", _addSAPEntryParameterTypes0);
 
-			MethodHandler methodHandler = new MethodHandler(methodKey,
-					allowedServiceSignatures, defaultSAPEntry, enabled, name,
-					titleMap, serviceContext);
+	public static
+		com.liferay.portal.security.service.access.policy.model.SAPEntry
+				addSAPEntry(
+					HttpPrincipal httpPrincipal,
+					String allowedServiceSignatures, boolean defaultSAPEntry,
+					boolean enabled, String name,
+					java.util.Map<java.util.Locale, String> titleMap,
+					com.liferay.portal.kernel.service.ServiceContext
+						serviceContext)
+			throws com.liferay.portal.kernel.exception.PortalException {
+
+		try {
+			MethodKey methodKey = new MethodKey(
+				SAPEntryServiceUtil.class, "addSAPEntry",
+				_addSAPEntryParameterTypes0);
+
+			MethodHandler methodHandler = new MethodHandler(
+				methodKey, allowedServiceSignatures, defaultSAPEntry, enabled,
+				name, titleMap, serviceContext);
 
 			Object returnObj = null;
 
@@ -74,14 +80,19 @@ public class SAPEntryServiceHttp {
 				returnObj = TunnelUtil.invoke(httpPrincipal, methodHandler);
 			}
 			catch (Exception e) {
-				if (e instanceof com.liferay.portal.kernel.exception.PortalException) {
-					throw (com.liferay.portal.kernel.exception.PortalException)e;
+				if (e instanceof
+						com.liferay.portal.kernel.exception.PortalException) {
+
+					throw (com.liferay.portal.kernel.exception.PortalException)
+						e;
 				}
 
-				throw new com.liferay.portal.kernel.exception.SystemException(e);
+				throw new com.liferay.portal.kernel.exception.SystemException(
+					e);
 			}
 
-			return (com.liferay.portal.security.service.access.policy.model.SAPEntry)returnObj;
+			return (com.liferay.portal.security.service.access.policy.model.
+				SAPEntry)returnObj;
 		}
 		catch (com.liferay.portal.kernel.exception.SystemException se) {
 			_log.error(se, se);
@@ -90,15 +101,18 @@ public class SAPEntryServiceHttp {
 		}
 	}
 
-	public static com.liferay.portal.security.service.access.policy.model.SAPEntry deleteSAPEntry(
-		HttpPrincipal httpPrincipal, long sapEntryId)
-		throws com.liferay.portal.kernel.exception.PortalException {
-		try {
-			MethodKey methodKey = new MethodKey(SAPEntryServiceUtil.class,
-					"deleteSAPEntry", _deleteSAPEntryParameterTypes1);
+	public static
+		com.liferay.portal.security.service.access.policy.model.SAPEntry
+				deleteSAPEntry(HttpPrincipal httpPrincipal, long sapEntryId)
+			throws com.liferay.portal.kernel.exception.PortalException {
 
-			MethodHandler methodHandler = new MethodHandler(methodKey,
-					sapEntryId);
+		try {
+			MethodKey methodKey = new MethodKey(
+				SAPEntryServiceUtil.class, "deleteSAPEntry",
+				_deleteSAPEntryParameterTypes1);
+
+			MethodHandler methodHandler = new MethodHandler(
+				methodKey, sapEntryId);
 
 			Object returnObj = null;
 
@@ -106,14 +120,19 @@ public class SAPEntryServiceHttp {
 				returnObj = TunnelUtil.invoke(httpPrincipal, methodHandler);
 			}
 			catch (Exception e) {
-				if (e instanceof com.liferay.portal.kernel.exception.PortalException) {
-					throw (com.liferay.portal.kernel.exception.PortalException)e;
+				if (e instanceof
+						com.liferay.portal.kernel.exception.PortalException) {
+
+					throw (com.liferay.portal.kernel.exception.PortalException)
+						e;
 				}
 
-				throw new com.liferay.portal.kernel.exception.SystemException(e);
+				throw new com.liferay.portal.kernel.exception.SystemException(
+					e);
 			}
 
-			return (com.liferay.portal.security.service.access.policy.model.SAPEntry)returnObj;
+			return (com.liferay.portal.security.service.access.policy.model.
+				SAPEntry)returnObj;
 		}
 		catch (com.liferay.portal.kernel.exception.SystemException se) {
 			_log.error(se, se);
@@ -122,15 +141,21 @@ public class SAPEntryServiceHttp {
 		}
 	}
 
-	public static com.liferay.portal.security.service.access.policy.model.SAPEntry deleteSAPEntry(
-		HttpPrincipal httpPrincipal,
-		com.liferay.portal.security.service.access.policy.model.SAPEntry sapEntry)
-		throws com.liferay.portal.kernel.exception.PortalException {
-		try {
-			MethodKey methodKey = new MethodKey(SAPEntryServiceUtil.class,
-					"deleteSAPEntry", _deleteSAPEntryParameterTypes2);
+	public static
+		com.liferay.portal.security.service.access.policy.model.SAPEntry
+				deleteSAPEntry(
+					HttpPrincipal httpPrincipal,
+					com.liferay.portal.security.service.access.policy.model.
+						SAPEntry sapEntry)
+			throws com.liferay.portal.kernel.exception.PortalException {
 
-			MethodHandler methodHandler = new MethodHandler(methodKey, sapEntry);
+		try {
+			MethodKey methodKey = new MethodKey(
+				SAPEntryServiceUtil.class, "deleteSAPEntry",
+				_deleteSAPEntryParameterTypes2);
+
+			MethodHandler methodHandler = new MethodHandler(
+				methodKey, sapEntry);
 
 			Object returnObj = null;
 
@@ -138,14 +163,19 @@ public class SAPEntryServiceHttp {
 				returnObj = TunnelUtil.invoke(httpPrincipal, methodHandler);
 			}
 			catch (Exception e) {
-				if (e instanceof com.liferay.portal.kernel.exception.PortalException) {
-					throw (com.liferay.portal.kernel.exception.PortalException)e;
+				if (e instanceof
+						com.liferay.portal.kernel.exception.PortalException) {
+
+					throw (com.liferay.portal.kernel.exception.PortalException)
+						e;
 				}
 
-				throw new com.liferay.portal.kernel.exception.SystemException(e);
+				throw new com.liferay.portal.kernel.exception.SystemException(
+					e);
 			}
 
-			return (com.liferay.portal.security.service.access.policy.model.SAPEntry)returnObj;
+			return (com.liferay.portal.security.service.access.policy.model.
+				SAPEntry)returnObj;
 		}
 		catch (com.liferay.portal.kernel.exception.SystemException se) {
 			_log.error(se, se);
@@ -154,15 +184,19 @@ public class SAPEntryServiceHttp {
 		}
 	}
 
-	public static com.liferay.portal.security.service.access.policy.model.SAPEntry fetchSAPEntry(
-		HttpPrincipal httpPrincipal, long companyId, String name)
-		throws com.liferay.portal.kernel.exception.PortalException {
-		try {
-			MethodKey methodKey = new MethodKey(SAPEntryServiceUtil.class,
-					"fetchSAPEntry", _fetchSAPEntryParameterTypes3);
+	public static
+		com.liferay.portal.security.service.access.policy.model.SAPEntry
+				fetchSAPEntry(
+					HttpPrincipal httpPrincipal, long companyId, String name)
+			throws com.liferay.portal.kernel.exception.PortalException {
 
-			MethodHandler methodHandler = new MethodHandler(methodKey,
-					companyId, name);
+		try {
+			MethodKey methodKey = new MethodKey(
+				SAPEntryServiceUtil.class, "fetchSAPEntry",
+				_fetchSAPEntryParameterTypes3);
+
+			MethodHandler methodHandler = new MethodHandler(
+				methodKey, companyId, name);
 
 			Object returnObj = null;
 
@@ -170,14 +204,19 @@ public class SAPEntryServiceHttp {
 				returnObj = TunnelUtil.invoke(httpPrincipal, methodHandler);
 			}
 			catch (Exception e) {
-				if (e instanceof com.liferay.portal.kernel.exception.PortalException) {
-					throw (com.liferay.portal.kernel.exception.PortalException)e;
+				if (e instanceof
+						com.liferay.portal.kernel.exception.PortalException) {
+
+					throw (com.liferay.portal.kernel.exception.PortalException)
+						e;
 				}
 
-				throw new com.liferay.portal.kernel.exception.SystemException(e);
+				throw new com.liferay.portal.kernel.exception.SystemException(
+					e);
 			}
 
-			return (com.liferay.portal.security.service.access.policy.model.SAPEntry)returnObj;
+			return (com.liferay.portal.security.service.access.policy.model.
+				SAPEntry)returnObj;
 		}
 		catch (com.liferay.portal.kernel.exception.SystemException se) {
 			_log.error(se, se);
@@ -186,14 +225,19 @@ public class SAPEntryServiceHttp {
 		}
 	}
 
-	public static java.util.List<com.liferay.portal.security.service.access.policy.model.SAPEntry> getCompanySAPEntries(
-		HttpPrincipal httpPrincipal, long companyId, int start, int end) {
-		try {
-			MethodKey methodKey = new MethodKey(SAPEntryServiceUtil.class,
-					"getCompanySAPEntries", _getCompanySAPEntriesParameterTypes4);
+	public static java.util.List
+		<com.liferay.portal.security.service.access.policy.model.SAPEntry>
+			getCompanySAPEntries(
+				HttpPrincipal httpPrincipal, long companyId, int start,
+				int end) {
 
-			MethodHandler methodHandler = new MethodHandler(methodKey,
-					companyId, start, end);
+		try {
+			MethodKey methodKey = new MethodKey(
+				SAPEntryServiceUtil.class, "getCompanySAPEntries",
+				_getCompanySAPEntriesParameterTypes4);
+
+			MethodHandler methodHandler = new MethodHandler(
+				methodKey, companyId, start, end);
 
 			Object returnObj = null;
 
@@ -201,10 +245,13 @@ public class SAPEntryServiceHttp {
 				returnObj = TunnelUtil.invoke(httpPrincipal, methodHandler);
 			}
 			catch (Exception e) {
-				throw new com.liferay.portal.kernel.exception.SystemException(e);
+				throw new com.liferay.portal.kernel.exception.SystemException(
+					e);
 			}
 
-			return (java.util.List<com.liferay.portal.security.service.access.policy.model.SAPEntry>)returnObj;
+			return (java.util.List
+				<com.liferay.portal.security.service.access.policy.model.
+					SAPEntry>)returnObj;
 		}
 		catch (com.liferay.portal.kernel.exception.SystemException se) {
 			_log.error(se, se);
@@ -213,15 +260,21 @@ public class SAPEntryServiceHttp {
 		}
 	}
 
-	public static java.util.List<com.liferay.portal.security.service.access.policy.model.SAPEntry> getCompanySAPEntries(
-		HttpPrincipal httpPrincipal, long companyId, int start, int end,
-		com.liferay.portal.kernel.util.OrderByComparator<com.liferay.portal.security.service.access.policy.model.SAPEntry> obc) {
-		try {
-			MethodKey methodKey = new MethodKey(SAPEntryServiceUtil.class,
-					"getCompanySAPEntries", _getCompanySAPEntriesParameterTypes5);
+	public static java.util.List
+		<com.liferay.portal.security.service.access.policy.model.SAPEntry>
+			getCompanySAPEntries(
+				HttpPrincipal httpPrincipal, long companyId, int start, int end,
+				com.liferay.portal.kernel.util.OrderByComparator
+					<com.liferay.portal.security.service.access.policy.model.
+						SAPEntry> obc) {
 
-			MethodHandler methodHandler = new MethodHandler(methodKey,
-					companyId, start, end, obc);
+		try {
+			MethodKey methodKey = new MethodKey(
+				SAPEntryServiceUtil.class, "getCompanySAPEntries",
+				_getCompanySAPEntriesParameterTypes5);
+
+			MethodHandler methodHandler = new MethodHandler(
+				methodKey, companyId, start, end, obc);
 
 			Object returnObj = null;
 
@@ -229,10 +282,13 @@ public class SAPEntryServiceHttp {
 				returnObj = TunnelUtil.invoke(httpPrincipal, methodHandler);
 			}
 			catch (Exception e) {
-				throw new com.liferay.portal.kernel.exception.SystemException(e);
+				throw new com.liferay.portal.kernel.exception.SystemException(
+					e);
 			}
 
-			return (java.util.List<com.liferay.portal.security.service.access.policy.model.SAPEntry>)returnObj;
+			return (java.util.List
+				<com.liferay.portal.security.service.access.policy.model.
+					SAPEntry>)returnObj;
 		}
 		catch (com.liferay.portal.kernel.exception.SystemException se) {
 			_log.error(se, se);
@@ -241,14 +297,16 @@ public class SAPEntryServiceHttp {
 		}
 	}
 
-	public static int getCompanySAPEntriesCount(HttpPrincipal httpPrincipal,
-		long companyId) {
-		try {
-			MethodKey methodKey = new MethodKey(SAPEntryServiceUtil.class,
-					"getCompanySAPEntriesCount",
-					_getCompanySAPEntriesCountParameterTypes6);
+	public static int getCompanySAPEntriesCount(
+		HttpPrincipal httpPrincipal, long companyId) {
 
-			MethodHandler methodHandler = new MethodHandler(methodKey, companyId);
+		try {
+			MethodKey methodKey = new MethodKey(
+				SAPEntryServiceUtil.class, "getCompanySAPEntriesCount",
+				_getCompanySAPEntriesCountParameterTypes6);
+
+			MethodHandler methodHandler = new MethodHandler(
+				methodKey, companyId);
 
 			Object returnObj = null;
 
@@ -256,7 +314,8 @@ public class SAPEntryServiceHttp {
 				returnObj = TunnelUtil.invoke(httpPrincipal, methodHandler);
 			}
 			catch (Exception e) {
-				throw new com.liferay.portal.kernel.exception.SystemException(e);
+				throw new com.liferay.portal.kernel.exception.SystemException(
+					e);
 			}
 
 			return ((Integer)returnObj).intValue();
@@ -268,15 +327,18 @@ public class SAPEntryServiceHttp {
 		}
 	}
 
-	public static com.liferay.portal.security.service.access.policy.model.SAPEntry getSAPEntry(
-		HttpPrincipal httpPrincipal, long sapEntryId)
-		throws com.liferay.portal.kernel.exception.PortalException {
-		try {
-			MethodKey methodKey = new MethodKey(SAPEntryServiceUtil.class,
-					"getSAPEntry", _getSAPEntryParameterTypes7);
+	public static
+		com.liferay.portal.security.service.access.policy.model.SAPEntry
+				getSAPEntry(HttpPrincipal httpPrincipal, long sapEntryId)
+			throws com.liferay.portal.kernel.exception.PortalException {
 
-			MethodHandler methodHandler = new MethodHandler(methodKey,
-					sapEntryId);
+		try {
+			MethodKey methodKey = new MethodKey(
+				SAPEntryServiceUtil.class, "getSAPEntry",
+				_getSAPEntryParameterTypes7);
+
+			MethodHandler methodHandler = new MethodHandler(
+				methodKey, sapEntryId);
 
 			Object returnObj = null;
 
@@ -284,14 +346,19 @@ public class SAPEntryServiceHttp {
 				returnObj = TunnelUtil.invoke(httpPrincipal, methodHandler);
 			}
 			catch (Exception e) {
-				if (e instanceof com.liferay.portal.kernel.exception.PortalException) {
-					throw (com.liferay.portal.kernel.exception.PortalException)e;
+				if (e instanceof
+						com.liferay.portal.kernel.exception.PortalException) {
+
+					throw (com.liferay.portal.kernel.exception.PortalException)
+						e;
 				}
 
-				throw new com.liferay.portal.kernel.exception.SystemException(e);
+				throw new com.liferay.portal.kernel.exception.SystemException(
+					e);
 			}
 
-			return (com.liferay.portal.security.service.access.policy.model.SAPEntry)returnObj;
+			return (com.liferay.portal.security.service.access.policy.model.
+				SAPEntry)returnObj;
 		}
 		catch (com.liferay.portal.kernel.exception.SystemException se) {
 			_log.error(se, se);
@@ -300,15 +367,19 @@ public class SAPEntryServiceHttp {
 		}
 	}
 
-	public static com.liferay.portal.security.service.access.policy.model.SAPEntry getSAPEntry(
-		HttpPrincipal httpPrincipal, long companyId, String name)
-		throws com.liferay.portal.kernel.exception.PortalException {
-		try {
-			MethodKey methodKey = new MethodKey(SAPEntryServiceUtil.class,
-					"getSAPEntry", _getSAPEntryParameterTypes8);
+	public static
+		com.liferay.portal.security.service.access.policy.model.SAPEntry
+				getSAPEntry(
+					HttpPrincipal httpPrincipal, long companyId, String name)
+			throws com.liferay.portal.kernel.exception.PortalException {
 
-			MethodHandler methodHandler = new MethodHandler(methodKey,
-					companyId, name);
+		try {
+			MethodKey methodKey = new MethodKey(
+				SAPEntryServiceUtil.class, "getSAPEntry",
+				_getSAPEntryParameterTypes8);
+
+			MethodHandler methodHandler = new MethodHandler(
+				methodKey, companyId, name);
 
 			Object returnObj = null;
 
@@ -316,14 +387,19 @@ public class SAPEntryServiceHttp {
 				returnObj = TunnelUtil.invoke(httpPrincipal, methodHandler);
 			}
 			catch (Exception e) {
-				if (e instanceof com.liferay.portal.kernel.exception.PortalException) {
-					throw (com.liferay.portal.kernel.exception.PortalException)e;
+				if (e instanceof
+						com.liferay.portal.kernel.exception.PortalException) {
+
+					throw (com.liferay.portal.kernel.exception.PortalException)
+						e;
 				}
 
-				throw new com.liferay.portal.kernel.exception.SystemException(e);
+				throw new com.liferay.portal.kernel.exception.SystemException(
+					e);
 			}
 
-			return (com.liferay.portal.security.service.access.policy.model.SAPEntry)returnObj;
+			return (com.liferay.portal.security.service.access.policy.model.
+				SAPEntry)returnObj;
 		}
 		catch (com.liferay.portal.kernel.exception.SystemException se) {
 			_log.error(se, se);
@@ -332,20 +408,25 @@ public class SAPEntryServiceHttp {
 		}
 	}
 
-	public static com.liferay.portal.security.service.access.policy.model.SAPEntry updateSAPEntry(
-		HttpPrincipal httpPrincipal, long sapEntryId,
-		String allowedServiceSignatures, boolean defaultSAPEntry,
-		boolean enabled, String name,
-		java.util.Map<java.util.Locale, String> titleMap,
-		com.liferay.portal.kernel.service.ServiceContext serviceContext)
-		throws com.liferay.portal.kernel.exception.PortalException {
-		try {
-			MethodKey methodKey = new MethodKey(SAPEntryServiceUtil.class,
-					"updateSAPEntry", _updateSAPEntryParameterTypes9);
+	public static
+		com.liferay.portal.security.service.access.policy.model.SAPEntry
+				updateSAPEntry(
+					HttpPrincipal httpPrincipal, long sapEntryId,
+					String allowedServiceSignatures, boolean defaultSAPEntry,
+					boolean enabled, String name,
+					java.util.Map<java.util.Locale, String> titleMap,
+					com.liferay.portal.kernel.service.ServiceContext
+						serviceContext)
+			throws com.liferay.portal.kernel.exception.PortalException {
 
-			MethodHandler methodHandler = new MethodHandler(methodKey,
-					sapEntryId, allowedServiceSignatures, defaultSAPEntry,
-					enabled, name, titleMap, serviceContext);
+		try {
+			MethodKey methodKey = new MethodKey(
+				SAPEntryServiceUtil.class, "updateSAPEntry",
+				_updateSAPEntryParameterTypes9);
+
+			MethodHandler methodHandler = new MethodHandler(
+				methodKey, sapEntryId, allowedServiceSignatures,
+				defaultSAPEntry, enabled, name, titleMap, serviceContext);
 
 			Object returnObj = null;
 
@@ -353,14 +434,19 @@ public class SAPEntryServiceHttp {
 				returnObj = TunnelUtil.invoke(httpPrincipal, methodHandler);
 			}
 			catch (Exception e) {
-				if (e instanceof com.liferay.portal.kernel.exception.PortalException) {
-					throw (com.liferay.portal.kernel.exception.PortalException)e;
+				if (e instanceof
+						com.liferay.portal.kernel.exception.PortalException) {
+
+					throw (com.liferay.portal.kernel.exception.PortalException)
+						e;
 				}
 
-				throw new com.liferay.portal.kernel.exception.SystemException(e);
+				throw new com.liferay.portal.kernel.exception.SystemException(
+					e);
 			}
 
-			return (com.liferay.portal.security.service.access.policy.model.SAPEntry)returnObj;
+			return (com.liferay.portal.security.service.access.policy.model.
+				SAPEntry)returnObj;
 		}
 		catch (com.liferay.portal.kernel.exception.SystemException se) {
 			_log.error(se, se);
@@ -370,39 +456,41 @@ public class SAPEntryServiceHttp {
 	}
 
 	private static Log _log = LogFactoryUtil.getLog(SAPEntryServiceHttp.class);
+
 	private static final Class<?>[] _addSAPEntryParameterTypes0 = new Class[] {
-			String.class, boolean.class, boolean.class, String.class,
-			java.util.Map.class,
-			com.liferay.portal.kernel.service.ServiceContext.class
+		String.class, boolean.class, boolean.class, String.class,
+		java.util.Map.class,
+		com.liferay.portal.kernel.service.ServiceContext.class
+	};
+	private static final Class<?>[] _deleteSAPEntryParameterTypes1 =
+		new Class[] {long.class};
+	private static final Class<?>[] _deleteSAPEntryParameterTypes2 =
+		new Class[] {
+			com.liferay.portal.security.service.access.policy.model.SAPEntry.
+				class
 		};
-	private static final Class<?>[] _deleteSAPEntryParameterTypes1 = new Class[] {
-			long.class
-		};
-	private static final Class<?>[] _deleteSAPEntryParameterTypes2 = new Class[] {
-			com.liferay.portal.security.service.access.policy.model.SAPEntry.class
-		};
-	private static final Class<?>[] _fetchSAPEntryParameterTypes3 = new Class[] {
-			long.class, String.class
-		};
-	private static final Class<?>[] _getCompanySAPEntriesParameterTypes4 = new Class[] {
-			long.class, int.class, int.class
-		};
-	private static final Class<?>[] _getCompanySAPEntriesParameterTypes5 = new Class[] {
+	private static final Class<?>[] _fetchSAPEntryParameterTypes3 =
+		new Class[] {long.class, String.class};
+	private static final Class<?>[] _getCompanySAPEntriesParameterTypes4 =
+		new Class[] {long.class, int.class, int.class};
+	private static final Class<?>[] _getCompanySAPEntriesParameterTypes5 =
+		new Class[] {
 			long.class, int.class, int.class,
 			com.liferay.portal.kernel.util.OrderByComparator.class
 		};
-	private static final Class<?>[] _getCompanySAPEntriesCountParameterTypes6 = new Class[] {
-			long.class
-		};
+	private static final Class<?>[] _getCompanySAPEntriesCountParameterTypes6 =
+		new Class[] {long.class};
 	private static final Class<?>[] _getSAPEntryParameterTypes7 = new Class[] {
-			long.class
-		};
+		long.class
+	};
 	private static final Class<?>[] _getSAPEntryParameterTypes8 = new Class[] {
-			long.class, String.class
-		};
-	private static final Class<?>[] _updateSAPEntryParameterTypes9 = new Class[] {
-			long.class, String.class, boolean.class, boolean.class, String.class,
-			java.util.Map.class,
+		long.class, String.class
+	};
+	private static final Class<?>[] _updateSAPEntryParameterTypes9 =
+		new Class[] {
+			long.class, String.class, boolean.class, boolean.class,
+			String.class, java.util.Map.class,
 			com.liferay.portal.kernel.service.ServiceContext.class
 		};
+
 }

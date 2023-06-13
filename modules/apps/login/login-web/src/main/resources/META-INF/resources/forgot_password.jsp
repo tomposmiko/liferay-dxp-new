@@ -28,6 +28,8 @@ Integer reminderAttempts = (Integer)portletSession.getAttribute(WebKeys.FORGOT_P
 if (reminderAttempts == null) {
 	reminderAttempts = 0;
 }
+
+renderResponse.setTitle(LanguageUtil.get(request, "forgot-password"));
 %>
 
 <portlet:actionURL name="/login/forgot_password" var="forgotPasswordURL">
@@ -143,7 +145,7 @@ if (reminderAttempts == null) {
 						%>
 
 						<div class="alert alert-info">
-							<liferay-ui:message arguments="<%= HtmlUtil.escape(login) %>" key="a-new-password-will-be-sent-to-x-if-you-can-correctly-answer-the-following-question" translateArguments="<%= false %>" />
+							<liferay-ui:message arguments="<%= HtmlUtil.escape(login) %>" key="an-email-will-be-sent-to-x-if-you-can-correctly-answer-the-following-question" translateArguments="<%= false %>" />
 						</div>
 
 						<aui:input autoFocus="<%= true %>" label="<%= HtmlUtil.escape(LanguageUtil.get(request, user2.getReminderQueryQuestion())) %>" name="answer" type="text" />

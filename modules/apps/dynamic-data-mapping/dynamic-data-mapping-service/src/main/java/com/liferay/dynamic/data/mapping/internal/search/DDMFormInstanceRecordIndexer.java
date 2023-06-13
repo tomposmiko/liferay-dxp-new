@@ -50,8 +50,7 @@ import com.liferay.portal.kernel.search.filter.QueryFilter;
 import com.liferay.portal.kernel.service.ClassNameLocalService;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
-import com.liferay.portal.kernel.util.ResourceBundleLoader;
-import com.liferay.portal.kernel.util.ResourceBundleLoaderUtil;
+import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 
@@ -313,10 +312,7 @@ public class DDMFormInstanceRecordIndexer
 	}
 
 	protected ResourceBundle getResourceBundle(Locale defaultLocale) {
-		ResourceBundleLoader portalResourceBundleLoader =
-			ResourceBundleLoaderUtil.getPortalResourceBundleLoader();
-
-		return portalResourceBundleLoader.loadResourceBundle(defaultLocale);
+		return portal.getResourceBundle(defaultLocale);
 	}
 
 	protected String getTitle(long ddmFormInstanceId, Locale locale) {
@@ -412,6 +408,9 @@ public class DDMFormInstanceRecordIndexer
 
 	@Reference
 	protected IndexWriterHelper indexWriterHelper;
+
+	@Reference
+	protected Portal portal;
 
 	@Reference
 	protected SearchPermissionChecker searchPermissionChecker;

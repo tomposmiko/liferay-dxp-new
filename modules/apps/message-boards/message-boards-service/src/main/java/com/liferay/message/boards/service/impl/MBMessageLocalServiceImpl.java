@@ -45,7 +45,6 @@ import com.liferay.message.boards.settings.MBGroupServiceSettings;
 import com.liferay.message.boards.social.MBActivityKeys;
 import com.liferay.message.boards.util.comparator.MessageCreateDateComparator;
 import com.liferay.message.boards.util.comparator.MessageThreadComparator;
-import com.liferay.petra.reflect.ReflectionUtil;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.bean.BeanReference;
@@ -252,7 +251,10 @@ public class MBMessageLocalServiceImpl extends MBMessageLocalServiceBaseImpl {
 
 		// Message
 
-		User user = userLocalService.getUser(userId);
+		Group group = groupLocalService.getGroup(groupId);
+
+		User user = userLocalService.fetchUser(
+			PortalUtil.getValidUserId(group.getCompanyId(), userId));
 
 		userName = user.isDefaultUser() ? userName : user.getFullName();
 
@@ -1983,22 +1985,21 @@ public class MBMessageLocalServiceImpl extends MBMessageLocalServiceBaseImpl {
 				layoutURL, Portal.FRIENDLY_URL_SEPARATOR,
 				"message_boards/view_message/", message.getMessageId());
 		}
-		else {
-			Group group = groupLocalService.fetchGroup(message.getGroupId());
 
-			portletId = PortletProviderUtil.getPortletId(
-				MBMessage.class.getName(), PortletProvider.Action.MANAGE);
+		Group group = groupLocalService.fetchGroup(message.getGroupId());
 
-			PortletURL portletURL = PortalUtil.getControlPanelPortletURL(
-				request, group, portletId, 0, 0, PortletRequest.RENDER_PHASE);
+		portletId = PortletProviderUtil.getPortletId(
+			MBMessage.class.getName(), PortletProvider.Action.MANAGE);
 
-			portletURL.setParameter(
-				"mvcRenderCommandName", "/message_boards/view_message");
-			portletURL.setParameter(
-				"messageId", String.valueOf(message.getMessageId()));
+		PortletURL portletURL = PortalUtil.getControlPanelPortletURL(
+			request, group, portletId, 0, 0, PortletRequest.RENDER_PHASE);
 
-			return portletURL.toString();
-		}
+		portletURL.setParameter(
+			"mvcRenderCommandName", "/message_boards/view_message");
+		portletURL.setParameter(
+			"messageId", String.valueOf(message.getMessageId()));
+
+		return portletURL.toString();
 	}
 
 	protected String getSubject(String subject, String body) {
@@ -2010,14 +2011,15 @@ public class MBMessageLocalServiceImpl extends MBMessageLocalServiceBaseImpl {
 	}
 
 	protected MBSubscriptionSender getSubscriptionSender(
-		long userId, MBCategory category, MBMessage message, String messageURL,
-		String entryTitle, boolean htmlFormat, String messageBody,
-		String messageSubject, String messageSubjectPrefix, String inReplyTo,
-		String fromName, String fromAddress, String replyToAddress,
-		String emailAddress, String fullName,
-		LocalizedValuesMap subjectLocalizedValuesMap,
-		LocalizedValuesMap bodyLocalizedValuesMap,
-		ServiceContext serviceContext) {
+			long userId, MBCategory category, MBMessage message,
+			String messageURL, String entryTitle, boolean htmlFormat,
+			String messageBody, String messageSubject,
+			String messageSubjectPrefix, String inReplyTo, String fromName,
+			String fromAddress, String replyToAddress, String emailAddress,
+			String fullName, LocalizedValuesMap subjectLocalizedValuesMap,
+			LocalizedValuesMap bodyLocalizedValuesMap,
+			ServiceContext serviceContext)
+		throws PortalException {
 
 		MBSubscriptionSender subscriptionSender = new MBSubscriptionSender(
 			MBConstants.RESOURCE_NAME);
@@ -2032,6 +2034,8 @@ public class MBMessageLocalServiceImpl extends MBMessageLocalServiceBaseImpl {
 
 		long groupId = message.getGroupId();
 
+		Group group = groupLocalService.getGroup(groupId);
+
 		if (category.getCategoryId() !=
 				MBCategoryConstants.DEFAULT_PARENT_CATEGORY_ID) {
 
@@ -2039,18 +2043,10 @@ public class MBMessageLocalServiceImpl extends MBMessageLocalServiceBaseImpl {
 				"[$CATEGORY_NAME$]", category.getName(), true);
 		}
 		else {
-			try {
-				Group group = groupLocalService.getGroup(groupId);
-
-				subscriptionSender.setLocalizedContextAttribute(
-					"[$CATEGORY_NAME$]",
-					new EscapableLocalizableFunction(
-						locale -> _getLocalizedRootCategoryName(
-							group, locale)));
-			}
-			catch (PortalException pe) {
-				ReflectionUtil.throwException(pe);
-			}
+			subscriptionSender.setLocalizedContextAttribute(
+				"[$CATEGORY_NAME$]",
+				new EscapableLocalizableFunction(
+					locale -> _getLocalizedRootCategoryName(group, locale)));
 		}
 
 		subscriptionSender.setContextAttributes(
@@ -2066,6 +2062,10 @@ public class MBMessageLocalServiceImpl extends MBMessageLocalServiceBaseImpl {
 		subscriptionSender.setFullName(fullName);
 		subscriptionSender.setHtmlFormat(htmlFormat);
 		subscriptionSender.setInReplyTo(inReplyTo);
+		subscriptionSender.setLocalizedContextAttribute(
+			"[$SITE_NAME$]",
+			new EscapableLocalizableFunction(
+				locale -> _getGroupDescriptiveName(group, locale)));
 
 		if (bodyLocalizedValuesMap != null) {
 			subscriptionSender.setLocalizedBodyMap(
@@ -2618,6 +2618,20 @@ public class MBMessageLocalServiceImpl extends MBMessageLocalServiceBaseImpl {
 			fileEntry.getFolderId());
 
 		return GetterUtil.getLong(folder.getName());
+	}
+
+	private String _getGroupDescriptiveName(Group group, Locale locale) {
+		try {
+			return group.getDescriptiveName(locale);
+		}
+		catch (PortalException pe) {
+			_log.error(
+				"Unable to get descriptive name for group " +
+					group.getGroupId(),
+				pe);
+		}
+
+		return StringPool.BLANK;
 	}
 
 	private long _getRootDiscussionMessageId(String className, long classPK)

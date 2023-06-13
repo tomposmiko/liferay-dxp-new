@@ -751,7 +751,7 @@ definition {
 
 		Page.viewSpecificPG(pageNameList = "Home,Wiki");
 
-		AssertTextEquals.assertTextCaseInsensitive(
+		AssertTextEquals(
 			locator1 = "Portlet#SPECIFIC_TITLE",
 			value1 = "Message Boards",
 			key_portletTitleName = "Message Boards"
@@ -1386,7 +1386,11 @@ definition {
 			configurationScope = "System Scope"
 		);
 
-		AssertClick(locator1 = "Button#ADD", value1 = "Add");
+		AssertClick(
+			locator1 = "Button#ANY",
+			value1 = "Add",
+			key_text = "Add"
+		);
 
 		for (var settingName : list "Name,Children Types") {
 			SystemSettings.editTextAreaSetting(

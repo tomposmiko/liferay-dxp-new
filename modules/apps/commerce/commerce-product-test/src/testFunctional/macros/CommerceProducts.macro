@@ -1,0 +1,48 @@
+definition {
+	macro addEntry {
+		CommerceNavigator.gotoCommercePortletNavItem(navItem = "Products");
+
+		Click(locator1 = "Button#PLUS");
+
+		Click(
+			locator1 = "MenuItem#DROPDOWN_MENU_ITEM",
+			value1 = "${key_menuItem}",
+			key_menuItem = "${productType}"
+		);
+
+		CommerceEntry.addProductsEntry(
+			productFullDescription = "${productFullDescription}",
+			productName = "${productName}",
+			productShortDescription = "${productShortDescription}"
+		);
+	}
+
+	macro deleteEntries {
+		Click(locator1 = "CommerceNavigation#SELECT_ALL_CHECKBOX");
+
+		Click(locator1 = "Button#DELETE");
+
+		AssertConfirm.waitForConfirmation(value1 = "${deleteMessage}");
+	}
+
+	macro moveCatalogEntriesToRecycleBin {
+		Click(locator1 = "CommerceNavigation#SELECT_ALL_CHECKBOX");
+
+		Click(locator1 = "Button#RECYCLE_BIN");
+	}
+
+	macro moveCatalogEntryToRecycleBinViaCheckbox {
+		Click(
+			locator1 = "CommerceNavigation#SINGLE_ENTRY_CHECKBOX",
+			key_entryName = "${productName}"
+		);
+
+		Click(locator1 = "Button#RECYCLE_BIN");
+
+		AssertElementPresent(locator1 = "Message#SUCCESS");
+
+		AssertElementNotPresent(locator1 = "Message#ERROR");
+
+		AssertElementPresent(locator1 = "CommerceNavigation#EMPTY_SEARCH_CONTAINER");
+	}
+}

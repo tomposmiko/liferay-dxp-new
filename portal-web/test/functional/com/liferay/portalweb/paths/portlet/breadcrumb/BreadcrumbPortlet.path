@@ -15,12 +15,12 @@
 </tr>
 <tr>
 	<td>BREADCRUMB_PAGE_LINK</td>
-	<td>//div[contains(@id,'breadcrumb')]/ul/li/a[@href='${key_URL}']</td>
+	<td>//nav[contains(@id,'breadcrumb')]/ul/li/a[@href='${key_URL}']</td>
 	<td></td>
 </tr>
 <tr>
 	<td>BREADCRUMB_ADT</td>
-	<td>//div/ul[contains(@class,'breadcrumb-${key_breadcrumbADTType}')] | //div[contains(@class,'breadcrumb-${key_breadcrumbADTType}')]</td>
+	<td>//nav/ul[contains(@class,'breadcrumb-${key_breadcrumbADTType}')] | //div[contains(@class,'breadcrumb-${key_breadcrumbADTType}')]</td>
 	<td></td>
 </tr>
 <tr>

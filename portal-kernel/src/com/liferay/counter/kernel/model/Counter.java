@@ -25,19 +25,20 @@ import com.liferay.portal.kernel.util.Accessor;
  *
  * @author Brian Wing Shun Chan
  * @see CounterModel
- * @see com.liferay.counter.model.impl.CounterImpl
- * @see com.liferay.counter.model.impl.CounterModelImpl
  * @generated
  */
 @ImplementationClassName("com.liferay.counter.model.impl.CounterImpl")
 @ProviderType
 public interface Counter extends CounterModel, PersistedModel {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
-	 * Never modify this interface directly. Add methods to {@link com.liferay.counter.model.impl.CounterImpl} and rerun ServiceBuilder to automatically copy the method declarations to this interface.
+	 * Never modify this interface directly. Add methods to <code>com.liferay.counter.model.impl.CounterImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
 	 */
-	public static final Accessor<Counter, String> NAME_ACCESSOR = new Accessor<Counter, String>() {
+	public static final Accessor<Counter, String> NAME_ACCESSOR =
+		new Accessor<Counter, String>() {
+
 			@Override
 			public String get(Counter counter) {
 				return counter.getName();
@@ -52,5 +53,7 @@ public interface Counter extends CounterModel, PersistedModel {
 			public Class<Counter> getTypeClass() {
 				return Counter.class;
 			}
+
 		};
+
 }

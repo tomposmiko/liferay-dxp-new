@@ -7,9 +7,9 @@ definition {
 
 		selenium.waitForVisible();
 
-		selenium.waitForPartialText();
+		selenium.waitForPartialTextCaseInsensitive();
 
-		selenium.assertPartialText();
+		selenium.assertPartialTextCaseInsensitive();
 
 		selenium.assertJavaScriptErrors();
 
@@ -35,23 +35,23 @@ definition {
 
 		selenium.waitForVisible();
 
-		selenium.waitForText();
+		selenium.waitForTextCaseInsensitive();
 
-		selenium.assertText();
+		selenium.assertTextCaseInsensitive();
 
 		selenium.assertJavaScriptErrors();
 
 		selenium.assertLiferayErrors();
 	}
 
-	function assertTextCaseInsensitive {
+	function assertTextCaseSensitive {
 		WaitForSPARefresh();
 
 		selenium.waitForVisible();
 
-		selenium.waitForTextCaseInsensitive();
+		selenium.waitForText();
 
-		selenium.assertTextCaseInsensitive();
+		selenium.assertText();
 
 		selenium.assertJavaScriptErrors();
 

@@ -58,7 +58,7 @@ import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
 /**
- * @author Eduardo Garcia
+ * @author Eduardo García
  */
 @Component(
 	immediate = true,
@@ -214,7 +214,7 @@ public class AssetPublisherPortletToolbarContributor
 
 		urlMenuItem.setData(data);
 
-		urlMenuItem.setLabel(HtmlUtil.escape(message));
+		urlMenuItem.setLabel(message);
 
 		long curGroupId = groupId;
 

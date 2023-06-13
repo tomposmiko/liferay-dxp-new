@@ -15,6 +15,7 @@
 package com.liferay.portal.apio.internal.architect.provider;
 
 import com.liferay.apio.architect.language.AcceptLanguage;
+import com.liferay.portal.kernel.util.LocaleUtil;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -29,7 +30,7 @@ import org.junit.Test;
 import org.springframework.mock.web.MockHttpServletRequest;
 
 /**
- * @author Ruben Pulido
+ * @author Rubén Pulido
  */
 public class AcceptLanguageProviderTest {
 
@@ -45,7 +46,7 @@ public class AcceptLanguageProviderTest {
 			HttpHeaders.ACCEPT_LANGUAGE, "someValue");
 
 		List<Locale> locales = Arrays.asList(
-			Locale.JAPAN, Locale.GERMAN, Locale.US);
+			LocaleUtil.JAPAN, LocaleUtil.GERMAN, LocaleUtil.US);
 
 		mockHttpServletRequest.setPreferredLocales(locales);
 
@@ -67,9 +68,9 @@ public class AcceptLanguageProviderTest {
 
 		List<Locale> locales = new ArrayList<Locale>() {
 			{
-				add(Locale.JAPAN);
-				add(Locale.GERMAN);
-				add(Locale.US);
+				add(LocaleUtil.JAPAN);
+				add(LocaleUtil.GERMAN);
+				add(LocaleUtil.US);
 			}
 		};
 

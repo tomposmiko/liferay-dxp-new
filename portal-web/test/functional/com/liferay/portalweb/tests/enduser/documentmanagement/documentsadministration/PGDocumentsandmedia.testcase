@@ -3,6 +3,7 @@ definition {
 	property portal.release = "true";
 	property portal.upstream = "true";
 	property custom.properties = "default.layout.template.id=1_column";
+	property test.assert.warning.exceptions = "true";
 	property testray.main.component.name = "Documents Management";
 	var pageName = "Documents and Media Page";
 	var portletName = "Documents and Media";
@@ -1190,9 +1191,13 @@ definition {
 
 		Navigator.gotoNavTab(navTab = "Miscellaneous");
 
+		var googlePropertiesSet = MathUtil.randomNumber("3");
+		var googleAppsAPIKey = PropsUtil.get("google.api.key.${googlePropertiesSet}");
+		var googleClientID = PropsUtil.get("google.client.id.${googlePropertiesSet}");
+
 		PortalSettings.configureGoogleApps(
-			googleAppsAPIKey = PropsUtil.get("google.api.key"),
-			googleClientID = PropsUtil.get("google.client.id")
+			googleAppsAPIKey = "${googleAppsAPIKey}",
+			googleClientID = "${googleClientID}"
 		);
 
 		Navigator.gotoPage(pageName = "Documents and Media Page");

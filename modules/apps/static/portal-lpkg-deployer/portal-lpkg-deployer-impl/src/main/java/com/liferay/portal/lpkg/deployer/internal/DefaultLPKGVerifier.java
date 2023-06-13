@@ -14,9 +14,7 @@
 
 package com.liferay.portal.lpkg.deployer.internal;
 
-import com.liferay.petra.string.CharPool;
 import com.liferay.portal.kernel.util.StringBundler;
-import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.lpkg.deployer.LPKGVerifier;
 import com.liferay.portal.lpkg.deployer.LPKGVerifyException;
@@ -107,12 +105,10 @@ public class DefaultLPKGVerifier implements LPKGVerifier {
 					oldBundles.add(bundle);
 				}
 				else {
-					String path = lpkgFile.getCanonicalPath();
+					String location = LPKGLocationUtil.getLPKGLocation(
+						lpkgFile);
 
-					path = StringUtil.replace(
-						path, CharPool.BACK_SLASH, CharPool.FORWARD_SLASH);
-
-					if (path.equals(bundle.getLocation())) {
+					if (location.equals(bundle.getLocation())) {
 						continue;
 					}
 
@@ -120,7 +116,7 @@ public class DefaultLPKGVerifier implements LPKGVerifier {
 						StringBundler.concat(
 							"Existing LPKG bundle ", String.valueOf(bundle),
 							" has the same symbolic name and version as LPKG ",
-							"file ", path));
+							"file ", location));
 				}
 			}
 

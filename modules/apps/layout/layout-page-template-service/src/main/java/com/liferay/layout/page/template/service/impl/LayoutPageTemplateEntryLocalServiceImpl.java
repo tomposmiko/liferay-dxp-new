@@ -302,6 +302,13 @@ public class LayoutPageTemplateEntryLocalServiceImpl
 	}
 
 	@Override
+	public LayoutPageTemplateEntry fetchLayoutPageTemplateEntry(
+		long groupId, String name) {
+
+		return layoutPageTemplateEntryPersistence.fetchByG_N(groupId, name);
+	}
+
+	@Override
 	public List<LayoutPageTemplateEntry> getLayoutPageTemplateEntries(
 		long groupId, long layoutPageTemplateCollectionId) {
 

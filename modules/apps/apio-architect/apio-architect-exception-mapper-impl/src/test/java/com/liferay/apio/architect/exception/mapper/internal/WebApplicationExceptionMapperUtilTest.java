@@ -36,8 +36,8 @@ public class WebApplicationExceptionMapperUtilTest {
 	@Test(expected = UnsupportedOperationException.class)
 	public void testConstructorThrowsException() throws Throwable {
 		Constructor<?> constructor =
-			WebApplicationExceptionMapperUtil.class.
-				getDeclaredConstructors()[0];
+			WebApplicationExceptionMapperUtil.class.getDeclaredConstructors()
+				[0];
 
 		constructor.setAccessible(true);
 

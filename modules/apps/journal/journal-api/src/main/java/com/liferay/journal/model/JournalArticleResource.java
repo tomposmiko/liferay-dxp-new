@@ -25,34 +25,39 @@ import com.liferay.portal.kernel.util.Accessor;
  *
  * @author Brian Wing Shun Chan
  * @see JournalArticleResourceModel
- * @see com.liferay.journal.model.impl.JournalArticleResourceImpl
- * @see com.liferay.journal.model.impl.JournalArticleResourceModelImpl
  * @generated
  */
-@ImplementationClassName("com.liferay.journal.model.impl.JournalArticleResourceImpl")
+@ImplementationClassName(
+	"com.liferay.journal.model.impl.JournalArticleResourceImpl"
+)
 @ProviderType
-public interface JournalArticleResource extends JournalArticleResourceModel,
-	PersistedModel {
+public interface JournalArticleResource
+	extends JournalArticleResourceModel, PersistedModel {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
-	 * Never modify this interface directly. Add methods to {@link com.liferay.journal.model.impl.JournalArticleResourceImpl} and rerun ServiceBuilder to automatically copy the method declarations to this interface.
+	 * Never modify this interface directly. Add methods to <code>com.liferay.journal.model.impl.JournalArticleResourceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
 	 */
-	public static final Accessor<JournalArticleResource, Long> RESOURCE_PRIM_KEY_ACCESSOR =
-		new Accessor<JournalArticleResource, Long>() {
-			@Override
-			public Long get(JournalArticleResource journalArticleResource) {
-				return journalArticleResource.getResourcePrimKey();
-			}
+	public static final Accessor<JournalArticleResource, Long>
+		RESOURCE_PRIM_KEY_ACCESSOR =
+			new Accessor<JournalArticleResource, Long>() {
 
-			@Override
-			public Class<Long> getAttributeClass() {
-				return Long.class;
-			}
+				@Override
+				public Long get(JournalArticleResource journalArticleResource) {
+					return journalArticleResource.getResourcePrimKey();
+				}
 
-			@Override
-			public Class<JournalArticleResource> getTypeClass() {
-				return JournalArticleResource.class;
-			}
-		};
+				@Override
+				public Class<Long> getAttributeClass() {
+					return Long.class;
+				}
+
+				@Override
+				public Class<JournalArticleResource> getTypeClass() {
+					return JournalArticleResource.class;
+				}
+
+			};
+
 }

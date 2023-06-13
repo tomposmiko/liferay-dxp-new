@@ -28,7 +28,7 @@ import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.PageContext;
 
 /**
- * @author Ambrin Chaudhary
+ * @author Ambrín Chaudhary
  */
 public class AddMenuTag extends IncludeTag {
 
@@ -183,11 +183,8 @@ public class AddMenuTag extends IncludeTag {
 	}
 
 	protected List<AddMenuItem> getAddMenuItems() {
-		List<AddMenuItem> addMenuItems =
-			(List<AddMenuItem>)request.getAttribute(
-				"liferay-frontend:add-menu:addMenuItems");
-
-		return addMenuItems;
+		return (List<AddMenuItem>)request.getAttribute(
+			"liferay-frontend:add-menu:addMenuItems");
 	}
 
 	@Override

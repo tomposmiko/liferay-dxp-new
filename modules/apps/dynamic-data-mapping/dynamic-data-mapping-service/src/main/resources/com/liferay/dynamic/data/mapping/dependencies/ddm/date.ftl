@@ -16,9 +16,17 @@
 			void = fieldValue.setTimeInMillis(dateValue?long)
 		/>
 	<#elseif validator.isNotNull(predefinedValue)>
-		<#assign
-			dateValue = predefinedValue?date["MM/dd/yyyy"]
+		<#if predefinedValue?contains("/")>
+			<#assign
+				dateValue = predefinedValue?date["MM/dd/yyyy"]
+			/>
+		<#elseif predefinedValue?contains("-")>
+			<#assign
+				dateValue = predefinedValue?date["yyyy-MM-dd"]
+			/>
+		</#if>
 
+		<#assign
 			fieldValue = calendarFactory.getCalendar(requestedLocale)
 
 			void = fieldValue.setTimeInMillis(dateValue?long)
@@ -66,6 +74,7 @@
 	helpMessage=escape(fieldStructure.tip)
 	label=escape(label)
 	name=namespacedFieldName
+	required=required
 >
 	<div class="form-group">
 		<@liferay_ui["input-date"]

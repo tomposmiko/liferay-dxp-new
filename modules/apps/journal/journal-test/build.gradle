@@ -3,7 +3,7 @@ copyLibs {
 }
 
 dependencies {
-	compileOnly group: "com.liferay.portal", name: "com.liferay.util.java", version: "3.0.0"
+	compileOnly group: "com.liferay.portal", name: "com.liferay.util.java", version: "default"
 	compileOnly project(":apps:export-import:export-import-api")
 	compileOnly project(":apps:petra:petra-xml")
 	compileOnly project(":core:petra:petra-lang")
@@ -17,7 +17,7 @@ dependencies {
 	testCompile project(":apps:portal-search:portal-search")
 	testCompile project(":core:registry-api")
 
-	testIntegrationCompile group: "com.liferay", name: "com.liferay.arquillian.extension.junit.bridge", version: "1.0.10"
+	testIntegrationCompile group: "com.liferay", name: "com.liferay.arquillian.extension.junit.bridge", version: "1.0.15"
 	testIntegrationCompile group: "com.liferay.portal", name: "com.liferay.portal.impl", version: "default"
 	testIntegrationCompile project(":apps:asset:asset-api")
 	testIntegrationCompile project(":apps:asset:asset-test-util")

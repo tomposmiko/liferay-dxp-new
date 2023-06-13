@@ -21,6 +21,7 @@ import com.liferay.apio.architect.routes.NestedCollectionRoutes;
 import com.liferay.document.library.kernel.service.DLAppService;
 import com.liferay.folder.apio.architect.identifier.FolderIdentifier;
 import com.liferay.media.object.apio.architect.identifier.MediaObjectIdentifier;
+import com.liferay.media.object.apio.architect.model.MediaObject;
 import com.liferay.media.object.apio.internal.architect.form.MediaObjectCreatorForm;
 import com.liferay.media.object.apio.internal.helper.MediaObjectHelper;
 import com.liferay.portal.apio.permission.HasPermission;
@@ -39,7 +40,7 @@ import org.osgi.service.component.annotations.Reference;
  * inside a <a href="http://schema.org/Folder">Folder</a> through a web API. The
  * resources are mapped from the internal model {@link FileEntry}.
  *
- * @author Eduardo Perez
+ * @author Eduardo Pérez
  */
 @Component(immediate = true, service = NestedCollectionRouter.class)
 public class FolderMediaObjectNestedCollectionRouter
@@ -53,20 +54,19 @@ public class FolderMediaObjectNestedCollectionRouter
 		return builder.addGetter(
 			this::_getPageItems
 		).addCreator(
-			this::_getFileEntry,
+			this::_addFileEntry,
 			_hasPermission.forAddingIn(FolderIdentifier.class),
 			MediaObjectCreatorForm::buildForm
 		).build();
 	}
 
-	private FileEntry _getFileEntry(
-			long folderId, MediaObjectCreatorForm mediaObjectCreatorForm)
+	private FileEntry _addFileEntry(long folderId, MediaObject mediaObject)
 		throws Exception {
 
 		Folder folder = _dlAppService.getFolder(folderId);
 
 		return _mediaObjectHelper.addFileEntry(
-			folder.getRepositoryId(), folderId, mediaObjectCreatorForm);
+			folder.getRepositoryId(), folderId, mediaObject);
 	}
 
 	private PageItems<FileEntry> _getPageItems(

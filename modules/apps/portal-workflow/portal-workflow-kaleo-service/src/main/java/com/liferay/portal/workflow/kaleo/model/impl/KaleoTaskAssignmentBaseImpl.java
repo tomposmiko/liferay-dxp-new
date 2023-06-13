@@ -34,10 +34,11 @@ import com.liferay.portal.workflow.kaleo.service.KaleoTaskAssignmentLocalService
 @ProviderType
 public abstract class KaleoTaskAssignmentBaseImpl
 	extends KaleoTaskAssignmentModelImpl implements KaleoTaskAssignment {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
-	 * Never modify or reference this class directly. All methods that expect a kaleo task assignment model instance should use the {@link KaleoTaskAssignment} interface instead.
+	 * Never modify or reference this class directly. All methods that expect a kaleo task assignment model instance should use the <code>KaleoTaskAssignment</code> interface instead.
 	 */
 	@Override
 	public void persist() {
@@ -48,4 +49,5 @@ public abstract class KaleoTaskAssignmentBaseImpl
 			KaleoTaskAssignmentLocalServiceUtil.updateKaleoTaskAssignment(this);
 		}
 	}
+
 }

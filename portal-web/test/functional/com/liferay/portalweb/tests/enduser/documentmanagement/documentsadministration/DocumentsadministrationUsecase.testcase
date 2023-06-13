@@ -3,6 +3,7 @@ definition {
 	property portal.release = "true";
 	property portal.upstream = "true";
 	property custom.properties = "default.layout.template.id=1_column";
+	property test.assert.warning.exceptions = "true";
 	property testray.main.component.name = "Documents Management";
 
 	setUp {
@@ -604,22 +605,18 @@ definition {
 
 		Navigator.gotoPage(pageName = "Documents and Media Page");
 
-		DMDocument.viewCheckedoutPG(
+		DMDocument.editCmdPG(
+			checkedOut = "true",
 			dmDocumentTitle = "Document_1.doc",
-			status = "Approved"
+			userName = "Test Test"
 		);
-
-		for (var menuItem : list "Checkout,Edit,Move,Move to Recycle Bin") {
-			AssertElementNotPresent(
-				locator1 = "MenuItem#ANY_MENU_ITEM",
-				key_menuItem = "${menuItem}"
-			);
-		}
 	}
 
 	@description = "This test checks if the file extension upload restrictions in System Settings works as expected."
 	@priority = "5"
 	test CheckValidationForFileEntries {
+		property test.name.skip.portal.instance = "DocumentsadministrationUsecase#CheckValidationForFileEntries";
+
 		ProductMenu.gotoPortlet(
 			category = "Configuration",
 			panel = "Control Panel",
@@ -634,13 +631,13 @@ definition {
 
 		ScrollWebElementIntoView(locator1 = "TextArea#ANY", key_text = "fileExtensions");
 
-		Type(locator1 = "TextArea#ANY", value1 = ".doc", key_text = "fileExtensions");
+		Type(
+			locator1 = "TextArea#ANY",
+			value1 = ".doc",
+			key_text = "fileExtensions"
+		);
 
-		ScrollWebElementIntoView(locator1 = "Button#UPDATE");
-
-		AssertClick(locator1 = "Button#UPDATE", value1 = "Update");
-
-		AssertElementPresent(locator1 = "Message#SUCCESS");
+		SystemSettings.saveConfiguration();
 
 		ProductMenu.gotoPortlet(
 			category = "Content",
@@ -739,7 +736,7 @@ definition {
 		DMNavigator.gotoDocumentCP(dmDocumentTitle = "Zero Document File");
 
 		DMDocument.viewCP(
-			dmDocumentSize = "0KB",
+			dmDocumentSize = "0B",
 			dmDocumentTitle = "Zero Document File"
 		);
 
@@ -829,6 +826,18 @@ definition {
 		property custom.properties = "xuggler.enabled=true${line.separator}dl.file.entry.preview.video.width=0${line.separator}dl.file.entry.preview.video.height=0";
 		property dummy.socket.proxy.disabled = "true";
 		property test.name.skip.portal.instance = "DocumentsadministrationUsecase#ConfigureXugglerVideoPreviewSizePG";
+
+		ProductMenu.gotoPortlet(
+			category = "Configuration",
+			panel = "Control Panel",
+			portlet = "Server Administration"
+		);
+
+		ServerAdministration.configureExternalServices(installXuggler = "true");
+
+		Portlet.shutdownServer();
+
+		Portlet.startServer(deleteLiferayHome = "false");
 
 		ProductMenu.gotoPortlet(
 			category = "Configuration",
@@ -1574,7 +1583,6 @@ definition {
 		DMDocument.addCP(
 			dmDocumentDescription = "DM Document Description",
 			dmDocumentFile = "Document_1.txt",
-			dmDocumentSize = "0KB",
 			dmDocumentTitle = "DM Document Title"
 		);
 

@@ -17,7 +17,6 @@ package com.liferay.chat.model;
 import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.expando.kernel.model.ExpandoBridge;
-
 import com.liferay.portal.kernel.model.ModelWrapper;
 import com.liferay.portal.kernel.service.ServiceContext;
 
@@ -38,6 +37,7 @@ import java.util.Objects;
  */
 @ProviderType
 public class EntryWrapper implements Entry, ModelWrapper<Entry> {
+
 	public EntryWrapper(Entry entry) {
 		_entry = entry;
 	}
@@ -116,30 +116,30 @@ public class EntryWrapper implements Entry, ModelWrapper<Entry> {
 	}
 
 	/**
-	* Returns the content of this entry.
-	*
-	* @return the content of this entry
-	*/
+	 * Returns the content of this entry.
+	 *
+	 * @return the content of this entry
+	 */
 	@Override
 	public String getContent() {
 		return _entry.getContent();
 	}
 
 	/**
-	* Returns the create date of this entry.
-	*
-	* @return the create date of this entry
-	*/
+	 * Returns the create date of this entry.
+	 *
+	 * @return the create date of this entry
+	 */
 	@Override
 	public long getCreateDate() {
 		return _entry.getCreateDate();
 	}
 
 	/**
-	* Returns the entry ID of this entry.
-	*
-	* @return the entry ID of this entry
-	*/
+	 * Returns the entry ID of this entry.
+	 *
+	 * @return the entry ID of this entry
+	 */
 	@Override
 	public long getEntryId() {
 		return _entry.getEntryId();
@@ -151,40 +151,40 @@ public class EntryWrapper implements Entry, ModelWrapper<Entry> {
 	}
 
 	/**
-	* Returns the flag of this entry.
-	*
-	* @return the flag of this entry
-	*/
+	 * Returns the flag of this entry.
+	 *
+	 * @return the flag of this entry
+	 */
 	@Override
 	public int getFlag() {
 		return _entry.getFlag();
 	}
 
 	/**
-	* Returns the from user ID of this entry.
-	*
-	* @return the from user ID of this entry
-	*/
+	 * Returns the from user ID of this entry.
+	 *
+	 * @return the from user ID of this entry
+	 */
 	@Override
 	public long getFromUserId() {
 		return _entry.getFromUserId();
 	}
 
 	/**
-	* Returns the from user uuid of this entry.
-	*
-	* @return the from user uuid of this entry
-	*/
+	 * Returns the from user uuid of this entry.
+	 *
+	 * @return the from user uuid of this entry
+	 */
 	@Override
 	public String getFromUserUuid() {
 		return _entry.getFromUserUuid();
 	}
 
 	/**
-	* Returns the primary key of this entry.
-	*
-	* @return the primary key of this entry
-	*/
+	 * Returns the primary key of this entry.
+	 *
+	 * @return the primary key of this entry
+	 */
 	@Override
 	public long getPrimaryKey() {
 		return _entry.getPrimaryKey();
@@ -196,20 +196,20 @@ public class EntryWrapper implements Entry, ModelWrapper<Entry> {
 	}
 
 	/**
-	* Returns the to user ID of this entry.
-	*
-	* @return the to user ID of this entry
-	*/
+	 * Returns the to user ID of this entry.
+	 *
+	 * @return the to user ID of this entry
+	 */
 	@Override
 	public long getToUserId() {
 		return _entry.getToUserId();
 	}
 
 	/**
-	* Returns the to user uuid of this entry.
-	*
-	* @return the to user uuid of this entry
-	*/
+	 * Returns the to user uuid of this entry.
+	 *
+	 * @return the to user uuid of this entry
+	 */
 	@Override
 	public String getToUserUuid() {
 		return _entry.getToUserUuid();
@@ -246,30 +246,30 @@ public class EntryWrapper implements Entry, ModelWrapper<Entry> {
 	}
 
 	/**
-	* Sets the content of this entry.
-	*
-	* @param content the content of this entry
-	*/
+	 * Sets the content of this entry.
+	 *
+	 * @param content the content of this entry
+	 */
 	@Override
 	public void setContent(String content) {
 		_entry.setContent(content);
 	}
 
 	/**
-	* Sets the create date of this entry.
-	*
-	* @param createDate the create date of this entry
-	*/
+	 * Sets the create date of this entry.
+	 *
+	 * @param createDate the create date of this entry
+	 */
 	@Override
 	public void setCreateDate(long createDate) {
 		_entry.setCreateDate(createDate);
 	}
 
 	/**
-	* Sets the entry ID of this entry.
-	*
-	* @param entryId the entry ID of this entry
-	*/
+	 * Sets the entry ID of this entry.
+	 *
+	 * @param entryId the entry ID of this entry
+	 */
 	@Override
 	public void setEntryId(long entryId) {
 		_entry.setEntryId(entryId);
@@ -278,6 +278,7 @@ public class EntryWrapper implements Entry, ModelWrapper<Entry> {
 	@Override
 	public void setExpandoBridgeAttributes(
 		com.liferay.portal.kernel.model.BaseModel<?> baseModel) {
+
 		_entry.setExpandoBridgeAttributes(baseModel);
 	}
 
@@ -292,30 +293,30 @@ public class EntryWrapper implements Entry, ModelWrapper<Entry> {
 	}
 
 	/**
-	* Sets the flag of this entry.
-	*
-	* @param flag the flag of this entry
-	*/
+	 * Sets the flag of this entry.
+	 *
+	 * @param flag the flag of this entry
+	 */
 	@Override
 	public void setFlag(int flag) {
 		_entry.setFlag(flag);
 	}
 
 	/**
-	* Sets the from user ID of this entry.
-	*
-	* @param fromUserId the from user ID of this entry
-	*/
+	 * Sets the from user ID of this entry.
+	 *
+	 * @param fromUserId the from user ID of this entry
+	 */
 	@Override
 	public void setFromUserId(long fromUserId) {
 		_entry.setFromUserId(fromUserId);
 	}
 
 	/**
-	* Sets the from user uuid of this entry.
-	*
-	* @param fromUserUuid the from user uuid of this entry
-	*/
+	 * Sets the from user uuid of this entry.
+	 *
+	 * @param fromUserUuid the from user uuid of this entry
+	 */
 	@Override
 	public void setFromUserUuid(String fromUserUuid) {
 		_entry.setFromUserUuid(fromUserUuid);
@@ -327,10 +328,10 @@ public class EntryWrapper implements Entry, ModelWrapper<Entry> {
 	}
 
 	/**
-	* Sets the primary key of this entry.
-	*
-	* @param primaryKey the primary key of this entry
-	*/
+	 * Sets the primary key of this entry.
+	 *
+	 * @param primaryKey the primary key of this entry
+	 */
 	@Override
 	public void setPrimaryKey(long primaryKey) {
 		_entry.setPrimaryKey(primaryKey);
@@ -342,20 +343,20 @@ public class EntryWrapper implements Entry, ModelWrapper<Entry> {
 	}
 
 	/**
-	* Sets the to user ID of this entry.
-	*
-	* @param toUserId the to user ID of this entry
-	*/
+	 * Sets the to user ID of this entry.
+	 *
+	 * @param toUserId the to user ID of this entry
+	 */
 	@Override
 	public void setToUserId(long toUserId) {
 		_entry.setToUserId(toUserId);
 	}
 
 	/**
-	* Sets the to user uuid of this entry.
-	*
-	* @param toUserUuid the to user uuid of this entry
-	*/
+	 * Sets the to user uuid of this entry.
+	 *
+	 * @param toUserUuid the to user uuid of this entry
+	 */
 	@Override
 	public void setToUserUuid(String toUserUuid) {
 		_entry.setToUserUuid(toUserUuid);
@@ -426,4 +427,5 @@ public class EntryWrapper implements Entry, ModelWrapper<Entry> {
 	}
 
 	private final Entry _entry;
+
 }

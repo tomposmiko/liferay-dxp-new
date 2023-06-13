@@ -15,6 +15,9 @@
 package com.liferay.exportimport.internal.verify.system.event;
 
 import com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery;
+import com.liferay.portal.kernel.dao.orm.Property;
+import com.liferay.portal.kernel.dao.orm.PropertyFactoryUtil;
+import com.liferay.portal.kernel.dao.orm.RestrictionsFactoryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.service.GroupLocalService;
@@ -38,13 +41,28 @@ public class SystemEventVerifyProcess extends VerifyProcess {
 		ActionableDynamicQuery actionableDynamicQuery =
 			_groupLocalService.getActionableDynamicQuery();
 
+		actionableDynamicQuery.setAddCriteriaMethod(
+			dynamicQuery -> {
+				Property liveGroupIdProperty = PropertyFactoryUtil.forName(
+					"liveGroupId");
+				Property remoteStagingGroupCountProperty =
+					PropertyFactoryUtil.forName("remoteStagingGroupCount");
+
+				dynamicQuery.add(
+					RestrictionsFactoryUtil.or(
+						liveGroupIdProperty.ne(0L),
+						remoteStagingGroupCountProperty.gt(0)));
+			});
 		actionableDynamicQuery.setPerformActionMethod(
 			(Group group) -> {
-				if (!_systemEventLocalService.validateGroup(
-						group.getGroupId())) {
+				long liveGroupId = group.getLiveGroupId();
 
-					_systemEventLocalService.deleteSystemEvents(
-						group.getGroupId());
+				if (liveGroupId == 0) {
+					liveGroupId = group.getGroupId();
+				}
+
+				if (!_systemEventLocalService.validateGroup(liveGroupId)) {
+					_systemEventLocalService.deleteSystemEvents(liveGroupId);
 				}
 			});
 

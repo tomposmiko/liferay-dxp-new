@@ -132,6 +132,10 @@ public class VelocityTemplateTest {
 			RuntimeConstants.INTROSPECTOR_RESTRICT_CLASSES,
 			StringUtil.merge(velocityEngineConfiguration.restrictedClasses()));
 		extendedProperties.setProperty(
+			"liferay." + RuntimeConstants.INTROSPECTOR_RESTRICT_CLASSES +
+				".methods",
+			velocityEngineConfiguration.restrictedMethods());
+		extendedProperties.setProperty(
 			RuntimeConstants.INTROSPECTOR_RESTRICT_PACKAGES,
 			StringUtil.merge(velocityEngineConfiguration.restrictedPackages()));
 		extendedProperties.setProperty(

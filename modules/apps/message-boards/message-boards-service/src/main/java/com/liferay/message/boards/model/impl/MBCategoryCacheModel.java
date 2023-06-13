@@ -17,7 +17,6 @@ package com.liferay.message.boards.model.impl;
 import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.message.boards.model.MBCategory;
-
 import com.liferay.portal.kernel.model.CacheModel;
 import com.liferay.portal.kernel.util.HashUtil;
 import com.liferay.portal.kernel.util.StringBundler;
@@ -33,12 +32,12 @@ import java.util.Date;
  * The cache model class for representing MBCategory in entity cache.
  *
  * @author Brian Wing Shun Chan
- * @see MBCategory
  * @generated
  */
 @ProviderType
-public class MBCategoryCacheModel implements CacheModel<MBCategory>,
-	Externalizable {
+public class MBCategoryCacheModel
+	implements CacheModel<MBCategory>, Externalizable {
+
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj) {
@@ -245,8 +244,7 @@ public class MBCategoryCacheModel implements CacheModel<MBCategory>,
 	}
 
 	@Override
-	public void writeExternal(ObjectOutput objectOutput)
-		throws IOException {
+	public void writeExternal(ObjectOutput objectOutput) throws IOException {
 		if (uuid == null) {
 			objectOutput.writeUTF("");
 		}
@@ -335,4 +333,5 @@ public class MBCategoryCacheModel implements CacheModel<MBCategory>,
 	public long statusByUserId;
 	public String statusByUserName;
 	public long statusDate;
+
 }

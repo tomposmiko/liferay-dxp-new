@@ -44,7 +44,7 @@ import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
 /**
- * @author Roberto Diaz
+ * @author Roberto Díaz
  * @author Zsolt Berentey
  */
 @Component(
@@ -96,8 +96,10 @@ public class JournalArticleActivityInterpreter
 				layout.getLayoutSet(), serviceContext.getThemeDisplay());
 
 			return groupFriendlyURL.concat(
-				JournalArticleConstants.CANONICAL_URL_SEPARATOR).concat(
-				article.getUrlTitle());
+				JournalArticleConstants.CANONICAL_URL_SEPARATOR
+			).concat(
+				article.getUrlTitle()
+			);
 		}
 
 		return null;

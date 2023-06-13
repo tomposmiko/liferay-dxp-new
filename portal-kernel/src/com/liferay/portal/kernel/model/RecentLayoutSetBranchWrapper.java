@@ -17,7 +17,6 @@ package com.liferay.portal.kernel.model;
 import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.expando.kernel.model.ExpandoBridge;
-
 import com.liferay.portal.kernel.service.ServiceContext;
 
 import java.io.Serializable;
@@ -36,10 +35,12 @@ import java.util.Objects;
  * @generated
  */
 @ProviderType
-public class RecentLayoutSetBranchWrapper implements RecentLayoutSetBranch,
-	ModelWrapper<RecentLayoutSetBranch> {
+public class RecentLayoutSetBranchWrapper
+	implements RecentLayoutSetBranch, ModelWrapper<RecentLayoutSetBranch> {
+
 	public RecentLayoutSetBranchWrapper(
 		RecentLayoutSetBranch recentLayoutSetBranch) {
+
 		_recentLayoutSetBranch = recentLayoutSetBranch;
 	}
 
@@ -77,7 +78,7 @@ public class RecentLayoutSetBranchWrapper implements RecentLayoutSetBranch,
 		}
 
 		Long recentLayoutSetBranchId = (Long)attributes.get(
-				"recentLayoutSetBranchId");
+			"recentLayoutSetBranchId");
 
 		if (recentLayoutSetBranchId != null) {
 			setRecentLayoutSetBranchId(recentLayoutSetBranchId);
@@ -116,7 +117,8 @@ public class RecentLayoutSetBranchWrapper implements RecentLayoutSetBranch,
 
 	@Override
 	public Object clone() {
-		return new RecentLayoutSetBranchWrapper((RecentLayoutSetBranch)_recentLayoutSetBranch.clone());
+		return new RecentLayoutSetBranchWrapper(
+			(RecentLayoutSetBranch)_recentLayoutSetBranch.clone());
 	}
 
 	@Override
@@ -125,10 +127,10 @@ public class RecentLayoutSetBranchWrapper implements RecentLayoutSetBranch,
 	}
 
 	/**
-	* Returns the company ID of this recent layout set branch.
-	*
-	* @return the company ID of this recent layout set branch
-	*/
+	 * Returns the company ID of this recent layout set branch.
+	 *
+	 * @return the company ID of this recent layout set branch
+	 */
 	@Override
 	public long getCompanyId() {
 		return _recentLayoutSetBranch.getCompanyId();
@@ -140,50 +142,50 @@ public class RecentLayoutSetBranchWrapper implements RecentLayoutSetBranch,
 	}
 
 	/**
-	* Returns the group ID of this recent layout set branch.
-	*
-	* @return the group ID of this recent layout set branch
-	*/
+	 * Returns the group ID of this recent layout set branch.
+	 *
+	 * @return the group ID of this recent layout set branch
+	 */
 	@Override
 	public long getGroupId() {
 		return _recentLayoutSetBranch.getGroupId();
 	}
 
 	/**
-	* Returns the layout set branch ID of this recent layout set branch.
-	*
-	* @return the layout set branch ID of this recent layout set branch
-	*/
+	 * Returns the layout set branch ID of this recent layout set branch.
+	 *
+	 * @return the layout set branch ID of this recent layout set branch
+	 */
 	@Override
 	public long getLayoutSetBranchId() {
 		return _recentLayoutSetBranch.getLayoutSetBranchId();
 	}
 
 	/**
-	* Returns the layout set ID of this recent layout set branch.
-	*
-	* @return the layout set ID of this recent layout set branch
-	*/
+	 * Returns the layout set ID of this recent layout set branch.
+	 *
+	 * @return the layout set ID of this recent layout set branch
+	 */
 	@Override
 	public long getLayoutSetId() {
 		return _recentLayoutSetBranch.getLayoutSetId();
 	}
 
 	/**
-	* Returns the mvcc version of this recent layout set branch.
-	*
-	* @return the mvcc version of this recent layout set branch
-	*/
+	 * Returns the mvcc version of this recent layout set branch.
+	 *
+	 * @return the mvcc version of this recent layout set branch
+	 */
 	@Override
 	public long getMvccVersion() {
 		return _recentLayoutSetBranch.getMvccVersion();
 	}
 
 	/**
-	* Returns the primary key of this recent layout set branch.
-	*
-	* @return the primary key of this recent layout set branch
-	*/
+	 * Returns the primary key of this recent layout set branch.
+	 *
+	 * @return the primary key of this recent layout set branch
+	 */
 	@Override
 	public long getPrimaryKey() {
 		return _recentLayoutSetBranch.getPrimaryKey();
@@ -195,30 +197,30 @@ public class RecentLayoutSetBranchWrapper implements RecentLayoutSetBranch,
 	}
 
 	/**
-	* Returns the recent layout set branch ID of this recent layout set branch.
-	*
-	* @return the recent layout set branch ID of this recent layout set branch
-	*/
+	 * Returns the recent layout set branch ID of this recent layout set branch.
+	 *
+	 * @return the recent layout set branch ID of this recent layout set branch
+	 */
 	@Override
 	public long getRecentLayoutSetBranchId() {
 		return _recentLayoutSetBranch.getRecentLayoutSetBranchId();
 	}
 
 	/**
-	* Returns the user ID of this recent layout set branch.
-	*
-	* @return the user ID of this recent layout set branch
-	*/
+	 * Returns the user ID of this recent layout set branch.
+	 *
+	 * @return the user ID of this recent layout set branch
+	 */
 	@Override
 	public long getUserId() {
 		return _recentLayoutSetBranch.getUserId();
 	}
 
 	/**
-	* Returns the user uuid of this recent layout set branch.
-	*
-	* @return the user uuid of this recent layout set branch
-	*/
+	 * Returns the user uuid of this recent layout set branch.
+	 *
+	 * @return the user uuid of this recent layout set branch
+	 */
 	@Override
 	public String getUserUuid() {
 		return _recentLayoutSetBranch.getUserUuid();
@@ -255,10 +257,10 @@ public class RecentLayoutSetBranchWrapper implements RecentLayoutSetBranch,
 	}
 
 	/**
-	* Sets the company ID of this recent layout set branch.
-	*
-	* @param companyId the company ID of this recent layout set branch
-	*/
+	 * Sets the company ID of this recent layout set branch.
+	 *
+	 * @param companyId the company ID of this recent layout set branch
+	 */
 	@Override
 	public void setCompanyId(long companyId) {
 		_recentLayoutSetBranch.setCompanyId(companyId);
@@ -280,40 +282,40 @@ public class RecentLayoutSetBranchWrapper implements RecentLayoutSetBranch,
 	}
 
 	/**
-	* Sets the group ID of this recent layout set branch.
-	*
-	* @param groupId the group ID of this recent layout set branch
-	*/
+	 * Sets the group ID of this recent layout set branch.
+	 *
+	 * @param groupId the group ID of this recent layout set branch
+	 */
 	@Override
 	public void setGroupId(long groupId) {
 		_recentLayoutSetBranch.setGroupId(groupId);
 	}
 
 	/**
-	* Sets the layout set branch ID of this recent layout set branch.
-	*
-	* @param layoutSetBranchId the layout set branch ID of this recent layout set branch
-	*/
+	 * Sets the layout set branch ID of this recent layout set branch.
+	 *
+	 * @param layoutSetBranchId the layout set branch ID of this recent layout set branch
+	 */
 	@Override
 	public void setLayoutSetBranchId(long layoutSetBranchId) {
 		_recentLayoutSetBranch.setLayoutSetBranchId(layoutSetBranchId);
 	}
 
 	/**
-	* Sets the layout set ID of this recent layout set branch.
-	*
-	* @param layoutSetId the layout set ID of this recent layout set branch
-	*/
+	 * Sets the layout set ID of this recent layout set branch.
+	 *
+	 * @param layoutSetId the layout set ID of this recent layout set branch
+	 */
 	@Override
 	public void setLayoutSetId(long layoutSetId) {
 		_recentLayoutSetBranch.setLayoutSetId(layoutSetId);
 	}
 
 	/**
-	* Sets the mvcc version of this recent layout set branch.
-	*
-	* @param mvccVersion the mvcc version of this recent layout set branch
-	*/
+	 * Sets the mvcc version of this recent layout set branch.
+	 *
+	 * @param mvccVersion the mvcc version of this recent layout set branch
+	 */
 	@Override
 	public void setMvccVersion(long mvccVersion) {
 		_recentLayoutSetBranch.setMvccVersion(mvccVersion);
@@ -325,10 +327,10 @@ public class RecentLayoutSetBranchWrapper implements RecentLayoutSetBranch,
 	}
 
 	/**
-	* Sets the primary key of this recent layout set branch.
-	*
-	* @param primaryKey the primary key of this recent layout set branch
-	*/
+	 * Sets the primary key of this recent layout set branch.
+	 *
+	 * @param primaryKey the primary key of this recent layout set branch
+	 */
 	@Override
 	public void setPrimaryKey(long primaryKey) {
 		_recentLayoutSetBranch.setPrimaryKey(primaryKey);
@@ -340,30 +342,31 @@ public class RecentLayoutSetBranchWrapper implements RecentLayoutSetBranch,
 	}
 
 	/**
-	* Sets the recent layout set branch ID of this recent layout set branch.
-	*
-	* @param recentLayoutSetBranchId the recent layout set branch ID of this recent layout set branch
-	*/
+	 * Sets the recent layout set branch ID of this recent layout set branch.
+	 *
+	 * @param recentLayoutSetBranchId the recent layout set branch ID of this recent layout set branch
+	 */
 	@Override
 	public void setRecentLayoutSetBranchId(long recentLayoutSetBranchId) {
-		_recentLayoutSetBranch.setRecentLayoutSetBranchId(recentLayoutSetBranchId);
+		_recentLayoutSetBranch.setRecentLayoutSetBranchId(
+			recentLayoutSetBranchId);
 	}
 
 	/**
-	* Sets the user ID of this recent layout set branch.
-	*
-	* @param userId the user ID of this recent layout set branch
-	*/
+	 * Sets the user ID of this recent layout set branch.
+	 *
+	 * @param userId the user ID of this recent layout set branch
+	 */
 	@Override
 	public void setUserId(long userId) {
 		_recentLayoutSetBranch.setUserId(userId);
 	}
 
 	/**
-	* Sets the user uuid of this recent layout set branch.
-	*
-	* @param userUuid the user uuid of this recent layout set branch
-	*/
+	 * Sets the user uuid of this recent layout set branch.
+	 *
+	 * @param userUuid the user uuid of this recent layout set branch
+	 */
 	@Override
 	public void setUserUuid(String userUuid) {
 		_recentLayoutSetBranch.setUserUuid(userUuid);
@@ -376,7 +379,8 @@ public class RecentLayoutSetBranchWrapper implements RecentLayoutSetBranch,
 
 	@Override
 	public RecentLayoutSetBranch toEscapedModel() {
-		return new RecentLayoutSetBranchWrapper(_recentLayoutSetBranch.toEscapedModel());
+		return new RecentLayoutSetBranchWrapper(
+			_recentLayoutSetBranch.toEscapedModel());
 	}
 
 	@Override
@@ -386,7 +390,8 @@ public class RecentLayoutSetBranchWrapper implements RecentLayoutSetBranch,
 
 	@Override
 	public RecentLayoutSetBranch toUnescapedModel() {
-		return new RecentLayoutSetBranchWrapper(_recentLayoutSetBranch.toUnescapedModel());
+		return new RecentLayoutSetBranchWrapper(
+			_recentLayoutSetBranch.toUnescapedModel());
 	}
 
 	@Override
@@ -404,10 +409,13 @@ public class RecentLayoutSetBranchWrapper implements RecentLayoutSetBranch,
 			return false;
 		}
 
-		RecentLayoutSetBranchWrapper recentLayoutSetBranchWrapper = (RecentLayoutSetBranchWrapper)obj;
+		RecentLayoutSetBranchWrapper recentLayoutSetBranchWrapper =
+			(RecentLayoutSetBranchWrapper)obj;
 
-		if (Objects.equals(_recentLayoutSetBranch,
-					recentLayoutSetBranchWrapper._recentLayoutSetBranch)) {
+		if (Objects.equals(
+				_recentLayoutSetBranch,
+				recentLayoutSetBranchWrapper._recentLayoutSetBranch)) {
+
 			return true;
 		}
 
@@ -435,4 +443,5 @@ public class RecentLayoutSetBranchWrapper implements RecentLayoutSetBranch,
 	}
 
 	private final RecentLayoutSetBranch _recentLayoutSetBranch;
+
 }

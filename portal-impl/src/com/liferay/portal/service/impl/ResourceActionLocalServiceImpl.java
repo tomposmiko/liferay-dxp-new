@@ -266,7 +266,8 @@ public class ResourceActionLocalServiceImpl
 						actionIds &= ~bitwiseValue;
 
 						resourcePermission.setActionIds(actionIds);
-						resourcePermission.setViewActionId(actionIds % 2 == 1);
+						resourcePermission.setViewActionId(
+							(actionIds % 2) == 1);
 
 						resourcePermissionPersistence.update(
 							resourcePermission);
@@ -326,7 +327,11 @@ public class ResourceActionLocalServiceImpl
 	}
 
 	protected String encodeKey(String name, String actionId) {
-		return name.concat(StringPool.POUND).concat(actionId);
+		return name.concat(
+			StringPool.POUND
+		).concat(
+			actionId
+		);
 	}
 
 	private static final Map<String, ResourceAction> _resourceActions =

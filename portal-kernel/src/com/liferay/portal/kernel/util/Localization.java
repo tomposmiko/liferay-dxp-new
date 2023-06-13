@@ -481,6 +481,10 @@ public interface Localization {
 	public String getXml(
 		Map<String, String> map, String defaultLanguageId, String key);
 
+	public Map<Locale, String> populateLocalizationMap(
+		Map<Locale, String> localizationMap, String defaultLanguageId,
+		long groupId);
+
 	/**
 	 * Removes the localization for the language from the localizations XML. The
 	 * localized strings are stored as characters in the XML.

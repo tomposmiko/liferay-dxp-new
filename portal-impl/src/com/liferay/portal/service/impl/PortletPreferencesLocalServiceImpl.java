@@ -170,6 +170,10 @@ public class PortletPreferencesLocalServiceImpl
 	public PortletPreferences fetchPortletPreferences(
 		long ownerId, int ownerType, long plid, String portletId) {
 
+		if (!_exists(plid, portletId)) {
+			return null;
+		}
+
 		return portletPreferencesPersistence.fetchByO_O_P_P(
 			ownerId, ownerType, _swapPlidForPortletPreferences(plid),
 			portletId);
@@ -353,6 +357,10 @@ public class PortletPreferencesLocalServiceImpl
 	public long getPortletPreferencesCount(
 		int ownerType, long plid, String portletId) {
 
+		if (!_exists(plid, portletId)) {
+			return 0;
+		}
+
 		return portletPreferencesPersistence.countByO_P_P(
 			ownerType, _swapPlidForPortletPreferences(plid), portletId);
 	}
@@ -534,6 +542,12 @@ public class PortletPreferencesLocalServiceImpl
 		long companyId, long ownerId, int ownerType, long plid,
 		String portletId) {
 
+		if (!_exists(plid, companyId, portletId)) {
+			return PortletPreferencesFactoryUtil.strictFromXML(
+				companyId, ownerId, ownerType, plid, portletId,
+				PortletConstants.DEFAULT_PREFERENCES);
+		}
+
 		plid = _swapPlidForPreferences(plid);
 
 		PortletPreferences portletPreferences =
@@ -617,6 +631,34 @@ public class PortletPreferencesLocalServiceImpl
 		portletPreferencesPersistence.update(portletPreferences);
 
 		return portletPreferences;
+	}
+
+	private boolean _exists(long plid, long companyId, String portletId) {
+		if (plid == PortletKeys.PREFS_PLID_SHARED) {
+			return true;
+		}
+
+		if (portletLocalService.fetchPortletById(companyId, portletId) !=
+				null) {
+
+			return true;
+		}
+
+		return false;
+	}
+
+	private boolean _exists(long plid, String portletId) {
+		if (plid == PortletKeys.PREFS_PLID_SHARED) {
+			return true;
+		}
+
+		Layout layout = layoutPersistence.fetchByPrimaryKey(plid);
+
+		if (layout == null) {
+			return false;
+		}
+
+		return _exists(plid, layout.getCompanyId(), portletId);
 	}
 
 	private LayoutRevision _getLayoutRevision(long plid) {
@@ -738,6 +780,11 @@ public class PortletPreferencesLocalServiceImpl
 		}
 
 		try {
+			boolean hasWorkflowTask = StagingUtil.hasWorkflowTask(
+				serviceContext.getUserId(), layoutRevision);
+
+			serviceContext.setAttribute("revisionInProgress", hasWorkflowTask);
+
 			layoutRevision = layoutRevisionLocalService.updateLayoutRevision(
 				serviceContext.getUserId(),
 				layoutRevision.getLayoutRevisionId(),

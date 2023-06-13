@@ -19,7 +19,6 @@ import aQute.bnd.annotation.ProviderType;
 import com.liferay.portal.kernel.model.CacheModel;
 import com.liferay.portal.kernel.util.HashUtil;
 import com.liferay.portal.kernel.util.StringBundler;
-
 import com.liferay.social.kernel.model.SocialActivitySet;
 
 import java.io.Externalizable;
@@ -31,12 +30,12 @@ import java.io.ObjectOutput;
  * The cache model class for representing SocialActivitySet in entity cache.
  *
  * @author Brian Wing Shun Chan
- * @see SocialActivitySet
  * @generated
  */
 @ProviderType
-public class SocialActivitySetCacheModel implements CacheModel<SocialActivitySet>,
-	Externalizable {
+public class SocialActivitySetCacheModel
+	implements CacheModel<SocialActivitySet>, Externalizable {
+
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj) {
@@ -47,7 +46,8 @@ public class SocialActivitySetCacheModel implements CacheModel<SocialActivitySet
 			return false;
 		}
 
-		SocialActivitySetCacheModel socialActivitySetCacheModel = (SocialActivitySetCacheModel)obj;
+		SocialActivitySetCacheModel socialActivitySetCacheModel =
+			(SocialActivitySetCacheModel)obj;
 
 		if (activitySetId == socialActivitySetCacheModel.activitySetId) {
 			return true;
@@ -94,7 +94,8 @@ public class SocialActivitySetCacheModel implements CacheModel<SocialActivitySet
 
 	@Override
 	public SocialActivitySet toEntityModel() {
-		SocialActivitySetImpl socialActivitySetImpl = new SocialActivitySetImpl();
+		SocialActivitySetImpl socialActivitySetImpl =
+			new SocialActivitySetImpl();
 
 		socialActivitySetImpl.setActivitySetId(activitySetId);
 		socialActivitySetImpl.setGroupId(groupId);
@@ -145,8 +146,7 @@ public class SocialActivitySetCacheModel implements CacheModel<SocialActivitySet
 	}
 
 	@Override
-	public void writeExternal(ObjectOutput objectOutput)
-		throws IOException {
+	public void writeExternal(ObjectOutput objectOutput) throws IOException {
 		objectOutput.writeLong(activitySetId);
 
 		objectOutput.writeLong(groupId);
@@ -186,4 +186,5 @@ public class SocialActivitySetCacheModel implements CacheModel<SocialActivitySet
 	public int type;
 	public String extraData;
 	public int activityCount;
+
 }

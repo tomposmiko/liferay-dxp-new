@@ -17,7 +17,6 @@ package com.liferay.portal.kernel.model;
 import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.expando.kernel.model.ExpandoBridge;
-
 import com.liferay.portal.kernel.service.ServiceContext;
 
 import java.io.Serializable;
@@ -38,8 +37,9 @@ import java.util.Objects;
  */
 @Deprecated
 @ProviderType
-public class ResourceBlockWrapper implements ResourceBlock,
-	ModelWrapper<ResourceBlock> {
+public class ResourceBlockWrapper
+	implements ResourceBlock, ModelWrapper<ResourceBlock> {
+
 	public ResourceBlockWrapper(ResourceBlock resourceBlock) {
 		_resourceBlock = resourceBlock;
 	}
@@ -125,10 +125,10 @@ public class ResourceBlockWrapper implements ResourceBlock,
 	}
 
 	/**
-	* Returns the company ID of this resource block.
-	*
-	* @return the company ID of this resource block
-	*/
+	 * Returns the company ID of this resource block.
+	 *
+	 * @return the company ID of this resource block
+	 */
 	@Override
 	public long getCompanyId() {
 		return _resourceBlock.getCompanyId();
@@ -140,50 +140,50 @@ public class ResourceBlockWrapper implements ResourceBlock,
 	}
 
 	/**
-	* Returns the group ID of this resource block.
-	*
-	* @return the group ID of this resource block
-	*/
+	 * Returns the group ID of this resource block.
+	 *
+	 * @return the group ID of this resource block
+	 */
 	@Override
 	public long getGroupId() {
 		return _resourceBlock.getGroupId();
 	}
 
 	/**
-	* Returns the mvcc version of this resource block.
-	*
-	* @return the mvcc version of this resource block
-	*/
+	 * Returns the mvcc version of this resource block.
+	 *
+	 * @return the mvcc version of this resource block
+	 */
 	@Override
 	public long getMvccVersion() {
 		return _resourceBlock.getMvccVersion();
 	}
 
 	/**
-	* Returns the name of this resource block.
-	*
-	* @return the name of this resource block
-	*/
+	 * Returns the name of this resource block.
+	 *
+	 * @return the name of this resource block
+	 */
 	@Override
 	public String getName() {
 		return _resourceBlock.getName();
 	}
 
 	/**
-	* Returns the permissions hash of this resource block.
-	*
-	* @return the permissions hash of this resource block
-	*/
+	 * Returns the permissions hash of this resource block.
+	 *
+	 * @return the permissions hash of this resource block
+	 */
 	@Override
 	public String getPermissionsHash() {
 		return _resourceBlock.getPermissionsHash();
 	}
 
 	/**
-	* Returns the primary key of this resource block.
-	*
-	* @return the primary key of this resource block
-	*/
+	 * Returns the primary key of this resource block.
+	 *
+	 * @return the primary key of this resource block
+	 */
 	@Override
 	public long getPrimaryKey() {
 		return _resourceBlock.getPrimaryKey();
@@ -195,20 +195,20 @@ public class ResourceBlockWrapper implements ResourceBlock,
 	}
 
 	/**
-	* Returns the reference count of this resource block.
-	*
-	* @return the reference count of this resource block
-	*/
+	 * Returns the reference count of this resource block.
+	 *
+	 * @return the reference count of this resource block
+	 */
 	@Override
 	public long getReferenceCount() {
 		return _resourceBlock.getReferenceCount();
 	}
 
 	/**
-	* Returns the resource block ID of this resource block.
-	*
-	* @return the resource block ID of this resource block
-	*/
+	 * Returns the resource block ID of this resource block.
+	 *
+	 * @return the resource block ID of this resource block
+	 */
 	@Override
 	public long getResourceBlockId() {
 		return _resourceBlock.getResourceBlockId();
@@ -245,10 +245,10 @@ public class ResourceBlockWrapper implements ResourceBlock,
 	}
 
 	/**
-	* Sets the company ID of this resource block.
-	*
-	* @param companyId the company ID of this resource block
-	*/
+	 * Sets the company ID of this resource block.
+	 *
+	 * @param companyId the company ID of this resource block
+	 */
 	@Override
 	public void setCompanyId(long companyId) {
 		_resourceBlock.setCompanyId(companyId);
@@ -270,30 +270,30 @@ public class ResourceBlockWrapper implements ResourceBlock,
 	}
 
 	/**
-	* Sets the group ID of this resource block.
-	*
-	* @param groupId the group ID of this resource block
-	*/
+	 * Sets the group ID of this resource block.
+	 *
+	 * @param groupId the group ID of this resource block
+	 */
 	@Override
 	public void setGroupId(long groupId) {
 		_resourceBlock.setGroupId(groupId);
 	}
 
 	/**
-	* Sets the mvcc version of this resource block.
-	*
-	* @param mvccVersion the mvcc version of this resource block
-	*/
+	 * Sets the mvcc version of this resource block.
+	 *
+	 * @param mvccVersion the mvcc version of this resource block
+	 */
 	@Override
 	public void setMvccVersion(long mvccVersion) {
 		_resourceBlock.setMvccVersion(mvccVersion);
 	}
 
 	/**
-	* Sets the name of this resource block.
-	*
-	* @param name the name of this resource block
-	*/
+	 * Sets the name of this resource block.
+	 *
+	 * @param name the name of this resource block
+	 */
 	@Override
 	public void setName(String name) {
 		_resourceBlock.setName(name);
@@ -305,20 +305,20 @@ public class ResourceBlockWrapper implements ResourceBlock,
 	}
 
 	/**
-	* Sets the permissions hash of this resource block.
-	*
-	* @param permissionsHash the permissions hash of this resource block
-	*/
+	 * Sets the permissions hash of this resource block.
+	 *
+	 * @param permissionsHash the permissions hash of this resource block
+	 */
 	@Override
 	public void setPermissionsHash(String permissionsHash) {
 		_resourceBlock.setPermissionsHash(permissionsHash);
 	}
 
 	/**
-	* Sets the primary key of this resource block.
-	*
-	* @param primaryKey the primary key of this resource block
-	*/
+	 * Sets the primary key of this resource block.
+	 *
+	 * @param primaryKey the primary key of this resource block
+	 */
 	@Override
 	public void setPrimaryKey(long primaryKey) {
 		_resourceBlock.setPrimaryKey(primaryKey);
@@ -330,20 +330,20 @@ public class ResourceBlockWrapper implements ResourceBlock,
 	}
 
 	/**
-	* Sets the reference count of this resource block.
-	*
-	* @param referenceCount the reference count of this resource block
-	*/
+	 * Sets the reference count of this resource block.
+	 *
+	 * @param referenceCount the reference count of this resource block
+	 */
 	@Override
 	public void setReferenceCount(long referenceCount) {
 		_resourceBlock.setReferenceCount(referenceCount);
 	}
 
 	/**
-	* Sets the resource block ID of this resource block.
-	*
-	* @param resourceBlockId the resource block ID of this resource block
-	*/
+	 * Sets the resource block ID of this resource block.
+	 *
+	 * @param resourceBlockId the resource block ID of this resource block
+	 */
 	@Override
 	public void setResourceBlockId(long resourceBlockId) {
 		_resourceBlock.setResourceBlockId(resourceBlockId);
@@ -386,7 +386,9 @@ public class ResourceBlockWrapper implements ResourceBlock,
 
 		ResourceBlockWrapper resourceBlockWrapper = (ResourceBlockWrapper)obj;
 
-		if (Objects.equals(_resourceBlock, resourceBlockWrapper._resourceBlock)) {
+		if (Objects.equals(
+				_resourceBlock, resourceBlockWrapper._resourceBlock)) {
+
 			return true;
 		}
 
@@ -414,4 +416,5 @@ public class ResourceBlockWrapper implements ResourceBlock,
 	}
 
 	private final ResourceBlock _resourceBlock;
+
 }

@@ -1024,7 +1024,7 @@ definition {
 		Staging.gotoPublishToLive();
 
 		Staging.configurePublishToLive(
-			checkContentNameList = "Blogs,Navigation Menus",
+			checkContentNameList = "Blogs",
 			checkPageName = "Blogs Page 2",
 			contentDateRange = "All"
 		);
@@ -1881,7 +1881,7 @@ definition {
 
 		Navigator.gotoPage(pageName = "Blogs Aggregator Page");
 
-		AssertTextEquals.assertTextCaseInsensitive(
+		AssertTextEquals(
 			locator1 = "Portlet#H2_HEADER",
 			value1 = "Blogs Aggregator"
 		);
@@ -1913,7 +1913,7 @@ definition {
 
 		Navigator.gotoPage(pageName = "Blogs Aggregator Page");
 
-		AssertTextEquals.assertTextCaseInsensitive(
+		AssertTextEquals(
 			locator1 = "Portlet#H2_HEADER",
 			value1 = "Blogs Aggregator"
 		);
@@ -2035,9 +2035,13 @@ definition {
 
 		SitePages.addPrivatePage(pageName = "Private Blogs Page");
 
-		Navigator.gotoSpecificURLPage(
-			baseURL = "http://www.baker.com:8080/group/guest",
-			pageName = "Private Blogs Page"
+		Navigator.openSpecificURL(
+			url = "http://www.baker.com:8080/group/guest");
+
+		User.loginPG(
+			password = "test",
+			specificURL = "http://www.baker.com:8080/group/guest",
+			userEmailAddress = "test@liferay.com"
 		);
 
 		Portlet.addPG(portletName = "Blogs");

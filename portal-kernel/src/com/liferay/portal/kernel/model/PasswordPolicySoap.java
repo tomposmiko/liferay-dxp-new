@@ -26,11 +26,11 @@ import java.util.List;
  * This class is used by SOAP remote services, specifically {@link com.liferay.portal.service.http.PasswordPolicyServiceSoap}.
  *
  * @author Brian Wing Shun Chan
- * @see com.liferay.portal.service.http.PasswordPolicyServiceSoap
  * @generated
  */
 @ProviderType
 public class PasswordPolicySoap implements Serializable {
+
 	public static PasswordPolicySoap toSoapModel(PasswordPolicy model) {
 		PasswordPolicySoap soapModel = new PasswordPolicySoap();
 
@@ -83,11 +83,14 @@ public class PasswordPolicySoap implements Serializable {
 		return soapModels;
 	}
 
-	public static PasswordPolicySoap[][] toSoapModels(PasswordPolicy[][] models) {
+	public static PasswordPolicySoap[][] toSoapModels(
+		PasswordPolicy[][] models) {
+
 		PasswordPolicySoap[][] soapModels = null;
 
 		if (models.length > 0) {
-			soapModels = new PasswordPolicySoap[models.length][models[0].length];
+			soapModels =
+				new PasswordPolicySoap[models.length][models[0].length];
 		}
 		else {
 			soapModels = new PasswordPolicySoap[0][0];
@@ -100,8 +103,11 @@ public class PasswordPolicySoap implements Serializable {
 		return soapModels;
 	}
 
-	public static PasswordPolicySoap[] toSoapModels(List<PasswordPolicy> models) {
-		List<PasswordPolicySoap> soapModels = new ArrayList<PasswordPolicySoap>(models.size());
+	public static PasswordPolicySoap[] toSoapModels(
+		List<PasswordPolicy> models) {
+
+		List<PasswordPolicySoap> soapModels = new ArrayList<PasswordPolicySoap>(
+			models.size());
 
 		for (PasswordPolicy model : models) {
 			soapModels.add(toSoapModel(model));
@@ -472,4 +478,5 @@ public class PasswordPolicySoap implements Serializable {
 	private boolean _requireUnlock;
 	private long _resetFailureCount;
 	private long _resetTicketMaxAge;
+
 }

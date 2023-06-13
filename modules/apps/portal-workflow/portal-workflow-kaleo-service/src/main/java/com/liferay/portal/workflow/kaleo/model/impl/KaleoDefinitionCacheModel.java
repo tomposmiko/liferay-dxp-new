@@ -32,12 +32,12 @@ import java.util.Date;
  * The cache model class for representing KaleoDefinition in entity cache.
  *
  * @author Brian Wing Shun Chan
- * @see KaleoDefinition
  * @generated
  */
 @ProviderType
-public class KaleoDefinitionCacheModel implements CacheModel<KaleoDefinition>,
-	Externalizable {
+public class KaleoDefinitionCacheModel
+	implements CacheModel<KaleoDefinition>, Externalizable {
+
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj) {
@@ -48,7 +48,8 @@ public class KaleoDefinitionCacheModel implements CacheModel<KaleoDefinition>,
 			return false;
 		}
 
-		KaleoDefinitionCacheModel kaleoDefinitionCacheModel = (KaleoDefinitionCacheModel)obj;
+		KaleoDefinitionCacheModel kaleoDefinitionCacheModel =
+			(KaleoDefinitionCacheModel)obj;
 
 		if (kaleoDefinitionId == kaleoDefinitionCacheModel.kaleoDefinitionId) {
 			return true;
@@ -186,8 +187,7 @@ public class KaleoDefinitionCacheModel implements CacheModel<KaleoDefinition>,
 	}
 
 	@Override
-	public void writeExternal(ObjectOutput objectOutput)
-		throws IOException {
+	public void writeExternal(ObjectOutput objectOutput) throws IOException {
 		objectOutput.writeLong(kaleoDefinitionId);
 
 		objectOutput.writeLong(groupId);
@@ -252,4 +252,5 @@ public class KaleoDefinitionCacheModel implements CacheModel<KaleoDefinition>,
 	public String content;
 	public int version;
 	public boolean active;
+
 }

@@ -33,12 +33,12 @@ import java.util.Date;
  * The cache model class for representing Ticket in entity cache.
  *
  * @author Brian Wing Shun Chan
- * @see Ticket
  * @generated
  */
 @ProviderType
-public class TicketCacheModel implements CacheModel<Ticket>, Externalizable,
-	MVCCModel {
+public class TicketCacheModel
+	implements CacheModel<Ticket>, Externalizable, MVCCModel {
+
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj) {
@@ -52,7 +52,8 @@ public class TicketCacheModel implements CacheModel<Ticket>, Externalizable,
 		TicketCacheModel ticketCacheModel = (TicketCacheModel)obj;
 
 		if ((ticketId == ticketCacheModel.ticketId) &&
-				(mvccVersion == ticketCacheModel.mvccVersion)) {
+			(mvccVersion == ticketCacheModel.mvccVersion)) {
+
 			return true;
 		}
 
@@ -171,8 +172,7 @@ public class TicketCacheModel implements CacheModel<Ticket>, Externalizable,
 	}
 
 	@Override
-	public void writeExternal(ObjectOutput objectOutput)
-		throws IOException {
+	public void writeExternal(ObjectOutput objectOutput) throws IOException {
 		objectOutput.writeLong(mvccVersion);
 
 		objectOutput.writeLong(ticketId);
@@ -213,4 +213,5 @@ public class TicketCacheModel implements CacheModel<Ticket>, Externalizable,
 	public int type;
 	public String extraInfo;
 	public long expirationDate;
+
 }

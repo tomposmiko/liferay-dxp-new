@@ -52,11 +52,9 @@ public class UpgradeMessageBoardsAttachments extends BaseUpgradeAttachments {
 			groupId, companyId, userId, userName, createDate, repositoryId,
 			repositoryFolderId, String.valueOf(containerModelId), false);
 
-		long messageFolderId = getFolderId(
+		return getFolderId(
 			groupId, companyId, userId, userName, createDate, repositoryId,
 			threadFolderId, String.valueOf(resourcePrimKey), false);
-
-		return messageFolderId;
 	}
 
 	@Override

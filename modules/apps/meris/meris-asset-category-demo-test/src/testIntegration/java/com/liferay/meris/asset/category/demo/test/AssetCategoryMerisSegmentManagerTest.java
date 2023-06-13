@@ -35,6 +35,7 @@ import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.ServiceContextTestUtil;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.kernel.test.util.UserTestUtil;
+import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.service.test.ServiceTestUtil;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
@@ -42,7 +43,6 @@ import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -52,7 +52,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 /**
- * @author Eduardo Garcia
+ * @author Eduardo García
  */
 @RunWith(Arquillian.class)
 public class AssetCategoryMerisSegmentManagerTest {
@@ -98,7 +98,7 @@ public class AssetCategoryMerisSegmentManagerTest {
 	@Test
 	public void testGetMerisProfileMerisSegments() throws Exception {
 		Comparator<MerisSegment> merisSegmentNameComparator =
-			Comparator.comparing(s -> s.getName(Locale.getDefault()));
+			Comparator.comparing(s -> s.getName(LocaleUtil.getDefault()));
 
 		List<MerisSegment> merisSegments =
 			_merisSegmentManager.getMerisSegments(
@@ -132,7 +132,7 @@ public class AssetCategoryMerisSegmentManagerTest {
 	@Test
 	public void testGetMerisSegments() {
 		Comparator<MerisSegment> merisSegmentNameComparator =
-			Comparator.comparing(s -> s.getName(Locale.getDefault()));
+			Comparator.comparing(s -> s.getName(LocaleUtil.getDefault()));
 
 		List<MerisSegment> merisSegments =
 			_merisSegmentManager.getMerisSegments(

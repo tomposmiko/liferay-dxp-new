@@ -17,7 +17,6 @@ package com.liferay.calendar.service.base;
 import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.asset.kernel.service.persistence.AssetEntryPersistence;
-
 import com.liferay.calendar.model.CalendarResource;
 import com.liferay.calendar.service.CalendarResourceLocalService;
 import com.liferay.calendar.service.persistence.CalendarBookingFinder;
@@ -27,13 +26,11 @@ import com.liferay.calendar.service.persistence.CalendarNotificationTemplatePers
 import com.liferay.calendar.service.persistence.CalendarPersistence;
 import com.liferay.calendar.service.persistence.CalendarResourceFinder;
 import com.liferay.calendar.service.persistence.CalendarResourcePersistence;
-
 import com.liferay.exportimport.kernel.lar.ExportImportHelperUtil;
 import com.liferay.exportimport.kernel.lar.ManifestSummary;
 import com.liferay.exportimport.kernel.lar.PortletDataContext;
 import com.liferay.exportimport.kernel.lar.StagedModelDataHandlerUtil;
 import com.liferay.exportimport.kernel.lar.StagedModelType;
-
 import com.liferay.portal.kernel.bean.BeanReference;
 import com.liferay.portal.kernel.dao.db.DB;
 import com.liferay.portal.kernel.dao.db.DBManagerUtil;
@@ -78,17 +75,17 @@ import javax.sql.DataSource;
  *
  * @author Eduardo Lundgren
  * @see com.liferay.calendar.service.impl.CalendarResourceLocalServiceImpl
- * @see com.liferay.calendar.service.CalendarResourceLocalServiceUtil
  * @generated
  */
 @ProviderType
 public abstract class CalendarResourceLocalServiceBaseImpl
-	extends BaseLocalServiceImpl implements CalendarResourceLocalService,
-		IdentifiableOSGiService {
+	extends BaseLocalServiceImpl
+	implements CalendarResourceLocalService, IdentifiableOSGiService {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
-	 * Never modify or reference this class directly. Always use {@link com.liferay.calendar.service.CalendarResourceLocalServiceUtil} to access the calendar resource local service.
+	 * Never modify or reference this class directly. Use <code>CalendarResourceLocalService</code> via injection or a <code>org.osgi.util.tracker.ServiceTracker</code> or use <code>com.liferay.calendar.service.CalendarResourceLocalServiceUtil</code>.
 	 */
 
 	/**
@@ -101,6 +98,7 @@ public abstract class CalendarResourceLocalServiceBaseImpl
 	@Override
 	public CalendarResource addCalendarResource(
 		CalendarResource calendarResource) {
+
 		calendarResource.setNew(true);
 
 		return calendarResourcePersistence.update(calendarResource);
@@ -129,6 +127,7 @@ public abstract class CalendarResourceLocalServiceBaseImpl
 	@Override
 	public CalendarResource deleteCalendarResource(long calendarResourceId)
 		throws PortalException {
+
 		return calendarResourcePersistence.remove(calendarResourceId);
 	}
 
@@ -142,7 +141,9 @@ public abstract class CalendarResourceLocalServiceBaseImpl
 	@Indexable(type = IndexableType.DELETE)
 	@Override
 	public CalendarResource deleteCalendarResource(
-		CalendarResource calendarResource) throws PortalException {
+			CalendarResource calendarResource)
+		throws PortalException {
+
 		return calendarResourcePersistence.remove(calendarResource);
 	}
 
@@ -150,8 +151,8 @@ public abstract class CalendarResourceLocalServiceBaseImpl
 	public DynamicQuery dynamicQuery() {
 		Class<?> clazz = getClass();
 
-		return DynamicQueryFactoryUtil.forClass(CalendarResource.class,
-			clazz.getClassLoader());
+		return DynamicQueryFactoryUtil.forClass(
+			CalendarResource.class, clazz.getClassLoader());
 	}
 
 	/**
@@ -169,7 +170,7 @@ public abstract class CalendarResourceLocalServiceBaseImpl
 	 * Performs a dynamic query on the database and returns a range of the matching rows.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link com.liferay.calendar.model.impl.CalendarResourceModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>com.liferay.calendar.model.impl.CalendarResourceModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param dynamicQuery the dynamic query
@@ -178,17 +179,18 @@ public abstract class CalendarResourceLocalServiceBaseImpl
 	 * @return the range of matching rows
 	 */
 	@Override
-	public <T> List<T> dynamicQuery(DynamicQuery dynamicQuery, int start,
-		int end) {
-		return calendarResourcePersistence.findWithDynamicQuery(dynamicQuery,
-			start, end);
+	public <T> List<T> dynamicQuery(
+		DynamicQuery dynamicQuery, int start, int end) {
+
+		return calendarResourcePersistence.findWithDynamicQuery(
+			dynamicQuery, start, end);
 	}
 
 	/**
 	 * Performs a dynamic query on the database and returns an ordered range of the matching rows.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link com.liferay.calendar.model.impl.CalendarResourceModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>com.liferay.calendar.model.impl.CalendarResourceModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param dynamicQuery the dynamic query
@@ -198,10 +200,12 @@ public abstract class CalendarResourceLocalServiceBaseImpl
 	 * @return the ordered range of matching rows
 	 */
 	@Override
-	public <T> List<T> dynamicQuery(DynamicQuery dynamicQuery, int start,
-		int end, OrderByComparator<T> orderByComparator) {
-		return calendarResourcePersistence.findWithDynamicQuery(dynamicQuery,
-			start, end, orderByComparator);
+	public <T> List<T> dynamicQuery(
+		DynamicQuery dynamicQuery, int start, int end,
+		OrderByComparator<T> orderByComparator) {
+
+		return calendarResourcePersistence.findWithDynamicQuery(
+			dynamicQuery, start, end, orderByComparator);
 	}
 
 	/**
@@ -223,15 +227,17 @@ public abstract class CalendarResourceLocalServiceBaseImpl
 	 * @return the number of rows matching the dynamic query
 	 */
 	@Override
-	public long dynamicQueryCount(DynamicQuery dynamicQuery,
-		Projection projection) {
-		return calendarResourcePersistence.countWithDynamicQuery(dynamicQuery,
-			projection);
+	public long dynamicQueryCount(
+		DynamicQuery dynamicQuery, Projection projection) {
+
+		return calendarResourcePersistence.countWithDynamicQuery(
+			dynamicQuery, projection);
 	}
 
 	@Override
 	public CalendarResource fetchCalendarResource(long calendarResourceId) {
-		return calendarResourcePersistence.fetchByPrimaryKey(calendarResourceId);
+		return calendarResourcePersistence.fetchByPrimaryKey(
+			calendarResourceId);
 	}
 
 	/**
@@ -242,8 +248,9 @@ public abstract class CalendarResourceLocalServiceBaseImpl
 	 * @return the matching calendar resource, or <code>null</code> if a matching calendar resource could not be found
 	 */
 	@Override
-	public CalendarResource fetchCalendarResourceByUuidAndGroupId(String uuid,
-		long groupId) {
+	public CalendarResource fetchCalendarResourceByUuidAndGroupId(
+		String uuid, long groupId) {
+
 		return calendarResourcePersistence.fetchByUUID_G(uuid, groupId);
 	}
 
@@ -257,14 +264,17 @@ public abstract class CalendarResourceLocalServiceBaseImpl
 	@Override
 	public CalendarResource getCalendarResource(long calendarResourceId)
 		throws PortalException {
+
 		return calendarResourcePersistence.findByPrimaryKey(calendarResourceId);
 	}
 
 	@Override
 	public ActionableDynamicQuery getActionableDynamicQuery() {
-		ActionableDynamicQuery actionableDynamicQuery = new DefaultActionableDynamicQuery();
+		ActionableDynamicQuery actionableDynamicQuery =
+			new DefaultActionableDynamicQuery();
 
-		actionableDynamicQuery.setBaseLocalService(calendarResourceLocalService);
+		actionableDynamicQuery.setBaseLocalService(
+			calendarResourceLocalService);
 		actionableDynamicQuery.setClassLoader(getClassLoader());
 		actionableDynamicQuery.setModelClass(CalendarResource.class);
 
@@ -274,10 +284,14 @@ public abstract class CalendarResourceLocalServiceBaseImpl
 	}
 
 	@Override
-	public IndexableActionableDynamicQuery getIndexableActionableDynamicQuery() {
-		IndexableActionableDynamicQuery indexableActionableDynamicQuery = new IndexableActionableDynamicQuery();
+	public IndexableActionableDynamicQuery
+		getIndexableActionableDynamicQuery() {
 
-		indexableActionableDynamicQuery.setBaseLocalService(calendarResourceLocalService);
+		IndexableActionableDynamicQuery indexableActionableDynamicQuery =
+			new IndexableActionableDynamicQuery();
+
+		indexableActionableDynamicQuery.setBaseLocalService(
+			calendarResourceLocalService);
 		indexableActionableDynamicQuery.setClassLoader(getClassLoader());
 		indexableActionableDynamicQuery.setModelClass(CalendarResource.class);
 
@@ -289,7 +303,9 @@ public abstract class CalendarResourceLocalServiceBaseImpl
 
 	protected void initActionableDynamicQuery(
 		ActionableDynamicQuery actionableDynamicQuery) {
-		actionableDynamicQuery.setBaseLocalService(calendarResourceLocalService);
+
+		actionableDynamicQuery.setBaseLocalService(
+			calendarResourceLocalService);
 		actionableDynamicQuery.setClassLoader(getClassLoader());
 		actionableDynamicQuery.setModelClass(CalendarResource.class);
 
@@ -299,67 +315,91 @@ public abstract class CalendarResourceLocalServiceBaseImpl
 	@Override
 	public ExportActionableDynamicQuery getExportActionableDynamicQuery(
 		final PortletDataContext portletDataContext) {
-		final ExportActionableDynamicQuery exportActionableDynamicQuery = new ExportActionableDynamicQuery() {
+
+		final ExportActionableDynamicQuery exportActionableDynamicQuery =
+			new ExportActionableDynamicQuery() {
+
 				@Override
 				public long performCount() throws PortalException {
-					ManifestSummary manifestSummary = portletDataContext.getManifestSummary();
+					ManifestSummary manifestSummary =
+						portletDataContext.getManifestSummary();
 
 					StagedModelType stagedModelType = getStagedModelType();
 
 					long modelAdditionCount = super.performCount();
 
-					manifestSummary.addModelAdditionCount(stagedModelType,
-						modelAdditionCount);
+					manifestSummary.addModelAdditionCount(
+						stagedModelType, modelAdditionCount);
 
-					long modelDeletionCount = ExportImportHelperUtil.getModelDeletionCount(portletDataContext,
-							stagedModelType);
+					long modelDeletionCount =
+						ExportImportHelperUtil.getModelDeletionCount(
+							portletDataContext, stagedModelType);
 
-					manifestSummary.addModelDeletionCount(stagedModelType,
-						modelDeletionCount);
+					manifestSummary.addModelDeletionCount(
+						stagedModelType, modelDeletionCount);
 
 					return modelAdditionCount;
 				}
+
 			};
 
 		initActionableDynamicQuery(exportActionableDynamicQuery);
 
-		exportActionableDynamicQuery.setAddCriteriaMethod(new ActionableDynamicQuery.AddCriteriaMethod() {
+		exportActionableDynamicQuery.setAddCriteriaMethod(
+			new ActionableDynamicQuery.AddCriteriaMethod() {
+
 				@Override
 				public void addCriteria(DynamicQuery dynamicQuery) {
-					portletDataContext.addDateRangeCriteria(dynamicQuery,
-						"modifiedDate");
+					portletDataContext.addDateRangeCriteria(
+						dynamicQuery, "modifiedDate");
 
-					StagedModelType stagedModelType = exportActionableDynamicQuery.getStagedModelType();
+					StagedModelType stagedModelType =
+						exportActionableDynamicQuery.getStagedModelType();
 
-					long referrerClassNameId = stagedModelType.getReferrerClassNameId();
+					long referrerClassNameId =
+						stagedModelType.getReferrerClassNameId();
 
 					Property classNameIdProperty = PropertyFactoryUtil.forName(
-							"classNameId");
+						"classNameId");
 
-					if ((referrerClassNameId != StagedModelType.REFERRER_CLASS_NAME_ID_ALL) &&
-							(referrerClassNameId != StagedModelType.REFERRER_CLASS_NAME_ID_ANY)) {
-						dynamicQuery.add(classNameIdProperty.eq(
+					if ((referrerClassNameId !=
+							StagedModelType.REFERRER_CLASS_NAME_ID_ALL) &&
+						(referrerClassNameId !=
+							StagedModelType.REFERRER_CLASS_NAME_ID_ANY)) {
+
+						dynamicQuery.add(
+							classNameIdProperty.eq(
 								stagedModelType.getReferrerClassNameId()));
 					}
-					else if (referrerClassNameId == StagedModelType.REFERRER_CLASS_NAME_ID_ANY) {
+					else if (referrerClassNameId ==
+								StagedModelType.REFERRER_CLASS_NAME_ID_ANY) {
+
 						dynamicQuery.add(classNameIdProperty.isNotNull());
 					}
 				}
+
 			});
 
-		exportActionableDynamicQuery.setCompanyId(portletDataContext.getCompanyId());
+		exportActionableDynamicQuery.setCompanyId(
+			portletDataContext.getCompanyId());
 
-		exportActionableDynamicQuery.setGroupId(portletDataContext.getScopeGroupId());
+		exportActionableDynamicQuery.setGroupId(
+			portletDataContext.getScopeGroupId());
 
-		exportActionableDynamicQuery.setPerformActionMethod(new ActionableDynamicQuery.PerformActionMethod<CalendarResource>() {
+		exportActionableDynamicQuery.setPerformActionMethod(
+			new ActionableDynamicQuery.PerformActionMethod<CalendarResource>() {
+
 				@Override
 				public void performAction(CalendarResource calendarResource)
 					throws PortalException {
-					StagedModelDataHandlerUtil.exportStagedModel(portletDataContext,
-						calendarResource);
+
+					StagedModelDataHandlerUtil.exportStagedModel(
+						portletDataContext, calendarResource);
 				}
+
 			});
-		exportActionableDynamicQuery.setStagedModelType(new StagedModelType(
+		exportActionableDynamicQuery.setStagedModelType(
+			new StagedModelType(
 				PortalUtil.getClassNameId(CalendarResource.class.getName()),
 				StagedModelType.REFERRER_CLASS_NAME_ID_ALL));
 
@@ -372,12 +412,15 @@ public abstract class CalendarResourceLocalServiceBaseImpl
 	@Override
 	public PersistedModel deletePersistedModel(PersistedModel persistedModel)
 		throws PortalException {
-		return calendarResourceLocalService.deleteCalendarResource((CalendarResource)persistedModel);
+
+		return calendarResourceLocalService.deleteCalendarResource(
+			(CalendarResource)persistedModel);
 	}
 
 	@Override
 	public PersistedModel getPersistedModel(Serializable primaryKeyObj)
 		throws PortalException {
+
 		return calendarResourcePersistence.findByPrimaryKey(primaryKeyObj);
 	}
 
@@ -391,6 +434,7 @@ public abstract class CalendarResourceLocalServiceBaseImpl
 	@Override
 	public List<CalendarResource> getCalendarResourcesByUuidAndCompanyId(
 		String uuid, long companyId) {
+
 		return calendarResourcePersistence.findByUuid_C(uuid, companyId);
 	}
 
@@ -408,8 +452,9 @@ public abstract class CalendarResourceLocalServiceBaseImpl
 	public List<CalendarResource> getCalendarResourcesByUuidAndCompanyId(
 		String uuid, long companyId, int start, int end,
 		OrderByComparator<CalendarResource> orderByComparator) {
-		return calendarResourcePersistence.findByUuid_C(uuid, companyId, start,
-			end, orderByComparator);
+
+		return calendarResourcePersistence.findByUuid_C(
+			uuid, companyId, start, end, orderByComparator);
 	}
 
 	/**
@@ -421,8 +466,10 @@ public abstract class CalendarResourceLocalServiceBaseImpl
 	 * @throws PortalException if a matching calendar resource could not be found
 	 */
 	@Override
-	public CalendarResource getCalendarResourceByUuidAndGroupId(String uuid,
-		long groupId) throws PortalException {
+	public CalendarResource getCalendarResourceByUuidAndGroupId(
+			String uuid, long groupId)
+		throws PortalException {
+
 		return calendarResourcePersistence.findByUUID_G(uuid, groupId);
 	}
 
@@ -430,7 +477,7 @@ public abstract class CalendarResourceLocalServiceBaseImpl
 	 * Returns a range of all the calendar resources.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link com.liferay.calendar.model.impl.CalendarResourceModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>com.liferay.calendar.model.impl.CalendarResourceModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param start the lower bound of the range of calendar resources
@@ -462,6 +509,7 @@ public abstract class CalendarResourceLocalServiceBaseImpl
 	@Override
 	public CalendarResource updateCalendarResource(
 		CalendarResource calendarResource) {
+
 		return calendarResourcePersistence.update(calendarResource);
 	}
 
@@ -470,7 +518,9 @@ public abstract class CalendarResourceLocalServiceBaseImpl
 	 *
 	 * @return the calendar local service
 	 */
-	public com.liferay.calendar.service.CalendarLocalService getCalendarLocalService() {
+	public com.liferay.calendar.service.CalendarLocalService
+		getCalendarLocalService() {
+
 		return calendarLocalService;
 	}
 
@@ -480,7 +530,9 @@ public abstract class CalendarResourceLocalServiceBaseImpl
 	 * @param calendarLocalService the calendar local service
 	 */
 	public void setCalendarLocalService(
-		com.liferay.calendar.service.CalendarLocalService calendarLocalService) {
+		com.liferay.calendar.service.CalendarLocalService
+			calendarLocalService) {
+
 		this.calendarLocalService = calendarLocalService;
 	}
 
@@ -498,7 +550,9 @@ public abstract class CalendarResourceLocalServiceBaseImpl
 	 *
 	 * @param calendarPersistence the calendar persistence
 	 */
-	public void setCalendarPersistence(CalendarPersistence calendarPersistence) {
+	public void setCalendarPersistence(
+		CalendarPersistence calendarPersistence) {
+
 		this.calendarPersistence = calendarPersistence;
 	}
 
@@ -525,7 +579,9 @@ public abstract class CalendarResourceLocalServiceBaseImpl
 	 *
 	 * @return the calendar booking local service
 	 */
-	public com.liferay.calendar.service.CalendarBookingLocalService getCalendarBookingLocalService() {
+	public com.liferay.calendar.service.CalendarBookingLocalService
+		getCalendarBookingLocalService() {
+
 		return calendarBookingLocalService;
 	}
 
@@ -535,7 +591,9 @@ public abstract class CalendarResourceLocalServiceBaseImpl
 	 * @param calendarBookingLocalService the calendar booking local service
 	 */
 	public void setCalendarBookingLocalService(
-		com.liferay.calendar.service.CalendarBookingLocalService calendarBookingLocalService) {
+		com.liferay.calendar.service.CalendarBookingLocalService
+			calendarBookingLocalService) {
+
 		this.calendarBookingLocalService = calendarBookingLocalService;
 	}
 
@@ -555,6 +613,7 @@ public abstract class CalendarResourceLocalServiceBaseImpl
 	 */
 	public void setCalendarBookingPersistence(
 		CalendarBookingPersistence calendarBookingPersistence) {
+
 		this.calendarBookingPersistence = calendarBookingPersistence;
 	}
 
@@ -574,6 +633,7 @@ public abstract class CalendarResourceLocalServiceBaseImpl
 	 */
 	public void setCalendarBookingFinder(
 		CalendarBookingFinder calendarBookingFinder) {
+
 		this.calendarBookingFinder = calendarBookingFinder;
 	}
 
@@ -582,7 +642,9 @@ public abstract class CalendarResourceLocalServiceBaseImpl
 	 *
 	 * @return the calendar notification template local service
 	 */
-	public com.liferay.calendar.service.CalendarNotificationTemplateLocalService getCalendarNotificationTemplateLocalService() {
+	public com.liferay.calendar.service.CalendarNotificationTemplateLocalService
+		getCalendarNotificationTemplateLocalService() {
+
 		return calendarNotificationTemplateLocalService;
 	}
 
@@ -592,8 +654,11 @@ public abstract class CalendarResourceLocalServiceBaseImpl
 	 * @param calendarNotificationTemplateLocalService the calendar notification template local service
 	 */
 	public void setCalendarNotificationTemplateLocalService(
-		com.liferay.calendar.service.CalendarNotificationTemplateLocalService calendarNotificationTemplateLocalService) {
-		this.calendarNotificationTemplateLocalService = calendarNotificationTemplateLocalService;
+		com.liferay.calendar.service.CalendarNotificationTemplateLocalService
+			calendarNotificationTemplateLocalService) {
+
+		this.calendarNotificationTemplateLocalService =
+			calendarNotificationTemplateLocalService;
 	}
 
 	/**
@@ -601,7 +666,9 @@ public abstract class CalendarResourceLocalServiceBaseImpl
 	 *
 	 * @return the calendar notification template persistence
 	 */
-	public CalendarNotificationTemplatePersistence getCalendarNotificationTemplatePersistence() {
+	public CalendarNotificationTemplatePersistence
+		getCalendarNotificationTemplatePersistence() {
+
 		return calendarNotificationTemplatePersistence;
 	}
 
@@ -611,8 +678,11 @@ public abstract class CalendarResourceLocalServiceBaseImpl
 	 * @param calendarNotificationTemplatePersistence the calendar notification template persistence
 	 */
 	public void setCalendarNotificationTemplatePersistence(
-		CalendarNotificationTemplatePersistence calendarNotificationTemplatePersistence) {
-		this.calendarNotificationTemplatePersistence = calendarNotificationTemplatePersistence;
+		CalendarNotificationTemplatePersistence
+			calendarNotificationTemplatePersistence) {
+
+		this.calendarNotificationTemplatePersistence =
+			calendarNotificationTemplatePersistence;
 	}
 
 	/**
@@ -631,6 +701,7 @@ public abstract class CalendarResourceLocalServiceBaseImpl
 	 */
 	public void setCalendarResourceLocalService(
 		CalendarResourceLocalService calendarResourceLocalService) {
+
 		this.calendarResourceLocalService = calendarResourceLocalService;
 	}
 
@@ -650,6 +721,7 @@ public abstract class CalendarResourceLocalServiceBaseImpl
 	 */
 	public void setCalendarResourcePersistence(
 		CalendarResourcePersistence calendarResourcePersistence) {
+
 		this.calendarResourcePersistence = calendarResourcePersistence;
 	}
 
@@ -669,6 +741,7 @@ public abstract class CalendarResourceLocalServiceBaseImpl
 	 */
 	public void setCalendarResourceFinder(
 		CalendarResourceFinder calendarResourceFinder) {
+
 		this.calendarResourceFinder = calendarResourceFinder;
 	}
 
@@ -677,7 +750,9 @@ public abstract class CalendarResourceLocalServiceBaseImpl
 	 *
 	 * @return the counter local service
 	 */
-	public com.liferay.counter.kernel.service.CounterLocalService getCounterLocalService() {
+	public com.liferay.counter.kernel.service.CounterLocalService
+		getCounterLocalService() {
+
 		return counterLocalService;
 	}
 
@@ -687,7 +762,9 @@ public abstract class CalendarResourceLocalServiceBaseImpl
 	 * @param counterLocalService the counter local service
 	 */
 	public void setCounterLocalService(
-		com.liferay.counter.kernel.service.CounterLocalService counterLocalService) {
+		com.liferay.counter.kernel.service.CounterLocalService
+			counterLocalService) {
+
 		this.counterLocalService = counterLocalService;
 	}
 
@@ -696,7 +773,9 @@ public abstract class CalendarResourceLocalServiceBaseImpl
 	 *
 	 * @return the class name local service
 	 */
-	public com.liferay.portal.kernel.service.ClassNameLocalService getClassNameLocalService() {
+	public com.liferay.portal.kernel.service.ClassNameLocalService
+		getClassNameLocalService() {
+
 		return classNameLocalService;
 	}
 
@@ -706,7 +785,9 @@ public abstract class CalendarResourceLocalServiceBaseImpl
 	 * @param classNameLocalService the class name local service
 	 */
 	public void setClassNameLocalService(
-		com.liferay.portal.kernel.service.ClassNameLocalService classNameLocalService) {
+		com.liferay.portal.kernel.service.ClassNameLocalService
+			classNameLocalService) {
+
 		this.classNameLocalService = classNameLocalService;
 	}
 
@@ -726,6 +807,7 @@ public abstract class CalendarResourceLocalServiceBaseImpl
 	 */
 	public void setClassNamePersistence(
 		ClassNamePersistence classNamePersistence) {
+
 		this.classNamePersistence = classNamePersistence;
 	}
 
@@ -734,7 +816,9 @@ public abstract class CalendarResourceLocalServiceBaseImpl
 	 *
 	 * @return the resource local service
 	 */
-	public com.liferay.portal.kernel.service.ResourceLocalService getResourceLocalService() {
+	public com.liferay.portal.kernel.service.ResourceLocalService
+		getResourceLocalService() {
+
 		return resourceLocalService;
 	}
 
@@ -744,7 +828,9 @@ public abstract class CalendarResourceLocalServiceBaseImpl
 	 * @param resourceLocalService the resource local service
 	 */
 	public void setResourceLocalService(
-		com.liferay.portal.kernel.service.ResourceLocalService resourceLocalService) {
+		com.liferay.portal.kernel.service.ResourceLocalService
+			resourceLocalService) {
+
 		this.resourceLocalService = resourceLocalService;
 	}
 
@@ -753,7 +839,9 @@ public abstract class CalendarResourceLocalServiceBaseImpl
 	 *
 	 * @return the user local service
 	 */
-	public com.liferay.portal.kernel.service.UserLocalService getUserLocalService() {
+	public com.liferay.portal.kernel.service.UserLocalService
+		getUserLocalService() {
+
 		return userLocalService;
 	}
 
@@ -764,6 +852,7 @@ public abstract class CalendarResourceLocalServiceBaseImpl
 	 */
 	public void setUserLocalService(
 		com.liferay.portal.kernel.service.UserLocalService userLocalService) {
+
 		this.userLocalService = userLocalService;
 	}
 
@@ -790,7 +879,9 @@ public abstract class CalendarResourceLocalServiceBaseImpl
 	 *
 	 * @return the asset entry local service
 	 */
-	public com.liferay.asset.kernel.service.AssetEntryLocalService getAssetEntryLocalService() {
+	public com.liferay.asset.kernel.service.AssetEntryLocalService
+		getAssetEntryLocalService() {
+
 		return assetEntryLocalService;
 	}
 
@@ -800,7 +891,9 @@ public abstract class CalendarResourceLocalServiceBaseImpl
 	 * @param assetEntryLocalService the asset entry local service
 	 */
 	public void setAssetEntryLocalService(
-		com.liferay.asset.kernel.service.AssetEntryLocalService assetEntryLocalService) {
+		com.liferay.asset.kernel.service.AssetEntryLocalService
+			assetEntryLocalService) {
+
 		this.assetEntryLocalService = assetEntryLocalService;
 	}
 
@@ -820,11 +913,13 @@ public abstract class CalendarResourceLocalServiceBaseImpl
 	 */
 	public void setAssetEntryPersistence(
 		AssetEntryPersistence assetEntryPersistence) {
+
 		this.assetEntryPersistence = assetEntryPersistence;
 	}
 
 	public void afterPropertiesSet() {
-		persistedModelLocalServiceRegistry.register("com.liferay.calendar.model.CalendarResource",
+		persistedModelLocalServiceRegistry.register(
+			"com.liferay.calendar.model.CalendarResource",
 			calendarResourceLocalService);
 	}
 
@@ -865,8 +960,8 @@ public abstract class CalendarResourceLocalServiceBaseImpl
 			sql = db.buildSQL(sql);
 			sql = PortalUtil.transformSQL(sql);
 
-			SqlUpdate sqlUpdate = SqlUpdateFactoryUtil.getSqlUpdate(dataSource,
-					sql);
+			SqlUpdate sqlUpdate = SqlUpdateFactoryUtil.getSqlUpdate(
+				dataSource, sql);
 
 			sqlUpdate.update();
 		}
@@ -875,44 +970,91 @@ public abstract class CalendarResourceLocalServiceBaseImpl
 		}
 	}
 
-	@BeanReference(type = com.liferay.calendar.service.CalendarLocalService.class)
-	protected com.liferay.calendar.service.CalendarLocalService calendarLocalService;
+	@BeanReference(
+		type = com.liferay.calendar.service.CalendarLocalService.class
+	)
+	protected com.liferay.calendar.service.CalendarLocalService
+		calendarLocalService;
+
 	@BeanReference(type = CalendarPersistence.class)
 	protected CalendarPersistence calendarPersistence;
+
 	@BeanReference(type = CalendarFinder.class)
 	protected CalendarFinder calendarFinder;
-	@BeanReference(type = com.liferay.calendar.service.CalendarBookingLocalService.class)
-	protected com.liferay.calendar.service.CalendarBookingLocalService calendarBookingLocalService;
+
+	@BeanReference(
+		type = com.liferay.calendar.service.CalendarBookingLocalService.class
+	)
+	protected com.liferay.calendar.service.CalendarBookingLocalService
+		calendarBookingLocalService;
+
 	@BeanReference(type = CalendarBookingPersistence.class)
 	protected CalendarBookingPersistence calendarBookingPersistence;
+
 	@BeanReference(type = CalendarBookingFinder.class)
 	protected CalendarBookingFinder calendarBookingFinder;
-	@BeanReference(type = com.liferay.calendar.service.CalendarNotificationTemplateLocalService.class)
-	protected com.liferay.calendar.service.CalendarNotificationTemplateLocalService calendarNotificationTemplateLocalService;
+
+	@BeanReference(
+		type = com.liferay.calendar.service.CalendarNotificationTemplateLocalService.class
+	)
+	protected
+		com.liferay.calendar.service.CalendarNotificationTemplateLocalService
+			calendarNotificationTemplateLocalService;
+
 	@BeanReference(type = CalendarNotificationTemplatePersistence.class)
-	protected CalendarNotificationTemplatePersistence calendarNotificationTemplatePersistence;
+	protected CalendarNotificationTemplatePersistence
+		calendarNotificationTemplatePersistence;
+
 	@BeanReference(type = CalendarResourceLocalService.class)
 	protected CalendarResourceLocalService calendarResourceLocalService;
+
 	@BeanReference(type = CalendarResourcePersistence.class)
 	protected CalendarResourcePersistence calendarResourcePersistence;
+
 	@BeanReference(type = CalendarResourceFinder.class)
 	protected CalendarResourceFinder calendarResourceFinder;
-	@ServiceReference(type = com.liferay.counter.kernel.service.CounterLocalService.class)
-	protected com.liferay.counter.kernel.service.CounterLocalService counterLocalService;
-	@ServiceReference(type = com.liferay.portal.kernel.service.ClassNameLocalService.class)
-	protected com.liferay.portal.kernel.service.ClassNameLocalService classNameLocalService;
+
+	@ServiceReference(
+		type = com.liferay.counter.kernel.service.CounterLocalService.class
+	)
+	protected com.liferay.counter.kernel.service.CounterLocalService
+		counterLocalService;
+
+	@ServiceReference(
+		type = com.liferay.portal.kernel.service.ClassNameLocalService.class
+	)
+	protected com.liferay.portal.kernel.service.ClassNameLocalService
+		classNameLocalService;
+
 	@ServiceReference(type = ClassNamePersistence.class)
 	protected ClassNamePersistence classNamePersistence;
-	@ServiceReference(type = com.liferay.portal.kernel.service.ResourceLocalService.class)
-	protected com.liferay.portal.kernel.service.ResourceLocalService resourceLocalService;
-	@ServiceReference(type = com.liferay.portal.kernel.service.UserLocalService.class)
-	protected com.liferay.portal.kernel.service.UserLocalService userLocalService;
+
+	@ServiceReference(
+		type = com.liferay.portal.kernel.service.ResourceLocalService.class
+	)
+	protected com.liferay.portal.kernel.service.ResourceLocalService
+		resourceLocalService;
+
+	@ServiceReference(
+		type = com.liferay.portal.kernel.service.UserLocalService.class
+	)
+	protected com.liferay.portal.kernel.service.UserLocalService
+		userLocalService;
+
 	@ServiceReference(type = UserPersistence.class)
 	protected UserPersistence userPersistence;
-	@ServiceReference(type = com.liferay.asset.kernel.service.AssetEntryLocalService.class)
-	protected com.liferay.asset.kernel.service.AssetEntryLocalService assetEntryLocalService;
+
+	@ServiceReference(
+		type = com.liferay.asset.kernel.service.AssetEntryLocalService.class
+	)
+	protected com.liferay.asset.kernel.service.AssetEntryLocalService
+		assetEntryLocalService;
+
 	@ServiceReference(type = AssetEntryPersistence.class)
 	protected AssetEntryPersistence assetEntryPersistence;
+
 	@ServiceReference(type = PersistedModelLocalServiceRegistry.class)
-	protected PersistedModelLocalServiceRegistry persistedModelLocalServiceRegistry;
+	protected PersistedModelLocalServiceRegistry
+		persistedModelLocalServiceRegistry;
+
 }

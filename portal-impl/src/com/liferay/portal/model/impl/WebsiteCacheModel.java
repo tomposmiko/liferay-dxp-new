@@ -33,12 +33,12 @@ import java.util.Date;
  * The cache model class for representing Website in entity cache.
  *
  * @author Brian Wing Shun Chan
- * @see Website
  * @generated
  */
 @ProviderType
-public class WebsiteCacheModel implements CacheModel<Website>, Externalizable,
-	MVCCModel {
+public class WebsiteCacheModel
+	implements CacheModel<Website>, Externalizable, MVCCModel {
+
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj) {
@@ -52,7 +52,8 @@ public class WebsiteCacheModel implements CacheModel<Website>, Externalizable,
 		WebsiteCacheModel websiteCacheModel = (WebsiteCacheModel)obj;
 
 		if ((websiteId == websiteCacheModel.websiteId) &&
-				(mvccVersion == websiteCacheModel.mvccVersion)) {
+			(mvccVersion == websiteCacheModel.mvccVersion)) {
+
 			return true;
 		}
 
@@ -202,8 +203,7 @@ public class WebsiteCacheModel implements CacheModel<Website>, Externalizable,
 	}
 
 	@Override
-	public void writeExternal(ObjectOutput objectOutput)
-		throws IOException {
+	public void writeExternal(ObjectOutput objectOutput) throws IOException {
 		objectOutput.writeLong(mvccVersion);
 
 		if (uuid == null) {
@@ -260,4 +260,5 @@ public class WebsiteCacheModel implements CacheModel<Website>, Externalizable,
 	public long typeId;
 	public boolean primary;
 	public long lastPublishDate;
+
 }

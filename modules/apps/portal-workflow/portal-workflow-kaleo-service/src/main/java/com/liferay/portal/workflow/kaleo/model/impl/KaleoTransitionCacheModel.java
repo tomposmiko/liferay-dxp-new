@@ -32,12 +32,12 @@ import java.util.Date;
  * The cache model class for representing KaleoTransition in entity cache.
  *
  * @author Brian Wing Shun Chan
- * @see KaleoTransition
  * @generated
  */
 @ProviderType
-public class KaleoTransitionCacheModel implements CacheModel<KaleoTransition>,
-	Externalizable {
+public class KaleoTransitionCacheModel
+	implements CacheModel<KaleoTransition>, Externalizable {
+
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj) {
@@ -48,7 +48,8 @@ public class KaleoTransitionCacheModel implements CacheModel<KaleoTransition>,
 			return false;
 		}
 
-		KaleoTransitionCacheModel kaleoTransitionCacheModel = (KaleoTransitionCacheModel)obj;
+		KaleoTransitionCacheModel kaleoTransitionCacheModel =
+			(KaleoTransitionCacheModel)obj;
 
 		if (kaleoTransitionId == kaleoTransitionCacheModel.kaleoTransitionId) {
 			return true;
@@ -133,7 +134,8 @@ public class KaleoTransitionCacheModel implements CacheModel<KaleoTransition>,
 			kaleoTransitionImpl.setModifiedDate(new Date(modifiedDate));
 		}
 
-		kaleoTransitionImpl.setKaleoDefinitionVersionId(kaleoDefinitionVersionId);
+		kaleoTransitionImpl.setKaleoDefinitionVersionId(
+			kaleoDefinitionVersionId);
 		kaleoTransitionImpl.setKaleoNodeId(kaleoNodeId);
 
 		if (name == null) {
@@ -204,8 +206,7 @@ public class KaleoTransitionCacheModel implements CacheModel<KaleoTransition>,
 	}
 
 	@Override
-	public void writeExternal(ObjectOutput objectOutput)
-		throws IOException {
+	public void writeExternal(ObjectOutput objectOutput) throws IOException {
 		objectOutput.writeLong(kaleoTransitionId);
 
 		objectOutput.writeLong(groupId);
@@ -279,4 +280,5 @@ public class KaleoTransitionCacheModel implements CacheModel<KaleoTransition>,
 	public long targetKaleoNodeId;
 	public String targetKaleoNodeName;
 	public boolean defaultTransition;
+
 }

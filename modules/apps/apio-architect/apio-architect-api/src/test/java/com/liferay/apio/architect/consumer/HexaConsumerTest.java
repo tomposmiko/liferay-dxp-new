@@ -56,7 +56,10 @@ public class HexaConsumerTest {
 
 	@Test(expected = NullPointerException.class)
 	public void testOnInvokingAndThenWithNullAfterThrowsException() {
-		HexaConsumer.empty().andThen(null);
+		HexaConsumer.empty(
+		).andThen(
+			null
+		);
 	}
 
 }

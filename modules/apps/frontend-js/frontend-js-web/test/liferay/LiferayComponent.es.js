@@ -16,7 +16,8 @@ describe(
 				const window = {
 					Liferay: {
 						fire: () => 0,
-						namespace: 0
+						namespace: 0,
+						on: () => 0
 					}
 				};
 

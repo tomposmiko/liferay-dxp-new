@@ -15,12 +15,12 @@
 package com.liferay.apio.architect.internal.writer;
 
 import static com.liferay.apio.architect.internal.url.URLCreator.createCollectionPageURL;
-import static com.liferay.apio.architect.internal.url.URLCreator.createCollectionURL;
-import static com.liferay.apio.architect.internal.url.URLCreator.createNestedCollectionURL;
+import static com.liferay.apio.architect.internal.url.URLCreator.createResourceURL;
 import static com.liferay.apio.architect.internal.writer.util.WriterUtil.getFieldsWriter;
 import static com.liferay.apio.architect.internal.writer.util.WriterUtil.getPathOptional;
 
 import com.liferay.apio.architect.alias.representor.NestedListFieldFunction;
+import com.liferay.apio.architect.internal.alias.ActionSemanticsFunction;
 import com.liferay.apio.architect.internal.alias.BaseRepresentorFunction;
 import com.liferay.apio.architect.internal.alias.PathFunction;
 import com.liferay.apio.architect.internal.alias.RepresentorFunction;
@@ -32,14 +32,12 @@ import com.liferay.apio.architect.internal.message.json.PageMessageMapper;
 import com.liferay.apio.architect.internal.pagination.PageType;
 import com.liferay.apio.architect.internal.request.RequestInfo;
 import com.liferay.apio.architect.internal.single.model.SingleModelImpl;
-import com.liferay.apio.architect.operation.Operation;
 import com.liferay.apio.architect.pagination.Page;
 import com.liferay.apio.architect.representor.BaseRepresentor;
 import com.liferay.apio.architect.single.model.SingleModel;
 import com.liferay.apio.architect.uri.Path;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
@@ -68,6 +66,7 @@ public class PageWriter<T> {
 
 	public PageWriter(Builder<T> builder) {
 		_page = builder._page;
+		_actionSemanticsFunction = builder._actionSemanticsFunction;
 		_pageMessageMapper = builder._pageMessageMapper;
 		_pathFunction = builder._pathFunction;
 		_representorFunction = builder._representorFunction;
@@ -99,29 +98,32 @@ public class PageWriter<T> {
 
 		_writePageURLs();
 
-		String url = _getCollectionURL();
+		Optional<String> optionalURL = createResourceURL(
+			_requestInfo.getApplicationURL(), _page.getResource());
 
-		_pageMessageMapper.mapCollectionURL(_jsonObjectBuilder, url);
+		optionalURL.ifPresent(
+			url -> _pageMessageMapper.mapCollectionURL(
+				_jsonObjectBuilder, url));
 
 		String resourceName = _page.getResourceName();
 
 		items.forEach(
-			model -> _writeItem(
-				new SingleModelImpl<>(
-					model, resourceName, Collections.emptyList())));
+			model -> _writeItem(new SingleModelImpl<>(model, resourceName)));
 
-		List<Operation> operations = _page.getOperations();
+		ActionWriter actionWriter = new ActionWriter(
+			_pageMessageMapper, _requestInfo, _jsonObjectBuilder);
+
+		_actionSemanticsFunction.apply(
+			_page.getResource()
+		).forEach(
+			actionWriter::write
+		);
 
 		_representorFunction.apply(
 			resourceName
 		).ifPresent(
 			_mapPageSemantics(_jsonObjectBuilder)
 		);
-
-		OperationWriter operationWriter = new OperationWriter(
-			_pageMessageMapper, _requestInfo, _jsonObjectBuilder);
-
-		operations.forEach(operationWriter::write);
 
 		_pageMessageMapper.onFinish(_jsonObjectBuilder, _page);
 
@@ -145,6 +147,26 @@ public class PageWriter<T> {
 			_page = page;
 
 			return new PageMessageMapperStep();
+		}
+
+		public class ActionSemanticsFunctionStep {
+
+			/**
+			 * Adds information to the builder about the function that gets the
+			 * {@code ActionSemantics} of a resource.
+			 *
+			 * @param  actionSemanticsFunction the function that gets the {@code
+			 *         ActionSemantics} of a resource
+			 * @return the updated builder
+			 */
+			public BuildStep actionSemanticsFunction(
+				ActionSemanticsFunction actionSemanticsFunction) {
+
+				_actionSemanticsFunction = actionSemanticsFunction;
+
+				return new BuildStep();
+			}
+
 		}
 
 		public class BuildStep {
@@ -272,16 +294,17 @@ public class PageWriter<T> {
 			 *         SingleModel} of a class
 			 * @return the updated builder
 			 */
-			public BuildStep singleModelFunction(
+			public ActionSemanticsFunctionStep singleModelFunction(
 				SingleModelFunction singleModelFunction) {
 
 				_singleModelFunction = singleModelFunction;
 
-				return new BuildStep();
+				return new ActionSemanticsFunctionStep();
 			}
 
 		}
 
+		private ActionSemanticsFunction _actionSemanticsFunction;
 		private Page<T> _page;
 		private PageMessageMapper<T> _pageMessageMapper;
 		private PathFunction _pathFunction;
@@ -290,18 +313,6 @@ public class PageWriter<T> {
 		private ResourceNameFunction _resourceNameFunction;
 		private SingleModelFunction _singleModelFunction;
 
-	}
-
-	private String _getCollectionURL() {
-		Optional<Path> optional = _page.getPathOptional();
-
-		return optional.map(
-			path -> createNestedCollectionURL(
-				_requestInfo.getApplicationURL(), path, _page.getResourceName())
-		).orElseGet(
-			() -> createCollectionURL(
-				_requestInfo.getApplicationURL(), _page.getResourceName())
-		);
 	}
 
 	private Consumer<BaseRepresentor> _mapPageSemantics(
@@ -382,8 +393,7 @@ public class PageWriter<T> {
 
 		Optional<FieldsWriter<U>> fieldsWriterOptional = getFieldsWriter(
 			singleModel, embeddedPathElements, _requestInfo,
-			baseRepresentorFunction, _singleModelFunction, pathOptional.get(),
-			_pathFunction);
+			baseRepresentorFunction, _singleModelFunction, pathOptional.get());
 
 		if (!fieldsWriterOptional.isPresent()) {
 			return;
@@ -398,7 +408,7 @@ public class PageWriter<T> {
 		Optional<FieldsWriter<U>> relatedModelsFieldsWriterOptional =
 			getFieldsWriter(
 				singleModel, null, _requestInfo, baseRepresentorFunction,
-				_singleModelFunction, pathOptional.get(), _pathFunction);
+				_singleModelFunction, pathOptional.get());
 
 		relatedModelsFieldsWriterOptional.ifPresent(
 			relatedModelFieldsWriter -> {
@@ -419,7 +429,7 @@ public class PageWriter<T> {
 							embeddedPathElements1, resourceURL));
 
 				relatedModelFieldsWriter.writeRelatedCollections(
-					_resourceNameFunction,
+					_pathFunction, _resourceNameFunction,
 					(url, embeddedPathElements1) ->
 						_pageMessageMapper.mapItemLinkedResourceURL(
 							_jsonObjectBuilder, itemJsonObjectBuilder,
@@ -428,8 +438,8 @@ public class PageWriter<T> {
 
 		fieldsWriter.writeNestedResources(
 			baseRepresentorFunction, singleModel, null,
-			(nestedSingleModel, nestedPathElements, nestedRepresentorFunction)
-				-> _writeItemEmbeddedModelFields(
+			(nestedSingleModel, nestedPathElements,
+			 nestedRepresentorFunction) -> _writeItemEmbeddedModelFields(
 				nestedSingleModel, nestedPathElements, itemJsonObjectBuilder,
 				nestedRepresentorFunction, rootSingleModel));
 
@@ -453,7 +463,7 @@ public class PageWriter<T> {
 
 		Optional<FieldsWriter<T>> optional = getFieldsWriter(
 			singleModel, null, _requestInfo, _representorFunction::apply,
-			_singleModelFunction, pathOptional.get(), _pathFunction);
+			_singleModelFunction, pathOptional.get());
 
 		if (!optional.isPresent()) {
 			return;
@@ -485,7 +495,7 @@ public class PageWriter<T> {
 					embeddedPathElements, resourceURL));
 
 		fieldsWriter.writeRelatedCollections(
-			_resourceNameFunction,
+			_pathFunction, _resourceNameFunction,
 			(url, embeddedPathElements) ->
 				_pageMessageMapper.mapItemLinkedResourceURL(
 					_jsonObjectBuilder, itemJsonObjectBuilder,
@@ -493,8 +503,8 @@ public class PageWriter<T> {
 
 		fieldsWriter.writeNestedResources(
 			_representorFunction::apply, singleModel, null,
-			(nestedSingleModel, nestedPathElements, nestedRepresentorFunction)
-				-> _writeItemEmbeddedModelFields(
+			(nestedSingleModel, nestedPathElements,
+			 nestedRepresentorFunction) -> _writeItemEmbeddedModelFields(
 				nestedSingleModel, nestedPathElements, itemJsonObjectBuilder,
 				nestedRepresentorFunction, singleModel));
 
@@ -533,8 +543,7 @@ public class PageWriter<T> {
 
 		Optional<FieldsWriter<S>> fieldsWriterOptional = getFieldsWriter(
 			singleModel, embeddedPathElements, _requestInfo,
-			baseRepresentorFunction, _singleModelFunction, pathOptional.get(),
-			_pathFunction);
+			baseRepresentorFunction, _singleModelFunction, pathOptional.get());
 
 		if (!fieldsWriterOptional.isPresent()) {
 			return;
@@ -633,7 +642,7 @@ public class PageWriter<T> {
 					resourceEmbeddedPathElements, resourceURL));
 
 		fieldsWriter.writeRelatedCollections(
-			_resourceNameFunction,
+			_pathFunction, _resourceNameFunction,
 			(url, resourceEmbeddedPathElements) ->
 				_pageMessageMapper.mapItemLinkedResourceURL(
 					_jsonObjectBuilder, itemJsonObjectBuilder,
@@ -641,8 +650,8 @@ public class PageWriter<T> {
 
 		fieldsWriter.writeNestedResources(
 			baseRepresentorFunction, singleModel, embeddedPathElements,
-			(nestedSingleModel, nestedPathElements, nestedRepresentorFunction)
-				-> _writeItemEmbeddedModelFields(
+			(nestedSingleModel, nestedPathElements,
+			 nestedRepresentorFunction) -> _writeItemEmbeddedModelFields(
 				nestedSingleModel, nestedPathElements, itemJsonObjectBuilder,
 				nestedRepresentorFunction, rootSingleModel));
 
@@ -673,8 +682,7 @@ public class PageWriter<T> {
 
 		nestedList.forEach(
 			model -> _writeItem(
-				nestedPageJSONObjectBuilder,
-				new SingleModelImpl<>(model, "", Collections.emptyList()),
+				nestedPageJSONObjectBuilder, new SingleModelImpl<>(model, ""),
 				embeddedPathElements, baseRepresentorFunction, singleModel));
 
 		_pageMessageMapper.onFinishNestedCollection(
@@ -702,33 +710,38 @@ public class PageWriter<T> {
 	}
 
 	private void _writePageURLs() {
-		String url = _getCollectionURL();
+		Optional<String> optionalURL = createResourceURL(
+			_requestInfo.getApplicationURL(), _page.getResource());
 
-		_pageMessageMapper.mapCurrentPageURL(
-			_jsonObjectBuilder,
-			createCollectionPageURL(url, _page, PageType.CURRENT));
+		optionalURL.ifPresent(
+			url -> {
+				_pageMessageMapper.mapCurrentPageURL(
+					_jsonObjectBuilder,
+					createCollectionPageURL(url, _page, PageType.CURRENT));
 
-		_pageMessageMapper.mapFirstPageURL(
-			_jsonObjectBuilder,
-			createCollectionPageURL(url, _page, PageType.FIRST));
+				_pageMessageMapper.mapFirstPageURL(
+					_jsonObjectBuilder,
+					createCollectionPageURL(url, _page, PageType.FIRST));
 
-		_pageMessageMapper.mapLastPageURL(
-			_jsonObjectBuilder,
-			createCollectionPageURL(url, _page, PageType.LAST));
+				_pageMessageMapper.mapLastPageURL(
+					_jsonObjectBuilder,
+					createCollectionPageURL(url, _page, PageType.LAST));
 
-		if (_page.hasNext()) {
-			_pageMessageMapper.mapNextPageURL(
-				_jsonObjectBuilder,
-				createCollectionPageURL(url, _page, PageType.NEXT));
-		}
+				if (_page.hasNext()) {
+					_pageMessageMapper.mapNextPageURL(
+						_jsonObjectBuilder,
+						createCollectionPageURL(url, _page, PageType.NEXT));
+				}
 
-		if (_page.hasPrevious()) {
-			_pageMessageMapper.mapPreviousPageURL(
-				_jsonObjectBuilder,
-				createCollectionPageURL(url, _page, PageType.PREVIOUS));
-		}
+				if (_page.hasPrevious()) {
+					_pageMessageMapper.mapPreviousPageURL(
+						_jsonObjectBuilder,
+						createCollectionPageURL(url, _page, PageType.PREVIOUS));
+				}
+			});
 	}
 
+	private final ActionSemanticsFunction _actionSemanticsFunction;
 	private final JSONObjectBuilder _jsonObjectBuilder;
 	private final Page<T> _page;
 	private final PageMessageMapper<T> _pageMessageMapper;

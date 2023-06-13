@@ -17,9 +17,7 @@ package com.liferay.polls.model;
 import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.expando.kernel.model.ExpandoBridge;
-
 import com.liferay.exportimport.kernel.lar.StagedModelType;
-
 import com.liferay.portal.kernel.model.ModelWrapper;
 import com.liferay.portal.kernel.service.ServiceContext;
 
@@ -41,6 +39,7 @@ import java.util.Objects;
  */
 @ProviderType
 public class PollsVoteWrapper implements PollsVote, ModelWrapper<PollsVote> {
+
 	public PollsVoteWrapper(PollsVote pollsVote) {
 		_pollsVote = pollsVote;
 	}
@@ -163,34 +162,35 @@ public class PollsVoteWrapper implements PollsVote, ModelWrapper<PollsVote> {
 	@Override
 	public PollsChoice getChoice()
 		throws com.liferay.portal.kernel.exception.PortalException {
+
 		return _pollsVote.getChoice();
 	}
 
 	/**
-	* Returns the choice ID of this polls vote.
-	*
-	* @return the choice ID of this polls vote
-	*/
+	 * Returns the choice ID of this polls vote.
+	 *
+	 * @return the choice ID of this polls vote
+	 */
 	@Override
 	public long getChoiceId() {
 		return _pollsVote.getChoiceId();
 	}
 
 	/**
-	* Returns the company ID of this polls vote.
-	*
-	* @return the company ID of this polls vote
-	*/
+	 * Returns the company ID of this polls vote.
+	 *
+	 * @return the company ID of this polls vote
+	 */
 	@Override
 	public long getCompanyId() {
 		return _pollsVote.getCompanyId();
 	}
 
 	/**
-	* Returns the create date of this polls vote.
-	*
-	* @return the create date of this polls vote
-	*/
+	 * Returns the create date of this polls vote.
+	 *
+	 * @return the create date of this polls vote
+	 */
 	@Override
 	public Date getCreateDate() {
 		return _pollsVote.getCreateDate();
@@ -202,40 +202,40 @@ public class PollsVoteWrapper implements PollsVote, ModelWrapper<PollsVote> {
 	}
 
 	/**
-	* Returns the group ID of this polls vote.
-	*
-	* @return the group ID of this polls vote
-	*/
+	 * Returns the group ID of this polls vote.
+	 *
+	 * @return the group ID of this polls vote
+	 */
 	@Override
 	public long getGroupId() {
 		return _pollsVote.getGroupId();
 	}
 
 	/**
-	* Returns the last publish date of this polls vote.
-	*
-	* @return the last publish date of this polls vote
-	*/
+	 * Returns the last publish date of this polls vote.
+	 *
+	 * @return the last publish date of this polls vote
+	 */
 	@Override
 	public Date getLastPublishDate() {
 		return _pollsVote.getLastPublishDate();
 	}
 
 	/**
-	* Returns the modified date of this polls vote.
-	*
-	* @return the modified date of this polls vote
-	*/
+	 * Returns the modified date of this polls vote.
+	 *
+	 * @return the modified date of this polls vote
+	 */
 	@Override
 	public Date getModifiedDate() {
 		return _pollsVote.getModifiedDate();
 	}
 
 	/**
-	* Returns the primary key of this polls vote.
-	*
-	* @return the primary key of this polls vote
-	*/
+	 * Returns the primary key of this polls vote.
+	 *
+	 * @return the primary key of this polls vote
+	 */
 	@Override
 	public long getPrimaryKey() {
 		return _pollsVote.getPrimaryKey();
@@ -247,70 +247,70 @@ public class PollsVoteWrapper implements PollsVote, ModelWrapper<PollsVote> {
 	}
 
 	/**
-	* Returns the question ID of this polls vote.
-	*
-	* @return the question ID of this polls vote
-	*/
+	 * Returns the question ID of this polls vote.
+	 *
+	 * @return the question ID of this polls vote
+	 */
 	@Override
 	public long getQuestionId() {
 		return _pollsVote.getQuestionId();
 	}
 
 	/**
-	* Returns the user ID of this polls vote.
-	*
-	* @return the user ID of this polls vote
-	*/
+	 * Returns the user ID of this polls vote.
+	 *
+	 * @return the user ID of this polls vote
+	 */
 	@Override
 	public long getUserId() {
 		return _pollsVote.getUserId();
 	}
 
 	/**
-	* Returns the user name of this polls vote.
-	*
-	* @return the user name of this polls vote
-	*/
+	 * Returns the user name of this polls vote.
+	 *
+	 * @return the user name of this polls vote
+	 */
 	@Override
 	public String getUserName() {
 		return _pollsVote.getUserName();
 	}
 
 	/**
-	* Returns the user uuid of this polls vote.
-	*
-	* @return the user uuid of this polls vote
-	*/
+	 * Returns the user uuid of this polls vote.
+	 *
+	 * @return the user uuid of this polls vote
+	 */
 	@Override
 	public String getUserUuid() {
 		return _pollsVote.getUserUuid();
 	}
 
 	/**
-	* Returns the uuid of this polls vote.
-	*
-	* @return the uuid of this polls vote
-	*/
+	 * Returns the uuid of this polls vote.
+	 *
+	 * @return the uuid of this polls vote
+	 */
 	@Override
 	public String getUuid() {
 		return _pollsVote.getUuid();
 	}
 
 	/**
-	* Returns the vote date of this polls vote.
-	*
-	* @return the vote date of this polls vote
-	*/
+	 * Returns the vote date of this polls vote.
+	 *
+	 * @return the vote date of this polls vote
+	 */
 	@Override
 	public Date getVoteDate() {
 		return _pollsVote.getVoteDate();
 	}
 
 	/**
-	* Returns the vote ID of this polls vote.
-	*
-	* @return the vote ID of this polls vote
-	*/
+	 * Returns the vote ID of this polls vote.
+	 *
+	 * @return the vote ID of this polls vote
+	 */
 	@Override
 	public long getVoteId() {
 		return _pollsVote.getVoteId();
@@ -347,30 +347,30 @@ public class PollsVoteWrapper implements PollsVote, ModelWrapper<PollsVote> {
 	}
 
 	/**
-	* Sets the choice ID of this polls vote.
-	*
-	* @param choiceId the choice ID of this polls vote
-	*/
+	 * Sets the choice ID of this polls vote.
+	 *
+	 * @param choiceId the choice ID of this polls vote
+	 */
 	@Override
 	public void setChoiceId(long choiceId) {
 		_pollsVote.setChoiceId(choiceId);
 	}
 
 	/**
-	* Sets the company ID of this polls vote.
-	*
-	* @param companyId the company ID of this polls vote
-	*/
+	 * Sets the company ID of this polls vote.
+	 *
+	 * @param companyId the company ID of this polls vote
+	 */
 	@Override
 	public void setCompanyId(long companyId) {
 		_pollsVote.setCompanyId(companyId);
 	}
 
 	/**
-	* Sets the create date of this polls vote.
-	*
-	* @param createDate the create date of this polls vote
-	*/
+	 * Sets the create date of this polls vote.
+	 *
+	 * @param createDate the create date of this polls vote
+	 */
 	@Override
 	public void setCreateDate(Date createDate) {
 		_pollsVote.setCreateDate(createDate);
@@ -379,6 +379,7 @@ public class PollsVoteWrapper implements PollsVote, ModelWrapper<PollsVote> {
 	@Override
 	public void setExpandoBridgeAttributes(
 		com.liferay.portal.kernel.model.BaseModel<?> baseModel) {
+
 		_pollsVote.setExpandoBridgeAttributes(baseModel);
 	}
 
@@ -393,30 +394,30 @@ public class PollsVoteWrapper implements PollsVote, ModelWrapper<PollsVote> {
 	}
 
 	/**
-	* Sets the group ID of this polls vote.
-	*
-	* @param groupId the group ID of this polls vote
-	*/
+	 * Sets the group ID of this polls vote.
+	 *
+	 * @param groupId the group ID of this polls vote
+	 */
 	@Override
 	public void setGroupId(long groupId) {
 		_pollsVote.setGroupId(groupId);
 	}
 
 	/**
-	* Sets the last publish date of this polls vote.
-	*
-	* @param lastPublishDate the last publish date of this polls vote
-	*/
+	 * Sets the last publish date of this polls vote.
+	 *
+	 * @param lastPublishDate the last publish date of this polls vote
+	 */
 	@Override
 	public void setLastPublishDate(Date lastPublishDate) {
 		_pollsVote.setLastPublishDate(lastPublishDate);
 	}
 
 	/**
-	* Sets the modified date of this polls vote.
-	*
-	* @param modifiedDate the modified date of this polls vote
-	*/
+	 * Sets the modified date of this polls vote.
+	 *
+	 * @param modifiedDate the modified date of this polls vote
+	 */
 	@Override
 	public void setModifiedDate(Date modifiedDate) {
 		_pollsVote.setModifiedDate(modifiedDate);
@@ -428,10 +429,10 @@ public class PollsVoteWrapper implements PollsVote, ModelWrapper<PollsVote> {
 	}
 
 	/**
-	* Sets the primary key of this polls vote.
-	*
-	* @param primaryKey the primary key of this polls vote
-	*/
+	 * Sets the primary key of this polls vote.
+	 *
+	 * @param primaryKey the primary key of this polls vote
+	 */
 	@Override
 	public void setPrimaryKey(long primaryKey) {
 		_pollsVote.setPrimaryKey(primaryKey);
@@ -443,77 +444,79 @@ public class PollsVoteWrapper implements PollsVote, ModelWrapper<PollsVote> {
 	}
 
 	/**
-	* Sets the question ID of this polls vote.
-	*
-	* @param questionId the question ID of this polls vote
-	*/
+	 * Sets the question ID of this polls vote.
+	 *
+	 * @param questionId the question ID of this polls vote
+	 */
 	@Override
 	public void setQuestionId(long questionId) {
 		_pollsVote.setQuestionId(questionId);
 	}
 
 	/**
-	* Sets the user ID of this polls vote.
-	*
-	* @param userId the user ID of this polls vote
-	*/
+	 * Sets the user ID of this polls vote.
+	 *
+	 * @param userId the user ID of this polls vote
+	 */
 	@Override
 	public void setUserId(long userId) {
 		_pollsVote.setUserId(userId);
 	}
 
 	/**
-	* Sets the user name of this polls vote.
-	*
-	* @param userName the user name of this polls vote
-	*/
+	 * Sets the user name of this polls vote.
+	 *
+	 * @param userName the user name of this polls vote
+	 */
 	@Override
 	public void setUserName(String userName) {
 		_pollsVote.setUserName(userName);
 	}
 
 	/**
-	* Sets the user uuid of this polls vote.
-	*
-	* @param userUuid the user uuid of this polls vote
-	*/
+	 * Sets the user uuid of this polls vote.
+	 *
+	 * @param userUuid the user uuid of this polls vote
+	 */
 	@Override
 	public void setUserUuid(String userUuid) {
 		_pollsVote.setUserUuid(userUuid);
 	}
 
 	/**
-	* Sets the uuid of this polls vote.
-	*
-	* @param uuid the uuid of this polls vote
-	*/
+	 * Sets the uuid of this polls vote.
+	 *
+	 * @param uuid the uuid of this polls vote
+	 */
 	@Override
 	public void setUuid(String uuid) {
 		_pollsVote.setUuid(uuid);
 	}
 
 	/**
-	* Sets the vote date of this polls vote.
-	*
-	* @param voteDate the vote date of this polls vote
-	*/
+	 * Sets the vote date of this polls vote.
+	 *
+	 * @param voteDate the vote date of this polls vote
+	 */
 	@Override
 	public void setVoteDate(Date voteDate) {
 		_pollsVote.setVoteDate(voteDate);
 	}
 
 	/**
-	* Sets the vote ID of this polls vote.
-	*
-	* @param voteId the vote ID of this polls vote
-	*/
+	 * Sets the vote ID of this polls vote.
+	 *
+	 * @param voteId the vote ID of this polls vote
+	 */
 	@Override
 	public void setVoteId(long voteId) {
 		_pollsVote.setVoteId(voteId);
 	}
 
 	@Override
-	public com.liferay.portal.kernel.model.CacheModel<PollsVote> toCacheModel() {
+	public com.liferay.portal.kernel.model.CacheModel<PollsVote>
+		toCacheModel() {
+
 		return _pollsVote.toCacheModel();
 	}
 
@@ -582,4 +585,5 @@ public class PollsVoteWrapper implements PollsVote, ModelWrapper<PollsVote> {
 	}
 
 	private final PollsVote _pollsVote;
+
 }

@@ -65,7 +65,7 @@ import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Gergely Mathe
- * @author Mate Thurzo
+ * @author Máté Thurzó
  */
 @Component(
 	property = "model.class.name=com.liferay.journal.model.JournalArticle",
@@ -138,6 +138,9 @@ public class JournalArticleExportImportContentProcessor
 		DDMStructure ddmStructure = _fetchDDMStructure(
 			portletDataContext, article);
 
+		content = replaceImportJournalArticleReferences(
+			portletDataContext, stagedModel, content);
+
 		Fields fields = _getDDMStructureFields(ddmStructure, content);
 
 		if (fields != null) {
@@ -177,9 +180,6 @@ public class JournalArticleExportImportContentProcessor
 			content = imageImportDDMFormFieldValueTransformer.getContent();
 		}
 
-		content = replaceImportJournalArticleReferences(
-			portletDataContext, stagedModel, content);
-
 		content =
 			_defaultTextExportImportContentProcessor.
 				replaceImportContentReferences(
@@ -209,8 +209,8 @@ public class JournalArticleExportImportContentProcessor
 
 					String type = "page";
 
-					if (e instanceof NoSuchFileEntryException ||
-						e.getCause() instanceof NoSuchFileEntryException) {
+					if ((e instanceof NoSuchFileEntryException) ||
+						(e.getCause() instanceof NoSuchFileEntryException)) {
 
 						type = "file entry";
 					}
@@ -409,18 +409,17 @@ public class JournalArticleExportImportContentProcessor
 
 				throw eicpe;
 			}
-			else {
-				String journalArticleReference =
-					"[$journal-article-reference=" + classPK + "$]";
 
-				JSONObject jsonObject = _jsonFactory.createJSONObject();
+			String journalArticleReference =
+				"[$journal-article-reference=" + classPK + "$]";
 
-				jsonObject.put("className", JournalArticle.class.getName());
-				jsonObject.put("classPK", journalArticle.getResourcePrimKey());
+			JSONObject jsonObject = _jsonFactory.createJSONObject();
 
-				content = StringUtil.replace(
-					content, journalArticleReference, jsonObject.toString());
-			}
+			jsonObject.put("className", JournalArticle.class.getName());
+			jsonObject.put("classPK", journalArticle.getResourcePrimKey());
+
+			content = StringUtil.replace(
+				content, journalArticleReference, jsonObject.toString());
 		}
 
 		return content;
@@ -523,9 +522,17 @@ public class JournalArticleExportImportContentProcessor
 	private List<String> _fetchContentsFromDDMFormValues(
 		List<DDMFormFieldValue> ddmFormFieldValues) {
 
-		List<String> contents = new ArrayList<>();
+		return _fetchContentsFromDDMFormValues(
+			new ArrayList<String>(), ddmFormFieldValues);
+	}
+
+	private List<String> _fetchContentsFromDDMFormValues(
+		List<String> contents, List<DDMFormFieldValue> ddmFormFieldValues) {
 
 		for (DDMFormFieldValue ddmFormFieldValue : ddmFormFieldValues) {
+			contents = _fetchContentsFromDDMFormValues(
+				contents, ddmFormFieldValue.getNestedDDMFormFieldValues());
+
 			Value value = ddmFormFieldValue.getValue();
 
 			if (value == null) {
@@ -564,10 +571,7 @@ public class JournalArticleExportImportContentProcessor
 		}
 
 		try {
-			Fields fields = _journalConverter.getDDMFields(
-				ddmStructure, content);
-
-			return fields;
+			return _journalConverter.getDDMFields(ddmStructure, content);
 		}
 		catch (Exception e) {
 			if (_log.isWarnEnabled()) {

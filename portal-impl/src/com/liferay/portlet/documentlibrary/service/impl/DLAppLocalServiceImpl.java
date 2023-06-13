@@ -204,11 +204,9 @@ public class DLAppLocalServiceImpl extends DLAppLocalServiceBaseImpl {
 
 		LocalRepository localRepository = getLocalRepository(repositoryId);
 
-		FileEntry fileEntry = localRepository.addFileEntry(
+		return localRepository.addFileEntry(
 			userId, folderId, sourceFileName, mimeType, title, description,
 			changeLog, file, serviceContext);
-
-		return fileEntry;
 	}
 
 	/**
@@ -288,11 +286,9 @@ public class DLAppLocalServiceImpl extends DLAppLocalServiceBaseImpl {
 
 		LocalRepository localRepository = getLocalRepository(repositoryId);
 
-		FileEntry fileEntry = localRepository.addFileEntry(
+		return localRepository.addFileEntry(
 			userId, folderId, sourceFileName, mimeType, title, description,
 			changeLog, is, size, serviceContext);
-
-		return fileEntry;
 	}
 
 	/**

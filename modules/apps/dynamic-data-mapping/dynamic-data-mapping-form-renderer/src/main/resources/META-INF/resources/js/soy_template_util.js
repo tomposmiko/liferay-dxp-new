@@ -17,18 +17,33 @@ AUI.add(
 			},
 
 			loadModules: function(callback) {
-				var modules = AObject.keys(Liferay.MODULES);
+				if (Liferay.Loader.version().indexOf('3.') === 0) {
+					var modules = AObject.keys(Liferay.MODULES);
 
-				var dependencies = modules.filter(
-					function(item) {
-						return /dynamic-data-.*\.es/.test(item);
-					}
-				);
+					var dependencies = modules.filter(
+						function(item) {
+							return /dynamic-data-.*\.es/.test(item);
+						}
+					);
 
-				Liferay.Loader.require.apply(
-					Liferay.Loader,
-					dependencies.concat(callback)
-				);
+					Liferay.Loader.require.apply(
+						Liferay.Loader,
+						dependencies.concat(callback)
+					);
+
+				}
+				else {
+					fetch(Liferay.MODULES_PATH + '?query=' + encodeURI('dynamic-data-.*\\.es'))
+						.then(response => response.json())
+						.then(modules => {
+							var dependencies = AObject.keys(modules);
+
+							Liferay.Loader.require.apply(
+								Liferay.Loader,
+								dependencies.concat(callback)
+							);
+						});
+				}
 			}
 		};
 

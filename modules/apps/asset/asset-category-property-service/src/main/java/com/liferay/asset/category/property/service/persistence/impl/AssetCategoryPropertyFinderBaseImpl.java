@@ -16,7 +16,6 @@ package com.liferay.asset.category.property.service.persistence.impl;
 
 import com.liferay.asset.category.property.model.AssetCategoryProperty;
 import com.liferay.asset.category.property.service.persistence.AssetCategoryPropertyPersistence;
-
 import com.liferay.portal.kernel.bean.BeanReference;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
@@ -32,19 +31,21 @@ import java.util.Set;
  * @author Brian Wing Shun Chan
  * @generated
  */
-public class AssetCategoryPropertyFinderBaseImpl extends BasePersistenceImpl<AssetCategoryProperty> {
+public class AssetCategoryPropertyFinderBaseImpl
+	extends BasePersistenceImpl<AssetCategoryProperty> {
+
 	public AssetCategoryPropertyFinderBaseImpl() {
 		setModelClass(AssetCategoryProperty.class);
 
+		Map<String, String> dbColumnNames = new HashMap<String, String>();
+
+		dbColumnNames.put("key", "key_");
+
 		try {
 			Field field = BasePersistenceImpl.class.getDeclaredField(
-					"_dbColumnNames");
+				"_dbColumnNames");
 
 			field.setAccessible(true);
-
-			Map<String, String> dbColumnNames = new HashMap<String, String>();
-
-			dbColumnNames.put("key", "key_");
 
 			field.set(this, dbColumnNames);
 		}
@@ -65,7 +66,9 @@ public class AssetCategoryPropertyFinderBaseImpl extends BasePersistenceImpl<Ass
 	 *
 	 * @return the asset category property persistence
 	 */
-	public AssetCategoryPropertyPersistence getAssetCategoryPropertyPersistence() {
+	public AssetCategoryPropertyPersistence
+		getAssetCategoryPropertyPersistence() {
+
 		return assetCategoryPropertyPersistence;
 	}
 
@@ -76,10 +79,15 @@ public class AssetCategoryPropertyFinderBaseImpl extends BasePersistenceImpl<Ass
 	 */
 	public void setAssetCategoryPropertyPersistence(
 		AssetCategoryPropertyPersistence assetCategoryPropertyPersistence) {
-		this.assetCategoryPropertyPersistence = assetCategoryPropertyPersistence;
+
+		this.assetCategoryPropertyPersistence =
+			assetCategoryPropertyPersistence;
 	}
 
 	@BeanReference(type = AssetCategoryPropertyPersistence.class)
 	protected AssetCategoryPropertyPersistence assetCategoryPropertyPersistence;
-	private static final Log _log = LogFactoryUtil.getLog(AssetCategoryPropertyFinderBaseImpl.class);
+
+	private static final Log _log = LogFactoryUtil.getLog(
+		AssetCategoryPropertyFinderBaseImpl.class);
+
 }

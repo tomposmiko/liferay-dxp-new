@@ -15,39 +15,46 @@
 package com.liferay.apio.architect.internal.url;
 
 import static com.liferay.apio.architect.internal.url.URLCreator.createAbsoluteURL;
+import static com.liferay.apio.architect.internal.url.URLCreator.createActionURL;
 import static com.liferay.apio.architect.internal.url.URLCreator.createBinaryURL;
 import static com.liferay.apio.architect.internal.url.URLCreator.createCollectionPageURL;
-import static com.liferay.apio.architect.internal.url.URLCreator.createCollectionURL;
-import static com.liferay.apio.architect.internal.url.URLCreator.createNestedCollectionURL;
-import static com.liferay.apio.architect.internal.url.URLCreator.createOperationURL;
-import static com.liferay.apio.architect.internal.url.URLCreator.createSingleURL;
+import static com.liferay.apio.architect.internal.url.URLCreator.createGenericParentResourceURL;
+import static com.liferay.apio.architect.internal.url.URLCreator.createItemResourceURL;
+import static com.liferay.apio.architect.internal.url.URLCreator.createNestedResourceURL;
+import static com.liferay.apio.architect.internal.url.URLCreator.createPagedResourceURL;
 import static com.liferay.apio.architect.internal.url.URLCreator.getPath;
 
+import static com.spotify.hamcrest.optional.OptionalMatchers.emptyOptional;
+import static com.spotify.hamcrest.optional.OptionalMatchers.optionalWithValue;
+
+import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.core.Is.is;
-import static org.hamcrest.core.IsNull.notNullValue;
 import static org.hamcrest.core.IsNull.nullValue;
 
-import com.liferay.apio.architect.form.Form;
-import com.liferay.apio.architect.internal.operation.CreateOperation;
-import com.liferay.apio.architect.internal.operation.DeleteOperation;
-import com.liferay.apio.architect.internal.operation.RetrieveOperation;
-import com.liferay.apio.architect.internal.operation.UpdateOperation;
 import com.liferay.apio.architect.internal.pagination.PageImpl;
 import com.liferay.apio.architect.internal.pagination.PageType;
-import com.liferay.apio.architect.operation.HTTPMethod;
-import com.liferay.apio.architect.operation.Operation;
 import com.liferay.apio.architect.pagination.Page;
 import com.liferay.apio.architect.pagination.PageItems;
 import com.liferay.apio.architect.pagination.Pagination;
+import com.liferay.apio.architect.resource.Resource;
+import com.liferay.apio.architect.resource.Resource.GenericParent;
+import com.liferay.apio.architect.resource.Resource.Id;
+import com.liferay.apio.architect.resource.Resource.Item;
+import com.liferay.apio.architect.resource.Resource.Nested;
+import com.liferay.apio.architect.resource.Resource.Paged;
 import com.liferay.apio.architect.uri.Path;
+
+import io.vavr.Tuple;
+import io.vavr.Tuple2;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 
-import java.util.NoSuchElementException;
+import java.util.List;
 import java.util.Optional;
 
 import org.junit.Test;
@@ -89,12 +96,141 @@ public class URLCreatorTest {
 	}
 
 	@Test
+	public void testCreateActionURLReturnsEmptyIfMissingId() {
+		Item item = Item.of("item");
+
+		Nested nested = Nested.of(item, "nested");
+
+		GenericParent genericParent = GenericParent.of("parent", "name");
+
+		List<Tuple2<Resource, String>> list = asList(
+			Tuple.of(item, "retrieve"), Tuple.of(item, "remove"),
+			Tuple.of(item, "replace"), Tuple.of(item, "merge"),
+			Tuple.of(nested, "retrieve"), Tuple.of(nested, "create"),
+			Tuple.of(nested, "peek"), Tuple.of(genericParent, "retrieve"),
+			Tuple.of(genericParent, "create"));
+
+		list.forEach(
+			tuple -> {
+				Optional<String> optional = createActionURL(
+					_applicationURL, tuple._1, tuple._2);
+
+				assertThat(optional, is(emptyOptional()));
+			});
+	}
+
+	@Test
+	public void testCreateActionURLReturnsValidURLIfIdPresent() {
+		Paged paged = Paged.of("paged");
+
+		Item item = Item.of("item", Id.of("id", "id"));
+
+		Nested nested = Nested.of(item, "nested");
+
+		GenericParent genericParent = GenericParent.of(
+			"parent", Id.of("id", "id"), "name");
+
+		Optional<String> optional1 = createActionURL(
+			_applicationURL, paged, "retrieve");
+
+		assertThat(
+			optional1, is(optionalWithValue(equalTo("www.liferay.com/paged"))));
+
+		Optional<String> optional2 = createActionURL(
+			_applicationURL, paged, "create");
+
+		assertThat(
+			optional2, is(optionalWithValue(equalTo("www.liferay.com/paged"))));
+
+		Optional<String> optional3 = createActionURL(
+			_applicationURL, paged, "subscribe");
+
+		assertThat(
+			optional3,
+			is(optionalWithValue(equalTo("www.liferay.com/paged/subscribe"))));
+
+		Optional<String> optional4 = createActionURL(
+			_applicationURL, item, "retrieve");
+
+		assertThat(
+			optional4,
+			is(optionalWithValue(equalTo("www.liferay.com/item/id"))));
+
+		Optional<String> optional5 = createActionURL(
+			_applicationURL, item, "remove");
+
+		assertThat(
+			optional5,
+			is(optionalWithValue(equalTo("www.liferay.com/item/id"))));
+
+		Optional<String> optional6 = createActionURL(
+			_applicationURL, item, "replace");
+
+		assertThat(
+			optional6,
+			is(optionalWithValue(equalTo("www.liferay.com/item/id"))));
+
+		Optional<String> optional7 = createActionURL(
+			_applicationURL, item, "merge");
+
+		assertThat(
+			optional7,
+			is(optionalWithValue(equalTo("www.liferay.com/item/id/merge"))));
+
+		Optional<String> optional8 = createActionURL(
+			_applicationURL, nested, "retrieve");
+
+		assertThat(
+			optional8,
+			is(optionalWithValue(equalTo("www.liferay.com/item/id/nested"))));
+
+		Optional<String> optional = createActionURL(
+			_applicationURL, nested, "create");
+
+		assertThat(
+			optional,
+			is(optionalWithValue(equalTo("www.liferay.com/item/id/nested"))));
+
+		Optional<String> optional9 = createActionURL(
+			_applicationURL, nested, "peek");
+
+		assertThat(
+			optional9,
+			is(
+				optionalWithValue(
+					equalTo("www.liferay.com/item/id/nested/peek"))));
+
+		Optional<String> optional10 = createActionURL(
+			_applicationURL, genericParent, "retrieve");
+
+		assertThat(
+			optional10,
+			is(optionalWithValue(equalTo("www.liferay.com/name/parent/id"))));
+
+		Optional<String> optional11 = createActionURL(
+			_applicationURL, genericParent, "create");
+
+		assertThat(
+			optional11,
+			is(optionalWithValue(equalTo("www.liferay.com/name/parent/id"))));
+
+		Optional<String> optional12 = createActionURL(
+			_applicationURL, genericParent, "fix");
+
+		assertThat(
+			optional12,
+			is(
+				optionalWithValue(
+					equalTo("www.liferay.com/name/parent/id/fix"))));
+	}
+
+	@Test
 	public void testCreateBinaryURL() {
 		String binaryId = "binary";
 
 		String url = createBinaryURL(_applicationURL, binaryId, _path);
 
-		assertThat(url, is("www.liferay.com/b/name/id/binary"));
+		assertThat(url, is("www.liferay.com/name/id/binary"));
 	}
 
 	@Test
@@ -115,7 +251,7 @@ public class URLCreatorTest {
 
 		PageItems<String> pageItems = new PageItems<>(emptyList(), 0);
 
-		Page page = new PageImpl<>("", pageItems, pagination, null);
+		Page page = new PageImpl<>(Paged.of("name"), pageItems, pagination);
 
 		String firstPageURL = createCollectionPageURL(
 			"www.liferay.com", page, PageType.FIRST);
@@ -125,145 +261,55 @@ public class URLCreatorTest {
 
 	@Test
 	public void testCreateCollectionURL() {
-		String url = createCollectionURL(_applicationURL, "resource");
+		Paged paged = Paged.of("resource");
 
-		assertThat(url, is("www.liferay.com/p/resource"));
+		String url = createPagedResourceURL(_applicationURL, paged);
+
+		assertThat(url, is("www.liferay.com/resource"));
 	}
 
 	@Test
-	public void testCreateNestedCollectionURL() {
-		String url = createNestedCollectionURL(
-			_applicationURL, _path, "related");
+	public void testCreateGenericParentResourceURLReturnsEmptyIfMissingId() {
+		GenericParent genericParent = GenericParent.of("parent", "name");
 
-		assertThat(url, is("www.liferay.com/p/name/id/related"));
-	}
+		Optional<String> optional = createGenericParentResourceURL(
+			_applicationURL, genericParent);
 
-	@Test(expected = NoSuchElementException.class)
-	public void testCreateOperationWithoutURIReturnsOptionalEmpty() {
-		CreateOperation createOperation = new CreateOperation(null, "");
-
-		_validateOperationURL(createOperation, "");
+		assertThat(optional, is(emptyOptional()));
 	}
 
 	@Test
-	public void testCreateOperationWithURIHasValidURL() {
-		CreateOperation createOperation = new CreateOperation(null, "", "name");
+	public void testCreateNestedResourceURLReturnsEmptyIfMissingId() {
+		Nested nested = Nested.of(Item.of("parent"), "related");
 
-		_validateOperationURL(createOperation, "www.liferay.com/p/name");
+		Optional<String> optional = createNestedResourceURL(
+			_applicationURL, nested);
+
+		assertThat(optional, is(emptyOptional()));
 	}
 
 	@Test
 	public void testCreateSingleURL() {
-		String url = createSingleURL(_applicationURL, _path);
+		Item item = Item.of(_path.getName());
 
-		assertThat(url, is("www.liferay.com/p/name/id"));
-	}
+		Optional<String> optional = createItemResourceURL(
+			_applicationURL, item);
 
-	@Test(expected = NoSuchElementException.class)
-	public void testDeleteOperationWithoutURIReturnsOptionalEmpty() {
-		DeleteOperation deleteOperation = new DeleteOperation("");
-
-		_validateOperationURL(deleteOperation, "");
-	}
-
-	@Test
-	public void testDeleteOperationWithURIHasValidURL() {
-		DeleteOperation deleteOperation = new DeleteOperation("", "name");
-
-		_validateOperationURL(deleteOperation, "www.liferay.com/p/name");
+		assertThat(optional, is(emptyOptional()));
 	}
 
 	@Test
 	public void testExtractsPathFromSingleURL() {
-		Path path = getPath("www.liferay.com/p/name/id");
+		Optional<Path> optional = getPath("www.liferay.com/name/id", "name");
 
-		assertThat(path, is(notNullValue()));
+		if (!optional.isPresent()) {
+			throw new AssertionError("Optional should not be empty");
+		}
+
+		Path path = optional.get();
+
 		assertThat(path.getName(), is("name"));
 		assertThat(path.getId(), is("id"));
-	}
-
-	@Test(expected = NoSuchElementException.class)
-	public void testNotSpecificOperationReturnsOptionalEmpty() {
-		Operation operation = new Operation() {
-
-			@Override
-			public String getCustomRoute() {
-				return null;
-			}
-
-			@Override
-			public Optional<Form> getFormOptional() {
-				return Optional.empty();
-			}
-
-			@Override
-			public HTTPMethod getHttpMethod() {
-				return null;
-			}
-
-			@Override
-			public String getName() {
-				return null;
-			}
-
-			@Override
-			public Optional<String> getURIOptional() {
-				return Optional.of("name");
-			}
-
-			@Override
-			public boolean isCollection() {
-				return false;
-			}
-
-			@Override
-			public boolean isCustom() {
-				return false;
-			}
-
-		};
-
-		_validateOperationURL(operation, "");
-	}
-
-	@Test(expected = NoSuchElementException.class)
-	public void testRetrieveOperationWithoutURIReturnsOptionalEmpty() {
-		RetrieveOperation retrieveOperation = new RetrieveOperation("", false);
-
-		_validateOperationURL(retrieveOperation, "");
-	}
-
-	@Test
-	public void testRetrieveOperationWithURIHasValidURL() {
-		RetrieveOperation retrieveOperation = new RetrieveOperation(
-			"", false, "name");
-
-		_validateOperationURL(retrieveOperation, "www.liferay.com/p/name");
-	}
-
-	@Test(expected = NoSuchElementException.class)
-	public void testUpdateOperationWithoutURIReturnsOptionalEmpty() {
-		UpdateOperation updateOperation = new UpdateOperation(null, "");
-
-		_validateOperationURL(updateOperation, "");
-	}
-
-	@Test
-	public void testUpdateOperationWithURIHasValidURL() {
-		UpdateOperation updateOperation = new UpdateOperation(null, "", "name");
-
-		_validateOperationURL(updateOperation, "www.liferay.com/p/name");
-	}
-
-	private void _validateOperationURL(
-		Operation operation, String expectedURL) {
-
-		Optional<String> optional = createOperationURL(
-			_applicationURL, operation);
-
-		String url = optional.orElseThrow(NoSuchElementException::new);
-
-		assertThat(url, is(expectedURL));
 	}
 
 	private final ApplicationURL _applicationURL = () -> "www.liferay.com/";

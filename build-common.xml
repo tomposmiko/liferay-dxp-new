@@ -53,7 +53,7 @@
 	<path id="lib.classpath">
 		<fileset
 			dir="${project.dir}/lib/development"
-			excludes="biz.aQute.bnd.jar,com.liferay.ant.bnd.jar"
+			excludes="com.liferay.ant.bnd.jar"
 			includes="*.jar"
 		/>
 		<fileset
@@ -84,15 +84,11 @@
 		<pathelement path="${classpath.full}" />
 		<fileset
 			dir="${project.dir}/lib/development"
-			includes="jsp-api.jar,mail.jar,servlet-api.jar"
+			includes="biz.aQute.bnd.jar,jsp-api.jar,mail.jar,servlet-api.jar"
 		/>
 		<fileset
 			dir="${project.dir}/lib/global"
 			includes="*.jar"
-		/>
-		<fileset
-			dir="${project.dir}/lib/portal"
-			includes="bnd.jar"
 		/>
 		<path refid="lib.pre.classpath" />
 		<path refid="web-lib.classpath" />
@@ -718,6 +714,32 @@ information.
 		</sequential>
 	</macrodef>
 
+	<macrodef name="generate-backend-batch-junit-report">
+		<attribute name="junit.failure.count" />
+		<attribute name="junit.failure.message.element" />
+		<attribute name="test.class.name" />
+		<attribute name="test.command.name" />
+
+		<sequential>
+			<local name="junit.timestamp" />
+
+			<tstamp>
+				<format pattern="yyyy-MM-dd_kk:mm:ss" property="junit.timestamp" />
+			</tstamp>
+
+			<echo file="TEST-@{test.class.name}.xml"><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
+
+			<testsuite errors="@{junit.failure.count}" failures="@{junit.failure.count}" hostname="localhost" name="@{test.class.name}" skipped="0" tests="1" time="0.0" timestamp="${junit.timestamp}">
+				<properties />
+				<testcase classname="@{test.class.name}" name="@{test.command.name}" time="0.0">
+					@{junit.failure.message.element}
+				</testcase>
+				<system-out></system-out>
+				<system-err></system-err>
+			</testsuite>]]></echo>
+		</sequential>
+	</macrodef>
+
 	<macrodef name="generate-pom-info">
 		<sequential>
 			<property name="artifact.name" value="${ant.project.name}" />
@@ -759,6 +781,27 @@ information.
 		</sequential>
 	</macrodef>
 
+	<macrodef name="get-junit-failure-message-element">
+		<sequential>
+			<var name="junit.failure.message.element" unset="true" />
+
+			<if>
+				<isset property="junit.failure.message" />
+				<then>
+					<antelope:stringutil property="junit.failure.message" string="${junit.failure.message}">
+						<antelope:replace regex="&gt;" replacement="&amp;gt;" />
+						<antelope:replace regex="&lt;" replacement="&amp;lt;" />
+						<antelope:replace regex="&quot;" replacement="&apos;" />
+					</antelope:stringutil>
+				</then>
+			</if>
+
+			<condition else="" property="junit.failure.message.element" value="&lt;failure message=&quot;${junit.failure.message}&quot; /&gt;">
+				<isset property="junit.failure.message" />
+			</condition>
+		</sequential>
+	</macrodef>
+
 	<macrodef name="gradle-execute">
 		<attribute default="false" name="checktask" />
 		<attribute default="${basedir}" name="dir" />
@@ -767,11 +810,17 @@ information.
 		<attribute default="${env.ANT_OPTS}" name="gradleopts" />
 		<attribute default="" name="outputproperty" />
 		<attribute default="" name="refreshdependencies" />
+		<attribute default="true" name="setupbinariescache" />
 		<attribute name="task" />
 		<element implicit="true" name="args" optional="true" />
 
 		<sequential>
-			<setup-binaries-cache unless:true="${setup.binaries.cache.executed}" />
+			<if>
+				<equals arg1="@{setupbinariescache}" arg2="true" />
+				<then>
+					<setup-binaries-cache unless:true="${setup.binaries.cache.executed}" />
+				</then>
+			</if>
 
 			<if>
 				<not>
@@ -817,6 +866,8 @@ information.
 						<arg value="-Dforced.cache.enabled=@{forcedcacheenabled}" />
 						<arg value="-Dliferay.home=${liferay.home}" />
 						<arg if:set="env.JENKINS_HOME" value="-Dliferay.ssl.context.enabled=true" />
+						<arg if:set="env.JENKINS_HOME" value="-Dorg.gradle.internal.http.connectionTimeout=120000" />
+						<arg if:set="env.JENKINS_HOME" value="-Dorg.gradle.internal.http.socketTimeout=120000" />
 						<arg value="tasks" />
 						<arg value="--all" />
 						<env key="GRADLE_OPTS" value="@{gradleopts}" />
@@ -857,6 +908,8 @@ information.
 								<arg value="-Dforced.cache.enabled=@{forcedcacheenabled}" />
 								<arg value="-Dliferay.home=${liferay.home}" />
 								<arg if:set="env.JENKINS_HOME" value="-Dliferay.ssl.context.enabled=true" />
+								<arg if:set="env.JENKINS_HOME" value="-Dorg.gradle.internal.http.connectionTimeout=120000" />
+								<arg if:set="env.JENKINS_HOME" value="-Dorg.gradle.internal.http.socketTimeout=120000" />
 								<arg line="@{task}" />
 								<env key="GRADLE_OPTS" value="@{gradleopts}" />
 								<redirector errorproperty="@{outputproperty}.error" outputproperty="@{outputproperty}" unless:blank="@{outputproperty}" />
@@ -959,6 +1012,13 @@ information.
 				<equals arg1="@{test.type}" arg2="unit" />
 				<then>
 					<if>
+						<isset property="junit.java.unit.gc[${java.specification.version}]" />
+						<then>
+							<propertycopy from="junit.java.unit.gc[${java.specification.version}]" name="junit.java.unit.gc" override="true" />
+						</then>
+					</if>
+
+					<if>
 						<equals arg1="${junit.java.unit.gc.logging}" arg2="on" />
 						<then>
 							<property name="junit.java.gc" value="${junit.java.unit.gc} -verbose:gc -XX:+PrintGCCause -XX:+PrintGCDetails" />
@@ -969,6 +1029,13 @@ information.
 					</if>
 				</then>
 				<else>
+					<if>
+						<isset property="junit.java.integration.gc[${java.specification.version}]" />
+						<then>
+							<propertycopy from="junit.java.integration.gc[${java.specification.version}]" name="junit.java.integration.gc" override="true" />
+						</then>
+					</if>
+
 					<property name="aspectj.weaver.enabled" value="true" />
 
 					<local name="project.dir.name" />
@@ -977,6 +1044,13 @@ information.
 
 					<property name="junit.java.gc" value="${junit.java.integration.gc} -verbose:gc -Xloggc:/tmp/${project.dir.name}-@{test.type}-gc.log -XX:+PrintGCCause -XX:+PrintGCDetails" />
 				</else>
+			</if>
+
+			<if>
+				<isset property="junit.java.add.opens[${java.specification.version}]" />
+				<then>
+					<propertycopy from="junit.java.add.opens[${java.specification.version}]" name="junit.java.add.opens" override="true" />
+				</then>
 			</if>
 
 			<junit dir="${project.dir}" fork="on" forkmode="@{forkmode}" haltonfailure="${junit.halt.on.failure}" jvm="${junit.jvm}" outputtoformatters="false" printsummary="on" showoutput="true">
@@ -994,6 +1068,7 @@ information.
 				<jvmarg if:true="${jvm.debug}" line="${jpda.settings}" />
 				<jvmarg if:true="${junit.code.coverage}" line="-javaagent:${jacoco.agent.jar}${jacoco.agent.configuration}" />
 				<jvmarg if:true="${aspectj.weaver.enabled}" line="${aspectj.agent}" />
+				<jvmarg if:set="junit.java.add.opens" line="${junit.java.add.opens}" />
 				<jvmarg line="${junit.java.gc}" />
 				<jvmarg line="${whip.agent}" />
 				<jvmarg value="-Xss2m" />
@@ -1049,6 +1124,27 @@ information.
 					</for>
 				</then>
 			</if>
+		</sequential>
+	</macrodef>
+
+	<macrodef name="lstopwatch">
+		<attribute name="action" />
+		<attribute name="name" />
+		<sequential>
+			<if>
+				<equals arg1="@{action}" arg2="start" />
+				<then>
+					<local name="timestamp" />
+
+					<tstamp>
+						<format pattern="MM-dd-yyyy HH:mm:ss:SSS z" property="timestamp" timezone="America/Los_Angeles" />
+					</tstamp>
+
+					<echo>@{name}.start.timestamp: ${timestamp}</echo>
+				</then>
+			</if>
+
+			<stopwatch action="@{action}" name="@{name}" />
 		</sequential>
 	</macrodef>
 
@@ -1462,8 +1558,10 @@ artifact.url=${remote.repository.url}/com/liferay/portal/com.liferay.${processed
 	</macrodef>
 
 	<macrodef name="setup-sdk">
+		<attribute default="true" name="setupbinariescache" />
+
 		<sequential>
-			<gradle-execute forcedcacheenabled="true" outputproperty="sdk.zip.file" task="printDependencyPath">
+			<gradle-execute forcedcacheenabled="true" outputproperty="sdk.zip.file" setupbinariescache="@{setupbinariescache}" task="printDependencyPath">
 				<arg value="--build-file=${project.dir}/modules/util.gradle" />
 				<arg value="--quiet" />
 				<arg value="-Dorg.gradle.internal.launcher.welcomeMessageEnabled=false" />
@@ -1510,7 +1608,7 @@ artifact.url=${remote.repository.url}/com/liferay/portal/com.liferay.${processed
 
 			<update-gradle-properties />
 
-			<gradle-execute task="setUpPortalTools">
+			<gradle-execute setupbinariescache="@{setupbinariescache}" task="setUpPortalTools">
 				<arg value="--build-file=${project.dir}/modules/util.gradle" />
 			</gradle-execute>
 		</sequential>
@@ -1580,6 +1678,7 @@ artifact.url=${remote.repository.url}/com/liferay/portal/com.liferay.${processed
 				<pathelement path="test-classes/@{test.type}" />
 				<pathelement path="${junit.classpath}" />
 				<pathelement path="${test.additional.classpath}" />
+				<pathelement location="${project.dir}/${junit.whip.jar}" />
 				<path refid="lib.pre.classpath" />
 				<fileset
 					dir="${project.dir}/lib/development"

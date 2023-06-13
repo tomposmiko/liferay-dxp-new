@@ -52,7 +52,6 @@ import com.liferay.portal.kernel.service.GroupLocalService;
 import com.liferay.portal.kernel.service.LayoutLocalService;
 import com.liferay.portal.kernel.service.PortletLocalService;
 import com.liferay.portal.kernel.servlet.SessionMessages;
-import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.Http;
@@ -61,7 +60,6 @@ import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
-import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.kernel.xml.Document;
 import com.liferay.portal.kernel.xml.Element;
 import com.liferay.portal.kernel.xml.SAXReaderUtil;
@@ -545,20 +543,6 @@ public class AssetPublisherHelperImpl implements AssetPublisherHelper {
 			assetRenderer.getAssetRendererFactory();
 
 		viewFullContentURL.setParameter("type", assetRendererFactory.getType());
-
-		if (Validator.isNotNull(assetRenderer.getUrlTitle())) {
-			ThemeDisplay themeDisplay =
-				(ThemeDisplay)liferayPortletRequest.getAttribute(
-					WebKeys.THEME_DISPLAY);
-
-			if (assetRenderer.getGroupId() != themeDisplay.getScopeGroupId()) {
-				viewFullContentURL.setParameter(
-					"groupId", String.valueOf(assetRenderer.getGroupId()));
-			}
-
-			viewFullContentURL.setParameter(
-				"urlTitle", assetRenderer.getUrlTitle());
-		}
 
 		String viewURL = null;
 

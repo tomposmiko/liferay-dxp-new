@@ -77,6 +77,15 @@ public abstract class BaseTestPreparatorBundleActivator
 
 		autoCloseables = new ArrayList<>();
 
+		Dictionary<String, Object> properties = new HashMapDictionary<>();
+
+		properties.put("osgi.jaxrs.name", "Default");
+		properties.put("service.ranking", Integer.MAX_VALUE);
+
+		registerPrefixHandler(
+			PrefixHandler.PASS_THROUGH_PREFIX_HANDLER, properties);
+		registerScopeMapper(ScopeMapper.PASS_THROUGH_SCOPE_MAPPER, properties);
+
 		try {
 			prepareTest();
 		}
@@ -446,6 +455,10 @@ public abstract class BaseTestPreparatorBundleActivator
 			properties = new HashMapDictionary<>();
 		}
 
+		if (properties.get("auth.verifier.guest.allowed") == null) {
+			properties.put("auth.verifier.guest.allowed", "false");
+		}
+
 		properties.put("oauth2.test.application", "true");
 		properties.put("osgi.jaxrs.application.base", "/oauth2-test/" + path);
 		properties.put(
@@ -567,15 +580,14 @@ public abstract class BaseTestPreparatorBundleActivator
 
 			return () -> deleteConfiguration(bundleContext, servicePid);
 		}
-		else {
-			Dictionary<String, Object> oldProperties =
-				configuration.getProperties();
 
-			updateConfiguration(bundleContext, servicePid, properties);
+		Dictionary<String, Object> oldProperties =
+			configuration.getProperties();
 
-			return () -> updateConfiguration(
-				bundleContext, servicePid, oldProperties);
-		}
+		updateConfiguration(bundleContext, servicePid, properties);
+
+		return () -> updateConfiguration(
+			bundleContext, servicePid, oldProperties);
 	}
 
 	protected ArrayList<AutoCloseable> autoCloseables;

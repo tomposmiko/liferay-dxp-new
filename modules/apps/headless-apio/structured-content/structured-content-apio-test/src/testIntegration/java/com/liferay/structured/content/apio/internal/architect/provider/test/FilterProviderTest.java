@@ -59,7 +59,8 @@ public class FilterProviderTest {
 
 		exception.hasMessage(
 			String.format(
-				"Invalid query computed from filter '%s': Unknown property.",
+				"Invalid query computed from filter '%s': A property used in " +
+					"the filter criteria is not supported",
 				filterString));
 	}
 

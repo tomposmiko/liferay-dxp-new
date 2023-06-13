@@ -74,6 +74,7 @@ import com.liferay.portal.kernel.service.SystemEventLocalService;
 import com.liferay.portal.kernel.systemevent.SystemEvent;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.ContentTypes;
+import com.liferay.portal.kernel.util.DateUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
@@ -174,8 +175,17 @@ public class CalendarBookingLocalServiceImpl
 		calendarBooking.setCompanyId(user.getCompanyId());
 		calendarBooking.setUserId(user.getUserId());
 		calendarBooking.setUserName(user.getFullName());
-		calendarBooking.setCreateDate(serviceContext.getCreateDate(now));
-		calendarBooking.setModifiedDate(serviceContext.getModifiedDate(now));
+
+		Date createDate = serviceContext.getCreateDate(now);
+
+		calendarBooking.setCreateDate(createDate);
+		serviceContext.setCreateDate(createDate);
+
+		Date modifiedDate = serviceContext.getModifiedDate(now);
+
+		calendarBooking.setModifiedDate(modifiedDate);
+		serviceContext.setModifiedDate(modifiedDate);
+
 		calendarBooking.setCalendarId(calendarId);
 		calendarBooking.setCalendarResourceId(calendar.getCalendarResourceId());
 
@@ -1612,6 +1622,7 @@ public class CalendarBookingLocalServiceImpl
 		User user = userLocalService.getUser(userId);
 		Date now = new Date();
 
+		Date oldModifiedDate = calendarBooking.getModifiedDate();
 		int oldStatus = calendarBooking.getStatus();
 
 		calendarBooking.setModifiedDate(serviceContext.getModifiedDate(now));
@@ -1682,10 +1693,43 @@ public class CalendarBookingLocalServiceImpl
 						calendarBooking.getUuid(), null,
 						WorkflowConstants.STATUS_PENDING, null, null);
 				}
+			}
+		}
 
-				sendNotification(
-					calendarBooking, NotificationTemplateType.MOVED_TO_TRASH,
-					serviceContext);
+		if (calendarBooking.isMasterBooking()) {
+			Date createDate = calendarBooking.getCreateDate();
+
+			NotificationTemplateType notificationTemplateType =
+				NotificationTemplateType.INVITE;
+
+			if (!DateUtil.equals(createDate, oldModifiedDate)) {
+				notificationTemplateType = NotificationTemplateType.UPDATE;
+			}
+
+			for (CalendarBooking childCalendarBooking : childCalendarBookings) {
+				if (childCalendarBooking.equals(calendarBooking)) {
+					continue;
+				}
+
+				if (childCalendarBooking.isDenied()) {
+					notificationTemplateType = NotificationTemplateType.DECLINE;
+				}
+
+				if (calendarBooking.isApproved()) {
+					sendNotification(
+						childCalendarBooking, notificationTemplateType,
+						serviceContext);
+				}
+				else if ((oldStatus == WorkflowConstants.STATUS_APPROVED) &&
+						 (status == WorkflowConstants.STATUS_IN_TRASH)) {
+
+					notificationTemplateType =
+						NotificationTemplateType.MOVED_TO_TRASH;
+
+					sendNotification(
+						childCalendarBooking, notificationTemplateType,
+						serviceContext);
+				}
 			}
 		}
 
@@ -1819,21 +1863,6 @@ public class CalendarBookingLocalServiceImpl
 						oldChildCalendarBooking.getStatus(), serviceContext);
 				}
 			}
-
-			NotificationTemplateType notificationTemplateType =
-				NotificationTemplateType.INVITE;
-
-			if (childCalendarBooking.isDenied()) {
-				notificationTemplateType = NotificationTemplateType.DECLINE;
-			}
-			else if (childCalendarBookingMap.containsKey(
-						childCalendarBooking.getCalendarId())) {
-
-				notificationTemplateType = NotificationTemplateType.UPDATE;
-			}
-
-			sendNotification(
-				childCalendarBooking, notificationTemplateType, serviceContext);
 		}
 	}
 
@@ -2077,7 +2106,7 @@ public class CalendarBookingLocalServiceImpl
 
 		if (stagingGroup == null) {
 			return false;
-		};
+		}
 
 		return stagingGroup.isInStagingPortlet(CalendarPortletKeys.CALENDAR);
 	}

@@ -30,6 +30,7 @@ import java.util.List;
  */
 @ProviderType
 public class FriendlyURLEntrySoap implements Serializable {
+
 	public static FriendlyURLEntrySoap toSoapModel(FriendlyURLEntry model) {
 		FriendlyURLEntrySoap soapModel = new FriendlyURLEntrySoap();
 
@@ -47,8 +48,11 @@ public class FriendlyURLEntrySoap implements Serializable {
 		return soapModel;
 	}
 
-	public static FriendlyURLEntrySoap[] toSoapModels(FriendlyURLEntry[] models) {
-		FriendlyURLEntrySoap[] soapModels = new FriendlyURLEntrySoap[models.length];
+	public static FriendlyURLEntrySoap[] toSoapModels(
+		FriendlyURLEntry[] models) {
+
+		FriendlyURLEntrySoap[] soapModels =
+			new FriendlyURLEntrySoap[models.length];
 
 		for (int i = 0; i < models.length; i++) {
 			soapModels[i] = toSoapModel(models[i]);
@@ -59,10 +63,12 @@ public class FriendlyURLEntrySoap implements Serializable {
 
 	public static FriendlyURLEntrySoap[][] toSoapModels(
 		FriendlyURLEntry[][] models) {
+
 		FriendlyURLEntrySoap[][] soapModels = null;
 
 		if (models.length > 0) {
-			soapModels = new FriendlyURLEntrySoap[models.length][models[0].length];
+			soapModels =
+				new FriendlyURLEntrySoap[models.length][models[0].length];
 		}
 		else {
 			soapModels = new FriendlyURLEntrySoap[0][0];
@@ -77,7 +83,9 @@ public class FriendlyURLEntrySoap implements Serializable {
 
 	public static FriendlyURLEntrySoap[] toSoapModels(
 		List<FriendlyURLEntry> models) {
-		List<FriendlyURLEntrySoap> soapModels = new ArrayList<FriendlyURLEntrySoap>(models.size());
+
+		List<FriendlyURLEntrySoap> soapModels =
+			new ArrayList<FriendlyURLEntrySoap>(models.size());
 
 		for (FriendlyURLEntry model : models) {
 			soapModels.add(toSoapModel(model));
@@ -187,4 +195,5 @@ public class FriendlyURLEntrySoap implements Serializable {
 	private Date _modifiedDate;
 	private long _classNameId;
 	private long _classPK;
+
 }

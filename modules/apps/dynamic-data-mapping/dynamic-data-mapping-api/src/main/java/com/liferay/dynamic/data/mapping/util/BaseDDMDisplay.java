@@ -59,7 +59,7 @@ import org.osgi.framework.Bundle;
 import org.osgi.framework.FrameworkUtil;
 
 /**
- * @author Eduardo Garcia
+ * @author Eduardo García
  */
 @ProviderType
 public abstract class BaseDDMDisplay implements DDMDisplay {
@@ -315,17 +315,16 @@ public abstract class BaseDDMDisplay implements DDMDisplay {
 
 			return ParamUtil.getString(liferayPortletRequest, "redirect");
 		}
-		else {
-			String portletId = PortletProviderUtil.getPortletId(
-				DDMStructure.class.getName(), PortletProvider.Action.VIEW);
 
-			PortletURL portletURL = PortalUtil.getControlPanelPortletURL(
-				liferayPortletRequest, portletId, PortletRequest.RENDER_PHASE);
+		String portletId = PortletProviderUtil.getPortletId(
+			DDMStructure.class.getName(), PortletProvider.Action.VIEW);
 
-			portletURL.setParameter("mvcPath", "/view.jsp");
+		PortletURL portletURL = PortalUtil.getControlPanelPortletURL(
+			liferayPortletRequest, portletId, PortletRequest.RENDER_PHASE);
 
-			return portletURL.toString();
-		}
+		portletURL.setParameter("mvcPath", "/view.jsp");
+
+		return portletURL.toString();
 	}
 
 	@Override
@@ -408,11 +407,13 @@ public abstract class BaseDDMDisplay implements DDMDisplay {
 			return false;
 		}
 
-		if (!scopeGroup.hasLocalOrRemoteStagingGroup()) {
+		if (!scopeGroup.hasLocalOrRemoteStagingGroup() ||
+			!scopeGroup.isStagedPortlet(portletId)) {
+
 			return true;
 		}
 
-		return scopeGroup.isStagingGroup();
+		return false;
 	}
 
 	@Override

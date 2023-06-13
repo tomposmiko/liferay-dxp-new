@@ -93,6 +93,8 @@ definition {
 
 		Pause(locator1 = "3000");
 
+		var larFileName = LAR.getLarFileName();
+
 		LAR.downloadLar();
 
 		ProductMenu.gotoPortlet(
@@ -103,7 +105,7 @@ definition {
 
 		Site.addBlankCP(siteName = "Site Name");
 
-		LAR.importSiteCP(larFileName = "Export.Template", siteName = "Site Name");
+		LAR.importSiteCP(larFileName = "${larFileName}", siteName = "Site Name");
 
 		ProductMenu.gotoSite(site = "Site Name");
 
@@ -149,7 +151,7 @@ definition {
 			larFileName = "Edited Export Template Name"
 		);
 
-		var larFile = RegexUtil.replace("Edited Export Template Name", "([a-zA-z0-9_.-]*)[(0-9KB)]*", "1");
+		var larFileName = LAR.getLarFileName();
 
 		AssertTextEquals.assertPartialText(
 			locator1 = "SitePagesExport#CURRENT_AND_PREVIOUS_STATUS",
@@ -160,7 +162,7 @@ definition {
 
 		Pause(locator1 = "5000");
 
-		LAR.importSiteCP(larFileName = "${larFile}", siteName = "Site Name");
+		LAR.importSiteCP(larFileName = "${larFileName}", siteName = "Site Name");
 
 		ProductMenu.gotoSite(site = "Site Name");
 
@@ -181,6 +183,8 @@ definition {
 	@description = "This is a use case for LPS-86501."
 	@priority = "3"
 	test EditImportedContentPageViaImportedSiteTemplate {
+		property testray.component.names = "Training";
+
 		ProductMenu.gotoPortlet(
 			category = "Sites",
 			panel = "Control Panel",
@@ -441,7 +445,7 @@ definition {
 			portlet = "Web Content"
 		);
 
-		WebContent.deleteCP(webContentTitle = "Web Content Title");
+		WebContent.deleteCP(siteURLKey = "guest", webContentTitle = "Web Content Title");
 
 		LAR.exportPortlet(
 			exportIndividualDeletions = "true",
@@ -538,13 +542,7 @@ definition {
 
 		LAR.exportSuccess();
 
-		var valueName = selenium.getText("//ul/li/div/h5");
-
-		echo("value name ${valueName}");
-
-		var larFileName = RegexUtil.replace("${valueName}", "([a-zA-z0-9_.-]*)[(0-9KB)]*", "1");
-
-		echo("file name ${larFileName}");
+		var larFileName = LAR.getLarFileName();
 
 		LAR.downloadLar();
 
@@ -597,13 +595,7 @@ definition {
 			value1 = "Successful"
 		);
 
-		var valueName = selenium.getText("//ul/li/div/h5");
-
-		echo("value name ${valueName}");
-
-		var larFileName = RegexUtil.replace("${valueName}", "([a-zA-z0-9_.-]*)[(0-9k)]*", "1");
-
-		echo("lar file name ${larFileName}");
+		var larFileName = LAR.getLarFileName();
 
 		LAR.downloadLar();
 
@@ -686,8 +678,6 @@ definition {
 		property portal.acceptance = "true";
 		property testray.component.names = "Training";
 
-		User.firstLoginPG();
-
 		LAR.exportSiteCP();
 
 		var key_larFileName = "${larFileName}";
@@ -697,13 +687,7 @@ definition {
 			value1 = "Successful"
 		);
 
-		var valueName = selenium.getText("//ul/li/div/h5");
-
-		echo("value name ${valueName}");
-
-		var larFileName = RegexUtil.replace("${valueName}", "([a-zA-z0-9_.-]*)[(0-9KB)]*", "1");
-
-		echo("lar file name ${larFileName}");
+		var larFileName = LAR.getLarFileName();
 
 		LAR.downloadLar();
 
@@ -749,13 +733,7 @@ definition {
 			value1 = "Successful"
 		);
 
-		var valueName = selenium.getText("//ul/li/div/h5");
-
-		echo("value name ${valueName}");
-
-		var larFileName = RegexUtil.replace("${valueName}", "([a-zA-z0-9_.-]*)[(0-9KB)]*", "1");
-
-		echo("file name ${larFileName}");
+		var larFileName = LAR.getLarFileName();
 
 		LAR.downloadLar();
 
@@ -845,13 +823,7 @@ definition {
 
 		LAR.exportSuccess();
 
-		var valueName = selenium.getText("//ul/li/div/h5");
-
-		echo("value name ${valueName}");
-
-		var larFileName = RegexUtil.replace("${valueName}", "([a-zA-z0-9_.-]*)[(0-9KB)]*", "1");
-
-		echo("file name ${larFileName}");
+		var larFileName = LAR.getLarFileName();
 
 		LAR.downloadLar();
 
@@ -877,6 +849,141 @@ definition {
 			importValidationMissingItem = "DM Document Title",
 			larFileName = "${larFileName}",
 			siteName = "Site Name"
+		);
+	}
+
+	@description = "This is a use case for LPS-86608."
+	@priority = "3"
+	test ExportImportWebcontentWithRepeatField{
+		ProductMenu.gotoPortlet(
+			category = "Sites",
+			panel = "Control Panel",
+			portlet = "Sites"
+		);
+
+		Site.addBlankCP(siteName = "Exported Site");
+
+		ProductMenu.gotoPortlet(
+			category = "Content",
+			panel = "Site Administration",
+			portlet = "Web Content"
+		);
+
+		NavItem.gotoStructures();
+
+		WebContentStructures.addCP(
+			structureDescription = "Exported Structure Description",
+			structureName = "Exported Structure"
+		);
+
+		DynamicDataMapping.addField(
+			field = "Separator",
+			fieldFieldLabel = "SeparatorField",
+			fieldName = "Separator"
+		);
+
+		DynamicDataMapping.editFieldRepeatable(fieldFieldLabel = "SeparatorField");
+
+		DynamicDataMapping.addFieldNested(
+			field = "Text",
+			fieldFieldLabel = "Text",
+			fieldName = "Text"
+		);
+
+		WebContentStructures.saveCP(structureName = "Exported Structure");
+
+		WebContent.openWebContentAdmin(siteURLKey = "exported-site");
+
+		NavItem.gotoTemplates();
+
+		WebContentTemplates.addCP(
+			structureName = "Exported Structure",
+			templateDescription = "Exported Template Description",
+			templateFieldNames = "Text",
+			templateName = "Exported Template"
+		);
+
+		WebContent.openWebContentAdmin(siteURLKey = "exported-site");
+
+		WebContentNavigator.gotoAddWithStructureCP(structureName = "Exported Structure");
+
+		WebContent.addWithStructureCP(
+			structureName = "Exported Structure",
+			webContentText = "Exported Template",
+			webContentTitle = "Exported Article"
+		);
+
+		DDLRecord.addRepeatableField(fieldName = "Separator");
+
+		DDLRecord.populateFieldText(
+			ddlRecordFieldData = "Liferay",
+			fieldName = "Separator"
+		);
+
+		PortletEntry.publish();
+
+		WebContent.viewTitle(webContentTitle = "Exported Article");
+
+		WebContent.openWebContentAdmin(siteURLKey = "exported-site");
+
+		LAR.exportPortlet(larFileName = "WebContent_portlet.lar");
+
+		ProductMenu.gotoPortlet(
+			category = "Sites",
+			panel = "Control Panel",
+			portlet = "Sites"
+		);
+
+		Site.addBlankCP(siteName = "Imported Site");
+
+		ProductMenu.gotoPortlet(
+			category = "Content",
+			panel = "Site Administration",
+			portlet = "Web Content"
+		);
+
+		LAR.importPortlet(larFileName = "WebContent_portlet.lar");
+
+		WebContent.openWebContentAdmin(siteURLKey = "imported-site");
+
+		WebContent.viewWithStructureCP(webContentTitle = "Exported Article");
+
+		WebContent.viewFieldRepeated(
+			ddlRecordFieldData = "Liferay",
+			fieldName = "Separator"
+		);
+
+		WebContent.openWebContentAdmin(siteURLKey = "imported-site");
+
+		NavItem.gotoStructures();
+
+		WebContentStructures.viewCP(
+			structureDescription = "Exported Structure Description",
+			structureName = "Exported Structure"
+		);
+
+		LexiconEntry.gotoEntry(rowEntry = "Exported Structure");
+
+		DynamicDataMapping.viewField(
+			field = "Separator",
+			fieldFieldLabel = "SeparatorField",
+			fieldName = "Separator"
+		);
+
+		DynamicDataMapping.viewField(
+			field = "Text",
+			fieldFieldLabel = "Text",
+			fieldName = "Text"
+		);
+
+		WebContent.openWebContentAdmin(siteURLKey = "imported-site");
+
+		NavItem.gotoTemplates();
+
+		WebContentTemplates.viewCP(
+			structureName = "Exported Structure",
+			templateDescription = "Exported Template Description",
+			templateName = "Exported Template"
 		);
 	}
 
@@ -912,13 +1019,7 @@ definition {
 			exportTemplateName = "Export Template Name"
 		);
 
-		var valueName = selenium.getAttribute("//ul/li/div/h5//a@href");
-
-		echo("value name ${valueName}");
-
-		var larFileName = RegexUtil.replace("${valueName}", "http://localhost:8080/documents/portlet_file_entry/[0-9]*/([a-zA-z0-9_.-]*)[(0-9KB)]*", "1");
-
-		echo("file name ${larFileName}");
+		var larFileName = LAR.getLarFileName();
 
 		LAR.downloadLar();
 
@@ -953,5 +1054,63 @@ definition {
 			larFileName = "bookmarks-corrupted.portlet.lar",
 			uploadFrom = "dependencies"
 		);
+	}
+
+	@description = "This is a test for LPS-91233."
+	@priority = "3"
+	test PublishWebContentWithBrokenLink {
+		property test.name.skip.portal.instance = "ExportImport#PublishWebContentWithBrokenLink";
+
+		ProductMenu.gotoPortlet(
+			category = "Configuration",
+			panel = "Control Panel",
+			portlet = "System Settings");
+
+		SystemSettings.gotoConfiguration(
+			configurationCategory = "Infrastructure",
+			configurationName = "Export/Import",
+			configurationScope = "Virtual Instance Scope");
+
+		SystemSettings.configureSystemSetting(
+			enableSetting = "false",
+			settingFieldName = "Validate Layout References");
+
+		ProductMenu.gotoPortlet(
+			category = "Content",
+			panel = "Site Administration",
+			portlet = "Documents and Media");
+
+		DMDocument.addCP(
+			dmDocumentDescription = "DM Document Description",
+			dmDocumentFile = "Document_1.jpg",
+			dmDocumentTitle = "DM Document Title");
+
+		DMNavigator.gotoDocumentCP(dmDocumentTitle = "DM Document Title");
+
+		DMDocument.expandInfo();
+
+		var dmDocumentURL = selenium.getAttribute("//input[contains(@class,'lfr-input-resource')]@value");
+
+		ProductMenu.gotoPortlet(
+			category = "Content",
+			panel = "Site Administration",
+			portlet = "Documents and Media");
+
+		DMDocument.deleteCP(dmDocumentTitle = "DM Document Title");
+
+		ProductMenu.gotoPortlet(
+			category = "Content",
+			panel = "Site Administration",
+			portlet = "Web Content");
+
+		WebContentNavigator.gotoAddCP();
+
+		WebContent.addCP(
+			webContentContent = "${dmDocumentURL}",
+			webContentTitle = "WC WebContent Title");
+
+		AlloyEditor.addEntryExternalURL(entryExternalURL = "${dmDocumentURL}");
+
+		PortletEntry.publish();
 	}
 }

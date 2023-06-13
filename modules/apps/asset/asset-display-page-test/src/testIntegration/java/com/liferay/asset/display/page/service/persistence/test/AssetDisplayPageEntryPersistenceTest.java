@@ -15,13 +15,11 @@
 package com.liferay.asset.display.page.service.persistence.test;
 
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
-
 import com.liferay.asset.display.page.exception.NoSuchDisplayPageEntryException;
 import com.liferay.asset.display.page.model.AssetDisplayPageEntry;
 import com.liferay.asset.display.page.service.AssetDisplayPageEntryLocalServiceUtil;
 import com.liferay.asset.display.page.service.persistence.AssetDisplayPageEntryPersistence;
 import com.liferay.asset.display.page.service.persistence.AssetDisplayPageEntryUtil;
-
 import com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQueryFactoryUtil;
@@ -40,15 +38,6 @@ import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import com.liferay.portal.test.rule.PersistenceTestRule;
 import com.liferay.portal.test.rule.TransactionalTestRule;
 
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.ClassRule;
-import org.junit.Rule;
-import org.junit.Test;
-
-import org.junit.runner.RunWith;
-
 import java.io.Serializable;
 
 import java.util.ArrayList;
@@ -59,16 +48,27 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
+import org.junit.After;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.ClassRule;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+
 /**
  * @generated
  */
 @RunWith(Arquillian.class)
 public class AssetDisplayPageEntryPersistenceTest {
+
 	@ClassRule
 	@Rule
-	public static final AggregateTestRule aggregateTestRule = new AggregateTestRule(new LiferayIntegrationTestRule(),
-			PersistenceTestRule.INSTANCE,
-			new TransactionalTestRule(Propagation.REQUIRED,
+	public static final AggregateTestRule aggregateTestRule =
+		new AggregateTestRule(
+			new LiferayIntegrationTestRule(), PersistenceTestRule.INSTANCE,
+			new TransactionalTestRule(
+				Propagation.REQUIRED,
 				"com.liferay.asset.display.page.service"));
 
 	@Before
@@ -82,7 +82,8 @@ public class AssetDisplayPageEntryPersistenceTest {
 
 	@After
 	public void tearDown() throws Exception {
-		Iterator<AssetDisplayPageEntry> iterator = _assetDisplayPageEntries.iterator();
+		Iterator<AssetDisplayPageEntry> iterator =
+			_assetDisplayPageEntries.iterator();
 
 		while (iterator.hasNext()) {
 			_persistence.remove(iterator.next());
@@ -104,11 +105,14 @@ public class AssetDisplayPageEntryPersistenceTest {
 
 	@Test
 	public void testRemove() throws Exception {
-		AssetDisplayPageEntry newAssetDisplayPageEntry = addAssetDisplayPageEntry();
+		AssetDisplayPageEntry newAssetDisplayPageEntry =
+			addAssetDisplayPageEntry();
 
 		_persistence.remove(newAssetDisplayPageEntry);
 
-		AssetDisplayPageEntry existingAssetDisplayPageEntry = _persistence.fetchByPrimaryKey(newAssetDisplayPageEntry.getPrimaryKey());
+		AssetDisplayPageEntry existingAssetDisplayPageEntry =
+			_persistence.fetchByPrimaryKey(
+				newAssetDisplayPageEntry.getPrimaryKey());
 
 		Assert.assertNull(existingAssetDisplayPageEntry);
 	}
@@ -122,7 +126,8 @@ public class AssetDisplayPageEntryPersistenceTest {
 	public void testUpdateExisting() throws Exception {
 		long pk = RandomTestUtil.nextLong();
 
-		AssetDisplayPageEntry newAssetDisplayPageEntry = _persistence.create(pk);
+		AssetDisplayPageEntry newAssetDisplayPageEntry = _persistence.create(
+			pk);
 
 		newAssetDisplayPageEntry.setUuid(RandomTestUtil.randomString());
 
@@ -142,40 +147,55 @@ public class AssetDisplayPageEntryPersistenceTest {
 
 		newAssetDisplayPageEntry.setClassPK(RandomTestUtil.nextLong());
 
-		newAssetDisplayPageEntry.setLayoutPageTemplateEntryId(RandomTestUtil.nextLong());
+		newAssetDisplayPageEntry.setLayoutPageTemplateEntryId(
+			RandomTestUtil.nextLong());
 
 		newAssetDisplayPageEntry.setType(RandomTestUtil.nextInt());
 
-		_assetDisplayPageEntries.add(_persistence.update(
-				newAssetDisplayPageEntry));
+		_assetDisplayPageEntries.add(
+			_persistence.update(newAssetDisplayPageEntry));
 
-		AssetDisplayPageEntry existingAssetDisplayPageEntry = _persistence.findByPrimaryKey(newAssetDisplayPageEntry.getPrimaryKey());
+		AssetDisplayPageEntry existingAssetDisplayPageEntry =
+			_persistence.findByPrimaryKey(
+				newAssetDisplayPageEntry.getPrimaryKey());
 
-		Assert.assertEquals(existingAssetDisplayPageEntry.getUuid(),
+		Assert.assertEquals(
+			existingAssetDisplayPageEntry.getUuid(),
 			newAssetDisplayPageEntry.getUuid());
-		Assert.assertEquals(existingAssetDisplayPageEntry.getAssetDisplayPageEntryId(),
+		Assert.assertEquals(
+			existingAssetDisplayPageEntry.getAssetDisplayPageEntryId(),
 			newAssetDisplayPageEntry.getAssetDisplayPageEntryId());
-		Assert.assertEquals(existingAssetDisplayPageEntry.getGroupId(),
+		Assert.assertEquals(
+			existingAssetDisplayPageEntry.getGroupId(),
 			newAssetDisplayPageEntry.getGroupId());
-		Assert.assertEquals(existingAssetDisplayPageEntry.getCompanyId(),
+		Assert.assertEquals(
+			existingAssetDisplayPageEntry.getCompanyId(),
 			newAssetDisplayPageEntry.getCompanyId());
-		Assert.assertEquals(existingAssetDisplayPageEntry.getUserId(),
+		Assert.assertEquals(
+			existingAssetDisplayPageEntry.getUserId(),
 			newAssetDisplayPageEntry.getUserId());
-		Assert.assertEquals(existingAssetDisplayPageEntry.getUserName(),
+		Assert.assertEquals(
+			existingAssetDisplayPageEntry.getUserName(),
 			newAssetDisplayPageEntry.getUserName());
-		Assert.assertEquals(Time.getShortTimestamp(
+		Assert.assertEquals(
+			Time.getShortTimestamp(
 				existingAssetDisplayPageEntry.getCreateDate()),
 			Time.getShortTimestamp(newAssetDisplayPageEntry.getCreateDate()));
-		Assert.assertEquals(Time.getShortTimestamp(
+		Assert.assertEquals(
+			Time.getShortTimestamp(
 				existingAssetDisplayPageEntry.getModifiedDate()),
 			Time.getShortTimestamp(newAssetDisplayPageEntry.getModifiedDate()));
-		Assert.assertEquals(existingAssetDisplayPageEntry.getClassNameId(),
+		Assert.assertEquals(
+			existingAssetDisplayPageEntry.getClassNameId(),
 			newAssetDisplayPageEntry.getClassNameId());
-		Assert.assertEquals(existingAssetDisplayPageEntry.getClassPK(),
+		Assert.assertEquals(
+			existingAssetDisplayPageEntry.getClassPK(),
 			newAssetDisplayPageEntry.getClassPK());
-		Assert.assertEquals(existingAssetDisplayPageEntry.getLayoutPageTemplateEntryId(),
+		Assert.assertEquals(
+			existingAssetDisplayPageEntry.getLayoutPageTemplateEntryId(),
 			newAssetDisplayPageEntry.getLayoutPageTemplateEntryId());
-		Assert.assertEquals(existingAssetDisplayPageEntry.getType(),
+		Assert.assertEquals(
+			existingAssetDisplayPageEntry.getType(),
 			newAssetDisplayPageEntry.getType());
 	}
 
@@ -214,29 +234,33 @@ public class AssetDisplayPageEntryPersistenceTest {
 	}
 
 	@Test
-	public void testCountByLayoutPageTemplateEntryId()
-		throws Exception {
-		_persistence.countByLayoutPageTemplateEntryId(RandomTestUtil.nextLong());
+	public void testCountByLayoutPageTemplateEntryId() throws Exception {
+		_persistence.countByLayoutPageTemplateEntryId(
+			RandomTestUtil.nextLong());
 
 		_persistence.countByLayoutPageTemplateEntryId(0L);
 	}
 
 	@Test
 	public void testCountByG_C_C() throws Exception {
-		_persistence.countByG_C_C(RandomTestUtil.nextLong(),
-			RandomTestUtil.nextLong(), RandomTestUtil.nextLong());
+		_persistence.countByG_C_C(
+			RandomTestUtil.nextLong(), RandomTestUtil.nextLong(),
+			RandomTestUtil.nextLong());
 
 		_persistence.countByG_C_C(0L, 0L, 0L);
 	}
 
 	@Test
 	public void testFindByPrimaryKeyExisting() throws Exception {
-		AssetDisplayPageEntry newAssetDisplayPageEntry = addAssetDisplayPageEntry();
+		AssetDisplayPageEntry newAssetDisplayPageEntry =
+			addAssetDisplayPageEntry();
 
-		AssetDisplayPageEntry existingAssetDisplayPageEntry = _persistence.findByPrimaryKey(newAssetDisplayPageEntry.getPrimaryKey());
+		AssetDisplayPageEntry existingAssetDisplayPageEntry =
+			_persistence.findByPrimaryKey(
+				newAssetDisplayPageEntry.getPrimaryKey());
 
-		Assert.assertEquals(existingAssetDisplayPageEntry,
-			newAssetDisplayPageEntry);
+		Assert.assertEquals(
+			existingAssetDisplayPageEntry, newAssetDisplayPageEntry);
 	}
 
 	@Test(expected = NoSuchDisplayPageEntryException.class)
@@ -248,33 +272,38 @@ public class AssetDisplayPageEntryPersistenceTest {
 
 	@Test
 	public void testFindAll() throws Exception {
-		_persistence.findAll(QueryUtil.ALL_POS, QueryUtil.ALL_POS,
-			getOrderByComparator());
+		_persistence.findAll(
+			QueryUtil.ALL_POS, QueryUtil.ALL_POS, getOrderByComparator());
 	}
 
 	protected OrderByComparator<AssetDisplayPageEntry> getOrderByComparator() {
-		return OrderByComparatorFactoryUtil.create("AssetDisplayPageEntry",
-			"uuid", true, "assetDisplayPageEntryId", true, "groupId", true,
-			"companyId", true, "userId", true, "userName", true, "createDate",
-			true, "modifiedDate", true, "classNameId", true, "classPK", true,
-			"layoutPageTemplateEntryId", true, "type", true);
+		return OrderByComparatorFactoryUtil.create(
+			"AssetDisplayPageEntry", "uuid", true, "assetDisplayPageEntryId",
+			true, "groupId", true, "companyId", true, "userId", true,
+			"userName", true, "createDate", true, "modifiedDate", true,
+			"classNameId", true, "classPK", true, "layoutPageTemplateEntryId",
+			true, "type", true);
 	}
 
 	@Test
 	public void testFetchByPrimaryKeyExisting() throws Exception {
-		AssetDisplayPageEntry newAssetDisplayPageEntry = addAssetDisplayPageEntry();
+		AssetDisplayPageEntry newAssetDisplayPageEntry =
+			addAssetDisplayPageEntry();
 
-		AssetDisplayPageEntry existingAssetDisplayPageEntry = _persistence.fetchByPrimaryKey(newAssetDisplayPageEntry.getPrimaryKey());
+		AssetDisplayPageEntry existingAssetDisplayPageEntry =
+			_persistence.fetchByPrimaryKey(
+				newAssetDisplayPageEntry.getPrimaryKey());
 
-		Assert.assertEquals(existingAssetDisplayPageEntry,
-			newAssetDisplayPageEntry);
+		Assert.assertEquals(
+			existingAssetDisplayPageEntry, newAssetDisplayPageEntry);
 	}
 
 	@Test
 	public void testFetchByPrimaryKeyMissing() throws Exception {
 		long pk = RandomTestUtil.nextLong();
 
-		AssetDisplayPageEntry missingAssetDisplayPageEntry = _persistence.fetchByPrimaryKey(pk);
+		AssetDisplayPageEntry missingAssetDisplayPageEntry =
+			_persistence.fetchByPrimaryKey(pk);
 
 		Assert.assertNull(missingAssetDisplayPageEntry);
 	}
@@ -282,21 +311,27 @@ public class AssetDisplayPageEntryPersistenceTest {
 	@Test
 	public void testFetchByPrimaryKeysWithMultiplePrimaryKeysWhereAllPrimaryKeysExist()
 		throws Exception {
-		AssetDisplayPageEntry newAssetDisplayPageEntry1 = addAssetDisplayPageEntry();
-		AssetDisplayPageEntry newAssetDisplayPageEntry2 = addAssetDisplayPageEntry();
+
+		AssetDisplayPageEntry newAssetDisplayPageEntry1 =
+			addAssetDisplayPageEntry();
+		AssetDisplayPageEntry newAssetDisplayPageEntry2 =
+			addAssetDisplayPageEntry();
 
 		Set<Serializable> primaryKeys = new HashSet<Serializable>();
 
 		primaryKeys.add(newAssetDisplayPageEntry1.getPrimaryKey());
 		primaryKeys.add(newAssetDisplayPageEntry2.getPrimaryKey());
 
-		Map<Serializable, AssetDisplayPageEntry> assetDisplayPageEntries = _persistence.fetchByPrimaryKeys(primaryKeys);
+		Map<Serializable, AssetDisplayPageEntry> assetDisplayPageEntries =
+			_persistence.fetchByPrimaryKeys(primaryKeys);
 
 		Assert.assertEquals(2, assetDisplayPageEntries.size());
-		Assert.assertEquals(newAssetDisplayPageEntry1,
+		Assert.assertEquals(
+			newAssetDisplayPageEntry1,
 			assetDisplayPageEntries.get(
 				newAssetDisplayPageEntry1.getPrimaryKey()));
-		Assert.assertEquals(newAssetDisplayPageEntry2,
+		Assert.assertEquals(
+			newAssetDisplayPageEntry2,
 			assetDisplayPageEntries.get(
 				newAssetDisplayPageEntry2.getPrimaryKey()));
 	}
@@ -304,6 +339,7 @@ public class AssetDisplayPageEntryPersistenceTest {
 	@Test
 	public void testFetchByPrimaryKeysWithMultiplePrimaryKeysWhereNoPrimaryKeysExist()
 		throws Exception {
+
 		long pk1 = RandomTestUtil.nextLong();
 
 		long pk2 = RandomTestUtil.nextLong();
@@ -313,7 +349,8 @@ public class AssetDisplayPageEntryPersistenceTest {
 		primaryKeys.add(pk1);
 		primaryKeys.add(pk2);
 
-		Map<Serializable, AssetDisplayPageEntry> assetDisplayPageEntries = _persistence.fetchByPrimaryKeys(primaryKeys);
+		Map<Serializable, AssetDisplayPageEntry> assetDisplayPageEntries =
+			_persistence.fetchByPrimaryKeys(primaryKeys);
 
 		Assert.assertTrue(assetDisplayPageEntries.isEmpty());
 	}
@@ -321,7 +358,9 @@ public class AssetDisplayPageEntryPersistenceTest {
 	@Test
 	public void testFetchByPrimaryKeysWithMultiplePrimaryKeysWhereSomePrimaryKeysExist()
 		throws Exception {
-		AssetDisplayPageEntry newAssetDisplayPageEntry = addAssetDisplayPageEntry();
+
+		AssetDisplayPageEntry newAssetDisplayPageEntry =
+			addAssetDisplayPageEntry();
 
 		long pk = RandomTestUtil.nextLong();
 
@@ -330,37 +369,41 @@ public class AssetDisplayPageEntryPersistenceTest {
 		primaryKeys.add(newAssetDisplayPageEntry.getPrimaryKey());
 		primaryKeys.add(pk);
 
-		Map<Serializable, AssetDisplayPageEntry> assetDisplayPageEntries = _persistence.fetchByPrimaryKeys(primaryKeys);
+		Map<Serializable, AssetDisplayPageEntry> assetDisplayPageEntries =
+			_persistence.fetchByPrimaryKeys(primaryKeys);
 
 		Assert.assertEquals(1, assetDisplayPageEntries.size());
-		Assert.assertEquals(newAssetDisplayPageEntry,
+		Assert.assertEquals(
+			newAssetDisplayPageEntry,
 			assetDisplayPageEntries.get(
 				newAssetDisplayPageEntry.getPrimaryKey()));
 	}
 
 	@Test
-	public void testFetchByPrimaryKeysWithNoPrimaryKeys()
-		throws Exception {
+	public void testFetchByPrimaryKeysWithNoPrimaryKeys() throws Exception {
 		Set<Serializable> primaryKeys = new HashSet<Serializable>();
 
-		Map<Serializable, AssetDisplayPageEntry> assetDisplayPageEntries = _persistence.fetchByPrimaryKeys(primaryKeys);
+		Map<Serializable, AssetDisplayPageEntry> assetDisplayPageEntries =
+			_persistence.fetchByPrimaryKeys(primaryKeys);
 
 		Assert.assertTrue(assetDisplayPageEntries.isEmpty());
 	}
 
 	@Test
-	public void testFetchByPrimaryKeysWithOnePrimaryKey()
-		throws Exception {
-		AssetDisplayPageEntry newAssetDisplayPageEntry = addAssetDisplayPageEntry();
+	public void testFetchByPrimaryKeysWithOnePrimaryKey() throws Exception {
+		AssetDisplayPageEntry newAssetDisplayPageEntry =
+			addAssetDisplayPageEntry();
 
 		Set<Serializable> primaryKeys = new HashSet<Serializable>();
 
 		primaryKeys.add(newAssetDisplayPageEntry.getPrimaryKey());
 
-		Map<Serializable, AssetDisplayPageEntry> assetDisplayPageEntries = _persistence.fetchByPrimaryKeys(primaryKeys);
+		Map<Serializable, AssetDisplayPageEntry> assetDisplayPageEntries =
+			_persistence.fetchByPrimaryKeys(primaryKeys);
 
 		Assert.assertEquals(1, assetDisplayPageEntries.size());
-		Assert.assertEquals(newAssetDisplayPageEntry,
+		Assert.assertEquals(
+			newAssetDisplayPageEntry,
 			assetDisplayPageEntries.get(
 				newAssetDisplayPageEntry.getPrimaryKey()));
 	}
@@ -369,16 +412,22 @@ public class AssetDisplayPageEntryPersistenceTest {
 	public void testActionableDynamicQuery() throws Exception {
 		final IntegerWrapper count = new IntegerWrapper();
 
-		ActionableDynamicQuery actionableDynamicQuery = AssetDisplayPageEntryLocalServiceUtil.getActionableDynamicQuery();
+		ActionableDynamicQuery actionableDynamicQuery =
+			AssetDisplayPageEntryLocalServiceUtil.getActionableDynamicQuery();
 
-		actionableDynamicQuery.setPerformActionMethod(new ActionableDynamicQuery.PerformActionMethod<AssetDisplayPageEntry>() {
+		actionableDynamicQuery.setPerformActionMethod(
+			new ActionableDynamicQuery.PerformActionMethod
+				<AssetDisplayPageEntry>() {
+
 				@Override
 				public void performAction(
 					AssetDisplayPageEntry assetDisplayPageEntry) {
+
 					Assert.assertNotNull(assetDisplayPageEntry);
 
 					count.increment();
 				}
+
 			});
 
 		actionableDynamicQuery.performActions();
@@ -387,54 +436,62 @@ public class AssetDisplayPageEntryPersistenceTest {
 	}
 
 	@Test
-	public void testDynamicQueryByPrimaryKeyExisting()
-		throws Exception {
-		AssetDisplayPageEntry newAssetDisplayPageEntry = addAssetDisplayPageEntry();
+	public void testDynamicQueryByPrimaryKeyExisting() throws Exception {
+		AssetDisplayPageEntry newAssetDisplayPageEntry =
+			addAssetDisplayPageEntry();
 
-		DynamicQuery dynamicQuery = DynamicQueryFactoryUtil.forClass(AssetDisplayPageEntry.class,
-				_dynamicQueryClassLoader);
+		DynamicQuery dynamicQuery = DynamicQueryFactoryUtil.forClass(
+			AssetDisplayPageEntry.class, _dynamicQueryClassLoader);
 
-		dynamicQuery.add(RestrictionsFactoryUtil.eq("assetDisplayPageEntryId",
+		dynamicQuery.add(
+			RestrictionsFactoryUtil.eq(
+				"assetDisplayPageEntryId",
 				newAssetDisplayPageEntry.getAssetDisplayPageEntryId()));
 
-		List<AssetDisplayPageEntry> result = _persistence.findWithDynamicQuery(dynamicQuery);
+		List<AssetDisplayPageEntry> result = _persistence.findWithDynamicQuery(
+			dynamicQuery);
 
 		Assert.assertEquals(1, result.size());
 
 		AssetDisplayPageEntry existingAssetDisplayPageEntry = result.get(0);
 
-		Assert.assertEquals(existingAssetDisplayPageEntry,
-			newAssetDisplayPageEntry);
+		Assert.assertEquals(
+			existingAssetDisplayPageEntry, newAssetDisplayPageEntry);
 	}
 
 	@Test
 	public void testDynamicQueryByPrimaryKeyMissing() throws Exception {
-		DynamicQuery dynamicQuery = DynamicQueryFactoryUtil.forClass(AssetDisplayPageEntry.class,
-				_dynamicQueryClassLoader);
+		DynamicQuery dynamicQuery = DynamicQueryFactoryUtil.forClass(
+			AssetDisplayPageEntry.class, _dynamicQueryClassLoader);
 
-		dynamicQuery.add(RestrictionsFactoryUtil.eq("assetDisplayPageEntryId",
-				RandomTestUtil.nextLong()));
+		dynamicQuery.add(
+			RestrictionsFactoryUtil.eq(
+				"assetDisplayPageEntryId", RandomTestUtil.nextLong()));
 
-		List<AssetDisplayPageEntry> result = _persistence.findWithDynamicQuery(dynamicQuery);
+		List<AssetDisplayPageEntry> result = _persistence.findWithDynamicQuery(
+			dynamicQuery);
 
 		Assert.assertEquals(0, result.size());
 	}
 
 	@Test
-	public void testDynamicQueryByProjectionExisting()
-		throws Exception {
-		AssetDisplayPageEntry newAssetDisplayPageEntry = addAssetDisplayPageEntry();
+	public void testDynamicQueryByProjectionExisting() throws Exception {
+		AssetDisplayPageEntry newAssetDisplayPageEntry =
+			addAssetDisplayPageEntry();
 
-		DynamicQuery dynamicQuery = DynamicQueryFactoryUtil.forClass(AssetDisplayPageEntry.class,
-				_dynamicQueryClassLoader);
+		DynamicQuery dynamicQuery = DynamicQueryFactoryUtil.forClass(
+			AssetDisplayPageEntry.class, _dynamicQueryClassLoader);
 
-		dynamicQuery.setProjection(ProjectionFactoryUtil.property(
-				"assetDisplayPageEntryId"));
+		dynamicQuery.setProjection(
+			ProjectionFactoryUtil.property("assetDisplayPageEntryId"));
 
-		Object newAssetDisplayPageEntryId = newAssetDisplayPageEntry.getAssetDisplayPageEntryId();
+		Object newAssetDisplayPageEntryId =
+			newAssetDisplayPageEntry.getAssetDisplayPageEntryId();
 
-		dynamicQuery.add(RestrictionsFactoryUtil.in("assetDisplayPageEntryId",
-				new Object[] { newAssetDisplayPageEntryId }));
+		dynamicQuery.add(
+			RestrictionsFactoryUtil.in(
+				"assetDisplayPageEntryId",
+				new Object[] {newAssetDisplayPageEntryId}));
 
 		List<Object> result = _persistence.findWithDynamicQuery(dynamicQuery);
 
@@ -442,20 +499,22 @@ public class AssetDisplayPageEntryPersistenceTest {
 
 		Object existingAssetDisplayPageEntryId = result.get(0);
 
-		Assert.assertEquals(existingAssetDisplayPageEntryId,
-			newAssetDisplayPageEntryId);
+		Assert.assertEquals(
+			existingAssetDisplayPageEntryId, newAssetDisplayPageEntryId);
 	}
 
 	@Test
 	public void testDynamicQueryByProjectionMissing() throws Exception {
-		DynamicQuery dynamicQuery = DynamicQueryFactoryUtil.forClass(AssetDisplayPageEntry.class,
-				_dynamicQueryClassLoader);
+		DynamicQuery dynamicQuery = DynamicQueryFactoryUtil.forClass(
+			AssetDisplayPageEntry.class, _dynamicQueryClassLoader);
 
-		dynamicQuery.setProjection(ProjectionFactoryUtil.property(
-				"assetDisplayPageEntryId"));
+		dynamicQuery.setProjection(
+			ProjectionFactoryUtil.property("assetDisplayPageEntryId"));
 
-		dynamicQuery.add(RestrictionsFactoryUtil.in("assetDisplayPageEntryId",
-				new Object[] { RandomTestUtil.nextLong() }));
+		dynamicQuery.add(
+			RestrictionsFactoryUtil.in(
+				"assetDisplayPageEntryId",
+				new Object[] {RandomTestUtil.nextLong()}));
 
 		List<Object> result = _persistence.findWithDynamicQuery(dynamicQuery);
 
@@ -464,37 +523,47 @@ public class AssetDisplayPageEntryPersistenceTest {
 
 	@Test
 	public void testResetOriginalValues() throws Exception {
-		AssetDisplayPageEntry newAssetDisplayPageEntry = addAssetDisplayPageEntry();
+		AssetDisplayPageEntry newAssetDisplayPageEntry =
+			addAssetDisplayPageEntry();
 
 		_persistence.clearCache();
 
-		AssetDisplayPageEntry existingAssetDisplayPageEntry = _persistence.findByPrimaryKey(newAssetDisplayPageEntry.getPrimaryKey());
+		AssetDisplayPageEntry existingAssetDisplayPageEntry =
+			_persistence.findByPrimaryKey(
+				newAssetDisplayPageEntry.getPrimaryKey());
 
-		Assert.assertTrue(Objects.equals(
+		Assert.assertTrue(
+			Objects.equals(
 				existingAssetDisplayPageEntry.getUuid(),
-				ReflectionTestUtil.invoke(existingAssetDisplayPageEntry,
-					"getOriginalUuid", new Class<?>[0])));
-		Assert.assertEquals(Long.valueOf(
-				existingAssetDisplayPageEntry.getGroupId()),
-			ReflectionTestUtil.<Long>invoke(existingAssetDisplayPageEntry,
-				"getOriginalGroupId", new Class<?>[0]));
+				ReflectionTestUtil.invoke(
+					existingAssetDisplayPageEntry, "getOriginalUuid",
+					new Class<?>[0])));
+		Assert.assertEquals(
+			Long.valueOf(existingAssetDisplayPageEntry.getGroupId()),
+			ReflectionTestUtil.<Long>invoke(
+				existingAssetDisplayPageEntry, "getOriginalGroupId",
+				new Class<?>[0]));
 
-		Assert.assertEquals(Long.valueOf(
-				existingAssetDisplayPageEntry.getGroupId()),
-			ReflectionTestUtil.<Long>invoke(existingAssetDisplayPageEntry,
-				"getOriginalGroupId", new Class<?>[0]));
-		Assert.assertEquals(Long.valueOf(
-				existingAssetDisplayPageEntry.getClassNameId()),
-			ReflectionTestUtil.<Long>invoke(existingAssetDisplayPageEntry,
-				"getOriginalClassNameId", new Class<?>[0]));
-		Assert.assertEquals(Long.valueOf(
-				existingAssetDisplayPageEntry.getClassPK()),
-			ReflectionTestUtil.<Long>invoke(existingAssetDisplayPageEntry,
-				"getOriginalClassPK", new Class<?>[0]));
+		Assert.assertEquals(
+			Long.valueOf(existingAssetDisplayPageEntry.getGroupId()),
+			ReflectionTestUtil.<Long>invoke(
+				existingAssetDisplayPageEntry, "getOriginalGroupId",
+				new Class<?>[0]));
+		Assert.assertEquals(
+			Long.valueOf(existingAssetDisplayPageEntry.getClassNameId()),
+			ReflectionTestUtil.<Long>invoke(
+				existingAssetDisplayPageEntry, "getOriginalClassNameId",
+				new Class<?>[0]));
+		Assert.assertEquals(
+			Long.valueOf(existingAssetDisplayPageEntry.getClassPK()),
+			ReflectionTestUtil.<Long>invoke(
+				existingAssetDisplayPageEntry, "getOriginalClassPK",
+				new Class<?>[0]));
 	}
 
 	protected AssetDisplayPageEntry addAssetDisplayPageEntry()
 		throws Exception {
+
 		long pk = RandomTestUtil.nextLong();
 
 		AssetDisplayPageEntry assetDisplayPageEntry = _persistence.create(pk);
@@ -517,16 +586,20 @@ public class AssetDisplayPageEntryPersistenceTest {
 
 		assetDisplayPageEntry.setClassPK(RandomTestUtil.nextLong());
 
-		assetDisplayPageEntry.setLayoutPageTemplateEntryId(RandomTestUtil.nextLong());
+		assetDisplayPageEntry.setLayoutPageTemplateEntryId(
+			RandomTestUtil.nextLong());
 
 		assetDisplayPageEntry.setType(RandomTestUtil.nextInt());
 
-		_assetDisplayPageEntries.add(_persistence.update(assetDisplayPageEntry));
+		_assetDisplayPageEntries.add(
+			_persistence.update(assetDisplayPageEntry));
 
 		return assetDisplayPageEntry;
 	}
 
-	private List<AssetDisplayPageEntry> _assetDisplayPageEntries = new ArrayList<AssetDisplayPageEntry>();
+	private List<AssetDisplayPageEntry> _assetDisplayPageEntries =
+		new ArrayList<AssetDisplayPageEntry>();
 	private AssetDisplayPageEntryPersistence _persistence;
 	private ClassLoader _dynamicQueryClassLoader;
+
 }

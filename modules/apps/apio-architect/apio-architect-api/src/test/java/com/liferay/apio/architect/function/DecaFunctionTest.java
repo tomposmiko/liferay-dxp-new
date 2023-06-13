@@ -29,10 +29,10 @@ public class DecaFunctionTest {
 	@Test
 	public void testOnInvokingAndThenShouldExecuteBothFunctions() {
 		DecaFunction
-			<String, String, String, String, String, String, String,
-			 String, String, String, String> firstFunction = (
-				string1, string2, string3, string4, string5, string6,
-				string7, string8, string9, string10) ->
+			<String, String, String, String, String, String, String, String,
+			 String, String, String> firstFunction =
+				(string1, string2, string3, string4, string5, string6, string7,
+				 string8, string9, string10) ->
 					string1 + string2 + string3 + string4 + string5 + string6 +
 						string7 + string8 + string9 + string10;
 
@@ -50,10 +50,10 @@ public class DecaFunctionTest {
 	@Test(expected = NullPointerException.class)
 	public void testOnInvokingAndThenWithNullAfterFunctionThrowsException() {
 		DecaFunction
-			<String, String, String, String, String, String, String,
-			 String, String, String, String> firstFunction = (
-				string1, string2, string3, string4, string5, string6,
-				string7, string8, string9, string10) ->
+			<String, String, String, String, String, String, String, String,
+			 String, String, String> firstFunction =
+				(string1, string2, string3, string4, string5, string6, string7,
+				 string8, string9, string10) ->
 					string1 + string2 + string3 + string4 + string5 + string6 +
 						string7 + string8 + string9 + string10;
 

@@ -26,8 +26,6 @@ definition {
 			layoutName = "Test Page 3"
 		);
 
-		NavigationMenusAdmin.openNavigationMenusAdmin(siteURLKey = "test-site-name");
-
 		Staging.openStagingAdmin(siteURLKey = "test-site-name");
 
 		Staging.activateStagingCP(siteName = "Test Site Name");
@@ -188,9 +186,9 @@ definition {
 			siteURLKey = "test-site-name-staging"
 		);
 
-		NavigationMenusAdmin.markAsPrimaryNavigation(
-			newMenuName = "Test Navigation Menu Name",
-			oldMenuName = "Default"
+		NavigationMenusAdmin.configureMenuType(
+			menuType = "Primary Navigation",
+			navigationMenu = "Test Navigation Menu Name"
 		);
 
 		Navigator.openWithAppendToBaseURL(urlAppend = "web/test-site-name-staging");
@@ -418,9 +416,9 @@ definition {
 			siteURLKey = "test-site-name-staging"
 		);
 
-		NavigationMenusAdmin.markAsPrimaryNavigation(
-			newMenuName = "Test Navigation Menu Name",
-			oldMenuName = "Default"
+		NavigationMenusAdmin.configureMenuType(
+			menuType = "Primary Navigation",
+			navigationMenu = "Test Navigation Menu Name"
 		);
 
 		Navigator.openWithAppendToBaseURL(urlAppend = "web/test-site-name-staging");
@@ -506,9 +504,9 @@ definition {
 			siteURLKey = "test-site-name-staging"
 		);
 
-		NavigationMenusAdmin.markAsPrimaryNavigation(
-			newMenuName = "Test Navigation Menu Name",
-			oldMenuName = "Default"
+		NavigationMenusAdmin.configureMenuType(
+			menuType = "Primary Navigation",
+			navigationMenu = "Test Navigation Menu Name"
 		);
 
 		Navigator.openWithAppendToBaseURL(urlAppend = "web/test-site-name-staging");

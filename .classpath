@@ -41,6 +41,7 @@
 	<classpathentry kind="lib" path="lib/development/ant-contrib.jar"/>
 	<classpathentry kind="lib" path="lib/development/antelope.jar"/>
 	<classpathentry kind="lib" path="lib/development/appium.jar"/>
+	<classpathentry kind="lib" path="lib/development/biz.aQute.bnd.jar"/>
 	<classpathentry kind="lib" path="lib/development/bsh.jar"/>
 	<classpathentry kind="lib" path="lib/development/catalina.jar"/>
 	<classpathentry kind="lib" path="lib/development/com.liferay.ant.beanshell.jar"/>
@@ -56,6 +57,7 @@
 	<classpathentry kind="lib" path="lib/development/dumbster.jar"/>
 	<classpathentry kind="lib" path="lib/development/error-prone-ant.jar"/>
 	<classpathentry kind="lib" path="lib/development/gson.jar"/>
+	<classpathentry kind="lib" path="lib/development/guava.jar" />
 	<classpathentry kind="lib" path="lib/development/hamcrest-core.jar"/>
 	<classpathentry kind="lib" path="lib/development/hamcrest-library.jar"/>
 	<classpathentry kind="lib" path="lib/development/hsql.jar"/>
@@ -123,14 +125,17 @@
 	<classpathentry kind="lib" path="lib/portal/antlr3.jar"/>
 	<classpathentry kind="lib" path="lib/portal/antlr3-runtime.jar"/>
 	<classpathentry kind="lib" path="lib/portal/aopalliance.jar"/>
-	<classpathentry kind="lib" path="lib/portal/asm-debug-all.jar"/>
+	<classpathentry kind="lib" path="lib/portal/asm-analysis.jar"/>
+	<classpathentry kind="lib" path="lib/portal/asm-commons.jar"/>
+	<classpathentry kind="lib" path="lib/portal/asm-tree.jar"/>
+	<classpathentry kind="lib" path="lib/portal/asm-util.jar"/>
+	<classpathentry kind="lib" path="lib/portal/asm.jar"/>
 	<classpathentry kind="lib" path="lib/portal/aspectj-rt.jar"/>
 	<classpathentry kind="lib" path="lib/portal/aspectj-weaver.jar"/>
 	<classpathentry kind="lib" path="lib/portal/axis.jar"/>
 	<classpathentry kind="lib" path="lib/portal/axis-ant.jar"/>
 	<classpathentry kind="lib" path="lib/portal/bcmail.jar"/>
 	<classpathentry kind="lib" path="lib/portal/bcprov.jar"/>
-	<classpathentry kind="lib" path="lib/portal/bnd.jar"/>
 	<classpathentry kind="lib" path="lib/portal/boilerpipe.jar"/>
 	<classpathentry kind="lib" path="lib/portal/bsf.jar"/>
 	<classpathentry kind="lib" path="lib/portal/c3p0.jar"/>
@@ -148,6 +153,7 @@
 	<classpathentry kind="lib" path="lib/portal/commons-chain.jar"/>
 	<classpathentry kind="lib" path="lib/portal/commons-codec.jar"/>
 	<classpathentry kind="lib" path="lib/portal/commons-collections.jar"/>
+	<classpathentry kind="lib" path="lib/portal/commons-collections4.jar"/>
 	<classpathentry kind="lib" path="lib/portal/commons-compress.jar"/>
 	<classpathentry kind="lib" path="lib/portal/commons-configuration.jar"/>
 	<classpathentry kind="lib" path="lib/portal/commons-dbcp.jar"/>
@@ -159,6 +165,7 @@
 	<classpathentry kind="lib" path="lib/portal/commons-io.jar"/>
 	<classpathentry kind="lib" path="lib/portal/commons-lang.jar"/>
 	<classpathentry kind="lib" path="lib/portal/commons-logging.jar"/>
+	<classpathentry kind="lib" path="lib/portal/commons-math3.jar"/>
 	<classpathentry kind="lib" path="lib/portal/commons-math.jar"/>
 	<classpathentry kind="lib" path="lib/portal/commons-pool.jar"/>
 	<classpathentry kind="lib" path="lib/portal/commons-validator.jar"/>
@@ -185,6 +192,9 @@
 	<classpathentry kind="lib" path="lib/portal/im4java.jar"/>
 	<classpathentry kind="lib" path="lib/portal/isoparser.jar"/>
 	<classpathentry kind="lib" path="lib/portal/jabsorb.jar"/>
+	<classpathentry kind="lib" path="lib/portal/jackson-annotations.jar"/>
+	<classpathentry kind="lib" path="lib/portal/jackson-core.jar"/>
+	<classpathentry kind="lib" path="lib/portal/jackson-databind.jar"/>
 	<classpathentry kind="lib" path="lib/portal/jai_codec.jar"/>
 	<classpathentry kind="lib" path="lib/portal/jai_core.jar"/>
 	<classpathentry kind="lib" path="lib/portal/jakarta-regexp.jar"/>
@@ -261,7 +271,6 @@
 	<classpathentry kind="lib" path="lib/portal/saaj-impl.jar"/>
 	<classpathentry kind="lib" path="lib/portal/scribe.jar"/>
 	<classpathentry kind="lib" path="lib/portal/serializer.jar"/>
-	<classpathentry kind="lib" path="lib/portal/sigar.jar"/>
 	<classpathentry kind="lib" path="lib/portal/simplecaptcha.jar"/>
 	<classpathentry kind="lib" path="lib/portal/slf4j-api.jar"/>
 	<classpathentry kind="lib" path="lib/portal/soap.jar"/>

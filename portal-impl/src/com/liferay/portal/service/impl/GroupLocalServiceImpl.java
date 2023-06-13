@@ -708,14 +708,12 @@ public class GroupLocalServiceImpl extends GroupLocalServiceBaseImpl {
 
 		nameMap.put(LocaleUtil.getDefault(), String.valueOf(layout.getPlid()));
 
-		Group scopeGroup = groupLocalService.addGroup(
+		return groupLocalService.addGroup(
 			userId, GroupConstants.DEFAULT_PARENT_GROUP_ID,
 			Layout.class.getName(), layout.getPlid(),
 			GroupConstants.DEFAULT_LIVE_GROUP_ID, nameMap, null, 0, true,
 			GroupConstants.DEFAULT_MEMBERSHIP_RESTRICTION, null, false, true,
 			null);
-
-		return scopeGroup;
 	}
 
 	/**
@@ -1397,8 +1395,9 @@ public class GroupLocalServiceImpl extends GroupLocalServiceBaseImpl {
 	@Override
 	@Skip
 	public Group fetchGroup(long companyId, String groupKey) {
-		Group group = _systemGroupsMap.get(
-			StringUtil.toHexString(companyId).concat(groupKey));
+		String companyIdHexString = StringUtil.toHexString(companyId);
+
+		Group group = _systemGroupsMap.get(companyIdHexString.concat(groupKey));
 
 		if (group != null) {
 			return group;
@@ -1654,8 +1653,9 @@ public class GroupLocalServiceImpl extends GroupLocalServiceBaseImpl {
 	public Group getGroup(long companyId, String groupKey)
 		throws PortalException {
 
-		Group group = _systemGroupsMap.get(
-			StringUtil.toHexString(companyId).concat(groupKey));
+		String companyIdHexString = StringUtil.toHexString(companyId);
+
+		Group group = _systemGroupsMap.get(companyIdHexString.concat(groupKey));
 
 		if (group != null) {
 			return group;
@@ -4412,17 +4412,15 @@ public class GroupLocalServiceImpl extends GroupLocalServiceBaseImpl {
 				Set<Group> rolePermissionsGroups = new HashSet<>();
 
 				List<ResourcePermission> resourcePermissions =
-					resourcePermissionPersistence.findByC_N_S(
+					resourcePermissionPersistence.findByC_N_S_R(
 						companyId, rolePermissions.getName(),
-						rolePermissions.getScope());
+						rolePermissions.getScope(),
+						rolePermissions.getRoleId());
 
 				for (ResourcePermission resourcePermission :
 						resourcePermissions) {
 
-					if ((resourcePermission.getRoleId() ==
-							rolePermissions.getRoleId()) &&
-						resourcePermission.hasAction(resourceAction)) {
-
+					if (resourcePermission.hasAction(resourceAction)) {
 						Group group = groupPersistence.fetchByPrimaryKey(
 							GetterUtil.getLong(
 								resourcePermission.getPrimKey()));
@@ -4498,11 +4496,10 @@ public class GroupLocalServiceImpl extends GroupLocalServiceBaseImpl {
 
 			return groups;
 		}
-		else {
-			joinedGroups.retainAll(groups);
 
-			return joinedGroups;
-		}
+		joinedGroups.retainAll(groups);
+
+		return joinedGroups;
 	}
 
 	protected long[] getClassNameIds() {
@@ -4633,7 +4630,12 @@ public class GroupLocalServiceImpl extends GroupLocalServiceBaseImpl {
 						}
 					}
 
-					friendlyURL = friendlyURL + CharPool.DASH + ++i;
+					if (StringUtil.endsWith(friendlyURL, CharPool.DASH)) {
+						friendlyURL = friendlyURL + ++i;
+					}
+					else {
+						friendlyURL = friendlyURL + CharPool.DASH + ++i;
+					}
 				}
 				else if (type == GroupFriendlyURLException.ENDS_WITH_DASH) {
 					friendlyURL = StringUtil.replaceLast(
@@ -4700,7 +4702,7 @@ public class GroupLocalServiceImpl extends GroupLocalServiceBaseImpl {
 		ClassName className = ClassNameServiceHttp.fetchByClassNameId(
 			httpPrincipal, group.getClassNameId());
 
-		if (Objects.equals(className.getClassName(), Company.class.getName())) {
+		if (Objects.equals(className.getValue(), Company.class.getName())) {
 			return true;
 		}
 
@@ -5017,29 +5019,6 @@ public class GroupLocalServiceImpl extends GroupLocalServiceBaseImpl {
 						GroupFriendlyURLException.POSSIBLE_DUPLICATE);
 
 				gfurle.setKeywordConflict(groupIdFriendlyURL);
-
-				throw gfurle;
-			}
-		}
-
-		String screenName = friendlyURL.substring(1);
-
-		User user = userPersistence.fetchByC_SN(companyId, screenName);
-
-		if (user != null) {
-			long userClassNameId = classNameLocalService.getClassNameId(
-				User.class);
-
-			if ((classNameId == userClassNameId) &&
-				(classPK == user.getUserId())) {
-			}
-			else {
-				GroupFriendlyURLException gfurle =
-					new GroupFriendlyURLException(
-						GroupFriendlyURLException.DUPLICATE);
-
-				gfurle.setDuplicateClassPK(user.getUserId());
-				gfurle.setDuplicateClassName(User.class.getName());
 
 				throw gfurle;
 			}

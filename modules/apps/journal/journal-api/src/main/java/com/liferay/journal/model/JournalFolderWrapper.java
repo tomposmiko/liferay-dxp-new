@@ -17,9 +17,7 @@ package com.liferay.journal.model;
 import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.expando.kernel.model.ExpandoBridge;
-
 import com.liferay.exportimport.kernel.lar.StagedModelType;
-
 import com.liferay.portal.kernel.model.ModelWrapper;
 import com.liferay.portal.kernel.service.ServiceContext;
 
@@ -40,8 +38,9 @@ import java.util.Objects;
  * @generated
  */
 @ProviderType
-public class JournalFolderWrapper implements JournalFolder,
-	ModelWrapper<JournalFolder> {
+public class JournalFolderWrapper
+	implements JournalFolder, ModelWrapper<JournalFolder> {
+
 	public JournalFolderWrapper(JournalFolder journalFolder) {
 		_journalFolder = journalFolder;
 	}
@@ -196,6 +195,7 @@ public class JournalFolderWrapper implements JournalFolder,
 	@Override
 	public String buildTreePath()
 		throws com.liferay.portal.kernel.exception.PortalException {
+
 		return _journalFolder.buildTreePath();
 	}
 
@@ -212,60 +212,62 @@ public class JournalFolderWrapper implements JournalFolder,
 	@Override
 	public java.util.List<Long> getAncestorFolderIds()
 		throws com.liferay.portal.kernel.exception.PortalException {
+
 		return _journalFolder.getAncestorFolderIds();
 	}
 
 	@Override
 	public java.util.List<JournalFolder> getAncestors()
 		throws com.liferay.portal.kernel.exception.PortalException {
+
 		return _journalFolder.getAncestors();
 	}
 
 	/**
-	* Returns the company ID of this journal folder.
-	*
-	* @return the company ID of this journal folder
-	*/
+	 * Returns the company ID of this journal folder.
+	 *
+	 * @return the company ID of this journal folder
+	 */
 	@Override
 	public long getCompanyId() {
 		return _journalFolder.getCompanyId();
 	}
 
 	/**
-	* Returns the container model ID of this journal folder.
-	*
-	* @return the container model ID of this journal folder
-	*/
+	 * Returns the container model ID of this journal folder.
+	 *
+	 * @return the container model ID of this journal folder
+	 */
 	@Override
 	public long getContainerModelId() {
 		return _journalFolder.getContainerModelId();
 	}
 
 	/**
-	* Returns the container name of this journal folder.
-	*
-	* @return the container name of this journal folder
-	*/
+	 * Returns the container name of this journal folder.
+	 *
+	 * @return the container name of this journal folder
+	 */
 	@Override
 	public String getContainerModelName() {
 		return _journalFolder.getContainerModelName();
 	}
 
 	/**
-	* Returns the create date of this journal folder.
-	*
-	* @return the create date of this journal folder
-	*/
+	 * Returns the create date of this journal folder.
+	 *
+	 * @return the create date of this journal folder
+	 */
 	@Override
 	public Date getCreateDate() {
 		return _journalFolder.getCreateDate();
 	}
 
 	/**
-	* Returns the description of this journal folder.
-	*
-	* @return the description of this journal folder
-	*/
+	 * Returns the description of this journal folder.
+	 *
+	 * @return the description of this journal folder
+	 */
 	@Override
 	public String getDescription() {
 		return _journalFolder.getDescription();
@@ -277,60 +279,60 @@ public class JournalFolderWrapper implements JournalFolder,
 	}
 
 	/**
-	* Returns the folder ID of this journal folder.
-	*
-	* @return the folder ID of this journal folder
-	*/
+	 * Returns the folder ID of this journal folder.
+	 *
+	 * @return the folder ID of this journal folder
+	 */
 	@Override
 	public long getFolderId() {
 		return _journalFolder.getFolderId();
 	}
 
 	/**
-	* Returns the group ID of this journal folder.
-	*
-	* @return the group ID of this journal folder
-	*/
+	 * Returns the group ID of this journal folder.
+	 *
+	 * @return the group ID of this journal folder
+	 */
 	@Override
 	public long getGroupId() {
 		return _journalFolder.getGroupId();
 	}
 
 	/**
-	* Returns the last publish date of this journal folder.
-	*
-	* @return the last publish date of this journal folder
-	*/
+	 * Returns the last publish date of this journal folder.
+	 *
+	 * @return the last publish date of this journal folder
+	 */
 	@Override
 	public Date getLastPublishDate() {
 		return _journalFolder.getLastPublishDate();
 	}
 
 	/**
-	* Returns the modified date of this journal folder.
-	*
-	* @return the modified date of this journal folder
-	*/
+	 * Returns the modified date of this journal folder.
+	 *
+	 * @return the modified date of this journal folder
+	 */
 	@Override
 	public Date getModifiedDate() {
 		return _journalFolder.getModifiedDate();
 	}
 
 	/**
-	* Returns the name of this journal folder.
-	*
-	* @return the name of this journal folder
-	*/
+	 * Returns the name of this journal folder.
+	 *
+	 * @return the name of this journal folder
+	 */
 	@Override
 	public String getName() {
 		return _journalFolder.getName();
 	}
 
 	/**
-	* Returns the parent container model ID of this journal folder.
-	*
-	* @return the parent container model ID of this journal folder
-	*/
+	 * Returns the parent container model ID of this journal folder.
+	 *
+	 * @return the parent container model ID of this journal folder
+	 */
 	@Override
 	public long getParentContainerModelId() {
 		return _journalFolder.getParentContainerModelId();
@@ -339,24 +341,25 @@ public class JournalFolderWrapper implements JournalFolder,
 	@Override
 	public JournalFolder getParentFolder()
 		throws com.liferay.portal.kernel.exception.PortalException {
+
 		return _journalFolder.getParentFolder();
 	}
 
 	/**
-	* Returns the parent folder ID of this journal folder.
-	*
-	* @return the parent folder ID of this journal folder
-	*/
+	 * Returns the parent folder ID of this journal folder.
+	 *
+	 * @return the parent folder ID of this journal folder
+	 */
 	@Override
 	public long getParentFolderId() {
 		return _journalFolder.getParentFolderId();
 	}
 
 	/**
-	* Returns the primary key of this journal folder.
-	*
-	* @return the primary key of this journal folder
-	*/
+	 * Returns the primary key of this journal folder.
+	 *
+	 * @return the primary key of this journal folder
+	 */
 	@Override
 	public long getPrimaryKey() {
 		return _journalFolder.getPrimaryKey();
@@ -368,92 +371,93 @@ public class JournalFolderWrapper implements JournalFolder,
 	}
 
 	/**
-	* Returns the restriction type of this journal folder.
-	*
-	* @return the restriction type of this journal folder
-	*/
+	 * Returns the restriction type of this journal folder.
+	 *
+	 * @return the restriction type of this journal folder
+	 */
 	@Override
 	public int getRestrictionType() {
 		return _journalFolder.getRestrictionType();
 	}
 
 	/**
-	* Returns the status of this journal folder.
-	*
-	* @return the status of this journal folder
-	*/
+	 * Returns the status of this journal folder.
+	 *
+	 * @return the status of this journal folder
+	 */
 	@Override
 	public int getStatus() {
 		return _journalFolder.getStatus();
 	}
 
 	/**
-	* Returns the status by user ID of this journal folder.
-	*
-	* @return the status by user ID of this journal folder
-	*/
+	 * Returns the status by user ID of this journal folder.
+	 *
+	 * @return the status by user ID of this journal folder
+	 */
 	@Override
 	public long getStatusByUserId() {
 		return _journalFolder.getStatusByUserId();
 	}
 
 	/**
-	* Returns the status by user name of this journal folder.
-	*
-	* @return the status by user name of this journal folder
-	*/
+	 * Returns the status by user name of this journal folder.
+	 *
+	 * @return the status by user name of this journal folder
+	 */
 	@Override
 	public String getStatusByUserName() {
 		return _journalFolder.getStatusByUserName();
 	}
 
 	/**
-	* Returns the status by user uuid of this journal folder.
-	*
-	* @return the status by user uuid of this journal folder
-	*/
+	 * Returns the status by user uuid of this journal folder.
+	 *
+	 * @return the status by user uuid of this journal folder
+	 */
 	@Override
 	public String getStatusByUserUuid() {
 		return _journalFolder.getStatusByUserUuid();
 	}
 
 	/**
-	* Returns the status date of this journal folder.
-	*
-	* @return the status date of this journal folder
-	*/
+	 * Returns the status date of this journal folder.
+	 *
+	 * @return the status date of this journal folder
+	 */
 	@Override
 	public Date getStatusDate() {
 		return _journalFolder.getStatusDate();
 	}
 
 	/**
-	* Returns the trash entry created when this journal folder was moved to the Recycle Bin. The trash entry may belong to one of the ancestors of this journal folder.
-	*
-	* @return the trash entry created when this journal folder was moved to the Recycle Bin
-	*/
+	 * Returns the trash entry created when this journal folder was moved to the Recycle Bin. The trash entry may belong to one of the ancestors of this journal folder.
+	 *
+	 * @return the trash entry created when this journal folder was moved to the Recycle Bin
+	 */
 	@Override
 	public com.liferay.trash.kernel.model.TrashEntry getTrashEntry()
 		throws com.liferay.portal.kernel.exception.PortalException {
+
 		return _journalFolder.getTrashEntry();
 	}
 
 	/**
-	* Returns the class primary key of the trash entry for this journal folder.
-	*
-	* @return the class primary key of the trash entry for this journal folder
-	*/
+	 * Returns the class primary key of the trash entry for this journal folder.
+	 *
+	 * @return the class primary key of the trash entry for this journal folder
+	 */
 	@Override
 	public long getTrashEntryClassPK() {
 		return _journalFolder.getTrashEntryClassPK();
 	}
 
 	/**
-	* Returns the trash handler for this journal folder.
-	*
-	* @return the trash handler for this journal folder
-	* @deprecated As of Judson (7.1.x), with no direct replacement
-	*/
+	 * Returns the trash handler for this journal folder.
+	 *
+	 * @return the trash handler for this journal folder
+	 * @deprecated As of Judson (7.1.x), with no direct replacement
+	 */
 	@Deprecated
 	@Override
 	public com.liferay.portal.kernel.trash.TrashHandler getTrashHandler() {
@@ -461,50 +465,50 @@ public class JournalFolderWrapper implements JournalFolder,
 	}
 
 	/**
-	* Returns the tree path of this journal folder.
-	*
-	* @return the tree path of this journal folder
-	*/
+	 * Returns the tree path of this journal folder.
+	 *
+	 * @return the tree path of this journal folder
+	 */
 	@Override
 	public String getTreePath() {
 		return _journalFolder.getTreePath();
 	}
 
 	/**
-	* Returns the user ID of this journal folder.
-	*
-	* @return the user ID of this journal folder
-	*/
+	 * Returns the user ID of this journal folder.
+	 *
+	 * @return the user ID of this journal folder
+	 */
 	@Override
 	public long getUserId() {
 		return _journalFolder.getUserId();
 	}
 
 	/**
-	* Returns the user name of this journal folder.
-	*
-	* @return the user name of this journal folder
-	*/
+	 * Returns the user name of this journal folder.
+	 *
+	 * @return the user name of this journal folder
+	 */
 	@Override
 	public String getUserName() {
 		return _journalFolder.getUserName();
 	}
 
 	/**
-	* Returns the user uuid of this journal folder.
-	*
-	* @return the user uuid of this journal folder
-	*/
+	 * Returns the user uuid of this journal folder.
+	 *
+	 * @return the user uuid of this journal folder
+	 */
 	@Override
 	public String getUserUuid() {
 		return _journalFolder.getUserUuid();
 	}
 
 	/**
-	* Returns the uuid of this journal folder.
-	*
-	* @return the uuid of this journal folder
-	*/
+	 * Returns the uuid of this journal folder.
+	 *
+	 * @return the uuid of this journal folder
+	 */
 	@Override
 	public String getUuid() {
 		return _journalFolder.getUuid();
@@ -516,10 +520,10 @@ public class JournalFolderWrapper implements JournalFolder,
 	}
 
 	/**
-	* Returns <code>true</code> if this journal folder is approved.
-	*
-	* @return <code>true</code> if this journal folder is approved; <code>false</code> otherwise
-	*/
+	 * Returns <code>true</code> if this journal folder is approved.
+	 *
+	 * @return <code>true</code> if this journal folder is approved; <code>false</code> otherwise
+	 */
 	@Override
 	public boolean isApproved() {
 		return _journalFolder.isApproved();
@@ -531,20 +535,20 @@ public class JournalFolderWrapper implements JournalFolder,
 	}
 
 	/**
-	* Returns <code>true</code> if this journal folder is denied.
-	*
-	* @return <code>true</code> if this journal folder is denied; <code>false</code> otherwise
-	*/
+	 * Returns <code>true</code> if this journal folder is denied.
+	 *
+	 * @return <code>true</code> if this journal folder is denied; <code>false</code> otherwise
+	 */
 	@Override
 	public boolean isDenied() {
 		return _journalFolder.isDenied();
 	}
 
 	/**
-	* Returns <code>true</code> if this journal folder is a draft.
-	*
-	* @return <code>true</code> if this journal folder is a draft; <code>false</code> otherwise
-	*/
+	 * Returns <code>true</code> if this journal folder is a draft.
+	 *
+	 * @return <code>true</code> if this journal folder is a draft; <code>false</code> otherwise
+	 */
 	@Override
 	public boolean isDraft() {
 		return _journalFolder.isDraft();
@@ -556,50 +560,50 @@ public class JournalFolderWrapper implements JournalFolder,
 	}
 
 	/**
-	* Returns <code>true</code> if this journal folder is expired.
-	*
-	* @return <code>true</code> if this journal folder is expired; <code>false</code> otherwise
-	*/
+	 * Returns <code>true</code> if this journal folder is expired.
+	 *
+	 * @return <code>true</code> if this journal folder is expired; <code>false</code> otherwise
+	 */
 	@Override
 	public boolean isExpired() {
 		return _journalFolder.isExpired();
 	}
 
 	/**
-	* Returns <code>true</code> if this journal folder is inactive.
-	*
-	* @return <code>true</code> if this journal folder is inactive; <code>false</code> otherwise
-	*/
+	 * Returns <code>true</code> if this journal folder is inactive.
+	 *
+	 * @return <code>true</code> if this journal folder is inactive; <code>false</code> otherwise
+	 */
 	@Override
 	public boolean isInactive() {
 		return _journalFolder.isInactive();
 	}
 
 	/**
-	* Returns <code>true</code> if this journal folder is incomplete.
-	*
-	* @return <code>true</code> if this journal folder is incomplete; <code>false</code> otherwise
-	*/
+	 * Returns <code>true</code> if this journal folder is incomplete.
+	 *
+	 * @return <code>true</code> if this journal folder is incomplete; <code>false</code> otherwise
+	 */
 	@Override
 	public boolean isIncomplete() {
 		return _journalFolder.isIncomplete();
 	}
 
 	/**
-	* Returns <code>true</code> if this journal folder is in the Recycle Bin.
-	*
-	* @return <code>true</code> if this journal folder is in the Recycle Bin; <code>false</code> otherwise
-	*/
+	 * Returns <code>true</code> if this journal folder is in the Recycle Bin.
+	 *
+	 * @return <code>true</code> if this journal folder is in the Recycle Bin; <code>false</code> otherwise
+	 */
 	@Override
 	public boolean isInTrash() {
 		return _journalFolder.isInTrash();
 	}
 
 	/**
-	* Returns <code>true</code> if the parent of this journal folder is in the Recycle Bin.
-	*
-	* @return <code>true</code> if the parent of this journal folder is in the Recycle Bin; <code>false</code> otherwise
-	*/
+	 * Returns <code>true</code> if the parent of this journal folder is in the Recycle Bin.
+	 *
+	 * @return <code>true</code> if the parent of this journal folder is in the Recycle Bin; <code>false</code> otherwise
+	 */
 	@Override
 	public boolean isInTrashContainer() {
 		return _journalFolder.isInTrashContainer();
@@ -621,10 +625,10 @@ public class JournalFolderWrapper implements JournalFolder,
 	}
 
 	/**
-	* Returns <code>true</code> if this journal folder is pending.
-	*
-	* @return <code>true</code> if this journal folder is pending; <code>false</code> otherwise
-	*/
+	 * Returns <code>true</code> if this journal folder is pending.
+	 *
+	 * @return <code>true</code> if this journal folder is pending; <code>false</code> otherwise
+	 */
 	@Override
 	public boolean isPending() {
 		return _journalFolder.isPending();
@@ -636,10 +640,10 @@ public class JournalFolderWrapper implements JournalFolder,
 	}
 
 	/**
-	* Returns <code>true</code> if this journal folder is scheduled.
-	*
-	* @return <code>true</code> if this journal folder is scheduled; <code>false</code> otherwise
-	*/
+	 * Returns <code>true</code> if this journal folder is scheduled.
+	 *
+	 * @return <code>true</code> if this journal folder is scheduled; <code>false</code> otherwise
+	 */
 	@Override
 	public boolean isScheduled() {
 		return _journalFolder.isScheduled();
@@ -656,40 +660,40 @@ public class JournalFolderWrapper implements JournalFolder,
 	}
 
 	/**
-	* Sets the company ID of this journal folder.
-	*
-	* @param companyId the company ID of this journal folder
-	*/
+	 * Sets the company ID of this journal folder.
+	 *
+	 * @param companyId the company ID of this journal folder
+	 */
 	@Override
 	public void setCompanyId(long companyId) {
 		_journalFolder.setCompanyId(companyId);
 	}
 
 	/**
-	* Sets the container model ID of this journal folder.
-	*
-	* @param containerModelId the container model ID of this journal folder
-	*/
+	 * Sets the container model ID of this journal folder.
+	 *
+	 * @param containerModelId the container model ID of this journal folder
+	 */
 	@Override
 	public void setContainerModelId(long containerModelId) {
 		_journalFolder.setContainerModelId(containerModelId);
 	}
 
 	/**
-	* Sets the create date of this journal folder.
-	*
-	* @param createDate the create date of this journal folder
-	*/
+	 * Sets the create date of this journal folder.
+	 *
+	 * @param createDate the create date of this journal folder
+	 */
 	@Override
 	public void setCreateDate(Date createDate) {
 		_journalFolder.setCreateDate(createDate);
 	}
 
 	/**
-	* Sets the description of this journal folder.
-	*
-	* @param description the description of this journal folder
-	*/
+	 * Sets the description of this journal folder.
+	 *
+	 * @param description the description of this journal folder
+	 */
 	@Override
 	public void setDescription(String description) {
 		_journalFolder.setDescription(description);
@@ -698,6 +702,7 @@ public class JournalFolderWrapper implements JournalFolder,
 	@Override
 	public void setExpandoBridgeAttributes(
 		com.liferay.portal.kernel.model.BaseModel<?> baseModel) {
+
 		_journalFolder.setExpandoBridgeAttributes(baseModel);
 	}
 
@@ -712,50 +717,50 @@ public class JournalFolderWrapper implements JournalFolder,
 	}
 
 	/**
-	* Sets the folder ID of this journal folder.
-	*
-	* @param folderId the folder ID of this journal folder
-	*/
+	 * Sets the folder ID of this journal folder.
+	 *
+	 * @param folderId the folder ID of this journal folder
+	 */
 	@Override
 	public void setFolderId(long folderId) {
 		_journalFolder.setFolderId(folderId);
 	}
 
 	/**
-	* Sets the group ID of this journal folder.
-	*
-	* @param groupId the group ID of this journal folder
-	*/
+	 * Sets the group ID of this journal folder.
+	 *
+	 * @param groupId the group ID of this journal folder
+	 */
 	@Override
 	public void setGroupId(long groupId) {
 		_journalFolder.setGroupId(groupId);
 	}
 
 	/**
-	* Sets the last publish date of this journal folder.
-	*
-	* @param lastPublishDate the last publish date of this journal folder
-	*/
+	 * Sets the last publish date of this journal folder.
+	 *
+	 * @param lastPublishDate the last publish date of this journal folder
+	 */
 	@Override
 	public void setLastPublishDate(Date lastPublishDate) {
 		_journalFolder.setLastPublishDate(lastPublishDate);
 	}
 
 	/**
-	* Sets the modified date of this journal folder.
-	*
-	* @param modifiedDate the modified date of this journal folder
-	*/
+	 * Sets the modified date of this journal folder.
+	 *
+	 * @param modifiedDate the modified date of this journal folder
+	 */
 	@Override
 	public void setModifiedDate(Date modifiedDate) {
 		_journalFolder.setModifiedDate(modifiedDate);
 	}
 
 	/**
-	* Sets the name of this journal folder.
-	*
-	* @param name the name of this journal folder
-	*/
+	 * Sets the name of this journal folder.
+	 *
+	 * @param name the name of this journal folder
+	 */
 	@Override
 	public void setName(String name) {
 		_journalFolder.setName(name);
@@ -767,30 +772,30 @@ public class JournalFolderWrapper implements JournalFolder,
 	}
 
 	/**
-	* Sets the parent container model ID of this journal folder.
-	*
-	* @param parentContainerModelId the parent container model ID of this journal folder
-	*/
+	 * Sets the parent container model ID of this journal folder.
+	 *
+	 * @param parentContainerModelId the parent container model ID of this journal folder
+	 */
 	@Override
 	public void setParentContainerModelId(long parentContainerModelId) {
 		_journalFolder.setParentContainerModelId(parentContainerModelId);
 	}
 
 	/**
-	* Sets the parent folder ID of this journal folder.
-	*
-	* @param parentFolderId the parent folder ID of this journal folder
-	*/
+	 * Sets the parent folder ID of this journal folder.
+	 *
+	 * @param parentFolderId the parent folder ID of this journal folder
+	 */
 	@Override
 	public void setParentFolderId(long parentFolderId) {
 		_journalFolder.setParentFolderId(parentFolderId);
 	}
 
 	/**
-	* Sets the primary key of this journal folder.
-	*
-	* @param primaryKey the primary key of this journal folder
-	*/
+	 * Sets the primary key of this journal folder.
+	 *
+	 * @param primaryKey the primary key of this journal folder
+	 */
 	@Override
 	public void setPrimaryKey(long primaryKey) {
 		_journalFolder.setPrimaryKey(primaryKey);
@@ -802,117 +807,119 @@ public class JournalFolderWrapper implements JournalFolder,
 	}
 
 	/**
-	* Sets the restriction type of this journal folder.
-	*
-	* @param restrictionType the restriction type of this journal folder
-	*/
+	 * Sets the restriction type of this journal folder.
+	 *
+	 * @param restrictionType the restriction type of this journal folder
+	 */
 	@Override
 	public void setRestrictionType(int restrictionType) {
 		_journalFolder.setRestrictionType(restrictionType);
 	}
 
 	/**
-	* Sets the status of this journal folder.
-	*
-	* @param status the status of this journal folder
-	*/
+	 * Sets the status of this journal folder.
+	 *
+	 * @param status the status of this journal folder
+	 */
 	@Override
 	public void setStatus(int status) {
 		_journalFolder.setStatus(status);
 	}
 
 	/**
-	* Sets the status by user ID of this journal folder.
-	*
-	* @param statusByUserId the status by user ID of this journal folder
-	*/
+	 * Sets the status by user ID of this journal folder.
+	 *
+	 * @param statusByUserId the status by user ID of this journal folder
+	 */
 	@Override
 	public void setStatusByUserId(long statusByUserId) {
 		_journalFolder.setStatusByUserId(statusByUserId);
 	}
 
 	/**
-	* Sets the status by user name of this journal folder.
-	*
-	* @param statusByUserName the status by user name of this journal folder
-	*/
+	 * Sets the status by user name of this journal folder.
+	 *
+	 * @param statusByUserName the status by user name of this journal folder
+	 */
 	@Override
 	public void setStatusByUserName(String statusByUserName) {
 		_journalFolder.setStatusByUserName(statusByUserName);
 	}
 
 	/**
-	* Sets the status by user uuid of this journal folder.
-	*
-	* @param statusByUserUuid the status by user uuid of this journal folder
-	*/
+	 * Sets the status by user uuid of this journal folder.
+	 *
+	 * @param statusByUserUuid the status by user uuid of this journal folder
+	 */
 	@Override
 	public void setStatusByUserUuid(String statusByUserUuid) {
 		_journalFolder.setStatusByUserUuid(statusByUserUuid);
 	}
 
 	/**
-	* Sets the status date of this journal folder.
-	*
-	* @param statusDate the status date of this journal folder
-	*/
+	 * Sets the status date of this journal folder.
+	 *
+	 * @param statusDate the status date of this journal folder
+	 */
 	@Override
 	public void setStatusDate(Date statusDate) {
 		_journalFolder.setStatusDate(statusDate);
 	}
 
 	/**
-	* Sets the tree path of this journal folder.
-	*
-	* @param treePath the tree path of this journal folder
-	*/
+	 * Sets the tree path of this journal folder.
+	 *
+	 * @param treePath the tree path of this journal folder
+	 */
 	@Override
 	public void setTreePath(String treePath) {
 		_journalFolder.setTreePath(treePath);
 	}
 
 	/**
-	* Sets the user ID of this journal folder.
-	*
-	* @param userId the user ID of this journal folder
-	*/
+	 * Sets the user ID of this journal folder.
+	 *
+	 * @param userId the user ID of this journal folder
+	 */
 	@Override
 	public void setUserId(long userId) {
 		_journalFolder.setUserId(userId);
 	}
 
 	/**
-	* Sets the user name of this journal folder.
-	*
-	* @param userName the user name of this journal folder
-	*/
+	 * Sets the user name of this journal folder.
+	 *
+	 * @param userName the user name of this journal folder
+	 */
 	@Override
 	public void setUserName(String userName) {
 		_journalFolder.setUserName(userName);
 	}
 
 	/**
-	* Sets the user uuid of this journal folder.
-	*
-	* @param userUuid the user uuid of this journal folder
-	*/
+	 * Sets the user uuid of this journal folder.
+	 *
+	 * @param userUuid the user uuid of this journal folder
+	 */
 	@Override
 	public void setUserUuid(String userUuid) {
 		_journalFolder.setUserUuid(userUuid);
 	}
 
 	/**
-	* Sets the uuid of this journal folder.
-	*
-	* @param uuid the uuid of this journal folder
-	*/
+	 * Sets the uuid of this journal folder.
+	 *
+	 * @param uuid the uuid of this journal folder
+	 */
 	@Override
 	public void setUuid(String uuid) {
 		_journalFolder.setUuid(uuid);
 	}
 
 	@Override
-	public com.liferay.portal.kernel.model.CacheModel<JournalFolder> toCacheModel() {
+	public com.liferay.portal.kernel.model.CacheModel<JournalFolder>
+		toCacheModel() {
+
 		return _journalFolder.toCacheModel();
 	}
 
@@ -953,7 +960,9 @@ public class JournalFolderWrapper implements JournalFolder,
 
 		JournalFolderWrapper journalFolderWrapper = (JournalFolderWrapper)obj;
 
-		if (Objects.equals(_journalFolder, journalFolderWrapper._journalFolder)) {
+		if (Objects.equals(
+				_journalFolder, journalFolderWrapper._journalFolder)) {
+
 			return true;
 		}
 
@@ -986,4 +995,5 @@ public class JournalFolderWrapper implements JournalFolder,
 	}
 
 	private final JournalFolder _journalFolder;
+
 }

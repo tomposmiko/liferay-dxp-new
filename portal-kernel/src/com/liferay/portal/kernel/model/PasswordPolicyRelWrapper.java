@@ -17,7 +17,6 @@ package com.liferay.portal.kernel.model;
 import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.expando.kernel.model.ExpandoBridge;
-
 import com.liferay.portal.kernel.service.ServiceContext;
 
 import java.io.Serializable;
@@ -36,8 +35,9 @@ import java.util.Objects;
  * @generated
  */
 @ProviderType
-public class PasswordPolicyRelWrapper implements PasswordPolicyRel,
-	ModelWrapper<PasswordPolicyRel> {
+public class PasswordPolicyRelWrapper
+	implements PasswordPolicyRel, ModelWrapper<PasswordPolicyRel> {
+
 	public PasswordPolicyRelWrapper(PasswordPolicyRel passwordPolicyRel) {
 		_passwordPolicyRel = passwordPolicyRel;
 	}
@@ -107,7 +107,8 @@ public class PasswordPolicyRelWrapper implements PasswordPolicyRel,
 
 	@Override
 	public Object clone() {
-		return new PasswordPolicyRelWrapper((PasswordPolicyRel)_passwordPolicyRel.clone());
+		return new PasswordPolicyRelWrapper(
+			(PasswordPolicyRel)_passwordPolicyRel.clone());
 	}
 
 	@Override
@@ -116,40 +117,40 @@ public class PasswordPolicyRelWrapper implements PasswordPolicyRel,
 	}
 
 	/**
-	* Returns the fully qualified class name of this password policy rel.
-	*
-	* @return the fully qualified class name of this password policy rel
-	*/
+	 * Returns the fully qualified class name of this password policy rel.
+	 *
+	 * @return the fully qualified class name of this password policy rel
+	 */
 	@Override
 	public String getClassName() {
 		return _passwordPolicyRel.getClassName();
 	}
 
 	/**
-	* Returns the class name ID of this password policy rel.
-	*
-	* @return the class name ID of this password policy rel
-	*/
+	 * Returns the class name ID of this password policy rel.
+	 *
+	 * @return the class name ID of this password policy rel
+	 */
 	@Override
 	public long getClassNameId() {
 		return _passwordPolicyRel.getClassNameId();
 	}
 
 	/**
-	* Returns the class pk of this password policy rel.
-	*
-	* @return the class pk of this password policy rel
-	*/
+	 * Returns the class pk of this password policy rel.
+	 *
+	 * @return the class pk of this password policy rel
+	 */
 	@Override
 	public long getClassPK() {
 		return _passwordPolicyRel.getClassPK();
 	}
 
 	/**
-	* Returns the company ID of this password policy rel.
-	*
-	* @return the company ID of this password policy rel
-	*/
+	 * Returns the company ID of this password policy rel.
+	 *
+	 * @return the company ID of this password policy rel
+	 */
 	@Override
 	public long getCompanyId() {
 		return _passwordPolicyRel.getCompanyId();
@@ -161,40 +162,40 @@ public class PasswordPolicyRelWrapper implements PasswordPolicyRel,
 	}
 
 	/**
-	* Returns the mvcc version of this password policy rel.
-	*
-	* @return the mvcc version of this password policy rel
-	*/
+	 * Returns the mvcc version of this password policy rel.
+	 *
+	 * @return the mvcc version of this password policy rel
+	 */
 	@Override
 	public long getMvccVersion() {
 		return _passwordPolicyRel.getMvccVersion();
 	}
 
 	/**
-	* Returns the password policy ID of this password policy rel.
-	*
-	* @return the password policy ID of this password policy rel
-	*/
+	 * Returns the password policy ID of this password policy rel.
+	 *
+	 * @return the password policy ID of this password policy rel
+	 */
 	@Override
 	public long getPasswordPolicyId() {
 		return _passwordPolicyRel.getPasswordPolicyId();
 	}
 
 	/**
-	* Returns the password policy rel ID of this password policy rel.
-	*
-	* @return the password policy rel ID of this password policy rel
-	*/
+	 * Returns the password policy rel ID of this password policy rel.
+	 *
+	 * @return the password policy rel ID of this password policy rel
+	 */
 	@Override
 	public long getPasswordPolicyRelId() {
 		return _passwordPolicyRel.getPasswordPolicyRelId();
 	}
 
 	/**
-	* Returns the primary key of this password policy rel.
-	*
-	* @return the primary key of this password policy rel
-	*/
+	 * Returns the primary key of this password policy rel.
+	 *
+	 * @return the primary key of this password policy rel
+	 */
 	@Override
 	public long getPrimaryKey() {
 		return _passwordPolicyRel.getPrimaryKey();
@@ -241,30 +242,30 @@ public class PasswordPolicyRelWrapper implements PasswordPolicyRel,
 	}
 
 	/**
-	* Sets the class name ID of this password policy rel.
-	*
-	* @param classNameId the class name ID of this password policy rel
-	*/
+	 * Sets the class name ID of this password policy rel.
+	 *
+	 * @param classNameId the class name ID of this password policy rel
+	 */
 	@Override
 	public void setClassNameId(long classNameId) {
 		_passwordPolicyRel.setClassNameId(classNameId);
 	}
 
 	/**
-	* Sets the class pk of this password policy rel.
-	*
-	* @param classPK the class pk of this password policy rel
-	*/
+	 * Sets the class pk of this password policy rel.
+	 *
+	 * @param classPK the class pk of this password policy rel
+	 */
 	@Override
 	public void setClassPK(long classPK) {
 		_passwordPolicyRel.setClassPK(classPK);
 	}
 
 	/**
-	* Sets the company ID of this password policy rel.
-	*
-	* @param companyId the company ID of this password policy rel
-	*/
+	 * Sets the company ID of this password policy rel.
+	 *
+	 * @param companyId the company ID of this password policy rel
+	 */
 	@Override
 	public void setCompanyId(long companyId) {
 		_passwordPolicyRel.setCompanyId(companyId);
@@ -286,10 +287,10 @@ public class PasswordPolicyRelWrapper implements PasswordPolicyRel,
 	}
 
 	/**
-	* Sets the mvcc version of this password policy rel.
-	*
-	* @param mvccVersion the mvcc version of this password policy rel
-	*/
+	 * Sets the mvcc version of this password policy rel.
+	 *
+	 * @param mvccVersion the mvcc version of this password policy rel
+	 */
 	@Override
 	public void setMvccVersion(long mvccVersion) {
 		_passwordPolicyRel.setMvccVersion(mvccVersion);
@@ -301,30 +302,30 @@ public class PasswordPolicyRelWrapper implements PasswordPolicyRel,
 	}
 
 	/**
-	* Sets the password policy ID of this password policy rel.
-	*
-	* @param passwordPolicyId the password policy ID of this password policy rel
-	*/
+	 * Sets the password policy ID of this password policy rel.
+	 *
+	 * @param passwordPolicyId the password policy ID of this password policy rel
+	 */
 	@Override
 	public void setPasswordPolicyId(long passwordPolicyId) {
 		_passwordPolicyRel.setPasswordPolicyId(passwordPolicyId);
 	}
 
 	/**
-	* Sets the password policy rel ID of this password policy rel.
-	*
-	* @param passwordPolicyRelId the password policy rel ID of this password policy rel
-	*/
+	 * Sets the password policy rel ID of this password policy rel.
+	 *
+	 * @param passwordPolicyRelId the password policy rel ID of this password policy rel
+	 */
 	@Override
 	public void setPasswordPolicyRelId(long passwordPolicyRelId) {
 		_passwordPolicyRel.setPasswordPolicyRelId(passwordPolicyRelId);
 	}
 
 	/**
-	* Sets the primary key of this password policy rel.
-	*
-	* @param primaryKey the primary key of this password policy rel
-	*/
+	 * Sets the primary key of this password policy rel.
+	 *
+	 * @param primaryKey the primary key of this password policy rel
+	 */
 	@Override
 	public void setPrimaryKey(long primaryKey) {
 		_passwordPolicyRel.setPrimaryKey(primaryKey);
@@ -342,7 +343,8 @@ public class PasswordPolicyRelWrapper implements PasswordPolicyRel,
 
 	@Override
 	public PasswordPolicyRel toEscapedModel() {
-		return new PasswordPolicyRelWrapper(_passwordPolicyRel.toEscapedModel());
+		return new PasswordPolicyRelWrapper(
+			_passwordPolicyRel.toEscapedModel());
 	}
 
 	@Override
@@ -352,7 +354,8 @@ public class PasswordPolicyRelWrapper implements PasswordPolicyRel,
 
 	@Override
 	public PasswordPolicyRel toUnescapedModel() {
-		return new PasswordPolicyRelWrapper(_passwordPolicyRel.toUnescapedModel());
+		return new PasswordPolicyRelWrapper(
+			_passwordPolicyRel.toUnescapedModel());
 	}
 
 	@Override
@@ -370,10 +373,13 @@ public class PasswordPolicyRelWrapper implements PasswordPolicyRel,
 			return false;
 		}
 
-		PasswordPolicyRelWrapper passwordPolicyRelWrapper = (PasswordPolicyRelWrapper)obj;
+		PasswordPolicyRelWrapper passwordPolicyRelWrapper =
+			(PasswordPolicyRelWrapper)obj;
 
-		if (Objects.equals(_passwordPolicyRel,
-					passwordPolicyRelWrapper._passwordPolicyRel)) {
+		if (Objects.equals(
+				_passwordPolicyRel,
+				passwordPolicyRelWrapper._passwordPolicyRel)) {
+
 			return true;
 		}
 
@@ -401,4 +407,5 @@ public class PasswordPolicyRelWrapper implements PasswordPolicyRel,
 	}
 
 	private final PasswordPolicyRel _passwordPolicyRel;
+
 }

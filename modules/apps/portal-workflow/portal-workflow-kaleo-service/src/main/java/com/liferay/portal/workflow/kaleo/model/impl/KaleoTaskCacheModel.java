@@ -32,12 +32,12 @@ import java.util.Date;
  * The cache model class for representing KaleoTask in entity cache.
  *
  * @author Brian Wing Shun Chan
- * @see KaleoTask
  * @generated
  */
 @ProviderType
-public class KaleoTaskCacheModel implements CacheModel<KaleoTask>,
-	Externalizable {
+public class KaleoTaskCacheModel
+	implements CacheModel<KaleoTask>, Externalizable {
+
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj) {
@@ -166,8 +166,7 @@ public class KaleoTaskCacheModel implements CacheModel<KaleoTask>,
 	}
 
 	@Override
-	public void writeExternal(ObjectOutput objectOutput)
-		throws IOException {
+	public void writeExternal(ObjectOutput objectOutput) throws IOException {
 		objectOutput.writeLong(kaleoTaskId);
 
 		objectOutput.writeLong(groupId);
@@ -216,4 +215,5 @@ public class KaleoTaskCacheModel implements CacheModel<KaleoTask>,
 	public long kaleoNodeId;
 	public String name;
 	public String description;
+
 }

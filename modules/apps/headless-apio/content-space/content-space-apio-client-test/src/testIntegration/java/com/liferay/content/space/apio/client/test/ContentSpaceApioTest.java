@@ -14,9 +14,10 @@
 
 package com.liferay.content.space.apio.client.test;
 
-import com.liferay.content.space.apio.client.test.activator.ContentSpaceTestActivator;
+import com.liferay.content.space.apio.client.test.internal.activator.ContentSpaceTestActivator;
 import com.liferay.oauth2.provider.test.util.OAuth2ProviderTestUtil;
 import com.liferay.portal.apio.test.util.ApioClientBuilder;
+import com.liferay.portal.apio.test.util.ContentSpaceApioTestUtil;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -69,7 +70,67 @@ public class ContentSpaceApioTest {
 		).statusCode(
 			200
 		).body(
-			"_embedded.ContentSpace.find { it.name == 'Liferay' }",
+			"_embedded.ContentSpace.find {it.name == '" +
+				ContentSpaceTestActivator.CONTENT_SPACE_NAME + "'}",
+			IsNull.notNullValue()
+		).body(
+			"_embedded.ContentSpace.find {it.name == '" +
+				ContentSpaceTestActivator.CONTENT_SPACE_NAME +
+					"'}.availableLanguages",
+			Matchers.hasItems("en-US")
+		).body(
+			"_embedded.ContentSpace.find {it.name == '" +
+				ContentSpaceTestActivator.CONTENT_SPACE_NAME + "'}.name",
+			Matchers.equalTo(ContentSpaceTestActivator.CONTENT_SPACE_NAME)
+		).body(
+			"_embedded.ContentSpace.find {it.name == '" +
+				ContentSpaceTestActivator.CONTENT_SPACE_NAME +
+					"'}._links.blogPosts",
+			IsNull.notNullValue()
+		).body(
+			"_embedded.ContentSpace.find {it.name == '" +
+				ContentSpaceTestActivator.CONTENT_SPACE_NAME +
+					"'}._links.contentStructures",
+			IsNull.notNullValue()
+		).body(
+			"_embedded.ContentSpace.find {it.name == '" +
+				ContentSpaceTestActivator.CONTENT_SPACE_NAME +
+					"'}._links.creator",
+			IsNull.notNullValue()
+		).body(
+			"_embedded.ContentSpace.find {it.name == '" +
+				ContentSpaceTestActivator.CONTENT_SPACE_NAME +
+					"'}._links.documentsRepository",
+			IsNull.notNullValue()
+		).body(
+			"_embedded.ContentSpace.find {it.name == '" +
+				ContentSpaceTestActivator.CONTENT_SPACE_NAME +
+					"'}._links.forms",
+			IsNull.notNullValue()
+		).body(
+			"_embedded.ContentSpace.find {it.name == '" +
+				ContentSpaceTestActivator.CONTENT_SPACE_NAME +
+					"'}._links.formStructures",
+			IsNull.notNullValue()
+		).body(
+			"_embedded.ContentSpace.find {it.name == '" +
+				ContentSpaceTestActivator.CONTENT_SPACE_NAME +
+					"'}._links.keywords",
+			IsNull.notNullValue()
+		).body(
+			"_embedded.ContentSpace.find {it.name == '" +
+				ContentSpaceTestActivator.CONTENT_SPACE_NAME + "' " +
+					"}._links.self",
+			IsNull.notNullValue()
+		).body(
+			"_embedded.ContentSpace.find {it.name == '" +
+				ContentSpaceTestActivator.CONTENT_SPACE_NAME +
+					"'}._links.structuredContents",
+			IsNull.notNullValue()
+		).body(
+			"_embedded.ContentSpace.find {it.name == '" +
+				ContentSpaceTestActivator.CONTENT_SPACE_NAME +
+					"'}._links.vocabularies",
 			IsNull.notNullValue()
 		);
 	}
@@ -94,6 +155,10 @@ public class ContentSpaceApioTest {
 
 	@Test
 	public void testGetContentSpace() {
+		String contentSpaceHref = ContentSpaceApioTestUtil.getContentSpaceHref(
+			_rootEndpointURL.toExternalForm(),
+			ContentSpaceTestActivator.CONTENT_SPACE_NAME);
+
 		ApioClientBuilder.given(
 		).basicAuth(
 			"test@liferay.com", "test"
@@ -101,13 +166,7 @@ public class ContentSpaceApioTest {
 			"Accept", "application/hal+json"
 		).when(
 		).get(
-			_rootEndpointURL.toExternalForm()
-		).follow(
-			"_links.content-space.href"
-		).follow(
-			"_embedded.ContentSpace.find { it.name == '" +
-				ContentSpaceTestActivator.CONTENT_SPACE_NAME +
-					"' }._links.self.href"
+			contentSpaceHref
 		).then(
 		).statusCode(
 			200
@@ -136,8 +195,6 @@ public class ContentSpaceApioTest {
 			"_links.structuredContents.href", IsNull.notNullValue()
 		).body(
 			"_links.vocabularies.href", IsNull.notNullValue()
-		).body(
-			"_links.webSite.href", IsNull.notNullValue()
 		);
 	}
 

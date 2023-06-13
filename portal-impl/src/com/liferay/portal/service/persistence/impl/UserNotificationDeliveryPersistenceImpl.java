@@ -59,55 +59,33 @@ import java.util.Set;
  * </p>
  *
  * @author Brian Wing Shun Chan
- * @see UserNotificationDeliveryPersistence
- * @see com.liferay.portal.kernel.service.persistence.UserNotificationDeliveryUtil
  * @generated
  */
 @ProviderType
-public class UserNotificationDeliveryPersistenceImpl extends BasePersistenceImpl<UserNotificationDelivery>
+public class UserNotificationDeliveryPersistenceImpl
+	extends BasePersistenceImpl<UserNotificationDelivery>
 	implements UserNotificationDeliveryPersistence {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
-	 * Never modify or reference this class directly. Always use {@link UserNotificationDeliveryUtil} to access the user notification delivery persistence. Modify <code>service.xml</code> and rerun ServiceBuilder to regenerate this class.
+	 * Never modify or reference this class directly. Always use <code>UserNotificationDeliveryUtil</code> to access the user notification delivery persistence. Modify <code>service.xml</code> and rerun ServiceBuilder to regenerate this class.
 	 */
-	public static final String FINDER_CLASS_NAME_ENTITY = UserNotificationDeliveryImpl.class.getName();
-	public static final String FINDER_CLASS_NAME_LIST_WITH_PAGINATION = FINDER_CLASS_NAME_ENTITY +
-		".List1";
-	public static final String FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION = FINDER_CLASS_NAME_ENTITY +
-		".List2";
-	public static final FinderPath FINDER_PATH_WITH_PAGINATION_FIND_ALL = new FinderPath(UserNotificationDeliveryModelImpl.ENTITY_CACHE_ENABLED,
-			UserNotificationDeliveryModelImpl.FINDER_CACHE_ENABLED,
-			UserNotificationDeliveryImpl.class,
-			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findAll", new String[0]);
-	public static final FinderPath FINDER_PATH_WITHOUT_PAGINATION_FIND_ALL = new FinderPath(UserNotificationDeliveryModelImpl.ENTITY_CACHE_ENABLED,
-			UserNotificationDeliveryModelImpl.FINDER_CACHE_ENABLED,
-			UserNotificationDeliveryImpl.class,
-			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findAll", new String[0]);
-	public static final FinderPath FINDER_PATH_COUNT_ALL = new FinderPath(UserNotificationDeliveryModelImpl.ENTITY_CACHE_ENABLED,
-			UserNotificationDeliveryModelImpl.FINDER_CACHE_ENABLED, Long.class,
-			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countAll", new String[0]);
-	public static final FinderPath FINDER_PATH_WITH_PAGINATION_FIND_BY_USERID = new FinderPath(UserNotificationDeliveryModelImpl.ENTITY_CACHE_ENABLED,
-			UserNotificationDeliveryModelImpl.FINDER_CACHE_ENABLED,
-			UserNotificationDeliveryImpl.class,
-			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByUserId",
-			new String[] {
-				Long.class.getName(),
-				
-			Integer.class.getName(), Integer.class.getName(),
-				OrderByComparator.class.getName()
-			});
-	public static final FinderPath FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_USERID =
-		new FinderPath(UserNotificationDeliveryModelImpl.ENTITY_CACHE_ENABLED,
-			UserNotificationDeliveryModelImpl.FINDER_CACHE_ENABLED,
-			UserNotificationDeliveryImpl.class,
-			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByUserId",
-			new String[] { Long.class.getName() },
-			UserNotificationDeliveryModelImpl.USERID_COLUMN_BITMASK);
-	public static final FinderPath FINDER_PATH_COUNT_BY_USERID = new FinderPath(UserNotificationDeliveryModelImpl.ENTITY_CACHE_ENABLED,
-			UserNotificationDeliveryModelImpl.FINDER_CACHE_ENABLED, Long.class,
-			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByUserId",
-			new String[] { Long.class.getName() });
+	public static final String FINDER_CLASS_NAME_ENTITY =
+		UserNotificationDeliveryImpl.class.getName();
+
+	public static final String FINDER_CLASS_NAME_LIST_WITH_PAGINATION =
+		FINDER_CLASS_NAME_ENTITY + ".List1";
+
+	public static final String FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION =
+		FINDER_CLASS_NAME_ENTITY + ".List2";
+
+	private FinderPath _finderPathWithPaginationFindAll;
+	private FinderPath _finderPathWithoutPaginationFindAll;
+	private FinderPath _finderPathCountAll;
+	private FinderPath _finderPathWithPaginationFindByUserId;
+	private FinderPath _finderPathWithoutPaginationFindByUserId;
+	private FinderPath _finderPathCountByUserId;
 
 	/**
 	 * Returns all the user notification deliveries where userId = &#63;.
@@ -124,7 +102,7 @@ public class UserNotificationDeliveryPersistenceImpl extends BasePersistenceImpl
 	 * Returns a range of all the user notification deliveries where userId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link UserNotificationDeliveryModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>UserNotificationDeliveryModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param userId the user ID
@@ -133,8 +111,9 @@ public class UserNotificationDeliveryPersistenceImpl extends BasePersistenceImpl
 	 * @return the range of matching user notification deliveries
 	 */
 	@Override
-	public List<UserNotificationDelivery> findByUserId(long userId, int start,
-		int end) {
+	public List<UserNotificationDelivery> findByUserId(
+		long userId, int start, int end) {
+
 		return findByUserId(userId, start, end, null);
 	}
 
@@ -142,7 +121,7 @@ public class UserNotificationDeliveryPersistenceImpl extends BasePersistenceImpl
 	 * Returns an ordered range of all the user notification deliveries where userId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link UserNotificationDeliveryModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>UserNotificationDeliveryModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param userId the user ID
@@ -152,8 +131,10 @@ public class UserNotificationDeliveryPersistenceImpl extends BasePersistenceImpl
 	 * @return the ordered range of matching user notification deliveries
 	 */
 	@Override
-	public List<UserNotificationDelivery> findByUserId(long userId, int start,
-		int end, OrderByComparator<UserNotificationDelivery> orderByComparator) {
+	public List<UserNotificationDelivery> findByUserId(
+		long userId, int start, int end,
+		OrderByComparator<UserNotificationDelivery> orderByComparator) {
+
 		return findByUserId(userId, start, end, orderByComparator, true);
 	}
 
@@ -161,7 +142,7 @@ public class UserNotificationDeliveryPersistenceImpl extends BasePersistenceImpl
 	 * Returns an ordered range of all the user notification deliveries where userId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link UserNotificationDeliveryModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>UserNotificationDeliveryModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param userId the user ID
@@ -172,29 +153,32 @@ public class UserNotificationDeliveryPersistenceImpl extends BasePersistenceImpl
 	 * @return the ordered range of matching user notification deliveries
 	 */
 	@Override
-	public List<UserNotificationDelivery> findByUserId(long userId, int start,
-		int end, OrderByComparator<UserNotificationDelivery> orderByComparator,
+	public List<UserNotificationDelivery> findByUserId(
+		long userId, int start, int end,
+		OrderByComparator<UserNotificationDelivery> orderByComparator,
 		boolean retrieveFromCache) {
+
 		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
-				(orderByComparator == null)) {
+			(orderByComparator == null)) {
+
 			pagination = false;
-			finderPath = FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_USERID;
-			finderArgs = new Object[] { userId };
+			finderPath = _finderPathWithoutPaginationFindByUserId;
+			finderArgs = new Object[] {userId};
 		}
 		else {
-			finderPath = FINDER_PATH_WITH_PAGINATION_FIND_BY_USERID;
-			finderArgs = new Object[] { userId, start, end, orderByComparator };
+			finderPath = _finderPathWithPaginationFindByUserId;
+			finderArgs = new Object[] {userId, start, end, orderByComparator};
 		}
 
 		List<UserNotificationDelivery> list = null;
 
 		if (retrieveFromCache) {
-			list = (List<UserNotificationDelivery>)FinderCacheUtil.getResult(finderPath,
-					finderArgs, this);
+			list = (List<UserNotificationDelivery>)FinderCacheUtil.getResult(
+				finderPath, finderArgs, this);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (UserNotificationDelivery userNotificationDelivery : list) {
@@ -211,8 +195,8 @@ public class UserNotificationDeliveryPersistenceImpl extends BasePersistenceImpl
 			StringBundler query = null;
 
 			if (orderByComparator != null) {
-				query = new StringBundler(3 +
-						(orderByComparator.getOrderByFields().length * 2));
+				query = new StringBundler(
+					3 + (orderByComparator.getOrderByFields().length * 2));
 			}
 			else {
 				query = new StringBundler(3);
@@ -223,11 +207,10 @@ public class UserNotificationDeliveryPersistenceImpl extends BasePersistenceImpl
 			query.append(_FINDER_COLUMN_USERID_USERID_2);
 
 			if (orderByComparator != null) {
-				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
-					orderByComparator);
+				appendOrderByComparator(
+					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
 			}
-			else
-			 if (pagination) {
+			else if (pagination) {
 				query.append(UserNotificationDeliveryModelImpl.ORDER_BY_JPQL);
 			}
 
@@ -245,16 +228,16 @@ public class UserNotificationDeliveryPersistenceImpl extends BasePersistenceImpl
 				qPos.add(userId);
 
 				if (!pagination) {
-					list = (List<UserNotificationDelivery>)QueryUtil.list(q,
-							getDialect(), start, end, false);
+					list = (List<UserNotificationDelivery>)QueryUtil.list(
+						q, getDialect(), start, end, false);
 
 					Collections.sort(list);
 
 					list = Collections.unmodifiableList(list);
 				}
 				else {
-					list = (List<UserNotificationDelivery>)QueryUtil.list(q,
-							getDialect(), start, end);
+					list = (List<UserNotificationDelivery>)QueryUtil.list(
+						q, getDialect(), start, end);
 				}
 
 				cacheResult(list);
@@ -283,11 +266,13 @@ public class UserNotificationDeliveryPersistenceImpl extends BasePersistenceImpl
 	 * @throws NoSuchUserNotificationDeliveryException if a matching user notification delivery could not be found
 	 */
 	@Override
-	public UserNotificationDelivery findByUserId_First(long userId,
-		OrderByComparator<UserNotificationDelivery> orderByComparator)
+	public UserNotificationDelivery findByUserId_First(
+			long userId,
+			OrderByComparator<UserNotificationDelivery> orderByComparator)
 		throws NoSuchUserNotificationDeliveryException {
-		UserNotificationDelivery userNotificationDelivery = fetchByUserId_First(userId,
-				orderByComparator);
+
+		UserNotificationDelivery userNotificationDelivery = fetchByUserId_First(
+			userId, orderByComparator);
 
 		if (userNotificationDelivery != null) {
 			return userNotificationDelivery;
@@ -313,10 +298,12 @@ public class UserNotificationDeliveryPersistenceImpl extends BasePersistenceImpl
 	 * @return the first matching user notification delivery, or <code>null</code> if a matching user notification delivery could not be found
 	 */
 	@Override
-	public UserNotificationDelivery fetchByUserId_First(long userId,
+	public UserNotificationDelivery fetchByUserId_First(
+		long userId,
 		OrderByComparator<UserNotificationDelivery> orderByComparator) {
-		List<UserNotificationDelivery> list = findByUserId(userId, 0, 1,
-				orderByComparator);
+
+		List<UserNotificationDelivery> list = findByUserId(
+			userId, 0, 1, orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -334,11 +321,13 @@ public class UserNotificationDeliveryPersistenceImpl extends BasePersistenceImpl
 	 * @throws NoSuchUserNotificationDeliveryException if a matching user notification delivery could not be found
 	 */
 	@Override
-	public UserNotificationDelivery findByUserId_Last(long userId,
-		OrderByComparator<UserNotificationDelivery> orderByComparator)
+	public UserNotificationDelivery findByUserId_Last(
+			long userId,
+			OrderByComparator<UserNotificationDelivery> orderByComparator)
 		throws NoSuchUserNotificationDeliveryException {
-		UserNotificationDelivery userNotificationDelivery = fetchByUserId_Last(userId,
-				orderByComparator);
+
+		UserNotificationDelivery userNotificationDelivery = fetchByUserId_Last(
+			userId, orderByComparator);
 
 		if (userNotificationDelivery != null) {
 			return userNotificationDelivery;
@@ -364,16 +353,18 @@ public class UserNotificationDeliveryPersistenceImpl extends BasePersistenceImpl
 	 * @return the last matching user notification delivery, or <code>null</code> if a matching user notification delivery could not be found
 	 */
 	@Override
-	public UserNotificationDelivery fetchByUserId_Last(long userId,
+	public UserNotificationDelivery fetchByUserId_Last(
+		long userId,
 		OrderByComparator<UserNotificationDelivery> orderByComparator) {
+
 		int count = countByUserId(userId);
 
 		if (count == 0) {
 			return null;
 		}
 
-		List<UserNotificationDelivery> list = findByUserId(userId, count - 1,
-				count, orderByComparator);
+		List<UserNotificationDelivery> list = findByUserId(
+			userId, count - 1, count, orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -393,25 +384,30 @@ public class UserNotificationDeliveryPersistenceImpl extends BasePersistenceImpl
 	 */
 	@Override
 	public UserNotificationDelivery[] findByUserId_PrevAndNext(
-		long userNotificationDeliveryId, long userId,
-		OrderByComparator<UserNotificationDelivery> orderByComparator)
+			long userNotificationDeliveryId, long userId,
+			OrderByComparator<UserNotificationDelivery> orderByComparator)
 		throws NoSuchUserNotificationDeliveryException {
-		UserNotificationDelivery userNotificationDelivery = findByPrimaryKey(userNotificationDeliveryId);
+
+		UserNotificationDelivery userNotificationDelivery = findByPrimaryKey(
+			userNotificationDeliveryId);
 
 		Session session = null;
 
 		try {
 			session = openSession();
 
-			UserNotificationDelivery[] array = new UserNotificationDeliveryImpl[3];
+			UserNotificationDelivery[] array =
+				new UserNotificationDeliveryImpl[3];
 
-			array[0] = getByUserId_PrevAndNext(session,
-					userNotificationDelivery, userId, orderByComparator, true);
+			array[0] = getByUserId_PrevAndNext(
+				session, userNotificationDelivery, userId, orderByComparator,
+				true);
 
 			array[1] = userNotificationDelivery;
 
-			array[2] = getByUserId_PrevAndNext(session,
-					userNotificationDelivery, userId, orderByComparator, false);
+			array[2] = getByUserId_PrevAndNext(
+				session, userNotificationDelivery, userId, orderByComparator,
+				false);
 
 			return array;
 		}
@@ -428,11 +424,12 @@ public class UserNotificationDeliveryPersistenceImpl extends BasePersistenceImpl
 		long userId,
 		OrderByComparator<UserNotificationDelivery> orderByComparator,
 		boolean previous) {
+
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(4 +
-					(orderByComparator.getOrderByConditionFields().length * 3) +
+			query = new StringBundler(
+				4 + (orderByComparator.getOrderByConditionFields().length * 3) +
 					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
@@ -444,7 +441,8 @@ public class UserNotificationDeliveryPersistenceImpl extends BasePersistenceImpl
 		query.append(_FINDER_COLUMN_USERID_USERID_2);
 
 		if (orderByComparator != null) {
-			String[] orderByConditionFields = orderByComparator.getOrderByConditionFields();
+			String[] orderByConditionFields =
+				orderByComparator.getOrderByConditionFields();
 
 			if (orderByConditionFields.length > 0) {
 				query.append(WHERE_AND);
@@ -514,10 +512,11 @@ public class UserNotificationDeliveryPersistenceImpl extends BasePersistenceImpl
 		qPos.add(userId);
 
 		if (orderByComparator != null) {
-			Object[] values = orderByComparator.getOrderByConditionValues(userNotificationDelivery);
+			for (Object orderByConditionValue :
+					orderByComparator.getOrderByConditionValues(
+						userNotificationDelivery)) {
 
-			for (Object value : values) {
-				qPos.add(value);
+				qPos.add(orderByConditionValue);
 			}
 		}
 
@@ -538,8 +537,10 @@ public class UserNotificationDeliveryPersistenceImpl extends BasePersistenceImpl
 	 */
 	@Override
 	public void removeByUserId(long userId) {
-		for (UserNotificationDelivery userNotificationDelivery : findByUserId(
-				userId, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null)) {
+		for (UserNotificationDelivery userNotificationDelivery :
+				findByUserId(
+					userId, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null)) {
+
 			remove(userNotificationDelivery);
 		}
 	}
@@ -552,12 +553,12 @@ public class UserNotificationDeliveryPersistenceImpl extends BasePersistenceImpl
 	 */
 	@Override
 	public int countByUserId(long userId) {
-		FinderPath finderPath = FINDER_PATH_COUNT_BY_USERID;
+		FinderPath finderPath = _finderPathCountByUserId;
 
-		Object[] finderArgs = new Object[] { userId };
+		Object[] finderArgs = new Object[] {userId};
 
-		Long count = (Long)FinderCacheUtil.getResult(finderPath, finderArgs,
-				this);
+		Long count = (Long)FinderCacheUtil.getResult(
+			finderPath, finderArgs, this);
 
 		if (count == null) {
 			StringBundler query = new StringBundler(2);
@@ -596,32 +597,14 @@ public class UserNotificationDeliveryPersistenceImpl extends BasePersistenceImpl
 		return count.intValue();
 	}
 
-	private static final String _FINDER_COLUMN_USERID_USERID_2 = "userNotificationDelivery.userId = ?";
-	public static final FinderPath FINDER_PATH_FETCH_BY_U_P_C_N_D = new FinderPath(UserNotificationDeliveryModelImpl.ENTITY_CACHE_ENABLED,
-			UserNotificationDeliveryModelImpl.FINDER_CACHE_ENABLED,
-			UserNotificationDeliveryImpl.class, FINDER_CLASS_NAME_ENTITY,
-			"fetchByU_P_C_N_D",
-			new String[] {
-				Long.class.getName(), String.class.getName(),
-				Long.class.getName(), Integer.class.getName(),
-				Integer.class.getName()
-			},
-			UserNotificationDeliveryModelImpl.USERID_COLUMN_BITMASK |
-			UserNotificationDeliveryModelImpl.PORTLETID_COLUMN_BITMASK |
-			UserNotificationDeliveryModelImpl.CLASSNAMEID_COLUMN_BITMASK |
-			UserNotificationDeliveryModelImpl.NOTIFICATIONTYPE_COLUMN_BITMASK |
-			UserNotificationDeliveryModelImpl.DELIVERYTYPE_COLUMN_BITMASK);
-	public static final FinderPath FINDER_PATH_COUNT_BY_U_P_C_N_D = new FinderPath(UserNotificationDeliveryModelImpl.ENTITY_CACHE_ENABLED,
-			UserNotificationDeliveryModelImpl.FINDER_CACHE_ENABLED, Long.class,
-			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByU_P_C_N_D",
-			new String[] {
-				Long.class.getName(), String.class.getName(),
-				Long.class.getName(), Integer.class.getName(),
-				Integer.class.getName()
-			});
+	private static final String _FINDER_COLUMN_USERID_USERID_2 =
+		"userNotificationDelivery.userId = ?";
+
+	private FinderPath _finderPathFetchByU_P_C_N_D;
+	private FinderPath _finderPathCountByU_P_C_N_D;
 
 	/**
-	 * Returns the user notification delivery where userId = &#63; and portletId = &#63; and classNameId = &#63; and notificationType = &#63; and deliveryType = &#63; or throws a {@link NoSuchUserNotificationDeliveryException} if it could not be found.
+	 * Returns the user notification delivery where userId = &#63; and portletId = &#63; and classNameId = &#63; and notificationType = &#63; and deliveryType = &#63; or throws a <code>NoSuchUserNotificationDeliveryException</code> if it could not be found.
 	 *
 	 * @param userId the user ID
 	 * @param portletId the portlet ID
@@ -632,11 +615,13 @@ public class UserNotificationDeliveryPersistenceImpl extends BasePersistenceImpl
 	 * @throws NoSuchUserNotificationDeliveryException if a matching user notification delivery could not be found
 	 */
 	@Override
-	public UserNotificationDelivery findByU_P_C_N_D(long userId,
-		String portletId, long classNameId, int notificationType,
-		int deliveryType) throws NoSuchUserNotificationDeliveryException {
-		UserNotificationDelivery userNotificationDelivery = fetchByU_P_C_N_D(userId,
-				portletId, classNameId, notificationType, deliveryType);
+	public UserNotificationDelivery findByU_P_C_N_D(
+			long userId, String portletId, long classNameId,
+			int notificationType, int deliveryType)
+		throws NoSuchUserNotificationDeliveryException {
+
+		UserNotificationDelivery userNotificationDelivery = fetchByU_P_C_N_D(
+			userId, portletId, classNameId, notificationType, deliveryType);
 
 		if (userNotificationDelivery == null) {
 			StringBundler msg = new StringBundler(12);
@@ -681,11 +666,13 @@ public class UserNotificationDeliveryPersistenceImpl extends BasePersistenceImpl
 	 * @return the matching user notification delivery, or <code>null</code> if a matching user notification delivery could not be found
 	 */
 	@Override
-	public UserNotificationDelivery fetchByU_P_C_N_D(long userId,
-		String portletId, long classNameId, int notificationType,
+	public UserNotificationDelivery fetchByU_P_C_N_D(
+		long userId, String portletId, long classNameId, int notificationType,
 		int deliveryType) {
-		return fetchByU_P_C_N_D(userId, portletId, classNameId,
-			notificationType, deliveryType, true);
+
+		return fetchByU_P_C_N_D(
+			userId, portletId, classNameId, notificationType, deliveryType,
+			true);
 	}
 
 	/**
@@ -700,31 +687,35 @@ public class UserNotificationDeliveryPersistenceImpl extends BasePersistenceImpl
 	 * @return the matching user notification delivery, or <code>null</code> if a matching user notification delivery could not be found
 	 */
 	@Override
-	public UserNotificationDelivery fetchByU_P_C_N_D(long userId,
-		String portletId, long classNameId, int notificationType,
+	public UserNotificationDelivery fetchByU_P_C_N_D(
+		long userId, String portletId, long classNameId, int notificationType,
 		int deliveryType, boolean retrieveFromCache) {
+
 		portletId = Objects.toString(portletId, "");
 
 		Object[] finderArgs = new Object[] {
-				userId, portletId, classNameId, notificationType, deliveryType
-			};
+			userId, portletId, classNameId, notificationType, deliveryType
+		};
 
 		Object result = null;
 
 		if (retrieveFromCache) {
-			result = FinderCacheUtil.getResult(FINDER_PATH_FETCH_BY_U_P_C_N_D,
-					finderArgs, this);
+			result = FinderCacheUtil.getResult(
+				_finderPathFetchByU_P_C_N_D, finderArgs, this);
 		}
 
 		if (result instanceof UserNotificationDelivery) {
-			UserNotificationDelivery userNotificationDelivery = (UserNotificationDelivery)result;
+			UserNotificationDelivery userNotificationDelivery =
+				(UserNotificationDelivery)result;
 
 			if ((userId != userNotificationDelivery.getUserId()) ||
-					!Objects.equals(portletId,
-						userNotificationDelivery.getPortletId()) ||
-					(classNameId != userNotificationDelivery.getClassNameId()) ||
-					(notificationType != userNotificationDelivery.getNotificationType()) ||
-					(deliveryType != userNotificationDelivery.getDeliveryType())) {
+				!Objects.equals(
+					portletId, userNotificationDelivery.getPortletId()) ||
+				(classNameId != userNotificationDelivery.getClassNameId()) ||
+				(notificationType !=
+					userNotificationDelivery.getNotificationType()) ||
+				(deliveryType != userNotificationDelivery.getDeliveryType())) {
+
 				result = null;
 			}
 		}
@@ -779,11 +770,12 @@ public class UserNotificationDeliveryPersistenceImpl extends BasePersistenceImpl
 				List<UserNotificationDelivery> list = q.list();
 
 				if (list.isEmpty()) {
-					FinderCacheUtil.putResult(FINDER_PATH_FETCH_BY_U_P_C_N_D,
-						finderArgs, list);
+					FinderCacheUtil.putResult(
+						_finderPathFetchByU_P_C_N_D, finderArgs, list);
 				}
 				else {
-					UserNotificationDelivery userNotificationDelivery = list.get(0);
+					UserNotificationDelivery userNotificationDelivery =
+						list.get(0);
 
 					result = userNotificationDelivery;
 
@@ -791,8 +783,8 @@ public class UserNotificationDeliveryPersistenceImpl extends BasePersistenceImpl
 				}
 			}
 			catch (Exception e) {
-				FinderCacheUtil.removeResult(FINDER_PATH_FETCH_BY_U_P_C_N_D,
-					finderArgs);
+				FinderCacheUtil.removeResult(
+					_finderPathFetchByU_P_C_N_D, finderArgs);
 
 				throw processException(e);
 			}
@@ -820,11 +812,13 @@ public class UserNotificationDeliveryPersistenceImpl extends BasePersistenceImpl
 	 * @return the user notification delivery that was removed
 	 */
 	@Override
-	public UserNotificationDelivery removeByU_P_C_N_D(long userId,
-		String portletId, long classNameId, int notificationType,
-		int deliveryType) throws NoSuchUserNotificationDeliveryException {
-		UserNotificationDelivery userNotificationDelivery = findByU_P_C_N_D(userId,
-				portletId, classNameId, notificationType, deliveryType);
+	public UserNotificationDelivery removeByU_P_C_N_D(
+			long userId, String portletId, long classNameId,
+			int notificationType, int deliveryType)
+		throws NoSuchUserNotificationDeliveryException {
+
+		UserNotificationDelivery userNotificationDelivery = findByU_P_C_N_D(
+			userId, portletId, classNameId, notificationType, deliveryType);
 
 		return remove(userNotificationDelivery);
 	}
@@ -840,18 +834,20 @@ public class UserNotificationDeliveryPersistenceImpl extends BasePersistenceImpl
 	 * @return the number of matching user notification deliveries
 	 */
 	@Override
-	public int countByU_P_C_N_D(long userId, String portletId,
-		long classNameId, int notificationType, int deliveryType) {
+	public int countByU_P_C_N_D(
+		long userId, String portletId, long classNameId, int notificationType,
+		int deliveryType) {
+
 		portletId = Objects.toString(portletId, "");
 
-		FinderPath finderPath = FINDER_PATH_COUNT_BY_U_P_C_N_D;
+		FinderPath finderPath = _finderPathCountByU_P_C_N_D;
 
 		Object[] finderArgs = new Object[] {
-				userId, portletId, classNameId, notificationType, deliveryType
-			};
+			userId, portletId, classNameId, notificationType, deliveryType
+		};
 
-		Long count = (Long)FinderCacheUtil.getResult(finderPath, finderArgs,
-				this);
+		Long count = (Long)FinderCacheUtil.getResult(
+			finderPath, finderArgs, this);
 
 		if (count == null) {
 			StringBundler query = new StringBundler(6);
@@ -917,12 +913,23 @@ public class UserNotificationDeliveryPersistenceImpl extends BasePersistenceImpl
 		return count.intValue();
 	}
 
-	private static final String _FINDER_COLUMN_U_P_C_N_D_USERID_2 = "userNotificationDelivery.userId = ? AND ";
-	private static final String _FINDER_COLUMN_U_P_C_N_D_PORTLETID_2 = "userNotificationDelivery.portletId = ? AND ";
-	private static final String _FINDER_COLUMN_U_P_C_N_D_PORTLETID_3 = "(userNotificationDelivery.portletId IS NULL OR userNotificationDelivery.portletId = '') AND ";
-	private static final String _FINDER_COLUMN_U_P_C_N_D_CLASSNAMEID_2 = "userNotificationDelivery.classNameId = ? AND ";
-	private static final String _FINDER_COLUMN_U_P_C_N_D_NOTIFICATIONTYPE_2 = "userNotificationDelivery.notificationType = ? AND ";
-	private static final String _FINDER_COLUMN_U_P_C_N_D_DELIVERYTYPE_2 = "userNotificationDelivery.deliveryType = ?";
+	private static final String _FINDER_COLUMN_U_P_C_N_D_USERID_2 =
+		"userNotificationDelivery.userId = ? AND ";
+
+	private static final String _FINDER_COLUMN_U_P_C_N_D_PORTLETID_2 =
+		"userNotificationDelivery.portletId = ? AND ";
+
+	private static final String _FINDER_COLUMN_U_P_C_N_D_PORTLETID_3 =
+		"(userNotificationDelivery.portletId IS NULL OR userNotificationDelivery.portletId = '') AND ";
+
+	private static final String _FINDER_COLUMN_U_P_C_N_D_CLASSNAMEID_2 =
+		"userNotificationDelivery.classNameId = ? AND ";
+
+	private static final String _FINDER_COLUMN_U_P_C_N_D_NOTIFICATIONTYPE_2 =
+		"userNotificationDelivery.notificationType = ? AND ";
+
+	private static final String _FINDER_COLUMN_U_P_C_N_D_DELIVERYTYPE_2 =
+		"userNotificationDelivery.deliveryType = ?";
 
 	public UserNotificationDeliveryPersistenceImpl() {
 		setModelClass(UserNotificationDelivery.class);
@@ -935,18 +942,21 @@ public class UserNotificationDeliveryPersistenceImpl extends BasePersistenceImpl
 	 */
 	@Override
 	public void cacheResult(UserNotificationDelivery userNotificationDelivery) {
-		EntityCacheUtil.putResult(UserNotificationDeliveryModelImpl.ENTITY_CACHE_ENABLED,
+		EntityCacheUtil.putResult(
+			UserNotificationDeliveryModelImpl.ENTITY_CACHE_ENABLED,
 			UserNotificationDeliveryImpl.class,
 			userNotificationDelivery.getPrimaryKey(), userNotificationDelivery);
 
-		FinderCacheUtil.putResult(FINDER_PATH_FETCH_BY_U_P_C_N_D,
+		FinderCacheUtil.putResult(
+			_finderPathFetchByU_P_C_N_D,
 			new Object[] {
 				userNotificationDelivery.getUserId(),
 				userNotificationDelivery.getPortletId(),
 				userNotificationDelivery.getClassNameId(),
 				userNotificationDelivery.getNotificationType(),
 				userNotificationDelivery.getDeliveryType()
-			}, userNotificationDelivery);
+			},
+			userNotificationDelivery);
 
 		userNotificationDelivery.resetOriginalValues();
 	}
@@ -959,11 +969,15 @@ public class UserNotificationDeliveryPersistenceImpl extends BasePersistenceImpl
 	@Override
 	public void cacheResult(
 		List<UserNotificationDelivery> userNotificationDeliveries) {
-		for (UserNotificationDelivery userNotificationDelivery : userNotificationDeliveries) {
+
+		for (UserNotificationDelivery userNotificationDelivery :
+				userNotificationDeliveries) {
+
 			if (EntityCacheUtil.getResult(
-						UserNotificationDeliveryModelImpl.ENTITY_CACHE_ENABLED,
-						UserNotificationDeliveryImpl.class,
-						userNotificationDelivery.getPrimaryKey()) == null) {
+					UserNotificationDeliveryModelImpl.ENTITY_CACHE_ENABLED,
+					UserNotificationDeliveryImpl.class,
+					userNotificationDelivery.getPrimaryKey()) == null) {
+
 				cacheResult(userNotificationDelivery);
 			}
 			else {
@@ -976,7 +990,7 @@ public class UserNotificationDeliveryPersistenceImpl extends BasePersistenceImpl
 	 * Clears the cache for all user notification deliveries.
 	 *
 	 * <p>
-	 * The {@link com.liferay.portal.kernel.dao.orm.EntityCache} and {@link com.liferay.portal.kernel.dao.orm.FinderCache} are both cleared by this method.
+	 * The <code>com.liferay.portal.kernel.dao.orm.EntityCache</code> and <code>com.liferay.portal.kernel.dao.orm.FinderCache</code> are both cleared by this method.
 	 * </p>
 	 */
 	@Override
@@ -992,41 +1006,68 @@ public class UserNotificationDeliveryPersistenceImpl extends BasePersistenceImpl
 	 * Clears the cache for the user notification delivery.
 	 *
 	 * <p>
-	 * The {@link com.liferay.portal.kernel.dao.orm.EntityCache} and {@link com.liferay.portal.kernel.dao.orm.FinderCache} are both cleared by this method.
+	 * The <code>com.liferay.portal.kernel.dao.orm.EntityCache</code> and <code>com.liferay.portal.kernel.dao.orm.FinderCache</code> are both cleared by this method.
 	 * </p>
 	 */
 	@Override
 	public void clearCache(UserNotificationDelivery userNotificationDelivery) {
-		EntityCacheUtil.removeResult(UserNotificationDeliveryModelImpl.ENTITY_CACHE_ENABLED,
+		EntityCacheUtil.removeResult(
+			UserNotificationDeliveryModelImpl.ENTITY_CACHE_ENABLED,
 			UserNotificationDeliveryImpl.class,
 			userNotificationDelivery.getPrimaryKey());
 
 		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
 		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
 
-		clearUniqueFindersCache((UserNotificationDeliveryModelImpl)userNotificationDelivery,
-			true);
+		clearUniqueFindersCache(
+			(UserNotificationDeliveryModelImpl)userNotificationDelivery, true);
 	}
 
 	@Override
 	public void clearCache(
 		List<UserNotificationDelivery> userNotificationDeliveries) {
+
 		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
 		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
 
-		for (UserNotificationDelivery userNotificationDelivery : userNotificationDeliveries) {
-			EntityCacheUtil.removeResult(UserNotificationDeliveryModelImpl.ENTITY_CACHE_ENABLED,
+		for (UserNotificationDelivery userNotificationDelivery :
+				userNotificationDeliveries) {
+
+			EntityCacheUtil.removeResult(
+				UserNotificationDeliveryModelImpl.ENTITY_CACHE_ENABLED,
 				UserNotificationDeliveryImpl.class,
 				userNotificationDelivery.getPrimaryKey());
 
-			clearUniqueFindersCache((UserNotificationDeliveryModelImpl)userNotificationDelivery,
+			clearUniqueFindersCache(
+				(UserNotificationDeliveryModelImpl)userNotificationDelivery,
 				true);
 		}
 	}
 
 	protected void cacheUniqueFindersCache(
 		UserNotificationDeliveryModelImpl userNotificationDeliveryModelImpl) {
+
 		Object[] args = new Object[] {
+			userNotificationDeliveryModelImpl.getUserId(),
+			userNotificationDeliveryModelImpl.getPortletId(),
+			userNotificationDeliveryModelImpl.getClassNameId(),
+			userNotificationDeliveryModelImpl.getNotificationType(),
+			userNotificationDeliveryModelImpl.getDeliveryType()
+		};
+
+		FinderCacheUtil.putResult(
+			_finderPathCountByU_P_C_N_D, args, Long.valueOf(1), false);
+		FinderCacheUtil.putResult(
+			_finderPathFetchByU_P_C_N_D, args,
+			userNotificationDeliveryModelImpl, false);
+	}
+
+	protected void clearUniqueFindersCache(
+		UserNotificationDeliveryModelImpl userNotificationDeliveryModelImpl,
+		boolean clearCurrent) {
+
+		if (clearCurrent) {
+			Object[] args = new Object[] {
 				userNotificationDeliveryModelImpl.getUserId(),
 				userNotificationDeliveryModelImpl.getPortletId(),
 				userNotificationDeliveryModelImpl.getClassNameId(),
@@ -1034,40 +1075,23 @@ public class UserNotificationDeliveryPersistenceImpl extends BasePersistenceImpl
 				userNotificationDeliveryModelImpl.getDeliveryType()
 			};
 
-		FinderCacheUtil.putResult(FINDER_PATH_COUNT_BY_U_P_C_N_D, args,
-			Long.valueOf(1), false);
-		FinderCacheUtil.putResult(FINDER_PATH_FETCH_BY_U_P_C_N_D, args,
-			userNotificationDeliveryModelImpl, false);
-	}
-
-	protected void clearUniqueFindersCache(
-		UserNotificationDeliveryModelImpl userNotificationDeliveryModelImpl,
-		boolean clearCurrent) {
-		if (clearCurrent) {
-			Object[] args = new Object[] {
-					userNotificationDeliveryModelImpl.getUserId(),
-					userNotificationDeliveryModelImpl.getPortletId(),
-					userNotificationDeliveryModelImpl.getClassNameId(),
-					userNotificationDeliveryModelImpl.getNotificationType(),
-					userNotificationDeliveryModelImpl.getDeliveryType()
-				};
-
-			FinderCacheUtil.removeResult(FINDER_PATH_COUNT_BY_U_P_C_N_D, args);
-			FinderCacheUtil.removeResult(FINDER_PATH_FETCH_BY_U_P_C_N_D, args);
+			FinderCacheUtil.removeResult(_finderPathCountByU_P_C_N_D, args);
+			FinderCacheUtil.removeResult(_finderPathFetchByU_P_C_N_D, args);
 		}
 
 		if ((userNotificationDeliveryModelImpl.getColumnBitmask() &
-				FINDER_PATH_FETCH_BY_U_P_C_N_D.getColumnBitmask()) != 0) {
-			Object[] args = new Object[] {
-					userNotificationDeliveryModelImpl.getOriginalUserId(),
-					userNotificationDeliveryModelImpl.getOriginalPortletId(),
-					userNotificationDeliveryModelImpl.getOriginalClassNameId(),
-					userNotificationDeliveryModelImpl.getOriginalNotificationType(),
-					userNotificationDeliveryModelImpl.getOriginalDeliveryType()
-				};
+			 _finderPathFetchByU_P_C_N_D.getColumnBitmask()) != 0) {
 
-			FinderCacheUtil.removeResult(FINDER_PATH_COUNT_BY_U_P_C_N_D, args);
-			FinderCacheUtil.removeResult(FINDER_PATH_FETCH_BY_U_P_C_N_D, args);
+			Object[] args = new Object[] {
+				userNotificationDeliveryModelImpl.getOriginalUserId(),
+				userNotificationDeliveryModelImpl.getOriginalPortletId(),
+				userNotificationDeliveryModelImpl.getOriginalClassNameId(),
+				userNotificationDeliveryModelImpl.getOriginalNotificationType(),
+				userNotificationDeliveryModelImpl.getOriginalDeliveryType()
+			};
+
+			FinderCacheUtil.removeResult(_finderPathCountByU_P_C_N_D, args);
+			FinderCacheUtil.removeResult(_finderPathFetchByU_P_C_N_D, args);
 		}
 	}
 
@@ -1079,7 +1103,8 @@ public class UserNotificationDeliveryPersistenceImpl extends BasePersistenceImpl
 	 */
 	@Override
 	public UserNotificationDelivery create(long userNotificationDeliveryId) {
-		UserNotificationDelivery userNotificationDelivery = new UserNotificationDeliveryImpl();
+		UserNotificationDelivery userNotificationDelivery =
+			new UserNotificationDeliveryImpl();
 
 		userNotificationDelivery.setNew(true);
 		userNotificationDelivery.setPrimaryKey(userNotificationDeliveryId);
@@ -1099,6 +1124,7 @@ public class UserNotificationDeliveryPersistenceImpl extends BasePersistenceImpl
 	@Override
 	public UserNotificationDelivery remove(long userNotificationDeliveryId)
 		throws NoSuchUserNotificationDeliveryException {
+
 		return remove((Serializable)userNotificationDeliveryId);
 	}
 
@@ -1112,21 +1138,23 @@ public class UserNotificationDeliveryPersistenceImpl extends BasePersistenceImpl
 	@Override
 	public UserNotificationDelivery remove(Serializable primaryKey)
 		throws NoSuchUserNotificationDeliveryException {
+
 		Session session = null;
 
 		try {
 			session = openSession();
 
-			UserNotificationDelivery userNotificationDelivery = (UserNotificationDelivery)session.get(UserNotificationDeliveryImpl.class,
-					primaryKey);
+			UserNotificationDelivery userNotificationDelivery =
+				(UserNotificationDelivery)session.get(
+					UserNotificationDeliveryImpl.class, primaryKey);
 
 			if (userNotificationDelivery == null) {
 				if (_log.isDebugEnabled()) {
 					_log.debug(_NO_SUCH_ENTITY_WITH_PRIMARY_KEY + primaryKey);
 				}
 
-				throw new NoSuchUserNotificationDeliveryException(_NO_SUCH_ENTITY_WITH_PRIMARY_KEY +
-					primaryKey);
+				throw new NoSuchUserNotificationDeliveryException(
+					_NO_SUCH_ENTITY_WITH_PRIMARY_KEY + primaryKey);
 			}
 
 			return remove(userNotificationDelivery);
@@ -1145,13 +1173,16 @@ public class UserNotificationDeliveryPersistenceImpl extends BasePersistenceImpl
 	@Override
 	protected UserNotificationDelivery removeImpl(
 		UserNotificationDelivery userNotificationDelivery) {
+
 		Session session = null;
 
 		try {
 			session = openSession();
 
 			if (!session.contains(userNotificationDelivery)) {
-				userNotificationDelivery = (UserNotificationDelivery)session.get(UserNotificationDeliveryImpl.class,
+				userNotificationDelivery =
+					(UserNotificationDelivery)session.get(
+						UserNotificationDeliveryImpl.class,
 						userNotificationDelivery.getPrimaryKeyObj());
 			}
 
@@ -1176,25 +1207,30 @@ public class UserNotificationDeliveryPersistenceImpl extends BasePersistenceImpl
 	@Override
 	public UserNotificationDelivery updateImpl(
 		UserNotificationDelivery userNotificationDelivery) {
+
 		boolean isNew = userNotificationDelivery.isNew();
 
-		if (!(userNotificationDelivery instanceof UserNotificationDeliveryModelImpl)) {
+		if (!(userNotificationDelivery instanceof
+				UserNotificationDeliveryModelImpl)) {
+
 			InvocationHandler invocationHandler = null;
 
 			if (ProxyUtil.isProxyClass(userNotificationDelivery.getClass())) {
-				invocationHandler = ProxyUtil.getInvocationHandler(userNotificationDelivery);
+				invocationHandler = ProxyUtil.getInvocationHandler(
+					userNotificationDelivery);
 
 				throw new IllegalArgumentException(
 					"Implement ModelWrapper in userNotificationDelivery proxy " +
-					invocationHandler.getClass());
+						invocationHandler.getClass());
 			}
 
 			throw new IllegalArgumentException(
 				"Implement ModelWrapper in custom UserNotificationDelivery implementation " +
-				userNotificationDelivery.getClass());
+					userNotificationDelivery.getClass());
 		}
 
-		UserNotificationDeliveryModelImpl userNotificationDeliveryModelImpl = (UserNotificationDeliveryModelImpl)userNotificationDelivery;
+		UserNotificationDeliveryModelImpl userNotificationDeliveryModelImpl =
+			(UserNotificationDeliveryModelImpl)userNotificationDelivery;
 
 		Session session = null;
 
@@ -1207,7 +1243,9 @@ public class UserNotificationDeliveryPersistenceImpl extends BasePersistenceImpl
 				userNotificationDelivery.setNew(false);
 			}
 			else {
-				userNotificationDelivery = (UserNotificationDelivery)session.merge(userNotificationDelivery);
+				userNotificationDelivery =
+					(UserNotificationDelivery)session.merge(
+						userNotificationDelivery);
 			}
 		}
 		catch (Exception e) {
@@ -1220,46 +1258,48 @@ public class UserNotificationDeliveryPersistenceImpl extends BasePersistenceImpl
 		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
 
 		if (!UserNotificationDeliveryModelImpl.COLUMN_BITMASK_ENABLED) {
-			FinderCacheUtil.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
+			FinderCacheUtil.clearCache(
+				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
 		}
-		else
-		 if (isNew) {
+		else if (isNew) {
 			Object[] args = new Object[] {
+				userNotificationDeliveryModelImpl.getUserId()
+			};
+
+			FinderCacheUtil.removeResult(_finderPathCountByUserId, args);
+			FinderCacheUtil.removeResult(
+				_finderPathWithoutPaginationFindByUserId, args);
+
+			FinderCacheUtil.removeResult(
+				_finderPathCountAll, FINDER_ARGS_EMPTY);
+			FinderCacheUtil.removeResult(
+				_finderPathWithoutPaginationFindAll, FINDER_ARGS_EMPTY);
+		}
+		else {
+			if ((userNotificationDeliveryModelImpl.getColumnBitmask() &
+				 _finderPathWithoutPaginationFindByUserId.getColumnBitmask()) !=
+					 0) {
+
+				Object[] args = new Object[] {
+					userNotificationDeliveryModelImpl.getOriginalUserId()
+				};
+
+				FinderCacheUtil.removeResult(_finderPathCountByUserId, args);
+				FinderCacheUtil.removeResult(
+					_finderPathWithoutPaginationFindByUserId, args);
+
+				args = new Object[] {
 					userNotificationDeliveryModelImpl.getUserId()
 				};
 
-			FinderCacheUtil.removeResult(FINDER_PATH_COUNT_BY_USERID, args);
-			FinderCacheUtil.removeResult(FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_USERID,
-				args);
-
-			FinderCacheUtil.removeResult(FINDER_PATH_COUNT_ALL,
-				FINDER_ARGS_EMPTY);
-			FinderCacheUtil.removeResult(FINDER_PATH_WITHOUT_PAGINATION_FIND_ALL,
-				FINDER_ARGS_EMPTY);
-		}
-
-		else {
-			if ((userNotificationDeliveryModelImpl.getColumnBitmask() &
-					FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_USERID.getColumnBitmask()) != 0) {
-				Object[] args = new Object[] {
-						userNotificationDeliveryModelImpl.getOriginalUserId()
-					};
-
-				FinderCacheUtil.removeResult(FINDER_PATH_COUNT_BY_USERID, args);
-				FinderCacheUtil.removeResult(FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_USERID,
-					args);
-
-				args = new Object[] {
-						userNotificationDeliveryModelImpl.getUserId()
-					};
-
-				FinderCacheUtil.removeResult(FINDER_PATH_COUNT_BY_USERID, args);
-				FinderCacheUtil.removeResult(FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_USERID,
-					args);
+				FinderCacheUtil.removeResult(_finderPathCountByUserId, args);
+				FinderCacheUtil.removeResult(
+					_finderPathWithoutPaginationFindByUserId, args);
 			}
 		}
 
-		EntityCacheUtil.putResult(UserNotificationDeliveryModelImpl.ENTITY_CACHE_ENABLED,
+		EntityCacheUtil.putResult(
+			UserNotificationDeliveryModelImpl.ENTITY_CACHE_ENABLED,
 			UserNotificationDeliveryImpl.class,
 			userNotificationDelivery.getPrimaryKey(), userNotificationDelivery,
 			false);
@@ -1273,7 +1313,7 @@ public class UserNotificationDeliveryPersistenceImpl extends BasePersistenceImpl
 	}
 
 	/**
-	 * Returns the user notification delivery with the primary key or throws a {@link com.liferay.portal.kernel.exception.NoSuchModelException} if it could not be found.
+	 * Returns the user notification delivery with the primary key or throws a <code>com.liferay.portal.kernel.exception.NoSuchModelException</code> if it could not be found.
 	 *
 	 * @param primaryKey the primary key of the user notification delivery
 	 * @return the user notification delivery
@@ -1282,22 +1322,24 @@ public class UserNotificationDeliveryPersistenceImpl extends BasePersistenceImpl
 	@Override
 	public UserNotificationDelivery findByPrimaryKey(Serializable primaryKey)
 		throws NoSuchUserNotificationDeliveryException {
-		UserNotificationDelivery userNotificationDelivery = fetchByPrimaryKey(primaryKey);
+
+		UserNotificationDelivery userNotificationDelivery = fetchByPrimaryKey(
+			primaryKey);
 
 		if (userNotificationDelivery == null) {
 			if (_log.isDebugEnabled()) {
 				_log.debug(_NO_SUCH_ENTITY_WITH_PRIMARY_KEY + primaryKey);
 			}
 
-			throw new NoSuchUserNotificationDeliveryException(_NO_SUCH_ENTITY_WITH_PRIMARY_KEY +
-				primaryKey);
+			throw new NoSuchUserNotificationDeliveryException(
+				_NO_SUCH_ENTITY_WITH_PRIMARY_KEY + primaryKey);
 		}
 
 		return userNotificationDelivery;
 	}
 
 	/**
-	 * Returns the user notification delivery with the primary key or throws a {@link NoSuchUserNotificationDeliveryException} if it could not be found.
+	 * Returns the user notification delivery with the primary key or throws a <code>NoSuchUserNotificationDeliveryException</code> if it could not be found.
 	 *
 	 * @param userNotificationDeliveryId the primary key of the user notification delivery
 	 * @return the user notification delivery
@@ -1305,8 +1347,9 @@ public class UserNotificationDeliveryPersistenceImpl extends BasePersistenceImpl
 	 */
 	@Override
 	public UserNotificationDelivery findByPrimaryKey(
-		long userNotificationDeliveryId)
+			long userNotificationDeliveryId)
 		throws NoSuchUserNotificationDeliveryException {
+
 		return findByPrimaryKey((Serializable)userNotificationDeliveryId);
 	}
 
@@ -1318,14 +1361,16 @@ public class UserNotificationDeliveryPersistenceImpl extends BasePersistenceImpl
 	 */
 	@Override
 	public UserNotificationDelivery fetchByPrimaryKey(Serializable primaryKey) {
-		Serializable serializable = EntityCacheUtil.getResult(UserNotificationDeliveryModelImpl.ENTITY_CACHE_ENABLED,
-				UserNotificationDeliveryImpl.class, primaryKey);
+		Serializable serializable = EntityCacheUtil.getResult(
+			UserNotificationDeliveryModelImpl.ENTITY_CACHE_ENABLED,
+			UserNotificationDeliveryImpl.class, primaryKey);
 
 		if (serializable == nullModel) {
 			return null;
 		}
 
-		UserNotificationDelivery userNotificationDelivery = (UserNotificationDelivery)serializable;
+		UserNotificationDelivery userNotificationDelivery =
+			(UserNotificationDelivery)serializable;
 
 		if (userNotificationDelivery == null) {
 			Session session = null;
@@ -1333,20 +1378,23 @@ public class UserNotificationDeliveryPersistenceImpl extends BasePersistenceImpl
 			try {
 				session = openSession();
 
-				userNotificationDelivery = (UserNotificationDelivery)session.get(UserNotificationDeliveryImpl.class,
-						primaryKey);
+				userNotificationDelivery =
+					(UserNotificationDelivery)session.get(
+						UserNotificationDeliveryImpl.class, primaryKey);
 
 				if (userNotificationDelivery != null) {
 					cacheResult(userNotificationDelivery);
 				}
 				else {
-					EntityCacheUtil.putResult(UserNotificationDeliveryModelImpl.ENTITY_CACHE_ENABLED,
+					EntityCacheUtil.putResult(
+						UserNotificationDeliveryModelImpl.ENTITY_CACHE_ENABLED,
 						UserNotificationDeliveryImpl.class, primaryKey,
 						nullModel);
 				}
 			}
 			catch (Exception e) {
-				EntityCacheUtil.removeResult(UserNotificationDeliveryModelImpl.ENTITY_CACHE_ENABLED,
+				EntityCacheUtil.removeResult(
+					UserNotificationDeliveryModelImpl.ENTITY_CACHE_ENABLED,
 					UserNotificationDeliveryImpl.class, primaryKey);
 
 				throw processException(e);
@@ -1368,24 +1416,28 @@ public class UserNotificationDeliveryPersistenceImpl extends BasePersistenceImpl
 	@Override
 	public UserNotificationDelivery fetchByPrimaryKey(
 		long userNotificationDeliveryId) {
+
 		return fetchByPrimaryKey((Serializable)userNotificationDeliveryId);
 	}
 
 	@Override
 	public Map<Serializable, UserNotificationDelivery> fetchByPrimaryKeys(
 		Set<Serializable> primaryKeys) {
+
 		if (primaryKeys.isEmpty()) {
 			return Collections.emptyMap();
 		}
 
-		Map<Serializable, UserNotificationDelivery> map = new HashMap<Serializable, UserNotificationDelivery>();
+		Map<Serializable, UserNotificationDelivery> map =
+			new HashMap<Serializable, UserNotificationDelivery>();
 
 		if (primaryKeys.size() == 1) {
 			Iterator<Serializable> iterator = primaryKeys.iterator();
 
 			Serializable primaryKey = iterator.next();
 
-			UserNotificationDelivery userNotificationDelivery = fetchByPrimaryKey(primaryKey);
+			UserNotificationDelivery userNotificationDelivery =
+				fetchByPrimaryKey(primaryKey);
 
 			if (userNotificationDelivery != null) {
 				map.put(primaryKey, userNotificationDelivery);
@@ -1397,8 +1449,9 @@ public class UserNotificationDeliveryPersistenceImpl extends BasePersistenceImpl
 		Set<Serializable> uncachedPrimaryKeys = null;
 
 		for (Serializable primaryKey : primaryKeys) {
-			Serializable serializable = EntityCacheUtil.getResult(UserNotificationDeliveryModelImpl.ENTITY_CACHE_ENABLED,
-					UserNotificationDeliveryImpl.class, primaryKey);
+			Serializable serializable = EntityCacheUtil.getResult(
+				UserNotificationDeliveryModelImpl.ENTITY_CACHE_ENABLED,
+				UserNotificationDeliveryImpl.class, primaryKey);
 
 			if (serializable != nullModel) {
 				if (serializable == null) {
@@ -1418,8 +1471,8 @@ public class UserNotificationDeliveryPersistenceImpl extends BasePersistenceImpl
 			return map;
 		}
 
-		StringBundler query = new StringBundler((uncachedPrimaryKeys.size() * 2) +
-				1);
+		StringBundler query = new StringBundler(
+			uncachedPrimaryKeys.size() * 2 + 1);
 
 		query.append(_SQL_SELECT_USERNOTIFICATIONDELIVERY_WHERE_PKS_IN);
 
@@ -1442,17 +1495,22 @@ public class UserNotificationDeliveryPersistenceImpl extends BasePersistenceImpl
 
 			Query q = session.createQuery(sql);
 
-			for (UserNotificationDelivery userNotificationDelivery : (List<UserNotificationDelivery>)q.list()) {
-				map.put(userNotificationDelivery.getPrimaryKeyObj(),
+			for (UserNotificationDelivery userNotificationDelivery :
+					(List<UserNotificationDelivery>)q.list()) {
+
+				map.put(
+					userNotificationDelivery.getPrimaryKeyObj(),
 					userNotificationDelivery);
 
 				cacheResult(userNotificationDelivery);
 
-				uncachedPrimaryKeys.remove(userNotificationDelivery.getPrimaryKeyObj());
+				uncachedPrimaryKeys.remove(
+					userNotificationDelivery.getPrimaryKeyObj());
 			}
 
 			for (Serializable primaryKey : uncachedPrimaryKeys) {
-				EntityCacheUtil.putResult(UserNotificationDeliveryModelImpl.ENTITY_CACHE_ENABLED,
+				EntityCacheUtil.putResult(
+					UserNotificationDeliveryModelImpl.ENTITY_CACHE_ENABLED,
 					UserNotificationDeliveryImpl.class, primaryKey, nullModel);
 			}
 		}
@@ -1480,7 +1538,7 @@ public class UserNotificationDeliveryPersistenceImpl extends BasePersistenceImpl
 	 * Returns a range of all the user notification deliveries.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link UserNotificationDeliveryModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>UserNotificationDeliveryModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param start the lower bound of the range of user notification deliveries
@@ -1496,7 +1554,7 @@ public class UserNotificationDeliveryPersistenceImpl extends BasePersistenceImpl
 	 * Returns an ordered range of all the user notification deliveries.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link UserNotificationDeliveryModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>UserNotificationDeliveryModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param start the lower bound of the range of user notification deliveries
@@ -1505,8 +1563,10 @@ public class UserNotificationDeliveryPersistenceImpl extends BasePersistenceImpl
 	 * @return the ordered range of user notification deliveries
 	 */
 	@Override
-	public List<UserNotificationDelivery> findAll(int start, int end,
+	public List<UserNotificationDelivery> findAll(
+		int start, int end,
 		OrderByComparator<UserNotificationDelivery> orderByComparator) {
+
 		return findAll(start, end, orderByComparator, true);
 	}
 
@@ -1514,7 +1574,7 @@ public class UserNotificationDeliveryPersistenceImpl extends BasePersistenceImpl
 	 * Returns an ordered range of all the user notification deliveries.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link UserNotificationDeliveryModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>UserNotificationDeliveryModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param start the lower bound of the range of user notification deliveries
@@ -1524,29 +1584,32 @@ public class UserNotificationDeliveryPersistenceImpl extends BasePersistenceImpl
 	 * @return the ordered range of user notification deliveries
 	 */
 	@Override
-	public List<UserNotificationDelivery> findAll(int start, int end,
+	public List<UserNotificationDelivery> findAll(
+		int start, int end,
 		OrderByComparator<UserNotificationDelivery> orderByComparator,
 		boolean retrieveFromCache) {
+
 		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
-				(orderByComparator == null)) {
+			(orderByComparator == null)) {
+
 			pagination = false;
-			finderPath = FINDER_PATH_WITHOUT_PAGINATION_FIND_ALL;
+			finderPath = _finderPathWithoutPaginationFindAll;
 			finderArgs = FINDER_ARGS_EMPTY;
 		}
 		else {
-			finderPath = FINDER_PATH_WITH_PAGINATION_FIND_ALL;
-			finderArgs = new Object[] { start, end, orderByComparator };
+			finderPath = _finderPathWithPaginationFindAll;
+			finderArgs = new Object[] {start, end, orderByComparator};
 		}
 
 		List<UserNotificationDelivery> list = null;
 
 		if (retrieveFromCache) {
-			list = (List<UserNotificationDelivery>)FinderCacheUtil.getResult(finderPath,
-					finderArgs, this);
+			list = (List<UserNotificationDelivery>)FinderCacheUtil.getResult(
+				finderPath, finderArgs, this);
 		}
 
 		if (list == null) {
@@ -1554,13 +1617,13 @@ public class UserNotificationDeliveryPersistenceImpl extends BasePersistenceImpl
 			String sql = null;
 
 			if (orderByComparator != null) {
-				query = new StringBundler(2 +
-						(orderByComparator.getOrderByFields().length * 2));
+				query = new StringBundler(
+					2 + (orderByComparator.getOrderByFields().length * 2));
 
 				query.append(_SQL_SELECT_USERNOTIFICATIONDELIVERY);
 
-				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
-					orderByComparator);
+				appendOrderByComparator(
+					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
 
 				sql = query.toString();
 			}
@@ -1568,7 +1631,8 @@ public class UserNotificationDeliveryPersistenceImpl extends BasePersistenceImpl
 				sql = _SQL_SELECT_USERNOTIFICATIONDELIVERY;
 
 				if (pagination) {
-					sql = sql.concat(UserNotificationDeliveryModelImpl.ORDER_BY_JPQL);
+					sql = sql.concat(
+						UserNotificationDeliveryModelImpl.ORDER_BY_JPQL);
 				}
 			}
 
@@ -1580,16 +1644,16 @@ public class UserNotificationDeliveryPersistenceImpl extends BasePersistenceImpl
 				Query q = session.createQuery(sql);
 
 				if (!pagination) {
-					list = (List<UserNotificationDelivery>)QueryUtil.list(q,
-							getDialect(), start, end, false);
+					list = (List<UserNotificationDelivery>)QueryUtil.list(
+						q, getDialect(), start, end, false);
 
 					Collections.sort(list);
 
 					list = Collections.unmodifiableList(list);
 				}
 				else {
-					list = (List<UserNotificationDelivery>)QueryUtil.list(q,
-							getDialect(), start, end);
+					list = (List<UserNotificationDelivery>)QueryUtil.list(
+						q, getDialect(), start, end);
 				}
 
 				cacheResult(list);
@@ -1627,8 +1691,8 @@ public class UserNotificationDeliveryPersistenceImpl extends BasePersistenceImpl
 	 */
 	@Override
 	public int countAll() {
-		Long count = (Long)FinderCacheUtil.getResult(FINDER_PATH_COUNT_ALL,
-				FINDER_ARGS_EMPTY, this);
+		Long count = (Long)FinderCacheUtil.getResult(
+			_finderPathCountAll, FINDER_ARGS_EMPTY, this);
 
 		if (count == null) {
 			Session session = null;
@@ -1636,16 +1700,17 @@ public class UserNotificationDeliveryPersistenceImpl extends BasePersistenceImpl
 			try {
 				session = openSession();
 
-				Query q = session.createQuery(_SQL_COUNT_USERNOTIFICATIONDELIVERY);
+				Query q = session.createQuery(
+					_SQL_COUNT_USERNOTIFICATIONDELIVERY);
 
 				count = (Long)q.uniqueResult();
 
-				FinderCacheUtil.putResult(FINDER_PATH_COUNT_ALL,
-					FINDER_ARGS_EMPTY, count);
+				FinderCacheUtil.putResult(
+					_finderPathCountAll, FINDER_ARGS_EMPTY, count);
 			}
 			catch (Exception e) {
-				FinderCacheUtil.removeResult(FINDER_PATH_COUNT_ALL,
-					FINDER_ARGS_EMPTY);
+				FinderCacheUtil.removeResult(
+					_finderPathCountAll, FINDER_ARGS_EMPTY);
 
 				throw processException(e);
 			}
@@ -1666,10 +1731,79 @@ public class UserNotificationDeliveryPersistenceImpl extends BasePersistenceImpl
 	 * Initializes the user notification delivery persistence.
 	 */
 	public void afterPropertiesSet() {
+		_finderPathWithPaginationFindAll = new FinderPath(
+			UserNotificationDeliveryModelImpl.ENTITY_CACHE_ENABLED,
+			UserNotificationDeliveryModelImpl.FINDER_CACHE_ENABLED,
+			UserNotificationDeliveryImpl.class,
+			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findAll", new String[0]);
+
+		_finderPathWithoutPaginationFindAll = new FinderPath(
+			UserNotificationDeliveryModelImpl.ENTITY_CACHE_ENABLED,
+			UserNotificationDeliveryModelImpl.FINDER_CACHE_ENABLED,
+			UserNotificationDeliveryImpl.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findAll",
+			new String[0]);
+
+		_finderPathCountAll = new FinderPath(
+			UserNotificationDeliveryModelImpl.ENTITY_CACHE_ENABLED,
+			UserNotificationDeliveryModelImpl.FINDER_CACHE_ENABLED, Long.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countAll",
+			new String[0]);
+
+		_finderPathWithPaginationFindByUserId = new FinderPath(
+			UserNotificationDeliveryModelImpl.ENTITY_CACHE_ENABLED,
+			UserNotificationDeliveryModelImpl.FINDER_CACHE_ENABLED,
+			UserNotificationDeliveryImpl.class,
+			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByUserId",
+			new String[] {
+				Long.class.getName(), Integer.class.getName(),
+				Integer.class.getName(), OrderByComparator.class.getName()
+			});
+
+		_finderPathWithoutPaginationFindByUserId = new FinderPath(
+			UserNotificationDeliveryModelImpl.ENTITY_CACHE_ENABLED,
+			UserNotificationDeliveryModelImpl.FINDER_CACHE_ENABLED,
+			UserNotificationDeliveryImpl.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByUserId",
+			new String[] {Long.class.getName()},
+			UserNotificationDeliveryModelImpl.USERID_COLUMN_BITMASK);
+
+		_finderPathCountByUserId = new FinderPath(
+			UserNotificationDeliveryModelImpl.ENTITY_CACHE_ENABLED,
+			UserNotificationDeliveryModelImpl.FINDER_CACHE_ENABLED, Long.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByUserId",
+			new String[] {Long.class.getName()});
+
+		_finderPathFetchByU_P_C_N_D = new FinderPath(
+			UserNotificationDeliveryModelImpl.ENTITY_CACHE_ENABLED,
+			UserNotificationDeliveryModelImpl.FINDER_CACHE_ENABLED,
+			UserNotificationDeliveryImpl.class, FINDER_CLASS_NAME_ENTITY,
+			"fetchByU_P_C_N_D",
+			new String[] {
+				Long.class.getName(), String.class.getName(),
+				Long.class.getName(), Integer.class.getName(),
+				Integer.class.getName()
+			},
+			UserNotificationDeliveryModelImpl.USERID_COLUMN_BITMASK |
+			UserNotificationDeliveryModelImpl.PORTLETID_COLUMN_BITMASK |
+			UserNotificationDeliveryModelImpl.CLASSNAMEID_COLUMN_BITMASK |
+			UserNotificationDeliveryModelImpl.NOTIFICATIONTYPE_COLUMN_BITMASK |
+			UserNotificationDeliveryModelImpl.DELIVERYTYPE_COLUMN_BITMASK);
+
+		_finderPathCountByU_P_C_N_D = new FinderPath(
+			UserNotificationDeliveryModelImpl.ENTITY_CACHE_ENABLED,
+			UserNotificationDeliveryModelImpl.FINDER_CACHE_ENABLED, Long.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByU_P_C_N_D",
+			new String[] {
+				Long.class.getName(), String.class.getName(),
+				Long.class.getName(), Integer.class.getName(),
+				Integer.class.getName()
+			});
 	}
 
 	public void destroy() {
-		EntityCacheUtil.removeCache(UserNotificationDeliveryImpl.class.getName());
+		EntityCacheUtil.removeCache(
+			UserNotificationDeliveryImpl.class.getName());
 		FinderCacheUtil.removeCache(FINDER_CLASS_NAME_ENTITY);
 		FinderCacheUtil.removeCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
 		FinderCacheUtil.removeCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
@@ -1677,14 +1811,33 @@ public class UserNotificationDeliveryPersistenceImpl extends BasePersistenceImpl
 
 	@BeanReference(type = CompanyProviderWrapper.class)
 	protected CompanyProvider companyProvider;
-	private static final String _SQL_SELECT_USERNOTIFICATIONDELIVERY = "SELECT userNotificationDelivery FROM UserNotificationDelivery userNotificationDelivery";
-	private static final String _SQL_SELECT_USERNOTIFICATIONDELIVERY_WHERE_PKS_IN =
-		"SELECT userNotificationDelivery FROM UserNotificationDelivery userNotificationDelivery WHERE userNotificationDeliveryId IN (";
-	private static final String _SQL_SELECT_USERNOTIFICATIONDELIVERY_WHERE = "SELECT userNotificationDelivery FROM UserNotificationDelivery userNotificationDelivery WHERE ";
-	private static final String _SQL_COUNT_USERNOTIFICATIONDELIVERY = "SELECT COUNT(userNotificationDelivery) FROM UserNotificationDelivery userNotificationDelivery";
-	private static final String _SQL_COUNT_USERNOTIFICATIONDELIVERY_WHERE = "SELECT COUNT(userNotificationDelivery) FROM UserNotificationDelivery userNotificationDelivery WHERE ";
-	private static final String _ORDER_BY_ENTITY_ALIAS = "userNotificationDelivery.";
-	private static final String _NO_SUCH_ENTITY_WITH_PRIMARY_KEY = "No UserNotificationDelivery exists with the primary key ";
-	private static final String _NO_SUCH_ENTITY_WITH_KEY = "No UserNotificationDelivery exists with the key {";
-	private static final Log _log = LogFactoryUtil.getLog(UserNotificationDeliveryPersistenceImpl.class);
+
+	private static final String _SQL_SELECT_USERNOTIFICATIONDELIVERY =
+		"SELECT userNotificationDelivery FROM UserNotificationDelivery userNotificationDelivery";
+
+	private static final String
+		_SQL_SELECT_USERNOTIFICATIONDELIVERY_WHERE_PKS_IN =
+			"SELECT userNotificationDelivery FROM UserNotificationDelivery userNotificationDelivery WHERE userNotificationDeliveryId IN (";
+
+	private static final String _SQL_SELECT_USERNOTIFICATIONDELIVERY_WHERE =
+		"SELECT userNotificationDelivery FROM UserNotificationDelivery userNotificationDelivery WHERE ";
+
+	private static final String _SQL_COUNT_USERNOTIFICATIONDELIVERY =
+		"SELECT COUNT(userNotificationDelivery) FROM UserNotificationDelivery userNotificationDelivery";
+
+	private static final String _SQL_COUNT_USERNOTIFICATIONDELIVERY_WHERE =
+		"SELECT COUNT(userNotificationDelivery) FROM UserNotificationDelivery userNotificationDelivery WHERE ";
+
+	private static final String _ORDER_BY_ENTITY_ALIAS =
+		"userNotificationDelivery.";
+
+	private static final String _NO_SUCH_ENTITY_WITH_PRIMARY_KEY =
+		"No UserNotificationDelivery exists with the primary key ";
+
+	private static final String _NO_SUCH_ENTITY_WITH_KEY =
+		"No UserNotificationDelivery exists with the key {";
+
+	private static final Log _log = LogFactoryUtil.getLog(
+		UserNotificationDeliveryPersistenceImpl.class);
+
 }

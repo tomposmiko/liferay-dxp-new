@@ -17,7 +17,6 @@ package com.liferay.mail.reader.model;
 import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.expando.kernel.model.ExpandoBridge;
-
 import com.liferay.portal.kernel.model.ModelWrapper;
 import com.liferay.portal.kernel.service.ServiceContext;
 
@@ -38,6 +37,7 @@ import java.util.Objects;
  */
 @ProviderType
 public class AttachmentWrapper implements Attachment, ModelWrapper<Attachment> {
+
 	public AttachmentWrapper(Attachment attachment) {
 		_attachment = attachment;
 	}
@@ -137,40 +137,40 @@ public class AttachmentWrapper implements Attachment, ModelWrapper<Attachment> {
 	}
 
 	/**
-	* Returns the account ID of this attachment.
-	*
-	* @return the account ID of this attachment
-	*/
+	 * Returns the account ID of this attachment.
+	 *
+	 * @return the account ID of this attachment
+	 */
 	@Override
 	public long getAccountId() {
 		return _attachment.getAccountId();
 	}
 
 	/**
-	* Returns the attachment ID of this attachment.
-	*
-	* @return the attachment ID of this attachment
-	*/
+	 * Returns the attachment ID of this attachment.
+	 *
+	 * @return the attachment ID of this attachment
+	 */
 	@Override
 	public long getAttachmentId() {
 		return _attachment.getAttachmentId();
 	}
 
 	/**
-	* Returns the company ID of this attachment.
-	*
-	* @return the company ID of this attachment
-	*/
+	 * Returns the company ID of this attachment.
+	 *
+	 * @return the company ID of this attachment
+	 */
 	@Override
 	public long getCompanyId() {
 		return _attachment.getCompanyId();
 	}
 
 	/**
-	* Returns the content path of this attachment.
-	*
-	* @return the content path of this attachment
-	*/
+	 * Returns the content path of this attachment.
+	 *
+	 * @return the content path of this attachment
+	 */
 	@Override
 	public String getContentPath() {
 		return _attachment.getContentPath();
@@ -182,40 +182,40 @@ public class AttachmentWrapper implements Attachment, ModelWrapper<Attachment> {
 	}
 
 	/**
-	* Returns the file name of this attachment.
-	*
-	* @return the file name of this attachment
-	*/
+	 * Returns the file name of this attachment.
+	 *
+	 * @return the file name of this attachment
+	 */
 	@Override
 	public String getFileName() {
 		return _attachment.getFileName();
 	}
 
 	/**
-	* Returns the folder ID of this attachment.
-	*
-	* @return the folder ID of this attachment
-	*/
+	 * Returns the folder ID of this attachment.
+	 *
+	 * @return the folder ID of this attachment
+	 */
 	@Override
 	public long getFolderId() {
 		return _attachment.getFolderId();
 	}
 
 	/**
-	* Returns the message ID of this attachment.
-	*
-	* @return the message ID of this attachment
-	*/
+	 * Returns the message ID of this attachment.
+	 *
+	 * @return the message ID of this attachment
+	 */
 	@Override
 	public long getMessageId() {
 		return _attachment.getMessageId();
 	}
 
 	/**
-	* Returns the primary key of this attachment.
-	*
-	* @return the primary key of this attachment
-	*/
+	 * Returns the primary key of this attachment.
+	 *
+	 * @return the primary key of this attachment
+	 */
 	@Override
 	public long getPrimaryKey() {
 		return _attachment.getPrimaryKey();
@@ -227,30 +227,30 @@ public class AttachmentWrapper implements Attachment, ModelWrapper<Attachment> {
 	}
 
 	/**
-	* Returns the size of this attachment.
-	*
-	* @return the size of this attachment
-	*/
+	 * Returns the size of this attachment.
+	 *
+	 * @return the size of this attachment
+	 */
 	@Override
 	public long getSize() {
 		return _attachment.getSize();
 	}
 
 	/**
-	* Returns the user ID of this attachment.
-	*
-	* @return the user ID of this attachment
-	*/
+	 * Returns the user ID of this attachment.
+	 *
+	 * @return the user ID of this attachment
+	 */
 	@Override
 	public long getUserId() {
 		return _attachment.getUserId();
 	}
 
 	/**
-	* Returns the user uuid of this attachment.
-	*
-	* @return the user uuid of this attachment
-	*/
+	 * Returns the user uuid of this attachment.
+	 *
+	 * @return the user uuid of this attachment
+	 */
 	@Override
 	public String getUserUuid() {
 		return _attachment.getUserUuid();
@@ -282,20 +282,20 @@ public class AttachmentWrapper implements Attachment, ModelWrapper<Attachment> {
 	}
 
 	/**
-	* Sets the account ID of this attachment.
-	*
-	* @param accountId the account ID of this attachment
-	*/
+	 * Sets the account ID of this attachment.
+	 *
+	 * @param accountId the account ID of this attachment
+	 */
 	@Override
 	public void setAccountId(long accountId) {
 		_attachment.setAccountId(accountId);
 	}
 
 	/**
-	* Sets the attachment ID of this attachment.
-	*
-	* @param attachmentId the attachment ID of this attachment
-	*/
+	 * Sets the attachment ID of this attachment.
+	 *
+	 * @param attachmentId the attachment ID of this attachment
+	 */
 	@Override
 	public void setAttachmentId(long attachmentId) {
 		_attachment.setAttachmentId(attachmentId);
@@ -307,20 +307,20 @@ public class AttachmentWrapper implements Attachment, ModelWrapper<Attachment> {
 	}
 
 	/**
-	* Sets the company ID of this attachment.
-	*
-	* @param companyId the company ID of this attachment
-	*/
+	 * Sets the company ID of this attachment.
+	 *
+	 * @param companyId the company ID of this attachment
+	 */
 	@Override
 	public void setCompanyId(long companyId) {
 		_attachment.setCompanyId(companyId);
 	}
 
 	/**
-	* Sets the content path of this attachment.
-	*
-	* @param contentPath the content path of this attachment
-	*/
+	 * Sets the content path of this attachment.
+	 *
+	 * @param contentPath the content path of this attachment
+	 */
 	@Override
 	public void setContentPath(String contentPath) {
 		_attachment.setContentPath(contentPath);
@@ -329,6 +329,7 @@ public class AttachmentWrapper implements Attachment, ModelWrapper<Attachment> {
 	@Override
 	public void setExpandoBridgeAttributes(
 		com.liferay.portal.kernel.model.BaseModel<?> baseModel) {
+
 		_attachment.setExpandoBridgeAttributes(baseModel);
 	}
 
@@ -343,30 +344,30 @@ public class AttachmentWrapper implements Attachment, ModelWrapper<Attachment> {
 	}
 
 	/**
-	* Sets the file name of this attachment.
-	*
-	* @param fileName the file name of this attachment
-	*/
+	 * Sets the file name of this attachment.
+	 *
+	 * @param fileName the file name of this attachment
+	 */
 	@Override
 	public void setFileName(String fileName) {
 		_attachment.setFileName(fileName);
 	}
 
 	/**
-	* Sets the folder ID of this attachment.
-	*
-	* @param folderId the folder ID of this attachment
-	*/
+	 * Sets the folder ID of this attachment.
+	 *
+	 * @param folderId the folder ID of this attachment
+	 */
 	@Override
 	public void setFolderId(long folderId) {
 		_attachment.setFolderId(folderId);
 	}
 
 	/**
-	* Sets the message ID of this attachment.
-	*
-	* @param messageId the message ID of this attachment
-	*/
+	 * Sets the message ID of this attachment.
+	 *
+	 * @param messageId the message ID of this attachment
+	 */
 	@Override
 	public void setMessageId(long messageId) {
 		_attachment.setMessageId(messageId);
@@ -378,10 +379,10 @@ public class AttachmentWrapper implements Attachment, ModelWrapper<Attachment> {
 	}
 
 	/**
-	* Sets the primary key of this attachment.
-	*
-	* @param primaryKey the primary key of this attachment
-	*/
+	 * Sets the primary key of this attachment.
+	 *
+	 * @param primaryKey the primary key of this attachment
+	 */
 	@Override
 	public void setPrimaryKey(long primaryKey) {
 		_attachment.setPrimaryKey(primaryKey);
@@ -393,37 +394,39 @@ public class AttachmentWrapper implements Attachment, ModelWrapper<Attachment> {
 	}
 
 	/**
-	* Sets the size of this attachment.
-	*
-	* @param size the size of this attachment
-	*/
+	 * Sets the size of this attachment.
+	 *
+	 * @param size the size of this attachment
+	 */
 	@Override
 	public void setSize(long size) {
 		_attachment.setSize(size);
 	}
 
 	/**
-	* Sets the user ID of this attachment.
-	*
-	* @param userId the user ID of this attachment
-	*/
+	 * Sets the user ID of this attachment.
+	 *
+	 * @param userId the user ID of this attachment
+	 */
 	@Override
 	public void setUserId(long userId) {
 		_attachment.setUserId(userId);
 	}
 
 	/**
-	* Sets the user uuid of this attachment.
-	*
-	* @param userUuid the user uuid of this attachment
-	*/
+	 * Sets the user uuid of this attachment.
+	 *
+	 * @param userUuid the user uuid of this attachment
+	 */
 	@Override
 	public void setUserUuid(String userUuid) {
 		_attachment.setUserUuid(userUuid);
 	}
 
 	@Override
-	public com.liferay.portal.kernel.model.CacheModel<Attachment> toCacheModel() {
+	public com.liferay.portal.kernel.model.CacheModel<Attachment>
+		toCacheModel() {
+
 		return _attachment.toCacheModel();
 	}
 
@@ -487,4 +490,5 @@ public class AttachmentWrapper implements Attachment, ModelWrapper<Attachment> {
 	}
 
 	private final Attachment _attachment;
+
 }

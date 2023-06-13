@@ -33,12 +33,12 @@ import java.util.Date;
  * The cache model class for representing Image in entity cache.
  *
  * @author Brian Wing Shun Chan
- * @see Image
  * @generated
  */
 @ProviderType
-public class ImageCacheModel implements CacheModel<Image>, Externalizable,
-	MVCCModel {
+public class ImageCacheModel
+	implements CacheModel<Image>, Externalizable, MVCCModel {
+
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj) {
@@ -52,7 +52,8 @@ public class ImageCacheModel implements CacheModel<Image>, Externalizable,
 		ImageCacheModel imageCacheModel = (ImageCacheModel)obj;
 
 		if ((imageId == imageCacheModel.imageId) &&
-				(mvccVersion == imageCacheModel.mvccVersion)) {
+			(mvccVersion == imageCacheModel.mvccVersion)) {
+
 			return true;
 		}
 
@@ -150,8 +151,7 @@ public class ImageCacheModel implements CacheModel<Image>, Externalizable,
 	}
 
 	@Override
-	public void writeExternal(ObjectOutput objectOutput)
-		throws IOException {
+	public void writeExternal(ObjectOutput objectOutput) throws IOException {
 		objectOutput.writeLong(mvccVersion);
 
 		objectOutput.writeLong(imageId);
@@ -181,4 +181,5 @@ public class ImageCacheModel implements CacheModel<Image>, Externalizable,
 	public int height;
 	public int width;
 	public int size;
+
 }

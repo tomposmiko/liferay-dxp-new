@@ -26,21 +26,23 @@ import com.liferay.portal.kernel.util.Accessor;
  *
  * @author Brian Wing Shun Chan
  * @see DLFileShortcutModel
- * @see com.liferay.portlet.documentlibrary.model.impl.DLFileShortcutImpl
- * @see com.liferay.portlet.documentlibrary.model.impl.DLFileShortcutModelImpl
  * @generated
  */
-@ImplementationClassName("com.liferay.portlet.documentlibrary.model.impl.DLFileShortcutImpl")
+@ImplementationClassName(
+	"com.liferay.portlet.documentlibrary.model.impl.DLFileShortcutImpl"
+)
 @ProviderType
-public interface DLFileShortcut extends DLFileShortcutModel, PersistedModel,
-	TreeModel {
+public interface DLFileShortcut
+	extends DLFileShortcutModel, PersistedModel, TreeModel {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
-	 * Never modify this interface directly. Add methods to {@link com.liferay.portlet.documentlibrary.model.impl.DLFileShortcutImpl} and rerun ServiceBuilder to automatically copy the method declarations to this interface.
+	 * Never modify this interface directly. Add methods to <code>com.liferay.portlet.documentlibrary.model.impl.DLFileShortcutImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
 	 */
-	public static final Accessor<DLFileShortcut, Long> FILE_SHORTCUT_ID_ACCESSOR =
-		new Accessor<DLFileShortcut, Long>() {
+	public static final Accessor<DLFileShortcut, Long>
+		FILE_SHORTCUT_ID_ACCESSOR = new Accessor<DLFileShortcut, Long>() {
+
 			@Override
 			public Long get(DLFileShortcut dlFileShortcut) {
 				return dlFileShortcut.getFileShortcutId();
@@ -55,6 +57,7 @@ public interface DLFileShortcut extends DLFileShortcutModel, PersistedModel,
 			public Class<DLFileShortcut> getTypeClass() {
 				return DLFileShortcut.class;
 			}
+
 		};
 
 	@Override
@@ -64,7 +67,8 @@ public interface DLFileShortcut extends DLFileShortcutModel, PersistedModel,
 	public DLFolder getDLFolder()
 		throws com.liferay.portal.kernel.exception.PortalException;
 
-	public com.liferay.portal.kernel.repository.model.FileVersion getFileVersion()
+	public com.liferay.portal.kernel.repository.model.FileVersion
+			getFileVersion()
 		throws com.liferay.portal.kernel.exception.PortalException;
 
 	public com.liferay.portal.kernel.repository.model.Folder getFolder()
@@ -73,4 +77,5 @@ public interface DLFileShortcut extends DLFileShortcutModel, PersistedModel,
 	public String getToTitle();
 
 	public boolean isInHiddenFolder();
+
 }

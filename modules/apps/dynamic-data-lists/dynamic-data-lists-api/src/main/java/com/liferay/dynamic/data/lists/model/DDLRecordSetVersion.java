@@ -25,40 +25,46 @@ import com.liferay.portal.kernel.util.Accessor;
  *
  * @author Brian Wing Shun Chan
  * @see DDLRecordSetVersionModel
- * @see com.liferay.dynamic.data.lists.model.impl.DDLRecordSetVersionImpl
- * @see com.liferay.dynamic.data.lists.model.impl.DDLRecordSetVersionModelImpl
  * @generated
  */
-@ImplementationClassName("com.liferay.dynamic.data.lists.model.impl.DDLRecordSetVersionImpl")
+@ImplementationClassName(
+	"com.liferay.dynamic.data.lists.model.impl.DDLRecordSetVersionImpl"
+)
 @ProviderType
-public interface DDLRecordSetVersion extends DDLRecordSetVersionModel,
-	PersistedModel {
+public interface DDLRecordSetVersion
+	extends DDLRecordSetVersionModel, PersistedModel {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
-	 * Never modify this interface directly. Add methods to {@link com.liferay.dynamic.data.lists.model.impl.DDLRecordSetVersionImpl} and rerun ServiceBuilder to automatically copy the method declarations to this interface.
+	 * Never modify this interface directly. Add methods to <code>com.liferay.dynamic.data.lists.model.impl.DDLRecordSetVersionImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
 	 */
-	public static final Accessor<DDLRecordSetVersion, Long> RECORD_SET_VERSION_ID_ACCESSOR =
-		new Accessor<DDLRecordSetVersion, Long>() {
-			@Override
-			public Long get(DDLRecordSetVersion ddlRecordSetVersion) {
-				return ddlRecordSetVersion.getRecordSetVersionId();
-			}
+	public static final Accessor<DDLRecordSetVersion, Long>
+		RECORD_SET_VERSION_ID_ACCESSOR =
+			new Accessor<DDLRecordSetVersion, Long>() {
 
-			@Override
-			public Class<Long> getAttributeClass() {
-				return Long.class;
-			}
+				@Override
+				public Long get(DDLRecordSetVersion ddlRecordSetVersion) {
+					return ddlRecordSetVersion.getRecordSetVersionId();
+				}
 
-			@Override
-			public Class<DDLRecordSetVersion> getTypeClass() {
-				return DDLRecordSetVersion.class;
-			}
-		};
+				@Override
+				public Class<Long> getAttributeClass() {
+					return Long.class;
+				}
 
-	public com.liferay.dynamic.data.mapping.model.DDMStructureVersion getDDMStructureVersion()
+				@Override
+				public Class<DDLRecordSetVersion> getTypeClass() {
+					return DDLRecordSetVersion.class;
+				}
+
+			};
+
+	public com.liferay.dynamic.data.mapping.model.DDMStructureVersion
+			getDDMStructureVersion()
 		throws com.liferay.portal.kernel.exception.PortalException;
 
 	public DDLRecordSet getRecordSet()
 		throws com.liferay.portal.kernel.exception.PortalException;
+
 }

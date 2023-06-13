@@ -82,6 +82,14 @@ AUI.add(
 
 						instance.render();
 
+						var required = instance.get('required');
+
+						var valid = instance.get('valid');
+
+						if (required && !valid) {
+							instance.showErrorMessage();
+						}
+
 						instance.focusOnTarget();
 					},
 
@@ -118,6 +126,7 @@ AUI.add(
 					_onBlurItem: function() {
 						var instance = this;
 
+						instance.showErrorMessage();
 						instance._fireBlurEvent();
 					},
 

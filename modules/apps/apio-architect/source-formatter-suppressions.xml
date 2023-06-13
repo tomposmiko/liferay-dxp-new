@@ -2,18 +2,31 @@
 
 <suppressions>
 	<checkstyle>
-		<suppress checks="ConstantNameCheck" files="apio-architect-sample/src/test/java/com/liferay/apio/architect/sample/internal/converter/DemoDataUtil\.java" />
-		<suppress checks="MissingModifierCheck" files="apio-architect-impl/src/test/java/com/liferay/apio/architect/internal/annotation/representor/ActionRouterTypeExtractorTest\.java" />
-		<suppress checks="ParsePrimitiveTypeCheck" files="apio-architect-uri-mapper-impl/src/main/java/com/liferay/apio/architect/uri/mapper/internal/PathLongIdentifierMapper\.java" />
-		<suppress checks="SelfReferenceCheck" files="apio-architect-api/src/main/java/com/liferay/apio/architect/functional/Try\.java" />
-		<suppress checks="VariableNameCheck" files="apio-architect-api/src/main/java/com/liferay/apio/architect/routes/.*" />
-		<suppress checks="VariableNameCheck" files="apio-architect-impl/src/main/java/com/liferay/apio/architect/internal/routes/.*" />
+		<suppress checks="ChainingCheck" files="modules/apps/apio-architect/apio-architect-test/src/main/java/com/liferay/apio/architect/internal/test/base/BaseTest\.java" />
+		<suppress checks="ConstantNameCheck" files="modules/apps/apio-architect/apio-architect-sample/src/test/java/com/liferay/apio/architect/sample/internal/converter/DemoDataUtil\.java" />
+		<suppress checks="IndentationCheck" files="modules/apps/apio-architect/apio-architect-api/src/test/java/com/liferay/apio/architect/consumer/DecaConsumerTest\.java" />
+		<suppress checks="IndentationCheck" files="modules/apps/apio-architect/apio-architect-api/src/test/java/com/liferay/apio/architect/consumer/EnneaConsumerTest\.java" />
+		<suppress checks="IndentationCheck" files="modules/apps/apio-architect/apio-architect-api/src/test/java/com/liferay/apio/architect/consumer/HeptaConsumerTest\.java" />
+		<suppress checks="IndentationCheck" files="modules/apps/apio-architect/apio-architect-api/src/test/java/com/liferay/apio/architect/consumer/OctaConsumerTest\.java" />
+		<suppress checks="IndentationCheck" files="modules/apps/apio-architect/apio-architect-api/src/test/java/com/liferay/apio/architect/consumer/throwable/ThrowableDecaConsumerTest\.java" />
+		<suppress checks="IndentationCheck" files="modules/apps/apio-architect/apio-architect-api/src/test/java/com/liferay/apio/architect/consumer/throwable/ThrowableEnneaConsumerTest\.java" />
+		<suppress checks="IndentationCheck" files="modules/apps/apio-architect/apio-architect-api/src/test/java/com/liferay/apio/architect/consumer/throwable/ThrowableHeptaConsumerTest\.java" />
+		<suppress checks="IndentationCheck" files="modules/apps/apio-architect/apio-architect-api/src/test/java/com/liferay/apio/architect/consumer/throwable/ThrowableOctaConsumerTest\.java" />
+		<suppress checks="IndentationCheck" files="modules/apps/apio-architect/apio-architect-api/src/test/java/com/liferay/apio/architect/consumer/throwable/ThrowableUndecaConsumerTest\.java" />
+		<suppress checks="IndentationCheck" files="modules/apps/apio-architect/apio-architect-api/src/test/java/com/liferay/apio/architect/consumer/UndecaConsumerTest\.java" />
+		<suppress checks="MissingModifierCheck" files="modules/apps/apio-architect/apio-architect-impl/src/test/java/com/liferay/apio/architect/internal/annotation/representor/ActionRouterTypeExtractorTest\.java" />
+		<suppress checks="ParsePrimitiveTypeCheck" files="modules/apps/apio-architect/apio-architect-uri-mapper-impl/src/main/java/com/liferay/apio/architect/uri/mapper/internal/PathLongIdentifierMapper\.java" />
+		<suppress checks="VariableNameCheck" files="modules/apps/apio-architect/apio-architect-api/src/main/java/com/liferay/apio/architect/routes/.*" />
+		<suppress checks="VariableNameCheck" files="modules/apps/apio-architect/apio-architect-impl/src/main/java/com/liferay/apio/architect/internal/routes/.*" />
 	</checkstyle>
 	<source-check>
+		<suppress checks="BNDExportsCheck" files="modules/apps/apio-architect/apio-architect-test-fragment/bnd\.bnd" />
 		<suppress checks="JavaDeprecatedJavadocCheck" files=".*" />
-		<suppress checks="JavaIllegalImportsCheck" files="apio-architect-impl/src/main/java/com/liferay/apio/architect/internal/.*" />
-		<suppress checks="JavaModuleInternalImportsCheck" files="apio-architect-impl/src/main/java/com/liferay/apio/architect/internal/wiring/osgi/manager/base/BaseManager\.java" />
-		<suppress checks="JavaModuleInternalImportsCheck" files="apio-architect-impl/src/main/java/com/liferay/apio/architect/internal/wiring/osgi/manager/documentation/contributor/CustomDocumentationManagerImpl\.java" />
+		<suppress checks="JavaIllegalImportsCheck" files="modules/apps/apio-architect/apio-architect-impl/src/main/java/com/liferay/apio/architect/internal/.*" />
+		<suppress checks="JavaModuleInternalImportsCheck" files="modules/apps/apio-architect/apio-architect-impl/src/main/java/com/liferay/apio/architect/internal/wiring/osgi/manager/base/BaseManager\.java" />
+		<suppress checks="JavaModuleInternalImportsCheck" files="modules/apps/apio-architect/apio-architect-impl/src/main/java/com/liferay/apio/architect/internal/wiring/osgi/manager/documentation/contributor/CustomDocumentationManager\.java" />
+		<suppress checks="JavaMultiPlusConcatCheck" files="modules/apps/apio-architect/apio-architect-api/src/main/java/com/liferay/apio/architect/resource/Resource\.java" />
+		<suppress checks="JavaMultiPlusConcatCheck" files="modules/apps/apio-architect/apio-architect-impl/src/main/java/com/liferay/apio/architect/internal/form/FormUtil\.java" />
 		<suppress checks="JavaStaticImportsCheck" files=".*" />
 		<suppress checks="StringMethodsCheck" files=".*" />
 	</source-check>

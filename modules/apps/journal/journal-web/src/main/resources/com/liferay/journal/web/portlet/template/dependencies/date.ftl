@@ -1,19 +1,21 @@
 <#include "init.ftl">
 
+<#assign encodedName = stringUtil.replace(name, ".", "_") />
+
 <#if stringUtil.equals(language, "ftl")>
-${r"<#assign"} ${name}_Data = getterUtil.getString(${variableName})>
+${r"<#assign"} ${encodedName}_Data = getterUtil.getString(${variableName})>
 
-${r"<#if"} validator.isNotNull(${name}_Data)>
-	${r"<#assign"} ${name}_DateObj = dateUtil.parseDate("yyyy-MM-dd", ${name}_Data, locale)>
+${r"<#if"} validator.isNotNull(${encodedName}_Data)>
+	${r"<#assign"} ${encodedName}_DateObj = dateUtil.parseDate("yyyy-MM-dd", ${encodedName}_Data, locale)>
 
-	${r"${"}dateUtil.getDate(${name}_DateObj, "dd MMM yyyy - HH:mm:ss", locale)}
+	${r"${"}dateUtil.getDate(${encodedName}_DateObj, "dd MMM yyyy - HH:mm:ss", locale)}
 ${r"</#if>"}
 <#else>
-#set ($${name}_Data = $getterUtil.getString($${variableName}))
+#set ($${encodedName}_Data = $getterUtil.getString($${variableName}))
 
-#if ($validator.isNotNull($${name}_Data))
-	#set ($${name}_DateObj = $dateUtil.parseDate("yyyy-MM-dd",$${name}_Data, $locale))
+#if ($validator.isNotNull($${encodedName}_Data))
+	#set ($${encodedName}_DateObj = $dateUtil.parseDate("yyyy-MM-dd",$${encodedName}_Data, $locale))
 
-	$dateUtil.getDate($${name}_DateObj, "dd MMM yyyy - HH:mm:ss", $locale)
+	$dateUtil.getDate($${encodedName}_DateObj, "dd MMM yyyy - HH:mm:ss", $locale)
 #end
 </#if>

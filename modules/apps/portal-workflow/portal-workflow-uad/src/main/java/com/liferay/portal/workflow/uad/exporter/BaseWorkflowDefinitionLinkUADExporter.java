@@ -19,7 +19,6 @@ import com.liferay.portal.kernel.model.WorkflowDefinitionLink;
 import com.liferay.portal.kernel.service.WorkflowDefinitionLinkLocalService;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.workflow.uad.constants.PortalWorkflowUADConstants;
-
 import com.liferay.user.associated.data.exporter.DynamicQueryUADExporter;
 
 import org.osgi.service.component.annotations.Reference;
@@ -38,6 +37,7 @@ import org.osgi.service.component.annotations.Reference;
  */
 public abstract class BaseWorkflowDefinitionLinkUADExporter
 	extends DynamicQueryUADExporter<WorkflowDefinitionLink> {
+
 	@Override
 	public Class<WorkflowDefinitionLink> getTypeClass() {
 		return WorkflowDefinitionLink.class;
@@ -50,11 +50,14 @@ public abstract class BaseWorkflowDefinitionLinkUADExporter
 
 	@Override
 	protected String[] doGetUserIdFieldNames() {
-		return PortalWorkflowUADConstants.USER_ID_FIELD_NAMES_WORKFLOW_DEFINITION_LINK;
+		return PortalWorkflowUADConstants.
+			USER_ID_FIELD_NAMES_WORKFLOW_DEFINITION_LINK;
 	}
 
 	@Override
-	protected String toXmlString(WorkflowDefinitionLink workflowDefinitionLink) {
+	protected String toXmlString(
+		WorkflowDefinitionLink workflowDefinitionLink) {
+
 		StringBundler sb = new StringBundler(13);
 
 		sb.append("<model><model-name>");
@@ -80,5 +83,7 @@ public abstract class BaseWorkflowDefinitionLinkUADExporter
 	}
 
 	@Reference
-	protected WorkflowDefinitionLinkLocalService workflowDefinitionLinkLocalService;
+	protected WorkflowDefinitionLinkLocalService
+		workflowDefinitionLinkLocalService;
+
 }

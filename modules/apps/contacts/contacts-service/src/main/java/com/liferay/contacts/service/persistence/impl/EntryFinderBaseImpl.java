@@ -16,7 +16,6 @@ package com.liferay.contacts.service.persistence.impl;
 
 import com.liferay.contacts.model.Entry;
 import com.liferay.contacts.service.persistence.EntryPersistence;
-
 import com.liferay.portal.kernel.bean.BeanReference;
 import com.liferay.portal.kernel.service.persistence.impl.BasePersistenceImpl;
 
@@ -25,6 +24,7 @@ import com.liferay.portal.kernel.service.persistence.impl.BasePersistenceImpl;
  * @generated
  */
 public class EntryFinderBaseImpl extends BasePersistenceImpl<Entry> {
+
 	public EntryFinderBaseImpl() {
 		setModelClass(Entry.class);
 	}
@@ -49,4 +49,5 @@ public class EntryFinderBaseImpl extends BasePersistenceImpl<Entry> {
 
 	@BeanReference(type = EntryPersistence.class)
 	protected EntryPersistence entryPersistence;
+
 }

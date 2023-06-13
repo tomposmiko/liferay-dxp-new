@@ -100,6 +100,16 @@ public class DDMExpressionImplTest {
 	}
 
 	@Test
+	public void testRegexExpression1() throws Exception {
+		new DDMExpressionImpl<>("'\\d{10}'", Boolean.class);
+	}
+
+	@Test
+	public void testRegexExpression2() throws Exception {
+		new DDMExpressionImpl<>("'\\d+'", Boolean.class);
+	}
+
+	@Test
 	public void testReturnTypeBooleanWithBoolean() throws Exception {
 		DDMExpressionImpl ddmExpression = new DDMExpressionImpl<>(
 			"true", Boolean.class);

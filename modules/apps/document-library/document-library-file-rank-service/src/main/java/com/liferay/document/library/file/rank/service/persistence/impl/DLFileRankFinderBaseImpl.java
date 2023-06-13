@@ -16,7 +16,6 @@ package com.liferay.document.library.file.rank.service.persistence.impl;
 
 import com.liferay.document.library.file.rank.model.DLFileRank;
 import com.liferay.document.library.file.rank.service.persistence.DLFileRankPersistence;
-
 import com.liferay.portal.kernel.bean.BeanReference;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
@@ -33,18 +32,19 @@ import java.util.Set;
  * @generated
  */
 public class DLFileRankFinderBaseImpl extends BasePersistenceImpl<DLFileRank> {
+
 	public DLFileRankFinderBaseImpl() {
 		setModelClass(DLFileRank.class);
 
+		Map<String, String> dbColumnNames = new HashMap<String, String>();
+
+		dbColumnNames.put("active", "active_");
+
 		try {
 			Field field = BasePersistenceImpl.class.getDeclaredField(
-					"_dbColumnNames");
+				"_dbColumnNames");
 
 			field.setAccessible(true);
-
-			Map<String, String> dbColumnNames = new HashMap<String, String>();
-
-			dbColumnNames.put("active", "active_");
 
 			field.set(this, dbColumnNames);
 		}
@@ -76,10 +76,14 @@ public class DLFileRankFinderBaseImpl extends BasePersistenceImpl<DLFileRank> {
 	 */
 	public void setDLFileRankPersistence(
 		DLFileRankPersistence dlFileRankPersistence) {
+
 		this.dlFileRankPersistence = dlFileRankPersistence;
 	}
 
 	@BeanReference(type = DLFileRankPersistence.class)
 	protected DLFileRankPersistence dlFileRankPersistence;
-	private static final Log _log = LogFactoryUtil.getLog(DLFileRankFinderBaseImpl.class);
+
+	private static final Log _log = LogFactoryUtil.getLog(
+		DLFileRankFinderBaseImpl.class);
+
 }

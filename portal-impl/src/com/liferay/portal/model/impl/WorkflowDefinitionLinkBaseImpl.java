@@ -34,18 +34,22 @@ import com.liferay.portal.kernel.service.WorkflowDefinitionLinkLocalServiceUtil;
 @ProviderType
 public abstract class WorkflowDefinitionLinkBaseImpl
 	extends WorkflowDefinitionLinkModelImpl implements WorkflowDefinitionLink {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
-	 * Never modify or reference this class directly. All methods that expect a workflow definition link model instance should use the {@link WorkflowDefinitionLink} interface instead.
+	 * Never modify or reference this class directly. All methods that expect a workflow definition link model instance should use the <code>WorkflowDefinitionLink</code> interface instead.
 	 */
 	@Override
 	public void persist() {
 		if (this.isNew()) {
-			WorkflowDefinitionLinkLocalServiceUtil.addWorkflowDefinitionLink(this);
+			WorkflowDefinitionLinkLocalServiceUtil.addWorkflowDefinitionLink(
+				this);
 		}
 		else {
-			WorkflowDefinitionLinkLocalServiceUtil.updateWorkflowDefinitionLink(this);
+			WorkflowDefinitionLinkLocalServiceUtil.updateWorkflowDefinitionLink(
+				this);
 		}
 	}
+
 }

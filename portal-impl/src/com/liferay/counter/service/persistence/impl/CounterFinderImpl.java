@@ -237,9 +237,7 @@ public class CounterFinderImpl
 	}
 
 	protected Connection getConnection() throws SQLException {
-		Connection connection = getDataSource().getConnection();
-
-		return connection;
+		return getDataSource().getConnection();
 	}
 
 	protected CounterRegister getCounterRegister(String name) {

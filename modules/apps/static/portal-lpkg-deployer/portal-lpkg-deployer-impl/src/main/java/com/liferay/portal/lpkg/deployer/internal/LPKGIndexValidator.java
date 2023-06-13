@@ -295,7 +295,13 @@ public class LPKGIndexValidator {
 			_lpkgDeployer.getDeployedLPKGBundles();
 
 		for (Bundle bundle : deployedLPKGBundles.keySet()) {
-			files.add(new File(bundle.getLocation()));
+			String location = bundle.getLocation();
+
+			URI uri = new URI(location);
+
+			uri = uri.normalize();
+
+			files.add(new File(uri.getPath()));
 		}
 
 		List<URI> uris = _indexLPKGFiles(files);

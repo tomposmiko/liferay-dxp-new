@@ -17,7 +17,6 @@ package com.liferay.portal.kernel.model;
 import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.expando.kernel.model.ExpandoBridge;
-
 import com.liferay.portal.kernel.service.ServiceContext;
 
 import java.io.Serializable;
@@ -38,6 +37,7 @@ import java.util.Objects;
  */
 @ProviderType
 public class ImageWrapper implements Image, ModelWrapper<Image> {
+
 	public ImageWrapper(Image image) {
 		_image = image;
 	}
@@ -130,10 +130,10 @@ public class ImageWrapper implements Image, ModelWrapper<Image> {
 	}
 
 	/**
-	* Returns the company ID of this image.
-	*
-	* @return the company ID of this image
-	*/
+	 * Returns the company ID of this image.
+	 *
+	 * @return the company ID of this image
+	 */
 	@Override
 	public long getCompanyId() {
 		return _image.getCompanyId();
@@ -145,50 +145,50 @@ public class ImageWrapper implements Image, ModelWrapper<Image> {
 	}
 
 	/**
-	* Returns the height of this image.
-	*
-	* @return the height of this image
-	*/
+	 * Returns the height of this image.
+	 *
+	 * @return the height of this image
+	 */
 	@Override
 	public int getHeight() {
 		return _image.getHeight();
 	}
 
 	/**
-	* Returns the image ID of this image.
-	*
-	* @return the image ID of this image
-	*/
+	 * Returns the image ID of this image.
+	 *
+	 * @return the image ID of this image
+	 */
 	@Override
 	public long getImageId() {
 		return _image.getImageId();
 	}
 
 	/**
-	* Returns the modified date of this image.
-	*
-	* @return the modified date of this image
-	*/
+	 * Returns the modified date of this image.
+	 *
+	 * @return the modified date of this image
+	 */
 	@Override
 	public Date getModifiedDate() {
 		return _image.getModifiedDate();
 	}
 
 	/**
-	* Returns the mvcc version of this image.
-	*
-	* @return the mvcc version of this image
-	*/
+	 * Returns the mvcc version of this image.
+	 *
+	 * @return the mvcc version of this image
+	 */
 	@Override
 	public long getMvccVersion() {
 		return _image.getMvccVersion();
 	}
 
 	/**
-	* Returns the primary key of this image.
-	*
-	* @return the primary key of this image
-	*/
+	 * Returns the primary key of this image.
+	 *
+	 * @return the primary key of this image
+	 */
 	@Override
 	public long getPrimaryKey() {
 		return _image.getPrimaryKey();
@@ -200,10 +200,10 @@ public class ImageWrapper implements Image, ModelWrapper<Image> {
 	}
 
 	/**
-	* Returns the size of this image.
-	*
-	* @return the size of this image
-	*/
+	 * Returns the size of this image.
+	 *
+	 * @return the size of this image
+	 */
 	@Override
 	public int getSize() {
 		return _image.getSize();
@@ -215,20 +215,20 @@ public class ImageWrapper implements Image, ModelWrapper<Image> {
 	}
 
 	/**
-	* Returns the type of this image.
-	*
-	* @return the type of this image
-	*/
+	 * Returns the type of this image.
+	 *
+	 * @return the type of this image
+	 */
 	@Override
 	public String getType() {
 		return _image.getType();
 	}
 
 	/**
-	* Returns the width of this image.
-	*
-	* @return the width of this image
-	*/
+	 * Returns the width of this image.
+	 *
+	 * @return the width of this image
+	 */
 	@Override
 	public int getWidth() {
 		return _image.getWidth();
@@ -265,10 +265,10 @@ public class ImageWrapper implements Image, ModelWrapper<Image> {
 	}
 
 	/**
-	* Sets the company ID of this image.
-	*
-	* @param companyId the company ID of this image
-	*/
+	 * Sets the company ID of this image.
+	 *
+	 * @param companyId the company ID of this image
+	 */
 	@Override
 	public void setCompanyId(long companyId) {
 		_image.setCompanyId(companyId);
@@ -290,40 +290,40 @@ public class ImageWrapper implements Image, ModelWrapper<Image> {
 	}
 
 	/**
-	* Sets the height of this image.
-	*
-	* @param height the height of this image
-	*/
+	 * Sets the height of this image.
+	 *
+	 * @param height the height of this image
+	 */
 	@Override
 	public void setHeight(int height) {
 		_image.setHeight(height);
 	}
 
 	/**
-	* Sets the image ID of this image.
-	*
-	* @param imageId the image ID of this image
-	*/
+	 * Sets the image ID of this image.
+	 *
+	 * @param imageId the image ID of this image
+	 */
 	@Override
 	public void setImageId(long imageId) {
 		_image.setImageId(imageId);
 	}
 
 	/**
-	* Sets the modified date of this image.
-	*
-	* @param modifiedDate the modified date of this image
-	*/
+	 * Sets the modified date of this image.
+	 *
+	 * @param modifiedDate the modified date of this image
+	 */
 	@Override
 	public void setModifiedDate(Date modifiedDate) {
 		_image.setModifiedDate(modifiedDate);
 	}
 
 	/**
-	* Sets the mvcc version of this image.
-	*
-	* @param mvccVersion the mvcc version of this image
-	*/
+	 * Sets the mvcc version of this image.
+	 *
+	 * @param mvccVersion the mvcc version of this image
+	 */
 	@Override
 	public void setMvccVersion(long mvccVersion) {
 		_image.setMvccVersion(mvccVersion);
@@ -335,10 +335,10 @@ public class ImageWrapper implements Image, ModelWrapper<Image> {
 	}
 
 	/**
-	* Sets the primary key of this image.
-	*
-	* @param primaryKey the primary key of this image
-	*/
+	 * Sets the primary key of this image.
+	 *
+	 * @param primaryKey the primary key of this image
+	 */
 	@Override
 	public void setPrimaryKey(long primaryKey) {
 		_image.setPrimaryKey(primaryKey);
@@ -350,10 +350,10 @@ public class ImageWrapper implements Image, ModelWrapper<Image> {
 	}
 
 	/**
-	* Sets the size of this image.
-	*
-	* @param size the size of this image
-	*/
+	 * Sets the size of this image.
+	 *
+	 * @param size the size of this image
+	 */
 	@Override
 	public void setSize(int size) {
 		_image.setSize(size);
@@ -365,20 +365,20 @@ public class ImageWrapper implements Image, ModelWrapper<Image> {
 	}
 
 	/**
-	* Sets the type of this image.
-	*
-	* @param type the type of this image
-	*/
+	 * Sets the type of this image.
+	 *
+	 * @param type the type of this image
+	 */
 	@Override
 	public void setType(String type) {
 		_image.setType(type);
 	}
 
 	/**
-	* Sets the width of this image.
-	*
-	* @param width the width of this image
-	*/
+	 * Sets the width of this image.
+	 *
+	 * @param width the width of this image
+	 */
 	@Override
 	public void setWidth(int width) {
 		_image.setWidth(width);
@@ -449,4 +449,5 @@ public class ImageWrapper implements Image, ModelWrapper<Image> {
 	}
 
 	private final Image _image;
+
 }

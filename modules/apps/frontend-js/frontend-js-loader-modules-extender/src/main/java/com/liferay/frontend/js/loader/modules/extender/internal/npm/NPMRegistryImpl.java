@@ -17,6 +17,7 @@ package com.liferay.frontend.js.loader.modules.extender.internal.npm;
 import com.github.yuchi.semver.Range;
 import com.github.yuchi.semver.Version;
 
+import com.liferay.frontend.js.loader.modules.extender.internal.JSLoaderModulesTracker;
 import com.liferay.frontend.js.loader.modules.extender.npm.JSBundle;
 import com.liferay.frontend.js.loader.modules.extender.npm.JSBundleProcessor;
 import com.liferay.frontend.js.loader.modules.extender.npm.JSModule;
@@ -344,6 +345,8 @@ public class NPMRegistryImpl implements NPMRegistry {
 		_jsPackageVersions = jsPackageVersions;
 		_resolvedJSModules = resolvedJSModules;
 		_resolvedJSPackages = resolvedJSPackages;
+
+		_jsLoaderModulesTracker.updateLastModified();
 	}
 
 	private synchronized boolean _removeBundle(JSBundle jsBundle) {
@@ -386,6 +389,9 @@ public class NPMRegistryImpl implements NPMRegistry {
 			}
 
 		});
+
+	@Reference
+	private JSLoaderModulesTracker _jsLoaderModulesTracker;
 
 	private Map<String, JSModule> _jsModules = new HashMap<>();
 

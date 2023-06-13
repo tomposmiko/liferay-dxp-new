@@ -52,11 +52,9 @@ public class UpgradeWikiAttachments extends BaseUpgradeAttachments {
 			groupId, companyId, userId, userName, createDate, repositoryId,
 			repositoryFolderId, String.valueOf(containerModelId), false);
 
-		long pageFolderId = getFolderId(
+		return getFolderId(
 			groupId, companyId, userId, userName, createDate, repositoryId,
 			nodeFolderId, String.valueOf(resourcePrimKey), false);
-
-		return pageFolderId;
 	}
 
 	@Override

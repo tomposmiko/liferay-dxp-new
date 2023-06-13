@@ -1,6 +1,6 @@
 Bundle-Name: Liferay User Associated Data API
 Bundle-SymbolicName: com.liferay.user.associated.data.api
-Bundle-Version: 3.0.4
+Bundle-Version: 3.0.5
 Export-Package:\
 	com.liferay.user.associated.data.aggregator,\
 	com.liferay.user.associated.data.anonymizer,\

@@ -17,7 +17,6 @@ package com.liferay.message.boards.service;
 import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.message.boards.model.MBBan;
-
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.jsonwebservice.JSONWebService;
@@ -35,22 +34,28 @@ import com.liferay.portal.kernel.transaction.Transactional;
  *
  * @author Brian Wing Shun Chan
  * @see MBBanServiceUtil
- * @see com.liferay.message.boards.service.base.MBBanServiceBaseImpl
- * @see com.liferay.message.boards.service.impl.MBBanServiceImpl
  * @generated
  */
 @AccessControlled
 @JSONWebService
-@OSGiBeanProperties(property =  {
-	"json.web.service.context.name=mb", "json.web.service.context.path=MBBan"}, service = MBBanService.class)
+@OSGiBeanProperties(
+	property = {
+		"json.web.service.context.name=mb",
+		"json.web.service.context.path=MBBan"
+	},
+	service = MBBanService.class
+)
 @ProviderType
-@Transactional(isolation = Isolation.PORTAL, rollbackFor =  {
-	PortalException.class, SystemException.class})
+@Transactional(
+	isolation = Isolation.PORTAL,
+	rollbackFor = {PortalException.class, SystemException.class}
+)
 public interface MBBanService extends BaseService {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
-	 * Never modify or reference this interface directly. Always use {@link MBBanServiceUtil} to access the message boards ban remote service. Add custom service methods to {@link com.liferay.message.boards.service.impl.MBBanServiceImpl} and rerun ServiceBuilder to automatically copy the method declarations to this interface.
+	 * Never modify or reference this interface directly. Always use {@link MBBanServiceUtil} to access the message boards ban remote service. Add custom service methods to <code>com.liferay.message.boards.service.impl.MBBanServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
 	 */
 	public MBBan addBan(long banUserId, ServiceContext serviceContext)
 		throws PortalException;
@@ -59,9 +64,10 @@ public interface MBBanService extends BaseService {
 		throws PortalException;
 
 	/**
-	* Returns the OSGi service identifier.
-	*
-	* @return the OSGi service identifier
-	*/
+	 * Returns the OSGi service identifier.
+	 *
+	 * @return the OSGi service identifier
+	 */
 	public String getOSGiServiceIdentifier();
+
 }

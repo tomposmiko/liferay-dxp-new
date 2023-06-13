@@ -54,7 +54,6 @@ import com.liferay.portal.kernel.service.PortletLocalServiceUtil;
 import com.liferay.portal.kernel.service.ResourceActionLocalServiceUtil;
 import com.liferay.portal.kernel.service.ThemeLocalServiceUtil;
 import com.liferay.portal.kernel.service.UserLocalServiceUtil;
-import com.liferay.portal.kernel.servlet.DynamicServletRequest;
 import com.liferay.portal.kernel.servlet.InactiveRequestHandler;
 import com.liferay.portal.kernel.servlet.PortalSessionThreadLocal;
 import com.liferay.portal.kernel.template.TemplateManager;
@@ -1237,7 +1236,9 @@ public class MainServlet extends ActionServlet {
 			return;
 		}
 
-		String redirect = PortalUtil.getPathMain().concat("/portal/login");
+		String pathMain = PortalUtil.getPathMain();
+
+		String redirect = pathMain.concat("/portal/login");
 
 		String currentURL = PortalUtil.getCurrentURL(request);
 
@@ -1356,18 +1357,7 @@ public class MainServlet extends ActionServlet {
 			HttpServletResponse response)
 		throws IOException, ServletException {
 
-		DynamicServletRequest dynamicRequest = new DynamicServletRequest(
-			request);
-
-		// Reset layout params or there will be an infinite loop
-
-		dynamicRequest.setParameter("p_l_id", StringPool.BLANK);
-
-		dynamicRequest.setParameter("groupId", StringPool.BLANK);
-		dynamicRequest.setParameter("layoutId", StringPool.BLANK);
-		dynamicRequest.setParameter("privateLayout", StringPool.BLANK);
-
-		PortalUtil.sendError(status, (Exception)t, dynamicRequest, response);
+		PortalUtil.sendError(status, (Exception)t, request, response);
 	}
 
 	protected void setPortalInetSocketAddresses(HttpServletRequest request) {

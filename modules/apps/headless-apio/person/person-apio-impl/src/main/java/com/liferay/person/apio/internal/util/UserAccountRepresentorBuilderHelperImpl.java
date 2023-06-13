@@ -39,7 +39,7 @@ import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
 /**
- * @author Eduardo Perez
+ * @author Eduardo Pérez
  */
 @Component(
 	immediate = true, service = UserAccountRepresentorBuilderHelper.class
@@ -112,8 +112,6 @@ public class UserAccountRepresentorBuilderHelperImpl
 		).addString(
 			"familyName", User::getLastName
 		).addString(
-			"gender", UserAccountRepresentorBuilderHelperImpl::_getGender
-		).addString(
 			"givenName", User::getFirstName
 		).addString(
 			"jobTitle", User::getJobTitle
@@ -127,16 +125,6 @@ public class UserAccountRepresentorBuilderHelperImpl
 	private static Date _getBirthday(User user) {
 		return Try.fromFallible(
 			user::getBirthday
-		).orElse(
-			null
-		);
-	}
-
-	private static String _getGender(User user) {
-		return Try.fromFallible(
-			user::isMale
-		).map(
-			male -> male ? "male" : "female"
 		).orElse(
 			null
 		);

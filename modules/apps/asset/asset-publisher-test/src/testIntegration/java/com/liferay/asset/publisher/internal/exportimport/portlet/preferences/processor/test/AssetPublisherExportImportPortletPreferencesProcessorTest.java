@@ -57,7 +57,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 /**
- * @author Mate Thurzo
+ * @author Máté Thurzó
  */
 @RunWith(Arquillian.class)
 public class AssetPublisherExportImportPortletPreferencesProcessorTest {
@@ -116,7 +116,7 @@ public class AssetPublisherExportImportPortletPreferencesProcessorTest {
 			ExportImportTestUtil.getImportPortletDataContext(
 				_group.getGroupId());
 
-		_portletDataContextExport.setPlid(_layout.getPlid());
+		_portletDataContextImport.setPlid(_layout.getPlid());
 		_portletDataContextImport.setPortletId(
 			AssetPublisherPortletKeys.ASSET_PUBLISHER);
 

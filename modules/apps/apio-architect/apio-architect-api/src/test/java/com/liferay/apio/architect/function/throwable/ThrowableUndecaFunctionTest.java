@@ -30,9 +30,9 @@ public class ThrowableUndecaFunctionTest {
 
 		ThrowableUndecaFunction
 			<String, String, String, String, String, String, String, String,
-			 String, String, String, String> throwableUndecaFunction = (
-				string1, string2, string3, string4, string5, string6,
-				string7, string8, string9, string10, string11) ->
+			 String, String, String, String> throwableUndecaFunction =
+				(string1, string2, string3, string4, string5, string6, string7,
+				 string8, string9, string10, string11) ->
 					string1 + string2 + string3 + string4 + string5 + string6 +
 						string7 + string8 + string9 + string10 + string11;
 
@@ -52,9 +52,9 @@ public class ThrowableUndecaFunctionTest {
 	public void testOnInvokingAndThenWithNullAfterFunctionThrowsException() {
 		ThrowableUndecaFunction
 			<String, String, String, String, String, String, String, String,
-			 String, String, String, String> throwableUndecaFunction = (
-				string1, string2, string3, string4, string5, string6,
-				string7, string8, string9, string10, string11) ->
+			 String, String, String, String> throwableUndecaFunction =
+				(string1, string2, string3, string4, string5, string6, string7,
+				 string8, string9, string10, string11) ->
 					string1 + string2 + string3 + string4 + string5 + string6 +
 						string7 + string8 + string9 + string10 + string11;
 

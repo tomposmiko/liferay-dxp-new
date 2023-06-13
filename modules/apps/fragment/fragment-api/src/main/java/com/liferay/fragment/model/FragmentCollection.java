@@ -25,38 +25,43 @@ import com.liferay.portal.kernel.util.Accessor;
  *
  * @author Brian Wing Shun Chan
  * @see FragmentCollectionModel
- * @see com.liferay.fragment.model.impl.FragmentCollectionImpl
- * @see com.liferay.fragment.model.impl.FragmentCollectionModelImpl
  * @generated
  */
-@ImplementationClassName("com.liferay.fragment.model.impl.FragmentCollectionImpl")
+@ImplementationClassName(
+	"com.liferay.fragment.model.impl.FragmentCollectionImpl"
+)
 @ProviderType
-public interface FragmentCollection extends FragmentCollectionModel,
-	PersistedModel {
+public interface FragmentCollection
+	extends FragmentCollectionModel, PersistedModel {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
-	 * Never modify this interface directly. Add methods to {@link com.liferay.fragment.model.impl.FragmentCollectionImpl} and rerun ServiceBuilder to automatically copy the method declarations to this interface.
+	 * Never modify this interface directly. Add methods to <code>com.liferay.fragment.model.impl.FragmentCollectionImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
 	 */
-	public static final Accessor<FragmentCollection, Long> FRAGMENT_COLLECTION_ID_ACCESSOR =
-		new Accessor<FragmentCollection, Long>() {
-			@Override
-			public Long get(FragmentCollection fragmentCollection) {
-				return fragmentCollection.getFragmentCollectionId();
-			}
+	public static final Accessor<FragmentCollection, Long>
+		FRAGMENT_COLLECTION_ID_ACCESSOR =
+			new Accessor<FragmentCollection, Long>() {
 
-			@Override
-			public Class<Long> getAttributeClass() {
-				return Long.class;
-			}
+				@Override
+				public Long get(FragmentCollection fragmentCollection) {
+					return fragmentCollection.getFragmentCollectionId();
+				}
 
-			@Override
-			public Class<FragmentCollection> getTypeClass() {
-				return FragmentCollection.class;
-			}
-		};
+				@Override
+				public Class<Long> getAttributeClass() {
+					return Long.class;
+				}
+
+				@Override
+				public Class<FragmentCollection> getTypeClass() {
+					return FragmentCollection.class;
+				}
+
+			};
 
 	public void populateZipWriter(
-		com.liferay.portal.kernel.zip.ZipWriter zipWriter)
+			com.liferay.portal.kernel.zip.ZipWriter zipWriter)
 		throws Exception;
+
 }

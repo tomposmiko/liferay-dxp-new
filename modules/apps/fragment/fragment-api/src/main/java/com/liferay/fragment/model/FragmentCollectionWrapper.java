@@ -17,9 +17,7 @@ package com.liferay.fragment.model;
 import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.expando.kernel.model.ExpandoBridge;
-
 import com.liferay.exportimport.kernel.lar.StagedModelType;
-
 import com.liferay.portal.kernel.model.ModelWrapper;
 import com.liferay.portal.kernel.service.ServiceContext;
 
@@ -40,8 +38,9 @@ import java.util.Objects;
  * @generated
  */
 @ProviderType
-public class FragmentCollectionWrapper implements FragmentCollection,
-	ModelWrapper<FragmentCollection> {
+public class FragmentCollectionWrapper
+	implements FragmentCollection, ModelWrapper<FragmentCollection> {
+
 	public FragmentCollectionWrapper(FragmentCollection fragmentCollection) {
 		_fragmentCollection = fragmentCollection;
 	}
@@ -84,7 +83,8 @@ public class FragmentCollectionWrapper implements FragmentCollection,
 			setUuid(uuid);
 		}
 
-		Long fragmentCollectionId = (Long)attributes.get("fragmentCollectionId");
+		Long fragmentCollectionId = (Long)attributes.get(
+			"fragmentCollectionId");
 
 		if (fragmentCollectionId != null) {
 			setFragmentCollectionId(fragmentCollectionId);
@@ -127,7 +127,7 @@ public class FragmentCollectionWrapper implements FragmentCollection,
 		}
 
 		String fragmentCollectionKey = (String)attributes.get(
-				"fragmentCollectionKey");
+			"fragmentCollectionKey");
 
 		if (fragmentCollectionKey != null) {
 			setFragmentCollectionKey(fragmentCollectionKey);
@@ -154,7 +154,8 @@ public class FragmentCollectionWrapper implements FragmentCollection,
 
 	@Override
 	public Object clone() {
-		return new FragmentCollectionWrapper((FragmentCollection)_fragmentCollection.clone());
+		return new FragmentCollectionWrapper(
+			(FragmentCollection)_fragmentCollection.clone());
 	}
 
 	@Override
@@ -163,30 +164,30 @@ public class FragmentCollectionWrapper implements FragmentCollection,
 	}
 
 	/**
-	* Returns the company ID of this fragment collection.
-	*
-	* @return the company ID of this fragment collection
-	*/
+	 * Returns the company ID of this fragment collection.
+	 *
+	 * @return the company ID of this fragment collection
+	 */
 	@Override
 	public long getCompanyId() {
 		return _fragmentCollection.getCompanyId();
 	}
 
 	/**
-	* Returns the create date of this fragment collection.
-	*
-	* @return the create date of this fragment collection
-	*/
+	 * Returns the create date of this fragment collection.
+	 *
+	 * @return the create date of this fragment collection
+	 */
 	@Override
 	public Date getCreateDate() {
 		return _fragmentCollection.getCreateDate();
 	}
 
 	/**
-	* Returns the description of this fragment collection.
-	*
-	* @return the description of this fragment collection
-	*/
+	 * Returns the description of this fragment collection.
+	 *
+	 * @return the description of this fragment collection
+	 */
 	@Override
 	public String getDescription() {
 		return _fragmentCollection.getDescription();
@@ -198,70 +199,70 @@ public class FragmentCollectionWrapper implements FragmentCollection,
 	}
 
 	/**
-	* Returns the fragment collection ID of this fragment collection.
-	*
-	* @return the fragment collection ID of this fragment collection
-	*/
+	 * Returns the fragment collection ID of this fragment collection.
+	 *
+	 * @return the fragment collection ID of this fragment collection
+	 */
 	@Override
 	public long getFragmentCollectionId() {
 		return _fragmentCollection.getFragmentCollectionId();
 	}
 
 	/**
-	* Returns the fragment collection key of this fragment collection.
-	*
-	* @return the fragment collection key of this fragment collection
-	*/
+	 * Returns the fragment collection key of this fragment collection.
+	 *
+	 * @return the fragment collection key of this fragment collection
+	 */
 	@Override
 	public String getFragmentCollectionKey() {
 		return _fragmentCollection.getFragmentCollectionKey();
 	}
 
 	/**
-	* Returns the group ID of this fragment collection.
-	*
-	* @return the group ID of this fragment collection
-	*/
+	 * Returns the group ID of this fragment collection.
+	 *
+	 * @return the group ID of this fragment collection
+	 */
 	@Override
 	public long getGroupId() {
 		return _fragmentCollection.getGroupId();
 	}
 
 	/**
-	* Returns the last publish date of this fragment collection.
-	*
-	* @return the last publish date of this fragment collection
-	*/
+	 * Returns the last publish date of this fragment collection.
+	 *
+	 * @return the last publish date of this fragment collection
+	 */
 	@Override
 	public Date getLastPublishDate() {
 		return _fragmentCollection.getLastPublishDate();
 	}
 
 	/**
-	* Returns the modified date of this fragment collection.
-	*
-	* @return the modified date of this fragment collection
-	*/
+	 * Returns the modified date of this fragment collection.
+	 *
+	 * @return the modified date of this fragment collection
+	 */
 	@Override
 	public Date getModifiedDate() {
 		return _fragmentCollection.getModifiedDate();
 	}
 
 	/**
-	* Returns the name of this fragment collection.
-	*
-	* @return the name of this fragment collection
-	*/
+	 * Returns the name of this fragment collection.
+	 *
+	 * @return the name of this fragment collection
+	 */
 	@Override
 	public String getName() {
 		return _fragmentCollection.getName();
 	}
 
 	/**
-	* Returns the primary key of this fragment collection.
-	*
-	* @return the primary key of this fragment collection
-	*/
+	 * Returns the primary key of this fragment collection.
+	 *
+	 * @return the primary key of this fragment collection
+	 */
 	@Override
 	public long getPrimaryKey() {
 		return _fragmentCollection.getPrimaryKey();
@@ -273,40 +274,40 @@ public class FragmentCollectionWrapper implements FragmentCollection,
 	}
 
 	/**
-	* Returns the user ID of this fragment collection.
-	*
-	* @return the user ID of this fragment collection
-	*/
+	 * Returns the user ID of this fragment collection.
+	 *
+	 * @return the user ID of this fragment collection
+	 */
 	@Override
 	public long getUserId() {
 		return _fragmentCollection.getUserId();
 	}
 
 	/**
-	* Returns the user name of this fragment collection.
-	*
-	* @return the user name of this fragment collection
-	*/
+	 * Returns the user name of this fragment collection.
+	 *
+	 * @return the user name of this fragment collection
+	 */
 	@Override
 	public String getUserName() {
 		return _fragmentCollection.getUserName();
 	}
 
 	/**
-	* Returns the user uuid of this fragment collection.
-	*
-	* @return the user uuid of this fragment collection
-	*/
+	 * Returns the user uuid of this fragment collection.
+	 *
+	 * @return the user uuid of this fragment collection
+	 */
 	@Override
 	public String getUserUuid() {
 		return _fragmentCollection.getUserUuid();
 	}
 
 	/**
-	* Returns the uuid of this fragment collection.
-	*
-	* @return the uuid of this fragment collection
-	*/
+	 * Returns the uuid of this fragment collection.
+	 *
+	 * @return the uuid of this fragment collection
+	 */
 	@Override
 	public String getUuid() {
 		return _fragmentCollection.getUuid();
@@ -339,8 +340,9 @@ public class FragmentCollectionWrapper implements FragmentCollection,
 
 	@Override
 	public void populateZipWriter(
-		com.liferay.portal.kernel.zip.ZipWriter zipWriter)
+			com.liferay.portal.kernel.zip.ZipWriter zipWriter)
 		throws Exception {
+
 		_fragmentCollection.populateZipWriter(zipWriter);
 	}
 
@@ -350,30 +352,30 @@ public class FragmentCollectionWrapper implements FragmentCollection,
 	}
 
 	/**
-	* Sets the company ID of this fragment collection.
-	*
-	* @param companyId the company ID of this fragment collection
-	*/
+	 * Sets the company ID of this fragment collection.
+	 *
+	 * @param companyId the company ID of this fragment collection
+	 */
 	@Override
 	public void setCompanyId(long companyId) {
 		_fragmentCollection.setCompanyId(companyId);
 	}
 
 	/**
-	* Sets the create date of this fragment collection.
-	*
-	* @param createDate the create date of this fragment collection
-	*/
+	 * Sets the create date of this fragment collection.
+	 *
+	 * @param createDate the create date of this fragment collection
+	 */
 	@Override
 	public void setCreateDate(Date createDate) {
 		_fragmentCollection.setCreateDate(createDate);
 	}
 
 	/**
-	* Sets the description of this fragment collection.
-	*
-	* @param description the description of this fragment collection
-	*/
+	 * Sets the description of this fragment collection.
+	 *
+	 * @param description the description of this fragment collection
+	 */
 	@Override
 	public void setDescription(String description) {
 		_fragmentCollection.setDescription(description);
@@ -382,6 +384,7 @@ public class FragmentCollectionWrapper implements FragmentCollection,
 	@Override
 	public void setExpandoBridgeAttributes(
 		com.liferay.portal.kernel.model.BaseModel<?> baseModel) {
+
 		_fragmentCollection.setExpandoBridgeAttributes(baseModel);
 	}
 
@@ -396,60 +399,60 @@ public class FragmentCollectionWrapper implements FragmentCollection,
 	}
 
 	/**
-	* Sets the fragment collection ID of this fragment collection.
-	*
-	* @param fragmentCollectionId the fragment collection ID of this fragment collection
-	*/
+	 * Sets the fragment collection ID of this fragment collection.
+	 *
+	 * @param fragmentCollectionId the fragment collection ID of this fragment collection
+	 */
 	@Override
 	public void setFragmentCollectionId(long fragmentCollectionId) {
 		_fragmentCollection.setFragmentCollectionId(fragmentCollectionId);
 	}
 
 	/**
-	* Sets the fragment collection key of this fragment collection.
-	*
-	* @param fragmentCollectionKey the fragment collection key of this fragment collection
-	*/
+	 * Sets the fragment collection key of this fragment collection.
+	 *
+	 * @param fragmentCollectionKey the fragment collection key of this fragment collection
+	 */
 	@Override
 	public void setFragmentCollectionKey(String fragmentCollectionKey) {
 		_fragmentCollection.setFragmentCollectionKey(fragmentCollectionKey);
 	}
 
 	/**
-	* Sets the group ID of this fragment collection.
-	*
-	* @param groupId the group ID of this fragment collection
-	*/
+	 * Sets the group ID of this fragment collection.
+	 *
+	 * @param groupId the group ID of this fragment collection
+	 */
 	@Override
 	public void setGroupId(long groupId) {
 		_fragmentCollection.setGroupId(groupId);
 	}
 
 	/**
-	* Sets the last publish date of this fragment collection.
-	*
-	* @param lastPublishDate the last publish date of this fragment collection
-	*/
+	 * Sets the last publish date of this fragment collection.
+	 *
+	 * @param lastPublishDate the last publish date of this fragment collection
+	 */
 	@Override
 	public void setLastPublishDate(Date lastPublishDate) {
 		_fragmentCollection.setLastPublishDate(lastPublishDate);
 	}
 
 	/**
-	* Sets the modified date of this fragment collection.
-	*
-	* @param modifiedDate the modified date of this fragment collection
-	*/
+	 * Sets the modified date of this fragment collection.
+	 *
+	 * @param modifiedDate the modified date of this fragment collection
+	 */
 	@Override
 	public void setModifiedDate(Date modifiedDate) {
 		_fragmentCollection.setModifiedDate(modifiedDate);
 	}
 
 	/**
-	* Sets the name of this fragment collection.
-	*
-	* @param name the name of this fragment collection
-	*/
+	 * Sets the name of this fragment collection.
+	 *
+	 * @param name the name of this fragment collection
+	 */
 	@Override
 	public void setName(String name) {
 		_fragmentCollection.setName(name);
@@ -461,10 +464,10 @@ public class FragmentCollectionWrapper implements FragmentCollection,
 	}
 
 	/**
-	* Sets the primary key of this fragment collection.
-	*
-	* @param primaryKey the primary key of this fragment collection
-	*/
+	 * Sets the primary key of this fragment collection.
+	 *
+	 * @param primaryKey the primary key of this fragment collection
+	 */
 	@Override
 	public void setPrimaryKey(long primaryKey) {
 		_fragmentCollection.setPrimaryKey(primaryKey);
@@ -476,53 +479,56 @@ public class FragmentCollectionWrapper implements FragmentCollection,
 	}
 
 	/**
-	* Sets the user ID of this fragment collection.
-	*
-	* @param userId the user ID of this fragment collection
-	*/
+	 * Sets the user ID of this fragment collection.
+	 *
+	 * @param userId the user ID of this fragment collection
+	 */
 	@Override
 	public void setUserId(long userId) {
 		_fragmentCollection.setUserId(userId);
 	}
 
 	/**
-	* Sets the user name of this fragment collection.
-	*
-	* @param userName the user name of this fragment collection
-	*/
+	 * Sets the user name of this fragment collection.
+	 *
+	 * @param userName the user name of this fragment collection
+	 */
 	@Override
 	public void setUserName(String userName) {
 		_fragmentCollection.setUserName(userName);
 	}
 
 	/**
-	* Sets the user uuid of this fragment collection.
-	*
-	* @param userUuid the user uuid of this fragment collection
-	*/
+	 * Sets the user uuid of this fragment collection.
+	 *
+	 * @param userUuid the user uuid of this fragment collection
+	 */
 	@Override
 	public void setUserUuid(String userUuid) {
 		_fragmentCollection.setUserUuid(userUuid);
 	}
 
 	/**
-	* Sets the uuid of this fragment collection.
-	*
-	* @param uuid the uuid of this fragment collection
-	*/
+	 * Sets the uuid of this fragment collection.
+	 *
+	 * @param uuid the uuid of this fragment collection
+	 */
 	@Override
 	public void setUuid(String uuid) {
 		_fragmentCollection.setUuid(uuid);
 	}
 
 	@Override
-	public com.liferay.portal.kernel.model.CacheModel<FragmentCollection> toCacheModel() {
+	public com.liferay.portal.kernel.model.CacheModel<FragmentCollection>
+		toCacheModel() {
+
 		return _fragmentCollection.toCacheModel();
 	}
 
 	@Override
 	public FragmentCollection toEscapedModel() {
-		return new FragmentCollectionWrapper(_fragmentCollection.toEscapedModel());
+		return new FragmentCollectionWrapper(
+			_fragmentCollection.toEscapedModel());
 	}
 
 	@Override
@@ -532,7 +538,8 @@ public class FragmentCollectionWrapper implements FragmentCollection,
 
 	@Override
 	public FragmentCollection toUnescapedModel() {
-		return new FragmentCollectionWrapper(_fragmentCollection.toUnescapedModel());
+		return new FragmentCollectionWrapper(
+			_fragmentCollection.toUnescapedModel());
 	}
 
 	@Override
@@ -550,10 +557,13 @@ public class FragmentCollectionWrapper implements FragmentCollection,
 			return false;
 		}
 
-		FragmentCollectionWrapper fragmentCollectionWrapper = (FragmentCollectionWrapper)obj;
+		FragmentCollectionWrapper fragmentCollectionWrapper =
+			(FragmentCollectionWrapper)obj;
 
-		if (Objects.equals(_fragmentCollection,
-					fragmentCollectionWrapper._fragmentCollection)) {
+		if (Objects.equals(
+				_fragmentCollection,
+				fragmentCollectionWrapper._fragmentCollection)) {
+
 			return true;
 		}
 
@@ -586,4 +596,5 @@ public class FragmentCollectionWrapper implements FragmentCollection,
 	}
 
 	private final FragmentCollection _fragmentCollection;
+
 }

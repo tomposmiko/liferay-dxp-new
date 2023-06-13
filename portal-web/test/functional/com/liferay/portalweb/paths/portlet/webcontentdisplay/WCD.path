@@ -76,6 +76,11 @@
 	<td></td>
 </tr>
 <tr>
+	<td>WEB_CONTENT_LINK</td>
+	<td>//div[contains(@class,'journal-content-article')]/p/a</td>
+	<td></td>
+</tr>
+<tr>
 	<td>WEB_CONTENT_TEXT_LINK_URL</td>
 	<td>//div[contains(@class,'journal-content-article')]//a[contains(.,'${key_contentText}')]</td>
 	<td></td>
@@ -87,7 +92,7 @@
 </tr>
 <tr>
 	<td>WEB_CONTENT_IMAGE_PNG</td>
-	<td>portal/screenshots/ddm/liferay_logo_image.png</td>
+	<td>//img[contains(@src,'Document_2.jpeg')]</td>
 	<td></td>
 </tr>
 <tr>

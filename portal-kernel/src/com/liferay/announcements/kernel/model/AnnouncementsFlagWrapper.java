@@ -17,7 +17,6 @@ package com.liferay.announcements.kernel.model;
 import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.expando.kernel.model.ExpandoBridge;
-
 import com.liferay.portal.kernel.model.ModelWrapper;
 import com.liferay.portal.kernel.service.ServiceContext;
 
@@ -38,8 +37,9 @@ import java.util.Objects;
  * @generated
  */
 @ProviderType
-public class AnnouncementsFlagWrapper implements AnnouncementsFlag,
-	ModelWrapper<AnnouncementsFlag> {
+public class AnnouncementsFlagWrapper
+	implements AnnouncementsFlag, ModelWrapper<AnnouncementsFlag> {
+
 	public AnnouncementsFlagWrapper(AnnouncementsFlag announcementsFlag) {
 		_announcementsFlag = announcementsFlag;
 	}
@@ -109,7 +109,8 @@ public class AnnouncementsFlagWrapper implements AnnouncementsFlag,
 
 	@Override
 	public Object clone() {
-		return new AnnouncementsFlagWrapper((AnnouncementsFlag)_announcementsFlag.clone());
+		return new AnnouncementsFlagWrapper(
+			(AnnouncementsFlag)_announcementsFlag.clone());
 	}
 
 	@Override
@@ -118,30 +119,30 @@ public class AnnouncementsFlagWrapper implements AnnouncementsFlag,
 	}
 
 	/**
-	* Returns the company ID of this announcements flag.
-	*
-	* @return the company ID of this announcements flag
-	*/
+	 * Returns the company ID of this announcements flag.
+	 *
+	 * @return the company ID of this announcements flag
+	 */
 	@Override
 	public long getCompanyId() {
 		return _announcementsFlag.getCompanyId();
 	}
 
 	/**
-	* Returns the create date of this announcements flag.
-	*
-	* @return the create date of this announcements flag
-	*/
+	 * Returns the create date of this announcements flag.
+	 *
+	 * @return the create date of this announcements flag
+	 */
 	@Override
 	public Date getCreateDate() {
 		return _announcementsFlag.getCreateDate();
 	}
 
 	/**
-	* Returns the entry ID of this announcements flag.
-	*
-	* @return the entry ID of this announcements flag
-	*/
+	 * Returns the entry ID of this announcements flag.
+	 *
+	 * @return the entry ID of this announcements flag
+	 */
 	@Override
 	public long getEntryId() {
 		return _announcementsFlag.getEntryId();
@@ -153,20 +154,20 @@ public class AnnouncementsFlagWrapper implements AnnouncementsFlag,
 	}
 
 	/**
-	* Returns the flag ID of this announcements flag.
-	*
-	* @return the flag ID of this announcements flag
-	*/
+	 * Returns the flag ID of this announcements flag.
+	 *
+	 * @return the flag ID of this announcements flag
+	 */
 	@Override
 	public long getFlagId() {
 		return _announcementsFlag.getFlagId();
 	}
 
 	/**
-	* Returns the primary key of this announcements flag.
-	*
-	* @return the primary key of this announcements flag
-	*/
+	 * Returns the primary key of this announcements flag.
+	 *
+	 * @return the primary key of this announcements flag
+	 */
 	@Override
 	public long getPrimaryKey() {
 		return _announcementsFlag.getPrimaryKey();
@@ -178,30 +179,30 @@ public class AnnouncementsFlagWrapper implements AnnouncementsFlag,
 	}
 
 	/**
-	* Returns the user ID of this announcements flag.
-	*
-	* @return the user ID of this announcements flag
-	*/
+	 * Returns the user ID of this announcements flag.
+	 *
+	 * @return the user ID of this announcements flag
+	 */
 	@Override
 	public long getUserId() {
 		return _announcementsFlag.getUserId();
 	}
 
 	/**
-	* Returns the user uuid of this announcements flag.
-	*
-	* @return the user uuid of this announcements flag
-	*/
+	 * Returns the user uuid of this announcements flag.
+	 *
+	 * @return the user uuid of this announcements flag
+	 */
 	@Override
 	public String getUserUuid() {
 		return _announcementsFlag.getUserUuid();
 	}
 
 	/**
-	* Returns the value of this announcements flag.
-	*
-	* @return the value of this announcements flag
-	*/
+	 * Returns the value of this announcements flag.
+	 *
+	 * @return the value of this announcements flag
+	 */
 	@Override
 	public int getValue() {
 		return _announcementsFlag.getValue();
@@ -238,30 +239,30 @@ public class AnnouncementsFlagWrapper implements AnnouncementsFlag,
 	}
 
 	/**
-	* Sets the company ID of this announcements flag.
-	*
-	* @param companyId the company ID of this announcements flag
-	*/
+	 * Sets the company ID of this announcements flag.
+	 *
+	 * @param companyId the company ID of this announcements flag
+	 */
 	@Override
 	public void setCompanyId(long companyId) {
 		_announcementsFlag.setCompanyId(companyId);
 	}
 
 	/**
-	* Sets the create date of this announcements flag.
-	*
-	* @param createDate the create date of this announcements flag
-	*/
+	 * Sets the create date of this announcements flag.
+	 *
+	 * @param createDate the create date of this announcements flag
+	 */
 	@Override
 	public void setCreateDate(Date createDate) {
 		_announcementsFlag.setCreateDate(createDate);
 	}
 
 	/**
-	* Sets the entry ID of this announcements flag.
-	*
-	* @param entryId the entry ID of this announcements flag
-	*/
+	 * Sets the entry ID of this announcements flag.
+	 *
+	 * @param entryId the entry ID of this announcements flag
+	 */
 	@Override
 	public void setEntryId(long entryId) {
 		_announcementsFlag.setEntryId(entryId);
@@ -270,6 +271,7 @@ public class AnnouncementsFlagWrapper implements AnnouncementsFlag,
 	@Override
 	public void setExpandoBridgeAttributes(
 		com.liferay.portal.kernel.model.BaseModel<?> baseModel) {
+
 		_announcementsFlag.setExpandoBridgeAttributes(baseModel);
 	}
 
@@ -284,10 +286,10 @@ public class AnnouncementsFlagWrapper implements AnnouncementsFlag,
 	}
 
 	/**
-	* Sets the flag ID of this announcements flag.
-	*
-	* @param flagId the flag ID of this announcements flag
-	*/
+	 * Sets the flag ID of this announcements flag.
+	 *
+	 * @param flagId the flag ID of this announcements flag
+	 */
 	@Override
 	public void setFlagId(long flagId) {
 		_announcementsFlag.setFlagId(flagId);
@@ -299,10 +301,10 @@ public class AnnouncementsFlagWrapper implements AnnouncementsFlag,
 	}
 
 	/**
-	* Sets the primary key of this announcements flag.
-	*
-	* @param primaryKey the primary key of this announcements flag
-	*/
+	 * Sets the primary key of this announcements flag.
+	 *
+	 * @param primaryKey the primary key of this announcements flag
+	 */
 	@Override
 	public void setPrimaryKey(long primaryKey) {
 		_announcementsFlag.setPrimaryKey(primaryKey);
@@ -314,43 +316,46 @@ public class AnnouncementsFlagWrapper implements AnnouncementsFlag,
 	}
 
 	/**
-	* Sets the user ID of this announcements flag.
-	*
-	* @param userId the user ID of this announcements flag
-	*/
+	 * Sets the user ID of this announcements flag.
+	 *
+	 * @param userId the user ID of this announcements flag
+	 */
 	@Override
 	public void setUserId(long userId) {
 		_announcementsFlag.setUserId(userId);
 	}
 
 	/**
-	* Sets the user uuid of this announcements flag.
-	*
-	* @param userUuid the user uuid of this announcements flag
-	*/
+	 * Sets the user uuid of this announcements flag.
+	 *
+	 * @param userUuid the user uuid of this announcements flag
+	 */
 	@Override
 	public void setUserUuid(String userUuid) {
 		_announcementsFlag.setUserUuid(userUuid);
 	}
 
 	/**
-	* Sets the value of this announcements flag.
-	*
-	* @param value the value of this announcements flag
-	*/
+	 * Sets the value of this announcements flag.
+	 *
+	 * @param value the value of this announcements flag
+	 */
 	@Override
 	public void setValue(int value) {
 		_announcementsFlag.setValue(value);
 	}
 
 	@Override
-	public com.liferay.portal.kernel.model.CacheModel<AnnouncementsFlag> toCacheModel() {
+	public com.liferay.portal.kernel.model.CacheModel<AnnouncementsFlag>
+		toCacheModel() {
+
 		return _announcementsFlag.toCacheModel();
 	}
 
 	@Override
 	public AnnouncementsFlag toEscapedModel() {
-		return new AnnouncementsFlagWrapper(_announcementsFlag.toEscapedModel());
+		return new AnnouncementsFlagWrapper(
+			_announcementsFlag.toEscapedModel());
 	}
 
 	@Override
@@ -360,7 +365,8 @@ public class AnnouncementsFlagWrapper implements AnnouncementsFlag,
 
 	@Override
 	public AnnouncementsFlag toUnescapedModel() {
-		return new AnnouncementsFlagWrapper(_announcementsFlag.toUnescapedModel());
+		return new AnnouncementsFlagWrapper(
+			_announcementsFlag.toUnescapedModel());
 	}
 
 	@Override
@@ -378,10 +384,13 @@ public class AnnouncementsFlagWrapper implements AnnouncementsFlag,
 			return false;
 		}
 
-		AnnouncementsFlagWrapper announcementsFlagWrapper = (AnnouncementsFlagWrapper)obj;
+		AnnouncementsFlagWrapper announcementsFlagWrapper =
+			(AnnouncementsFlagWrapper)obj;
 
-		if (Objects.equals(_announcementsFlag,
-					announcementsFlagWrapper._announcementsFlag)) {
+		if (Objects.equals(
+				_announcementsFlag,
+				announcementsFlagWrapper._announcementsFlag)) {
+
 			return true;
 		}
 
@@ -409,4 +418,5 @@ public class AnnouncementsFlagWrapper implements AnnouncementsFlag,
 	}
 
 	private final AnnouncementsFlag _announcementsFlag;
+
 }

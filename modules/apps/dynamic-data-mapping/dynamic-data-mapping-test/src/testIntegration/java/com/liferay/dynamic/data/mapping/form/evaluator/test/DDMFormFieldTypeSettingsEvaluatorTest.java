@@ -430,15 +430,10 @@ public class DDMFormFieldTypeSettingsEvaluatorTest {
 			ddmFormFieldEvaluationResultsMap =
 				ddmFormEvaluationResult.getDDMFormFieldEvaluationResultsMap();
 
-		DDMFormFieldEvaluationResult
-			ddmDataProviderInstanceOutputFieldEvaluationResult =
-				ddmFormFieldEvaluationResultsMap.get(
-					String.format(
-						"ddmDataProviderInstanceOutput_INSTANCE_%s",
-						ddmDataProviderInstanceOutputFormFieldValue.
-							getInstanceId()));
-
-		return ddmDataProviderInstanceOutputFieldEvaluationResult;
+		return ddmFormFieldEvaluationResultsMap.get(
+			String.format(
+				"ddmDataProviderInstanceOutput_INSTANCE_%s",
+				ddmDataProviderInstanceOutputFormFieldValue.getInstanceId()));
 	}
 
 }

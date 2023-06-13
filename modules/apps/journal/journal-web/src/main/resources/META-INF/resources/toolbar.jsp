@@ -101,6 +101,13 @@ String searchContainerId = ParamUtil.getString(request, "searchContainerId");
 		Liferay.Util.openWindow(
 			{
 				dialog: {
+					after: {
+						destroy: function(event) {
+							if (event.target.get('destroyOnHide')) {
+								window.location.reload();
+							}
+						}
+					},
 					destroyOnHide: true,
 					modal: true
 				},
@@ -153,11 +160,17 @@ String searchContainerId = ParamUtil.getString(request, "searchContainerId");
 	Liferay.on(
 		'<portlet:namespace />selectAddMenuItem',
 		function(event) {
-			var uri = '<%= addArticleURL %>';
+			const selectAddMenuItemWindow = Liferay.Util.Window.getById('<portlet:namespace />selectAddMenuItem');
 
-			uri = Liferay.Util.addParams('<portlet:namespace />ddmStructureKey=' + event.ddmStructureKey, uri);
+			selectAddMenuItemWindow.set('destroyOnHide', false);
 
-			location.href = uri;
+			Liferay.fire(
+				'closeWindow',
+				{
+					id: '<portlet:namespace />selectAddMenuItem',
+					redirect: Liferay.Util.addParams('<portlet:namespace />ddmStructureKey=' + event.ddmStructureKey, '<%= addArticleURL %>')
+				}
+			);
 		}
 	);
 </aui:script>

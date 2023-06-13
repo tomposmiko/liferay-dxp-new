@@ -85,7 +85,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Sten Martinez
  * @author Edward C. Han
  * @author Vilmos Papp
- * @author Mate Thurzo
+ * @author Máté Thurzó
  * @author Manuel de la Peña
  * @author Daniel Sanz
  */
@@ -630,9 +630,8 @@ public class S3Store extends BaseStore {
 				throw new NoSuchFileException(
 					companyId, repositoryId, fileName, versionLabel);
 			}
-			else {
-				return s3Object;
-			}
+
+			return s3Object;
 		}
 		catch (AmazonClientException ace) {
 			if (isFileNotFound(ace)) {

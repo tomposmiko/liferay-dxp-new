@@ -48,8 +48,6 @@ public class PersonUpdaterForm {
 		).addOptionalDate(
 			"birthDate", PersonUpdaterForm::setBirthDate
 		).addOptionalString(
-			"gender", PersonUpdaterForm::setGender
-		).addOptionalString(
 			"honorificPrefix", PersonUpdaterForm::setHonorificPrefix
 		).addOptionalString(
 			"honorificSuffix", PersonUpdaterForm::setHonorificSuffix
@@ -142,8 +140,8 @@ public class PersonUpdaterForm {
 	 *
 	 * @return the person's job title
 	 */
-	public String getJobTitle() {
-		return _jobTitle;
+	public Optional<String> getJobTitleOptional() {
+		return Optional.ofNullable(_jobTitle);
 	}
 
 	/**
@@ -153,10 +151,6 @@ public class PersonUpdaterForm {
 	 */
 	public String getPassword() {
 		return _password;
-	}
-
-	public Optional<Boolean> isMaleOptional() {
-		return Optional.ofNullable(_male);
 	}
 
 	public void setAlternateName(String alternateName) {
@@ -179,10 +173,6 @@ public class PersonUpdaterForm {
 
 	public void setFamilyName(String lastName) {
 		_familyName = lastName;
-	}
-
-	public void setGender(String gender) {
-		_male = "male".equals(gender);
 	}
 
 	public void setGivenName(String givenName) {
@@ -215,7 +205,6 @@ public class PersonUpdaterForm {
 	private String _honorificPrefix;
 	private String _honorificSuffix;
 	private String _jobTitle;
-	private Boolean _male;
 	private String _password;
 
 }

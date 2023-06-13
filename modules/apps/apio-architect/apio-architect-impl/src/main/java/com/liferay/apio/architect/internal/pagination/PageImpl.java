@@ -14,10 +14,13 @@
 
 package com.liferay.apio.architect.internal.pagination;
 
+import static java.util.Collections.emptyList;
+
 import com.liferay.apio.architect.operation.Operation;
 import com.liferay.apio.architect.pagination.Page;
 import com.liferay.apio.architect.pagination.PageItems;
 import com.liferay.apio.architect.pagination.Pagination;
+import com.liferay.apio.architect.resource.Resource;
 import com.liferay.apio.architect.uri.Path;
 
 import java.util.Collection;
@@ -36,24 +39,13 @@ import java.util.Optional;
 public class PageImpl<T> implements Page<T> {
 
 	public PageImpl(
-		String resourceName, PageItems<T> pageItems, Pagination pagination,
-		List<Operation> operations) {
+		Resource resource, PageItems<T> pageItems, Pagination pagination) {
 
-		this(resourceName, pageItems, pagination, null, operations);
-	}
-
-	public PageImpl(
-		String resourceName, PageItems<T> pageItems, Pagination pagination,
-		Path path, List<Operation> operations) {
-
-		_resourceName = resourceName;
-
+		_resource = resource;
 		_items = pageItems.getItems();
 		_itemsPerPage = pagination.getItemsPerPage();
 		_pageNumber = pagination.getPageNumber();
 		_totalCount = pageItems.getTotalCount();
-		_path = path;
-		_operations = operations;
 	}
 
 	@Override
@@ -77,7 +69,7 @@ public class PageImpl<T> implements Page<T> {
 
 	@Override
 	public List<Operation> getOperations() {
-		return _operations;
+		return emptyList();
 	}
 
 	@Override
@@ -87,12 +79,17 @@ public class PageImpl<T> implements Page<T> {
 
 	@Override
 	public Optional<Path> getPathOptional() {
-		return Optional.ofNullable(_path);
+		return Optional.empty();
+	}
+
+	@Override
+	public Resource getResource() {
+		return _resource;
 	}
 
 	@Override
 	public String getResourceName() {
-		return _resourceName;
+		return _resource.getName();
 	}
 
 	@Override
@@ -120,10 +117,8 @@ public class PageImpl<T> implements Page<T> {
 
 	private final Collection<T> _items;
 	private final int _itemsPerPage;
-	private final List<Operation> _operations;
 	private final int _pageNumber;
-	private final Path _path;
-	private final String _resourceName;
+	private final Resource _resource;
 	private final int _totalCount;
 
 }

@@ -43,8 +43,8 @@ public interface ThrowablePentaConsumer<A, B, C, D, E> {
 	 * @return an empty {@code ThrowablePentaConsumer} that doesn't perform any
 	 *         operation
 	 */
-	public static <A, B, C, D, E>
-		ThrowablePentaConsumer<A, B, C, D, E> empty() {
+	public static <A, B, C, D, E> ThrowablePentaConsumer<A, B, C, D, E>
+		empty() {
 
 		return (a, b, c, d, e) -> {
 		};

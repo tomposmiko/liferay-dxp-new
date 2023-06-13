@@ -581,7 +581,6 @@ public class WorkflowDefinitionDisplayContext {
 			dropdownItem.setLabel(
 				LanguageUtil.get(
 					_workflowDefinitionRequestHelper.getRequest(), navigation));
-
 		};
 	}
 

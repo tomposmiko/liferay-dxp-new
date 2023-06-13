@@ -142,15 +142,21 @@ public class AssetBrowserDisplayContext {
 		assetBrowserSearch.setTotal(total);
 
 		if (AssetBrowserWebConfigurationValues.SEARCH_WITH_DATABASE) {
+			long[] subtypeSelectionIds = null;
+
+			if (getSubtypeSelectionId() > 0) {
+				subtypeSelectionIds = new long[] {getSubtypeSelectionId()};
+			}
+
 			List<AssetEntry> assetEntries =
 				AssetEntryLocalServiceUtil.getEntries(
 					_getFilterGroupIds(),
 					new long[] {assetRendererFactory.getClassNameId()},
-					_getKeywords(), _getKeywords(), _getKeywords(),
-					_getKeywords(), _getListable(), false, false,
-					assetBrowserSearch.getStart(), assetBrowserSearch.getEnd(),
-					"modifiedDate", StringPool.BLANK, getOrderByType(),
-					StringPool.BLANK);
+					subtypeSelectionIds, _getKeywords(), _getKeywords(),
+					_getKeywords(), _getKeywords(), _getListable(), false,
+					false, assetBrowserSearch.getStart(),
+					assetBrowserSearch.getEnd(), "modifiedDate",
+					StringPool.BLANK, getOrderByType(), StringPool.BLANK);
 
 			assetBrowserSearch.setResults(assetEntries);
 		}
@@ -489,7 +495,6 @@ public class AssetBrowserDisplayContext {
 	private List<DropdownItem> _getOrderByDropdownItems() {
 		return new DropdownItemList() {
 			{
-
 				if (!AssetBrowserWebConfigurationValues.SEARCH_WITH_DATABASE) {
 					add(
 						dropdownItem -> {
@@ -602,10 +607,16 @@ public class AssetBrowserDisplayContext {
 		AssetRendererFactory assetRendererFactory = getAssetRendererFactory();
 
 		if (AssetBrowserWebConfigurationValues.SEARCH_WITH_DATABASE) {
+			long[] subtypeSelectionIds = null;
+
+			if (getSubtypeSelectionId() > 0) {
+				subtypeSelectionIds = new long[] {getSubtypeSelectionId()};
+			}
+
 			return AssetEntryLocalServiceUtil.getEntriesCount(
 				groupIds, new long[] {assetRendererFactory.getClassNameId()},
-				_getKeywords(), _getKeywords(), _getKeywords(), _getKeywords(),
-				_getListable(), false, false);
+				subtypeSelectionIds, _getKeywords(), _getKeywords(),
+				_getKeywords(), _getKeywords(), _getListable(), false, false);
 		}
 
 		ThemeDisplay themeDisplay = (ThemeDisplay)_request.getAttribute(

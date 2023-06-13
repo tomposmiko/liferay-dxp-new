@@ -21,7 +21,6 @@ import com.liferay.document.library.content.model.DLContent;
 import com.liferay.document.library.content.model.impl.DLContentImpl;
 import com.liferay.document.library.content.model.impl.DLContentModelImpl;
 import com.liferay.document.library.content.service.persistence.DLContentPersistence;
-
 import com.liferay.portal.kernel.dao.orm.EntityCache;
 import com.liferay.portal.kernel.dao.orm.FinderCache;
 import com.liferay.portal.kernel.dao.orm.FinderPath;
@@ -63,52 +62,32 @@ import java.util.Set;
  * </p>
  *
  * @author Brian Wing Shun Chan
- * @see DLContentPersistence
- * @see com.liferay.document.library.content.service.persistence.DLContentUtil
  * @generated
  */
 @ProviderType
-public class DLContentPersistenceImpl extends BasePersistenceImpl<DLContent>
-	implements DLContentPersistence {
+public class DLContentPersistenceImpl
+	extends BasePersistenceImpl<DLContent> implements DLContentPersistence {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
-	 * Never modify or reference this class directly. Always use {@link DLContentUtil} to access the document library content persistence. Modify <code>service.xml</code> and rerun ServiceBuilder to regenerate this class.
+	 * Never modify or reference this class directly. Always use <code>DLContentUtil</code> to access the document library content persistence. Modify <code>service.xml</code> and rerun ServiceBuilder to regenerate this class.
 	 */
-	public static final String FINDER_CLASS_NAME_ENTITY = DLContentImpl.class.getName();
-	public static final String FINDER_CLASS_NAME_LIST_WITH_PAGINATION = FINDER_CLASS_NAME_ENTITY +
-		".List1";
-	public static final String FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION = FINDER_CLASS_NAME_ENTITY +
-		".List2";
-	public static final FinderPath FINDER_PATH_WITH_PAGINATION_FIND_ALL = new FinderPath(DLContentModelImpl.ENTITY_CACHE_ENABLED,
-			DLContentModelImpl.FINDER_CACHE_ENABLED, DLContentImpl.class,
-			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findAll", new String[0]);
-	public static final FinderPath FINDER_PATH_WITHOUT_PAGINATION_FIND_ALL = new FinderPath(DLContentModelImpl.ENTITY_CACHE_ENABLED,
-			DLContentModelImpl.FINDER_CACHE_ENABLED, DLContentImpl.class,
-			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findAll", new String[0]);
-	public static final FinderPath FINDER_PATH_COUNT_ALL = new FinderPath(DLContentModelImpl.ENTITY_CACHE_ENABLED,
-			DLContentModelImpl.FINDER_CACHE_ENABLED, Long.class,
-			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countAll", new String[0]);
-	public static final FinderPath FINDER_PATH_WITH_PAGINATION_FIND_BY_C_R = new FinderPath(DLContentModelImpl.ENTITY_CACHE_ENABLED,
-			DLContentModelImpl.FINDER_CACHE_ENABLED, DLContentImpl.class,
-			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByC_R",
-			new String[] {
-				Long.class.getName(), Long.class.getName(),
-				
-			Integer.class.getName(), Integer.class.getName(),
-				OrderByComparator.class.getName()
-			});
-	public static final FinderPath FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_C_R = new FinderPath(DLContentModelImpl.ENTITY_CACHE_ENABLED,
-			DLContentModelImpl.FINDER_CACHE_ENABLED, DLContentImpl.class,
-			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByC_R",
-			new String[] { Long.class.getName(), Long.class.getName() },
-			DLContentModelImpl.COMPANYID_COLUMN_BITMASK |
-			DLContentModelImpl.REPOSITORYID_COLUMN_BITMASK |
-			DLContentModelImpl.VERSION_COLUMN_BITMASK);
-	public static final FinderPath FINDER_PATH_COUNT_BY_C_R = new FinderPath(DLContentModelImpl.ENTITY_CACHE_ENABLED,
-			DLContentModelImpl.FINDER_CACHE_ENABLED, Long.class,
-			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByC_R",
-			new String[] { Long.class.getName(), Long.class.getName() });
+	public static final String FINDER_CLASS_NAME_ENTITY =
+		DLContentImpl.class.getName();
+
+	public static final String FINDER_CLASS_NAME_LIST_WITH_PAGINATION =
+		FINDER_CLASS_NAME_ENTITY + ".List1";
+
+	public static final String FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION =
+		FINDER_CLASS_NAME_ENTITY + ".List2";
+
+	private FinderPath _finderPathWithPaginationFindAll;
+	private FinderPath _finderPathWithoutPaginationFindAll;
+	private FinderPath _finderPathCountAll;
+	private FinderPath _finderPathWithPaginationFindByC_R;
+	private FinderPath _finderPathWithoutPaginationFindByC_R;
+	private FinderPath _finderPathCountByC_R;
 
 	/**
 	 * Returns all the document library contents where companyId = &#63; and repositoryId = &#63;.
@@ -119,15 +98,16 @@ public class DLContentPersistenceImpl extends BasePersistenceImpl<DLContent>
 	 */
 	@Override
 	public List<DLContent> findByC_R(long companyId, long repositoryId) {
-		return findByC_R(companyId, repositoryId, QueryUtil.ALL_POS,
-			QueryUtil.ALL_POS, null);
+		return findByC_R(
+			companyId, repositoryId, QueryUtil.ALL_POS, QueryUtil.ALL_POS,
+			null);
 	}
 
 	/**
 	 * Returns a range of all the document library contents where companyId = &#63; and repositoryId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link DLContentModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>DLContentModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param companyId the company ID
@@ -137,8 +117,9 @@ public class DLContentPersistenceImpl extends BasePersistenceImpl<DLContent>
 	 * @return the range of matching document library contents
 	 */
 	@Override
-	public List<DLContent> findByC_R(long companyId, long repositoryId,
-		int start, int end) {
+	public List<DLContent> findByC_R(
+		long companyId, long repositoryId, int start, int end) {
+
 		return findByC_R(companyId, repositoryId, start, end, null);
 	}
 
@@ -146,7 +127,7 @@ public class DLContentPersistenceImpl extends BasePersistenceImpl<DLContent>
 	 * Returns an ordered range of all the document library contents where companyId = &#63; and repositoryId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link DLContentModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>DLContentModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param companyId the company ID
@@ -157,17 +138,19 @@ public class DLContentPersistenceImpl extends BasePersistenceImpl<DLContent>
 	 * @return the ordered range of matching document library contents
 	 */
 	@Override
-	public List<DLContent> findByC_R(long companyId, long repositoryId,
-		int start, int end, OrderByComparator<DLContent> orderByComparator) {
-		return findByC_R(companyId, repositoryId, start, end,
-			orderByComparator, true);
+	public List<DLContent> findByC_R(
+		long companyId, long repositoryId, int start, int end,
+		OrderByComparator<DLContent> orderByComparator) {
+
+		return findByC_R(
+			companyId, repositoryId, start, end, orderByComparator, true);
 	}
 
 	/**
 	 * Returns an ordered range of all the document library contents where companyId = &#63; and repositoryId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link DLContentModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>DLContentModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param companyId the company ID
@@ -179,38 +162,40 @@ public class DLContentPersistenceImpl extends BasePersistenceImpl<DLContent>
 	 * @return the ordered range of matching document library contents
 	 */
 	@Override
-	public List<DLContent> findByC_R(long companyId, long repositoryId,
-		int start, int end, OrderByComparator<DLContent> orderByComparator,
+	public List<DLContent> findByC_R(
+		long companyId, long repositoryId, int start, int end,
+		OrderByComparator<DLContent> orderByComparator,
 		boolean retrieveFromCache) {
+
 		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
-				(orderByComparator == null)) {
+			(orderByComparator == null)) {
+
 			pagination = false;
-			finderPath = FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_C_R;
-			finderArgs = new Object[] { companyId, repositoryId };
+			finderPath = _finderPathWithoutPaginationFindByC_R;
+			finderArgs = new Object[] {companyId, repositoryId};
 		}
 		else {
-			finderPath = FINDER_PATH_WITH_PAGINATION_FIND_BY_C_R;
+			finderPath = _finderPathWithPaginationFindByC_R;
 			finderArgs = new Object[] {
-					companyId, repositoryId,
-					
-					start, end, orderByComparator
-				};
+				companyId, repositoryId, start, end, orderByComparator
+			};
 		}
 
 		List<DLContent> list = null;
 
 		if (retrieveFromCache) {
-			list = (List<DLContent>)finderCache.getResult(finderPath,
-					finderArgs, this);
+			list = (List<DLContent>)finderCache.getResult(
+				finderPath, finderArgs, this);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (DLContent dlContent : list) {
 					if ((companyId != dlContent.getCompanyId()) ||
-							(repositoryId != dlContent.getRepositoryId())) {
+						(repositoryId != dlContent.getRepositoryId())) {
+
 						list = null;
 
 						break;
@@ -223,8 +208,8 @@ public class DLContentPersistenceImpl extends BasePersistenceImpl<DLContent>
 			StringBundler query = null;
 
 			if (orderByComparator != null) {
-				query = new StringBundler(4 +
-						(orderByComparator.getOrderByFields().length * 2));
+				query = new StringBundler(
+					4 + (orderByComparator.getOrderByFields().length * 2));
 			}
 			else {
 				query = new StringBundler(4);
@@ -237,11 +222,10 @@ public class DLContentPersistenceImpl extends BasePersistenceImpl<DLContent>
 			query.append(_FINDER_COLUMN_C_R_REPOSITORYID_2);
 
 			if (orderByComparator != null) {
-				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
-					orderByComparator);
+				appendOrderByComparator(
+					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
 			}
-			else
-			 if (pagination) {
+			else if (pagination) {
 				query.append(DLContentModelImpl.ORDER_BY_JPQL);
 			}
 
@@ -261,16 +245,16 @@ public class DLContentPersistenceImpl extends BasePersistenceImpl<DLContent>
 				qPos.add(repositoryId);
 
 				if (!pagination) {
-					list = (List<DLContent>)QueryUtil.list(q, getDialect(),
-							start, end, false);
+					list = (List<DLContent>)QueryUtil.list(
+						q, getDialect(), start, end, false);
 
 					Collections.sort(list);
 
 					list = Collections.unmodifiableList(list);
 				}
 				else {
-					list = (List<DLContent>)QueryUtil.list(q, getDialect(),
-							start, end);
+					list = (List<DLContent>)QueryUtil.list(
+						q, getDialect(), start, end);
 				}
 
 				cacheResult(list);
@@ -300,11 +284,13 @@ public class DLContentPersistenceImpl extends BasePersistenceImpl<DLContent>
 	 * @throws NoSuchContentException if a matching document library content could not be found
 	 */
 	@Override
-	public DLContent findByC_R_First(long companyId, long repositoryId,
-		OrderByComparator<DLContent> orderByComparator)
+	public DLContent findByC_R_First(
+			long companyId, long repositoryId,
+			OrderByComparator<DLContent> orderByComparator)
 		throws NoSuchContentException {
-		DLContent dlContent = fetchByC_R_First(companyId, repositoryId,
-				orderByComparator);
+
+		DLContent dlContent = fetchByC_R_First(
+			companyId, repositoryId, orderByComparator);
 
 		if (dlContent != null) {
 			return dlContent;
@@ -334,10 +320,12 @@ public class DLContentPersistenceImpl extends BasePersistenceImpl<DLContent>
 	 * @return the first matching document library content, or <code>null</code> if a matching document library content could not be found
 	 */
 	@Override
-	public DLContent fetchByC_R_First(long companyId, long repositoryId,
+	public DLContent fetchByC_R_First(
+		long companyId, long repositoryId,
 		OrderByComparator<DLContent> orderByComparator) {
-		List<DLContent> list = findByC_R(companyId, repositoryId, 0, 1,
-				orderByComparator);
+
+		List<DLContent> list = findByC_R(
+			companyId, repositoryId, 0, 1, orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -356,11 +344,13 @@ public class DLContentPersistenceImpl extends BasePersistenceImpl<DLContent>
 	 * @throws NoSuchContentException if a matching document library content could not be found
 	 */
 	@Override
-	public DLContent findByC_R_Last(long companyId, long repositoryId,
-		OrderByComparator<DLContent> orderByComparator)
+	public DLContent findByC_R_Last(
+			long companyId, long repositoryId,
+			OrderByComparator<DLContent> orderByComparator)
 		throws NoSuchContentException {
-		DLContent dlContent = fetchByC_R_Last(companyId, repositoryId,
-				orderByComparator);
+
+		DLContent dlContent = fetchByC_R_Last(
+			companyId, repositoryId, orderByComparator);
 
 		if (dlContent != null) {
 			return dlContent;
@@ -390,16 +380,18 @@ public class DLContentPersistenceImpl extends BasePersistenceImpl<DLContent>
 	 * @return the last matching document library content, or <code>null</code> if a matching document library content could not be found
 	 */
 	@Override
-	public DLContent fetchByC_R_Last(long companyId, long repositoryId,
+	public DLContent fetchByC_R_Last(
+		long companyId, long repositoryId,
 		OrderByComparator<DLContent> orderByComparator) {
+
 		int count = countByC_R(companyId, repositoryId);
 
 		if (count == 0) {
 			return null;
 		}
 
-		List<DLContent> list = findByC_R(companyId, repositoryId, count - 1,
-				count, orderByComparator);
+		List<DLContent> list = findByC_R(
+			companyId, repositoryId, count - 1, count, orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -419,9 +411,11 @@ public class DLContentPersistenceImpl extends BasePersistenceImpl<DLContent>
 	 * @throws NoSuchContentException if a document library content with the primary key could not be found
 	 */
 	@Override
-	public DLContent[] findByC_R_PrevAndNext(long contentId, long companyId,
-		long repositoryId, OrderByComparator<DLContent> orderByComparator)
+	public DLContent[] findByC_R_PrevAndNext(
+			long contentId, long companyId, long repositoryId,
+			OrderByComparator<DLContent> orderByComparator)
 		throws NoSuchContentException {
+
 		DLContent dlContent = findByPrimaryKey(contentId);
 
 		Session session = null;
@@ -431,13 +425,15 @@ public class DLContentPersistenceImpl extends BasePersistenceImpl<DLContent>
 
 			DLContent[] array = new DLContentImpl[3];
 
-			array[0] = getByC_R_PrevAndNext(session, dlContent, companyId,
-					repositoryId, orderByComparator, true);
+			array[0] = getByC_R_PrevAndNext(
+				session, dlContent, companyId, repositoryId, orderByComparator,
+				true);
 
 			array[1] = dlContent;
 
-			array[2] = getByC_R_PrevAndNext(session, dlContent, companyId,
-					repositoryId, orderByComparator, false);
+			array[2] = getByC_R_PrevAndNext(
+				session, dlContent, companyId, repositoryId, orderByComparator,
+				false);
 
 			return array;
 		}
@@ -449,14 +445,15 @@ public class DLContentPersistenceImpl extends BasePersistenceImpl<DLContent>
 		}
 	}
 
-	protected DLContent getByC_R_PrevAndNext(Session session,
-		DLContent dlContent, long companyId, long repositoryId,
+	protected DLContent getByC_R_PrevAndNext(
+		Session session, DLContent dlContent, long companyId, long repositoryId,
 		OrderByComparator<DLContent> orderByComparator, boolean previous) {
+
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(5 +
-					(orderByComparator.getOrderByConditionFields().length * 3) +
+			query = new StringBundler(
+				5 + (orderByComparator.getOrderByConditionFields().length * 3) +
 					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
@@ -470,7 +467,8 @@ public class DLContentPersistenceImpl extends BasePersistenceImpl<DLContent>
 		query.append(_FINDER_COLUMN_C_R_REPOSITORYID_2);
 
 		if (orderByComparator != null) {
-			String[] orderByConditionFields = orderByComparator.getOrderByConditionFields();
+			String[] orderByConditionFields =
+				orderByComparator.getOrderByConditionFields();
 
 			if (orderByConditionFields.length > 0) {
 				query.append(WHERE_AND);
@@ -542,10 +540,10 @@ public class DLContentPersistenceImpl extends BasePersistenceImpl<DLContent>
 		qPos.add(repositoryId);
 
 		if (orderByComparator != null) {
-			Object[] values = orderByComparator.getOrderByConditionValues(dlContent);
+			for (Object orderByConditionValue :
+					orderByComparator.getOrderByConditionValues(dlContent)) {
 
-			for (Object value : values) {
-				qPos.add(value);
+				qPos.add(orderByConditionValue);
 			}
 		}
 
@@ -567,8 +565,11 @@ public class DLContentPersistenceImpl extends BasePersistenceImpl<DLContent>
 	 */
 	@Override
 	public void removeByC_R(long companyId, long repositoryId) {
-		for (DLContent dlContent : findByC_R(companyId, repositoryId,
-				QueryUtil.ALL_POS, QueryUtil.ALL_POS, null)) {
+		for (DLContent dlContent :
+				findByC_R(
+					companyId, repositoryId, QueryUtil.ALL_POS,
+					QueryUtil.ALL_POS, null)) {
+
 			remove(dlContent);
 		}
 	}
@@ -582,9 +583,9 @@ public class DLContentPersistenceImpl extends BasePersistenceImpl<DLContent>
 	 */
 	@Override
 	public int countByC_R(long companyId, long repositoryId) {
-		FinderPath finderPath = FINDER_PATH_COUNT_BY_C_R;
+		FinderPath finderPath = _finderPathCountByC_R;
 
-		Object[] finderArgs = new Object[] { companyId, repositoryId };
+		Object[] finderArgs = new Object[] {companyId, repositoryId};
 
 		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
 
@@ -629,36 +630,15 @@ public class DLContentPersistenceImpl extends BasePersistenceImpl<DLContent>
 		return count.intValue();
 	}
 
-	private static final String _FINDER_COLUMN_C_R_COMPANYID_2 = "dlContent.companyId = ? AND ";
-	private static final String _FINDER_COLUMN_C_R_REPOSITORYID_2 = "dlContent.repositoryId = ?";
-	public static final FinderPath FINDER_PATH_WITH_PAGINATION_FIND_BY_C_R_P = new FinderPath(DLContentModelImpl.ENTITY_CACHE_ENABLED,
-			DLContentModelImpl.FINDER_CACHE_ENABLED, DLContentImpl.class,
-			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByC_R_P",
-			new String[] {
-				Long.class.getName(), Long.class.getName(),
-				String.class.getName(),
-				
-			Integer.class.getName(), Integer.class.getName(),
-				OrderByComparator.class.getName()
-			});
-	public static final FinderPath FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_C_R_P = new FinderPath(DLContentModelImpl.ENTITY_CACHE_ENABLED,
-			DLContentModelImpl.FINDER_CACHE_ENABLED, DLContentImpl.class,
-			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByC_R_P",
-			new String[] {
-				Long.class.getName(), Long.class.getName(),
-				String.class.getName()
-			},
-			DLContentModelImpl.COMPANYID_COLUMN_BITMASK |
-			DLContentModelImpl.REPOSITORYID_COLUMN_BITMASK |
-			DLContentModelImpl.PATH_COLUMN_BITMASK |
-			DLContentModelImpl.VERSION_COLUMN_BITMASK);
-	public static final FinderPath FINDER_PATH_COUNT_BY_C_R_P = new FinderPath(DLContentModelImpl.ENTITY_CACHE_ENABLED,
-			DLContentModelImpl.FINDER_CACHE_ENABLED, Long.class,
-			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByC_R_P",
-			new String[] {
-				Long.class.getName(), Long.class.getName(),
-				String.class.getName()
-			});
+	private static final String _FINDER_COLUMN_C_R_COMPANYID_2 =
+		"dlContent.companyId = ? AND ";
+
+	private static final String _FINDER_COLUMN_C_R_REPOSITORYID_2 =
+		"dlContent.repositoryId = ?";
+
+	private FinderPath _finderPathWithPaginationFindByC_R_P;
+	private FinderPath _finderPathWithoutPaginationFindByC_R_P;
+	private FinderPath _finderPathCountByC_R_P;
 
 	/**
 	 * Returns all the document library contents where companyId = &#63; and repositoryId = &#63; and path = &#63;.
@@ -669,17 +649,19 @@ public class DLContentPersistenceImpl extends BasePersistenceImpl<DLContent>
 	 * @return the matching document library contents
 	 */
 	@Override
-	public List<DLContent> findByC_R_P(long companyId, long repositoryId,
-		String path) {
-		return findByC_R_P(companyId, repositoryId, path, QueryUtil.ALL_POS,
-			QueryUtil.ALL_POS, null);
+	public List<DLContent> findByC_R_P(
+		long companyId, long repositoryId, String path) {
+
+		return findByC_R_P(
+			companyId, repositoryId, path, QueryUtil.ALL_POS, QueryUtil.ALL_POS,
+			null);
 	}
 
 	/**
 	 * Returns a range of all the document library contents where companyId = &#63; and repositoryId = &#63; and path = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link DLContentModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>DLContentModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param companyId the company ID
@@ -690,8 +672,9 @@ public class DLContentPersistenceImpl extends BasePersistenceImpl<DLContent>
 	 * @return the range of matching document library contents
 	 */
 	@Override
-	public List<DLContent> findByC_R_P(long companyId, long repositoryId,
-		String path, int start, int end) {
+	public List<DLContent> findByC_R_P(
+		long companyId, long repositoryId, String path, int start, int end) {
+
 		return findByC_R_P(companyId, repositoryId, path, start, end, null);
 	}
 
@@ -699,7 +682,7 @@ public class DLContentPersistenceImpl extends BasePersistenceImpl<DLContent>
 	 * Returns an ordered range of all the document library contents where companyId = &#63; and repositoryId = &#63; and path = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link DLContentModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>DLContentModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param companyId the company ID
@@ -711,18 +694,19 @@ public class DLContentPersistenceImpl extends BasePersistenceImpl<DLContent>
 	 * @return the ordered range of matching document library contents
 	 */
 	@Override
-	public List<DLContent> findByC_R_P(long companyId, long repositoryId,
-		String path, int start, int end,
+	public List<DLContent> findByC_R_P(
+		long companyId, long repositoryId, String path, int start, int end,
 		OrderByComparator<DLContent> orderByComparator) {
-		return findByC_R_P(companyId, repositoryId, path, start, end,
-			orderByComparator, true);
+
+		return findByC_R_P(
+			companyId, repositoryId, path, start, end, orderByComparator, true);
 	}
 
 	/**
 	 * Returns an ordered range of all the document library contents where companyId = &#63; and repositoryId = &#63; and path = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link DLContentModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>DLContentModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param companyId the company ID
@@ -735,10 +719,11 @@ public class DLContentPersistenceImpl extends BasePersistenceImpl<DLContent>
 	 * @return the ordered range of matching document library contents
 	 */
 	@Override
-	public List<DLContent> findByC_R_P(long companyId, long repositoryId,
-		String path, int start, int end,
+	public List<DLContent> findByC_R_P(
+		long companyId, long repositoryId, String path, int start, int end,
 		OrderByComparator<DLContent> orderByComparator,
 		boolean retrieveFromCache) {
+
 		path = Objects.toString(path, "");
 
 		boolean pagination = true;
@@ -746,31 +731,31 @@ public class DLContentPersistenceImpl extends BasePersistenceImpl<DLContent>
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
-				(orderByComparator == null)) {
+			(orderByComparator == null)) {
+
 			pagination = false;
-			finderPath = FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_C_R_P;
-			finderArgs = new Object[] { companyId, repositoryId, path };
+			finderPath = _finderPathWithoutPaginationFindByC_R_P;
+			finderArgs = new Object[] {companyId, repositoryId, path};
 		}
 		else {
-			finderPath = FINDER_PATH_WITH_PAGINATION_FIND_BY_C_R_P;
+			finderPath = _finderPathWithPaginationFindByC_R_P;
 			finderArgs = new Object[] {
-					companyId, repositoryId, path,
-					
-					start, end, orderByComparator
-				};
+				companyId, repositoryId, path, start, end, orderByComparator
+			};
 		}
 
 		List<DLContent> list = null;
 
 		if (retrieveFromCache) {
-			list = (List<DLContent>)finderCache.getResult(finderPath,
-					finderArgs, this);
+			list = (List<DLContent>)finderCache.getResult(
+				finderPath, finderArgs, this);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (DLContent dlContent : list) {
 					if ((companyId != dlContent.getCompanyId()) ||
-							(repositoryId != dlContent.getRepositoryId()) ||
-							!path.equals(dlContent.getPath())) {
+						(repositoryId != dlContent.getRepositoryId()) ||
+						!path.equals(dlContent.getPath())) {
+
 						list = null;
 
 						break;
@@ -783,8 +768,8 @@ public class DLContentPersistenceImpl extends BasePersistenceImpl<DLContent>
 			StringBundler query = null;
 
 			if (orderByComparator != null) {
-				query = new StringBundler(5 +
-						(orderByComparator.getOrderByFields().length * 2));
+				query = new StringBundler(
+					5 + (orderByComparator.getOrderByFields().length * 2));
 			}
 			else {
 				query = new StringBundler(5);
@@ -808,11 +793,10 @@ public class DLContentPersistenceImpl extends BasePersistenceImpl<DLContent>
 			}
 
 			if (orderByComparator != null) {
-				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
-					orderByComparator);
+				appendOrderByComparator(
+					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
 			}
-			else
-			 if (pagination) {
+			else if (pagination) {
 				query.append(DLContentModelImpl.ORDER_BY_JPQL);
 			}
 
@@ -836,16 +820,16 @@ public class DLContentPersistenceImpl extends BasePersistenceImpl<DLContent>
 				}
 
 				if (!pagination) {
-					list = (List<DLContent>)QueryUtil.list(q, getDialect(),
-							start, end, false);
+					list = (List<DLContent>)QueryUtil.list(
+						q, getDialect(), start, end, false);
 
 					Collections.sort(list);
 
 					list = Collections.unmodifiableList(list);
 				}
 				else {
-					list = (List<DLContent>)QueryUtil.list(q, getDialect(),
-							start, end);
+					list = (List<DLContent>)QueryUtil.list(
+						q, getDialect(), start, end);
 				}
 
 				cacheResult(list);
@@ -876,11 +860,13 @@ public class DLContentPersistenceImpl extends BasePersistenceImpl<DLContent>
 	 * @throws NoSuchContentException if a matching document library content could not be found
 	 */
 	@Override
-	public DLContent findByC_R_P_First(long companyId, long repositoryId,
-		String path, OrderByComparator<DLContent> orderByComparator)
+	public DLContent findByC_R_P_First(
+			long companyId, long repositoryId, String path,
+			OrderByComparator<DLContent> orderByComparator)
 		throws NoSuchContentException {
-		DLContent dlContent = fetchByC_R_P_First(companyId, repositoryId, path,
-				orderByComparator);
+
+		DLContent dlContent = fetchByC_R_P_First(
+			companyId, repositoryId, path, orderByComparator);
 
 		if (dlContent != null) {
 			return dlContent;
@@ -914,10 +900,12 @@ public class DLContentPersistenceImpl extends BasePersistenceImpl<DLContent>
 	 * @return the first matching document library content, or <code>null</code> if a matching document library content could not be found
 	 */
 	@Override
-	public DLContent fetchByC_R_P_First(long companyId, long repositoryId,
-		String path, OrderByComparator<DLContent> orderByComparator) {
-		List<DLContent> list = findByC_R_P(companyId, repositoryId, path, 0, 1,
-				orderByComparator);
+	public DLContent fetchByC_R_P_First(
+		long companyId, long repositoryId, String path,
+		OrderByComparator<DLContent> orderByComparator) {
+
+		List<DLContent> list = findByC_R_P(
+			companyId, repositoryId, path, 0, 1, orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -937,11 +925,13 @@ public class DLContentPersistenceImpl extends BasePersistenceImpl<DLContent>
 	 * @throws NoSuchContentException if a matching document library content could not be found
 	 */
 	@Override
-	public DLContent findByC_R_P_Last(long companyId, long repositoryId,
-		String path, OrderByComparator<DLContent> orderByComparator)
+	public DLContent findByC_R_P_Last(
+			long companyId, long repositoryId, String path,
+			OrderByComparator<DLContent> orderByComparator)
 		throws NoSuchContentException {
-		DLContent dlContent = fetchByC_R_P_Last(companyId, repositoryId, path,
-				orderByComparator);
+
+		DLContent dlContent = fetchByC_R_P_Last(
+			companyId, repositoryId, path, orderByComparator);
 
 		if (dlContent != null) {
 			return dlContent;
@@ -975,16 +965,18 @@ public class DLContentPersistenceImpl extends BasePersistenceImpl<DLContent>
 	 * @return the last matching document library content, or <code>null</code> if a matching document library content could not be found
 	 */
 	@Override
-	public DLContent fetchByC_R_P_Last(long companyId, long repositoryId,
-		String path, OrderByComparator<DLContent> orderByComparator) {
+	public DLContent fetchByC_R_P_Last(
+		long companyId, long repositoryId, String path,
+		OrderByComparator<DLContent> orderByComparator) {
+
 		int count = countByC_R_P(companyId, repositoryId, path);
 
 		if (count == 0) {
 			return null;
 		}
 
-		List<DLContent> list = findByC_R_P(companyId, repositoryId, path,
-				count - 1, count, orderByComparator);
+		List<DLContent> list = findByC_R_P(
+			companyId, repositoryId, path, count - 1, count, orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -1005,10 +997,11 @@ public class DLContentPersistenceImpl extends BasePersistenceImpl<DLContent>
 	 * @throws NoSuchContentException if a document library content with the primary key could not be found
 	 */
 	@Override
-	public DLContent[] findByC_R_P_PrevAndNext(long contentId, long companyId,
-		long repositoryId, String path,
-		OrderByComparator<DLContent> orderByComparator)
+	public DLContent[] findByC_R_P_PrevAndNext(
+			long contentId, long companyId, long repositoryId, String path,
+			OrderByComparator<DLContent> orderByComparator)
 		throws NoSuchContentException {
+
 		path = Objects.toString(path, "");
 
 		DLContent dlContent = findByPrimaryKey(contentId);
@@ -1020,13 +1013,15 @@ public class DLContentPersistenceImpl extends BasePersistenceImpl<DLContent>
 
 			DLContent[] array = new DLContentImpl[3];
 
-			array[0] = getByC_R_P_PrevAndNext(session, dlContent, companyId,
-					repositoryId, path, orderByComparator, true);
+			array[0] = getByC_R_P_PrevAndNext(
+				session, dlContent, companyId, repositoryId, path,
+				orderByComparator, true);
 
 			array[1] = dlContent;
 
-			array[2] = getByC_R_P_PrevAndNext(session, dlContent, companyId,
-					repositoryId, path, orderByComparator, false);
+			array[2] = getByC_R_P_PrevAndNext(
+				session, dlContent, companyId, repositoryId, path,
+				orderByComparator, false);
 
 			return array;
 		}
@@ -1038,14 +1033,16 @@ public class DLContentPersistenceImpl extends BasePersistenceImpl<DLContent>
 		}
 	}
 
-	protected DLContent getByC_R_P_PrevAndNext(Session session,
-		DLContent dlContent, long companyId, long repositoryId, String path,
-		OrderByComparator<DLContent> orderByComparator, boolean previous) {
+	protected DLContent getByC_R_P_PrevAndNext(
+		Session session, DLContent dlContent, long companyId, long repositoryId,
+		String path, OrderByComparator<DLContent> orderByComparator,
+		boolean previous) {
+
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(6 +
-					(orderByComparator.getOrderByConditionFields().length * 3) +
+			query = new StringBundler(
+				6 + (orderByComparator.getOrderByConditionFields().length * 3) +
 					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
@@ -1070,7 +1067,8 @@ public class DLContentPersistenceImpl extends BasePersistenceImpl<DLContent>
 		}
 
 		if (orderByComparator != null) {
-			String[] orderByConditionFields = orderByComparator.getOrderByConditionFields();
+			String[] orderByConditionFields =
+				orderByComparator.getOrderByConditionFields();
 
 			if (orderByConditionFields.length > 0) {
 				query.append(WHERE_AND);
@@ -1146,10 +1144,10 @@ public class DLContentPersistenceImpl extends BasePersistenceImpl<DLContent>
 		}
 
 		if (orderByComparator != null) {
-			Object[] values = orderByComparator.getOrderByConditionValues(dlContent);
+			for (Object orderByConditionValue :
+					orderByComparator.getOrderByConditionValues(dlContent)) {
 
-			for (Object value : values) {
-				qPos.add(value);
+				qPos.add(orderByConditionValue);
 			}
 		}
 
@@ -1172,8 +1170,11 @@ public class DLContentPersistenceImpl extends BasePersistenceImpl<DLContent>
 	 */
 	@Override
 	public void removeByC_R_P(long companyId, long repositoryId, String path) {
-		for (DLContent dlContent : findByC_R_P(companyId, repositoryId, path,
-				QueryUtil.ALL_POS, QueryUtil.ALL_POS, null)) {
+		for (DLContent dlContent :
+				findByC_R_P(
+					companyId, repositoryId, path, QueryUtil.ALL_POS,
+					QueryUtil.ALL_POS, null)) {
+
 			remove(dlContent);
 		}
 	}
@@ -1190,9 +1191,9 @@ public class DLContentPersistenceImpl extends BasePersistenceImpl<DLContent>
 	public int countByC_R_P(long companyId, long repositoryId, String path) {
 		path = Objects.toString(path, "");
 
-		FinderPath finderPath = FINDER_PATH_COUNT_BY_C_R_P;
+		FinderPath finderPath = _finderPathCountByC_R_P;
 
-		Object[] finderArgs = new Object[] { companyId, repositoryId, path };
+		Object[] finderArgs = new Object[] {companyId, repositoryId, path};
 
 		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
 
@@ -1252,29 +1253,20 @@ public class DLContentPersistenceImpl extends BasePersistenceImpl<DLContent>
 		return count.intValue();
 	}
 
-	private static final String _FINDER_COLUMN_C_R_P_COMPANYID_2 = "dlContent.companyId = ? AND ";
-	private static final String _FINDER_COLUMN_C_R_P_REPOSITORYID_2 = "dlContent.repositoryId = ? AND ";
-	private static final String _FINDER_COLUMN_C_R_P_PATH_2 = "dlContent.path = ?";
-	private static final String _FINDER_COLUMN_C_R_P_PATH_3 = "(dlContent.path IS NULL OR dlContent.path = '')";
-	public static final FinderPath FINDER_PATH_WITH_PAGINATION_FIND_BY_C_R_LIKEP =
-		new FinderPath(DLContentModelImpl.ENTITY_CACHE_ENABLED,
-			DLContentModelImpl.FINDER_CACHE_ENABLED, DLContentImpl.class,
-			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByC_R_LikeP",
-			new String[] {
-				Long.class.getName(), Long.class.getName(),
-				String.class.getName(),
-				
-			Integer.class.getName(), Integer.class.getName(),
-				OrderByComparator.class.getName()
-			});
-	public static final FinderPath FINDER_PATH_WITH_PAGINATION_COUNT_BY_C_R_LIKEP =
-		new FinderPath(DLContentModelImpl.ENTITY_CACHE_ENABLED,
-			DLContentModelImpl.FINDER_CACHE_ENABLED, Long.class,
-			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "countByC_R_LikeP",
-			new String[] {
-				Long.class.getName(), Long.class.getName(),
-				String.class.getName()
-			});
+	private static final String _FINDER_COLUMN_C_R_P_COMPANYID_2 =
+		"dlContent.companyId = ? AND ";
+
+	private static final String _FINDER_COLUMN_C_R_P_REPOSITORYID_2 =
+		"dlContent.repositoryId = ? AND ";
+
+	private static final String _FINDER_COLUMN_C_R_P_PATH_2 =
+		"dlContent.path = ?";
+
+	private static final String _FINDER_COLUMN_C_R_P_PATH_3 =
+		"(dlContent.path IS NULL OR dlContent.path = '')";
+
+	private FinderPath _finderPathWithPaginationFindByC_R_LikeP;
+	private FinderPath _finderPathWithPaginationCountByC_R_LikeP;
 
 	/**
 	 * Returns all the document library contents where companyId = &#63; and repositoryId = &#63; and path LIKE &#63;.
@@ -1285,17 +1277,19 @@ public class DLContentPersistenceImpl extends BasePersistenceImpl<DLContent>
 	 * @return the matching document library contents
 	 */
 	@Override
-	public List<DLContent> findByC_R_LikeP(long companyId, long repositoryId,
-		String path) {
-		return findByC_R_LikeP(companyId, repositoryId, path,
-			QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
+	public List<DLContent> findByC_R_LikeP(
+		long companyId, long repositoryId, String path) {
+
+		return findByC_R_LikeP(
+			companyId, repositoryId, path, QueryUtil.ALL_POS, QueryUtil.ALL_POS,
+			null);
 	}
 
 	/**
 	 * Returns a range of all the document library contents where companyId = &#63; and repositoryId = &#63; and path LIKE &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link DLContentModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>DLContentModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param companyId the company ID
@@ -1306,8 +1300,9 @@ public class DLContentPersistenceImpl extends BasePersistenceImpl<DLContent>
 	 * @return the range of matching document library contents
 	 */
 	@Override
-	public List<DLContent> findByC_R_LikeP(long companyId, long repositoryId,
-		String path, int start, int end) {
+	public List<DLContent> findByC_R_LikeP(
+		long companyId, long repositoryId, String path, int start, int end) {
+
 		return findByC_R_LikeP(companyId, repositoryId, path, start, end, null);
 	}
 
@@ -1315,7 +1310,7 @@ public class DLContentPersistenceImpl extends BasePersistenceImpl<DLContent>
 	 * Returns an ordered range of all the document library contents where companyId = &#63; and repositoryId = &#63; and path LIKE &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link DLContentModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>DLContentModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param companyId the company ID
@@ -1327,18 +1322,19 @@ public class DLContentPersistenceImpl extends BasePersistenceImpl<DLContent>
 	 * @return the ordered range of matching document library contents
 	 */
 	@Override
-	public List<DLContent> findByC_R_LikeP(long companyId, long repositoryId,
-		String path, int start, int end,
+	public List<DLContent> findByC_R_LikeP(
+		long companyId, long repositoryId, String path, int start, int end,
 		OrderByComparator<DLContent> orderByComparator) {
-		return findByC_R_LikeP(companyId, repositoryId, path, start, end,
-			orderByComparator, true);
+
+		return findByC_R_LikeP(
+			companyId, repositoryId, path, start, end, orderByComparator, true);
 	}
 
 	/**
 	 * Returns an ordered range of all the document library contents where companyId = &#63; and repositoryId = &#63; and path LIKE &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link DLContentModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>DLContentModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param companyId the company ID
@@ -1351,35 +1347,35 @@ public class DLContentPersistenceImpl extends BasePersistenceImpl<DLContent>
 	 * @return the ordered range of matching document library contents
 	 */
 	@Override
-	public List<DLContent> findByC_R_LikeP(long companyId, long repositoryId,
-		String path, int start, int end,
+	public List<DLContent> findByC_R_LikeP(
+		long companyId, long repositoryId, String path, int start, int end,
 		OrderByComparator<DLContent> orderByComparator,
 		boolean retrieveFromCache) {
+
 		path = Objects.toString(path, "");
 
 		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
-		finderPath = FINDER_PATH_WITH_PAGINATION_FIND_BY_C_R_LIKEP;
+		finderPath = _finderPathWithPaginationFindByC_R_LikeP;
 		finderArgs = new Object[] {
-				companyId, repositoryId, path,
-				
-				start, end, orderByComparator
-			};
+			companyId, repositoryId, path, start, end, orderByComparator
+		};
 
 		List<DLContent> list = null;
 
 		if (retrieveFromCache) {
-			list = (List<DLContent>)finderCache.getResult(finderPath,
-					finderArgs, this);
+			list = (List<DLContent>)finderCache.getResult(
+				finderPath, finderArgs, this);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (DLContent dlContent : list) {
 					if ((companyId != dlContent.getCompanyId()) ||
-							(repositoryId != dlContent.getRepositoryId()) ||
-							!StringUtil.wildcardMatches(dlContent.getPath(),
-								path, '_', '%', '\\', true)) {
+						(repositoryId != dlContent.getRepositoryId()) ||
+						!StringUtil.wildcardMatches(
+							dlContent.getPath(), path, '_', '%', '\\', true)) {
+
 						list = null;
 
 						break;
@@ -1392,8 +1388,8 @@ public class DLContentPersistenceImpl extends BasePersistenceImpl<DLContent>
 			StringBundler query = null;
 
 			if (orderByComparator != null) {
-				query = new StringBundler(5 +
-						(orderByComparator.getOrderByFields().length * 2));
+				query = new StringBundler(
+					5 + (orderByComparator.getOrderByFields().length * 2));
 			}
 			else {
 				query = new StringBundler(5);
@@ -1417,11 +1413,10 @@ public class DLContentPersistenceImpl extends BasePersistenceImpl<DLContent>
 			}
 
 			if (orderByComparator != null) {
-				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
-					orderByComparator);
+				appendOrderByComparator(
+					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
 			}
-			else
-			 if (pagination) {
+			else if (pagination) {
 				query.append(DLContentModelImpl.ORDER_BY_JPQL);
 			}
 
@@ -1445,16 +1440,16 @@ public class DLContentPersistenceImpl extends BasePersistenceImpl<DLContent>
 				}
 
 				if (!pagination) {
-					list = (List<DLContent>)QueryUtil.list(q, getDialect(),
-							start, end, false);
+					list = (List<DLContent>)QueryUtil.list(
+						q, getDialect(), start, end, false);
 
 					Collections.sort(list);
 
 					list = Collections.unmodifiableList(list);
 				}
 				else {
-					list = (List<DLContent>)QueryUtil.list(q, getDialect(),
-							start, end);
+					list = (List<DLContent>)QueryUtil.list(
+						q, getDialect(), start, end);
 				}
 
 				cacheResult(list);
@@ -1485,11 +1480,13 @@ public class DLContentPersistenceImpl extends BasePersistenceImpl<DLContent>
 	 * @throws NoSuchContentException if a matching document library content could not be found
 	 */
 	@Override
-	public DLContent findByC_R_LikeP_First(long companyId, long repositoryId,
-		String path, OrderByComparator<DLContent> orderByComparator)
+	public DLContent findByC_R_LikeP_First(
+			long companyId, long repositoryId, String path,
+			OrderByComparator<DLContent> orderByComparator)
 		throws NoSuchContentException {
-		DLContent dlContent = fetchByC_R_LikeP_First(companyId, repositoryId,
-				path, orderByComparator);
+
+		DLContent dlContent = fetchByC_R_LikeP_First(
+			companyId, repositoryId, path, orderByComparator);
 
 		if (dlContent != null) {
 			return dlContent;
@@ -1523,10 +1520,12 @@ public class DLContentPersistenceImpl extends BasePersistenceImpl<DLContent>
 	 * @return the first matching document library content, or <code>null</code> if a matching document library content could not be found
 	 */
 	@Override
-	public DLContent fetchByC_R_LikeP_First(long companyId, long repositoryId,
-		String path, OrderByComparator<DLContent> orderByComparator) {
-		List<DLContent> list = findByC_R_LikeP(companyId, repositoryId, path,
-				0, 1, orderByComparator);
+	public DLContent fetchByC_R_LikeP_First(
+		long companyId, long repositoryId, String path,
+		OrderByComparator<DLContent> orderByComparator) {
+
+		List<DLContent> list = findByC_R_LikeP(
+			companyId, repositoryId, path, 0, 1, orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -1546,11 +1545,13 @@ public class DLContentPersistenceImpl extends BasePersistenceImpl<DLContent>
 	 * @throws NoSuchContentException if a matching document library content could not be found
 	 */
 	@Override
-	public DLContent findByC_R_LikeP_Last(long companyId, long repositoryId,
-		String path, OrderByComparator<DLContent> orderByComparator)
+	public DLContent findByC_R_LikeP_Last(
+			long companyId, long repositoryId, String path,
+			OrderByComparator<DLContent> orderByComparator)
 		throws NoSuchContentException {
-		DLContent dlContent = fetchByC_R_LikeP_Last(companyId, repositoryId,
-				path, orderByComparator);
+
+		DLContent dlContent = fetchByC_R_LikeP_Last(
+			companyId, repositoryId, path, orderByComparator);
 
 		if (dlContent != null) {
 			return dlContent;
@@ -1584,16 +1585,18 @@ public class DLContentPersistenceImpl extends BasePersistenceImpl<DLContent>
 	 * @return the last matching document library content, or <code>null</code> if a matching document library content could not be found
 	 */
 	@Override
-	public DLContent fetchByC_R_LikeP_Last(long companyId, long repositoryId,
-		String path, OrderByComparator<DLContent> orderByComparator) {
+	public DLContent fetchByC_R_LikeP_Last(
+		long companyId, long repositoryId, String path,
+		OrderByComparator<DLContent> orderByComparator) {
+
 		int count = countByC_R_LikeP(companyId, repositoryId, path);
 
 		if (count == 0) {
 			return null;
 		}
 
-		List<DLContent> list = findByC_R_LikeP(companyId, repositoryId, path,
-				count - 1, count, orderByComparator);
+		List<DLContent> list = findByC_R_LikeP(
+			companyId, repositoryId, path, count - 1, count, orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -1614,10 +1617,11 @@ public class DLContentPersistenceImpl extends BasePersistenceImpl<DLContent>
 	 * @throws NoSuchContentException if a document library content with the primary key could not be found
 	 */
 	@Override
-	public DLContent[] findByC_R_LikeP_PrevAndNext(long contentId,
-		long companyId, long repositoryId, String path,
-		OrderByComparator<DLContent> orderByComparator)
+	public DLContent[] findByC_R_LikeP_PrevAndNext(
+			long contentId, long companyId, long repositoryId, String path,
+			OrderByComparator<DLContent> orderByComparator)
 		throws NoSuchContentException {
+
 		path = Objects.toString(path, "");
 
 		DLContent dlContent = findByPrimaryKey(contentId);
@@ -1629,13 +1633,15 @@ public class DLContentPersistenceImpl extends BasePersistenceImpl<DLContent>
 
 			DLContent[] array = new DLContentImpl[3];
 
-			array[0] = getByC_R_LikeP_PrevAndNext(session, dlContent,
-					companyId, repositoryId, path, orderByComparator, true);
+			array[0] = getByC_R_LikeP_PrevAndNext(
+				session, dlContent, companyId, repositoryId, path,
+				orderByComparator, true);
 
 			array[1] = dlContent;
 
-			array[2] = getByC_R_LikeP_PrevAndNext(session, dlContent,
-					companyId, repositoryId, path, orderByComparator, false);
+			array[2] = getByC_R_LikeP_PrevAndNext(
+				session, dlContent, companyId, repositoryId, path,
+				orderByComparator, false);
 
 			return array;
 		}
@@ -1647,14 +1653,16 @@ public class DLContentPersistenceImpl extends BasePersistenceImpl<DLContent>
 		}
 	}
 
-	protected DLContent getByC_R_LikeP_PrevAndNext(Session session,
-		DLContent dlContent, long companyId, long repositoryId, String path,
-		OrderByComparator<DLContent> orderByComparator, boolean previous) {
+	protected DLContent getByC_R_LikeP_PrevAndNext(
+		Session session, DLContent dlContent, long companyId, long repositoryId,
+		String path, OrderByComparator<DLContent> orderByComparator,
+		boolean previous) {
+
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(6 +
-					(orderByComparator.getOrderByConditionFields().length * 3) +
+			query = new StringBundler(
+				6 + (orderByComparator.getOrderByConditionFields().length * 3) +
 					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
@@ -1679,7 +1687,8 @@ public class DLContentPersistenceImpl extends BasePersistenceImpl<DLContent>
 		}
 
 		if (orderByComparator != null) {
-			String[] orderByConditionFields = orderByComparator.getOrderByConditionFields();
+			String[] orderByConditionFields =
+				orderByComparator.getOrderByConditionFields();
 
 			if (orderByConditionFields.length > 0) {
 				query.append(WHERE_AND);
@@ -1755,10 +1764,10 @@ public class DLContentPersistenceImpl extends BasePersistenceImpl<DLContent>
 		}
 
 		if (orderByComparator != null) {
-			Object[] values = orderByComparator.getOrderByConditionValues(dlContent);
+			for (Object orderByConditionValue :
+					orderByComparator.getOrderByConditionValues(dlContent)) {
 
-			for (Object value : values) {
-				qPos.add(value);
+				qPos.add(orderByConditionValue);
 			}
 		}
 
@@ -1780,9 +1789,14 @@ public class DLContentPersistenceImpl extends BasePersistenceImpl<DLContent>
 	 * @param path the path
 	 */
 	@Override
-	public void removeByC_R_LikeP(long companyId, long repositoryId, String path) {
-		for (DLContent dlContent : findByC_R_LikeP(companyId, repositoryId,
-				path, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null)) {
+	public void removeByC_R_LikeP(
+		long companyId, long repositoryId, String path) {
+
+		for (DLContent dlContent :
+				findByC_R_LikeP(
+					companyId, repositoryId, path, QueryUtil.ALL_POS,
+					QueryUtil.ALL_POS, null)) {
+
 			remove(dlContent);
 		}
 	}
@@ -1796,12 +1810,14 @@ public class DLContentPersistenceImpl extends BasePersistenceImpl<DLContent>
 	 * @return the number of matching document library contents
 	 */
 	@Override
-	public int countByC_R_LikeP(long companyId, long repositoryId, String path) {
+	public int countByC_R_LikeP(
+		long companyId, long repositoryId, String path) {
+
 		path = Objects.toString(path, "");
 
-		FinderPath finderPath = FINDER_PATH_WITH_PAGINATION_COUNT_BY_C_R_LIKEP;
+		FinderPath finderPath = _finderPathWithPaginationCountByC_R_LikeP;
 
-		Object[] finderArgs = new Object[] { companyId, repositoryId, path };
+		Object[] finderArgs = new Object[] {companyId, repositoryId, path};
 
 		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
 
@@ -1861,31 +1877,23 @@ public class DLContentPersistenceImpl extends BasePersistenceImpl<DLContent>
 		return count.intValue();
 	}
 
-	private static final String _FINDER_COLUMN_C_R_LIKEP_COMPANYID_2 = "dlContent.companyId = ? AND ";
-	private static final String _FINDER_COLUMN_C_R_LIKEP_REPOSITORYID_2 = "dlContent.repositoryId = ? AND ";
-	private static final String _FINDER_COLUMN_C_R_LIKEP_PATH_2 = "dlContent.path LIKE ?";
-	private static final String _FINDER_COLUMN_C_R_LIKEP_PATH_3 = "(dlContent.path IS NULL OR dlContent.path LIKE '')";
-	public static final FinderPath FINDER_PATH_FETCH_BY_C_R_P_V = new FinderPath(DLContentModelImpl.ENTITY_CACHE_ENABLED,
-			DLContentModelImpl.FINDER_CACHE_ENABLED, DLContentImpl.class,
-			FINDER_CLASS_NAME_ENTITY, "fetchByC_R_P_V",
-			new String[] {
-				Long.class.getName(), Long.class.getName(),
-				String.class.getName(), String.class.getName()
-			},
-			DLContentModelImpl.COMPANYID_COLUMN_BITMASK |
-			DLContentModelImpl.REPOSITORYID_COLUMN_BITMASK |
-			DLContentModelImpl.PATH_COLUMN_BITMASK |
-			DLContentModelImpl.VERSION_COLUMN_BITMASK);
-	public static final FinderPath FINDER_PATH_COUNT_BY_C_R_P_V = new FinderPath(DLContentModelImpl.ENTITY_CACHE_ENABLED,
-			DLContentModelImpl.FINDER_CACHE_ENABLED, Long.class,
-			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByC_R_P_V",
-			new String[] {
-				Long.class.getName(), Long.class.getName(),
-				String.class.getName(), String.class.getName()
-			});
+	private static final String _FINDER_COLUMN_C_R_LIKEP_COMPANYID_2 =
+		"dlContent.companyId = ? AND ";
+
+	private static final String _FINDER_COLUMN_C_R_LIKEP_REPOSITORYID_2 =
+		"dlContent.repositoryId = ? AND ";
+
+	private static final String _FINDER_COLUMN_C_R_LIKEP_PATH_2 =
+		"dlContent.path LIKE ?";
+
+	private static final String _FINDER_COLUMN_C_R_LIKEP_PATH_3 =
+		"(dlContent.path IS NULL OR dlContent.path LIKE '')";
+
+	private FinderPath _finderPathFetchByC_R_P_V;
+	private FinderPath _finderPathCountByC_R_P_V;
 
 	/**
-	 * Returns the document library content where companyId = &#63; and repositoryId = &#63; and path = &#63; and version = &#63; or throws a {@link NoSuchContentException} if it could not be found.
+	 * Returns the document library content where companyId = &#63; and repositoryId = &#63; and path = &#63; and version = &#63; or throws a <code>NoSuchContentException</code> if it could not be found.
 	 *
 	 * @param companyId the company ID
 	 * @param repositoryId the repository ID
@@ -1895,10 +1903,12 @@ public class DLContentPersistenceImpl extends BasePersistenceImpl<DLContent>
 	 * @throws NoSuchContentException if a matching document library content could not be found
 	 */
 	@Override
-	public DLContent findByC_R_P_V(long companyId, long repositoryId,
-		String path, String version) throws NoSuchContentException {
-		DLContent dlContent = fetchByC_R_P_V(companyId, repositoryId, path,
-				version);
+	public DLContent findByC_R_P_V(
+			long companyId, long repositoryId, String path, String version)
+		throws NoSuchContentException {
+
+		DLContent dlContent = fetchByC_R_P_V(
+			companyId, repositoryId, path, version);
 
 		if (dlContent == null) {
 			StringBundler msg = new StringBundler(10);
@@ -1939,8 +1949,9 @@ public class DLContentPersistenceImpl extends BasePersistenceImpl<DLContent>
 	 * @return the matching document library content, or <code>null</code> if a matching document library content could not be found
 	 */
 	@Override
-	public DLContent fetchByC_R_P_V(long companyId, long repositoryId,
-		String path, String version) {
+	public DLContent fetchByC_R_P_V(
+		long companyId, long repositoryId, String path, String version) {
+
 		return fetchByC_R_P_V(companyId, repositoryId, path, version, true);
 	}
 
@@ -1955,29 +1966,32 @@ public class DLContentPersistenceImpl extends BasePersistenceImpl<DLContent>
 	 * @return the matching document library content, or <code>null</code> if a matching document library content could not be found
 	 */
 	@Override
-	public DLContent fetchByC_R_P_V(long companyId, long repositoryId,
-		String path, String version, boolean retrieveFromCache) {
+	public DLContent fetchByC_R_P_V(
+		long companyId, long repositoryId, String path, String version,
+		boolean retrieveFromCache) {
+
 		path = Objects.toString(path, "");
 		version = Objects.toString(version, "");
 
 		Object[] finderArgs = new Object[] {
-				companyId, repositoryId, path, version
-			};
+			companyId, repositoryId, path, version
+		};
 
 		Object result = null;
 
 		if (retrieveFromCache) {
-			result = finderCache.getResult(FINDER_PATH_FETCH_BY_C_R_P_V,
-					finderArgs, this);
+			result = finderCache.getResult(
+				_finderPathFetchByC_R_P_V, finderArgs, this);
 		}
 
 		if (result instanceof DLContent) {
 			DLContent dlContent = (DLContent)result;
 
 			if ((companyId != dlContent.getCompanyId()) ||
-					(repositoryId != dlContent.getRepositoryId()) ||
-					!Objects.equals(path, dlContent.getPath()) ||
-					!Objects.equals(version, dlContent.getVersion())) {
+				(repositoryId != dlContent.getRepositoryId()) ||
+				!Objects.equals(path, dlContent.getPath()) ||
+				!Objects.equals(version, dlContent.getVersion())) {
+
 				result = null;
 			}
 		}
@@ -2039,8 +2053,8 @@ public class DLContentPersistenceImpl extends BasePersistenceImpl<DLContent>
 				List<DLContent> list = q.list();
 
 				if (list.isEmpty()) {
-					finderCache.putResult(FINDER_PATH_FETCH_BY_C_R_P_V,
-						finderArgs, list);
+					finderCache.putResult(
+						_finderPathFetchByC_R_P_V, finderArgs, list);
 				}
 				else {
 					DLContent dlContent = list.get(0);
@@ -2051,8 +2065,7 @@ public class DLContentPersistenceImpl extends BasePersistenceImpl<DLContent>
 				}
 			}
 			catch (Exception e) {
-				finderCache.removeResult(FINDER_PATH_FETCH_BY_C_R_P_V,
-					finderArgs);
+				finderCache.removeResult(_finderPathFetchByC_R_P_V, finderArgs);
 
 				throw processException(e);
 			}
@@ -2079,10 +2092,12 @@ public class DLContentPersistenceImpl extends BasePersistenceImpl<DLContent>
 	 * @return the document library content that was removed
 	 */
 	@Override
-	public DLContent removeByC_R_P_V(long companyId, long repositoryId,
-		String path, String version) throws NoSuchContentException {
-		DLContent dlContent = findByC_R_P_V(companyId, repositoryId, path,
-				version);
+	public DLContent removeByC_R_P_V(
+			long companyId, long repositoryId, String path, String version)
+		throws NoSuchContentException {
+
+		DLContent dlContent = findByC_R_P_V(
+			companyId, repositoryId, path, version);
 
 		return remove(dlContent);
 	}
@@ -2097,16 +2112,17 @@ public class DLContentPersistenceImpl extends BasePersistenceImpl<DLContent>
 	 * @return the number of matching document library contents
 	 */
 	@Override
-	public int countByC_R_P_V(long companyId, long repositoryId, String path,
-		String version) {
+	public int countByC_R_P_V(
+		long companyId, long repositoryId, String path, String version) {
+
 		path = Objects.toString(path, "");
 		version = Objects.toString(version, "");
 
-		FinderPath finderPath = FINDER_PATH_COUNT_BY_C_R_P_V;
+		FinderPath finderPath = _finderPathCountByC_R_P_V;
 
 		Object[] finderArgs = new Object[] {
-				companyId, repositoryId, path, version
-			};
+			companyId, repositoryId, path, version
+		};
 
 		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
 
@@ -2181,27 +2197,38 @@ public class DLContentPersistenceImpl extends BasePersistenceImpl<DLContent>
 		return count.intValue();
 	}
 
-	private static final String _FINDER_COLUMN_C_R_P_V_COMPANYID_2 = "dlContent.companyId = ? AND ";
-	private static final String _FINDER_COLUMN_C_R_P_V_REPOSITORYID_2 = "dlContent.repositoryId = ? AND ";
-	private static final String _FINDER_COLUMN_C_R_P_V_PATH_2 = "dlContent.path = ? AND ";
-	private static final String _FINDER_COLUMN_C_R_P_V_PATH_3 = "(dlContent.path IS NULL OR dlContent.path = '') AND ";
-	private static final String _FINDER_COLUMN_C_R_P_V_VERSION_2 = "dlContent.version = ?";
-	private static final String _FINDER_COLUMN_C_R_P_V_VERSION_3 = "(dlContent.version IS NULL OR dlContent.version = '')";
+	private static final String _FINDER_COLUMN_C_R_P_V_COMPANYID_2 =
+		"dlContent.companyId = ? AND ";
+
+	private static final String _FINDER_COLUMN_C_R_P_V_REPOSITORYID_2 =
+		"dlContent.repositoryId = ? AND ";
+
+	private static final String _FINDER_COLUMN_C_R_P_V_PATH_2 =
+		"dlContent.path = ? AND ";
+
+	private static final String _FINDER_COLUMN_C_R_P_V_PATH_3 =
+		"(dlContent.path IS NULL OR dlContent.path = '') AND ";
+
+	private static final String _FINDER_COLUMN_C_R_P_V_VERSION_2 =
+		"dlContent.version = ?";
+
+	private static final String _FINDER_COLUMN_C_R_P_V_VERSION_3 =
+		"(dlContent.version IS NULL OR dlContent.version = '')";
 
 	public DLContentPersistenceImpl() {
 		setModelClass(DLContent.class);
 
+		Map<String, String> dbColumnNames = new HashMap<String, String>();
+
+		dbColumnNames.put("path", "path_");
+		dbColumnNames.put("data", "data_");
+		dbColumnNames.put("size", "size_");
+
 		try {
 			Field field = BasePersistenceImpl.class.getDeclaredField(
-					"_dbColumnNames");
+				"_dbColumnNames");
 
 			field.setAccessible(true);
-
-			Map<String, String> dbColumnNames = new HashMap<String, String>();
-
-			dbColumnNames.put("path", "path_");
-			dbColumnNames.put("data", "data_");
-			dbColumnNames.put("size", "size_");
 
 			field.set(this, dbColumnNames);
 		}
@@ -2219,14 +2246,17 @@ public class DLContentPersistenceImpl extends BasePersistenceImpl<DLContent>
 	 */
 	@Override
 	public void cacheResult(DLContent dlContent) {
-		entityCache.putResult(DLContentModelImpl.ENTITY_CACHE_ENABLED,
-			DLContentImpl.class, dlContent.getPrimaryKey(), dlContent);
+		entityCache.putResult(
+			DLContentModelImpl.ENTITY_CACHE_ENABLED, DLContentImpl.class,
+			dlContent.getPrimaryKey(), dlContent);
 
-		finderCache.putResult(FINDER_PATH_FETCH_BY_C_R_P_V,
+		finderCache.putResult(
+			_finderPathFetchByC_R_P_V,
 			new Object[] {
 				dlContent.getCompanyId(), dlContent.getRepositoryId(),
 				dlContent.getPath(), dlContent.getVersion()
-			}, dlContent);
+			},
+			dlContent);
 
 		dlContent.resetOriginalValues();
 	}
@@ -2239,8 +2269,10 @@ public class DLContentPersistenceImpl extends BasePersistenceImpl<DLContent>
 	@Override
 	public void cacheResult(List<DLContent> dlContents) {
 		for (DLContent dlContent : dlContents) {
-			if (entityCache.getResult(DLContentModelImpl.ENTITY_CACHE_ENABLED,
-						DLContentImpl.class, dlContent.getPrimaryKey()) == null) {
+			if (entityCache.getResult(
+					DLContentModelImpl.ENTITY_CACHE_ENABLED,
+					DLContentImpl.class, dlContent.getPrimaryKey()) == null) {
+
 				cacheResult(dlContent);
 			}
 			else {
@@ -2253,7 +2285,7 @@ public class DLContentPersistenceImpl extends BasePersistenceImpl<DLContent>
 	 * Clears the cache for all document library contents.
 	 *
 	 * <p>
-	 * The {@link EntityCache} and {@link FinderCache} are both cleared by this method.
+	 * The <code>EntityCache</code> and <code>FinderCache</code> are both cleared by this method.
 	 * </p>
 	 */
 	@Override
@@ -2269,13 +2301,14 @@ public class DLContentPersistenceImpl extends BasePersistenceImpl<DLContent>
 	 * Clears the cache for the document library content.
 	 *
 	 * <p>
-	 * The {@link EntityCache} and {@link FinderCache} are both cleared by this method.
+	 * The <code>EntityCache</code> and <code>FinderCache</code> are both cleared by this method.
 	 * </p>
 	 */
 	@Override
 	public void clearCache(DLContent dlContent) {
-		entityCache.removeResult(DLContentModelImpl.ENTITY_CACHE_ENABLED,
-			DLContentImpl.class, dlContent.getPrimaryKey());
+		entityCache.removeResult(
+			DLContentModelImpl.ENTITY_CACHE_ENABLED, DLContentImpl.class,
+			dlContent.getPrimaryKey());
 
 		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
 		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
@@ -2289,8 +2322,9 @@ public class DLContentPersistenceImpl extends BasePersistenceImpl<DLContent>
 		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
 
 		for (DLContent dlContent : dlContents) {
-			entityCache.removeResult(DLContentModelImpl.ENTITY_CACHE_ENABLED,
-				DLContentImpl.class, dlContent.getPrimaryKey());
+			entityCache.removeResult(
+				DLContentModelImpl.ENTITY_CACHE_ENABLED, DLContentImpl.class,
+				dlContent.getPrimaryKey());
 
 			clearUniqueFindersCache((DLContentModelImpl)dlContent, true);
 		}
@@ -2298,43 +2332,45 @@ public class DLContentPersistenceImpl extends BasePersistenceImpl<DLContent>
 
 	protected void cacheUniqueFindersCache(
 		DLContentModelImpl dlContentModelImpl) {
+
 		Object[] args = new Object[] {
+			dlContentModelImpl.getCompanyId(),
+			dlContentModelImpl.getRepositoryId(), dlContentModelImpl.getPath(),
+			dlContentModelImpl.getVersion()
+		};
+
+		finderCache.putResult(
+			_finderPathCountByC_R_P_V, args, Long.valueOf(1), false);
+		finderCache.putResult(
+			_finderPathFetchByC_R_P_V, args, dlContentModelImpl, false);
+	}
+
+	protected void clearUniqueFindersCache(
+		DLContentModelImpl dlContentModelImpl, boolean clearCurrent) {
+
+		if (clearCurrent) {
+			Object[] args = new Object[] {
 				dlContentModelImpl.getCompanyId(),
 				dlContentModelImpl.getRepositoryId(),
 				dlContentModelImpl.getPath(), dlContentModelImpl.getVersion()
 			};
 
-		finderCache.putResult(FINDER_PATH_COUNT_BY_C_R_P_V, args,
-			Long.valueOf(1), false);
-		finderCache.putResult(FINDER_PATH_FETCH_BY_C_R_P_V, args,
-			dlContentModelImpl, false);
-	}
-
-	protected void clearUniqueFindersCache(
-		DLContentModelImpl dlContentModelImpl, boolean clearCurrent) {
-		if (clearCurrent) {
-			Object[] args = new Object[] {
-					dlContentModelImpl.getCompanyId(),
-					dlContentModelImpl.getRepositoryId(),
-					dlContentModelImpl.getPath(),
-					dlContentModelImpl.getVersion()
-				};
-
-			finderCache.removeResult(FINDER_PATH_COUNT_BY_C_R_P_V, args);
-			finderCache.removeResult(FINDER_PATH_FETCH_BY_C_R_P_V, args);
+			finderCache.removeResult(_finderPathCountByC_R_P_V, args);
+			finderCache.removeResult(_finderPathFetchByC_R_P_V, args);
 		}
 
 		if ((dlContentModelImpl.getColumnBitmask() &
-				FINDER_PATH_FETCH_BY_C_R_P_V.getColumnBitmask()) != 0) {
-			Object[] args = new Object[] {
-					dlContentModelImpl.getOriginalCompanyId(),
-					dlContentModelImpl.getOriginalRepositoryId(),
-					dlContentModelImpl.getOriginalPath(),
-					dlContentModelImpl.getOriginalVersion()
-				};
+			 _finderPathFetchByC_R_P_V.getColumnBitmask()) != 0) {
 
-			finderCache.removeResult(FINDER_PATH_COUNT_BY_C_R_P_V, args);
-			finderCache.removeResult(FINDER_PATH_FETCH_BY_C_R_P_V, args);
+			Object[] args = new Object[] {
+				dlContentModelImpl.getOriginalCompanyId(),
+				dlContentModelImpl.getOriginalRepositoryId(),
+				dlContentModelImpl.getOriginalPath(),
+				dlContentModelImpl.getOriginalVersion()
+			};
+
+			finderCache.removeResult(_finderPathCountByC_R_P_V, args);
+			finderCache.removeResult(_finderPathFetchByC_R_P_V, args);
 		}
 	}
 
@@ -2378,21 +2414,22 @@ public class DLContentPersistenceImpl extends BasePersistenceImpl<DLContent>
 	@Override
 	public DLContent remove(Serializable primaryKey)
 		throws NoSuchContentException {
+
 		Session session = null;
 
 		try {
 			session = openSession();
 
-			DLContent dlContent = (DLContent)session.get(DLContentImpl.class,
-					primaryKey);
+			DLContent dlContent = (DLContent)session.get(
+				DLContentImpl.class, primaryKey);
 
 			if (dlContent == null) {
 				if (_log.isDebugEnabled()) {
 					_log.debug(_NO_SUCH_ENTITY_WITH_PRIMARY_KEY + primaryKey);
 				}
 
-				throw new NoSuchContentException(_NO_SUCH_ENTITY_WITH_PRIMARY_KEY +
-					primaryKey);
+				throw new NoSuchContentException(
+					_NO_SUCH_ENTITY_WITH_PRIMARY_KEY + primaryKey);
 			}
 
 			return remove(dlContent);
@@ -2416,8 +2453,8 @@ public class DLContentPersistenceImpl extends BasePersistenceImpl<DLContent>
 			session = openSession();
 
 			if (!session.contains(dlContent)) {
-				dlContent = (DLContent)session.get(DLContentImpl.class,
-						dlContent.getPrimaryKeyObj());
+				dlContent = (DLContent)session.get(
+					DLContentImpl.class, dlContent.getPrimaryKeyObj());
 			}
 
 			if (dlContent != null) {
@@ -2450,12 +2487,12 @@ public class DLContentPersistenceImpl extends BasePersistenceImpl<DLContent>
 
 				throw new IllegalArgumentException(
 					"Implement ModelWrapper in dlContent proxy " +
-					invocationHandler.getClass());
+						invocationHandler.getClass());
 			}
 
 			throw new IllegalArgumentException(
 				"Implement ModelWrapper in custom DLContent implementation " +
-				dlContent.getClass());
+					dlContent.getClass());
 		}
 
 		DLContentModelImpl dlContentModelImpl = (DLContentModelImpl)dlContent;
@@ -2490,80 +2527,83 @@ public class DLContentPersistenceImpl extends BasePersistenceImpl<DLContent>
 		if (!DLContentModelImpl.COLUMN_BITMASK_ENABLED) {
 			finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
 		}
-		else
-		 if (isNew) {
+		else if (isNew) {
 			Object[] args = new Object[] {
+				dlContentModelImpl.getCompanyId(),
+				dlContentModelImpl.getRepositoryId()
+			};
+
+			finderCache.removeResult(_finderPathCountByC_R, args);
+			finderCache.removeResult(
+				_finderPathWithoutPaginationFindByC_R, args);
+
+			args = new Object[] {
+				dlContentModelImpl.getCompanyId(),
+				dlContentModelImpl.getRepositoryId(),
+				dlContentModelImpl.getPath()
+			};
+
+			finderCache.removeResult(_finderPathCountByC_R_P, args);
+			finderCache.removeResult(
+				_finderPathWithoutPaginationFindByC_R_P, args);
+
+			finderCache.removeResult(_finderPathCountAll, FINDER_ARGS_EMPTY);
+			finderCache.removeResult(
+				_finderPathWithoutPaginationFindAll, FINDER_ARGS_EMPTY);
+		}
+		else {
+			if ((dlContentModelImpl.getColumnBitmask() &
+				 _finderPathWithoutPaginationFindByC_R.getColumnBitmask()) !=
+					 0) {
+
+				Object[] args = new Object[] {
+					dlContentModelImpl.getOriginalCompanyId(),
+					dlContentModelImpl.getOriginalRepositoryId()
+				};
+
+				finderCache.removeResult(_finderPathCountByC_R, args);
+				finderCache.removeResult(
+					_finderPathWithoutPaginationFindByC_R, args);
+
+				args = new Object[] {
 					dlContentModelImpl.getCompanyId(),
 					dlContentModelImpl.getRepositoryId()
 				};
 
-			finderCache.removeResult(FINDER_PATH_COUNT_BY_C_R, args);
-			finderCache.removeResult(FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_C_R,
-				args);
+				finderCache.removeResult(_finderPathCountByC_R, args);
+				finderCache.removeResult(
+					_finderPathWithoutPaginationFindByC_R, args);
+			}
 
-			args = new Object[] {
+			if ((dlContentModelImpl.getColumnBitmask() &
+				 _finderPathWithoutPaginationFindByC_R_P.getColumnBitmask()) !=
+					 0) {
+
+				Object[] args = new Object[] {
+					dlContentModelImpl.getOriginalCompanyId(),
+					dlContentModelImpl.getOriginalRepositoryId(),
+					dlContentModelImpl.getOriginalPath()
+				};
+
+				finderCache.removeResult(_finderPathCountByC_R_P, args);
+				finderCache.removeResult(
+					_finderPathWithoutPaginationFindByC_R_P, args);
+
+				args = new Object[] {
 					dlContentModelImpl.getCompanyId(),
 					dlContentModelImpl.getRepositoryId(),
 					dlContentModelImpl.getPath()
 				};
 
-			finderCache.removeResult(FINDER_PATH_COUNT_BY_C_R_P, args);
-			finderCache.removeResult(FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_C_R_P,
-				args);
-
-			finderCache.removeResult(FINDER_PATH_COUNT_ALL, FINDER_ARGS_EMPTY);
-			finderCache.removeResult(FINDER_PATH_WITHOUT_PAGINATION_FIND_ALL,
-				FINDER_ARGS_EMPTY);
-		}
-
-		else {
-			if ((dlContentModelImpl.getColumnBitmask() &
-					FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_C_R.getColumnBitmask()) != 0) {
-				Object[] args = new Object[] {
-						dlContentModelImpl.getOriginalCompanyId(),
-						dlContentModelImpl.getOriginalRepositoryId()
-					};
-
-				finderCache.removeResult(FINDER_PATH_COUNT_BY_C_R, args);
-				finderCache.removeResult(FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_C_R,
-					args);
-
-				args = new Object[] {
-						dlContentModelImpl.getCompanyId(),
-						dlContentModelImpl.getRepositoryId()
-					};
-
-				finderCache.removeResult(FINDER_PATH_COUNT_BY_C_R, args);
-				finderCache.removeResult(FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_C_R,
-					args);
-			}
-
-			if ((dlContentModelImpl.getColumnBitmask() &
-					FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_C_R_P.getColumnBitmask()) != 0) {
-				Object[] args = new Object[] {
-						dlContentModelImpl.getOriginalCompanyId(),
-						dlContentModelImpl.getOriginalRepositoryId(),
-						dlContentModelImpl.getOriginalPath()
-					};
-
-				finderCache.removeResult(FINDER_PATH_COUNT_BY_C_R_P, args);
-				finderCache.removeResult(FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_C_R_P,
-					args);
-
-				args = new Object[] {
-						dlContentModelImpl.getCompanyId(),
-						dlContentModelImpl.getRepositoryId(),
-						dlContentModelImpl.getPath()
-					};
-
-				finderCache.removeResult(FINDER_PATH_COUNT_BY_C_R_P, args);
-				finderCache.removeResult(FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_C_R_P,
-					args);
+				finderCache.removeResult(_finderPathCountByC_R_P, args);
+				finderCache.removeResult(
+					_finderPathWithoutPaginationFindByC_R_P, args);
 			}
 		}
 
-		entityCache.putResult(DLContentModelImpl.ENTITY_CACHE_ENABLED,
-			DLContentImpl.class, dlContent.getPrimaryKey(), dlContent, false);
+		entityCache.putResult(
+			DLContentModelImpl.ENTITY_CACHE_ENABLED, DLContentImpl.class,
+			dlContent.getPrimaryKey(), dlContent, false);
 
 		clearUniqueFindersCache(dlContentModelImpl, false);
 		cacheUniqueFindersCache(dlContentModelImpl);
@@ -2574,7 +2614,7 @@ public class DLContentPersistenceImpl extends BasePersistenceImpl<DLContent>
 	}
 
 	/**
-	 * Returns the document library content with the primary key or throws a {@link com.liferay.portal.kernel.exception.NoSuchModelException} if it could not be found.
+	 * Returns the document library content with the primary key or throws a <code>com.liferay.portal.kernel.exception.NoSuchModelException</code> if it could not be found.
 	 *
 	 * @param primaryKey the primary key of the document library content
 	 * @return the document library content
@@ -2583,6 +2623,7 @@ public class DLContentPersistenceImpl extends BasePersistenceImpl<DLContent>
 	@Override
 	public DLContent findByPrimaryKey(Serializable primaryKey)
 		throws NoSuchContentException {
+
 		DLContent dlContent = fetchByPrimaryKey(primaryKey);
 
 		if (dlContent == null) {
@@ -2590,15 +2631,15 @@ public class DLContentPersistenceImpl extends BasePersistenceImpl<DLContent>
 				_log.debug(_NO_SUCH_ENTITY_WITH_PRIMARY_KEY + primaryKey);
 			}
 
-			throw new NoSuchContentException(_NO_SUCH_ENTITY_WITH_PRIMARY_KEY +
-				primaryKey);
+			throw new NoSuchContentException(
+				_NO_SUCH_ENTITY_WITH_PRIMARY_KEY + primaryKey);
 		}
 
 		return dlContent;
 	}
 
 	/**
-	 * Returns the document library content with the primary key or throws a {@link NoSuchContentException} if it could not be found.
+	 * Returns the document library content with the primary key or throws a <code>NoSuchContentException</code> if it could not be found.
 	 *
 	 * @param contentId the primary key of the document library content
 	 * @return the document library content
@@ -2607,6 +2648,7 @@ public class DLContentPersistenceImpl extends BasePersistenceImpl<DLContent>
 	@Override
 	public DLContent findByPrimaryKey(long contentId)
 		throws NoSuchContentException {
+
 		return findByPrimaryKey((Serializable)contentId);
 	}
 
@@ -2618,8 +2660,9 @@ public class DLContentPersistenceImpl extends BasePersistenceImpl<DLContent>
 	 */
 	@Override
 	public DLContent fetchByPrimaryKey(Serializable primaryKey) {
-		Serializable serializable = entityCache.getResult(DLContentModelImpl.ENTITY_CACHE_ENABLED,
-				DLContentImpl.class, primaryKey);
+		Serializable serializable = entityCache.getResult(
+			DLContentModelImpl.ENTITY_CACHE_ENABLED, DLContentImpl.class,
+			primaryKey);
 
 		if (serializable == nullModel) {
 			return null;
@@ -2633,19 +2676,21 @@ public class DLContentPersistenceImpl extends BasePersistenceImpl<DLContent>
 			try {
 				session = openSession();
 
-				dlContent = (DLContent)session.get(DLContentImpl.class,
-						primaryKey);
+				dlContent = (DLContent)session.get(
+					DLContentImpl.class, primaryKey);
 
 				if (dlContent != null) {
 					cacheResult(dlContent);
 				}
 				else {
-					entityCache.putResult(DLContentModelImpl.ENTITY_CACHE_ENABLED,
+					entityCache.putResult(
+						DLContentModelImpl.ENTITY_CACHE_ENABLED,
 						DLContentImpl.class, primaryKey, nullModel);
 				}
 			}
 			catch (Exception e) {
-				entityCache.removeResult(DLContentModelImpl.ENTITY_CACHE_ENABLED,
+				entityCache.removeResult(
+					DLContentModelImpl.ENTITY_CACHE_ENABLED,
 					DLContentImpl.class, primaryKey);
 
 				throw processException(e);
@@ -2672,11 +2717,13 @@ public class DLContentPersistenceImpl extends BasePersistenceImpl<DLContent>
 	@Override
 	public Map<Serializable, DLContent> fetchByPrimaryKeys(
 		Set<Serializable> primaryKeys) {
+
 		if (primaryKeys.isEmpty()) {
 			return Collections.emptyMap();
 		}
 
-		Map<Serializable, DLContent> map = new HashMap<Serializable, DLContent>();
+		Map<Serializable, DLContent> map =
+			new HashMap<Serializable, DLContent>();
 
 		if (primaryKeys.size() == 1) {
 			Iterator<Serializable> iterator = primaryKeys.iterator();
@@ -2695,8 +2742,9 @@ public class DLContentPersistenceImpl extends BasePersistenceImpl<DLContent>
 		Set<Serializable> uncachedPrimaryKeys = null;
 
 		for (Serializable primaryKey : primaryKeys) {
-			Serializable serializable = entityCache.getResult(DLContentModelImpl.ENTITY_CACHE_ENABLED,
-					DLContentImpl.class, primaryKey);
+			Serializable serializable = entityCache.getResult(
+				DLContentModelImpl.ENTITY_CACHE_ENABLED, DLContentImpl.class,
+				primaryKey);
 
 			if (serializable != nullModel) {
 				if (serializable == null) {
@@ -2716,8 +2764,8 @@ public class DLContentPersistenceImpl extends BasePersistenceImpl<DLContent>
 			return map;
 		}
 
-		StringBundler query = new StringBundler((uncachedPrimaryKeys.size() * 2) +
-				1);
+		StringBundler query = new StringBundler(
+			uncachedPrimaryKeys.size() * 2 + 1);
 
 		query.append(_SQL_SELECT_DLCONTENT_WHERE_PKS_IN);
 
@@ -2749,7 +2797,8 @@ public class DLContentPersistenceImpl extends BasePersistenceImpl<DLContent>
 			}
 
 			for (Serializable primaryKey : uncachedPrimaryKeys) {
-				entityCache.putResult(DLContentModelImpl.ENTITY_CACHE_ENABLED,
+				entityCache.putResult(
+					DLContentModelImpl.ENTITY_CACHE_ENABLED,
 					DLContentImpl.class, primaryKey, nullModel);
 			}
 		}
@@ -2777,7 +2826,7 @@ public class DLContentPersistenceImpl extends BasePersistenceImpl<DLContent>
 	 * Returns a range of all the document library contents.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link DLContentModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>DLContentModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param start the lower bound of the range of document library contents
@@ -2793,7 +2842,7 @@ public class DLContentPersistenceImpl extends BasePersistenceImpl<DLContent>
 	 * Returns an ordered range of all the document library contents.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link DLContentModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>DLContentModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param start the lower bound of the range of document library contents
@@ -2802,8 +2851,9 @@ public class DLContentPersistenceImpl extends BasePersistenceImpl<DLContent>
 	 * @return the ordered range of document library contents
 	 */
 	@Override
-	public List<DLContent> findAll(int start, int end,
-		OrderByComparator<DLContent> orderByComparator) {
+	public List<DLContent> findAll(
+		int start, int end, OrderByComparator<DLContent> orderByComparator) {
+
 		return findAll(start, end, orderByComparator, true);
 	}
 
@@ -2811,7 +2861,7 @@ public class DLContentPersistenceImpl extends BasePersistenceImpl<DLContent>
 	 * Returns an ordered range of all the document library contents.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link DLContentModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>DLContentModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param start the lower bound of the range of document library contents
@@ -2821,29 +2871,31 @@ public class DLContentPersistenceImpl extends BasePersistenceImpl<DLContent>
 	 * @return the ordered range of document library contents
 	 */
 	@Override
-	public List<DLContent> findAll(int start, int end,
-		OrderByComparator<DLContent> orderByComparator,
+	public List<DLContent> findAll(
+		int start, int end, OrderByComparator<DLContent> orderByComparator,
 		boolean retrieveFromCache) {
+
 		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
-				(orderByComparator == null)) {
+			(orderByComparator == null)) {
+
 			pagination = false;
-			finderPath = FINDER_PATH_WITHOUT_PAGINATION_FIND_ALL;
+			finderPath = _finderPathWithoutPaginationFindAll;
 			finderArgs = FINDER_ARGS_EMPTY;
 		}
 		else {
-			finderPath = FINDER_PATH_WITH_PAGINATION_FIND_ALL;
-			finderArgs = new Object[] { start, end, orderByComparator };
+			finderPath = _finderPathWithPaginationFindAll;
+			finderArgs = new Object[] {start, end, orderByComparator};
 		}
 
 		List<DLContent> list = null;
 
 		if (retrieveFromCache) {
-			list = (List<DLContent>)finderCache.getResult(finderPath,
-					finderArgs, this);
+			list = (List<DLContent>)finderCache.getResult(
+				finderPath, finderArgs, this);
 		}
 
 		if (list == null) {
@@ -2851,13 +2903,13 @@ public class DLContentPersistenceImpl extends BasePersistenceImpl<DLContent>
 			String sql = null;
 
 			if (orderByComparator != null) {
-				query = new StringBundler(2 +
-						(orderByComparator.getOrderByFields().length * 2));
+				query = new StringBundler(
+					2 + (orderByComparator.getOrderByFields().length * 2));
 
 				query.append(_SQL_SELECT_DLCONTENT);
 
-				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
-					orderByComparator);
+				appendOrderByComparator(
+					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
 
 				sql = query.toString();
 			}
@@ -2877,16 +2929,16 @@ public class DLContentPersistenceImpl extends BasePersistenceImpl<DLContent>
 				Query q = session.createQuery(sql);
 
 				if (!pagination) {
-					list = (List<DLContent>)QueryUtil.list(q, getDialect(),
-							start, end, false);
+					list = (List<DLContent>)QueryUtil.list(
+						q, getDialect(), start, end, false);
 
 					Collections.sort(list);
 
 					list = Collections.unmodifiableList(list);
 				}
 				else {
-					list = (List<DLContent>)QueryUtil.list(q, getDialect(),
-							start, end);
+					list = (List<DLContent>)QueryUtil.list(
+						q, getDialect(), start, end);
 				}
 
 				cacheResult(list);
@@ -2924,8 +2976,8 @@ public class DLContentPersistenceImpl extends BasePersistenceImpl<DLContent>
 	 */
 	@Override
 	public int countAll() {
-		Long count = (Long)finderCache.getResult(FINDER_PATH_COUNT_ALL,
-				FINDER_ARGS_EMPTY, this);
+		Long count = (Long)finderCache.getResult(
+			_finderPathCountAll, FINDER_ARGS_EMPTY, this);
 
 		if (count == null) {
 			Session session = null;
@@ -2937,12 +2989,12 @@ public class DLContentPersistenceImpl extends BasePersistenceImpl<DLContent>
 
 				count = (Long)q.uniqueResult();
 
-				finderCache.putResult(FINDER_PATH_COUNT_ALL, FINDER_ARGS_EMPTY,
-					count);
+				finderCache.putResult(
+					_finderPathCountAll, FINDER_ARGS_EMPTY, count);
 			}
 			catch (Exception e) {
-				finderCache.removeResult(FINDER_PATH_COUNT_ALL,
-					FINDER_ARGS_EMPTY);
+				finderCache.removeResult(
+					_finderPathCountAll, FINDER_ARGS_EMPTY);
 
 				throw processException(e);
 			}
@@ -2968,6 +3020,120 @@ public class DLContentPersistenceImpl extends BasePersistenceImpl<DLContent>
 	 * Initializes the document library content persistence.
 	 */
 	public void afterPropertiesSet() {
+		_finderPathWithPaginationFindAll = new FinderPath(
+			DLContentModelImpl.ENTITY_CACHE_ENABLED,
+			DLContentModelImpl.FINDER_CACHE_ENABLED, DLContentImpl.class,
+			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findAll", new String[0]);
+
+		_finderPathWithoutPaginationFindAll = new FinderPath(
+			DLContentModelImpl.ENTITY_CACHE_ENABLED,
+			DLContentModelImpl.FINDER_CACHE_ENABLED, DLContentImpl.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findAll",
+			new String[0]);
+
+		_finderPathCountAll = new FinderPath(
+			DLContentModelImpl.ENTITY_CACHE_ENABLED,
+			DLContentModelImpl.FINDER_CACHE_ENABLED, Long.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countAll",
+			new String[0]);
+
+		_finderPathWithPaginationFindByC_R = new FinderPath(
+			DLContentModelImpl.ENTITY_CACHE_ENABLED,
+			DLContentModelImpl.FINDER_CACHE_ENABLED, DLContentImpl.class,
+			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByC_R",
+			new String[] {
+				Long.class.getName(), Long.class.getName(),
+				Integer.class.getName(), Integer.class.getName(),
+				OrderByComparator.class.getName()
+			});
+
+		_finderPathWithoutPaginationFindByC_R = new FinderPath(
+			DLContentModelImpl.ENTITY_CACHE_ENABLED,
+			DLContentModelImpl.FINDER_CACHE_ENABLED, DLContentImpl.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByC_R",
+			new String[] {Long.class.getName(), Long.class.getName()},
+			DLContentModelImpl.COMPANYID_COLUMN_BITMASK |
+			DLContentModelImpl.REPOSITORYID_COLUMN_BITMASK |
+			DLContentModelImpl.VERSION_COLUMN_BITMASK);
+
+		_finderPathCountByC_R = new FinderPath(
+			DLContentModelImpl.ENTITY_CACHE_ENABLED,
+			DLContentModelImpl.FINDER_CACHE_ENABLED, Long.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByC_R",
+			new String[] {Long.class.getName(), Long.class.getName()});
+
+		_finderPathWithPaginationFindByC_R_P = new FinderPath(
+			DLContentModelImpl.ENTITY_CACHE_ENABLED,
+			DLContentModelImpl.FINDER_CACHE_ENABLED, DLContentImpl.class,
+			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByC_R_P",
+			new String[] {
+				Long.class.getName(), Long.class.getName(),
+				String.class.getName(), Integer.class.getName(),
+				Integer.class.getName(), OrderByComparator.class.getName()
+			});
+
+		_finderPathWithoutPaginationFindByC_R_P = new FinderPath(
+			DLContentModelImpl.ENTITY_CACHE_ENABLED,
+			DLContentModelImpl.FINDER_CACHE_ENABLED, DLContentImpl.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByC_R_P",
+			new String[] {
+				Long.class.getName(), Long.class.getName(),
+				String.class.getName()
+			},
+			DLContentModelImpl.COMPANYID_COLUMN_BITMASK |
+			DLContentModelImpl.REPOSITORYID_COLUMN_BITMASK |
+			DLContentModelImpl.PATH_COLUMN_BITMASK |
+			DLContentModelImpl.VERSION_COLUMN_BITMASK);
+
+		_finderPathCountByC_R_P = new FinderPath(
+			DLContentModelImpl.ENTITY_CACHE_ENABLED,
+			DLContentModelImpl.FINDER_CACHE_ENABLED, Long.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByC_R_P",
+			new String[] {
+				Long.class.getName(), Long.class.getName(),
+				String.class.getName()
+			});
+
+		_finderPathWithPaginationFindByC_R_LikeP = new FinderPath(
+			DLContentModelImpl.ENTITY_CACHE_ENABLED,
+			DLContentModelImpl.FINDER_CACHE_ENABLED, DLContentImpl.class,
+			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByC_R_LikeP",
+			new String[] {
+				Long.class.getName(), Long.class.getName(),
+				String.class.getName(), Integer.class.getName(),
+				Integer.class.getName(), OrderByComparator.class.getName()
+			});
+
+		_finderPathWithPaginationCountByC_R_LikeP = new FinderPath(
+			DLContentModelImpl.ENTITY_CACHE_ENABLED,
+			DLContentModelImpl.FINDER_CACHE_ENABLED, Long.class,
+			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "countByC_R_LikeP",
+			new String[] {
+				Long.class.getName(), Long.class.getName(),
+				String.class.getName()
+			});
+
+		_finderPathFetchByC_R_P_V = new FinderPath(
+			DLContentModelImpl.ENTITY_CACHE_ENABLED,
+			DLContentModelImpl.FINDER_CACHE_ENABLED, DLContentImpl.class,
+			FINDER_CLASS_NAME_ENTITY, "fetchByC_R_P_V",
+			new String[] {
+				Long.class.getName(), Long.class.getName(),
+				String.class.getName(), String.class.getName()
+			},
+			DLContentModelImpl.COMPANYID_COLUMN_BITMASK |
+			DLContentModelImpl.REPOSITORYID_COLUMN_BITMASK |
+			DLContentModelImpl.PATH_COLUMN_BITMASK |
+			DLContentModelImpl.VERSION_COLUMN_BITMASK);
+
+		_finderPathCountByC_R_P_V = new FinderPath(
+			DLContentModelImpl.ENTITY_CACHE_ENABLED,
+			DLContentModelImpl.FINDER_CACHE_ENABLED, Long.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByC_R_P_V",
+			new String[] {
+				Long.class.getName(), Long.class.getName(),
+				String.class.getName(), String.class.getName()
+			});
 	}
 
 	public void destroy() {
@@ -2979,20 +3145,40 @@ public class DLContentPersistenceImpl extends BasePersistenceImpl<DLContent>
 
 	@ServiceReference(type = CompanyProviderWrapper.class)
 	protected CompanyProvider companyProvider;
+
 	@ServiceReference(type = EntityCache.class)
 	protected EntityCache entityCache;
+
 	@ServiceReference(type = FinderCache.class)
 	protected FinderCache finderCache;
-	private static final String _SQL_SELECT_DLCONTENT = "SELECT dlContent FROM DLContent dlContent";
-	private static final String _SQL_SELECT_DLCONTENT_WHERE_PKS_IN = "SELECT dlContent FROM DLContent dlContent WHERE contentId IN (";
-	private static final String _SQL_SELECT_DLCONTENT_WHERE = "SELECT dlContent FROM DLContent dlContent WHERE ";
-	private static final String _SQL_COUNT_DLCONTENT = "SELECT COUNT(dlContent) FROM DLContent dlContent";
-	private static final String _SQL_COUNT_DLCONTENT_WHERE = "SELECT COUNT(dlContent) FROM DLContent dlContent WHERE ";
+
+	private static final String _SQL_SELECT_DLCONTENT =
+		"SELECT dlContent FROM DLContent dlContent";
+
+	private static final String _SQL_SELECT_DLCONTENT_WHERE_PKS_IN =
+		"SELECT dlContent FROM DLContent dlContent WHERE contentId IN (";
+
+	private static final String _SQL_SELECT_DLCONTENT_WHERE =
+		"SELECT dlContent FROM DLContent dlContent WHERE ";
+
+	private static final String _SQL_COUNT_DLCONTENT =
+		"SELECT COUNT(dlContent) FROM DLContent dlContent";
+
+	private static final String _SQL_COUNT_DLCONTENT_WHERE =
+		"SELECT COUNT(dlContent) FROM DLContent dlContent WHERE ";
+
 	private static final String _ORDER_BY_ENTITY_ALIAS = "dlContent.";
-	private static final String _NO_SUCH_ENTITY_WITH_PRIMARY_KEY = "No DLContent exists with the primary key ";
-	private static final String _NO_SUCH_ENTITY_WITH_KEY = "No DLContent exists with the key {";
-	private static final Log _log = LogFactoryUtil.getLog(DLContentPersistenceImpl.class);
-	private static final Set<String> _badColumnNames = SetUtil.fromArray(new String[] {
-				"path", "data", "size"
-			});
+
+	private static final String _NO_SUCH_ENTITY_WITH_PRIMARY_KEY =
+		"No DLContent exists with the primary key ";
+
+	private static final String _NO_SUCH_ENTITY_WITH_KEY =
+		"No DLContent exists with the key {";
+
+	private static final Log _log = LogFactoryUtil.getLog(
+		DLContentPersistenceImpl.class);
+
+	private static final Set<String> _badColumnNames = SetUtil.fromArray(
+		new String[] {"path", "data", "size"});
+
 }

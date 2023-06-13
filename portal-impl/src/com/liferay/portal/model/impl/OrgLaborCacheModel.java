@@ -31,12 +31,12 @@ import java.io.ObjectOutput;
  * The cache model class for representing OrgLabor in entity cache.
  *
  * @author Brian Wing Shun Chan
- * @see OrgLabor
  * @generated
  */
 @ProviderType
-public class OrgLaborCacheModel implements CacheModel<OrgLabor>, Externalizable,
-	MVCCModel {
+public class OrgLaborCacheModel
+	implements CacheModel<OrgLabor>, Externalizable, MVCCModel {
+
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj) {
@@ -50,7 +50,8 @@ public class OrgLaborCacheModel implements CacheModel<OrgLabor>, Externalizable,
 		OrgLaborCacheModel orgLaborCacheModel = (OrgLaborCacheModel)obj;
 
 		if ((orgLaborId == orgLaborCacheModel.orgLaborId) &&
-				(mvccVersion == orgLaborCacheModel.mvccVersion)) {
+			(mvccVersion == orgLaborCacheModel.mvccVersion)) {
+
 			return true;
 		}
 
@@ -192,8 +193,7 @@ public class OrgLaborCacheModel implements CacheModel<OrgLabor>, Externalizable,
 	}
 
 	@Override
-	public void writeExternal(ObjectOutput objectOutput)
-		throws IOException {
+	public void writeExternal(ObjectOutput objectOutput) throws IOException {
 		objectOutput.writeLong(mvccVersion);
 
 		objectOutput.writeLong(orgLaborId);
@@ -252,4 +252,5 @@ public class OrgLaborCacheModel implements CacheModel<OrgLabor>, Externalizable,
 	public int friClose;
 	public int satOpen;
 	public int satClose;
+
 }

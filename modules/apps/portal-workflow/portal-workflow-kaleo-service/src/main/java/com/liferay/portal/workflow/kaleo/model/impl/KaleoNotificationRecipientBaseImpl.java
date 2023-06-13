@@ -35,18 +35,22 @@ import com.liferay.portal.workflow.kaleo.service.KaleoNotificationRecipientLocal
 public abstract class KaleoNotificationRecipientBaseImpl
 	extends KaleoNotificationRecipientModelImpl
 	implements KaleoNotificationRecipient {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
-	 * Never modify or reference this class directly. All methods that expect a kaleo notification recipient model instance should use the {@link KaleoNotificationRecipient} interface instead.
+	 * Never modify or reference this class directly. All methods that expect a kaleo notification recipient model instance should use the <code>KaleoNotificationRecipient</code> interface instead.
 	 */
 	@Override
 	public void persist() {
 		if (this.isNew()) {
-			KaleoNotificationRecipientLocalServiceUtil.addKaleoNotificationRecipient(this);
+			KaleoNotificationRecipientLocalServiceUtil.
+				addKaleoNotificationRecipient(this);
 		}
 		else {
-			KaleoNotificationRecipientLocalServiceUtil.updateKaleoNotificationRecipient(this);
+			KaleoNotificationRecipientLocalServiceUtil.
+				updateKaleoNotificationRecipient(this);
 		}
 	}
+
 }

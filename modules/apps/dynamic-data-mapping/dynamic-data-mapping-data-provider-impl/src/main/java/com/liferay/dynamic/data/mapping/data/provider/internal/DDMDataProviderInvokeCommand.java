@@ -36,15 +36,20 @@ public class DDMDataProviderInvokeCommand
 		String ddmDataProviderInstanceName, DDMDataProvider ddmDataProvider,
 		DDMDataProviderRequest ddmDataProviderRequest) {
 
+		// Skip JavaParser
+
 		super(
-			Setter.withGroupKey(_hystrixCommandGroupKey).andCommandKey(
+			Setter.withGroupKey(
+				_hystrixCommandGroupKey
+			).andCommandKey(
 				HystrixCommandKey.Factory.asKey(
 					"DDMDataProviderInvokeCommand#" +
-						ddmDataProviderInstanceName)).
-				andCommandPropertiesDefaults(
-					HystrixCommandProperties.Setter().
-						withExecutionTimeoutInMilliseconds(
-							getTimeout(ddmDataProviderRequest))));
+						ddmDataProviderInstanceName)
+			).andCommandPropertiesDefaults(
+				HystrixCommandProperties.Setter().
+					withExecutionTimeoutInMilliseconds(
+						getTimeout(ddmDataProviderRequest))
+			));
 
 		_ddmDataProvider = ddmDataProvider;
 		_ddmDataProviderRequest = ddmDataProviderRequest;

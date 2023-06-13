@@ -17,7 +17,6 @@ package com.liferay.folder.apio.internal.architect.resource;
 import com.liferay.apio.architect.representor.Representor;
 import com.liferay.apio.architect.resource.ItemResource;
 import com.liferay.apio.architect.routes.ItemRoutes;
-import com.liferay.folder.apio.architect.identifier.FolderIdentifier;
 import com.liferay.folder.apio.architect.identifier.RootFolderIdentifier;
 import com.liferay.media.object.apio.architect.identifier.MediaObjectIdentifier;
 import com.liferay.portal.kernel.model.Group;
@@ -30,7 +29,7 @@ import org.osgi.service.component.annotations.Reference;
  * Provides the information necessary to expose the root folder resource through
  * a web API. This resource is mapped from the internal model {@code Group}.
  *
- * @author Eduardo Perez
+ * @author Eduardo Pérez
  */
 @Component(immediate = true, service = ItemResource.class)
 public class RootFolderItemResource
@@ -58,8 +57,6 @@ public class RootFolderItemResource
 			"Folder"
 		).identifier(
 			Group::getGroupId
-		).addRelatedCollection(
-			"folders", FolderIdentifier.class
 		).addRelatedCollection(
 			"documents", MediaObjectIdentifier.class
 		).build();

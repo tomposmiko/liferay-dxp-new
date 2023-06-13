@@ -17,7 +17,6 @@ package com.liferay.dynamic.data.lists.model.impl;
 import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.dynamic.data.lists.model.DDLRecordSet;
-
 import com.liferay.portal.kernel.model.CacheModel;
 import com.liferay.portal.kernel.util.HashUtil;
 import com.liferay.portal.kernel.util.StringBundler;
@@ -33,12 +32,12 @@ import java.util.Date;
  * The cache model class for representing DDLRecordSet in entity cache.
  *
  * @author Brian Wing Shun Chan
- * @see DDLRecordSet
  * @generated
  */
 @ProviderType
-public class DDLRecordSetCacheModel implements CacheModel<DDLRecordSet>,
-	Externalizable {
+public class DDLRecordSetCacheModel
+	implements CacheModel<DDLRecordSet>, Externalizable {
+
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj) {
@@ -49,7 +48,8 @@ public class DDLRecordSetCacheModel implements CacheModel<DDLRecordSet>,
 			return false;
 		}
 
-		DDLRecordSetCacheModel ddlRecordSetCacheModel = (DDLRecordSetCacheModel)obj;
+		DDLRecordSetCacheModel ddlRecordSetCacheModel =
+			(DDLRecordSetCacheModel)obj;
 
 		if (recordSetId == ddlRecordSetCacheModel.recordSetId) {
 			return true;
@@ -213,6 +213,7 @@ public class DDLRecordSetCacheModel implements CacheModel<DDLRecordSet>,
 	@Override
 	public void readExternal(ObjectInput objectInput)
 		throws ClassNotFoundException, IOException {
+
 		uuid = objectInput.readUTF();
 
 		recordSetId = objectInput.readLong();
@@ -241,12 +242,13 @@ public class DDLRecordSetCacheModel implements CacheModel<DDLRecordSet>,
 		settings = objectInput.readUTF();
 		lastPublishDate = objectInput.readLong();
 
-		_ddmFormValues = (com.liferay.dynamic.data.mapping.storage.DDMFormValues)objectInput.readObject();
+		_ddmFormValues =
+			(com.liferay.dynamic.data.mapping.storage.DDMFormValues)
+				objectInput.readObject();
 	}
 
 	@Override
-	public void writeExternal(ObjectOutput objectOutput)
-		throws IOException {
+	public void writeExternal(ObjectOutput objectOutput) throws IOException {
 		if (uuid == null) {
 			objectOutput.writeUTF("");
 		}
@@ -346,5 +348,7 @@ public class DDLRecordSetCacheModel implements CacheModel<DDLRecordSet>,
 	public int scope;
 	public String settings;
 	public long lastPublishDate;
-	public com.liferay.dynamic.data.mapping.storage.DDMFormValues _ddmFormValues;
+	public com.liferay.dynamic.data.mapping.storage.DDMFormValues
+		_ddmFormValues;
+
 }

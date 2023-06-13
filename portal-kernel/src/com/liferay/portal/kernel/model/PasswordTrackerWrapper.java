@@ -17,7 +17,6 @@ package com.liferay.portal.kernel.model;
 import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.expando.kernel.model.ExpandoBridge;
-
 import com.liferay.portal.kernel.service.ServiceContext;
 
 import java.io.Serializable;
@@ -37,8 +36,9 @@ import java.util.Objects;
  * @generated
  */
 @ProviderType
-public class PasswordTrackerWrapper implements PasswordTracker,
-	ModelWrapper<PasswordTracker> {
+public class PasswordTrackerWrapper
+	implements PasswordTracker, ModelWrapper<PasswordTracker> {
+
 	public PasswordTrackerWrapper(PasswordTracker passwordTracker) {
 		_passwordTracker = passwordTracker;
 	}
@@ -108,7 +108,8 @@ public class PasswordTrackerWrapper implements PasswordTracker,
 
 	@Override
 	public Object clone() {
-		return new PasswordTrackerWrapper((PasswordTracker)_passwordTracker.clone());
+		return new PasswordTrackerWrapper(
+			(PasswordTracker)_passwordTracker.clone());
 	}
 
 	@Override
@@ -117,20 +118,20 @@ public class PasswordTrackerWrapper implements PasswordTracker,
 	}
 
 	/**
-	* Returns the company ID of this password tracker.
-	*
-	* @return the company ID of this password tracker
-	*/
+	 * Returns the company ID of this password tracker.
+	 *
+	 * @return the company ID of this password tracker
+	 */
 	@Override
 	public long getCompanyId() {
 		return _passwordTracker.getCompanyId();
 	}
 
 	/**
-	* Returns the create date of this password tracker.
-	*
-	* @return the create date of this password tracker
-	*/
+	 * Returns the create date of this password tracker.
+	 *
+	 * @return the create date of this password tracker
+	 */
 	@Override
 	public Date getCreateDate() {
 		return _passwordTracker.getCreateDate();
@@ -142,40 +143,40 @@ public class PasswordTrackerWrapper implements PasswordTracker,
 	}
 
 	/**
-	* Returns the mvcc version of this password tracker.
-	*
-	* @return the mvcc version of this password tracker
-	*/
+	 * Returns the mvcc version of this password tracker.
+	 *
+	 * @return the mvcc version of this password tracker
+	 */
 	@Override
 	public long getMvccVersion() {
 		return _passwordTracker.getMvccVersion();
 	}
 
 	/**
-	* Returns the password of this password tracker.
-	*
-	* @return the password of this password tracker
-	*/
+	 * Returns the password of this password tracker.
+	 *
+	 * @return the password of this password tracker
+	 */
 	@Override
 	public String getPassword() {
 		return _passwordTracker.getPassword();
 	}
 
 	/**
-	* Returns the password tracker ID of this password tracker.
-	*
-	* @return the password tracker ID of this password tracker
-	*/
+	 * Returns the password tracker ID of this password tracker.
+	 *
+	 * @return the password tracker ID of this password tracker
+	 */
 	@Override
 	public long getPasswordTrackerId() {
 		return _passwordTracker.getPasswordTrackerId();
 	}
 
 	/**
-	* Returns the primary key of this password tracker.
-	*
-	* @return the primary key of this password tracker
-	*/
+	 * Returns the primary key of this password tracker.
+	 *
+	 * @return the primary key of this password tracker
+	 */
 	@Override
 	public long getPrimaryKey() {
 		return _passwordTracker.getPrimaryKey();
@@ -187,20 +188,20 @@ public class PasswordTrackerWrapper implements PasswordTracker,
 	}
 
 	/**
-	* Returns the user ID of this password tracker.
-	*
-	* @return the user ID of this password tracker
-	*/
+	 * Returns the user ID of this password tracker.
+	 *
+	 * @return the user ID of this password tracker
+	 */
 	@Override
 	public long getUserId() {
 		return _passwordTracker.getUserId();
 	}
 
 	/**
-	* Returns the user uuid of this password tracker.
-	*
-	* @return the user uuid of this password tracker
-	*/
+	 * Returns the user uuid of this password tracker.
+	 *
+	 * @return the user uuid of this password tracker
+	 */
 	@Override
 	public String getUserUuid() {
 		return _passwordTracker.getUserUuid();
@@ -237,20 +238,20 @@ public class PasswordTrackerWrapper implements PasswordTracker,
 	}
 
 	/**
-	* Sets the company ID of this password tracker.
-	*
-	* @param companyId the company ID of this password tracker
-	*/
+	 * Sets the company ID of this password tracker.
+	 *
+	 * @param companyId the company ID of this password tracker
+	 */
 	@Override
 	public void setCompanyId(long companyId) {
 		_passwordTracker.setCompanyId(companyId);
 	}
 
 	/**
-	* Sets the create date of this password tracker.
-	*
-	* @param createDate the create date of this password tracker
-	*/
+	 * Sets the create date of this password tracker.
+	 *
+	 * @param createDate the create date of this password tracker
+	 */
 	@Override
 	public void setCreateDate(Date createDate) {
 		_passwordTracker.setCreateDate(createDate);
@@ -272,10 +273,10 @@ public class PasswordTrackerWrapper implements PasswordTracker,
 	}
 
 	/**
-	* Sets the mvcc version of this password tracker.
-	*
-	* @param mvccVersion the mvcc version of this password tracker
-	*/
+	 * Sets the mvcc version of this password tracker.
+	 *
+	 * @param mvccVersion the mvcc version of this password tracker
+	 */
 	@Override
 	public void setMvccVersion(long mvccVersion) {
 		_passwordTracker.setMvccVersion(mvccVersion);
@@ -287,30 +288,30 @@ public class PasswordTrackerWrapper implements PasswordTracker,
 	}
 
 	/**
-	* Sets the password of this password tracker.
-	*
-	* @param password the password of this password tracker
-	*/
+	 * Sets the password of this password tracker.
+	 *
+	 * @param password the password of this password tracker
+	 */
 	@Override
 	public void setPassword(String password) {
 		_passwordTracker.setPassword(password);
 	}
 
 	/**
-	* Sets the password tracker ID of this password tracker.
-	*
-	* @param passwordTrackerId the password tracker ID of this password tracker
-	*/
+	 * Sets the password tracker ID of this password tracker.
+	 *
+	 * @param passwordTrackerId the password tracker ID of this password tracker
+	 */
 	@Override
 	public void setPasswordTrackerId(long passwordTrackerId) {
 		_passwordTracker.setPasswordTrackerId(passwordTrackerId);
 	}
 
 	/**
-	* Sets the primary key of this password tracker.
-	*
-	* @param primaryKey the primary key of this password tracker
-	*/
+	 * Sets the primary key of this password tracker.
+	 *
+	 * @param primaryKey the primary key of this password tracker
+	 */
 	@Override
 	public void setPrimaryKey(long primaryKey) {
 		_passwordTracker.setPrimaryKey(primaryKey);
@@ -322,20 +323,20 @@ public class PasswordTrackerWrapper implements PasswordTracker,
 	}
 
 	/**
-	* Sets the user ID of this password tracker.
-	*
-	* @param userId the user ID of this password tracker
-	*/
+	 * Sets the user ID of this password tracker.
+	 *
+	 * @param userId the user ID of this password tracker
+	 */
 	@Override
 	public void setUserId(long userId) {
 		_passwordTracker.setUserId(userId);
 	}
 
 	/**
-	* Sets the user uuid of this password tracker.
-	*
-	* @param userUuid the user uuid of this password tracker
-	*/
+	 * Sets the user uuid of this password tracker.
+	 *
+	 * @param userUuid the user uuid of this password tracker
+	 */
 	@Override
 	public void setUserUuid(String userUuid) {
 		_passwordTracker.setUserUuid(userUuid);
@@ -376,10 +377,12 @@ public class PasswordTrackerWrapper implements PasswordTracker,
 			return false;
 		}
 
-		PasswordTrackerWrapper passwordTrackerWrapper = (PasswordTrackerWrapper)obj;
+		PasswordTrackerWrapper passwordTrackerWrapper =
+			(PasswordTrackerWrapper)obj;
 
-		if (Objects.equals(_passwordTracker,
-					passwordTrackerWrapper._passwordTracker)) {
+		if (Objects.equals(
+				_passwordTracker, passwordTrackerWrapper._passwordTracker)) {
+
 			return true;
 		}
 
@@ -407,4 +410,5 @@ public class PasswordTrackerWrapper implements PasswordTracker,
 	}
 
 	private final PasswordTracker _passwordTracker;
+
 }

@@ -196,7 +196,10 @@ public class AssetEntriesFacetedSearcherTest
 	}
 
 	protected Map<String, Integer> toMap(Collection<String> strings) {
-		return strings.stream().collect(Collectors.toMap(s -> s, s -> 1));
+		return strings.stream(
+		).collect(
+			Collectors.toMap(s -> s, s -> 1)
+		);
 	}
 
 	@Inject

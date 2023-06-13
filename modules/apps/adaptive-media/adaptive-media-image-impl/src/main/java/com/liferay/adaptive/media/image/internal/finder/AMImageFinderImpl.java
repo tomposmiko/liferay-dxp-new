@@ -112,37 +112,11 @@ public class AMImageFinderImpl implements AMImageFinder {
 				filter.test(amImageConfigurationEntry) &&
 				_hasAdaptiveMedia(fileVersion, amImageConfigurationEntry)
 		).map(
-			amImageConfigurationEntry ->
-				_createMedia(fileVersion, uriFactory, amImageConfigurationEntry)
+			amImageConfigurationEntry -> _createMedia(
+				fileVersion, uriFactory, amImageConfigurationEntry)
 		).sorted(
 			amDistanceComparator.toComparator()
 		);
-	}
-
-	@Reference(unbind = "-")
-	public void setAMImageConfigurationHelper(
-		AMImageConfigurationHelper amImageConfigurationHelper) {
-
-		_amImageConfigurationHelper = amImageConfigurationHelper;
-	}
-
-	@Reference(unbind = "-")
-	public void setAMImageEntryLocalService(
-		AMImageEntryLocalService amImageEntryLocalService) {
-
-		_amImageEntryLocalService = amImageEntryLocalService;
-	}
-
-	@Reference(unbind = "-")
-	public void setAMImageMimeTypeProvider(
-		AMImageMimeTypeProvider amImageMimeTypeProvider) {
-
-		_amImageMimeTypeProvider = amImageMimeTypeProvider;
-	}
-
-	@Reference(unbind = "-")
-	public void setAMImageURLFactory(AMImageURLFactory amImageURLFactory) {
-		_amImageURLFactory = amImageURLFactory;
 	}
 
 	private AdaptiveMedia<AMImageProcessor> _createMedia(
@@ -234,9 +208,16 @@ public class AMImageFinderImpl implements AMImageFinder {
 		return true;
 	}
 
+	@Reference
 	private AMImageConfigurationHelper _amImageConfigurationHelper;
+
+	@Reference
 	private AMImageEntryLocalService _amImageEntryLocalService;
+
+	@Reference
 	private AMImageMimeTypeProvider _amImageMimeTypeProvider;
+
+	@Reference
 	private AMImageURLFactory _amImageURLFactory;
 
 }

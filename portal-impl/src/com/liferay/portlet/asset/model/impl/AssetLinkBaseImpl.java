@@ -32,12 +32,13 @@ import com.liferay.asset.kernel.service.AssetLinkLocalServiceUtil;
  * @generated
  */
 @ProviderType
-public abstract class AssetLinkBaseImpl extends AssetLinkModelImpl
-	implements AssetLink {
+public abstract class AssetLinkBaseImpl
+	extends AssetLinkModelImpl implements AssetLink {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
-	 * Never modify or reference this class directly. All methods that expect a asset link model instance should use the {@link AssetLink} interface instead.
+	 * Never modify or reference this class directly. All methods that expect a asset link model instance should use the <code>AssetLink</code> interface instead.
 	 */
 	@Override
 	public void persist() {
@@ -48,4 +49,5 @@ public abstract class AssetLinkBaseImpl extends AssetLinkModelImpl
 			AssetLinkLocalServiceUtil.updateAssetLink(this);
 		}
 	}
+
 }

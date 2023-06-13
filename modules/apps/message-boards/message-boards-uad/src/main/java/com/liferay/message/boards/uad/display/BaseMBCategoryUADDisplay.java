@@ -17,17 +17,15 @@ package com.liferay.message.boards.uad.display;
 import com.liferay.message.boards.model.MBCategory;
 import com.liferay.message.boards.service.MBCategoryLocalService;
 import com.liferay.message.boards.uad.constants.MBUADConstants;
-
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
 import com.liferay.portal.kernel.exception.PortalException;
-
 import com.liferay.user.associated.data.display.BaseModelUADDisplay;
-
-import org.osgi.service.component.annotations.Reference;
 
 import java.io.Serializable;
 
 import java.util.List;
+
+import org.osgi.service.component.annotations.Reference;
 
 /**
  * Provides the base implementation for the MBCategory UAD display.
@@ -41,16 +39,18 @@ import java.util.List;
  * @author Brian Wing Shun Chan
  * @generated
  */
-public abstract class BaseMBCategoryUADDisplay extends BaseModelUADDisplay<MBCategory> {
+public abstract class BaseMBCategoryUADDisplay
+	extends BaseModelUADDisplay<MBCategory> {
+
 	@Override
 	public MBCategory get(Serializable primaryKey) throws PortalException {
-		return mbCategoryLocalService.getMBCategory(Long.valueOf(
-				primaryKey.toString()));
+		return mbCategoryLocalService.getMBCategory(
+			Long.valueOf(primaryKey.toString()));
 	}
 
 	@Override
 	public String[] getDisplayFieldNames() {
-		return new String[] { "name", "description" };
+		return new String[] {"name", "description"};
 	}
 
 	@Override
@@ -69,8 +69,9 @@ public abstract class BaseMBCategoryUADDisplay extends BaseModelUADDisplay<MBCat
 	}
 
 	@Override
-	protected List<MBCategory> doGetRange(DynamicQuery dynamicQuery, int start,
-		int end) {
+	protected List<MBCategory> doGetRange(
+		DynamicQuery dynamicQuery, int start, int end) {
+
 		return mbCategoryLocalService.dynamicQuery(dynamicQuery, start, end);
 	}
 
@@ -81,4 +82,5 @@ public abstract class BaseMBCategoryUADDisplay extends BaseModelUADDisplay<MBCat
 
 	@Reference
 	protected MBCategoryLocalService mbCategoryLocalService;
+
 }

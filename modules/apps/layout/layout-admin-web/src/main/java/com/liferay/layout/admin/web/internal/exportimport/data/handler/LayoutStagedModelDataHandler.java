@@ -121,7 +121,7 @@ import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
 /**
- * @author Mate Thurzo
+ * @author Máté Thurzó
  */
 @Component(immediate = true, service = StagedModelDataHandler.class)
 public class LayoutStagedModelDataHandler
@@ -580,6 +580,14 @@ public class LayoutStagedModelDataHandler
 			importedLayout = existingLayout;
 		}
 
+		Map<Long, Long> layoutPlids =
+			(Map<Long, Long>)portletDataContext.getNewPrimaryKeysMap(
+				Layout.class);
+
+		layoutPlids.put(layout.getPlid(), importedLayout.getPlid());
+
+		layouts.put(oldLayoutId, importedLayout);
+
 		portletDataContext.setPlid(importedLayout.getPlid());
 		portletDataContext.setOldPlid(layout.getPlid());
 
@@ -595,8 +603,17 @@ public class LayoutStagedModelDataHandler
 		if ((parentLayoutId != LayoutConstants.DEFAULT_PARENT_LAYOUT_ID) &&
 			(parentLayoutElement != null)) {
 
-			StagedModelDataHandlerUtil.importStagedModel(
-				portletDataContext, parentLayoutElement);
+			long originalOldPlid = portletDataContext.getOldPlid();
+			long originalPlid = portletDataContext.getPlid();
+
+			try {
+				StagedModelDataHandlerUtil.importStagedModel(
+					portletDataContext, parentLayoutElement);
+			}
+			finally {
+				portletDataContext.setOldPlid(originalOldPlid);
+				portletDataContext.setPlid(originalPlid);
+			}
 
 			Layout importedParentLayout = layouts.get(parentLayoutId);
 
@@ -715,14 +732,6 @@ public class LayoutStagedModelDataHandler
 		_layoutLocalService.updateLayout(importedLayout);
 
 		_layoutSetLocalService.updatePageCount(groupId, privateLayout);
-
-		Map<Long, Long> layoutPlids =
-			(Map<Long, Long>)portletDataContext.getNewPrimaryKeysMap(
-				Layout.class);
-
-		layoutPlids.put(layout.getPlid(), importedLayout.getPlid());
-
-		layouts.put(oldLayoutId, importedLayout);
 
 		importFragmentEntryLinks(portletDataContext, layout, importedLayout);
 
@@ -1592,11 +1601,6 @@ public class LayoutStagedModelDataHandler
 			importedLayout.setColorSchemeId(layout.getColorSchemeId());
 			importedLayout.setCss(layout.getCss());
 		}
-		else {
-			importedLayout.setThemeId(StringPool.BLANK);
-			importedLayout.setColorSchemeId(StringPool.BLANK);
-			importedLayout.setCss(StringPool.BLANK);
-		}
 	}
 
 	protected void initNewLayoutPermissions(
@@ -1778,6 +1782,19 @@ public class LayoutStagedModelDataHandler
 			layoutElement.addAttribute(
 				"layout-prototype-name",
 				layoutPrototype.getName(LocaleUtil.getDefault()));
+
+			boolean layoutPrototypeGlobal = false;
+
+			Group companyGroup = _groupLocalService.getCompanyGroup(
+				layoutPrototype.getCompanyId());
+
+			if (layoutPrototype.getGroupId() == companyGroup.getGroupId()) {
+				layoutPrototypeGlobal = true;
+			}
+
+			layoutElement.addAttribute(
+				"layout-prototype-global",
+				String.valueOf(layoutPrototypeGlobal));
 		}
 	}
 

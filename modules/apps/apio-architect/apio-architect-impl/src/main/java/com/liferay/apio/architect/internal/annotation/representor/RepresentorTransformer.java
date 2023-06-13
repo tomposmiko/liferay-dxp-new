@@ -14,23 +14,28 @@
 
 package com.liferay.apio.architect.internal.annotation.representor;
 
+import static com.liferay.apio.architect.annotation.Vocabulary.LinkTo.ResourceType.CHILD_COLLECTION;
+import static com.liferay.apio.architect.annotation.Vocabulary.LinkTo.ResourceType.GENERIC_PARENT_COLLECTION;
 import static com.liferay.apio.architect.internal.annotation.representor.RepresentorTransformerUtil.addCommonFields;
+import static com.liferay.apio.architect.internal.annotation.representor.RepresentorTransformerUtil.filterWritableFields;
 import static com.liferay.apio.architect.internal.annotation.representor.RepresentorTransformerUtil.getMethodFunction;
+import static com.liferay.apio.architect.internal.annotation.representor.StringUtil.toLowercaseSlug;
 import static com.liferay.apio.architect.internal.unsafe.Unsafe.unsafeCast;
+import static com.liferay.apio.architect.internal.wiring.osgi.manager.cache.ManagerCache.INSTANCE;
 
-import static org.apache.commons.lang3.reflect.MethodUtils.getMethodsListWithAnnotation;
-
-import com.liferay.apio.architect.annotation.Id;
-import com.liferay.apio.architect.annotation.Vocabulary;
 import com.liferay.apio.architect.annotation.Vocabulary.BidirectionalModel;
 import com.liferay.apio.architect.annotation.Vocabulary.Field;
+import com.liferay.apio.architect.annotation.Vocabulary.LinkTo;
 import com.liferay.apio.architect.annotation.Vocabulary.Type;
-import com.liferay.apio.architect.functional.Try;
 import com.liferay.apio.architect.identifier.Identifier;
+import com.liferay.apio.architect.internal.annotation.representor.processor.FieldData;
+import com.liferay.apio.architect.internal.annotation.representor.processor.ParsedType;
 import com.liferay.apio.architect.internal.representor.RepresentorImpl;
 import com.liferay.apio.architect.related.RelatedCollection;
 import com.liferay.apio.architect.representor.Representor;
 import com.liferay.apio.architect.representor.Representor.FirstStep;
+
+import io.vavr.control.Try;
 
 import java.lang.reflect.Method;
 
@@ -42,30 +47,33 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 
 /**
- * Provides a utility function that transforms a class annotated with {@code
- * Vocabulary.Type} into a representor
+ * Provides a utility function that transforms a parsed type into a representor
  *
- * @author Alejandro Hernandez
+ * @author Alejandro Hernández
  * @author Víctor Galán
+ * @review
  */
 public class RepresentorTransformer {
 
 	/**
-	 * Transforms a class annotated with {@code Type} into a representor.
+	 * Transforms a parsed type into a representor.
 	 *
-	 * @param  typeClass the class annotated with {@code Type}
+	 * @param  parsedType the parsed type {@link ParsedType}
 	 * @param  nameFunction the function that gets a class's {@link
 	 *         com.liferay.apio.architect.resource.CollectionResource} name
 	 * @param  relatedCollections the list of the related collections of all
 	 *         representors
-	 * @return the representor
+	 * @return the instance of representor created
+	 * @review
 	 */
 	public static <T extends Identifier<S>, S> Representor<T> toRepresentor(
-		Class<T> typeClass,
+		ParsedType parsedType,
 		Function<Class<? extends Identifier<?>>, String> nameFunction,
 		Map<String, List<RelatedCollection<?, ?>>> relatedCollections) {
 
-		Type type = typeClass.getAnnotation(Type.class);
+		Type type = parsedType.getType();
+
+		Class<T> typeClass = unsafeCast(parsedType.getTypeClass());
 
 		Representor.Builder<T, S> builder = _createBuilder(
 			typeClass, nameFunction, unsafeCast(relatedCollections));
@@ -73,23 +81,14 @@ public class RepresentorTransformer {
 		FirstStep<T> firstStep = builder.types(
 			type.value()
 		).identifier(
-			s -> Try.fromFallible(
-				() -> getMethodsListWithAnnotation(typeClass, Id.class)
-			).filter(
-				methods -> !methods.isEmpty()
-			).map(
-				methods -> methods.get(0)
-			).map(
-				identifierMethod -> (S)identifierMethod.invoke(s)
-			).orElse(
-				null
-			)
+			t -> Try.of(
+				parsedType::getIdMethod
+			).mapTry(
+				method -> (S)method.invoke(t)
+			).getOrNull()
 		);
 
-		List<Method> methods = getMethodsListWithAnnotation(
-			typeClass, Field.class);
-
-		methods.forEach(method -> _processMethod(firstStep, method));
+		_processFields(parsedType, firstStep);
 
 		return firstStep.build();
 	}
@@ -116,35 +115,56 @@ public class RepresentorTransformer {
 			typeClass, nameFunction, biConsumer, relatedCollectionsSupplier);
 	}
 
-	private static <T extends Identifier<S>, S> void _processMethod(
-		FirstStep<T> firstStep, Method method) {
+	private static <T extends Identifier<?>> void _processFields(
+		ParsedType parsedType, FirstStep<T> firstStep) {
 
-		Class<?> returnType = method.getReturnType();
+		List<FieldData<BidirectionalModel>> bidirectionalFieldDataList =
+			filterWritableFields(parsedType::getBidirectionalFieldDataList);
 
-		Field field = method.getAnnotation(Field.class);
+		bidirectionalFieldDataList.forEach(
+			bidirectionalFieldData -> {
+				BidirectionalModel bidirectionalModel =
+					bidirectionalFieldData.getData();
 
-		String key = field.value();
+				Field field = bidirectionalModel.field();
 
-		Vocabulary.RelatedCollection relatedCollection = method.getAnnotation(
-			Vocabulary.RelatedCollection.class);
+				firstStep.addBidirectionalModel(
+					bidirectionalFieldData.getFieldName(), field.value(),
+					unsafeCast(bidirectionalModel.modelClass()),
+					getMethodFunction(bidirectionalFieldData.getMethod()));
+			});
 
-		BidirectionalModel bidirectionalModel = method.getAnnotation(
-			BidirectionalModel.class);
+		List<FieldData<LinkTo>> linkToFieldDataList = filterWritableFields(
+			parsedType::getLinkToFieldDataList);
 
-		if (relatedCollection != null) {
-			firstStep.addRelatedCollection(key, relatedCollection.value());
+		for (FieldData<LinkTo> fieldData : linkToFieldDataList) {
+			LinkTo linkTo = fieldData.getData();
+
+			if (CHILD_COLLECTION.equals(linkTo.resourceType())) {
+				firstStep.addRelatedCollection(
+					fieldData.getFieldName(), linkTo.resource());
+			}
+			else if (GENERIC_PARENT_COLLECTION.equals(linkTo.resourceType())) {
+				Method method = fieldData.getMethod();
+
+				firstStep.addRelatedCollection(
+					fieldData.getFieldName(), linkTo.resource(),
+					model -> Try.of(
+						() -> method.invoke(model)
+					).getOrNull());
+
+				Class<? extends Identifier<?>> typeClass = linkTo.resource();
+
+				Type type = typeClass.getAnnotation(Type.class);
+
+				String name = toLowercaseSlug(type.value());
+
+				INSTANCE.putReusableIdentifierClass(
+					name, method.getReturnType());
+			}
 		}
-		else if (bidirectionalModel != null) {
-			Field bidirectionalField = bidirectionalModel.field();
 
-			firstStep.addBidirectionalModel(
-				key, bidirectionalField.value(),
-				unsafeCast(bidirectionalModel.modelClass()),
-				getMethodFunction(method));
-		}
-		else {
-			addCommonFields(firstStep, method, returnType, key);
-		}
+		addCommonFields(firstStep, parsedType);
 	}
 
 }

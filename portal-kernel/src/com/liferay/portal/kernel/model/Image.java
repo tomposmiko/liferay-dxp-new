@@ -24,19 +24,20 @@ import com.liferay.portal.kernel.util.Accessor;
  *
  * @author Brian Wing Shun Chan
  * @see ImageModel
- * @see com.liferay.portal.model.impl.ImageImpl
- * @see com.liferay.portal.model.impl.ImageModelImpl
  * @generated
  */
 @ImplementationClassName("com.liferay.portal.model.impl.ImageImpl")
 @ProviderType
 public interface Image extends ImageModel, PersistedModel {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
-	 * Never modify this interface directly. Add methods to {@link com.liferay.portal.model.impl.ImageImpl} and rerun ServiceBuilder to automatically copy the method declarations to this interface.
+	 * Never modify this interface directly. Add methods to <code>com.liferay.portal.model.impl.ImageImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
 	 */
-	public static final Accessor<Image, Long> IMAGE_ID_ACCESSOR = new Accessor<Image, Long>() {
+	public static final Accessor<Image, Long> IMAGE_ID_ACCESSOR =
+		new Accessor<Image, Long>() {
+
 			@Override
 			public Long get(Image image) {
 				return image.getImageId();
@@ -51,9 +52,11 @@ public interface Image extends ImageModel, PersistedModel {
 			public Class<Image> getTypeClass() {
 				return Image.class;
 			}
+
 		};
 
 	public byte[] getTextObj();
 
 	public void setTextObj(byte[] textObj);
+
 }

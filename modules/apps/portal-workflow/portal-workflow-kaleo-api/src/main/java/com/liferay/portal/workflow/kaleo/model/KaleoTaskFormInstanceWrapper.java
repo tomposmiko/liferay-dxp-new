@@ -17,7 +17,6 @@ package com.liferay.portal.workflow.kaleo.model;
 import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.expando.kernel.model.ExpandoBridge;
-
 import com.liferay.portal.kernel.model.ModelWrapper;
 import com.liferay.portal.kernel.service.ServiceContext;
 
@@ -38,10 +37,12 @@ import java.util.Objects;
  * @generated
  */
 @ProviderType
-public class KaleoTaskFormInstanceWrapper implements KaleoTaskFormInstance,
-	ModelWrapper<KaleoTaskFormInstance> {
+public class KaleoTaskFormInstanceWrapper
+	implements KaleoTaskFormInstance, ModelWrapper<KaleoTaskFormInstance> {
+
 	public KaleoTaskFormInstanceWrapper(
 		KaleoTaskFormInstance kaleoTaskFormInstance) {
+
 		_kaleoTaskFormInstance = kaleoTaskFormInstance;
 	}
 
@@ -66,10 +67,12 @@ public class KaleoTaskFormInstanceWrapper implements KaleoTaskFormInstance,
 		attributes.put("userName", getUserName());
 		attributes.put("createDate", getCreateDate());
 		attributes.put("modifiedDate", getModifiedDate());
-		attributes.put("kaleoDefinitionVersionId", getKaleoDefinitionVersionId());
+		attributes.put(
+			"kaleoDefinitionVersionId", getKaleoDefinitionVersionId());
 		attributes.put("kaleoInstanceId", getKaleoInstanceId());
 		attributes.put("kaleoTaskId", getKaleoTaskId());
-		attributes.put("kaleoTaskInstanceTokenId", getKaleoTaskInstanceTokenId());
+		attributes.put(
+			"kaleoTaskInstanceTokenId", getKaleoTaskInstanceTokenId());
 		attributes.put("kaleoTaskFormId", getKaleoTaskFormId());
 		attributes.put("formValues", getFormValues());
 		attributes.put("formValueEntryGroupId", getFormValueEntryGroupId());
@@ -83,7 +86,7 @@ public class KaleoTaskFormInstanceWrapper implements KaleoTaskFormInstance,
 	@Override
 	public void setModelAttributes(Map<String, Object> attributes) {
 		Long kaleoTaskFormInstanceId = (Long)attributes.get(
-				"kaleoTaskFormInstanceId");
+			"kaleoTaskFormInstanceId");
 
 		if (kaleoTaskFormInstanceId != null) {
 			setKaleoTaskFormInstanceId(kaleoTaskFormInstanceId);
@@ -126,7 +129,7 @@ public class KaleoTaskFormInstanceWrapper implements KaleoTaskFormInstance,
 		}
 
 		Long kaleoDefinitionVersionId = (Long)attributes.get(
-				"kaleoDefinitionVersionId");
+			"kaleoDefinitionVersionId");
 
 		if (kaleoDefinitionVersionId != null) {
 			setKaleoDefinitionVersionId(kaleoDefinitionVersionId);
@@ -145,7 +148,7 @@ public class KaleoTaskFormInstanceWrapper implements KaleoTaskFormInstance,
 		}
 
 		Long kaleoTaskInstanceTokenId = (Long)attributes.get(
-				"kaleoTaskInstanceTokenId");
+			"kaleoTaskInstanceTokenId");
 
 		if (kaleoTaskInstanceTokenId != null) {
 			setKaleoTaskInstanceTokenId(kaleoTaskInstanceTokenId);
@@ -164,7 +167,7 @@ public class KaleoTaskFormInstanceWrapper implements KaleoTaskFormInstance,
 		}
 
 		Long formValueEntryGroupId = (Long)attributes.get(
-				"formValueEntryGroupId");
+			"formValueEntryGroupId");
 
 		if (formValueEntryGroupId != null) {
 			setFormValueEntryGroupId(formValueEntryGroupId);
@@ -176,7 +179,8 @@ public class KaleoTaskFormInstanceWrapper implements KaleoTaskFormInstance,
 			setFormValueEntryId(formValueEntryId);
 		}
 
-		String formValueEntryUuid = (String)attributes.get("formValueEntryUuid");
+		String formValueEntryUuid = (String)attributes.get(
+			"formValueEntryUuid");
 
 		if (formValueEntryUuid != null) {
 			setFormValueEntryUuid(formValueEntryUuid);
@@ -191,7 +195,8 @@ public class KaleoTaskFormInstanceWrapper implements KaleoTaskFormInstance,
 
 	@Override
 	public Object clone() {
-		return new KaleoTaskFormInstanceWrapper((KaleoTaskFormInstance)_kaleoTaskFormInstance.clone());
+		return new KaleoTaskFormInstanceWrapper(
+			(KaleoTaskFormInstance)_kaleoTaskFormInstance.clone());
 	}
 
 	@Override
@@ -200,20 +205,20 @@ public class KaleoTaskFormInstanceWrapper implements KaleoTaskFormInstance,
 	}
 
 	/**
-	* Returns the company ID of this kaleo task form instance.
-	*
-	* @return the company ID of this kaleo task form instance
-	*/
+	 * Returns the company ID of this kaleo task form instance.
+	 *
+	 * @return the company ID of this kaleo task form instance
+	 */
 	@Override
 	public long getCompanyId() {
 		return _kaleoTaskFormInstance.getCompanyId();
 	}
 
 	/**
-	* Returns the create date of this kaleo task form instance.
-	*
-	* @return the create date of this kaleo task form instance
-	*/
+	 * Returns the create date of this kaleo task form instance.
+	 *
+	 * @return the create date of this kaleo task form instance
+	 */
 	@Override
 	public Date getCreateDate() {
 		return _kaleoTaskFormInstance.getCreateDate();
@@ -225,140 +230,140 @@ public class KaleoTaskFormInstanceWrapper implements KaleoTaskFormInstance,
 	}
 
 	/**
-	* Returns the form value entry group ID of this kaleo task form instance.
-	*
-	* @return the form value entry group ID of this kaleo task form instance
-	*/
+	 * Returns the form value entry group ID of this kaleo task form instance.
+	 *
+	 * @return the form value entry group ID of this kaleo task form instance
+	 */
 	@Override
 	public long getFormValueEntryGroupId() {
 		return _kaleoTaskFormInstance.getFormValueEntryGroupId();
 	}
 
 	/**
-	* Returns the form value entry ID of this kaleo task form instance.
-	*
-	* @return the form value entry ID of this kaleo task form instance
-	*/
+	 * Returns the form value entry ID of this kaleo task form instance.
+	 *
+	 * @return the form value entry ID of this kaleo task form instance
+	 */
 	@Override
 	public long getFormValueEntryId() {
 		return _kaleoTaskFormInstance.getFormValueEntryId();
 	}
 
 	/**
-	* Returns the form value entry uuid of this kaleo task form instance.
-	*
-	* @return the form value entry uuid of this kaleo task form instance
-	*/
+	 * Returns the form value entry uuid of this kaleo task form instance.
+	 *
+	 * @return the form value entry uuid of this kaleo task form instance
+	 */
 	@Override
 	public String getFormValueEntryUuid() {
 		return _kaleoTaskFormInstance.getFormValueEntryUuid();
 	}
 
 	/**
-	* Returns the form values of this kaleo task form instance.
-	*
-	* @return the form values of this kaleo task form instance
-	*/
+	 * Returns the form values of this kaleo task form instance.
+	 *
+	 * @return the form values of this kaleo task form instance
+	 */
 	@Override
 	public String getFormValues() {
 		return _kaleoTaskFormInstance.getFormValues();
 	}
 
 	/**
-	* Returns the group ID of this kaleo task form instance.
-	*
-	* @return the group ID of this kaleo task form instance
-	*/
+	 * Returns the group ID of this kaleo task form instance.
+	 *
+	 * @return the group ID of this kaleo task form instance
+	 */
 	@Override
 	public long getGroupId() {
 		return _kaleoTaskFormInstance.getGroupId();
 	}
 
 	/**
-	* Returns the kaleo definition version ID of this kaleo task form instance.
-	*
-	* @return the kaleo definition version ID of this kaleo task form instance
-	*/
+	 * Returns the kaleo definition version ID of this kaleo task form instance.
+	 *
+	 * @return the kaleo definition version ID of this kaleo task form instance
+	 */
 	@Override
 	public long getKaleoDefinitionVersionId() {
 		return _kaleoTaskFormInstance.getKaleoDefinitionVersionId();
 	}
 
 	/**
-	* Returns the kaleo instance ID of this kaleo task form instance.
-	*
-	* @return the kaleo instance ID of this kaleo task form instance
-	*/
+	 * Returns the kaleo instance ID of this kaleo task form instance.
+	 *
+	 * @return the kaleo instance ID of this kaleo task form instance
+	 */
 	@Override
 	public long getKaleoInstanceId() {
 		return _kaleoTaskFormInstance.getKaleoInstanceId();
 	}
 
 	/**
-	* Returns the kaleo task form ID of this kaleo task form instance.
-	*
-	* @return the kaleo task form ID of this kaleo task form instance
-	*/
+	 * Returns the kaleo task form ID of this kaleo task form instance.
+	 *
+	 * @return the kaleo task form ID of this kaleo task form instance
+	 */
 	@Override
 	public long getKaleoTaskFormId() {
 		return _kaleoTaskFormInstance.getKaleoTaskFormId();
 	}
 
 	/**
-	* Returns the kaleo task form instance ID of this kaleo task form instance.
-	*
-	* @return the kaleo task form instance ID of this kaleo task form instance
-	*/
+	 * Returns the kaleo task form instance ID of this kaleo task form instance.
+	 *
+	 * @return the kaleo task form instance ID of this kaleo task form instance
+	 */
 	@Override
 	public long getKaleoTaskFormInstanceId() {
 		return _kaleoTaskFormInstance.getKaleoTaskFormInstanceId();
 	}
 
 	/**
-	* Returns the kaleo task ID of this kaleo task form instance.
-	*
-	* @return the kaleo task ID of this kaleo task form instance
-	*/
+	 * Returns the kaleo task ID of this kaleo task form instance.
+	 *
+	 * @return the kaleo task ID of this kaleo task form instance
+	 */
 	@Override
 	public long getKaleoTaskId() {
 		return _kaleoTaskFormInstance.getKaleoTaskId();
 	}
 
 	/**
-	* Returns the kaleo task instance token ID of this kaleo task form instance.
-	*
-	* @return the kaleo task instance token ID of this kaleo task form instance
-	*/
+	 * Returns the kaleo task instance token ID of this kaleo task form instance.
+	 *
+	 * @return the kaleo task instance token ID of this kaleo task form instance
+	 */
 	@Override
 	public long getKaleoTaskInstanceTokenId() {
 		return _kaleoTaskFormInstance.getKaleoTaskInstanceTokenId();
 	}
 
 	/**
-	* Returns the metadata of this kaleo task form instance.
-	*
-	* @return the metadata of this kaleo task form instance
-	*/
+	 * Returns the metadata of this kaleo task form instance.
+	 *
+	 * @return the metadata of this kaleo task form instance
+	 */
 	@Override
 	public String getMetadata() {
 		return _kaleoTaskFormInstance.getMetadata();
 	}
 
 	/**
-	* Returns the modified date of this kaleo task form instance.
-	*
-	* @return the modified date of this kaleo task form instance
-	*/
+	 * Returns the modified date of this kaleo task form instance.
+	 *
+	 * @return the modified date of this kaleo task form instance
+	 */
 	@Override
 	public Date getModifiedDate() {
 		return _kaleoTaskFormInstance.getModifiedDate();
 	}
 
 	/**
-	* Returns the primary key of this kaleo task form instance.
-	*
-	* @return the primary key of this kaleo task form instance
-	*/
+	 * Returns the primary key of this kaleo task form instance.
+	 *
+	 * @return the primary key of this kaleo task form instance
+	 */
 	@Override
 	public long getPrimaryKey() {
 		return _kaleoTaskFormInstance.getPrimaryKey();
@@ -370,30 +375,30 @@ public class KaleoTaskFormInstanceWrapper implements KaleoTaskFormInstance,
 	}
 
 	/**
-	* Returns the user ID of this kaleo task form instance.
-	*
-	* @return the user ID of this kaleo task form instance
-	*/
+	 * Returns the user ID of this kaleo task form instance.
+	 *
+	 * @return the user ID of this kaleo task form instance
+	 */
 	@Override
 	public long getUserId() {
 		return _kaleoTaskFormInstance.getUserId();
 	}
 
 	/**
-	* Returns the user name of this kaleo task form instance.
-	*
-	* @return the user name of this kaleo task form instance
-	*/
+	 * Returns the user name of this kaleo task form instance.
+	 *
+	 * @return the user name of this kaleo task form instance
+	 */
 	@Override
 	public String getUserName() {
 		return _kaleoTaskFormInstance.getUserName();
 	}
 
 	/**
-	* Returns the user uuid of this kaleo task form instance.
-	*
-	* @return the user uuid of this kaleo task form instance
-	*/
+	 * Returns the user uuid of this kaleo task form instance.
+	 *
+	 * @return the user uuid of this kaleo task form instance
+	 */
 	@Override
 	public String getUserUuid() {
 		return _kaleoTaskFormInstance.getUserUuid();
@@ -430,20 +435,20 @@ public class KaleoTaskFormInstanceWrapper implements KaleoTaskFormInstance,
 	}
 
 	/**
-	* Sets the company ID of this kaleo task form instance.
-	*
-	* @param companyId the company ID of this kaleo task form instance
-	*/
+	 * Sets the company ID of this kaleo task form instance.
+	 *
+	 * @param companyId the company ID of this kaleo task form instance
+	 */
 	@Override
 	public void setCompanyId(long companyId) {
 		_kaleoTaskFormInstance.setCompanyId(companyId);
 	}
 
 	/**
-	* Sets the create date of this kaleo task form instance.
-	*
-	* @param createDate the create date of this kaleo task form instance
-	*/
+	 * Sets the create date of this kaleo task form instance.
+	 *
+	 * @param createDate the create date of this kaleo task form instance
+	 */
 	@Override
 	public void setCreateDate(Date createDate) {
 		_kaleoTaskFormInstance.setCreateDate(createDate);
@@ -452,6 +457,7 @@ public class KaleoTaskFormInstanceWrapper implements KaleoTaskFormInstance,
 	@Override
 	public void setExpandoBridgeAttributes(
 		com.liferay.portal.kernel.model.BaseModel<?> baseModel) {
+
 		_kaleoTaskFormInstance.setExpandoBridgeAttributes(baseModel);
 	}
 
@@ -466,130 +472,133 @@ public class KaleoTaskFormInstanceWrapper implements KaleoTaskFormInstance,
 	}
 
 	/**
-	* Sets the form value entry group ID of this kaleo task form instance.
-	*
-	* @param formValueEntryGroupId the form value entry group ID of this kaleo task form instance
-	*/
+	 * Sets the form value entry group ID of this kaleo task form instance.
+	 *
+	 * @param formValueEntryGroupId the form value entry group ID of this kaleo task form instance
+	 */
 	@Override
 	public void setFormValueEntryGroupId(long formValueEntryGroupId) {
 		_kaleoTaskFormInstance.setFormValueEntryGroupId(formValueEntryGroupId);
 	}
 
 	/**
-	* Sets the form value entry ID of this kaleo task form instance.
-	*
-	* @param formValueEntryId the form value entry ID of this kaleo task form instance
-	*/
+	 * Sets the form value entry ID of this kaleo task form instance.
+	 *
+	 * @param formValueEntryId the form value entry ID of this kaleo task form instance
+	 */
 	@Override
 	public void setFormValueEntryId(long formValueEntryId) {
 		_kaleoTaskFormInstance.setFormValueEntryId(formValueEntryId);
 	}
 
 	/**
-	* Sets the form value entry uuid of this kaleo task form instance.
-	*
-	* @param formValueEntryUuid the form value entry uuid of this kaleo task form instance
-	*/
+	 * Sets the form value entry uuid of this kaleo task form instance.
+	 *
+	 * @param formValueEntryUuid the form value entry uuid of this kaleo task form instance
+	 */
 	@Override
 	public void setFormValueEntryUuid(String formValueEntryUuid) {
 		_kaleoTaskFormInstance.setFormValueEntryUuid(formValueEntryUuid);
 	}
 
 	/**
-	* Sets the form values of this kaleo task form instance.
-	*
-	* @param formValues the form values of this kaleo task form instance
-	*/
+	 * Sets the form values of this kaleo task form instance.
+	 *
+	 * @param formValues the form values of this kaleo task form instance
+	 */
 	@Override
 	public void setFormValues(String formValues) {
 		_kaleoTaskFormInstance.setFormValues(formValues);
 	}
 
 	/**
-	* Sets the group ID of this kaleo task form instance.
-	*
-	* @param groupId the group ID of this kaleo task form instance
-	*/
+	 * Sets the group ID of this kaleo task form instance.
+	 *
+	 * @param groupId the group ID of this kaleo task form instance
+	 */
 	@Override
 	public void setGroupId(long groupId) {
 		_kaleoTaskFormInstance.setGroupId(groupId);
 	}
 
 	/**
-	* Sets the kaleo definition version ID of this kaleo task form instance.
-	*
-	* @param kaleoDefinitionVersionId the kaleo definition version ID of this kaleo task form instance
-	*/
+	 * Sets the kaleo definition version ID of this kaleo task form instance.
+	 *
+	 * @param kaleoDefinitionVersionId the kaleo definition version ID of this kaleo task form instance
+	 */
 	@Override
 	public void setKaleoDefinitionVersionId(long kaleoDefinitionVersionId) {
-		_kaleoTaskFormInstance.setKaleoDefinitionVersionId(kaleoDefinitionVersionId);
+		_kaleoTaskFormInstance.setKaleoDefinitionVersionId(
+			kaleoDefinitionVersionId);
 	}
 
 	/**
-	* Sets the kaleo instance ID of this kaleo task form instance.
-	*
-	* @param kaleoInstanceId the kaleo instance ID of this kaleo task form instance
-	*/
+	 * Sets the kaleo instance ID of this kaleo task form instance.
+	 *
+	 * @param kaleoInstanceId the kaleo instance ID of this kaleo task form instance
+	 */
 	@Override
 	public void setKaleoInstanceId(long kaleoInstanceId) {
 		_kaleoTaskFormInstance.setKaleoInstanceId(kaleoInstanceId);
 	}
 
 	/**
-	* Sets the kaleo task form ID of this kaleo task form instance.
-	*
-	* @param kaleoTaskFormId the kaleo task form ID of this kaleo task form instance
-	*/
+	 * Sets the kaleo task form ID of this kaleo task form instance.
+	 *
+	 * @param kaleoTaskFormId the kaleo task form ID of this kaleo task form instance
+	 */
 	@Override
 	public void setKaleoTaskFormId(long kaleoTaskFormId) {
 		_kaleoTaskFormInstance.setKaleoTaskFormId(kaleoTaskFormId);
 	}
 
 	/**
-	* Sets the kaleo task form instance ID of this kaleo task form instance.
-	*
-	* @param kaleoTaskFormInstanceId the kaleo task form instance ID of this kaleo task form instance
-	*/
+	 * Sets the kaleo task form instance ID of this kaleo task form instance.
+	 *
+	 * @param kaleoTaskFormInstanceId the kaleo task form instance ID of this kaleo task form instance
+	 */
 	@Override
 	public void setKaleoTaskFormInstanceId(long kaleoTaskFormInstanceId) {
-		_kaleoTaskFormInstance.setKaleoTaskFormInstanceId(kaleoTaskFormInstanceId);
+		_kaleoTaskFormInstance.setKaleoTaskFormInstanceId(
+			kaleoTaskFormInstanceId);
 	}
 
 	/**
-	* Sets the kaleo task ID of this kaleo task form instance.
-	*
-	* @param kaleoTaskId the kaleo task ID of this kaleo task form instance
-	*/
+	 * Sets the kaleo task ID of this kaleo task form instance.
+	 *
+	 * @param kaleoTaskId the kaleo task ID of this kaleo task form instance
+	 */
 	@Override
 	public void setKaleoTaskId(long kaleoTaskId) {
 		_kaleoTaskFormInstance.setKaleoTaskId(kaleoTaskId);
 	}
 
 	/**
-	* Sets the kaleo task instance token ID of this kaleo task form instance.
-	*
-	* @param kaleoTaskInstanceTokenId the kaleo task instance token ID of this kaleo task form instance
-	*/
+	 * Sets the kaleo task instance token ID of this kaleo task form instance.
+	 *
+	 * @param kaleoTaskInstanceTokenId the kaleo task instance token ID of this kaleo task form instance
+	 */
 	@Override
 	public void setKaleoTaskInstanceTokenId(long kaleoTaskInstanceTokenId) {
-		_kaleoTaskFormInstance.setKaleoTaskInstanceTokenId(kaleoTaskInstanceTokenId);
+		_kaleoTaskFormInstance.setKaleoTaskInstanceTokenId(
+			kaleoTaskInstanceTokenId);
 	}
 
 	/**
-	* Sets the metadata of this kaleo task form instance.
-	*
-	* @param metadata the metadata of this kaleo task form instance
-	*/
+	 * Sets the metadata of this kaleo task form instance.
+	 *
+	 * @param metadata the metadata of this kaleo task form instance
+	 */
 	@Override
 	public void setMetadata(String metadata) {
 		_kaleoTaskFormInstance.setMetadata(metadata);
 	}
 
 	/**
-	* Sets the modified date of this kaleo task form instance.
-	*
-	* @param modifiedDate the modified date of this kaleo task form instance
-	*/
+	 * Sets the modified date of this kaleo task form instance.
+	 *
+	 * @param modifiedDate the modified date of this kaleo task form instance
+	 */
 	@Override
 	public void setModifiedDate(Date modifiedDate) {
 		_kaleoTaskFormInstance.setModifiedDate(modifiedDate);
@@ -601,10 +610,10 @@ public class KaleoTaskFormInstanceWrapper implements KaleoTaskFormInstance,
 	}
 
 	/**
-	* Sets the primary key of this kaleo task form instance.
-	*
-	* @param primaryKey the primary key of this kaleo task form instance
-	*/
+	 * Sets the primary key of this kaleo task form instance.
+	 *
+	 * @param primaryKey the primary key of this kaleo task form instance
+	 */
 	@Override
 	public void setPrimaryKey(long primaryKey) {
 		_kaleoTaskFormInstance.setPrimaryKey(primaryKey);
@@ -616,43 +625,46 @@ public class KaleoTaskFormInstanceWrapper implements KaleoTaskFormInstance,
 	}
 
 	/**
-	* Sets the user ID of this kaleo task form instance.
-	*
-	* @param userId the user ID of this kaleo task form instance
-	*/
+	 * Sets the user ID of this kaleo task form instance.
+	 *
+	 * @param userId the user ID of this kaleo task form instance
+	 */
 	@Override
 	public void setUserId(long userId) {
 		_kaleoTaskFormInstance.setUserId(userId);
 	}
 
 	/**
-	* Sets the user name of this kaleo task form instance.
-	*
-	* @param userName the user name of this kaleo task form instance
-	*/
+	 * Sets the user name of this kaleo task form instance.
+	 *
+	 * @param userName the user name of this kaleo task form instance
+	 */
 	@Override
 	public void setUserName(String userName) {
 		_kaleoTaskFormInstance.setUserName(userName);
 	}
 
 	/**
-	* Sets the user uuid of this kaleo task form instance.
-	*
-	* @param userUuid the user uuid of this kaleo task form instance
-	*/
+	 * Sets the user uuid of this kaleo task form instance.
+	 *
+	 * @param userUuid the user uuid of this kaleo task form instance
+	 */
 	@Override
 	public void setUserUuid(String userUuid) {
 		_kaleoTaskFormInstance.setUserUuid(userUuid);
 	}
 
 	@Override
-	public com.liferay.portal.kernel.model.CacheModel<KaleoTaskFormInstance> toCacheModel() {
+	public com.liferay.portal.kernel.model.CacheModel<KaleoTaskFormInstance>
+		toCacheModel() {
+
 		return _kaleoTaskFormInstance.toCacheModel();
 	}
 
 	@Override
 	public KaleoTaskFormInstance toEscapedModel() {
-		return new KaleoTaskFormInstanceWrapper(_kaleoTaskFormInstance.toEscapedModel());
+		return new KaleoTaskFormInstanceWrapper(
+			_kaleoTaskFormInstance.toEscapedModel());
 	}
 
 	@Override
@@ -662,7 +674,8 @@ public class KaleoTaskFormInstanceWrapper implements KaleoTaskFormInstance,
 
 	@Override
 	public KaleoTaskFormInstance toUnescapedModel() {
-		return new KaleoTaskFormInstanceWrapper(_kaleoTaskFormInstance.toUnescapedModel());
+		return new KaleoTaskFormInstanceWrapper(
+			_kaleoTaskFormInstance.toUnescapedModel());
 	}
 
 	@Override
@@ -680,10 +693,13 @@ public class KaleoTaskFormInstanceWrapper implements KaleoTaskFormInstance,
 			return false;
 		}
 
-		KaleoTaskFormInstanceWrapper kaleoTaskFormInstanceWrapper = (KaleoTaskFormInstanceWrapper)obj;
+		KaleoTaskFormInstanceWrapper kaleoTaskFormInstanceWrapper =
+			(KaleoTaskFormInstanceWrapper)obj;
 
-		if (Objects.equals(_kaleoTaskFormInstance,
-					kaleoTaskFormInstanceWrapper._kaleoTaskFormInstance)) {
+		if (Objects.equals(
+				_kaleoTaskFormInstance,
+				kaleoTaskFormInstanceWrapper._kaleoTaskFormInstance)) {
+
 			return true;
 		}
 
@@ -711,4 +727,5 @@ public class KaleoTaskFormInstanceWrapper implements KaleoTaskFormInstance,
 	}
 
 	private final KaleoTaskFormInstance _kaleoTaskFormInstance;
+
 }

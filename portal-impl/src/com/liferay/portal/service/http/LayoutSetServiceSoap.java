@@ -24,19 +24,20 @@ import java.rmi.RemoteException;
 
 /**
  * Provides the SOAP utility for the
- * {@link LayoutSetServiceUtil} service utility. The
- * static methods of this class calls the same methods of the service utility.
- * However, the signatures are different because it is difficult for SOAP to
- * support certain types.
+ * <code>LayoutSetServiceUtil</code> service
+ * utility. The static methods of this class call the same methods of the
+ * service utility. However, the signatures are different because it is
+ * difficult for SOAP to support certain types.
  *
  * <p>
  * ServiceBuilder follows certain rules in translating the methods. For example,
- * if the method in the service utility returns a {@link java.util.List}, that
- * is translated to an array of {@link com.liferay.portal.kernel.model.LayoutSetSoap}.
- * If the method in the service utility returns a
- * {@link com.liferay.portal.kernel.model.LayoutSet}, that is translated to a
- * {@link com.liferay.portal.kernel.model.LayoutSetSoap}. Methods that SOAP cannot
- * safely wire are skipped.
+ * if the method in the service utility returns a <code>java.util.List</code>,
+ * that is translated to an array of
+ * <code>com.liferay.portal.kernel.model.LayoutSetSoap</code>. If the method in the
+ * service utility returns a
+ * <code>com.liferay.portal.kernel.model.LayoutSet</code>, that is translated to a
+ * <code>com.liferay.portal.kernel.model.LayoutSetSoap</code>. Methods that SOAP
+ * cannot safely wire are skipped.
  * </p>
  *
  * <p>
@@ -58,36 +59,38 @@ import java.rmi.RemoteException;
  *
  * @author Brian Wing Shun Chan
  * @see LayoutSetServiceHttp
- * @see com.liferay.portal.kernel.model.LayoutSetSoap
- * @see LayoutSetServiceUtil
  * @generated
  */
 @ProviderType
 public class LayoutSetServiceSoap {
+
 	/**
-	* Updates the state of the layout set prototype link.
-	*
-	* <p>
-	* <strong>Important:</strong> Setting
-	* <code>layoutSetPrototypeLinkEnabled</code> to <code>true</code> and
-	* <code>layoutSetPrototypeUuid</code> to <code>null</code> when the layout
-	* set prototype's current uuid is <code>null</code> will result in an
-	* <code>IllegalStateException</code>.
-	* </p>
-	*
-	* @param groupId the primary key of the group
-	* @param privateLayout whether the layout set is private to the group
-	* @param layoutSetPrototypeLinkEnabled whether the layout set prototype is
-	link enabled
-	* @param layoutSetPrototypeUuid the uuid of the layout set prototype to
-	link with
-	*/
-	public static void updateLayoutSetPrototypeLinkEnabled(long groupId,
-		boolean privateLayout, boolean layoutSetPrototypeLinkEnabled,
-		String layoutSetPrototypeUuid) throws RemoteException {
+	 * Updates the state of the layout set prototype link.
+	 *
+	 * <p>
+	 * <strong>Important:</strong> Setting
+	 * <code>layoutSetPrototypeLinkEnabled</code> to <code>true</code> and
+	 * <code>layoutSetPrototypeUuid</code> to <code>null</code> when the layout
+	 * set prototype's current uuid is <code>null</code> will result in an
+	 * <code>IllegalStateException</code>.
+	 * </p>
+	 *
+	 * @param groupId the primary key of the group
+	 * @param privateLayout whether the layout set is private to the group
+	 * @param layoutSetPrototypeLinkEnabled whether the layout set prototype is
+	 link enabled
+	 * @param layoutSetPrototypeUuid the uuid of the layout set prototype to
+	 link with
+	 */
+	public static void updateLayoutSetPrototypeLinkEnabled(
+			long groupId, boolean privateLayout,
+			boolean layoutSetPrototypeLinkEnabled,
+			String layoutSetPrototypeUuid)
+		throws RemoteException {
+
 		try {
-			LayoutSetServiceUtil.updateLayoutSetPrototypeLinkEnabled(groupId,
-				privateLayout, layoutSetPrototypeLinkEnabled,
+			LayoutSetServiceUtil.updateLayoutSetPrototypeLinkEnabled(
+				groupId, privateLayout, layoutSetPrototypeLinkEnabled,
 				layoutSetPrototypeUuid);
 		}
 		catch (Exception e) {
@@ -97,10 +100,13 @@ public class LayoutSetServiceSoap {
 		}
 	}
 
-	public static void updateLogo(long groupId, boolean privateLayout,
-		boolean logo, byte[] bytes) throws RemoteException {
+	public static void updateLogo(
+			long groupId, boolean privateLayout, boolean logo, byte[] bytes)
+		throws RemoteException {
+
 		try {
-			LayoutSetServiceUtil.updateLogo(groupId, privateLayout, logo, bytes);
+			LayoutSetServiceUtil.updateLogo(
+				groupId, privateLayout, logo, bytes);
 		}
 		catch (Exception e) {
 			_log.error(e, e);
@@ -109,14 +115,19 @@ public class LayoutSetServiceSoap {
 		}
 	}
 
-	public static com.liferay.portal.kernel.model.LayoutSetSoap updateLookAndFeel(
-		long groupId, boolean privateLayout, String themeId,
-		String colorSchemeId, String css) throws RemoteException {
-		try {
-			com.liferay.portal.kernel.model.LayoutSet returnValue = LayoutSetServiceUtil.updateLookAndFeel(groupId,
-					privateLayout, themeId, colorSchemeId, css);
+	public static com.liferay.portal.kernel.model.LayoutSetSoap
+			updateLookAndFeel(
+				long groupId, boolean privateLayout, String themeId,
+				String colorSchemeId, String css)
+		throws RemoteException {
 
-			return com.liferay.portal.kernel.model.LayoutSetSoap.toSoapModel(returnValue);
+		try {
+			com.liferay.portal.kernel.model.LayoutSet returnValue =
+				LayoutSetServiceUtil.updateLookAndFeel(
+					groupId, privateLayout, themeId, colorSchemeId, css);
+
+			return com.liferay.portal.kernel.model.LayoutSetSoap.toSoapModel(
+				returnValue);
 		}
 		catch (Exception e) {
 			_log.error(e, e);
@@ -126,13 +137,16 @@ public class LayoutSetServiceSoap {
 	}
 
 	public static com.liferay.portal.kernel.model.LayoutSetSoap updateSettings(
-		long groupId, boolean privateLayout, String settings)
+			long groupId, boolean privateLayout, String settings)
 		throws RemoteException {
-		try {
-			com.liferay.portal.kernel.model.LayoutSet returnValue = LayoutSetServiceUtil.updateSettings(groupId,
-					privateLayout, settings);
 
-			return com.liferay.portal.kernel.model.LayoutSetSoap.toSoapModel(returnValue);
+		try {
+			com.liferay.portal.kernel.model.LayoutSet returnValue =
+				LayoutSetServiceUtil.updateSettings(
+					groupId, privateLayout, settings);
+
+			return com.liferay.portal.kernel.model.LayoutSetSoap.toSoapModel(
+				returnValue);
 		}
 		catch (Exception e) {
 			_log.error(e, e);
@@ -141,14 +155,18 @@ public class LayoutSetServiceSoap {
 		}
 	}
 
-	public static com.liferay.portal.kernel.model.LayoutSetSoap updateVirtualHost(
-		long groupId, boolean privateLayout, String virtualHost)
+	public static com.liferay.portal.kernel.model.LayoutSetSoap
+			updateVirtualHost(
+				long groupId, boolean privateLayout, String virtualHost)
 		throws RemoteException {
-		try {
-			com.liferay.portal.kernel.model.LayoutSet returnValue = LayoutSetServiceUtil.updateVirtualHost(groupId,
-					privateLayout, virtualHost);
 
-			return com.liferay.portal.kernel.model.LayoutSetSoap.toSoapModel(returnValue);
+		try {
+			com.liferay.portal.kernel.model.LayoutSet returnValue =
+				LayoutSetServiceUtil.updateVirtualHost(
+					groupId, privateLayout, virtualHost);
+
+			return com.liferay.portal.kernel.model.LayoutSetSoap.toSoapModel(
+				returnValue);
 		}
 		catch (Exception e) {
 			_log.error(e, e);
@@ -158,4 +176,5 @@ public class LayoutSetServiceSoap {
 	}
 
 	private static Log _log = LogFactoryUtil.getLog(LayoutSetServiceSoap.class);
+
 }

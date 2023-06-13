@@ -17,7 +17,6 @@ package com.liferay.portlet.asset.model.impl;
 import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.asset.kernel.model.AssetCategoryProperty;
-
 import com.liferay.portal.kernel.model.CacheModel;
 import com.liferay.portal.kernel.util.HashUtil;
 import com.liferay.portal.kernel.util.StringBundler;
@@ -33,14 +32,14 @@ import java.util.Date;
  * The cache model class for representing AssetCategoryProperty in entity cache.
  *
  * @author Brian Wing Shun Chan
- * @see AssetCategoryProperty
  * @deprecated
  * @generated
  */
 @Deprecated
 @ProviderType
-public class AssetCategoryPropertyCacheModel implements CacheModel<AssetCategoryProperty>,
-	Externalizable {
+public class AssetCategoryPropertyCacheModel
+	implements CacheModel<AssetCategoryProperty>, Externalizable {
+
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj) {
@@ -51,9 +50,12 @@ public class AssetCategoryPropertyCacheModel implements CacheModel<AssetCategory
 			return false;
 		}
 
-		AssetCategoryPropertyCacheModel assetCategoryPropertyCacheModel = (AssetCategoryPropertyCacheModel)obj;
+		AssetCategoryPropertyCacheModel assetCategoryPropertyCacheModel =
+			(AssetCategoryPropertyCacheModel)obj;
 
-		if (categoryPropertyId == assetCategoryPropertyCacheModel.categoryPropertyId) {
+		if (categoryPropertyId ==
+				assetCategoryPropertyCacheModel.categoryPropertyId) {
+
 			return true;
 		}
 
@@ -94,7 +96,8 @@ public class AssetCategoryPropertyCacheModel implements CacheModel<AssetCategory
 
 	@Override
 	public AssetCategoryProperty toEntityModel() {
-		AssetCategoryPropertyImpl assetCategoryPropertyImpl = new AssetCategoryPropertyImpl();
+		AssetCategoryPropertyImpl assetCategoryPropertyImpl =
+			new AssetCategoryPropertyImpl();
 
 		assetCategoryPropertyImpl.setCategoryPropertyId(categoryPropertyId);
 		assetCategoryPropertyImpl.setCompanyId(companyId);
@@ -159,8 +162,7 @@ public class AssetCategoryPropertyCacheModel implements CacheModel<AssetCategory
 	}
 
 	@Override
-	public void writeExternal(ObjectOutput objectOutput)
-		throws IOException {
+	public void writeExternal(ObjectOutput objectOutput) throws IOException {
 		objectOutput.writeLong(categoryPropertyId);
 
 		objectOutput.writeLong(companyId);
@@ -203,4 +205,5 @@ public class AssetCategoryPropertyCacheModel implements CacheModel<AssetCategory
 	public long categoryId;
 	public String key;
 	public String value;
+
 }

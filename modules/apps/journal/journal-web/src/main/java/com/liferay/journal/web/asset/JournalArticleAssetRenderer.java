@@ -229,10 +229,14 @@ public class JournalArticleAssetRenderer
 					WebKeys.THEME_DISPLAY);
 			}
 
+			String ddmTemplateKey = ParamUtil.getString(
+				portletRequest, "ddmTemplateKey");
+
 			JournalArticleDisplay articleDisplay =
 				JournalArticleLocalServiceUtil.getArticleDisplay(
-					_article, null, null, LanguageUtil.getLanguageId(locale), 1,
-					portletRequestModel, themeDisplay);
+					_article, ddmTemplateKey, null,
+					LanguageUtil.getLanguageId(locale), 1, portletRequestModel,
+					themeDisplay);
 
 			summary = HtmlUtil.unescape(
 				HtmlUtil.stripHtml(articleDisplay.getContent()));
@@ -329,6 +333,18 @@ public class JournalArticleAssetRenderer
 	}
 
 	@Override
+	public String getUrlTitle(Locale locale) {
+		try {
+			return _article.getUrlTitle(locale);
+		}
+		catch (Exception e) {
+			_log.error(e, e);
+		}
+
+		return getUrlTitle();
+	}
+
+	@Override
 	public PortletURL getURLViewDiffs(
 			LiferayPortletRequest liferayPortletRequest,
 			LiferayPortletResponse liferayPortletResponse)
@@ -337,7 +353,10 @@ public class JournalArticleAssetRenderer
 		JournalArticle previousApprovedArticle =
 			JournalArticleLocalServiceUtil.getPreviousApprovedArticle(_article);
 
-		if (previousApprovedArticle.getVersion() == _article.getVersion()) {
+		if ((previousApprovedArticle.getVersion() == _article.getVersion()) ||
+			(_article.getVersion() ==
+				JournalArticleConstants.VERSION_DEFAULT)) {
+
 			return null;
 		}
 
@@ -420,8 +439,10 @@ public class JournalArticleAssetRenderer
 			return PortalUtil.addPreservedParameters(
 				themeDisplay,
 				groupFriendlyURL.concat(
-					JournalArticleConstants.CANONICAL_URL_SEPARATOR).concat(
-						_article.getUrlTitle()));
+					JournalArticleConstants.CANONICAL_URL_SEPARATOR
+				).concat(
+					_article.getUrlTitle(themeDisplay.getLocale())
+				));
 		}
 
 		String hitLayoutURL = getHitLayoutURL(
@@ -543,6 +564,11 @@ public class JournalArticleAssetRenderer
 
 		String ddmTemplateKey = (String)request.getAttribute(
 			WebKeys.JOURNAL_TEMPLATE_ID);
+
+		if (Validator.isNull(ddmTemplateKey)) {
+			ddmTemplateKey = ParamUtil.getString(request, "ddmTemplateKey");
+		}
+
 		String viewMode = ParamUtil.getString(
 			request, "viewMode", Constants.VIEW);
 		String languageId = LanguageUtil.getLanguageId(request);

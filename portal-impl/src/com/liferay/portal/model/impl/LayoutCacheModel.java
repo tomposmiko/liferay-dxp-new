@@ -33,12 +33,12 @@ import java.util.Date;
  * The cache model class for representing Layout in entity cache.
  *
  * @author Brian Wing Shun Chan
- * @see Layout
  * @generated
  */
 @ProviderType
-public class LayoutCacheModel implements CacheModel<Layout>, Externalizable,
-	MVCCModel {
+public class LayoutCacheModel
+	implements CacheModel<Layout>, Externalizable, MVCCModel {
+
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj) {
@@ -52,7 +52,8 @@ public class LayoutCacheModel implements CacheModel<Layout>, Externalizable,
 		LayoutCacheModel layoutCacheModel = (LayoutCacheModel)obj;
 
 		if ((plid == layoutCacheModel.plid) &&
-				(mvccVersion == layoutCacheModel.mvccVersion)) {
+			(mvccVersion == layoutCacheModel.mvccVersion)) {
+
 			return true;
 		}
 
@@ -345,8 +346,7 @@ public class LayoutCacheModel implements CacheModel<Layout>, Externalizable,
 	}
 
 	@Override
-	public void writeExternal(ObjectOutput objectOutput)
-		throws IOException {
+	public void writeExternal(ObjectOutput objectOutput) throws IOException {
 		objectOutput.writeLong(mvccVersion);
 
 		if (uuid == null) {
@@ -512,4 +512,5 @@ public class LayoutCacheModel implements CacheModel<Layout>, Externalizable,
 	public boolean layoutPrototypeLinkEnabled;
 	public String sourcePrototypeLayoutUuid;
 	public long lastPublishDate;
+
 }

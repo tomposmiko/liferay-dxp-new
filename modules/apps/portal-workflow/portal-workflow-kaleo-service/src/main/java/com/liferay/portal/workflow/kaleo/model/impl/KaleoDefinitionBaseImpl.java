@@ -32,12 +32,13 @@ import com.liferay.portal.workflow.kaleo.service.KaleoDefinitionLocalServiceUtil
  * @generated
  */
 @ProviderType
-public abstract class KaleoDefinitionBaseImpl extends KaleoDefinitionModelImpl
-	implements KaleoDefinition {
+public abstract class KaleoDefinitionBaseImpl
+	extends KaleoDefinitionModelImpl implements KaleoDefinition {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
-	 * Never modify or reference this class directly. All methods that expect a kaleo definition model instance should use the {@link KaleoDefinition} interface instead.
+	 * Never modify or reference this class directly. All methods that expect a kaleo definition model instance should use the <code>KaleoDefinition</code> interface instead.
 	 */
 	@Override
 	public void persist() {
@@ -48,4 +49,5 @@ public abstract class KaleoDefinitionBaseImpl extends KaleoDefinitionModelImpl
 			KaleoDefinitionLocalServiceUtil.updateKaleoDefinition(this);
 		}
 	}
+
 }

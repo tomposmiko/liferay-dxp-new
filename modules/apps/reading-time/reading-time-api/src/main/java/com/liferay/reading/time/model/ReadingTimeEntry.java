@@ -25,33 +25,39 @@ import com.liferay.portal.kernel.util.Accessor;
  *
  * @author Brian Wing Shun Chan
  * @see ReadingTimeEntryModel
- * @see com.liferay.reading.time.model.impl.ReadingTimeEntryImpl
- * @see com.liferay.reading.time.model.impl.ReadingTimeEntryModelImpl
  * @generated
  */
-@ImplementationClassName("com.liferay.reading.time.model.impl.ReadingTimeEntryImpl")
+@ImplementationClassName(
+	"com.liferay.reading.time.model.impl.ReadingTimeEntryImpl"
+)
 @ProviderType
-public interface ReadingTimeEntry extends ReadingTimeEntryModel, PersistedModel {
+public interface ReadingTimeEntry
+	extends PersistedModel, ReadingTimeEntryModel {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
-	 * Never modify this interface directly. Add methods to {@link com.liferay.reading.time.model.impl.ReadingTimeEntryImpl} and rerun ServiceBuilder to automatically copy the method declarations to this interface.
+	 * Never modify this interface directly. Add methods to <code>com.liferay.reading.time.model.impl.ReadingTimeEntryImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
 	 */
-	public static final Accessor<ReadingTimeEntry, Long> READING_TIME_ENTRY_ID_ACCESSOR =
-		new Accessor<ReadingTimeEntry, Long>() {
-			@Override
-			public Long get(ReadingTimeEntry readingTimeEntry) {
-				return readingTimeEntry.getReadingTimeEntryId();
-			}
+	public static final Accessor<ReadingTimeEntry, Long>
+		READING_TIME_ENTRY_ID_ACCESSOR =
+			new Accessor<ReadingTimeEntry, Long>() {
 
-			@Override
-			public Class<Long> getAttributeClass() {
-				return Long.class;
-			}
+				@Override
+				public Long get(ReadingTimeEntry readingTimeEntry) {
+					return readingTimeEntry.getReadingTimeEntryId();
+				}
 
-			@Override
-			public Class<ReadingTimeEntry> getTypeClass() {
-				return ReadingTimeEntry.class;
-			}
-		};
+				@Override
+				public Class<Long> getAttributeClass() {
+					return Long.class;
+				}
+
+				@Override
+				public Class<ReadingTimeEntry> getTypeClass() {
+					return ReadingTimeEntry.class;
+				}
+
+			};
+
 }

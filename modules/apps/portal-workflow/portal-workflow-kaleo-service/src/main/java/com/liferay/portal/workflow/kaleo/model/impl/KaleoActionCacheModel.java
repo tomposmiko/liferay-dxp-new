@@ -32,12 +32,12 @@ import java.util.Date;
  * The cache model class for representing KaleoAction in entity cache.
  *
  * @author Brian Wing Shun Chan
- * @see KaleoAction
  * @generated
  */
 @ProviderType
-public class KaleoActionCacheModel implements CacheModel<KaleoAction>,
-	Externalizable {
+public class KaleoActionCacheModel
+	implements CacheModel<KaleoAction>, Externalizable {
+
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj) {
@@ -48,7 +48,8 @@ public class KaleoActionCacheModel implements CacheModel<KaleoAction>,
 			return false;
 		}
 
-		KaleoActionCacheModel kaleoActionCacheModel = (KaleoActionCacheModel)obj;
+		KaleoActionCacheModel kaleoActionCacheModel =
+			(KaleoActionCacheModel)obj;
 
 		if (kaleoActionId == kaleoActionCacheModel.kaleoActionId) {
 			return true;
@@ -232,8 +233,7 @@ public class KaleoActionCacheModel implements CacheModel<KaleoAction>,
 	}
 
 	@Override
-	public void writeExternal(ObjectOutput objectOutput)
-		throws IOException {
+	public void writeExternal(ObjectOutput objectOutput) throws IOException {
 		objectOutput.writeLong(kaleoActionId);
 
 		objectOutput.writeLong(groupId);
@@ -333,4 +333,5 @@ public class KaleoActionCacheModel implements CacheModel<KaleoAction>,
 	public String scriptLanguage;
 	public String scriptRequiredContexts;
 	public int priority;
+
 }
