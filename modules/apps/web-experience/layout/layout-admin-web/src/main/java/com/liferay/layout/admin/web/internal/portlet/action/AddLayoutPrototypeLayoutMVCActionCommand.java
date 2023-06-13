@@ -22,6 +22,7 @@ import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Layout;
+import com.liferay.portal.kernel.model.LayoutConstants;
 import com.liferay.portal.kernel.model.LayoutPrototype;
 import com.liferay.portal.kernel.portlet.JSONPortletResponseUtil;
 import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
@@ -31,12 +32,12 @@ import com.liferay.portal.kernel.service.LayoutPrototypeService;
 import com.liferay.portal.kernel.service.LayoutService;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextFactory;
+import com.liferay.portal.kernel.servlet.MultiSessionMessages;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
+import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.PropertiesParamUtil;
-import com.liferay.portal.kernel.util.ResourceBundleLoader;
-import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.UnicodeProperties;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.sites.kernel.util.SitesUtil;
@@ -44,7 +45,6 @@ import com.liferay.sites.kernel.util.SitesUtil;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
-import java.util.ResourceBundle;
 
 import javax.portlet.ActionRequest;
 import javax.portlet.ActionResponse;
@@ -83,11 +83,10 @@ public class AddLayoutPrototypeLayoutMVCActionCommand
 		long parentLayoutId = ParamUtil.getLong(
 			actionRequest, "parentLayoutId");
 		String name = ParamUtil.getString(actionRequest, "name");
-		String type = StringPool.BLANK;
 
 		Map<Locale, String> nameMap = new HashMap<>();
 
-		nameMap.put(themeDisplay.getLocale(), name);
+		nameMap.put(LocaleUtil.getSiteDefault(), name);
 
 		ServiceContext serviceContext = ServiceContextFactory.getInstance(
 			Layout.class.getName(), actionRequest);
@@ -107,14 +106,20 @@ public class AddLayoutPrototypeLayoutMVCActionCommand
 
 			Layout layout = _layoutService.addLayout(
 				groupId, privateLayout, parentLayoutId, nameMap,
-				new HashMap<Locale, String>(), new HashMap<Locale, String>(),
-				new HashMap<Locale, String>(), new HashMap<Locale, String>(),
-				type, typeSettingsProperties.toString(), false,
-				new HashMap<Locale, String>(), serviceContext);
+				new HashMap<>(), new HashMap<>(), new HashMap<>(),
+				new HashMap<>(), LayoutConstants.TYPE_PORTLET,
+				typeSettingsProperties.toString(), false, new HashMap<>(),
+				serviceContext);
 
 			// Force propagation from page template to page. See LPS-48430.
 
 			SitesUtil.mergeLayoutPrototypeLayout(layout.getGroup(), layout);
+
+			String portletResource = ParamUtil.getString(
+				actionRequest, "portletResource");
+
+			MultiSessionMessages.add(
+				actionRequest, portletResource + "layoutAdded", layout);
 
 			jsonObject.put("redirectURL", getRedirectURL(actionResponse));
 
@@ -126,14 +131,10 @@ public class AddLayoutPrototypeLayoutMVCActionCommand
 				_log.debug(pe, pe);
 			}
 
-			ResourceBundle resourceBundle =
-				_resourceBundleLoader.loadResourceBundle(
-					themeDisplay.getLocale());
-
 			jsonObject.put(
 				"error",
 				LanguageUtil.get(
-					resourceBundle, "an-unexpected-error-occurred"));
+					themeDisplay.getLocale(), "an-unexpected-error-occurred"));
 
 			JSONPortletResponseUtil.writeJSON(
 				actionRequest, actionResponse, jsonObject);
@@ -162,11 +163,5 @@ public class AddLayoutPrototypeLayoutMVCActionCommand
 
 	@Reference
 	private Portal _portal;
-
-	@Reference(
-		target = "(bundle.symbolic.name=com.liferay.layout.admin.web)",
-		unbind = "-"
-	)
-	private ResourceBundleLoader _resourceBundleLoader;
 
 }

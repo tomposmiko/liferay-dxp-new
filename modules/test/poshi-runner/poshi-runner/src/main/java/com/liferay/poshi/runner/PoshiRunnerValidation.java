@@ -21,8 +21,6 @@ import com.liferay.poshi.runner.util.Validator;
 
 import java.lang.reflect.Method;
 
-import java.net.URL;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -57,9 +55,7 @@ public class PoshiRunnerValidation {
 	}
 
 	public static void validate() throws Exception {
-		for (URL resourceURL : PoshiRunnerContext.getResourceURLs()) {
-			String filePath = resourceURL.getFile();
-
+		for (String filePath : PoshiRunnerContext.getFilePaths()) {
 			if (OSDetector.isWindows()) {
 				filePath = filePath.replace("/", "\\");
 			}
@@ -1476,34 +1472,25 @@ public class PoshiRunnerValidation {
 	protected static void validateTestCaseContext(
 		Element element, String filePath) {
 
+		String namespace = PoshiRunnerContext.getNamespaceFromFilePath(
+			filePath);
+
 		String testName = element.attributeValue("test-case");
-
-		String namespace =
-			PoshiRunnerGetterUtil.getNamespaceFromNamespacedClassCommandName(
-				testName);
-
-		if (namespace != null) {
-			_exceptions.add(
-				new Exception(
-					"Namespace is not supported for nested test case " +
-						"execution \n" + filePath + ":" +
-							element.attributeValue("line-number")));
-		}
 
 		String className =
 			PoshiRunnerGetterUtil.getClassNameFromNamespacedClassCommandName(
-				testName);
-
-		String commandName =
-			PoshiRunnerGetterUtil.getCommandNameFromNamespacedClassCommandName(
 				testName);
 
 		if (className.equals("super")) {
 			className = PoshiRunnerGetterUtil.getExtendedTestCaseName(filePath);
 		}
 
+		String commandName =
+			PoshiRunnerGetterUtil.getCommandNameFromNamespacedClassCommandName(
+				testName);
+
 		validateTestName(
-			className + "#" + commandName,
+			namespace + "." + className + "#" + commandName,
 			filePath + ":" + element.attributeValue("line-number"));
 	}
 

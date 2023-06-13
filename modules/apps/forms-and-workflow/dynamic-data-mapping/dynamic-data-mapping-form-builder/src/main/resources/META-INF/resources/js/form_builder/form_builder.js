@@ -1216,8 +1216,6 @@ AUI.add(
 						visitor.set('fieldHandler', A.bind('_renderField', instance));
 
 						visitor.visit();
-
-						instance._createFieldActions();
 					},
 
 					_renderPages: function() {
@@ -1240,7 +1238,11 @@ AUI.add(
 									{
 										message: Lang.sub(
 											Liferay.Language.get('all-fields-marked-with-x-are-required'),
-											['<i class="icon-asterisk text-warning"></i>']
+											[
+												'<svg aria-hidden="true" class="lexicon-icon lexicon-icon-asterisk reference-mark">' +
+											 		'<use xlink:href="' + themeDisplay.getPathThemeImages() + '/lexicon/icons.svg#asterisk" />' +
+												'</svg>'
+											]
 										)
 									}
 								)

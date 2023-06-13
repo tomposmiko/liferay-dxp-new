@@ -1,29 +1,38 @@
-/* global AlloyEditor, CKEDITOR */
-
 import Component from 'metal-component';
 import {Config} from 'metal-state';
+import {isFunction, isObject, object} from 'metal';
 import Soy from 'metal-soy';
 
 import templates from './FragmentEntryLink.soy';
+
+const ARROW_DOWN_KEYCODE = 40;
+
+const ARROW_UP_KEYCODE = 38;
 
 /**
  * FragmentEntryLink
  * @review
  */
+
 class FragmentEntryLink extends Component {
+
 	/**
 	 * @inheritDoc
 	 * @review
 	 */
+
 	created() {
 		this._handleEditorChange = this._handleEditorChange.bind(this);
+
+		Liferay.on('beforeNavigate', () => this._destroyEditors());
 	}
 
 	/**
 	 * @inheritDoc
 	 * @review
 	 */
-	detached() {
+
+	disposed() {
 		this._destroyEditors();
 	}
 
@@ -31,10 +40,15 @@ class FragmentEntryLink extends Component {
 	 * @inheritDoc
 	 * @review
 	 */
+
 	prepareStateForRender(state) {
-		return Object.assign({}, state, {
-			content: this.content ? Soy.toIncDom(this.content) : null,
-		});
+		return Object.assign(
+			{},
+			state,
+			{
+				content: this.content ? Soy.toIncDom(this.content) : null
+			}
+		);
 	}
 
 	/**
@@ -43,11 +57,12 @@ class FragmentEntryLink extends Component {
 	 * @inheritDoc
 	 * @review
 	 */
+
 	rendered() {
 		if (this.refs.content) {
 			this._destroyEditors();
-			this._enableEditableFields(this.refs.content);
 			this._executeFragmentScripts(this.refs.content);
+			this._enableEditableFields(this.refs.content);
 		}
 	}
 
@@ -55,6 +70,7 @@ class FragmentEntryLink extends Component {
 	 * @inheritDoc
 	 * @review
 	 */
+
 	shouldUpdate(changes) {
 		return !!changes.content;
 	}
@@ -64,12 +80,31 @@ class FragmentEntryLink extends Component {
 	 * @private
 	 * @review
 	 */
+
 	_destroyEditors() {
-		this._editors.forEach(editor => {
-			editor.destroy();
-		});
+		this._editors.forEach(
+			editor => {
+				editor.destroy();
+			}
+		);
 
 		this._editors = [];
+	}
+
+	/**
+	 * Emits a move event with the fragmentEntryLinkId and the direction.
+	 * @param {!number} direction
+	 * @private
+	 */
+
+	_emitMoveEvent(direction) {
+		this.emit(
+			'move',
+			{
+				direction,
+				fragmentEntryLinkId: this.fragmentEntryLinkId
+			}
+		);
 	}
 
 	/**
@@ -78,61 +113,79 @@ class FragmentEntryLink extends Component {
 	 * @private
 	 * @review
 	 */
+
 	_enableEditableFields(content) {
 		this._editors = [].slice
 			.call(content.querySelectorAll('lfr-editable'))
-			.map(editableElement => {
-				const wrapper = document.createElement('div');
-				const editableId = editableElement.id;
-				const editableContent =
-					typeof this.editableValues[editableId] === 'undefined'
-						? editableElement.innerHTML
-						: this.editableValues[editableId];
+			.map(
+				editableElement => {
+					const editableId = editableElement.id;
 
-				wrapper.dataset.lfrEditableId = editableId;
-				wrapper.innerHTML = editableContent;
+					const editableContent = editableElement.innerHTML;
 
-				editableElement.parentNode.replaceChild(
-					wrapper,
-					editableElement
-				);
+					const wrapper = document.createElement('div');
 
-				const editor = AlloyEditor.editable(wrapper, {
-					enterMode: CKEDITOR.ENTER_BR,
-					extraPlugins: [
-						'ae_autolink',
-						'ae_dragresize',
-						'ae_addimages',
-						'ae_imagealignment',
-						'ae_placeholder',
-						'ae_selectionregion',
-						'ae_tableresize',
-						'ae_tabletools',
-						'ae_uicore',
-						'itemselector',
-						'media',
-						'adaptivemedia',
-					].join(','),
-					removePlugins: [
-						'contextmenu',
-						'elementspath',
-						'image',
-						'link',
-						'liststyle',
-						'magicline',
-						'resize',
-						'tabletools',
-						'toolbar',
-						'ae_embed',
-					].join(','),
-				});
+					wrapper.dataset.lfrEditableId = editableId;
+					wrapper.innerHTML = editableContent;
 
-				editor
-					.get('nativeEditor')
-					.on('change', this._handleEditorChange);
+					editableElement.parentNode.replaceChild(
+						wrapper,
+						editableElement
+					);
 
-				return editor;
-			});
+					const editor = AlloyEditor.editable(
+						wrapper,
+						object.mixin(
+							this.defaultEditorConfiguration.editorConfig,
+							{
+								enterMode: CKEDITOR.ENTER_BR,
+								extraPlugins: [
+									'ae_autolink',
+									'ae_dragresize',
+									'ae_addimages',
+									'ae_imagealignment',
+									'ae_placeholder',
+									'ae_selectionregion',
+									'ae_tableresize',
+									'ae_tabletools',
+									'ae_uicore',
+									'itemselector',
+									'media',
+									'adaptivemedia'
+								].join(','),
+								removePlugins: [
+									'contextmenu',
+									'elementspath',
+									'image',
+									'link',
+									'liststyle',
+									'magicline',
+									'resize',
+									'tabletools',
+									'toolbar',
+									'ae_embed'
+								].join(',')
+							}
+						)
+					);
+
+					const nativeEditor = editor.get('nativeEditor');
+
+					nativeEditor.name = `${this.portletNamespace}fragmentEntryLink_`;
+
+					nativeEditor.on(
+						'change',
+						this._handleEditorChange
+					);
+
+					nativeEditor.on(
+						'selectionChange',
+						this._handleEditorChange
+					);
+
+					return editor;
+				}
+			);
 	}
 
 	/**
@@ -142,15 +195,18 @@ class FragmentEntryLink extends Component {
 	 * @private
 	 * @review
 	 */
-	_executeFragmentScripts(content) {
-		content.querySelectorAll('script').forEach(script => {
-			const parentNode = script.parentNode;
-			const newScript = document.createElement('script');
 
-			newScript.innerHTML = script.innerHTML;
-			parentNode.removeChild(script);
-			parentNode.appendChild(newScript);
-		});
+	_executeFragmentScripts(content) {
+		AUI().use(
+			'aui-parse-content',
+			A => {
+				const content = A.one(this.refs.content);
+
+				content.plug(A.Plugin.ParseContent);
+
+				content.setContent(this.content);
+			}
+		);
 	}
 
 	/**
@@ -160,26 +216,91 @@ class FragmentEntryLink extends Component {
 	 * @private
 	 * @review
 	 */
+
 	_handleEditorChange(event) {
-		this.emit('editableChanged', {
-			editableId: event.editor.element.$.dataset.lfrEditableId,
-			fragmentEntryLinkId: this.fragmentEntryLinkId,
-			value: event.editor.getData(),
-		});
+		this.emit(
+			'editableChanged',
+			{
+				editableId: event.editor.element.$.dataset.lfrEditableId,
+				fragmentEntryLinkId: this.fragmentEntryLinkId,
+				value: event.editor.getData()
+			}
+		);
+	}
+
+	/**
+	 * Handle fragment keyup event so it can emit when it
+	 * should be moved or selected.
+	 * @param {KeyboardEvent} event
+	 * @private
+	 * @review
+	 */
+
+	_handleFragmentKeyUp(event) {
+		if (document.activeElement === this.refs.fragmentEntryLinkWrapper) {
+			switch (event.which) {
+			case ARROW_DOWN_KEYCODE:
+				this._emitMoveEvent(FragmentEntryLink.MOVE_DIRECTIONS.DOWN);
+				break;
+			case ARROW_UP_KEYCODE:
+				this._emitMoveEvent(FragmentEntryLink.MOVE_DIRECTIONS.UP);
+				break;
+			}
+		}
+	}
+
+	/**
+	 * Callback executed when the fragment move down button is clicked.
+	 * It emits a 'moveDown' event with
+	 * the FragmentEntryLink id.
+	 * @private
+	 * @review
+	 */
+
+	_handleFragmentMoveDownButtonClick() {
+		this._emitMoveEvent(FragmentEntryLink.MOVE_DIRECTIONS.DOWN);
+	}
+
+	/**
+	 * Callback executed when the fragment move up button is clicked.
+	 * It emits a 'moveUp' event with
+	 * the FragmentEntryLink id.
+	 * @private
+	 * @review
+	 */
+
+	_handleFragmentMoveUpButtonClick() {
+		this._emitMoveEvent(FragmentEntryLink.MOVE_DIRECTIONS.UP);
 	}
 
 	/**
 	 * Callback executed when the fragment remove button is clicked.
-	 * It emits a 'fragmentRemoveButtonClick' event with
+	 * It emits a 'remove' event with
 	 * the FragmentEntryLink id.
 	 * @private
 	 */
+
 	_handleFragmentRemoveButtonClick() {
-		this.emit('fragmentRemoveButtonClick', {
-			fragmentEntryLinkId: this.fragmentEntryLinkId,
-		});
+		this.emit(
+			'remove',
+			{
+				fragmentEntryLinkId: this.fragmentEntryLinkId
+			}
+		);
 	}
 }
+
+/**
+ * Directions where a fragment can be moved to
+ * @review
+ * @static
+ * @type {!object}
+ */
+
+FragmentEntryLink.MOVE_DIRECTIONS = {
+	DOWN: 1,
+	UP: -1
+};
 
 /**
  * State definition.
@@ -187,7 +308,9 @@ class FragmentEntryLink extends Component {
  * @static
  * @type {!Object}
  */
+
 FragmentEntryLink.STATE = {
+
 	/**
 	 * Fragment content to be rendered
 	 * @default ''
@@ -196,7 +319,25 @@ FragmentEntryLink.STATE = {
 	 * @review
 	 * @type {string}
 	 */
-	content: Config.string().value(''),
+
+	content: Config.any()
+		.setter(
+			content => {
+				return !isFunction(content) && isObject(content) ? content.value.content : content;
+			}
+		)
+		.value(''),
+
+	/**
+	 * Default configuration for AlloyEditor instances.
+	 * @default {}
+	 * @instance
+	 * @memberOf FragmentEntryLink
+	 * @review
+	 * @type {object}
+	 */
+
+	defaultEditorConfiguration: Config.object().value({}),
 
 	/**
 	 * Editable values that should be used instead of the default ones
@@ -207,6 +348,7 @@ FragmentEntryLink.STATE = {
 	 * @review
 	 * @type {!Object}
 	 */
+
 	editableValues: Config.object().value({}),
 
 	/**
@@ -217,6 +359,7 @@ FragmentEntryLink.STATE = {
 	 * @review
 	 * @type {!string}
 	 */
+
 	fragmentEntryLinkId: Config.string().required(),
 
 	/**
@@ -227,7 +370,30 @@ FragmentEntryLink.STATE = {
 	 * @review
 	 * @type {string}
 	 */
+
 	name: Config.string().value(''),
+
+	/**
+	 * Shows FragmentEntryLink control toolbar
+	 * @default true
+	 * @instance
+	 * @memberOf FragmentEntryLink
+	 * @review
+	 * @type {!bool}
+	 */
+
+	showControlBar: Config.bool().value(true),
+
+	/**
+	 * Portlet namespace needed for prefixing Alloy Editor instances
+	 * @default undefined
+	 * @instance
+	 * @memberOf FragmentEntryLink
+	 * @review
+	 * @type {!string}
+	 */
+
+	portletNamespace: Config.string().required(),
 
 	/**
 	 * Fragment spritemap
@@ -237,6 +403,7 @@ FragmentEntryLink.STATE = {
 	 * @review
 	 * @type {!string}
 	 */
+
 	spritemap: Config.string().required(),
 
 	/**
@@ -248,9 +415,10 @@ FragmentEntryLink.STATE = {
 	 * @review
 	 * @type {Array<AlloyEditor>}
 	 */
+
 	_editors: Config.arrayOf(Config.object())
 		.internal()
-		.value([]),
+		.value([])
 };
 
 Soy.register(FragmentEntryLink, templates);

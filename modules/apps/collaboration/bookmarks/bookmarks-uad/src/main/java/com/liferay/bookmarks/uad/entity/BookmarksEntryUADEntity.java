@@ -18,9 +18,6 @@ import com.liferay.bookmarks.model.BookmarksEntry;
 import com.liferay.bookmarks.uad.constants.BookmarksUADConstants;
 import com.liferay.user.associated.data.entity.BaseUADEntity;
 
-import java.util.HashMap;
-import java.util.Map;
-
 /**
  * @author Noah Sherrill
  */
@@ -36,20 +33,14 @@ public class BookmarksEntryUADEntity extends BaseUADEntity {
 		_bookmarksEntry = bookmarksEntry;
 	}
 
-	public BookmarksEntry getBookmarksEntry() {
-		return _bookmarksEntry;
+	@Override
+	public Object clone() {
+		return new BookmarksEntryUADEntity(
+			getUserId(), getUADEntityId(), _bookmarksEntry);
 	}
 
-	@Override
-	public Map<String, Object> getEntityNonanonymizableFieldValues() {
-		Map<String, Object> entityNonanonymizableFieldValues = new HashMap<>();
-
-		entityNonanonymizableFieldValues.put(
-			"description", _bookmarksEntry.getDescription());
-		entityNonanonymizableFieldValues.put("name", _bookmarksEntry.getName());
-		entityNonanonymizableFieldValues.put("url", _bookmarksEntry.getUrl());
-
-		return entityNonanonymizableFieldValues;
+	public BookmarksEntry getBookmarksEntry() {
+		return _bookmarksEntry;
 	}
 
 	private final BookmarksEntry _bookmarksEntry;

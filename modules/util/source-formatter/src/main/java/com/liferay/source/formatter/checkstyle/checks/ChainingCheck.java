@@ -15,6 +15,7 @@
 package com.liferay.source.formatter.checkstyle.checks;
 
 import com.liferay.petra.string.CharPool;
+import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.source.formatter.checkstyle.util.DetailASTUtil;
@@ -39,15 +40,19 @@ public class ChainingCheck extends BaseCheck {
 	}
 
 	public void setAllowedClassNames(String allowedClassNames) {
-		_allowedClassNames = StringUtil.split(allowedClassNames);
+		_allowedClassNames = ArrayUtil.append(
+			_allowedClassNames, StringUtil.split(allowedClassNames));
 	}
 
 	public void setAllowedMethodNames(String allowedMethodNames) {
-		_allowedMethodNames = StringUtil.split(allowedMethodNames);
+		_allowedMethodNames = ArrayUtil.append(
+			_allowedMethodNames, StringUtil.split(allowedMethodNames));
 	}
 
 	public void setAllowedVariableTypeNames(String allowedVariableTypeNames) {
-		_allowedVariableTypeNames = StringUtil.split(allowedVariableTypeNames);
+		_allowedVariableTypeNames = ArrayUtil.append(
+			_allowedVariableTypeNames,
+			StringUtil.split(allowedVariableTypeNames));
 	}
 
 	@Override
@@ -302,21 +307,25 @@ public class ChainingCheck extends BaseCheck {
 			nameAST = dotAST.findFirstToken(TokenTypes.IDENT);
 		}
 
-		String classOrVariableName = nameAST.getText();
+		if (nameAST != null) {
+			String classOrVariableName = nameAST.getText();
 
-		for (String allowedClassName : _allowedClassNames) {
-			if (classOrVariableName.matches(allowedClassName)) {
-				return true;
-			}
-		}
-
-		String variableTypeName = DetailASTUtil.getVariableTypeName(
-			methodCallAST, classOrVariableName);
-
-		if (Validator.isNotNull(variableTypeName)) {
-			for (String allowedVariableTypeName : _allowedVariableTypeNames) {
-				if (variableTypeName.matches(allowedVariableTypeName)) {
+			for (String allowedClassName : _allowedClassNames) {
+				if (classOrVariableName.matches(allowedClassName)) {
 					return true;
+				}
+			}
+
+			String variableTypeName = DetailASTUtil.getVariableTypeName(
+				methodCallAST, classOrVariableName);
+
+			if (Validator.isNotNull(variableTypeName)) {
+				for (String allowedVariableTypeName :
+						_allowedVariableTypeNames) {
+
+					if (variableTypeName.matches(allowedVariableTypeName)) {
+						return true;
+					}
 				}
 			}
 		}

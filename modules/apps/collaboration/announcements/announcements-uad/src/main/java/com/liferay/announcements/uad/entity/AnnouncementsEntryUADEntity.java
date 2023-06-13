@@ -18,9 +18,6 @@ import com.liferay.announcements.kernel.model.AnnouncementsEntry;
 import com.liferay.announcements.uad.constants.AnnouncementsUADConstants;
 import com.liferay.user.associated.data.entity.BaseUADEntity;
 
-import java.util.HashMap;
-import java.util.Map;
-
 /**
  * @author Noah Sherrill
  */
@@ -39,18 +36,6 @@ public class AnnouncementsEntryUADEntity extends BaseUADEntity {
 
 	public AnnouncementsEntry getAnnouncementsEntry() {
 		return _announcementsEntry;
-	}
-
-	@Override
-	public Map<String, Object> getEntityNonanonymizableFieldValues() {
-		Map<String, Object> entityNonanonymizableFieldValues = new HashMap<>();
-
-		entityNonanonymizableFieldValues.put(
-			"content", _announcementsEntry.getContent());
-		entityNonanonymizableFieldValues.put(
-			"title", _announcementsEntry.getTitle());
-
-		return entityNonanonymizableFieldValues;
 	}
 
 	private final AnnouncementsEntry _announcementsEntry;

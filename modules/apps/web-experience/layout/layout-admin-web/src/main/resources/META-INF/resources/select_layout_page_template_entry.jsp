@@ -26,19 +26,12 @@ renderResponse.setTitle(LanguageUtil.get(request, "select-template"));
 %>
 
 <clay:navigation-bar
-	inverted="<%= true %>"
 	items="<%= selectLayoutPageTemplateEntryDisplayContext.getNavigationItems() %>"
 />
 
 <aui:form cssClass="container-fluid-1280" name="fm">
 	<c:choose>
-		<c:when test="<%= selectLayoutPageTemplateEntryDisplayContext.isBasicPages() %>">
-			<liferay-util:include page="/select_basic_pages.jsp" servletContext="<%= application %>" />
-		</c:when>
-		<c:when test="<%= selectLayoutPageTemplateEntryDisplayContext.isGlobalTemplates() %>">
-			<liferay-util:include page="/select_global_templates.jsp" servletContext="<%= application %>" />
-		</c:when>
-		<c:otherwise>
+		<c:when test="<%= selectLayoutPageTemplateEntryDisplayContext.isContentPages() %>">
 			<liferay-ui:search-container
 				id="layoutPageTemplateEntries"
 				total="<%= selectLayoutPageTemplateEntryDisplayContext.getLayoutPageTemplateEntriesCount() %>"
@@ -82,15 +75,23 @@ renderResponse.setTitle(LanguageUtil.get(request, "select-template"));
 					</liferay-ui:search-container-column-text>
 				</liferay-ui:search-container-row>
 
-				<liferay-ui:search-iterator displayStyle="icon" markupView="lexicon" />
+				<liferay-ui:search-iterator
+					displayStyle="icon"
+					markupView="lexicon"
+				/>
 			</liferay-ui:search-container>
 
 			<portlet:actionURL name="/layout/add_content_layout" var="addLayoutURL">
 				<portlet:param name="mvcPath" value="/select_layout_page_template_entry.jsp" />
 				<portlet:param name="groupId" value="<%= String.valueOf(layoutsAdminDisplayContext.getGroupId()) %>" />
+				<portlet:param name="portletResource" value="<%= portletDisplay.getPortletName() %>" />
 				<portlet:param name="parentLayoutId" value="<%= String.valueOf(layoutsAdminDisplayContext.getParentLayoutId()) %>" />
 				<portlet:param name="privateLayout" value="<%= String.valueOf(layoutsAdminDisplayContext.isPrivateLayout()) %>" />
 			</portlet:actionURL>
+
+			<%
+			String autoSiteNavigationMenuNames = layoutsAdminDisplayContext.getAutoSiteNavigationMenuNames();
+			%>
 
 			<aui:script require="metal-dom/src/all/dom as dom,frontend-js-web/liferay/modal/commands/OpenSimpleInputModal.es as modalCommands">
 				var addLayoutActionOptionQueryClickHandler = dom.delegate(
@@ -102,9 +103,15 @@ renderResponse.setTitle(LanguageUtil.get(request, "select-template"));
 
 						modalCommands.openSimpleInputModal(
 							{
+								<c:if test="<%= Validator.isNotNull(autoSiteNavigationMenuNames) %>">
+									checkboxFieldLabel: '<liferay-ui:message arguments="<%= autoSiteNavigationMenuNames %>" key="add-this-page-to-the-following-menus-x" />',
+									checkboxFieldName: 'TypeSettingsProperties--addToAutoMenus--',
+									checkboxFieldValue: true,
+								</c:if>
+
 								dialogTitle: '<liferay-ui:message key="add-page" />',
 								formSubmitURL: '<%= addLayoutURL %>',
-								idFieldName: 'layoutPageTemplateEntryId',
+								idFieldName: 'TypeSettingsProperties--layoutPageTemplateEntryId--',
 								idFieldValue: actionElement.dataset.layoutPageTemplateEntryId,
 								mainFieldName: 'name',
 								mainFieldLabel: '<liferay-ui:message key="name" />',
@@ -123,6 +130,12 @@ renderResponse.setTitle(LanguageUtil.get(request, "select-template"));
 
 				Liferay.on('destroyPortlet', handleDestroyPortlet);
 			</aui:script>
+		</c:when>
+		<c:when test="<%= selectLayoutPageTemplateEntryDisplayContext.isBasicPages() %>">
+			<liferay-util:include page="/select_basic_pages.jsp" servletContext="<%= application %>" />
+		</c:when>
+		<c:otherwise>
+			<liferay-util:include page="/select_global_templates.jsp" servletContext="<%= application %>" />
 		</c:otherwise>
 	</c:choose>
 </aui:form>

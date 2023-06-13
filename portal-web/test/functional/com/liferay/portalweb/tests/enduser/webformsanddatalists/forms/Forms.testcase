@@ -159,6 +159,14 @@
 
 		<execute macro="Form#closeSidebar" />
 
+		<execute macro="Form#saveElementSet" />
+
+		<execute macro="FormsAdminNavigator#gotoBack" />
+
+		<execute macro="FormsAdminNavigator#gotoEdit">
+			<var name="formName" value="Element Set 1" />
+		</execute>
+
 		<execute macro="DDLRecord#addTranslation">
 			<var name="localizedLanguage" value="Chinese (China)" />
 		</execute>
@@ -241,13 +249,85 @@
 
 		<execute macro="Form#closeSidebar" />
 
-		<execute macro="Form#gotoAddElementSet">
-			<var name="elementSetTitle" value="Element Set 1" />
+		<execute macro="FormsAdminNavigator#gotoEditField">
+			<var name="fieldName" value="TextFieldRequired" />
+		</execute>
+
+		<execute macro="FormFields#getFieldName">
+			<return from="fieldName" name="fieldName1" />
 		</execute>
 
 		<execute macro="Form#closeSidebar" />
 
-		<execute macro="Form#save" />
+		<execute macro="Form#gotoAddElementSet">
+			<var name="elementSetTitle" value="Element Set 1" />
+		</execute>
+
+		<execute macro="FormsAdminNavigator#gotoEditField">
+			<var name="fieldName" value="TextFieldRequired" />
+		</execute>
+
+		<execute macro="FormFields#getFieldName">
+			<return from="fieldName" name="fieldName2" />
+		</execute>
+
+		<execute macro="Form#closeSidebar" />
+
+		<execute macro="Form#publishForm" />
+
+		<execute macro="FormsAdminNavigator#gotoPublishedForm" />
+
+		<execute macro="FormFields#viewTextLabel">
+			<var name="fieldLabel" value="Text Field Required" />
+			<var name="fieldName" value="${fieldName1}" />
+		</execute>
+
+		<execute macro="FormFields#viewRequiredAsterisk" />
+
+		<execute macro="FormFields#viewSelectLabel">
+			<var name="fieldLabel" value="Select Repeatable" />
+			<var name="fieldName" value="SelectRepeatable" />
+		</execute>
+
+		<execute macro="FormFields#viewTextLabel">
+			<var name="fieldLabel" value="Text Field Required" />
+			<var name="fieldName" value="${fieldName2}" />
+		</execute>
+
+		<execute macro="FormPortlet#changeLocale">
+			<var name="locale" value="zh-cn" />
+		</execute>
+
+		<execute macro="FormFields#viewTextLabel">
+			<var name="fieldLabel" value="表格文本" />
+			<var name="fieldName" value="${fieldName1}" />
+		</execute>
+
+		<execute macro="FormFields#viewRequiredAsterisk" />
+
+		<execute macro="FormFields#viewSelectLabel">
+			<var name="fieldLabel" value="表单选择" />
+			<var name="fieldName" value="SelectRepeatable" />
+		</execute>
+
+		<execute macro="FormFields#viewTextLabel">
+			<var name="fieldLabel" value="表格文本" />
+			<var name="fieldName" value="${fieldName2}" />
+		</execute>
+
+		<execute macro="FormFields#editText">
+			<var name="fieldName" value="${fieldName1}" />
+			<var name="fieldValue" value="文本输入中文" />
+		</execute>
+
+		<execute macro="FormFields#editText">
+			<var name="fieldName" value="${fieldName2}" />
+			<var name="fieldValue" value="文本再次输入中文" />
+		</execute>
+
+		<execute macro="FormPortlet#submitLocalizedSuccessfully">
+			<var name="buttonName" value="提交" />
+		</execute>
 
 		<execute macro="ProductMenu#gotoPortlet">
 			<var name="category" value="Content" />
@@ -1062,12 +1142,10 @@
 			<var name="portlet" value="System Settings" />
 		</execute>
 
-		<execute macro="Navigator#gotoNavItem">
-			<var name="navItem" value="Forms and Workflow" />
-		</execute>
-
-		<execute macro="SystemSettings#editConfiguration">
+		<execute macro="SystemSettings#gotoConfiguration">
+			<var name="configurationCategory" value="Dynamic Data Mapping" />
 			<var name="configurationName" value="Forms" />
+			<var name="configurationScope" value="Site Scope" />
 		</execute>
 
 		<execute macro="FormFields#viewTextLabel">
@@ -1773,12 +1851,10 @@
 			<var name="portlet" value="System Settings" />
 		</execute>
 
-		<execute macro="Navigator#gotoNavItem">
-			<var name="navItem" value="Forms and Workflow" />
-		</execute>
-
-		<execute macro="SystemSettings#editConfiguration">
+		<execute macro="SystemSettings#gotoConfiguration">
+			<var name="configurationCategory" value="Dynamic Data Lists" />
 			<var name="configurationName" value="Dynamic Data Lists" />
+			<var name="configurationScope" value="System Scope" />
 		</execute>
 
 		<execute macro="FormFields#viewCheckboxLabel">
@@ -1815,8 +1891,12 @@
 
 		<execute macro="SystemSettings#saveConfiguration" />
 
-		<execute macro="SystemSettings#editConfiguration">
+		<execute macro="SystemSettings#exitEditConfiguration" />
+
+		<execute macro="SystemSettings#gotoConfiguration">
+			<var name="configurationCategory" value="Dynamic Data Lists" />
 			<var name="configurationName" value="Dynamic Data Lists" />
+			<var name="configurationScope" value="System Scope" />
 		</execute>
 
 		<execute macro="FormFields#viewCheckboxChecked">
@@ -1828,15 +1908,16 @@
 			<var name="selectOption" value="Descriptive" />
 		</execute>
 
-		<execute macro="SystemSettings#exitEditConfiguration" />
-
 		<execute macro="SystemSettings#resetConfiguration">
 			<var name="configurationName" value="Dynamic Data Lists" />
-			<var name="navItem" value="Forms and Workflow" />
 		</execute>
 
-		<execute macro="SystemSettings#editConfiguration">
+		<execute macro="SystemSettings#exitEditConfiguration" />
+
+		<execute macro="SystemSettings#gotoConfiguration">
+			<var name="configurationCategory" value="Dynamic Data Mapping" />
 			<var name="configurationName" value="Dynamic Data Mapping Service" />
+			<var name="configurationScope" value="Site Scope" />
 		</execute>
 
 		<execute macro="FormFields#viewRepeatableTextMultilineField">
@@ -1883,8 +1964,12 @@
 
 		<execute macro="SystemSettings#saveConfiguration" />
 
-		<execute macro="SystemSettings#editConfiguration">
+		<execute macro="SystemSettings#exitEditConfiguration" />
+
+		<execute macro="SystemSettings#gotoConfiguration">
+			<var name="configurationCategory" value="Dynamic Data Mapping" />
 			<var name="configurationName" value="Dynamic Data Mapping Service" />
+			<var name="configurationScope" value="Site Scope" />
 		</execute>
 
 		<execute macro="FormFields#viewRepeatableTextMultilineValue">
@@ -1908,15 +1993,14 @@
 
 		<execute macro="SystemSettings#resetConfiguration">
 			<var name="configurationName" value="Dynamic Data Mapping Service" />
-			<var name="navItem" value="Forms and Workflow" />
 		</execute>
 
-		<execute macro="Navigator#gotoNavItem">
-			<var name="navItem" value="Other" />
-		</execute>
+		<execute macro="SystemSettings#exitEditConfiguration" />
 
-		<execute macro="SystemSettings#editConfiguration">
+		<execute macro="SystemSettings#gotoConfiguration">
+			<var name="configurationCategory" value="Third Party" />
 			<var name="configurationName" value="Apache Felix Declarative Service Implementation" />
+			<var name="configurationScope" value="System Scope" />
 		</execute>
 
 		<execute macro="FormFields#viewTextField">
@@ -1938,12 +2022,10 @@
 
 		<execute macro="SystemSettings#exitEditConfiguration" />
 
-		<execute macro="Navigator#gotoNavItem">
-			<var name="navItem" value="Foundation" />
-		</execute>
-
-		<execute macro="SystemSettings#editConfiguration">
+		<execute macro="SystemSettings#gotoConfiguration">
+			<var name="configurationCategory" value="Frontend Infrastructure" />
 			<var name="configurationName" value="JavaScript Loader" />
+			<var name="configurationScope" value="System Scope" />
 		</execute>
 
 		<execute macro="FormFields#viewCheckboxLabel">
@@ -1977,8 +2059,12 @@
 
 		<execute macro="SystemSettings#saveConfiguration" />
 
-		<execute macro="SystemSettings#editConfiguration">
+		<execute macro="SystemSettings#exitEditConfiguration" />
+
+		<execute macro="SystemSettings#gotoConfiguration">
+			<var name="configurationCategory" value="Frontend Infrastructure" />
 			<var name="configurationName" value="JavaScript Loader" />
+			<var name="configurationScope" value="System Scope" />
 		</execute>
 
 		<for list="applyVersioning,exposeGlobal" param="fieldName">
@@ -1991,7 +2077,6 @@
 
 		<execute macro="SystemSettings#resetConfiguration">
 			<var name="configurationName" value="JavaScript Loader" />
-			<var name="navItem" value="Foundation" />
 		</execute>
 	</command>
 
@@ -2015,12 +2100,10 @@
 			<var name="portlet" value="System Settings" />
 		</execute>
 
-		<execute macro="Navigator#gotoNavItem">
-			<var name="navItem" value="Forms and Workflow" />
-		</execute>
-
-		<execute macro="SystemSettings#editConfiguration">
+		<execute macro="SystemSettings#gotoConfiguration">
+			<var name="configurationCategory" value="Dynamic Data Mapping" />
 			<var name="configurationName" value="Forms" />
+			<var name="configurationScope" value="Site Scope" />
 		</execute>
 
 		<execute macro="FormFields#viewSelectOption">
@@ -2051,9 +2134,14 @@
 			<var name="portlet" value="System Settings" />
 		</execute>
 
+		<execute macro="SystemSettings#gotoConfiguration">
+			<var name="configurationCategory" value="Dynamic Data Mapping" />
+			<var name="configurationName" value="Forms" />
+			<var name="configurationScope" value="Site Scope" />
+		</execute>
+
 		<execute macro="SystemSettings#resetConfiguration">
 			<var name="configurationName" value="Forms" />
-			<var name="navItem" value="Forms and Workflow" />
 		</execute>
 
 		<execute macro="ProductMenu#gotoPortlet">
@@ -3469,7 +3557,7 @@
 
 		<execute macro="PortletEntry#save" />
 
-		<for list="private,public" param="formAccessLevel" >
+		<for list="private,public" param="formAccessLevel">
 			<if>
 				<equals arg1="${formAccessLevel}" arg2="private" />
 				<then>
@@ -3571,7 +3659,7 @@
 		</execute>
 
 		<execute macro="FormFields#selectTextFieldLineOption">
-			<var name="textFieldLineOption" value="multiline" />
+			<var name="textFieldLineOption" value="Multiple Lines" />
 		</execute>
 
 		<execute macro="FormFields#enableSwitcher">
@@ -4345,7 +4433,7 @@
 		</execute>
 
 		<execute macro="FormFields#selectTextFieldLineOption">
-			<var name="textFieldLineOption" value="multiline" />
+			<var name="textFieldLineOption" value="Multiple Lines" />
 		</execute>
 
 		<execute macro="FormFields#enableSwitcher">
@@ -5369,7 +5457,7 @@
 
 		<execute macro="Form#gotoAdvancedTab" />
 
-		<execute macro="FormFields#enableSwitcher">
+		<execute macro="FormFields#disableSwitcher">
 			<var name="fieldName" value="showLabel" />
 		</execute>
 

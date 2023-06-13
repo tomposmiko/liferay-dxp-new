@@ -37,6 +37,7 @@ import javax.servlet.jsp.PageContext;
 
 /**
  * @author Eudaldo Alonso
+ * @author Marco Leo
  */
 public class ScreenNavigationTag extends IncludeTag {
 
@@ -72,8 +73,16 @@ public class ScreenNavigationTag extends IncludeTag {
 		return _context;
 	}
 
+	public void setContainerCssClass(String containerCssClass) {
+		_containerCssClass = containerCssClass;
+	}
+
 	public void setContext(Object context) {
 		_context = context;
+	}
+
+	public void setFullContainerCssClass(String fullContainerCssClass) {
+		_fullContainerCssClass = fullContainerCssClass;
 	}
 
 	public void setId(String id) {
@@ -86,6 +95,10 @@ public class ScreenNavigationTag extends IncludeTag {
 
 	public void setModelBean(Object modelBean) {
 		_modelBean = modelBean;
+	}
+
+	public void setNavCssClass(String navCssClass) {
+		_navCssClass = navCssClass;
 	}
 
 	@Override
@@ -101,6 +114,8 @@ public class ScreenNavigationTag extends IncludeTag {
 
 	@Override
 	protected void cleanUp() {
+		super.cleanUp();
+
 		_containerCssClass = "col-md-9";
 		_context = null;
 		_fullContainerCssClass = "col-md-12";

@@ -14,17 +14,12 @@
 
 package com.liferay.user.associated.data.entity;
 
-import java.util.HashMap;
-import java.util.Map;
+import com.liferay.portal.kernel.model.StagedModel;
 
 /**
  * @author William Newbury
  */
-public interface UADEntity {
-
-	public default Map<String, Object> getEntityNonanonymizableFieldValues() {
-		return new HashMap<>();
-	}
+public interface UADEntity extends StagedModel {
 
 	public String getUADEntityId();
 

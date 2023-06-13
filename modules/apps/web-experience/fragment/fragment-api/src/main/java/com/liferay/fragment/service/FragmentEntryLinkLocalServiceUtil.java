@@ -54,6 +54,17 @@ public class FragmentEntryLinkLocalServiceUtil {
 	}
 
 	public static com.liferay.fragment.model.FragmentEntryLink addFragmentEntryLink(
+		long groupId, long originalFragmentEntryLinkId, long fragmentEntryId,
+		long classNameId, long classPK, java.lang.String css,
+		java.lang.String html, java.lang.String js,
+		java.lang.String editableValues, int position) {
+		return getService()
+				   .addFragmentEntryLink(groupId, originalFragmentEntryLinkId,
+			fragmentEntryId, classNameId, classPK, css, html, js,
+			editableValues, position);
+	}
+
+	public static com.liferay.fragment.model.FragmentEntryLink addFragmentEntryLink(
 		long groupId, long fragmentEntryId, long classNameId, long classPK,
 		java.lang.String css, java.lang.String html, java.lang.String js,
 		java.lang.String editableValues, int position) {
@@ -271,6 +282,18 @@ public class FragmentEntryLinkLocalServiceUtil {
 	public static com.liferay.fragment.model.FragmentEntryLink updateFragmentEntryLink(
 		com.liferay.fragment.model.FragmentEntryLink fragmentEntryLink) {
 		return getService().updateFragmentEntryLink(fragmentEntryLink);
+	}
+
+	public static com.liferay.fragment.model.FragmentEntryLink updateFragmentEntryLink(
+		long fragmentEntryLinkId, int position) {
+		return getService()
+				   .updateFragmentEntryLink(fragmentEntryLinkId, position);
+	}
+
+	public static com.liferay.fragment.model.FragmentEntryLink updateFragmentEntryLink(
+		long fragmentEntryLinkId, java.lang.String editableValues) {
+		return getService()
+				   .updateFragmentEntryLink(fragmentEntryLinkId, editableValues);
 	}
 
 	public static void updateFragmentEntryLinks(long groupId, long classNameId,

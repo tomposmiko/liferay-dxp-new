@@ -36,9 +36,9 @@ public class FragmentEntryLinkLocalServiceImpl
 
 	@Override
 	public FragmentEntryLink addFragmentEntryLink(
-		long groupId, long fragmentEntryId, long classNameId, long classPK,
-		String css, String html, String js, String editableValues,
-		int position) {
+		long groupId, long originalFragmentEntryLinkId, long fragmentEntryId,
+		long classNameId, long classPK, String css, String html, String js,
+		String editableValues, int position) {
 
 		long fragmentEntryLinkId = counterLocalService.increment();
 
@@ -46,6 +46,8 @@ public class FragmentEntryLinkLocalServiceImpl
 			fragmentEntryLinkPersistence.create(fragmentEntryLinkId);
 
 		fragmentEntryLink.setGroupId(groupId);
+		fragmentEntryLink.setOriginalFragmentEntryLinkId(
+			originalFragmentEntryLinkId);
 		fragmentEntryLink.setFragmentEntryId(fragmentEntryId);
 		fragmentEntryLink.setClassNameId(classNameId);
 		fragmentEntryLink.setClassPK(classPK);
@@ -58,6 +60,17 @@ public class FragmentEntryLinkLocalServiceImpl
 		fragmentEntryLinkPersistence.update(fragmentEntryLink);
 
 		return fragmentEntryLink;
+	}
+
+	@Override
+	public FragmentEntryLink addFragmentEntryLink(
+		long groupId, long fragmentEntryId, long classNameId, long classPK,
+		String css, String html, String js, String editableValues,
+		int position) {
+
+		return addFragmentEntryLink(
+			groupId, 0, fragmentEntryId, classNameId, classPK, css, html, js,
+			editableValues, position);
 	}
 
 	@Override
@@ -98,6 +111,34 @@ public class FragmentEntryLinkLocalServiceImpl
 
 		return fragmentEntryLinkPersistence.findByG_C_C(
 			groupId, classNameId, classPK);
+	}
+
+	@Override
+	public FragmentEntryLink updateFragmentEntryLink(
+		long fragmentEntryLinkId, int position) {
+
+		FragmentEntryLink fragmentEntryLink = fetchFragmentEntryLink(
+			fragmentEntryLinkId);
+
+		fragmentEntryLink.setPosition(position);
+
+		fragmentEntryLinkPersistence.update(fragmentEntryLink);
+
+		return fragmentEntryLink;
+	}
+
+	@Override
+	public FragmentEntryLink updateFragmentEntryLink(
+		long fragmentEntryLinkId, String editableValues) {
+
+		FragmentEntryLink fragmentEntryLink = fetchFragmentEntryLink(
+			fragmentEntryLinkId);
+
+		fragmentEntryLink.setEditableValues(editableValues);
+
+		fragmentEntryLinkPersistence.update(fragmentEntryLink);
+
+		return fragmentEntryLink;
 	}
 
 	@Override

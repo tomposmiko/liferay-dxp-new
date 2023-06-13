@@ -154,8 +154,6 @@ request.setAttribute("view.jsp-displayStyle", displayStyle);
 
 request.setAttribute("view.jsp-bookmarksSearchContainer", bookmarksSearchContainer);
 
-request.setAttribute("view.jsp-total", String.valueOf(total));
-
 BookmarksUtil.addPortletBreadcrumbEntries(folder, request, renderResponse);
 %>
 
@@ -186,7 +184,12 @@ BookmarksUtil.addPortletBreadcrumbEntries(folder, request, renderResponse);
 	<div class="sidenav-content">
 		<div class="bookmakrs-breadcrumb" id="<portlet:namespace />breadcrumbContainer">
 			<c:if test='<%= !navigation.equals("recent") && !navigation.equals("mine") %>'>
-				<liferay-ui:breadcrumb showCurrentGroup="<%= false %>" showGuestGroup="<%= false %>" showLayout="<%= false %>" showParentGroups="<%= false %>" />
+				<liferay-ui:breadcrumb
+					showCurrentGroup="<%= false %>"
+					showGuestGroup="<%= false %>"
+					showLayout="<%= false %>"
+					showParentGroups="<%= false %>"
+				/>
 			</c:if>
 		</div>
 

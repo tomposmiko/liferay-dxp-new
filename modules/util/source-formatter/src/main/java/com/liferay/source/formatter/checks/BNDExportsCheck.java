@@ -27,6 +27,7 @@ import java.io.File;
 import java.io.FileFilter;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -41,10 +42,12 @@ public class BNDExportsCheck extends BaseFileCheck {
 		return true;
 	}
 
-	public void setAllowedExportPackageDirName(
-		String allowedExportPackageDirName) {
+	public void setAllowedExportPackageDirNames(
+		String allowedExportPackageDirNames) {
 
-		_allowedExportPackageDirNames.add(allowedExportPackageDirName);
+		Collections.addAll(
+			_allowedExportPackageDirNames,
+			StringUtil.split(allowedExportPackageDirNames));
 	}
 
 	@Override
@@ -85,7 +88,7 @@ public class BNDExportsCheck extends BaseFileCheck {
 		}
 
 		if (fileName.endsWith("/test-bnd.bnd") ||
-			absolutePath.contains("-api/") ||
+			absolutePath.contains("-api/") || absolutePath.contains("-spi/") ||
 			absolutePath.contains("-taglib/") ||
 			absolutePath.contains("-test-util/") ||
 			!content.contains("Export-Package")) {

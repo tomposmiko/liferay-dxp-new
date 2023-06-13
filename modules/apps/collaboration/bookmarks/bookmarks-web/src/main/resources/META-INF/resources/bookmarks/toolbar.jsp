@@ -19,7 +19,7 @@
 <%
 String searchContainerId = ParamUtil.getString(request, "searchContainerId");
 
-int total = GetterUtil.getInteger((String)request.getAttribute("view.jsp-total"));
+long folderId = GetterUtil.getLong((String)request.getAttribute("view.jsp-folderId"));
 
 PortletURL portletURL = renderResponse.createRenderURL();
 
@@ -34,7 +34,7 @@ portletURL.setParameter("tag", StringPool.BLANK);
 %>
 
 <liferay-frontend:management-bar
-	disabled="<%= total == 0 %>"
+	disabled="<%= BookmarksFolderServiceUtil.getFoldersAndEntriesCount(scopeGroupId, folderId) <= 0 %>"
 	includeCheckBox="<%= true %>"
 	searchContainerId="<%= searchContainerId %>"
 >
@@ -71,11 +71,6 @@ portletURL.setParameter("tag", StringPool.BLANK);
 
 		<c:if test="<%= bookmarksGroupServiceOverriddenConfiguration.showFoldersSearch() %>">
 			<li>
-
-				<%
-				long folderId = GetterUtil.getLong((String)request.getAttribute("view.jsp-folderId"));
-				%>
-
 				<liferay-portlet:renderURL varImpl="searchURL">
 					<portlet:param name="mvcRenderCommandName" value="/bookmarks/view" />
 					<portlet:param name="redirect" value="<%= currentURL %>" />
@@ -83,7 +78,9 @@ portletURL.setParameter("tag", StringPool.BLANK);
 				</liferay-portlet:renderURL>
 
 				<aui:form action="<%= searchURL.toString() %>" name="searchFm">
-					<liferay-ui:input-search markupView="lexicon" />
+					<liferay-ui:input-search
+						markupView="lexicon"
+					/>
 				</aui:form>
 			</li>
 		</c:if>
@@ -96,7 +93,11 @@ portletURL.setParameter("tag", StringPool.BLANK);
 		/>
 
 		<c:if test="<%= !user.isDefaultUser() %>">
-			<liferay-frontend:management-bar-button href='<%= "javascript:" + renderResponse.getNamespace() + "deleteEntries();" %>' icon='<%= trashHelper.isTrashEnabled(scopeGroupId) ? "trash" : "times" %>' label='<%= trashHelper.isTrashEnabled(scopeGroupId) ? "recycle-bin" : "delete" %>' />
+			<liferay-frontend:management-bar-button
+				href='<%= "javascript:" + renderResponse.getNamespace() + "deleteEntries();" %>'
+				icon='<%= trashHelper.isTrashEnabled(scopeGroupId) ? "trash" : "times" %>'
+				label='<%= trashHelper.isTrashEnabled(scopeGroupId) ? "recycle-bin" : "delete" %>'
+			/>
 		</c:if>
 	</liferay-frontend:management-bar-action-buttons>
 </liferay-frontend:management-bar>
