@@ -52,6 +52,10 @@ import postForm from './util/form/post_form.es';
 import setFormValues from './util/form/set_form_values.es';
 import formatStorage from './util/format_storage.es';
 import formatXML from './util/format_xml.es';
+import {
+	getCheckedCheckboxes,
+	getUncheckedCheckboxes,
+} from './util/get_checkboxes';
 import getCropRegion from './util/get_crop_region.es';
 import getDOM from './util/get_dom';
 import getElement from './util/get_element';
@@ -87,8 +91,11 @@ import {getSessionValue, setSessionValue} from './util/session.es';
 import showCapsLock from './util/show_caps_lock';
 import sub from './util/sub';
 import toCharCode from './util/to_char_code.es';
+import toggleBoxes from './util/toggle_boxes';
 import toggleControls from './util/toggle_controls';
 import toggleDisabled from './util/toggle_disabled';
+import toggleRadio from './util/toggle_radio';
+import toggleSelectBox from './util/toggle_select_box';
 import zIndex from './zIndex';
 
 Liferay = window.Liferay || {};
@@ -206,6 +213,8 @@ Liferay.Util.focusFormField = focusFormField;
 
 Liferay.Util.formatStorage = formatStorage;
 Liferay.Util.formatXML = formatXML;
+Liferay.Util.getCheckedCheckboxes = getCheckedCheckboxes;
+Liferay.Util.getUncheckedCheckboxes = getUncheckedCheckboxes;
 Liferay.Util.getCropRegion = getCropRegion;
 
 /**
@@ -326,7 +335,10 @@ Liferay.Util.Session = {
 	set: setSessionValue,
 };
 
+Liferay.Util.toggleBoxes = toggleBoxes;
 Liferay.Util.toggleControls = toggleControls;
+Liferay.Util.toggleRadio = toggleRadio;
+Liferay.Util.toggleSelectBox = toggleSelectBox;
 Liferay.Util.unescape = unescape;
 Liferay.Util.unescapeHTML = unescapeHTML;
 

@@ -20,11 +20,11 @@
 
 <liferay-util:dynamic-include key="/html/common/themes/top_head.jsp#pre" />
 
-<link href="<%= themeDisplay.getFavicon() %>" rel="icon" />
+<link href="<%= themeDisplay.getFaviconURL() %>" rel="icon" />
 
 <%-- Portal CSS --%>
 
-<link class="lfr-css-file" data-senna-track="temporary" href="<%= HtmlUtil.escapeAttribute(PortalUtil.getStaticResourceURL(request, themeDisplay.getPathThemeCss() + "/clay.css")) %>" id="liferayAUICSS" rel="stylesheet" type="text/css" />
+<link class="lfr-css-file" data-senna-track="temporary" href="<%= HtmlUtil.escapeAttribute(themeDisplay.getClayCSSURL()) %>" id="liferayAUICSS" rel="stylesheet" type="text/css" />
 
 <%
 List<Portlet> portlets = null;
@@ -163,7 +163,7 @@ for (Portlet portlet : portlets) {
 
 <%-- Theme CSS --%>
 
-<link class="lfr-css-file" data-senna-track="temporary" href="<%= HtmlUtil.escapeAttribute(PortalUtil.getStaticResourceURL(request, themeDisplay.getPathThemeCss() + "/main.css")) %>" id="liferayThemeCSS" rel="stylesheet" type="text/css" />
+<link class="lfr-css-file" data-senna-track="temporary" href="<%= HtmlUtil.escapeAttribute(themeDisplay.getMainCSSURL()) %>" id="liferayThemeCSS" rel="stylesheet" type="text/css" />
 
 <%-- User Inputted Layout CSS --%>
 

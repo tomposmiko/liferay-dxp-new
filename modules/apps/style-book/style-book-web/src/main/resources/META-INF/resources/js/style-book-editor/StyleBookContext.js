@@ -22,10 +22,11 @@ import {
 	SET_DRAFT_STATUS,
 	SET_PREVIEW_LAYOUT,
 	SET_PREVIEW_LAYOUT_TYPE,
-	SET_TOKEN_VALUE,
+	SET_TOKEN_VALUES,
 	UPDATE_UNDO_REDO_HISTORY,
 } from './constants/actionTypes';
 import {DRAFT_STATUS} from './constants/draftStatusConstants';
+import {UNDO_TYPES} from './constants/undoTypes';
 import reducer from './reducer';
 import saveDraft from './saveDraft';
 
@@ -84,24 +85,25 @@ export function useUndoHistory() {
 	return useContext(StyleBookStoreContext).undoHistory;
 }
 
-function internalSaveTokenValue({dispatch, frontendTokensValues, name, value}) {
+function internalSaveTokenValues({dispatch, frontendTokensValues, tokens}) {
 	dispatch({
 		type: SET_DRAFT_STATUS,
 		value: DRAFT_STATUS.saving,
 	});
 
-	return saveDraft({...frontendTokensValues, [name]: value})
+	return saveDraft({...frontendTokensValues, ...tokens})
 		.then(() => {
 			dispatch({
 				type: SET_DRAFT_STATUS,
 				value: DRAFT_STATUS.draftSaved,
 			});
 
-			dispatch({
-				name,
-				type: SET_TOKEN_VALUE,
-				value,
-			});
+			if (Object.keys(tokens).length !== 0) {
+				dispatch({
+					tokens,
+					type: SET_TOKEN_VALUES,
+				});
+			}
 		})
 		.catch((error) => {
 			if (process.env.NODE_ENV === 'development') {
@@ -124,16 +126,16 @@ export function useSaveTokenValue() {
 	const dispatch = useDispatch();
 	const frontendTokensValues = useFrontendTokensValues();
 
-	return (name, value) => {
+	return ({label, name, value}) => {
 		const previousValue = frontendTokensValues[name];
 
-		internalSaveTokenValue({
+		internalSaveTokenValues({
 			dispatch,
 			frontendTokensValues,
-			name,
-			value,
+			tokens: {[name]: value},
 		}).then(() => {
 			dispatch({
+				label,
 				name,
 				type: ADD_UNDO_ACTION,
 				value: previousValue,
@@ -173,17 +175,21 @@ export function useOnUndo() {
 		const [lastUndo, ...undos] = undoHistory;
 		const previousValue = frontendTokensValues[lastUndo.name];
 
-		internalSaveTokenValue({
+		if (!lastUndo.value) {
+			delete frontendTokensValues[lastUndo.name];
+		}
+
+		internalSaveTokenValues({
 			dispatch,
 			frontendTokensValues,
-			name: lastUndo.name,
-			value: lastUndo.value,
+			tokens: lastUndo.value ? {[lastUndo.name]: lastUndo.value} : {},
 		}).then(() => {
 			dispatch({
 				type: UPDATE_UNDO_REDO_HISTORY,
 				undoHistory: undos,
 			});
 			dispatch({
+				label: lastUndo.label,
 				name: lastUndo.name,
 				type: ADD_REDO_ACTION,
 				value: previousValue,
@@ -201,11 +207,10 @@ export function useOnRedo() {
 		const [lastRedo, ...redos] = redoHistory;
 		const previousValue = frontendTokensValues[lastRedo.name];
 
-		internalSaveTokenValue({
+		internalSaveTokenValues({
 			dispatch,
 			frontendTokensValues,
-			name: lastRedo.name,
-			value: lastRedo.value,
+			tokens: {[lastRedo.name]: lastRedo.value},
 		}).then(() => {
 			dispatch({
 				redoHistory: redos,
@@ -213,10 +218,83 @@ export function useOnRedo() {
 			});
 			dispatch({
 				isRedo: true,
+				label: lastRedo.label,
 				name: lastRedo.name,
 				type: ADD_UNDO_ACTION,
 				value: previousValue,
 			});
+		});
+	};
+}
+
+export function useMultipleUndo() {
+	const dispatch = useDispatch();
+	const undoHistory = useUndoHistory();
+	const redoHistory = useRedoHistory();
+	const frontendTokensValues = useFrontendTokensValues();
+	let tokens = {};
+
+	return ({numberOfActions, type}) => {
+		let remainingUndos;
+		let undosToUndo;
+		let updateHistoryAction;
+
+		if (type === UNDO_TYPES.undo) {
+			undosToUndo = undoHistory.slice(0, numberOfActions);
+
+			remainingUndos = undoHistory.slice(
+				numberOfActions,
+				undoHistory.length
+			);
+
+			const nextRedoHistory = undosToUndo.map(({label, name}) => ({
+				label,
+				name,
+				value: frontendTokensValues[name],
+			}));
+
+			updateHistoryAction = {
+				redoHistory: [...nextRedoHistory.reverse(), ...redoHistory],
+				type: UPDATE_UNDO_REDO_HISTORY,
+				undoHistory: remainingUndos,
+			};
+		}
+		else {
+			undosToUndo = redoHistory.slice(0, numberOfActions);
+
+			remainingUndos = redoHistory.slice(
+				numberOfActions,
+				redoHistory.length
+			);
+
+			const nextUndoHistory = undosToUndo.map(({label, name}) => ({
+				label,
+				name,
+				value: frontendTokensValues[name],
+			}));
+
+			updateHistoryAction = {
+				redoHistory: remainingUndos,
+				type: UPDATE_UNDO_REDO_HISTORY,
+				undoHistory: [...nextUndoHistory.reverse(), ...undoHistory],
+			};
+		}
+
+		for (const undo of undosToUndo) {
+			if (undo.value) {
+				tokens = {...tokens, [undo.name]: undo.value};
+			}
+			else {
+				delete frontendTokensValues[undo.name];
+			}
+		}
+
+		return internalSaveTokenValues({
+			dispatch,
+			frontendTokensValues,
+			tokens,
+		}).then(() => {
+			dispatch(updateHistoryAction);
 		});
 	};
 }

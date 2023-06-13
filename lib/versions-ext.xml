@@ -166,7 +166,7 @@
 			</library>
 			<library>
 				<file-name>lib/development/com.liferay.jenkins.results.parser.jar</file-name>
-				<version>1.0.1029</version>
+				<version>1.0.1060</version>
 				<project-name>Liferay Jenkins Results Parser</project-name>
 				<licenses>
 					<license>
@@ -177,7 +177,7 @@
 			</library>
 			<library>
 				<file-name>lib/development/com.liferay.poshi.core.jar</file-name>
-				<version>1.0.59</version>
+				<version>1.0.63</version>
 				<project-name>Liferay Poshi Core</project-name>
 				<licenses>
 					<license>
@@ -1174,18 +1174,6 @@
 				</comments>
 			</library>
 			<library>
-				<file-name>lib/portal/jackson-databind.jar</file-name>
-				<version>2.13.2.2</version>
-				<project-name>Jackson Databind</project-name>
-				<project-url>https://github.com/FasterXML/jackson-databind</project-url>
-				<licenses>
-					<license>
-						<license-name>Apache License 2.0</license-name>
-						<license-url>http://www.apache.org/licenses/LICENSE-2.0</license-url>
-					</license>
-				</licenses>
-			</library>
-			<library>
 				<file-name>lib/portal/javassist.jar</file-name>
 				<version>3.18.2 GA</version>
 				<project-name>Javassist</project-name>
@@ -1235,18 +1223,6 @@
 				</licenses>
 			</library>
 			<library>
-				<file-name>lib/portal/jaxrs-api.jar</file-name>
-				<version>2.1</version>
-				<project-name>Java API for RESTful Web Services</project-name>
-				<project-url>http://jax-rs-spec.java.net</project-url>
-				<licenses>
-					<license>
-						<license-name>CDDL 1.1</license-name>
-						<license-url>https://oss.oracle.com/licenses/CDDL-1.1</license-url>
-					</license>
-				</licenses>
-			</library>
-			<library>
 				<file-name>lib/portal/jaxws-api.jar</file-name>
 				<version>2.3.0</version>
 				<project-name>JAX-WS (JSR 224) API</project-name>
@@ -1269,18 +1245,6 @@
 						<license-name>MIT License</license-name>
 						<license-url>http://opensource.org/licenses/MIT</license-url>
 						<copyright-notice>Copyright (c) 2004-2007 QOS.ch</copyright-notice>
-					</license>
-				</licenses>
-			</library>
-			<library>
-				<file-name>lib/portal/jersey-common.jar</file-name>
-				<version>2.26</version>
-				<project-name>Jersey core common packages</project-name>
-				<project-url>https://jersey.github.io/</project-url>
-				<licenses>
-					<license>
-						<license-name>CDDL 1.1</license-name>
-						<license-url>https://oss.oracle.com/licenses/CDDL+GPL-1.1</license-url>
 					</license>
 				</licenses>
 			</library>
@@ -1601,7 +1565,7 @@
 			</library>
 			<library>
 				<file-name>lib/portal/xercesImpl.jar</file-name>
-				<version>2.12.1</version>
+				<version>2.12.2</version>
 				<project-name>Xerces</project-name>
 				<project-url>http://xerces.apache.org/xerces2-j</project-url>
 				<licenses>

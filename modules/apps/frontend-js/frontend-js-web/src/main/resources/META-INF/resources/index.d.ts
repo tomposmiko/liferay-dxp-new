@@ -668,3 +668,34 @@ export function openToast({
 }): void;
 
 export function fetch(resource: string | Request, init?: Object): Promise<any>;
+
+export function getCheckedCheckboxes(
+	form: HTMLFormElement,
+	except: string,
+	name?: string
+): Array<number> | '';
+
+export function getUncheckedCheckboxes(
+	form: HTMLFormElement,
+	except: string,
+	name?: string
+): Array<number> | '';
+
+export function toggleBoxes(
+	checkBoxId: string,
+	toggleBoxId: string,
+	displayWhenUnchecked?: boolean,
+	toggleChildCheckboxes?: boolean
+): void;
+
+export function toggleRadio(
+	radioId: string,
+	showBoxIds: string | string[],
+	hideBoxIds?: string | string[]
+): void;
+
+export function toggleSelectBox(
+	selectBoxId: string,
+	value: any,
+	toggleBoxId: string
+): void;

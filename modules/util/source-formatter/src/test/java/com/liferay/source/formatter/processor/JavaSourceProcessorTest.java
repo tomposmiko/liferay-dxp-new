@@ -63,18 +63,6 @@ public class JavaSourceProcessorTest extends BaseSourceProcessorTestCase {
 	}
 
 	@Test
-	public void testFDSTableSchemaBuilder() throws Exception {
-		test(
-			"FDSTableSchemaBuilder.testjava",
-			new String[] {
-				"Use 'add' instead of 'addFDSTableSchemaField'",
-				"Use 'add' instead of 'addFDSTableSchemaField'",
-				"Use 'add' instead of 'addFDSTableSchemaField'"
-			},
-			new Integer[] {43, 47, 50});
-	}
-
-	@Test
 	public void testCollapseImports() throws Exception {
 		test("CollapseImports.testjava");
 	}
@@ -396,6 +384,14 @@ public class JavaSourceProcessorTest extends BaseSourceProcessorTestCase {
 				"There should be an empty line after 'registry.register'"
 			},
 			new Integer[] {23, 24, 34});
+	}
+
+	@Test
+	public void testMissingEmptyLinesInInstanceInit() throws Exception {
+		test(
+			"MissingEmptyLinesInInstanceInit.testjava",
+			"There should be an empty line after line '27'",
+			27);
 	}
 
 	@Test

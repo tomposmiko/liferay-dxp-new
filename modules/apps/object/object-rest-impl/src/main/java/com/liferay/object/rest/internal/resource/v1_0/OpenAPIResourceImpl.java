@@ -132,13 +132,11 @@ public class OpenAPIResourceImpl {
 		return response;
 	}
 
-	private PathItem _createPathItem(
-		ObjectRelationship objectRelationship, PathItem pathItem,
-		ObjectDefinition relatedObjectDefinition) {
+	private Operation _createOperation(
+		String httpMethod, ObjectRelationship objectRelationship,
+		ObjectDefinition relatedObjectDefinition, Operation operation) {
 
 		Map<String, Parameter> parameters = new HashMap<>();
-
-		Operation operation = pathItem.getPut();
 
 		for (Parameter parameter : operation.getParameters()) {
 			String parameterName = parameter.getName();
@@ -174,25 +172,55 @@ public class OpenAPIResourceImpl {
 				});
 		}
 
-		return new PathItem() {
+		return new Operation() {
 			{
-				put(
-					new Operation() {
-						{
-							operationId(
-								StringBundler.concat(
-									"put",
-									_currentObjectDefinition.getShortName(),
-									StringUtil.upperCaseFirstLetter(
-										objectRelationship.getName()),
-									relatedObjectDefinition.getShortName()));
-							parameters(new ArrayList<>(parameters.values()));
-							responses(operation.getResponses());
-							tags(operation.getTags());
-						}
-					});
+				operationId(
+					StringBundler.concat(
+						httpMethod, _currentObjectDefinition.getShortName(),
+						StringUtil.upperCaseFirstLetter(
+							objectRelationship.getName()),
+						relatedObjectDefinition.getShortName()));
+				parameters(new ArrayList<>(parameters.values()));
+				responses(operation.getResponses());
+				tags(operation.getTags());
 			}
 		};
+	}
+
+	private PathItem _createPathItem(
+		ObjectRelationship objectRelationship, PathItem pathItem,
+		ObjectDefinition relatedObjectDefinition) {
+
+		Map<PathItem.HttpMethod, Operation> operations =
+			pathItem.readOperationsMap();
+
+		Operation operation = operations.get(PathItem.HttpMethod.GET);
+
+		if (operation != null) {
+			return new PathItem() {
+				{
+					get(
+						_createOperation(
+							"get", objectRelationship, relatedObjectDefinition,
+							pathItem.getGet()));
+				}
+			};
+		}
+
+		operation = operations.get(PathItem.HttpMethod.PUT);
+
+		if (operation != null) {
+			return new PathItem() {
+				{
+					put(
+						_createOperation(
+							"put", objectRelationship, relatedObjectDefinition,
+							pathItem.getPut()));
+				}
+			};
+		}
+
+		return new PathItem();
 	}
 
 	private final ObjectDefinition _currentObjectDefinition;

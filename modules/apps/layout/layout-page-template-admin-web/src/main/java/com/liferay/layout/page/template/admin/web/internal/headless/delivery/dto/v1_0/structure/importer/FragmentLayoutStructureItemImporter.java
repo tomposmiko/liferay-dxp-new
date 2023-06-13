@@ -63,6 +63,7 @@ import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
+import com.liferay.segments.model.SegmentsExperience;
 import com.liferay.segments.service.SegmentsExperienceLocalService;
 
 import java.util.HashMap;
@@ -225,6 +226,24 @@ public class FragmentLayoutStructureItemImporter
 		}
 
 		long fragmentEntryId = 0;
+
+		if (fragmentEntry != null) {
+			fragmentEntryId = fragmentEntry.getFragmentEntryId();
+		}
+
+		long segmentsExperienceId =
+			layoutStructureItemImporterContext.getSegmentsExperienceId();
+
+		SegmentsExperience segmentsExperience =
+			_segmentsExperienceLocalService.fetchSegmentsExperience(
+				segmentsExperienceId);
+
+		if (segmentsExperience == null) {
+			segmentsExperienceId =
+				_segmentsExperienceLocalService.
+					fetchDefaultSegmentsExperienceId(layout.getPlid());
+		}
+
 		String html = StringPool.BLANK;
 		String js = StringPool.BLANK;
 		String css = StringPool.BLANK;
@@ -234,7 +253,6 @@ public class FragmentLayoutStructureItemImporter
 			JSONFactoryUtil.createJSONObject();
 
 		if (fragmentEntry != null) {
-			fragmentEntryId = fragmentEntry.getFragmentEntryId();
 			html = fragmentEntry.getHtml();
 			js = fragmentEntry.getJs();
 			css = fragmentEntry.getCss();
@@ -305,11 +323,10 @@ public class FragmentLayoutStructureItemImporter
 		FragmentEntryLink fragmentEntryLink =
 			_fragmentEntryLinkLocalService.addFragmentEntryLink(
 				layout.getUserId(), layout.getGroupId(), 0, fragmentEntryId,
-				_segmentsExperienceLocalService.
-					fetchDefaultSegmentsExperienceId(layout.getPlid()),
-				layout.getPlid(), css, html, js, configuration,
-				jsonObject.toString(), StringUtil.randomId(), position,
-				fragmentKey, ServiceContextThreadLocal.getServiceContext());
+				segmentsExperienceId, layout.getPlid(), css, html, js,
+				configuration, jsonObject.toString(), StringUtil.randomId(),
+				position, fragmentKey,
+				ServiceContextThreadLocal.getServiceContext());
 
 		List<Object> widgetInstances = (List<Object>)definitionMap.get(
 			"widgetInstances");

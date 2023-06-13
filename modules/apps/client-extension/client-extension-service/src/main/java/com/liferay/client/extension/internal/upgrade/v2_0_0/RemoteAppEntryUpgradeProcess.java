@@ -14,7 +14,7 @@
 
 package com.liferay.client.extension.internal.upgrade.v2_0_0;
 
-import com.liferay.client.extension.constants.ClientExtensionConstants;
+import com.liferay.client.extension.constants.ClientExtensionEntryConstants;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.upgrade.UpgradeProcess;
 
@@ -69,7 +69,7 @@ public class RemoteAppEntryUpgradeProcess extends UpgradeProcess {
 			runSQL(
 				StringBundler.concat(
 					"update RemoteAppEntry set type_ = '",
-					ClientExtensionConstants.TYPE_IFRAME, "'"));
+					ClientExtensionEntryConstants.TYPE_IFRAME, "'"));
 		}
 	}
 

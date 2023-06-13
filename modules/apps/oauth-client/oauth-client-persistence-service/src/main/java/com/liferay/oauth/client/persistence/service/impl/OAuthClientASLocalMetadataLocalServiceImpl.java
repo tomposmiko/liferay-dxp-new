@@ -271,23 +271,16 @@ public class OAuthClientASLocalMetadataLocalServiceImpl
 			JSONObject metadataJSONObject, String wellKnownURISuffix)
 		throws PortalException {
 
-		if (wellKnownURISuffix.equals("openid-configuration")) {
-			try {
+		try {
+			if (wellKnownURISuffix.equals("openid-configuration")) {
 				OIDCProviderMetadata.parse(metadataJSONObject);
 			}
-			catch (ParseException parseException) {
-				throw new OAuthClientASLocalMetadataJSONException(
-					parseException);
-			}
-		}
-		else {
-			try {
+			else {
 				AuthorizationServerMetadata.parse(metadataJSONObject);
 			}
-			catch (ParseException parseException) {
-				throw new OAuthClientASLocalMetadataJSONException(
-					parseException);
-			}
+		}
+		catch (Exception exception) {
+			throw new OAuthClientASLocalMetadataJSONException(exception);
 		}
 	}
 

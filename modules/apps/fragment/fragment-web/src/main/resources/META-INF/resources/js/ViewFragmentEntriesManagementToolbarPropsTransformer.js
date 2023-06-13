@@ -12,7 +12,11 @@
  * details.
  */
 
-import {openSelectionModal, openSimpleInputModal} from 'frontend-js-web';
+import {
+	getCheckedCheckboxes,
+	openSelectionModal,
+	openSimpleInputModal,
+} from 'frontend-js-web';
 
 import openDeleteFragmentModal from './openDeleteFragmentModal';
 
@@ -46,7 +50,7 @@ export default function propsTransformer({
 			return;
 		}
 
-		const fragmentEntryIds = Liferay.Util.listCheckedExcept(
+		const fragmentEntryIds = getCheckedCheckboxes(
 			form,
 			`${portletNamespace}allRowIds`
 		);
@@ -110,13 +114,13 @@ export default function propsTransformer({
 			return;
 		}
 
-		const fragmentCompositionIds = Liferay.Util.listCheckedExcept(
+		const fragmentCompositionIds = getCheckedCheckboxes(
 			form,
 			`${portletNamespace}allRowIds`,
 			`${portletNamespace}rowIdsFragmentComposition`
 		);
 
-		const fragmentEntryIds = Liferay.Util.listCheckedExcept(
+		const fragmentEntryIds = getCheckedCheckboxes(
 			form,
 			`${portletNamespace}allRowIds`,
 			`${portletNamespace}rowIdsFragmentEntry`

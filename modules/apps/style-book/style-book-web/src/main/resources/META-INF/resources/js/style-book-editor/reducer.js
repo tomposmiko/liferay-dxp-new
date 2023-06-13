@@ -19,9 +19,11 @@ import {
 	SET_DRAFT_STATUS,
 	SET_PREVIEW_LAYOUT,
 	SET_PREVIEW_LAYOUT_TYPE,
-	SET_TOKEN_VALUE,
+	SET_TOKEN_VALUES,
 	UPDATE_UNDO_REDO_HISTORY,
 } from './constants/actionTypes';
+
+const MAX_UNDO_ACTIONS = 100;
 
 export default function reducer(state, action) {
 	switch (action.type) {
@@ -52,47 +54,51 @@ export default function reducer(state, action) {
 			return {...state, previewLayoutType: layoutType};
 		}
 
-		case SET_TOKEN_VALUE: {
-			const {name, value} = action;
+		case SET_TOKEN_VALUES: {
+			const {tokens} = action;
 
 			return {
 				...state,
 				frontendTokensValues: {
 					...state.frontendTokensValues,
-					[name]: value,
+					...tokens,
 				},
 			};
 		}
 
 		case ADD_UNDO_ACTION: {
-			const {isRedo = false, name, value} = action;
+			const {isRedo = false, label, name, value} = action;
 
 			const nextRedoHistory = isRedo ? state.redoHistory : [];
+			const nextUndoHistory = state.undoHistory || [];
 
 			return {
 				...state,
 				redoHistory: nextRedoHistory,
 				undoHistory: [
 					{
+						label,
 						name,
 						value,
 					},
-					...state.undoHistory,
+					...nextUndoHistory.slice(0, MAX_UNDO_ACTIONS - 1),
 				],
 			};
 		}
 
 		case ADD_REDO_ACTION: {
-			const {name, value} = action;
+			const {label, name, value} = action;
+			const nextRedoHistory = state.redoHistory || [];
 
 			return {
 				...state,
 				redoHistory: [
 					{
+						label,
 						name,
 						value,
 					},
-					...state.redoHistory,
+					...nextRedoHistory,
 				],
 			};
 		}

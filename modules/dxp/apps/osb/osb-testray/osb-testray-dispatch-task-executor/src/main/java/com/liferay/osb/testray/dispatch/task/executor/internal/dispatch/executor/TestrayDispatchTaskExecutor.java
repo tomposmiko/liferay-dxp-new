@@ -37,6 +37,7 @@ import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.User;
+import com.liferay.portal.kernel.search.Sort;
 import com.liferay.portal.kernel.search.filter.Filter;
 import com.liferay.portal.kernel.security.auth.PrincipalThreadLocal;
 import com.liferay.portal.kernel.security.permission.PermissionChecker;
@@ -228,7 +229,7 @@ public class TestrayDispatchTaskExecutor extends BaseDispatchTaskExecutor {
 		long testrayCaseId = _getObjectEntryId(
 			companyId,
 			StringBundler.concat(
-				"projectId eq ", testrayProjectId, " and name eq '",
+				"projectId eq '", testrayProjectId, "' and name eq '",
 				testrayCaseName, "'"),
 			"Case", objectEntryIdsKey);
 
@@ -245,7 +246,10 @@ public class TestrayDispatchTaskExecutor extends BaseDispatchTaskExecutor {
 			ObjectEntry objectEntry = _addObjectEntry(
 				"Case",
 				HashMapBuilder.<String, Object>put(
-					"caseNumber", 0
+					"caseNumber",
+					_increment(
+						companyId, "caseNumber",
+						"projectId eq '" + testrayProjectId + "'", "Case")
 				).put(
 					"description",
 					testrayCasePropertiesMap.get("testray.testcase.description")
@@ -519,7 +523,7 @@ public class TestrayDispatchTaskExecutor extends BaseDispatchTaskExecutor {
 		long testrayBuildId = _getObjectEntryId(
 			companyId,
 			StringBundler.concat(
-				"projectId eq ", testrayProjectId, " and name eq '",
+				"projectId eq '", testrayProjectId, "' and name eq '",
 				testrayBuildName, "'"),
 			"Build", objectEntryIdsKey);
 
@@ -701,7 +705,7 @@ public class TestrayDispatchTaskExecutor extends BaseDispatchTaskExecutor {
 		long testrayComponentId = _getObjectEntryId(
 			companyId,
 			StringBundler.concat(
-				"projectId eq ", testrayProjectId, " and name eq '",
+				"projectId eq '", testrayProjectId, "' and name eq '",
 				testrayComponentName, "'"),
 			"Component", objectEntryIdsKey);
 
@@ -766,8 +770,8 @@ public class TestrayDispatchTaskExecutor extends BaseDispatchTaskExecutor {
 		long testrayFactorOptionId = _getObjectEntryId(
 			companyId,
 			StringBundler.concat(
-				"factorCategoryId eq ", testrayFactorCategoryId,
-				" and name eq '", testrayFactorOptionName, "'"),
+				"factorCategoryId eq '", testrayFactorCategoryId,
+				"' and name eq '", testrayFactorOptionName, "'"),
 			"FactorOption", objectEntryIdsKey);
 
 		if (testrayFactorOptionId != 0) {
@@ -857,7 +861,7 @@ public class TestrayDispatchTaskExecutor extends BaseDispatchTaskExecutor {
 		long testrayRoutineId = _getObjectEntryId(
 			companyId,
 			StringBundler.concat(
-				"projectId eq ", testrayProjectId, " and name eq '",
+				"projectId eq '", testrayProjectId, "' and name eq '",
 				testrayRoutineName, "'"),
 			"Routine", objectEntryIdsKey);
 
@@ -930,8 +934,8 @@ public class TestrayDispatchTaskExecutor extends BaseDispatchTaskExecutor {
 		long testrayRunId = _getObjectEntryId(
 			companyId,
 			StringBundler.concat(
-				"buildId eq ", testrayBuildId, " and name eq '", testrayRunName,
-				"'"),
+				"buildId eq '", testrayBuildId, "' and name eq '",
+				testrayRunName, "'"),
 			"Run", objectEntryIdsKey);
 
 		if (testrayRunId != 0) {
@@ -950,7 +954,10 @@ public class TestrayDispatchTaskExecutor extends BaseDispatchTaskExecutor {
 			).put(
 				"name", testrayRunName
 			).put(
-				"number", 0
+				"number",
+				_increment(
+					companyId, "number", "buildId eq '" + testrayBuildId + "'",
+					"Run")
 			).put(
 				"r_buildToRuns_c_buildId", testrayBuildId
 			).build());
@@ -982,7 +989,7 @@ public class TestrayDispatchTaskExecutor extends BaseDispatchTaskExecutor {
 		long testrayTeamId = _getObjectEntryId(
 			companyId,
 			StringBundler.concat(
-				"projectId eq ", testrayProjectId, " and name eq '",
+				"projectId eq '", testrayProjectId, "' and name eq '",
 				testrayTeamName, "'"),
 			"Team", objectEntryIdsKey);
 
@@ -1001,6 +1008,37 @@ public class TestrayDispatchTaskExecutor extends BaseDispatchTaskExecutor {
 		_objectEntryIds.put(objectEntryIdsKey, objectEntry.getId());
 
 		return objectEntry.getId();
+	}
+
+	private long _increment(
+			long companyId, String fieldName, String filterString,
+			String objectDefinitionShortName)
+		throws Exception {
+
+		com.liferay.portal.vulcan.pagination.Page<ObjectEntry>
+			objectEntriesPage = _objectEntryManager.getObjectEntries(
+				companyId, _objectDefinitions.get(objectDefinitionShortName),
+				null, null, _defaultDTOConverterContext, filterString, null,
+				null,
+				new Sort[] {
+					new Sort("nestedFieldArray.value_long#" + fieldName, true)
+				});
+
+		ObjectEntry objectEntry = objectEntriesPage.fetchFirstItem();
+
+		if (objectEntry == null) {
+			return 1;
+		}
+
+		Map<String, Object> properties = objectEntry.getProperties();
+
+		Long fieldValue = (Long)properties.get(fieldName);
+
+		if (fieldValue == null) {
+			return 1;
+		}
+
+		return fieldValue.longValue() + 1;
 	}
 
 	private void _invoke(UnsafeRunnable<Exception> unsafeRunnable)

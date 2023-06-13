@@ -6556,6 +6556,10 @@ public class ServiceBuilder {
 
 			finderElement.addAttribute("return-type", entityName);
 
+			if (isVersionGTE_7_4_0()) {
+				finderElement.addAttribute("unique", "true");
+			}
+
 			Element finderColumnElement = finderElement.addElement(
 				"finder-column");
 

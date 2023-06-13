@@ -23,6 +23,7 @@ import com.liferay.portal.kernel.model.MVCCModel;
 import com.liferay.portal.kernel.model.ShardedModel;
 import com.liferay.portal.kernel.model.StagedAuditedModel;
 import com.liferay.portal.kernel.model.WorkflowedModel;
+import com.liferay.portal.kernel.model.change.tracking.CTModel;
 
 import java.util.Date;
 import java.util.Locale;
@@ -43,8 +44,9 @@ import org.osgi.annotation.versioning.ProviderType;
  */
 @ProviderType
 public interface ClientExtensionEntryModel
-	extends BaseModel<ClientExtensionEntry>, ContainerModel, LocalizedModel,
-			MVCCModel, ShardedModel, StagedAuditedModel, WorkflowedModel {
+	extends BaseModel<ClientExtensionEntry>, ContainerModel,
+			CTModel<ClientExtensionEntry>, LocalizedModel, MVCCModel,
+			ShardedModel, StagedAuditedModel, WorkflowedModel {
 
 	/*
 	 * NOTE FOR DEVELOPERS:
@@ -57,6 +59,7 @@ public interface ClientExtensionEntryModel
 	 *
 	 * @return the primary key of this client extension entry
 	 */
+	@Override
 	public long getPrimaryKey();
 
 	/**
@@ -64,6 +67,7 @@ public interface ClientExtensionEntryModel
 	 *
 	 * @param primaryKey the primary key of this client extension entry
 	 */
+	@Override
 	public void setPrimaryKey(long primaryKey);
 
 	/**
@@ -81,6 +85,22 @@ public interface ClientExtensionEntryModel
 	 */
 	@Override
 	public void setMvccVersion(long mvccVersion);
+
+	/**
+	 * Returns the ct collection ID of this client extension entry.
+	 *
+	 * @return the ct collection ID of this client extension entry
+	 */
+	@Override
+	public long getCtCollectionId();
+
+	/**
+	 * Sets the ct collection ID of this client extension entry.
+	 *
+	 * @param ctCollectionId the ct collection ID of this client extension entry
+	 */
+	@Override
+	public void setCtCollectionId(long ctCollectionId);
 
 	/**
 	 * Returns the uuid of this client extension entry.
@@ -226,73 +246,6 @@ public interface ClientExtensionEntryModel
 	public void setModifiedDate(Date modifiedDate);
 
 	/**
-	 * Returns the custom element cssur ls of this client extension entry.
-	 *
-	 * @return the custom element cssur ls of this client extension entry
-	 */
-	@AutoEscape
-	public String getCustomElementCSSURLs();
-
-	/**
-	 * Sets the custom element cssur ls of this client extension entry.
-	 *
-	 * @param customElementCSSURLs the custom element cssur ls of this client extension entry
-	 */
-	public void setCustomElementCSSURLs(String customElementCSSURLs);
-
-	/**
-	 * Returns the custom element html element name of this client extension entry.
-	 *
-	 * @return the custom element html element name of this client extension entry
-	 */
-	@AutoEscape
-	public String getCustomElementHTMLElementName();
-
-	/**
-	 * Sets the custom element html element name of this client extension entry.
-	 *
-	 * @param customElementHTMLElementName the custom element html element name of this client extension entry
-	 */
-	public void setCustomElementHTMLElementName(
-		String customElementHTMLElementName);
-
-	/**
-	 * Returns the custom element ur ls of this client extension entry.
-	 *
-	 * @return the custom element ur ls of this client extension entry
-	 */
-	@AutoEscape
-	public String getCustomElementURLs();
-
-	/**
-	 * Sets the custom element ur ls of this client extension entry.
-	 *
-	 * @param customElementURLs the custom element ur ls of this client extension entry
-	 */
-	public void setCustomElementURLs(String customElementURLs);
-
-	/**
-	 * Returns the custom element use esm of this client extension entry.
-	 *
-	 * @return the custom element use esm of this client extension entry
-	 */
-	public boolean getCustomElementUseESM();
-
-	/**
-	 * Returns <code>true</code> if this client extension entry is custom element use esm.
-	 *
-	 * @return <code>true</code> if this client extension entry is custom element use esm; <code>false</code> otherwise
-	 */
-	public boolean isCustomElementUseESM();
-
-	/**
-	 * Sets whether this client extension entry is custom element use esm.
-	 *
-	 * @param customElementUseESM the custom element use esm of this client extension entry
-	 */
-	public void setCustomElementUseESM(boolean customElementUseESM);
-
-	/**
 	 * Returns the description of this client extension entry.
 	 *
 	 * @return the description of this client extension entry
@@ -306,57 +259,6 @@ public interface ClientExtensionEntryModel
 	 * @param description the description of this client extension entry
 	 */
 	public void setDescription(String description);
-
-	/**
-	 * Returns the friendly url mapping of this client extension entry.
-	 *
-	 * @return the friendly url mapping of this client extension entry
-	 */
-	@AutoEscape
-	public String getFriendlyURLMapping();
-
-	/**
-	 * Sets the friendly url mapping of this client extension entry.
-	 *
-	 * @param friendlyURLMapping the friendly url mapping of this client extension entry
-	 */
-	public void setFriendlyURLMapping(String friendlyURLMapping);
-
-	/**
-	 * Returns the i frame url of this client extension entry.
-	 *
-	 * @return the i frame url of this client extension entry
-	 */
-	@AutoEscape
-	public String getIFrameURL();
-
-	/**
-	 * Sets the i frame url of this client extension entry.
-	 *
-	 * @param iFrameURL the i frame url of this client extension entry
-	 */
-	public void setIFrameURL(String iFrameURL);
-
-	/**
-	 * Returns the instanceable of this client extension entry.
-	 *
-	 * @return the instanceable of this client extension entry
-	 */
-	public boolean getInstanceable();
-
-	/**
-	 * Returns <code>true</code> if this client extension entry is instanceable.
-	 *
-	 * @return <code>true</code> if this client extension entry is instanceable; <code>false</code> otherwise
-	 */
-	public boolean isInstanceable();
-
-	/**
-	 * Sets whether this client extension entry is instanceable.
-	 *
-	 * @param instanceable the instanceable of this client extension entry
-	 */
-	public void setInstanceable(boolean instanceable);
 
 	/**
 	 * Returns the name of this client extension entry.
@@ -458,21 +360,6 @@ public interface ClientExtensionEntryModel
 	public void setNameMap(Map<Locale, String> nameMap, Locale defaultLocale);
 
 	/**
-	 * Returns the portlet category name of this client extension entry.
-	 *
-	 * @return the portlet category name of this client extension entry
-	 */
-	@AutoEscape
-	public String getPortletCategoryName();
-
-	/**
-	 * Sets the portlet category name of this client extension entry.
-	 *
-	 * @param portletCategoryName the portlet category name of this client extension entry
-	 */
-	public void setPortletCategoryName(String portletCategoryName);
-
-	/**
 	 * Returns the properties of this client extension entry.
 	 *
 	 * @return the properties of this client extension entry
@@ -516,6 +403,21 @@ public interface ClientExtensionEntryModel
 	 * @param type the type of this client extension entry
 	 */
 	public void setType(String type);
+
+	/**
+	 * Returns the type settings of this client extension entry.
+	 *
+	 * @return the type settings of this client extension entry
+	 */
+	@AutoEscape
+	public String getTypeSettings();
+
+	/**
+	 * Sets the type settings of this client extension entry.
+	 *
+	 * @param typeSettings the type settings of this client extension entry
+	 */
+	public void setTypeSettings(String typeSettings);
 
 	/**
 	 * Returns the status of this client extension entry.

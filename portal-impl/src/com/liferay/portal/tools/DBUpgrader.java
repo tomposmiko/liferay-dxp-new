@@ -45,7 +45,6 @@ import com.liferay.portal.upgrade.PortalUpgradeProcess;
 import com.liferay.portal.util.InitUtil;
 import com.liferay.portal.util.PortalClassPathUtil;
 import com.liferay.portal.util.PropsValues;
-import com.liferay.portal.verify.VerifyException;
 import com.liferay.portal.verify.VerifyGroup;
 import com.liferay.portal.verify.VerifyProperties;
 import com.liferay.portal.verify.VerifyResourcePermissions;
@@ -131,6 +130,14 @@ public class DBUpgrader {
 				upgrade();
 			}
 
+			StoreFactory storeFactory = StoreFactory.getInstance();
+
+			if (storeFactory.getStore(PropsValues.DL_STORE_IMPL) == null) {
+				throw new UpgradeException(
+					"Store \"" + PropsValues.DL_STORE_IMPL +
+						"\" is not available");
+			}
+
 			_registerModuleServiceLifecycle("portlets.initialized");
 
 			System.out.println(
@@ -158,6 +165,8 @@ public class DBUpgrader {
 	public static void upgrade(ApplicationContext applicationContext)
 		throws Exception {
 
+		VerifyProperties.verify();
+
 		StartupHelperUtil.setUpgrading(true);
 
 		_upgradePortal();
@@ -166,23 +175,12 @@ public class DBUpgrader {
 
 		_upgradeModules(applicationContext);
 
-		StoreFactory storeFactory = StoreFactory.getInstance();
-
-		if (storeFactory.getStore(PropsValues.DL_STORE_IMPL) == null) {
-			throw new UpgradeException(
-				"Store \"" + PropsValues.DL_STORE_IMPL + "\" is not available");
-		}
-
 		if (applicationContext == null) {
 			DependencyManagerSyncUtil.sync();
 		}
 	}
 
-	public static void verify() throws VerifyException {
-		VerifyProperties verifyProperties = new VerifyProperties();
-
-		verifyProperties.verify();
-
+	public static void verify() throws Exception {
 		VerifyGroup verifyGroup = new VerifyGroup();
 
 		verifyGroup.verify();

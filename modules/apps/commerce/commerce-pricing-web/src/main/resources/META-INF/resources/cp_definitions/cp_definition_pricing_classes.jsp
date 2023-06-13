@@ -120,7 +120,7 @@ CProduct cProduct = cpDefinition.getCProduct();
 						fieldName: ['title', 'LANG'],
 					},
 				],
-				spritemap: '<%= themeDisplay.getPathThemeImages() %>/clay/icons.svg',
+				spritemap: '<%= FrontendIconsUtil.getSpritemap(themeDisplay) %>',
 				titleLabel:
 					'<%= LanguageUtil.get(request, "add-existing-product-group") %>',
 			});
@@ -140,9 +140,6 @@ CProduct cProduct = cpDefinition.getCProduct();
 				dataProviderKey="<%= CommercePricingFDSNames.PRODUCT_PRICING_CLASSES %>"
 				id="<%= CommercePricingFDSNames.PRODUCT_PRICING_CLASSES %>"
 				itemsPerPage="<%= 10 %>"
-				namespace="<%= liferayPortletResponse.getNamespace() %>"
-				pageNumber="<%= 1 %>"
-				portletURL="<%= currentURLObj %>"
 				selectedItemsKey="pricingClassId"
 			/>
 		</commerce-ui:panel>

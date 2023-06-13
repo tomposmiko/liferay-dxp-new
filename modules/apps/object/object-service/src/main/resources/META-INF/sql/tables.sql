@@ -26,8 +26,10 @@ create table ObjectDefinition (
 	userName VARCHAR(75) null,
 	createDate DATE null,
 	modifiedDate DATE null,
+	accountERObjectFieldId LONG,
 	descriptionObjectFieldId LONG,
 	titleObjectFieldId LONG,
+	accountEntryRestricted BOOLEAN,
 	active_ BOOLEAN,
 	dbTableName VARCHAR(75) null,
 	label STRING null,
@@ -130,7 +132,8 @@ create table ObjectLayoutBox (
 	objectLayoutTabId LONG,
 	collapsable BOOLEAN,
 	name STRING null,
-	priority INTEGER
+	priority INTEGER,
+	type_ VARCHAR(75) null
 );
 
 create table ObjectLayoutColumn (

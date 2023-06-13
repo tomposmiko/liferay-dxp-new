@@ -21,7 +21,7 @@ import com.liferay.dynamic.data.mapping.expression.DDMExpressionFactory;
 import com.liferay.object.action.engine.ObjectActionEngine;
 import com.liferay.object.action.executor.ObjectActionExecutor;
 import com.liferay.object.action.executor.ObjectActionExecutorRegistry;
-import com.liferay.object.internal.action.util.ObjectActionDataConverterUtil;
+import com.liferay.object.internal.action.util.ObjectActionVariablesUtil;
 import com.liferay.object.model.ObjectAction;
 import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.service.ObjectActionLocalService;
@@ -34,8 +34,10 @@ import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.kernel.util.Validator;
+import com.liferay.portal.vulcan.dto.converter.DTOConverterRegistry;
 
 import java.util.List;
+import java.util.Map;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -63,7 +65,7 @@ public class ObjectActionEngineImpl implements ObjectActionEngine {
 	}
 
 	private boolean _evaluateConditionExpression(
-		String conditionExpression, JSONObject payloadJSONObject) {
+		String conditionExpression, Map<String, Object> variables) {
 
 		if (Validator.isNull(conditionExpression)) {
 			return true;
@@ -76,9 +78,7 @@ public class ObjectActionEngineImpl implements ObjectActionEngine {
 						conditionExpression
 					).build());
 
-			ddmExpression.setVariables(
-				ObjectActionDataConverterUtil.convertPayloadJSONObject(
-					payloadJSONObject));
+			ddmExpression.setVariables(variables);
 
 			return ddmExpression.evaluate();
 		}
@@ -120,6 +120,9 @@ public class ObjectActionEngineImpl implements ObjectActionEngine {
 			"userId", userId
 		);
 
+		Map<String, Object> variables = ObjectActionVariablesUtil.toVariables(
+			_dtoConverterRegistry, objectDefinition, payloadJSONObject);
+
 		List<ObjectAction> objectActions =
 			_objectActionLocalService.getObjectActions(
 				objectDefinition.getObjectDefinitionId(),
@@ -129,7 +132,7 @@ public class ObjectActionEngineImpl implements ObjectActionEngine {
 			if (GetterUtil.getBoolean(
 					PropsUtil.get("feature.flag.LPS-152181")) &&
 				!_evaluateConditionExpression(
-					objectAction.getConditionExpression(), payloadJSONObject)) {
+					objectAction.getConditionExpression(), variables)) {
 
 				continue;
 			}
@@ -149,6 +152,9 @@ public class ObjectActionEngineImpl implements ObjectActionEngine {
 
 	@Reference
 	private DDMExpressionFactory _ddmExpressionFactory;
+
+	@Reference
+	private DTOConverterRegistry _dtoConverterRegistry;
 
 	@Reference
 	private ObjectActionExecutorRegistry _objectActionExecutorRegistry;

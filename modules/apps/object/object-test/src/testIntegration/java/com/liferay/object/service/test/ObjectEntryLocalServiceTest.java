@@ -1090,7 +1090,7 @@ public class ObjectEntryLocalServiceTest {
 	public void testGetValuesList() throws Exception {
 		List<Map<String, Serializable>> valuesList =
 			_objectEntryLocalService.getValuesList(
-				_objectDefinition.getObjectDefinitionId(), null, null,
+				_objectDefinition.getObjectDefinitionId(), 0, null, null, null,
 				QueryUtil.ALL_POS, QueryUtil.ALL_POS);
 
 		Assert.assertEquals(valuesList.toString(), 0, valuesList.size());
@@ -1107,7 +1107,7 @@ public class ObjectEntryLocalServiceTest {
 			).build());
 
 		valuesList = _objectEntryLocalService.getValuesList(
-			_objectDefinition.getObjectDefinitionId(), null, null,
+			_objectDefinition.getObjectDefinitionId(), 0, null, null, null,
 			QueryUtil.ALL_POS, QueryUtil.ALL_POS);
 
 		Assert.assertEquals(valuesList.toString(), 1, valuesList.size());
@@ -1133,7 +1133,7 @@ public class ObjectEntryLocalServiceTest {
 			).build());
 
 		valuesList = _objectEntryLocalService.getValuesList(
-			_objectDefinition.getObjectDefinitionId(), null, null,
+			_objectDefinition.getObjectDefinitionId(), 0, null, null, null,
 			QueryUtil.ALL_POS, QueryUtil.ALL_POS);
 
 		Assert.assertEquals(valuesList.toString(), 2, valuesList.size());
@@ -1168,7 +1168,7 @@ public class ObjectEntryLocalServiceTest {
 			).build());
 
 		valuesList = _objectEntryLocalService.getValuesList(
-			_objectDefinition.getObjectDefinitionId(), null, null,
+			_objectDefinition.getObjectDefinitionId(), 0, null, null, null,
 			QueryUtil.ALL_POS, QueryUtil.ALL_POS);
 
 		Assert.assertEquals(valuesList.toString(), 3, valuesList.size());
@@ -1203,8 +1203,8 @@ public class ObjectEntryLocalServiceTest {
 		Assert.assertEquals(values.toString(), 19, values.size());
 
 		valuesList = _objectEntryLocalService.getValuesList(
-			_irrelevantObjectDefinition.getObjectDefinitionId(), null, null,
-			QueryUtil.ALL_POS, QueryUtil.ALL_POS);
+			_irrelevantObjectDefinition.getObjectDefinitionId(), 0, null, null,
+			null, QueryUtil.ALL_POS, QueryUtil.ALL_POS);
 
 		Assert.assertEquals(valuesList.toString(), 0, valuesList.size());
 	}

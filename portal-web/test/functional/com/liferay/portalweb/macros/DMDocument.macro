@@ -955,7 +955,7 @@ definition {
 	macro checkDocumentCheckboxPG {
 		var key_listEntry = "${dmDocumentTitle}";
 
-		Check(locator1 = "LexiconList#LIST_ENTRY_CHECKBOX");
+		Check.checkNotVisible(locator1 = "LexiconList#LIST_ENTRY_CHECKBOX");
 	}
 
 	macro checkinCP {
@@ -1571,9 +1571,11 @@ definition {
 	}
 
 	macro editCP {
-		LexiconEntry.gotoEntryMenuItem(
-			menuItem = "Edit",
-			rowEntry = "${dmDocumentTitle}");
+		if (!(isSet(skipNavigation))) {
+			LexiconEntry.gotoEntryMenuItem(
+				menuItem = "Edit",
+				rowEntry = "${dmDocumentTitle}");
+		}
 
 		DMDocument.editCmd(
 			dmDocumentDescriptionEdit = "${dmDocumentDescriptionEdit}",
@@ -1746,6 +1748,8 @@ definition {
 	}
 
 	macro editFriendlyURL {
+		Panel.expandPanel(panel = "Friendly URL");
+
 		Type(
 			inputFieldId = "urlTitle",
 			locator1 = "TextInput#INPUT_ID",
@@ -2594,6 +2598,8 @@ definition {
 	}
 
 	macro tearDownCP {
+		var key_dmDocumentTitle = "tree.png";
+
 		Navigator.openURL();
 
 		ProductMenu.gotoPortlet(
@@ -2603,11 +2609,17 @@ definition {
 		if (IsElementNotPresent(locator1 = "Message#EMPTY_INFO")) {
 			Click.clickNoMouseOverNoWaitForVisible(locator1 = "DocumentsAndMedia#TOOLBAR_SELECT_ALL_CHECKBOX");
 
-			Click(locator1 = "DocumentsAndMedia#TOOLBAR_ACTIONS");
+			if (IsElementPresent(locator1 = "DocumentsAndMedia#ICON_DOCUMENT_CHECKBOX")) {
+				Click.clickNoMouseOverNoWaitForVisible(locator1 = "DocumentsAndMedia#ICON_DOCUMENT_CHECKBOX");
+			}
 
-			MenuItem.viewPresent(menuItem = "Delete");
+			if (IsElementPresent(locator1 = "DocumentsAndMedia#TOOLBAR_ACTIONS")) {
+				Click(locator1 = "DocumentsAndMedia#TOOLBAR_ACTIONS");
 
-			PortletEntry.clickMoveToRecycleBin();
+				MenuItem.viewPresent(menuItem = "Delete");
+
+				PortletEntry.clickMoveToRecycleBin();
+			}
 		}
 
 		JSONRecycleBin.emptyRecycleBin();

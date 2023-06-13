@@ -12,6 +12,7 @@
  * details.
  */
 
+export declare type BoxType = 'regular' | 'categorization';
 export declare type TName = {
 	[key: string]: string;
 };
@@ -31,6 +32,7 @@ export declare type TObjectLayoutBox = {
 	name: TName;
 	objectLayoutRows: TObjectLayoutRow[];
 	priority: number;
+	type: BoxType;
 };
 export declare type TObjectLayoutRow = {
 	objectLayoutColumns: TObjectLayoutColumn[];

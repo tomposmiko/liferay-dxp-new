@@ -35,7 +35,6 @@ import com.liferay.portal.kernel.model.ShardedModel;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.service.ClassNameLocalService;
 import com.liferay.portal.kernel.service.UserLocalService;
-import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
@@ -98,12 +97,35 @@ public class DXPEntityDTOConverterImpl implements DXPEntityDTOConverter {
 			Field field = new Field() {
 				{
 					name = entry.getKey();
+
 					value = entry.getValue();
+
+					if (value instanceof Date) {
+						Date date = (Date)value;
+
+						value = date.getTime();
+					}
 				}
 			};
 
 			fields.add(field);
 		}
+	}
+
+	private List<String> _filterAttributeNames(
+		List<String> attributeNames, List<String> removeAttributeNames) {
+
+		List<String> filteredAttributeNames = new ArrayList<>();
+
+		for (String attributeName : attributeNames) {
+			if (removeAttributeNames.contains(attributeName)) {
+				continue;
+			}
+
+			filteredAttributeNames.add(attributeName);
+		}
+
+		return filteredAttributeNames;
 	}
 
 	private Map<String, Serializable> _getAttributes(
@@ -165,7 +187,10 @@ public class DXPEntityDTOConverterImpl implements DXPEntityDTOConverter {
 					new Field() {
 						{
 							name = "modifiedDate";
-							value = expandoColumn.getModifiedDate();
+
+							Date modifiedDate = expandoColumn.getModifiedDate();
+
+							value = modifiedDate.getTime();
 						}
 					});
 				add(
@@ -273,13 +298,15 @@ public class DXPEntityDTOConverterImpl implements DXPEntityDTOConverter {
 				_analyticsConfigurationTracker.getAnalyticsConfiguration(
 					user.getCompanyId());
 
-			_addFieldAttributes(
-				user.getContact(), fields,
-				ListUtil.fromArray(
-					analyticsConfiguration.syncedContactFieldNames()));
-
 			includeAttributeNames = ListUtil.fromArray(
 				analyticsConfiguration.syncedUserFieldNames());
+
+			_addFieldAttributes(
+				user.getContact(), fields,
+				_filterAttributeNames(
+					ListUtil.fromArray(
+						analyticsConfiguration.syncedContactFieldNames()),
+					includeAttributeNames));
 		}
 
 		_addFieldAttributes(baseModel, fields, includeAttributeNames);
@@ -331,13 +358,17 @@ public class DXPEntityDTOConverterImpl implements DXPEntityDTOConverter {
 
 		DXPEntity dxpEntity = new DXPEntity();
 
-		if (ArrayUtil.isNotEmpty(expandoFields)) {
-			dxpEntity.setExpandoFields(expandoFields);
+		if (expandoFields == null) {
+			expandoFields = new ExpandoField[0];
 		}
 
-		if (ArrayUtil.isNotEmpty(fields)) {
-			dxpEntity.setFields(fields);
+		dxpEntity.setExpandoFields(expandoFields);
+
+		if (fields == null) {
+			fields = new Field[0];
 		}
+
+		dxpEntity.setFields(fields);
 
 		dxpEntity.setId(id);
 		dxpEntity.setModifiedDate(modifiedDate);

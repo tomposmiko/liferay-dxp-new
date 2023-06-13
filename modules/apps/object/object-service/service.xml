@@ -56,8 +56,10 @@
 
 		<!-- Other fields -->
 
+		<column db-name="accountERObjectFieldId" name="accountEntryRestrictedObjectFieldId" type="long" />
 		<column name="descriptionObjectFieldId" type="long" />
 		<column name="titleObjectFieldId" type="long" />
+		<column name="accountEntryRestricted" type="boolean" />
 		<column name="active" type="boolean" />
 		<column method-name="DBTableName" name="dbTableName" type="String" />
 		<column localized="true" name="label" type="String" />
@@ -164,7 +166,7 @@
 			<finder-column name="objectDefinitionId" />
 			<finder-column comparator="!=" name="status" />
 		</finder>
-		<finder name="G_C_ERC" return-type="ObjectEntry">
+		<finder name="G_C_ERC" return-type="ObjectEntry" unique="true">
 			<finder-column name="groupId" />
 			<finder-column name="companyId" />
 			<finder-column name="externalReferenceCode" />
@@ -314,6 +316,7 @@
 		<column name="collapsable" type="boolean" />
 		<column localized="true" name="name" type="String" />
 		<column name="priority" type="int" />
+		<column name="type" type="String" />
 
 		<!-- Finder methods -->
 
@@ -624,6 +627,7 @@
 		<exception>ObjectActionExecutorKey</exception>
 		<exception>ObjectActionName</exception>
 		<exception>ObjectActionTriggerKey</exception>
+		<exception>ObjectDefinitionAccountEntryRestricted</exception>
 		<exception>ObjectDefinitionActive</exception>
 		<exception>ObjectDefinitionLabel</exception>
 		<exception>ObjectDefinitionName</exception>
@@ -640,6 +644,7 @@
 		<exception>ObjectFieldRelationshipType</exception>
 		<exception>ObjectFieldSettingName</exception>
 		<exception>ObjectFieldSettingValue</exception>
+		<exception>ObjectLayoutBoxCategorizationType</exception>
 		<exception>ObjectLayoutColumnSize</exception>
 		<exception>ObjectRelationshipName</exception>
 		<exception>ObjectRelationshipReverse</exception>

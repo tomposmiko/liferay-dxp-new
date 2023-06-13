@@ -12,12 +12,13 @@
  * details.
  */
 
+import {CustomItem} from '@liferay/object-js-components-web';
 import React from 'react';
 
-import {CustomItem} from '../Form/CustomSelect/CustomSelect';
 import ObjectAction from './index';
 
 export default function EditObjectAction({
+	ffNotificationTemplates,
 	objectAction: {id, ...values},
 	objectActionExecutors,
 	objectActionTriggers,
@@ -25,6 +26,7 @@ export default function EditObjectAction({
 }: IProps) {
 	return (
 		<ObjectAction
+			ffNotificationTemplates={ffNotificationTemplates}
 			objectAction={values}
 			objectActionExecutors={objectActionExecutors}
 			objectActionTriggers={objectActionTriggers}
@@ -42,6 +44,7 @@ export default function EditObjectAction({
 }
 
 interface IProps {
+	ffNotificationTemplates: boolean;
 	objectAction: ObjectAction;
 	objectActionExecutors: CustomItem[];
 	objectActionTriggers: CustomItem[];

@@ -486,7 +486,9 @@ export default withRouter(
 
 				window.location.replace(
 					`/c/portal/login?redirect=${baseURL}${
-						context.historyRouterBasePath ? '' : '#'
+						context.historyRouterBasePath
+							? context.historyRouterBasePath.replace('/', '')
+							: '#'
 					}/questions/${sectionTitle}/new`
 				);
 			}
@@ -606,6 +608,7 @@ export default withRouter(
 							>
 								{(question) => (
 									<QuestionRow
+										context={context}
 										currentSection={sectionTitle}
 										key={question.id}
 										question={question}

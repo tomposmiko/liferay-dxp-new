@@ -32,7 +32,6 @@ EnumConstantDividerCheck | .java | Find unnecessary empty lines between enum con
 EnumConstantOrderCheck | .java | Checks the order of enum constants. |
 EqualClauseIfStatementsCheck | .java | Finds consecutive if-statements with identical clauses. |
 [ExceptionMessageCheck](check/message_check.markdown#messagecheck) | .java, .jsp, .jspf, .jspx, .tag, .tpl or .vm | Validates messages that are passed to exceptions. |
-[FDSTableSchemaBuilderCheck](check/fds_table_schema_builder_check.markdown#fdstableschemabuildercheck) | .java | Finds cases where `add` should be used. |
 FTLEmptyLinesCheck | .ftl | Finds missing and unnecessary empty lines. |
 [FTLIfStatementCheck](check/if_statement_check.markdown#ifstatementcheck) | .ftl | Finds incorrect use of parentheses in statement. |
 FTLImportsCheck | .ftl | Sorts and groups imports in `.ftl` files. |
@@ -127,6 +126,7 @@ PropertiesDefinitionKeysCheck | .eslintignore, .prettierignore or .properties | 
 PropertiesDependenciesFileCheck | .eslintignore, .prettierignore or .properties | Sorts the properties in `dependencies.properties` file. |
 PropertiesEmptyLinesCheck | .eslintignore, .prettierignore or .properties | Finds missing and unnecessary empty lines. |
 PropertiesLanguageKeysOrderCheck | .eslintignore, .prettierignore or .properties | Sort language keys in `Language.properties` file. |
+PropertiesLanguageStylingCheck | .eslintignore, .prettierignore or .properties | Applies rules to enforce consistency in code style. |
 PropertiesLongLinesCheck | .eslintignore, .prettierignore or .properties | Finds lines that are longer than the specified maximum line length. |
 PropertiesMultiLineValuesOrderCheck | .eslintignore, .prettierignore or .properties | Verifies that property with multiple values is not on a single line. |
 PropertiesSQLStylingCheck | .eslintignore, .prettierignore or .properties | Applies rules to enforce consistency in code style. |

@@ -19,12 +19,12 @@ export default function propsTransformer({portletNamespace, ...otherProps}) {
 			const {value} = event.currentTarget;
 
 			document
-				.querySelectorAll(`fieldset[id*='${portletNamespace}_type_']`)
+				.querySelectorAll(`fieldset[id*='${portletNamespace}_fields_']`)
 				.forEach((fieldset) => {
 					fieldset.classList.add('d-none');
 					fieldset.setAttribute('disabled', true);
 
-					if (fieldset.id.endsWith(value)) {
+					if (fieldset.id.includes('_' + value)) {
 						fieldset.classList.remove('d-none');
 						fieldset.removeAttribute('disabled');
 					}

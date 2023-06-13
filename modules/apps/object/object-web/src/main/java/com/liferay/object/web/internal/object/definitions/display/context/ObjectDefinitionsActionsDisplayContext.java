@@ -20,12 +20,15 @@ import com.liferay.object.action.executor.ObjectActionExecutor;
 import com.liferay.object.action.executor.ObjectActionExecutorRegistry;
 import com.liferay.object.action.trigger.ObjectActionTrigger;
 import com.liferay.object.action.trigger.ObjectActionTriggerRegistry;
+import com.liferay.object.admin.rest.dto.v1_0.util.ObjectActionUtil;
+import com.liferay.object.constants.ObjectActionExecutorConstants;
 import com.liferay.object.model.ObjectAction;
 import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.web.internal.constants.ObjectWebKeys;
 import com.liferay.object.web.internal.object.definitions.display.context.util.ObjectCodeEditorUtil;
 import com.liferay.petra.function.UnsafeConsumer;
 import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
+import com.liferay.petra.portlet.url.builder.ResourceURLBuilder;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONFactory;
@@ -34,10 +37,15 @@ import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.portlet.LiferayWindowState;
 import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermission;
+import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.PropsUtil;
+import com.liferay.portal.kernel.util.StringUtil;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+
+import javax.portlet.ResourceURL;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -112,6 +120,15 @@ public class ObjectDefinitionsActionsDisplayContext
 		for (ObjectActionExecutor objectActionExecutor :
 				_objectActionExecutorRegistry.getObjectActionExecutors()) {
 
+			if (!GetterUtil.getBoolean(
+					PropsUtil.get("feature.flag.LPS-152180")) &&
+				StringUtil.equals(
+					objectActionExecutor.getKey(),
+					ObjectActionExecutorConstants.KEY_ADD_OBJECT_ENTRY)) {
+
+				continue;
+			}
+
 			objectActionExecutorsJSONArray.put(
 				JSONUtil.put(
 					"description",
@@ -159,7 +176,9 @@ public class ObjectDefinitionsActionsDisplayContext
 		).put(
 			"objectActionTriggerKey", objectAction.getObjectActionTriggerKey()
 		).put(
-			"parameters", objectAction.getParametersUnicodeProperties()
+			"parameters",
+			ObjectActionUtil.toParameters(
+				objectAction.getParametersUnicodeProperties())
 		);
 	}
 
@@ -200,6 +219,19 @@ public class ObjectDefinitionsActionsDisplayContext
 
 		return (ObjectDefinition)httpServletRequest.getAttribute(
 			ObjectWebKeys.OBJECT_DEFINITION);
+	}
+
+	public String getObjectDefinitionsRelationshipsURL() {
+		ResourceURL resourceURL = ResourceURLBuilder.createResourceURL(
+			objectRequestHelper.getLiferayPortletResponse()
+		).setResourceID(
+			"/object_definitions/get_object_definitions_relationships"
+		).buildResourceURL();
+
+		resourceURL.setParameter(
+			"objectDefinitionId", String.valueOf(getObjectDefinitionId()));
+
+		return resourceURL.toString();
 	}
 
 	@Override

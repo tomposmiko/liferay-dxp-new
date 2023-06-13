@@ -3,7 +3,7 @@
 
 <service-builder auto-import-default-references="false" auto-namespace-tables="false" dependency-injector="ds" mvcc-enabled="true" package-path="com.liferay.client.extension" short-no-such-exception-enabled="false">
 	<namespace>ClientExtension</namespace>
-	<entity external-reference-code="true" local-service="true" name="ClientExtensionEntry" remote-service="true" trash-enabled="false" uuid="true">
+	<entity change-tracking-enabled="true" external-reference-code="true" local-service="true" name="ClientExtensionEntry" remote-service="true" trash-enabled="false" uuid="true">
 
 		<!-- PK fields -->
 
@@ -19,23 +19,59 @@
 
 		<!-- Other fields -->
 
-		<column name="customElementCSSURLs" type="String" />
-		<column name="customElementHTMLElementName" type="String" />
-		<column name="customElementURLs" type="String" />
-		<column name="customElementUseESM" type="boolean" />
 		<column name="description" type="String" />
-		<column name="friendlyURLMapping" type="String" />
-		<column method-name="IFrameURL" name="iFrameURL" type="String" />
-		<column name="instanceable" type="boolean" />
 		<column localized="true" name="name" type="String" />
-		<column name="portletCategoryName" type="String" />
 		<column name="properties" type="String" />
 		<column name="sourceCodeURL" type="String" />
 		<column name="type" type="String" />
+		<column name="typeSettings" type="String" />
 		<column name="status" type="int" />
 		<column name="statusByUserId" type="long" />
 		<column name="statusByUserName" type="String" />
 		<column name="statusDate" type="Date" />
+
+		<!-- Finder methods -->
+
+		<finder name="CompanyId" return-type="Collection">
+			<finder-column name="companyId" />
+		</finder>
+		<finder name="C_T" return-type="Collection">
+			<finder-column name="companyId" />
+			<finder-column name="type" />
+		</finder>
+	</entity>
+	<entity change-tracking-enabled="true" external-reference-code="true" local-service="true" name="ClientExtensionEntryRel" remote-service="false" trash-enabled="false" uuid="true">
+
+		<!-- PK fields -->
+
+		<column container-model="true" name="clientExtensionEntryRelId" primary="true" type="long" />
+
+		<!-- Audit fields -->
+
+		<column name="companyId" type="long" />
+		<column name="userId" type="long" />
+		<column name="userName" type="String" uad-anonymize-field-name="fullName" />
+		<column name="createDate" type="Date" />
+		<column name="modifiedDate" type="Date" />
+
+		<!-- Other fields -->
+
+		<column name="classNameId" type="long" />
+		<column name="classPK" type="long" />
+		<column method-name="CETExternalReferenceCode" name="cetExternalReferenceCode" type="String" />
+		<column name="type" type="String" />
+
+		<!-- Finder methods -->
+
+		<finder name="C_C" return-type="Collection">
+			<finder-column name="classNameId" />
+			<finder-column name="classPK" />
+		</finder>
+		<finder name="C_C_T" return-type="Collection">
+			<finder-column name="classNameId" />
+			<finder-column name="classPK" />
+			<finder-column name="type" />
+		</finder>
 	</entity>
 	<exceptions>
 		<exception>ClientExtensionEntryCustomElementCSSURLs</exception>
@@ -43,6 +79,7 @@
 		<exception>ClientExtensionEntryCustomElementURLs</exception>
 		<exception>ClientExtensionEntryFriendlyURLMapping</exception>
 		<exception>ClientExtensionEntryIFrameURL</exception>
+		<exception>ClientExtensionEntryType</exception>
 		<exception>DuplicateClientExtensionEntryExternalReferenceCode</exception>
 	</exceptions>
 </service-builder>

@@ -39,6 +39,11 @@ components:
             type: object
         ObjectDefinition:
             properties:
+                accountEntryRestricted:
+                    type: boolean
+                accountEntryRestrictedObjectFieldId:
+                    format: int64
+                    type: integer
                 actions:
                     additionalProperties:
                         additionalProperties:
@@ -224,6 +229,9 @@ components:
                 priority:
                     format: int32
                     type: integer
+                type:
+                    enum: [categorization, regular]
+                    type: string
         ObjectLayoutColumn:
             properties:
                 id:
@@ -451,7 +459,7 @@ components:
 info:
     description:
         "A Java client JAR is available for use with the group ID 'com.liferay', artifact ID
-        'com.liferay.object.admin.rest.client', and version '1.0.25'."
+        'com.liferay.object.admin.rest.client', and version '1.0.26'."
     license:
         name: "Apache 2.0"
         url: "http://www.apache.org/licenses/LICENSE-2.0.html"

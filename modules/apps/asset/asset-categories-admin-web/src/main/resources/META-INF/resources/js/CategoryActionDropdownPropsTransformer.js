@@ -29,7 +29,7 @@ const ACTIONS = {
 	},
 
 	moveCategory(
-		{categoryId, categoryTitle, moveCategoryURL},
+		{categoryId, categoryTitle, selectParentCategoryURL},
 		portletNamespace
 	) {
 		openSelectionModal({
@@ -46,7 +46,7 @@ const ACTIONS = {
 				);
 
 				const parentCategoryId = item.categoryId || 0;
-				const vocabularyId = item.vocabularyId || 0;
+				const vocabularyId = item.vocabularyId;
 
 				if (categoryId === parentCategoryId) {
 					openToast({
@@ -84,7 +84,7 @@ const ACTIONS = {
 				Liferay.Language.get('move-x'),
 				categoryTitle
 			),
-			url: moveCategoryURL,
+			url: selectParentCategoryURL,
 		});
 	},
 

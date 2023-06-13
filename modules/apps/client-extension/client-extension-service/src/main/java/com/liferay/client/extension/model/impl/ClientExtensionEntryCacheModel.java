@@ -78,10 +78,12 @@ public class ClientExtensionEntryCacheModel
 
 	@Override
 	public String toString() {
-		StringBundler sb = new StringBundler(53);
+		StringBundler sb = new StringBundler(41);
 
 		sb.append("{mvccVersion=");
 		sb.append(mvccVersion);
+		sb.append(", ctCollectionId=");
+		sb.append(ctCollectionId);
 		sb.append(", uuid=");
 		sb.append(uuid);
 		sb.append(", externalReferenceCode=");
@@ -98,32 +100,18 @@ public class ClientExtensionEntryCacheModel
 		sb.append(createDate);
 		sb.append(", modifiedDate=");
 		sb.append(modifiedDate);
-		sb.append(", customElementCSSURLs=");
-		sb.append(customElementCSSURLs);
-		sb.append(", customElementHTMLElementName=");
-		sb.append(customElementHTMLElementName);
-		sb.append(", customElementURLs=");
-		sb.append(customElementURLs);
-		sb.append(", customElementUseESM=");
-		sb.append(customElementUseESM);
 		sb.append(", description=");
 		sb.append(description);
-		sb.append(", friendlyURLMapping=");
-		sb.append(friendlyURLMapping);
-		sb.append(", iFrameURL=");
-		sb.append(iFrameURL);
-		sb.append(", instanceable=");
-		sb.append(instanceable);
 		sb.append(", name=");
 		sb.append(name);
-		sb.append(", portletCategoryName=");
-		sb.append(portletCategoryName);
 		sb.append(", properties=");
 		sb.append(properties);
 		sb.append(", sourceCodeURL=");
 		sb.append(sourceCodeURL);
 		sb.append(", type=");
 		sb.append(type);
+		sb.append(", typeSettings=");
+		sb.append(typeSettings);
 		sb.append(", status=");
 		sb.append(status);
 		sb.append(", statusByUserId=");
@@ -143,6 +131,7 @@ public class ClientExtensionEntryCacheModel
 			new ClientExtensionEntryImpl();
 
 		clientExtensionEntryImpl.setMvccVersion(mvccVersion);
+		clientExtensionEntryImpl.setCtCollectionId(ctCollectionId);
 
 		if (uuid == null) {
 			clientExtensionEntryImpl.setUuid("");
@@ -185,31 +174,6 @@ public class ClientExtensionEntryCacheModel
 			clientExtensionEntryImpl.setModifiedDate(new Date(modifiedDate));
 		}
 
-		if (customElementCSSURLs == null) {
-			clientExtensionEntryImpl.setCustomElementCSSURLs("");
-		}
-		else {
-			clientExtensionEntryImpl.setCustomElementCSSURLs(
-				customElementCSSURLs);
-		}
-
-		if (customElementHTMLElementName == null) {
-			clientExtensionEntryImpl.setCustomElementHTMLElementName("");
-		}
-		else {
-			clientExtensionEntryImpl.setCustomElementHTMLElementName(
-				customElementHTMLElementName);
-		}
-
-		if (customElementURLs == null) {
-			clientExtensionEntryImpl.setCustomElementURLs("");
-		}
-		else {
-			clientExtensionEntryImpl.setCustomElementURLs(customElementURLs);
-		}
-
-		clientExtensionEntryImpl.setCustomElementUseESM(customElementUseESM);
-
 		if (description == null) {
 			clientExtensionEntryImpl.setDescription("");
 		}
@@ -217,35 +181,11 @@ public class ClientExtensionEntryCacheModel
 			clientExtensionEntryImpl.setDescription(description);
 		}
 
-		if (friendlyURLMapping == null) {
-			clientExtensionEntryImpl.setFriendlyURLMapping("");
-		}
-		else {
-			clientExtensionEntryImpl.setFriendlyURLMapping(friendlyURLMapping);
-		}
-
-		if (iFrameURL == null) {
-			clientExtensionEntryImpl.setIFrameURL("");
-		}
-		else {
-			clientExtensionEntryImpl.setIFrameURL(iFrameURL);
-		}
-
-		clientExtensionEntryImpl.setInstanceable(instanceable);
-
 		if (name == null) {
 			clientExtensionEntryImpl.setName("");
 		}
 		else {
 			clientExtensionEntryImpl.setName(name);
-		}
-
-		if (portletCategoryName == null) {
-			clientExtensionEntryImpl.setPortletCategoryName("");
-		}
-		else {
-			clientExtensionEntryImpl.setPortletCategoryName(
-				portletCategoryName);
 		}
 
 		if (properties == null) {
@@ -267,6 +207,13 @@ public class ClientExtensionEntryCacheModel
 		}
 		else {
 			clientExtensionEntryImpl.setType(type);
+		}
+
+		if (typeSettings == null) {
+			clientExtensionEntryImpl.setTypeSettings("");
+		}
+		else {
+			clientExtensionEntryImpl.setTypeSettings(typeSettings);
 		}
 
 		clientExtensionEntryImpl.setStatus(status);
@@ -296,6 +243,8 @@ public class ClientExtensionEntryCacheModel
 		throws ClassNotFoundException, IOException {
 
 		mvccVersion = objectInput.readLong();
+
+		ctCollectionId = objectInput.readLong();
 		uuid = objectInput.readUTF();
 		externalReferenceCode = objectInput.readUTF();
 
@@ -307,21 +256,12 @@ public class ClientExtensionEntryCacheModel
 		userName = objectInput.readUTF();
 		createDate = objectInput.readLong();
 		modifiedDate = objectInput.readLong();
-		customElementCSSURLs = (String)objectInput.readObject();
-		customElementHTMLElementName = objectInput.readUTF();
-		customElementURLs = (String)objectInput.readObject();
-
-		customElementUseESM = objectInput.readBoolean();
 		description = (String)objectInput.readObject();
-		friendlyURLMapping = objectInput.readUTF();
-		iFrameURL = objectInput.readUTF();
-
-		instanceable = objectInput.readBoolean();
 		name = objectInput.readUTF();
-		portletCategoryName = objectInput.readUTF();
 		properties = (String)objectInput.readObject();
 		sourceCodeURL = objectInput.readUTF();
 		type = objectInput.readUTF();
+		typeSettings = (String)objectInput.readObject();
 
 		status = objectInput.readInt();
 
@@ -333,6 +273,8 @@ public class ClientExtensionEntryCacheModel
 	@Override
 	public void writeExternal(ObjectOutput objectOutput) throws IOException {
 		objectOutput.writeLong(mvccVersion);
+
+		objectOutput.writeLong(ctCollectionId);
 
 		if (uuid == null) {
 			objectOutput.writeUTF("");
@@ -364,29 +306,6 @@ public class ClientExtensionEntryCacheModel
 		objectOutput.writeLong(createDate);
 		objectOutput.writeLong(modifiedDate);
 
-		if (customElementCSSURLs == null) {
-			objectOutput.writeObject("");
-		}
-		else {
-			objectOutput.writeObject(customElementCSSURLs);
-		}
-
-		if (customElementHTMLElementName == null) {
-			objectOutput.writeUTF("");
-		}
-		else {
-			objectOutput.writeUTF(customElementHTMLElementName);
-		}
-
-		if (customElementURLs == null) {
-			objectOutput.writeObject("");
-		}
-		else {
-			objectOutput.writeObject(customElementURLs);
-		}
-
-		objectOutput.writeBoolean(customElementUseESM);
-
 		if (description == null) {
 			objectOutput.writeObject("");
 		}
@@ -394,34 +313,11 @@ public class ClientExtensionEntryCacheModel
 			objectOutput.writeObject(description);
 		}
 
-		if (friendlyURLMapping == null) {
-			objectOutput.writeUTF("");
-		}
-		else {
-			objectOutput.writeUTF(friendlyURLMapping);
-		}
-
-		if (iFrameURL == null) {
-			objectOutput.writeUTF("");
-		}
-		else {
-			objectOutput.writeUTF(iFrameURL);
-		}
-
-		objectOutput.writeBoolean(instanceable);
-
 		if (name == null) {
 			objectOutput.writeUTF("");
 		}
 		else {
 			objectOutput.writeUTF(name);
-		}
-
-		if (portletCategoryName == null) {
-			objectOutput.writeUTF("");
-		}
-		else {
-			objectOutput.writeUTF(portletCategoryName);
 		}
 
 		if (properties == null) {
@@ -445,6 +341,13 @@ public class ClientExtensionEntryCacheModel
 			objectOutput.writeUTF(type);
 		}
 
+		if (typeSettings == null) {
+			objectOutput.writeObject("");
+		}
+		else {
+			objectOutput.writeObject(typeSettings);
+		}
+
 		objectOutput.writeInt(status);
 
 		objectOutput.writeLong(statusByUserId);
@@ -460,6 +363,7 @@ public class ClientExtensionEntryCacheModel
 	}
 
 	public long mvccVersion;
+	public long ctCollectionId;
 	public String uuid;
 	public String externalReferenceCode;
 	public long clientExtensionEntryId;
@@ -468,19 +372,12 @@ public class ClientExtensionEntryCacheModel
 	public String userName;
 	public long createDate;
 	public long modifiedDate;
-	public String customElementCSSURLs;
-	public String customElementHTMLElementName;
-	public String customElementURLs;
-	public boolean customElementUseESM;
 	public String description;
-	public String friendlyURLMapping;
-	public String iFrameURL;
-	public boolean instanceable;
 	public String name;
-	public String portletCategoryName;
 	public String properties;
 	public String sourceCodeURL;
 	public String type;
+	public String typeSettings;
 	public int status;
 	public long statusByUserId;
 	public String statusByUserName;

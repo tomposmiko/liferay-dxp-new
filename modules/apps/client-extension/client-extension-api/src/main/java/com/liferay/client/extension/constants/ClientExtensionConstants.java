@@ -21,8 +21,4 @@ public class ClientExtensionConstants {
 
 	public static final String RESOURCE_NAME = "com.liferay.client.extension";
 
-	public static final String TYPE_CUSTOM_ELEMENT = "customElement";
-
-	public static final String TYPE_IFRAME = "iframe";
-
 }

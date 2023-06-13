@@ -17,7 +17,7 @@ import {Align} from '@clayui/drop-down';
 import ClayIcon from '@clayui/icon';
 import ClayTabs from '@clayui/tabs';
 import classNames from 'classnames';
-import {useContext, useEffect} from 'react';
+import {useContext} from 'react';
 import {useNavigate} from 'react-router-dom';
 
 import {HeaderContext} from '../../context/HeaderContext';
@@ -33,12 +33,6 @@ const Header = () => {
 	const [{actions, dropdown, heading, symbol, tabs}] = useContext(
 		HeaderContext
 	);
-
-	useEffect(() => {
-		const {title} = heading[heading.length - 1];
-
-		document.title = title;
-	}, [heading]);
 
 	const navigate = useNavigate();
 
@@ -64,7 +58,7 @@ const Header = () => {
 	);
 
 	return (
-		<div className="d-flex flex-column header-container pt-4">
+		<header className="d-flex flex-column header-container pt-4">
 			<div className="d-flex">
 				<div className="align-items-center d-flex justify-content-center mx-3">
 					{dropdown.length ? (
@@ -158,7 +152,7 @@ const Header = () => {
 					</ClayTabs.Item>
 				))}
 			</ClayTabs>
-		</div>
+		</header>
 	);
 };
 

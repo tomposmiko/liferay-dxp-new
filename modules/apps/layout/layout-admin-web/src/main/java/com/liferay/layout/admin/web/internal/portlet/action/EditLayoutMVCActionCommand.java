@@ -16,6 +16,8 @@ package com.liferay.layout.admin.web.internal.portlet.action;
 
 import com.liferay.asset.kernel.model.AssetEntry;
 import com.liferay.asset.kernel.service.AssetEntryLocalService;
+import com.liferay.client.extension.constants.ClientExtensionEntryConstants;
+import com.liferay.client.extension.service.ClientExtensionEntryRelLocalService;
 import com.liferay.document.library.kernel.service.DLAppLocalService;
 import com.liferay.layout.admin.constants.LayoutAdminPortletKeys;
 import com.liferay.portal.events.EventsProcessorUtil;
@@ -117,12 +119,15 @@ public class EditLayoutMVCActionCommand extends BaseMVCActionCommand {
 			Layout layout = _layoutLocalService.getLayout(
 				groupId, privateLayout, layoutId);
 
-			long masterLayoutPlid = ParamUtil.getLong(
-				uploadPortletRequest, "masterLayoutPlid",
-				layout.getMasterLayoutPlid());
 			long styleBookEntryId = ParamUtil.getLong(
 				uploadPortletRequest, "styleBookEntryId",
 				layout.getStyleBookEntryId());
+			long faviconFileEntryId = ParamUtil.getLong(
+				uploadPortletRequest, "faviconFileEntryId",
+				layout.getFaviconFileEntryId());
+			long masterLayoutPlid = ParamUtil.getLong(
+				uploadPortletRequest, "masterLayoutPlid",
+				layout.getMasterLayoutPlid());
 
 			ServiceContext serviceContext = ServiceContextFactory.getInstance(
 				Layout.class.getName(), actionRequest);
@@ -155,8 +160,30 @@ public class EditLayoutMVCActionCommand extends BaseMVCActionCommand {
 				groupId, privateLayout, layoutId, layout.getParentLayoutId(),
 				nameMap, layout.getTitleMap(), layout.getDescriptionMap(),
 				layout.getKeywordsMap(), layout.getRobotsMap(), type, hidden,
-				friendlyURLMap, !deleteLogo, iconBytes, masterLayoutPlid,
-				styleBookEntryId, serviceContext);
+				friendlyURLMap, !deleteLogo, iconBytes, styleBookEntryId,
+				faviconFileEntryId, masterLayoutPlid, serviceContext);
+
+			String faviconCETExternalReferenceCode = ParamUtil.getString(
+				uploadPortletRequest, "faviconCETExternalReferenceCode");
+
+			if (Validator.isNotNull(faviconCETExternalReferenceCode)) {
+				_clientExtensionEntryRelLocalService.addClientExtensionEntryRel(
+					themeDisplay.getUserId(),
+					_portal.getClassNameId(Layout.class), layout.getPlid(),
+					faviconCETExternalReferenceCode,
+					ClientExtensionEntryConstants.TYPE_THEME_FAVICON);
+			}
+
+			String themeCSSCETExternalReferenceCode = ParamUtil.getString(
+				actionRequest, "themeCSSCETExternalReferenceCode");
+
+			if (Validator.isNotNull(themeCSSCETExternalReferenceCode)) {
+				_clientExtensionEntryRelLocalService.addClientExtensionEntryRel(
+					themeDisplay.getUserId(),
+					_portal.getClassNameId(Layout.class), layout.getPlid(),
+					themeCSSCETExternalReferenceCode,
+					ClientExtensionEntryConstants.TYPE_THEME_CSS);
+			}
 
 			UnicodeProperties formTypeSettingsUnicodeProperties =
 				PropertiesParamUtil.getProperties(
@@ -177,8 +204,27 @@ public class EditLayoutMVCActionCommand extends BaseMVCActionCommand {
 					draftLayout.getKeywordsMap(), draftLayout.getRobotsMap(),
 					type, draftLayout.isHidden(),
 					draftLayout.getFriendlyURLMap(), !deleteLogo, iconBytes,
-					draftLayout.getMasterLayoutPlid(), styleBookEntryId,
-					serviceContext);
+					styleBookEntryId, faviconFileEntryId,
+					draftLayout.getMasterLayoutPlid(), serviceContext);
+
+				if (Validator.isNotNull(faviconCETExternalReferenceCode)) {
+					_clientExtensionEntryRelLocalService.
+						addClientExtensionEntryRel(
+							themeDisplay.getUserId(),
+							_portal.getClassNameId(Layout.class),
+							draftLayout.getPlid(),
+							faviconCETExternalReferenceCode,
+							ClientExtensionEntryConstants.TYPE_THEME_FAVICON);
+				}
+
+				if (Validator.isNotNull(themeCSSCETExternalReferenceCode)) {
+					_clientExtensionEntryRelLocalService.
+						addClientExtensionEntryRel(
+							themeDisplay.getUserId(),
+							_portal.getClassNameId(Layout.class),
+							layout.getPlid(), themeCSSCETExternalReferenceCode,
+							ClientExtensionEntryConstants.TYPE_THEME_CSS);
+				}
 			}
 
 			themeDisplay.clearLayoutFriendlyURL(layout);
@@ -272,6 +318,10 @@ public class EditLayoutMVCActionCommand extends BaseMVCActionCommand {
 
 	@Reference
 	private AssetEntryLocalService _assetEntryLocalService;
+
+	@Reference
+	private ClientExtensionEntryRelLocalService
+		_clientExtensionEntryRelLocalService;
 
 	@Reference
 	private DLAppLocalService _dlAppLocalService;

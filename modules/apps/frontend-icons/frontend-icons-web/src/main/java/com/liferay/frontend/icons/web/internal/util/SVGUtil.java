@@ -93,6 +93,10 @@ public class SVGUtil {
 		for (FrontendIconsResourcePack frontendIconsResourcePack :
 				frontendIconsResourcePacks) {
 
+			if (frontendIconsResourcePack == null) {
+				continue;
+			}
+
 			for (FrontendIconsResource frontendIconsResource :
 					frontendIconsResourcePack.getFrontendIconsResources()) {
 

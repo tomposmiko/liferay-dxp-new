@@ -12,6 +12,7 @@
 <tbody>
 
 <!-- GENERAL_PATHS -->
+
 <tr>
 	<td>BUTTON_DIAGRAM_SOURCE_SWITCH</td>
 	<td>//*[not(self::div)][contains(@class,'btn-secondary')][normalize-space()=''][not(contains(@class,'navbar'))]</td>
@@ -22,7 +23,9 @@
 	<td>//div[contains(@class, 'alert-notifications')]</td>
 	<td></td>
 </tr>
+
 <!-- SOURCE_VIEW_PATHS -->
+
 <tr>
 	<td>SOURCE_EDITOR</td>
 	<td>//div[@class='CodeMirror-lines']</td>
@@ -43,7 +46,9 @@
 	<td>//div[contains(@class,'CodeMirror-gutter-wrapper')]//..//pre[@class=' CodeMirror-line ']//span[contains(.,'${key_elementOption}')]//..//*[normalize-space(text())='${key_elementValue}']</td>
 	<td></td>
 </tr>
+
 <!-- TRANSLATION_PATHS -->
+
 <tr>
 	<td>ICON_COUNTRY</td>
 	<td>//button[contains(@class,'btn')]//*[contains(@class,'lexicon-icon-${key_translationOptionSelected}')]</td>
@@ -59,7 +64,19 @@
 	<td>//div[@class='dropdown-menu show']</td>
 	<td></td>
 </tr>
+<tr>
+	<td>MANAGE_TRANSLATIONS_BUTTON</td>
+	<td>//button[@data-testid='translation-modal-trigger']//div[contains(@class,'autofit-section')and text()='Manage Translations']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>MANAGE_TRANSLATIONS_MODAL</td>
+	<td>//div[contains(text() ,'${key_modalTitle}')]/../../../..//*[contains(@class,'modal-dialog')]//*[contains(@class,'modal-body')]</td>
+	<td></td>
+</tr>
+
 <!-- DIAGRAM_VIEW_PATHS -->
+
 <tr>
 	<td>SIDEBAR_NODE</td>
 	<td>//div[@class='sidebar']//span[contains(.,'${key_nodeLabel}')]</td>
@@ -110,7 +127,9 @@
 	<td>//div[@class='react-flow']//span[contains(text(),'${key_nodeLabel}')]/../../..//div[@xpos='${key_nodeXPosition}' and @ypos='${key_nodeYPosition}']</td>
 	<td></td>
 </tr>
+
 <!-- CONNECTOR_PATHS -->
+
 <tr>
 	<td>SIDEBAR_CONNECTOR_LABEL</td>
 	<td>//input[@id='edgeLabel']</td>
@@ -136,7 +155,9 @@
 	<td>//div[@class='node ${key_nodeType}-node selected']/..//div[@data-handleid='${key_direction}Source']</td>
 	<td></td>
 </tr>
+
 <!-- MODAL_PATHS -->
+
 <tr>
 	<td>BUTTON_CLOSE_MODAL</td>
 	<td>//button[contains (@class,'close')]</td>
@@ -162,7 +183,9 @@
 	<td>//div[contains(@class, 'modal-content')]//div[contains(@class, 'modal-body') and contains(text(), '${key_modalMessage}')]</td>
 	<td></td>
 </tr>
+
 <!-- NODES_PROPERTIES_PATHS -->
+
 <tr>
 	<td>SIDEBAR_PROPERTY</td>
 	<td>//span[contains(., '${key_propertyName}')]/../..//div[@class='panel-body']/..//span[contains(.,'${key_propertyValue}')]</td>
@@ -181,6 +204,11 @@
 <tr>
 	<td>NODE_INFO</td>
 	<td>//span[contains(., 'Information')]/../..//input[@id='${key_infoOption}' and @value='${key_infoValue}'] | //span[contains(., 'Information')]/../..//textarea[@id='${key_infoOption}' and contains(., '${key_infoValue}')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>NODE_ID_GETTER</td>
+	<td>//input[@id='nodeId']</td>
 	<td></td>
 </tr>
 <tr>

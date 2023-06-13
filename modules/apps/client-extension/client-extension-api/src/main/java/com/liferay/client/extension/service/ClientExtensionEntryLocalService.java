@@ -16,7 +16,9 @@ package com.liferay.client.extension.service;
 
 import com.liferay.client.extension.model.ClientExtensionEntry;
 import com.liferay.exportimport.kernel.lar.PortletDataContext;
+import com.liferay.petra.function.UnsafeFunction;
 import com.liferay.petra.sql.dsl.query.DSLQuery;
+import com.liferay.portal.kernel.change.tracking.CTAware;
 import com.liferay.portal.kernel.cluster.Clusterable;
 import com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
@@ -32,6 +34,8 @@ import com.liferay.portal.kernel.search.IndexableType;
 import com.liferay.portal.kernel.search.Sort;
 import com.liferay.portal.kernel.service.BaseLocalService;
 import com.liferay.portal.kernel.service.PersistedModelLocalService;
+import com.liferay.portal.kernel.service.change.tracking.CTService;
+import com.liferay.portal.kernel.service.persistence.change.tracking.CTPersistence;
 import com.liferay.portal.kernel.systemevent.SystemEvent;
 import com.liferay.portal.kernel.transaction.Isolation;
 import com.liferay.portal.kernel.transaction.Propagation;
@@ -56,13 +60,15 @@ import org.osgi.annotation.versioning.ProviderType;
  * @see ClientExtensionEntryLocalServiceUtil
  * @generated
  */
+@CTAware
 @ProviderType
 @Transactional(
 	isolation = Isolation.PORTAL,
 	rollbackFor = {PortalException.class, SystemException.class}
 )
 public interface ClientExtensionEntryLocalService
-	extends BaseLocalService, PersistedModelLocalService {
+	extends BaseLocalService, CTService<ClientExtensionEntry>,
+			PersistedModelLocalService {
 
 	/*
 	 * NOTE FOR DEVELOPERS:
@@ -85,30 +91,17 @@ public interface ClientExtensionEntryLocalService
 		ClientExtensionEntry clientExtensionEntry);
 
 	@Indexable(type = IndexableType.REINDEX)
-	public ClientExtensionEntry addCustomElementClientExtensionEntry(
-			String externalReferenceCode, long userId,
-			String customElementCSSURLs, String customElementHTMLElementName,
-			String customElementURLs, boolean customElementUseESM,
-			String description, String friendlyURLMapping, boolean instanceable,
-			Map<Locale, String> nameMap, String portletCategoryName,
-			String properties, String sourceCodeURL)
+	public ClientExtensionEntry addClientExtensionEntry(
+			String externalReferenceCode, long userId, String description,
+			Map<Locale, String> nameMap, String properties,
+			String sourceCodeURL, String type, String typeSettings)
 		throws PortalException;
 
 	@Indexable(type = IndexableType.REINDEX)
-	public ClientExtensionEntry addIFrameClientExtensionEntry(
-			long userId, String description, String friendlyURLMapping,
-			String iFrameURL, boolean instanceable, Map<Locale, String> nameMap,
-			String portletCategoryName, String properties, String sourceCodeURL)
-		throws PortalException;
-
-	@Indexable(type = IndexableType.REINDEX)
-	public ClientExtensionEntry addOrUpdateCustomElementClientExtensionEntry(
-			String externalReferenceCode, long userId,
-			String customElementCSSURLs, String customElementHTMLElementName,
-			String customElementURLs, boolean customElementUseESM,
-			String description, String friendlyURLMapping, boolean instanceable,
-			Map<Locale, String> nameMap, String portletCategoryName,
-			String properties, String sourceCodeURL)
+	public ClientExtensionEntry addOrUpdateClientExtensionEntry(
+			String externalReferenceCode, long userId, String description,
+			Map<Locale, String> nameMap, String properties,
+			String sourceCodeURL, String type, String typeSettings)
 		throws PortalException;
 
 	/**
@@ -169,7 +162,8 @@ public interface ClientExtensionEntryLocalService
 
 	@Clusterable
 	public void deployClientExtensionEntry(
-		ClientExtensionEntry clientExtensionEntry);
+			ClientExtensionEntry clientExtensionEntry)
+		throws PortalException;
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public <T> T dslQuery(DSLQuery dslQuery);
@@ -296,6 +290,14 @@ public interface ClientExtensionEntryLocalService
 	public List<ClientExtensionEntry> getClientExtensionEntries(
 		int start, int end);
 
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public List<ClientExtensionEntry> getClientExtensionEntries(
+		long companyId, int start, int end);
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public List<ClientExtensionEntry> getClientExtensionEntries(
+		long companyId, String type, int start, int end);
+
 	/**
 	 * Returns the number of client extension entries.
 	 *
@@ -303,6 +305,12 @@ public interface ClientExtensionEntryLocalService
 	 */
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public int getClientExtensionEntriesCount();
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public int getClientExtensionEntriesCount(long companyId);
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public int getClientExtensionEntriesCount(long companyId, String type);
 
 	/**
 	 * Returns the client extension entry with the primary key.
@@ -392,26 +400,30 @@ public interface ClientExtensionEntryLocalService
 		ClientExtensionEntry clientExtensionEntry);
 
 	@Indexable(type = IndexableType.REINDEX)
-	public ClientExtensionEntry updateCustomElementClientExtensionEntry(
-			long userId, long clientExtensionEntryId,
-			String customElementCSSURLs, String customElementHTMLElementName,
-			String customElementURLs, boolean customElementUseESM,
-			String description, String friendlyURLMapping,
-			Map<Locale, String> nameMap, String portletCategoryName,
-			String properties, String sourceCodeURL)
-		throws PortalException;
-
-	@Indexable(type = IndexableType.REINDEX)
-	public ClientExtensionEntry updateIFrameClientExtensionEntry(
+	public ClientExtensionEntry updateClientExtensionEntry(
 			long userId, long clientExtensionEntryId, String description,
-			String friendlyURLMapping, String iFrameURL,
-			Map<Locale, String> nameMap, String portletCategoryName,
-			String properties, String sourceCodeURL)
+			Map<Locale, String> nameMap, String properties,
+			String sourceCodeURL, String typeSettings)
 		throws PortalException;
 
 	@Indexable(type = IndexableType.REINDEX)
 	public ClientExtensionEntry updateStatus(
 			long userId, long clientExtensionEntryId, int status)
 		throws PortalException;
+
+	@Override
+	@Transactional(enabled = false)
+	public CTPersistence<ClientExtensionEntry> getCTPersistence();
+
+	@Override
+	@Transactional(enabled = false)
+	public Class<ClientExtensionEntry> getModelClass();
+
+	@Override
+	@Transactional(rollbackFor = Throwable.class)
+	public <R, E extends Throwable> R updateWithUnsafeFunction(
+			UnsafeFunction<CTPersistence<ClientExtensionEntry>, R, E>
+				updateUnsafeFunction)
+		throws E;
 
 }

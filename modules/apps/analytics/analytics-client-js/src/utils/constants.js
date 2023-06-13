@@ -14,7 +14,19 @@
 
 // AC Version
 
-export const ANALYTICS_CLIENT_VERSION = '1.0.5';
+export const ANALYTICS_CLIENT_VERSION = '1.0.8';
+
+// Application ID
+
+export const BLOG = 'Blog';
+export const CUSTOM = 'Custom';
+export const CUSTOM_EVENT = 'CustomEvent';
+export const DOCUMENT = 'Document';
+export const FORM = 'Form';
+export const PAGE = 'Page';
+export const WEB_CONTENT = 'WebContent';
+
+export const DXP_APPLICATION_IDS = [BLOG, CUSTOM, DOCUMENT, FORM, WEB_CONTENT];
 
 // Default Config
 
@@ -100,7 +112,7 @@ export const READ_WORDS_PER_MIN = 265;
 // Track method
 
 export const TRACK_DEFAULT_OPTIONS = {
-	applicationId: 'CustomEvent',
+	applicationId: CUSTOM_EVENT,
 };
 
 // Validation

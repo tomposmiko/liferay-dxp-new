@@ -101,6 +101,7 @@ definition {
 	@priority = "3"
 	test CanRemoveUserFromGroupThroughLDAP {
 		property apacheds.enabled = "true";
+		property portal.release = "quarantine";
 		property portal.upstream = "quarantine";
 		property test.name.skip.portal.instance = "LDAP#CanRemoveUserFromGroupThroughLDAP";
 
@@ -337,6 +338,43 @@ definition {
 
 		task ("Then:The new user can log in with his encrypted password") {
 			User.logoutAndLoginPG();
+		}
+	}
+
+	@description = "This is a use case for LRQA-75138. User can set the Import Interval time manually."
+	@priority = "3"
+	test LDAPImportIntervalCanBeSetManually {
+		property apacheds.enabled = "true";
+		property test.name.skip.portal.instance = "LDAP#LDAPImportIntervalCanBeSetManually";
+
+		task ("Given: User enable DEBUG log level for LDAP related loggers") {
+			LDAP.enableLDAPDebugLogs();
+		}
+
+		task ("And: Adds LDAP server and test connection") {
+			PortalSettings.addLDAPServer();
+
+			PortalSettings.editLDAPServer();
+
+			PortalSettings.testLDAPConnection();
+		}
+
+		task ("When: User configure LDAP settings with Import Interval set to 1 minute") {
+			var enableSettingList = "enabled,ldapImportEnabled";
+
+			LDAP.enableLDAPSettings(enableSettingList = "${enableSettingList}");
+
+			PortalSettings.setImportIntervalTime(importIntervalTime = "1");
+		}
+
+		task ("And: Adds a new user in LDAP") {
+			LDAP.installLDAPCommandUtil();
+
+			LDAP.updateLDAPDatabaseWithLDIFFile(ldifName = "addUser");
+		}
+
+		task ("Then: Data will be imported from ldap in 1 minute") {
+			LDAP.verifyUserImportAfterImportIntervalTime(userScreenName = "testUser");
 		}
 	}
 

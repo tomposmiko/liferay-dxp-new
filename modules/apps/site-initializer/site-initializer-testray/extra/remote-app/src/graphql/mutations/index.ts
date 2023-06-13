@@ -20,5 +20,7 @@ export * from './testrayFactorCategory';
 export * from './testrayFactorOptions';
 export * from './testrayProject';
 export * from './testrayRequirement';
+export * from './testrayRequirementCase';
 export * from './testrayRoutine';
 export * from './testraySuite';
+export * from './testraySuiteCase';

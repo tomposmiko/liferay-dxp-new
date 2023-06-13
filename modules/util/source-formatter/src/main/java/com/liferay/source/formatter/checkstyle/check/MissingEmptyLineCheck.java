@@ -32,12 +32,19 @@ public class MissingEmptyLineCheck extends BaseCheck {
 	@Override
 	public int[] getDefaultTokens() {
 		return new int[] {
-			TokenTypes.ASSIGN, TokenTypes.METHOD_CALL, TokenTypes.VARIABLE_DEF
+			TokenTypes.ASSIGN, TokenTypes.INSTANCE_INIT, TokenTypes.METHOD_CALL,
+			TokenTypes.VARIABLE_DEF
 		};
 	}
 
 	@Override
 	protected void doVisitToken(DetailAST detailAST) {
+		if (detailAST.getType() == TokenTypes.INSTANCE_INIT) {
+			_checkMissingEmptyLineInInstanceInit(detailAST);
+
+			return;
+		}
+
 		if (detailAST.getType() == TokenTypes.METHOD_CALL) {
 			_checkMissingEmptyLinesAroundMethodCall(detailAST);
 
@@ -471,6 +478,57 @@ public class MissingEmptyLineCheck extends BaseCheck {
 			log(
 				nextExpressionStartLineNumber,
 				_MSG_MISSING_EMPTY_LINE_BEFORE_VARIABLE_USE, name);
+		}
+	}
+
+	private void _checkMissingEmptyLineInInstanceInit(DetailAST detailAST) {
+		DetailAST firstChildDetailAST = detailAST.getFirstChild();
+
+		if ((firstChildDetailAST == null) ||
+			(firstChildDetailAST.getType() != TokenTypes.SLIST)) {
+
+			return;
+		}
+
+		List<DetailAST> exprDetailASTList = getAllChildTokens(
+			firstChildDetailAST, false, TokenTypes.EXPR);
+
+		if (exprDetailASTList.size() < 2) {
+			return;
+		}
+
+		DetailAST previousExprDetailAST = null;
+
+		for (DetailAST exprDetailAST : exprDetailASTList) {
+			if (previousExprDetailAST == null) {
+				previousExprDetailAST = exprDetailAST;
+
+				continue;
+			}
+
+			firstChildDetailAST = exprDetailAST.getFirstChild();
+			DetailAST previousExprFirstChildDetailAST =
+				previousExprDetailAST.getFirstChild();
+
+			if ((firstChildDetailAST.getType() != TokenTypes.METHOD_CALL) ||
+				(previousExprFirstChildDetailAST.getType() !=
+					TokenTypes.ASSIGN)) {
+
+				previousExprDetailAST = exprDetailAST;
+
+				continue;
+			}
+
+			int previousExprEndLineNo = getEndLineNumber(previousExprDetailAST);
+
+			if ((previousExprEndLineNo + 1) == exprDetailAST.getLineNo()) {
+				log(
+					previousExprFirstChildDetailAST,
+					_MSG_MISSING_EMPTY_LINE_LINE_NUMBER, "after",
+					previousExprEndLineNo);
+			}
+
+			previousExprDetailAST = exprDetailAST;
 		}
 	}
 

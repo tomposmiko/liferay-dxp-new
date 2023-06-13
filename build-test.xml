@@ -4380,6 +4380,16 @@ tell application "Safari" to quit
 					</echo>
 				</else>
 			</if>
+
+			<get-testcase-property property.name="upgrade.reports.enabled" />
+
+			<if>
+				<equals arg1="${upgrade.reports.enabled}" arg2="true" />
+				<then>
+					<echo append="true" file="${liferay.home}/tools/portal-tools-db-upgrade-client/portal-upgrade-ext.properties">
+upgrade.report.enabled=true</echo>
+				</then>
+			</if>
 		</sequential>
 	</macrodef>
 
@@ -10572,6 +10582,7 @@ ${update.properties}</echo>
 				<equals arg1="${test.portal.bundle.version}" arg2="7.3.10" />
 				<equals arg1="${test.portal.bundle.version}" arg2="7.3.10.1" />
 				<equals arg1="${test.portal.bundle.version}" arg2="7.3.10.3" />
+				<equals arg1="${test.portal.bundle.version}" arg2="7.3.10.u4" />
 			</or>
 			<then>
 				<property name="invoker.filter.helper.log.level" value="" />
@@ -11102,7 +11113,19 @@ include-and-override=${liferay.home}/portal-setup-wizard.properties</echo>
 				<get-patch-requirements patch.file.zip.url="${test.build.fix.pack.zip.url}" />
 
 				<if>
-					<matches pattern="(sp|u)\d+" string="${patch.requirements}" />
+					<and>
+						<matches pattern="(sp|u)\d+" string="${patch.requirements}" />
+						<or>
+							<not>
+								<contains string="${test.portal.bundle.version}" substring="7.4" />
+							</not>
+							<equals arg1="${test.portal.bundle.version}" arg2="7.4.13" />
+							<equals arg1="${test.portal.bundle.version}" arg2="7.4.13.u1" />
+							<equals arg1="${test.portal.bundle.version}" arg2="7.4.13.u2" />
+							<equals arg1="${test.portal.bundle.version}" arg2="7.4.13.u3" />
+							<equals arg1="${test.portal.bundle.version}" arg2="7.4.13.u4" />
+						</or>
+					</and>
 					<then>
 						<echo append="true" file="portal-impl/src/portal-ext.properties">
 							verify.patch.levels.disabled=true

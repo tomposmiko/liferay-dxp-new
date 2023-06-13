@@ -20,11 +20,18 @@ import com.liferay.poshi.core.PoshiVariablesUtil;
 import com.liferay.poshi.core.selenium.LiferaySelenium;
 import com.liferay.poshi.core.util.FileUtil;
 import com.liferay.poshi.core.util.GetterUtil;
+import com.liferay.poshi.core.util.PropsValues;
 import com.liferay.poshi.core.util.StringUtil;
 import com.liferay.poshi.core.util.Validator;
 import com.liferay.poshi.runner.exception.PoshiRunnerLoggerException;
 import com.liferay.poshi.runner.selenium.SeleniumUtil;
 import com.liferay.poshi.runner.util.HtmlUtil;
+
+import java.io.IOException;
+
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import java.util.List;
 import java.util.Objects;
@@ -43,6 +50,32 @@ public final class CommandLogger {
 		_commandLogLoggerElement.setAttribute("data-logid", "01");
 		_commandLogLoggerElement.setClassName("collapse command-log");
 		_commandLogLoggerElement.setName("ul");
+	}
+
+	public void copyOcularImage(
+			String imageName, String filePath, int detailsLinkId)
+		throws IOException {
+
+		Path sourcePath = Paths.get(
+			PropsValues.TEST_DEPENDENCIES_DIR_NAME + "/ocular/" + imageName +
+				"/" + filePath);
+
+		String testClassCommandName =
+			PoshiContext.getTestCaseNamespacedClassCommandName();
+
+		testClassCommandName = StringUtil.replace(
+			testClassCommandName, "#", "_");
+
+		Path targetPath = Paths.get(
+			"test-results/" + testClassCommandName + "/screenshots/" +
+				imageName + detailsLinkId + ".jpg");
+
+		try {
+			Files.copy(sourcePath, targetPath);
+		}
+		catch (IOException ioException) {
+			throw ioException;
+		}
 	}
 
 	public void failCommand(Element element, SyntaxLogger syntaxLogger)
@@ -120,6 +153,24 @@ public final class CommandLogger {
 
 		loggerElement.addChildLoggerElement(
 			_getRunLineLoggerElement(element, arguments));
+	}
+
+	public void ocularCommand(Element element, SyntaxLogger syntaxLogger)
+		throws PoshiRunnerLoggerException {
+
+		if (!_isCurrentCommand(element)) {
+			return;
+		}
+
+		try {
+			_commandElement = null;
+
+			_ocularLineGroupLoggerElement(element, lineGroupLoggerElement);
+		}
+		catch (Throwable throwable) {
+			throw new PoshiRunnerLoggerException(
+				throwable.getMessage(), throwable);
+		}
 	}
 
 	public void passCommand(Element element, SyntaxLogger syntaxLogger) {
@@ -486,6 +537,50 @@ public final class CommandLogger {
 		return loggerElement;
 	}
 
+	private LoggerElement _getOcularErrorDetailsContainerLoggerElement(
+			Element element)
+		throws Exception {
+
+		LoggerElement loggerElement = new LoggerElement();
+
+		loggerElement.setClassName("details-container hidden");
+
+		loggerElement.addChildLoggerElement(
+			_getConsoleLoggerElement(_detailsLinkId));
+
+		loggerElement.addChildLoggerElement(
+			_getOcularScreenshotsLoggerElement(_detailsLinkId, element));
+
+		_detailsLinkId++;
+
+		return loggerElement;
+	}
+
+	private LoggerElement _getOcularScreenshotsLoggerElement(
+			int detailsLinkId, Element element)
+		throws Exception {
+
+		LoggerElement loggerElement = new LoggerElement();
+
+		loggerElement.setAttribute(
+			"data-detailslinkid", "screenshots-" + detailsLinkId);
+		loggerElement.setClassName("detailsPanel screenshots toggle");
+
+		String filePath = element.attributeValue("value1");
+
+		copyOcularImage("baseline", filePath, detailsLinkId);
+
+		loggerElement.addChildLoggerElement(
+			_getScreenshotContainerLoggerElement("baseline", detailsLinkId));
+
+		copyOcularImage("result", filePath, detailsLinkId);
+
+		loggerElement.addChildLoggerElement(
+			_getScreenshotContainerLoggerElement("result", detailsLinkId));
+
+		return loggerElement;
+	}
+
 	private LoggerElement _getRunLineLoggerElement(
 		Element element, List<String> arguments) {
 
@@ -635,6 +730,29 @@ public final class CommandLogger {
 			"data-functionlinkid", "functionLinkId-" + _functionLinkId);
 
 		_functionLinkId++;
+	}
+
+	private void _ocularLineGroupLoggerElement(
+			Element element, LoggerElement lineGroupLoggerElement)
+		throws Exception {
+
+		lineGroupLoggerElement.addClassName("failed");
+
+		lineGroupLoggerElement.addChildLoggerElement(
+			_getOcularErrorDetailsContainerLoggerElement(element));
+
+		LoggerElement childContainerLoggerElement =
+			lineGroupLoggerElement.loggerElement("ul");
+
+		List<LoggerElement> runLineLoggerElements =
+			childContainerLoggerElement.loggerElements("li");
+
+		if (!runLineLoggerElements.isEmpty()) {
+			LoggerElement runLineLoggerElement = runLineLoggerElements.get(
+				runLineLoggerElements.size() - 1);
+
+			runLineLoggerElement.addClassName("error-line");
+		}
 	}
 
 	private void _screenshotLineGroupLoggerElement(

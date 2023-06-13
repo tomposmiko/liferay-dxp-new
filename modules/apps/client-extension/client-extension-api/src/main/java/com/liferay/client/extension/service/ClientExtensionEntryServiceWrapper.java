@@ -14,6 +14,7 @@
 
 package com.liferay.client.extension.service;
 
+import com.liferay.client.extension.model.ClientExtensionEntry;
 import com.liferay.portal.kernel.service.ServiceWrapper;
 
 /**
@@ -38,44 +39,20 @@ public class ClientExtensionEntryServiceWrapper
 	}
 
 	@Override
-	public com.liferay.client.extension.model.ClientExtensionEntry
-			addCustomElementClientExtensionEntry(
-				String externalReferenceCode, String customElementCSSURLs,
-				String customElementHTMLElementName, String customElementURLs,
-				boolean customElementUseESM, String description,
-				String friendlyURLMapping, boolean instanceable,
-				java.util.Map<java.util.Locale, String> nameMap,
-				String portletCategoryName, String properties,
-				String sourceCodeURL)
+	public ClientExtensionEntry addClientExtensionEntry(
+			String externalReferenceCode, String description,
+			java.util.Map<java.util.Locale, String> nameMap, String properties,
+			String sourceCodeURL, String type, String typeSettings)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
-		return _clientExtensionEntryService.
-			addCustomElementClientExtensionEntry(
-				externalReferenceCode, customElementCSSURLs,
-				customElementHTMLElementName, customElementURLs,
-				customElementUseESM, description, friendlyURLMapping,
-				instanceable, nameMap, portletCategoryName, properties,
-				sourceCodeURL);
+		return _clientExtensionEntryService.addClientExtensionEntry(
+			externalReferenceCode, description, nameMap, properties,
+			sourceCodeURL, type, typeSettings);
 	}
 
 	@Override
-	public com.liferay.client.extension.model.ClientExtensionEntry
-			addIFrameClientExtensionEntry(
-				String description, String friendlyURLMapping, String iFrameURL,
-				boolean instanceable,
-				java.util.Map<java.util.Locale, String> nameMap,
-				String portletCategoryName, String properties,
-				String sourceCodeURL)
-		throws com.liferay.portal.kernel.exception.PortalException {
-
-		return _clientExtensionEntryService.addIFrameClientExtensionEntry(
-			description, friendlyURLMapping, iFrameURL, instanceable, nameMap,
-			portletCategoryName, properties, sourceCodeURL);
-	}
-
-	@Override
-	public com.liferay.client.extension.model.ClientExtensionEntry
-			deleteClientExtensionEntry(long clientExtensionEntryId)
+	public ClientExtensionEntry deleteClientExtensionEntry(
+			long clientExtensionEntryId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _clientExtensionEntryService.deleteClientExtensionEntry(
@@ -83,8 +60,30 @@ public class ClientExtensionEntryServiceWrapper
 	}
 
 	@Override
-	public com.liferay.client.extension.model.ClientExtensionEntry
-			getClientExtensionEntry(long clientExtensionEntryId)
+	public ClientExtensionEntry
+			deleteClientExtensionEntryByExternalReferenceCode(
+				long companyId, String externalReferenceCode)
+		throws com.liferay.portal.kernel.exception.PortalException {
+
+		return _clientExtensionEntryService.
+			deleteClientExtensionEntryByExternalReferenceCode(
+				companyId, externalReferenceCode);
+	}
+
+	@Override
+	public ClientExtensionEntry
+			fetchClientExtensionEntryByExternalReferenceCode(
+				long companyId, String externalReferenceCode)
+		throws com.liferay.portal.kernel.exception.PortalException {
+
+		return _clientExtensionEntryService.
+			fetchClientExtensionEntryByExternalReferenceCode(
+				companyId, externalReferenceCode);
+	}
+
+	@Override
+	public ClientExtensionEntry getClientExtensionEntry(
+			long clientExtensionEntryId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _clientExtensionEntryService.getClientExtensionEntry(
@@ -102,38 +101,15 @@ public class ClientExtensionEntryServiceWrapper
 	}
 
 	@Override
-	public com.liferay.client.extension.model.ClientExtensionEntry
-			updateCustomElementClientExtensionEntry(
-				long clientExtensionEntryId, String customElementCSSURLs,
-				String customElementHTMLElementName, String customElementURLs,
-				boolean customElementUseESM, String description,
-				String friendlyURLMapping,
-				java.util.Map<java.util.Locale, String> nameMap,
-				String portletCategoryName, String properties,
-				String sourceCodeURL)
+	public ClientExtensionEntry updateClientExtensionEntry(
+			long clientExtensionEntryId, String description,
+			java.util.Map<java.util.Locale, String> nameMap, String properties,
+			String sourceCodeURL, String typeSettings)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
-		return _clientExtensionEntryService.
-			updateCustomElementClientExtensionEntry(
-				clientExtensionEntryId, customElementCSSURLs,
-				customElementHTMLElementName, customElementURLs,
-				customElementUseESM, description, friendlyURLMapping, nameMap,
-				portletCategoryName, properties, sourceCodeURL);
-	}
-
-	@Override
-	public com.liferay.client.extension.model.ClientExtensionEntry
-			updateIFrameClientExtensionEntry(
-				long clientExtensionEntryId, String description,
-				String friendlyURLMapping, String iFrameURL,
-				java.util.Map<java.util.Locale, String> nameMap,
-				String portletCategoryName, String properties,
-				String sourceCodeURL)
-		throws com.liferay.portal.kernel.exception.PortalException {
-
-		return _clientExtensionEntryService.updateIFrameClientExtensionEntry(
-			clientExtensionEntryId, description, friendlyURLMapping, iFrameURL,
-			nameMap, portletCategoryName, properties, sourceCodeURL);
+		return _clientExtensionEntryService.updateClientExtensionEntry(
+			clientExtensionEntryId, description, nameMap, properties,
+			sourceCodeURL, typeSettings);
 	}
 
 	@Override

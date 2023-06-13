@@ -35,6 +35,7 @@ import com.liferay.portal.kernel.portlet.PortletProvider;
 import com.liferay.portal.kernel.portlet.PortletProviderUtil;
 import com.liferay.portal.kernel.portlet.bridges.mvc.BaseMVCActionCommand;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCActionCommand;
+import com.liferay.portal.kernel.search.IndexStatusManagerThreadLocal;
 import com.liferay.portal.kernel.security.auth.PrincipalException;
 import com.liferay.portal.kernel.service.ServiceContextFactory;
 import com.liferay.portal.kernel.servlet.SessionErrors;
@@ -74,9 +75,6 @@ public class ImportCommerceOrderItemsMVCActionCommand
 			ActionRequest actionRequest, ActionResponse actionResponse)
 		throws Exception {
 
-		int importedRowsCount = 0;
-		int notImportedRowsCount = 0;
-
 		String cmd = ParamUtil.getString(actionRequest, Constants.CMD);
 
 		long commerceOrderId = ParamUtil.getLong(
@@ -88,88 +86,22 @@ public class ImportCommerceOrderItemsMVCActionCommand
 		String commerceOrderImporterTypeKey = ParamUtil.getString(
 			actionRequest, "commerceOrderImporterTypeKey");
 
+		int[] counts = new int[2];
+
+		boolean indexReadOnly = IndexStatusManagerThreadLocal.isIndexReadOnly();
+
+		IndexStatusManagerThreadLocal.setIndexReadOnly(true);
+
 		try {
 			if (cmd.equals(Constants.IMPORT)) {
-				CommerceOrderImporterType commerceOrderImporterType =
-					_commerceOrderImporterTypeRegistry.
-						getCommerceOrderImporterType(
-							commerceOrderImporterTypeKey);
-
 				commerceOrder.setManuallyAdjusted(true);
 
 				commerceOrder = _commerceOrderService.updateCommerceOrder(
 					commerceOrder);
 
-				List<CommerceOrderImporterItem> commerceOrderImporterItems =
-					commerceOrderImporterType.getCommerceOrderImporterItems(
-						commerceOrder,
-						commerceOrderImporterType.getCommerceOrderImporterItem(
-							_portal.getHttpServletRequest(actionRequest)));
-
-				for (CommerceOrderImporterItem commerceOrderImporterItem :
-						commerceOrderImporterItems) {
-
-					if (commerceOrderImporterItem.getQuantity() < 1) {
-						notImportedRowsCount++;
-
-						continue;
-					}
-
-					try {
-						CommerceOrderItem commerceOrderItem =
-							_commerceOrderItemService.
-								addOrUpdateCommerceOrderItem(
-									commerceOrderId,
-									commerceOrderImporterItem.getCPInstanceId(),
-									commerceOrderImporterItem.getJSON(),
-									commerceOrderImporterItem.getQuantity(), 0,
-									(CommerceContext)actionRequest.getAttribute(
-										CommerceWebKeys.COMMERCE_CONTEXT),
-									ServiceContextFactory.getInstance(
-										CommerceOrderItem.class.getName(),
-										actionRequest));
-
-						try {
-							CommerceOrderImporterDateFormatConfiguration
-								commerceOrderImporterDateFormatConfiguration =
-									_configurationProvider.getConfiguration(
-										CommerceOrderImporterDateFormatConfiguration.class,
-										new GroupServiceSettingsLocator(
-											commerceOrder.getGroupId(),
-											CommerceConstants.
-												SERVICE_NAME_COMMERCE_ORDER_IMPORTER_DATE_FORMAT));
-
-							SimpleDateFormat simpleDateFormat =
-								new SimpleDateFormat(
-									commerceOrderImporterDateFormatConfiguration.
-										orderImporterDateFormat());
-
-							String requestedDeliveryDate =
-								commerceOrderImporterItem.
-									getRequestedDeliveryDateString();
-
-							_commerceOrderItemService.
-								updateCommerceOrderItemDeliveryDate(
-									commerceOrderItem.getCommerceOrderItemId(),
-									simpleDateFormat.parse(
-										requestedDeliveryDate));
-						}
-						catch (IllegalArgumentException | ParseException
-									exception) {
-						}
-
-						importedRowsCount++;
-					}
-					catch (Exception exception) {
-						if (exception instanceof
-								CommerceOrderImporterTypeException ||
-							exception instanceof NoSuchCPInstanceException ||
-							exception instanceof PrincipalException) {
-
-							notImportedRowsCount++;
-						}
-					}
-				}
+				_importRows(
+					actionRequest, commerceOrder, commerceOrderImporterTypeKey,
+					counts);
 			}
 		}
 		catch (Exception exception) {
@@ -195,6 +127,8 @@ public class ImportCommerceOrderItemsMVCActionCommand
 			}
 		}
 		finally {
+			IndexStatusManagerThreadLocal.setIndexReadOnly(indexReadOnly);
+
 			commerceOrder.setManuallyAdjusted(false);
 
 			_commerceOrderService.updateCommerceOrder(commerceOrder);
@@ -208,14 +142,12 @@ public class ImportCommerceOrderItemsMVCActionCommand
 		hideDefaultErrorMessage(actionRequest);
 		hideDefaultSuccessMessage(actionRequest);
 
-		if (importedRowsCount > 0) {
-			SessionMessages.add(
-				actionRequest, "importedRowsCount", importedRowsCount);
+		if (counts[0] > 0) {
+			SessionMessages.add(actionRequest, "counts", counts[0]);
 		}
 
-		if (notImportedRowsCount > 0) {
-			SessionErrors.add(
-				actionRequest, "notImportedRowsCount", notImportedRowsCount);
+		if (counts[1] > 0) {
+			SessionErrors.add(actionRequest, "notImportedRowsCount", counts[1]);
 		}
 
 		sendRedirect(
@@ -238,6 +170,83 @@ public class ImportCommerceOrderItemsMVCActionCommand
 		).setParameter(
 			"commerceOrderId", commerceOrderId
 		).buildString();
+	}
+
+	private void _importRows(
+			ActionRequest actionRequest, CommerceOrder commerceOrder,
+			String commerceOrderImporterTypeKey, int[] counts)
+		throws Exception {
+
+		CommerceOrderImporterDateFormatConfiguration
+			commerceOrderImporterDateFormatConfiguration =
+				_configurationProvider.getConfiguration(
+					CommerceOrderImporterDateFormatConfiguration.class,
+					new GroupServiceSettingsLocator(
+						commerceOrder.getGroupId(),
+						CommerceConstants.
+							SERVICE_NAME_COMMERCE_ORDER_IMPORTER_DATE_FORMAT));
+
+		SimpleDateFormat simpleDateFormat = new SimpleDateFormat(
+			commerceOrderImporterDateFormatConfiguration.
+				orderImporterDateFormat());
+
+		CommerceOrderImporterType commerceOrderImporterType =
+			_commerceOrderImporterTypeRegistry.getCommerceOrderImporterType(
+				commerceOrderImporterTypeKey);
+
+		List<CommerceOrderImporterItem> commerceOrderImporterItems =
+			commerceOrderImporterType.getCommerceOrderImporterItems(
+				commerceOrder,
+				commerceOrderImporterType.getCommerceOrderImporterItem(
+					_portal.getHttpServletRequest(actionRequest)));
+
+		for (CommerceOrderImporterItem commerceOrderImporterItem :
+				commerceOrderImporterItems) {
+
+			if (commerceOrderImporterItem.getQuantity() < 1) {
+				counts[1]++;
+
+				continue;
+			}
+
+			try {
+				CommerceOrderItem commerceOrderItem =
+					_commerceOrderItemService.addOrUpdateCommerceOrderItem(
+						commerceOrder.getCommerceOrderId(),
+						commerceOrderImporterItem.getCPInstanceId(),
+						commerceOrderImporterItem.getJSON(),
+						commerceOrderImporterItem.getQuantity(), 0,
+						(CommerceContext)actionRequest.getAttribute(
+							CommerceWebKeys.COMMERCE_CONTEXT),
+						ServiceContextFactory.getInstance(
+							CommerceOrderItem.class.getName(), actionRequest));
+
+				try {
+					String requestedDeliveryDate =
+						commerceOrderImporterItem.
+							getRequestedDeliveryDateString();
+
+					if (requestedDeliveryDate != null) {
+						_commerceOrderItemService.
+							updateCommerceOrderItemDeliveryDate(
+								commerceOrderItem.getCommerceOrderItemId(),
+								simpleDateFormat.parse(requestedDeliveryDate));
+					}
+				}
+				catch (IllegalArgumentException | ParseException exception) {
+				}
+
+				counts[0]++;
+			}
+			catch (Exception exception) {
+				if (exception instanceof CommerceOrderImporterTypeException ||
+					exception instanceof NoSuchCPInstanceException ||
+					exception instanceof PrincipalException) {
+
+					counts[1]++;
+				}
+			}
+		}
 	}
 
 	@Reference

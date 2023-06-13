@@ -16,6 +16,10 @@
 
 <%@ include file="/init.jsp" %>
 
+<%
+LayoutLookAndFeelDisplayContext layoutLookAndFeelDisplayContext = new LayoutLookAndFeelDisplayContext(request, layoutsAdminDisplayContext, liferayPortletResponse);
+%>
+
 <liferay-ui:error-marker
 	key="<%= WebKeys.ERROR_SECTION %>"
 	value="look-and-feel"
@@ -26,3 +30,16 @@
 <aui:input name="devices" type="hidden" value="regular" />
 
 <liferay-util:include page="/look_and_feel_themes.jsp" servletContext="<%= application %>" />
+
+<c:if test='<%= GetterUtil.getBoolean(PropsUtil.get("feature.flag.LPS-153457")) %>'>
+	<div class="mt-5">
+		<liferay-util:include page="/look_and_feel_theme_css.jsp" servletContext="<%= application %>" />
+	</div>
+
+	<clay:sheet-section>
+		<react:component
+			module="js/layout/look_and_feel/CSSExtensionsConfiguration"
+			props="<%= layoutLookAndFeelDisplayContext.getCSSExtensionsConfigurationProps() %>"
+		/>
+	</clay:sheet-section>
+</c:if>

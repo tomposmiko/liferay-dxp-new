@@ -34,26 +34,6 @@ definition {
 	test AddMultipleSKUToTheCart {
 		property portal.acceptance = "false";
 
-		task ("Given a Buyer account is created") {
-			CommerceAcceleratorsInitializer.inviteNewMemberWithRoleToAccount(
-				accountName = "Commerce Account",
-				emailAddress = "buyer@liferay.com",
-				role = "Buyer",
-				userFirstName = "Buyer",
-				userLastName = "User",
-				userScreenName = "buyeruser");
-
-			ApplicationsMenu.gotoPortlet(
-				category = "Users",
-				panel = "Control Panel",
-				portlet = "Users and Organizations");
-
-			CommerceLogin.editPasswordCP(
-				newPassword = "ttest",
-				requirePasswordReset = "true",
-				userScreenName = "buyeruser");
-		}
-
 		task ("And a Diagram with the "Type" set to "Default", an image (Commerce_Black.jpg) uploaded as "Diagram File" and 3 mapped pins, then disable ABS Sensor") {
 			CommerceProducts.openProductsAdmin();
 
@@ -137,8 +117,7 @@ definition {
 			User.logoutPG();
 
 			CommerceLogin.miniumLogin(
-				newPassword = "test",
-				password = "ttest",
+				password = "test",
 				urlAppend = "web/minium",
 				userEmailAddress = "buyer@liferay.com");
 
@@ -529,26 +508,6 @@ definition {
 	test VerifyAllPinTypeAndMappedProductInformation {
 		property portal.acceptance = "false";
 
-		task ("Given a Buyer account is created") {
-			CommerceAcceleratorsInitializer.inviteNewMemberWithRoleToAccount(
-				accountName = "Commerce Account",
-				emailAddress = "buyer@liferay.com",
-				role = "Buyer",
-				userFirstName = "Buyer",
-				userLastName = "User",
-				userScreenName = "buyeruser");
-
-			ApplicationsMenu.gotoPortlet(
-				category = "Users",
-				panel = "Control Panel",
-				portlet = "Users and Organizations");
-
-			CommerceLogin.editPasswordCP(
-				newPassword = "ttest",
-				requirePasswordReset = "true",
-				userScreenName = "buyeruser");
-		}
-
 		task ("And two Diagrams with the "Type" set to "Default", two images uploaded as "Diagram File", and three pins for "Diagram 1" and two mapped pins for "Diagram 2"") {
 			for (var num : list "1,2") {
 				CommerceJSONProductsAPI._addCommerceProduct(
@@ -629,8 +588,7 @@ definition {
 			User.logoutPG();
 
 			CommerceLogin.miniumLogin(
-				newPassword = "test",
-				password = "ttest",
+				password = "test",
 				urlAppend = "web/minium",
 				userEmailAddress = "buyer@liferay.com");
 
@@ -753,26 +711,6 @@ definition {
 	test VerifyIfDiagramWithProductPublisherWidgets {
 		property portal.acceptance = "false";
 
-		task ("Given a Buyer account is created") {
-			CommerceAcceleratorsInitializer.inviteNewMemberWithRoleToAccount(
-				accountName = "Commerce Account",
-				emailAddress = "buyer@liferay.com",
-				role = "Buyer",
-				userFirstName = "Buyer",
-				userLastName = "User",
-				userScreenName = "buyeruser");
-
-			ApplicationsMenu.gotoPortlet(
-				category = "Users",
-				panel = "Control Panel",
-				portlet = "Users and Organizations");
-
-			CommerceLogin.editPasswordCP(
-				newPassword = "ttest",
-				requirePasswordReset = "true",
-				userScreenName = "buyeruser");
-		}
-
 		task ("And a Diagram with the "Type" set to "Default", a png image uploaded as "Diagram File" and one pin linked to an SKU (MIN93015) within the image") {
 			CommerceProducts.openProductsAdmin();
 
@@ -802,8 +740,7 @@ definition {
 			User.logoutPG();
 
 			CommerceLogin.miniumLogin(
-				newPassword = "test",
-				password = "ttest",
+				password = "test",
 				urlAppend = "web/minium",
 				userEmailAddress = "buyer@liferay.com");
 
@@ -954,19 +891,6 @@ definition {
 
 		task ("Given the Minium site with two buyer users, and an account group with the buyer A") {
 			CommerceEntry.addAccountEntryUser(
-				accountName = "Commerce Account 1",
-				accountType = "Business",
-				agreeToTermsAndAnswerReminderQuery = "true",
-				createNewAccount = "true",
-				requireReset = "false",
-				userEmailAddress = "buyera@liferay.com",
-				userFirstName = "Buyer",
-				userLastName = "User",
-				userRole = "Buyer",
-				userScreenName = "buyeruser",
-				userSiteMembership = "Minium");
-
-			CommerceEntry.addAccountEntryUser(
 				accountName = "Commerce Account 2",
 				accountType = "Business",
 				agreeToTermsAndAnswerReminderQuery = "true",
@@ -987,7 +911,7 @@ definition {
 
 			AccountGroups.addAssignee(
 				accountGroupName = "Account Group",
-				assigneeNames = "Commerce Account 1",
+				assigneeNames = "Commerce Account",
 				assigneeType = "Accounts");
 		}
 
@@ -1073,7 +997,7 @@ definition {
 			CommerceLogin.miniumLogin(
 				password = "test",
 				urlAppend = "web/minium",
-				userEmailAddress = "buyera@liferay.com");
+				userEmailAddress = "buyer@liferay.com");
 
 			CommerceNavigator.gotoMiniumSidebarItem(menuItem = "Catalog");
 

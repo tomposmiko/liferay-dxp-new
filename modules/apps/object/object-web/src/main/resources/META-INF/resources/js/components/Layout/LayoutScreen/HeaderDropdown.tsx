@@ -23,7 +23,26 @@ const HeaderDropdown: FC<IHeaderDropdown> = ({
 	deleteElement,
 }) => {
 	const [active, setActive] = useState<boolean>(false);
-	const [{isViewOnly}] = useContext(LayoutContext);
+	const [
+		{
+			isViewOnly,
+			objectLayout: {objectLayoutTabs},
+		},
+	] = useContext(LayoutContext);
+
+	const handleOnClick = (handler: Function) => {
+		handler();
+		setActive(false);
+	};
+	const isThereFramework = (framework: string): boolean => {
+		for (const tab of objectLayoutTabs) {
+			if (tab.objectLayoutBoxes.some((box) => box.type === framework)) {
+				return true;
+			}
+		}
+
+		return false;
+	};
 
 	return (
 		<ClayDropDown
@@ -37,21 +56,21 @@ const HeaderDropdown: FC<IHeaderDropdown> = ({
 			}
 		>
 			<ClayDropDown.ItemList>
-				<ClayDropDown.Item
-					disabled={isViewOnly}
-					onClick={deleteElement}
-				>
-					{Liferay.Language.get('delete')}
-				</ClayDropDown.Item>
-
-				{addCategorization && (
+				{Liferay.FeatureFlags['LPS-149014'] && addCategorization && (
 					<ClayDropDown.Item
-						disabled={isViewOnly}
-						onClick={addCategorization}
+						disabled={isThereFramework('categorization')}
+						onClick={() => handleOnClick(addCategorization)}
 					>
 						{Liferay.Language.get('add-categorization')}
 					</ClayDropDown.Item>
 				)}
+
+				<ClayDropDown.Item
+					disabled={isViewOnly}
+					onClick={() => handleOnClick(deleteElement)}
+				>
+					{Liferay.Language.get('delete')}
+				</ClayDropDown.Item>
 			</ClayDropDown.ItemList>
 		</ClayDropDown>
 	);

@@ -16,12 +16,15 @@ package com.liferay.client.extension.web.internal.portlet.action;
 
 import com.liferay.client.extension.model.ClientExtensionEntry;
 import com.liferay.client.extension.service.ClientExtensionEntryService;
+import com.liferay.client.extension.type.factory.CETFactory;
 import com.liferay.client.extension.web.internal.constants.ClientExtensionAdminPortletKeys;
 import com.liferay.client.extension.web.internal.constants.ClientExtensionAdminWebKeys;
 import com.liferay.client.extension.web.internal.display.context.EditClientExtensionEntryDisplayContext;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCRenderCommand;
 import com.liferay.portal.kernel.util.ParamUtil;
+import com.liferay.portal.kernel.util.Portal;
+import com.liferay.portal.kernel.util.Validator;
 
 import javax.portlet.PortletException;
 import javax.portlet.RenderRequest;
@@ -54,7 +57,8 @@ public class EditClientExtensionEntryMVCRenderCommand
 				ClientExtensionAdminWebKeys.
 					EDIT_CLIENT_EXTENSION_ENTRY_DISPLAY_CONTEXT,
 				new EditClientExtensionEntryDisplayContext(
-					renderRequest, _getClientExtensionEntry(renderRequest)));
+					_cetFactory, _fetchClientExtensionEntry(renderRequest),
+					renderRequest));
 
 			return "/admin/edit_client_extension_entry.jsp";
 		}
@@ -63,22 +67,29 @@ public class EditClientExtensionEntryMVCRenderCommand
 		}
 	}
 
-	private ClientExtensionEntry _getClientExtensionEntry(
+	private ClientExtensionEntry _fetchClientExtensionEntry(
 			RenderRequest renderRequest)
 		throws PortalException {
 
-		long clientExtensionEntryId = ParamUtil.getLong(
-			renderRequest, "clientExtensionEntryId");
+		String externalReferenceCode = ParamUtil.getString(
+			renderRequest, "externalReferenceCode");
 
-		if (clientExtensionEntryId != 0) {
-			return _clientExtensionEntryService.getClientExtensionEntry(
-				clientExtensionEntryId);
+		if (Validator.isNull(externalReferenceCode)) {
+			return null;
 		}
 
-		return null;
+		return _clientExtensionEntryService.
+			fetchClientExtensionEntryByExternalReferenceCode(
+				_portal.getCompanyId(renderRequest), externalReferenceCode);
 	}
 
 	@Reference
+	private CETFactory _cetFactory;
+
+	@Reference
 	private ClientExtensionEntryService _clientExtensionEntryService;
+
+	@Reference
+	private Portal _portal;
 
 }

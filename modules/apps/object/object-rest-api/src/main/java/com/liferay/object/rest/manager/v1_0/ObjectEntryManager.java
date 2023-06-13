@@ -45,7 +45,7 @@ public interface ObjectEntryManager {
 		throws Exception;
 
 	public ObjectEntry addOrUpdateObjectEntry(
-			DTOConverterContext dtoConverterContext,
+			long companyId, DTOConverterContext dtoConverterContext,
 			String externalReferenceCode, ObjectDefinition objectDefinition,
 			ObjectEntry objectEntry, String scopeKey)
 		throws Exception;
@@ -93,6 +93,12 @@ public interface ObjectEntryManager {
 			DTOConverterContext dtoConverterContext,
 			String externalReferenceCode, long companyId,
 			ObjectDefinition objectDefinition, String scopeKey)
+		throws Exception;
+
+	public Page<ObjectEntry> getObjectEntryRelatedObjectEntries(
+			DTOConverterContext dtoConverterContext,
+			ObjectDefinition objectDefinition, Long objectEntryId,
+			String objectRelationshipName, Pagination pagination)
 		throws Exception;
 
 	public ObjectEntry updateObjectEntry(

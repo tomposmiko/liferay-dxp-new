@@ -12,32 +12,25 @@
  * details.
  */
 
-/**
- * These constants should be identical to the constants used at
- * `portal-kernel/src/com/liferay/portal/kernel/frontend/icons/FrontendIconsUtil.java`
- */
-const BASE_PATH = '/o/icons';
-const SYSTEM_ICON_PACK = 'clay';
-
-export function getSpritemapPath(iconPack?: string): string {
+export function getSpritemap(iconPack?: string): string {
 	if (!Liferay.FeatureFlags['LPS-145112']) {
 		return Liferay.ThemeDisplay.getPathThemeImages() + '/clay/icons.svg';
 	}
 
 	if (!iconPack && Liferay.ThemeDisplay.isControlPanel()) {
-		return getSystemSpritemapPath();
+		return getSystemSpritemap();
 	}
 
 	const packOrSite = iconPack ? 'pack' : 'site';
 	const iconPackOrSiteId = iconPack || Liferay.ThemeDisplay.getSiteGroupId();
 
-	return `${BASE_PATH}/${packOrSite}/${iconPackOrSiteId}.svg`;
+	return `${Liferay.Icons.basePath}/${packOrSite}/${iconPackOrSiteId}.svg`;
 }
 
-export function getSystemSpritemapPath(): string {
+export function getSystemSpritemap(): string {
 	if (!Liferay.FeatureFlags['LPS-145112']) {
 		return Liferay.ThemeDisplay.getPathThemeImages() + '/clay/icons.svg';
 	}
 
-	return getSpritemapPath(SYSTEM_ICON_PACK);
+	return Liferay.Icons.systemSpritemap;
 }

@@ -14,17 +14,13 @@
 
 package com.liferay.layout.content.page.editor.web.internal.portlet.action;
 
-import com.liferay.fragment.contributor.FragmentCollectionContributorTracker;
 import com.liferay.fragment.model.FragmentEntryLink;
-import com.liferay.fragment.renderer.FragmentRendererController;
-import com.liferay.fragment.renderer.FragmentRendererTracker;
 import com.liferay.fragment.service.FragmentEntryLinkLocalService;
-import com.liferay.fragment.util.configuration.FragmentEntryConfigurationParser;
-import com.liferay.item.selector.ItemSelector;
 import com.liferay.layout.content.page.editor.constants.ContentPageEditorPortletKeys;
 import com.liferay.layout.content.page.editor.web.internal.util.ContentUtil;
-import com.liferay.layout.content.page.editor.web.internal.util.FragmentEntryLinkUtil;
+import com.liferay.layout.content.page.editor.web.internal.util.FragmentEntryLinkManager;
 import com.liferay.layout.content.page.editor.web.internal.util.layout.structure.LayoutStructureUtil;
+import com.liferay.layout.util.structure.LayoutStructure;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
@@ -96,6 +92,11 @@ public class UpdateCollectionDisplayConfigMVCActionCommand
 					themeDisplay.getPlid(),
 					_KEY_COLLECTION_APPLIED_FILTERS_FRAGMENT_RENDERER));
 
+		LayoutStructure layoutStructure =
+			LayoutStructureUtil.getLayoutStructure(
+				themeDisplay.getScopeGroupId(), themeDisplay.getPlid(),
+				segmentsExperienceId);
+
 		for (FragmentEntryLink fragmentEntryLink : fragmentEntryLinks) {
 			JSONObject editableValuesJSONObject =
 				JSONFactoryUtil.createJSONObject(
@@ -147,13 +148,11 @@ public class UpdateCollectionDisplayConfigMVCActionCommand
 					fragmentEntryLinkId, editableValuesJSONObject.toString());
 
 			fragmentEntryLinksJSONArray.put(
-				FragmentEntryLinkUtil.getFragmentEntryLinkJSONObject(
-					_fragmentEntryConfigurationParser, fragmentEntryLink,
-					_fragmentCollectionContributorTracker,
-					_fragmentRendererController, _fragmentRendererTracker,
+				_fragmentEntryLinkManager.getFragmentEntryLinkJSONObject(
+					fragmentEntryLink,
 					_portal.getHttpServletRequest(actionRequest),
 					_portal.getHttpServletResponse(actionResponse),
-					_itemSelector, StringPool.BLANK));
+					layoutStructure, StringPool.BLANK));
 		}
 
 		try {
@@ -164,7 +163,7 @@ public class UpdateCollectionDisplayConfigMVCActionCommand
 				LayoutStructureUtil.updateLayoutPageTemplateData(
 					themeDisplay.getScopeGroupId(), segmentsExperienceId,
 					themeDisplay.getPlid(),
-					layoutStructure -> layoutStructure.updateItemConfig(
+					curLayoutStructure -> curLayoutStructure.updateItemConfig(
 						JSONFactoryUtil.createJSONObject(itemConfig), itemId))
 			).put(
 				"pageContents",
@@ -206,23 +205,10 @@ public class UpdateCollectionDisplayConfigMVCActionCommand
 		UpdateCollectionDisplayConfigMVCActionCommand.class);
 
 	@Reference
-	private FragmentCollectionContributorTracker
-		_fragmentCollectionContributorTracker;
-
-	@Reference
-	private FragmentEntryConfigurationParser _fragmentEntryConfigurationParser;
-
-	@Reference
 	private FragmentEntryLinkLocalService _fragmentEntryLinkLocalService;
 
 	@Reference
-	private FragmentRendererController _fragmentRendererController;
-
-	@Reference
-	private FragmentRendererTracker _fragmentRendererTracker;
-
-	@Reference
-	private ItemSelector _itemSelector;
+	private FragmentEntryLinkManager _fragmentEntryLinkManager;
 
 	@Reference
 	private Portal _portal;

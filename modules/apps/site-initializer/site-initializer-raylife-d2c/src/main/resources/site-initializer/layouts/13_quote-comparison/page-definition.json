@@ -195,7 +195,7 @@
 										"definition": {
 											"widgetInstance": {
 												"widgetConfig": {
-													"properties": "route:quote-comparison"
+													"properties": "route=quote-comparison"
 												},
 												"widgetName": "[$CLIENT_EXTENSION_ENTRY_ID:RAYLIFE$]"
 											}

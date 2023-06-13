@@ -191,19 +191,16 @@ Format dateFormat = FastDateFormatFactoryUtil.getDate(DateFormat.MEDIUM, locale,
 	bodyClasses="p-0"
 	title='<%= LanguageUtil.get(request, "products") %>'
 >
-	<clay:data-set-display
+	<frontend-data-set:classic-display
 		contextParams='<%=
 			HashMapBuilder.<String, String>put(
 				"commerceShipmentId", String.valueOf(commerceShipment.getCommerceShipmentId())
 			).build()
 		%>'
 		creationMenu="<%= commerceShipmentDisplayContext.getShipmentItemCreationMenu() %>"
-		dataProviderKey="<%= CommerceShipmentDataSetConstants.COMMERCE_DATA_SET_KEY_SHIPMENT_ITEMS %>"
+		dataProviderKey="<%= CommerceShipmentFDSNames.SHIPMENT_ITEMS %>"
 		id="<%= commerceShipmentDisplayContext.getDatasetView() %>"
 		itemsPerPage="<%= 10 %>"
-		namespace="<%= liferayPortletResponse.getNamespace() %>"
-		pageNumber="<%= 1 %>"
-		portletURL="<%= currentURLObj %>"
 		showSearch="<%= false %>"
 	/>
 </commerce-ui:panel>

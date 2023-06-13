@@ -38,12 +38,55 @@ PortletURL redirectURL = layoutsAdminDisplayContext.getRedirectURL();
 <aui:model-context bean="<%= selLayout %>" model="<%= Layout.class %>" />
 
 <aui:input name="devices" type="hidden" value="regular" />
-<aui:input name="masterLayoutPlid" type="hidden" />
 <aui:input name="styleBookEntryId" type="hidden" />
+<aui:input name="faviconCETExternalReferenceCode" type="hidden" />
+<aui:input name="faviconFileEntryId" type="hidden" />
+<aui:input name="masterLayoutPlid" type="hidden" />
 
 <%
 LayoutLookAndFeelDisplayContext layoutLookAndFeelDisplayContext = new LayoutLookAndFeelDisplayContext(request, layoutsAdminDisplayContext, liferayPortletResponse);
 %>
+
+<clay:sheet-section>
+	<h3 class="sheet-subtitle"><liferay-ui:message key="favicon" /></h3>
+
+	<img alt="<%= HtmlUtil.escape(layoutLookAndFeelDisplayContext.getFaviconFileEntryTitle()) %>" class="mb-2" height="16" id="<portlet:namespace />faviconFileEntryImage" src="<%= layoutLookAndFeelDisplayContext.getFaviconImage() %>" width="16" />
+
+	<p>
+		<b><liferay-ui:message key="favicon-name" />:</b> <span id="<portlet:namespace />faviconFileEntryTitle"><%= layoutLookAndFeelDisplayContext.getFaviconFileEntryTitle() %></span>
+	</p>
+
+	<clay:content-row>
+		<clay:content-col
+			cssClass="mr-4"
+		>
+			<clay:button
+				additionalProps="<%=
+					layoutLookAndFeelDisplayContext.getChangeFaviconButtonAdditionalProps()
+				%>"
+				displayType="secondary"
+				id='<%= liferayPortletResponse.getNamespace() + "changeFaviconButton" %>'
+				label="change-favicon"
+				propsTransformer="js/layout/ChangeFaviconButtonPropsTransformer"
+				small="<%= true %>"
+			/>
+		</clay:content-col>
+
+		<clay:content-col>
+			<clay:button
+				additionalProps="<%=
+					layoutLookAndFeelDisplayContext.getClearFaviconButtonAdditionalProps()
+				%>"
+				disabled="<%= !layoutLookAndFeelDisplayContext.isClearFaviconButtonEnabled() %>"
+				displayType="secondary"
+				id='<%= liferayPortletResponse.getNamespace() + "clearFaviconButton" %>'
+				label="clear"
+				propsTransformer="js/layout/ClearFaviconButtonPropsTransformer"
+				small="<%= true %>"
+			/>
+		</clay:content-col>
+	</clay:content-row>
+</clay:sheet-section>
 
 <c:if test="<%= layoutLookAndFeelDisplayContext.hasEditableMasterLayout() %>">
 	<clay:sheet-section>
@@ -150,6 +193,19 @@ else {
 		<liferay-util:include page="/look_and_feel_themes.jsp" servletContext="<%= application %>" />
 	</div>
 </clay:sheet-section>
+
+<c:if test='<%= GetterUtil.getBoolean(PropsUtil.get("feature.flag.LPS-153457")) %>'>
+	<liferay-util:include page="/look_and_feel_theme_css.jsp" servletContext="<%= application %>" />
+
+	<clay:sheet-section>
+		<div>
+			<react:component
+				module="js/layout/look_and_feel/CSSExtensionsConfiguration"
+				props="<%= layoutLookAndFeelDisplayContext.getCSSExtensionsConfigurationProps() %>"
+			/>
+		</div>
+	</clay:sheet-section>
+</c:if>
 
 <aui:script>
 	Liferay.Util.toggleRadio(

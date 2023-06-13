@@ -47,8 +47,15 @@ const DEFAULT_FORM_CONFIGURATION = {classNameId: null, classTypeId: null};
 
 const FIELD_ID_CONFIGURATION_KEY = 'inputFieldId';
 const HELP_TEXT_CONFIGURATION_KEY = 'inputHelpText';
+const LABEL_CONFIGURATION_KEY = 'inputLabel';
 const REQUIRED_CONFIGURATION_KEY = 'inputRequired';
 const SHOW_HELP_TEXT_CONFIGURATION_KEY = 'inputShowHelpText';
+
+function getFieldLabel(fieldKey, fields) {
+	const flattenedFields = fields.flatMap((fieldSet) => fieldSet.fields);
+
+	return flattenedFields.find((field) => field.key === fieldKey)?.label;
+}
 
 function getInputCommonConfiguration(configurationValues, formFields) {
 	const fields = [];
@@ -80,7 +87,7 @@ function getInputCommonConfiguration(configurationValues, formFields) {
 			defaultValue: '',
 			label: Liferay.Language.get('label'),
 			localizable: true,
-			name: 'inputLabel',
+			name: LABEL_CONFIGURATION_KEY,
 			type: 'text',
 		},
 		{
@@ -94,13 +101,17 @@ function getInputCommonConfiguration(configurationValues, formFields) {
 
 	if (configurationValues[SHOW_HELP_TEXT_CONFIGURATION_KEY] !== false) {
 		fields.push({
-			defaultValue: Liferay.Language.get(
-				'guide-your-users-to-fill-in-the-field-by-adding-help-text-here'
-			),
+			defaultValue: '',
 			label: Liferay.Language.get('help-text'),
 			localizable: true,
 			name: HELP_TEXT_CONFIGURATION_KEY,
 			type: 'text',
+			typeOptions: {
+				component: 'textarea',
+				placeholder: Liferay.Language.get(
+					'guide-your-users-to-fill-in-the-field-by-adding-help-text-here'
+				),
+			},
 		});
 	}
 
@@ -182,13 +193,28 @@ export function FormInputGeneralPanel({item}) {
 			keyPath.push(languageId);
 		}
 
+		let editableValues = fragmentEntryLinkRef.current.editableValues;
+
+		if (key === FIELD_ID_CONFIGURATION_KEY) {
+			editableValues = setIn(
+				fragmentEntryLinkRef.current.editableValues,
+				[
+					FREEMARKER_FRAGMENT_ENTRY_PROCESSOR,
+					REQUIRED_CONFIGURATION_KEY,
+				],
+				isFormRequiredField(value, formFields)
+			);
+
+			editableValues = setIn(
+				editableValues,
+				[FREEMARKER_FRAGMENT_ENTRY_PROCESSOR, LABEL_CONFIGURATION_KEY],
+				getFieldLabel(value, formFields)
+			);
+		}
+
 		dispatch(
 			updateEditableValues({
-				editableValues: setIn(
-					fragmentEntryLinkRef.current.editableValues,
-					keyPath,
-					value
-				),
+				editableValues: setIn(editableValues, keyPath, value),
 				fragmentEntryLinkId:
 					fragmentEntryLinkRef.current.fragmentEntryLinkId,
 				languageId,
@@ -315,12 +341,18 @@ function FormInputMappingOptions({
 			nextFields = nextFields
 				.map((fieldset) => ({
 					...fieldset,
-					fields: fieldset.fields.filter(
-						(field) =>
-							ALLOWED_INPUT_TYPES[field.type]?.includes(
-								inputType
-							) && !selectedFields.includes(field.key)
-					),
+					fields: fieldset.fields
+						.filter(
+							(field) =>
+								ALLOWED_INPUT_TYPES[field.type]?.includes(
+									inputType
+								) && !selectedFields.includes(field.key)
+						)
+						.map((field) =>
+							field.required
+								? {...field, label: `${field.label}*`}
+								: field
+						),
 				}))
 				.filter((fieldset) => fieldset.fields.length);
 

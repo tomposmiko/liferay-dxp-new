@@ -772,6 +772,7 @@
 			<hint-collection name="CLOB" />
 		</field>
 		<field name="priority" type="int" />
+		<field name="faviconFileEntryId" type="long" />
 		<field name="masterLayoutPlid" type="long" />
 		<field name="layoutPrototypeUuid" type="String" />
 		<field name="layoutPrototypeLinkEnabled" type="boolean" />
@@ -895,6 +896,7 @@
 		<field name="logoId" type="long" />
 		<field name="themeId" type="String" />
 		<field name="colorSchemeId" type="String" />
+		<field name="faviconFileEntryId" type="long" />
 		<field name="css" type="String">
 			<hint-collection name="CLOB" />
 		</field>

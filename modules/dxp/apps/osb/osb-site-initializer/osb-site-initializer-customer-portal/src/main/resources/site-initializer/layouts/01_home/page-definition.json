@@ -22,7 +22,7 @@
 							"widgetInstance": {
 								"widgetConfig": {
 									"portletSetupPortletDecoratorId": "barebone",
-									"properties": "page:home\nroute:portal"
+									"properties": "page=home\nroute=portal"
 								},
 								"widgetName": "[$CLIENT_EXTENSION_ENTRY_ID:CUSTOMER-PORTAL$]"
 							}

@@ -27,8 +27,8 @@ definition {
 		SelectFrame.selectFrameNoLoading(locator1 = "CommerceEntry#IFRAME_SIDE_PANEL");
 
 		Click(
-			key_radioOption = "${key_pricingType}",
-			locator1 = "CommerceEntry#RADIO_BUTTON");
+			locator1 = "Radio#ANY",
+			radioLabel = "${key_pricingType}");
 
 		Click(locator1 = "Button#PLUS");
 

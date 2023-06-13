@@ -30,6 +30,8 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.portletfilerepository.PortletFileRepositoryUtil;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
+import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.kernel.zip.ZipWriter;
@@ -62,7 +64,10 @@ public class FragmentEntryImpl extends FragmentEntryBaseImpl {
 	@Override
 	public String getIcon() {
 		if (Validator.isNull(_icon)) {
-			if (getType() == FragmentConstants.TYPE_REACT) {
+			if (getType() == FragmentConstants.TYPE_INPUT) {
+				_icon = "forms";
+			}
+			else if (getType() == FragmentConstants.TYPE_REACT) {
 				_icon = "react";
 			}
 			else {
@@ -75,7 +80,9 @@ public class FragmentEntryImpl extends FragmentEntryBaseImpl {
 
 	@Override
 	public String getImagePreviewURL(ThemeDisplay themeDisplay) {
-		if (Validator.isNotNull(_imagePreviewURL)) {
+		if (Validator.isNotNull(_imagePreviewURL) &&
+			!_imagePreviewURL.endsWith(StringPool.SLASH)) {
+
 			return _imagePreviewURL;
 		}
 
@@ -174,6 +181,14 @@ public class FragmentEntryImpl extends FragmentEntryBaseImpl {
 
 		if (Validator.isNotNull(typeLabel)) {
 			jsonObject.put("type", typeLabel);
+		}
+
+		String typeOptions = getTypeOptions();
+
+		if (GetterUtil.getBoolean(PropsUtil.get("feature.flag.LPS-152938")) &&
+			Validator.isNotNull(typeOptions)) {
+
+			jsonObject.put("typeOptions", typeOptions);
 		}
 
 		zipWriter.addEntry(

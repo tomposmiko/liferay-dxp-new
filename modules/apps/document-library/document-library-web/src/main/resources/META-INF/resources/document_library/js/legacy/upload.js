@@ -1086,7 +1086,7 @@ AUI.add(
 					}
 
 					if (validFilesLength) {
-						var openToastProps = {
+						var openToastSuccessProps = {
 							message: Liferay.Util.sub(
 								instance._strings.xValidFilesUploaded,
 								validFilesLength
@@ -1100,11 +1100,20 @@ AUI.add(
 						if (!currentUploadData.folder && !invalidFilesLength) {
 							var reloadButtonClassName = 'dl-reload-button';
 
-							openToastProps.message =
-								openToastProps.message +
-								` <button class="btn btn-sm btn-link alert-link ${reloadButtonClassName}">${instance._strings.reloadButton}</button>`;
+							openToastSuccessProps.autoClose = 10000;
 
-							openToastProps.onClick = ({event}) => {
+							openToastSuccessProps.message =
+								openToastSuccessProps.message +
+								`<div class="alert-footer">
+										<div class="btn-group" role="group">
+											<button class="btn btn-sm btn-primary alert-btn ${reloadButtonClassName}">${instance._strings.reloadButton}</button>
+										</div>
+								</div>`;
+
+							openToastSuccessProps.onClick = ({
+								event,
+								onClose: closeToast,
+							}) => {
 								if (
 									event.target.classList.contains(
 										reloadButtonClassName
@@ -1113,11 +1122,12 @@ AUI.add(
 									Liferay.Portlet.refresh(
 										`#p_p_id${instance._documentLibraryNamespace}`
 									);
+									closeToast();
 								}
 							};
 						}
 
-						Liferay.Util.openToast(openToastProps);
+						Liferay.Util.openToast(openToastSuccessProps);
 					}
 
 					if (invalidFilesLength) {
@@ -1151,21 +1161,25 @@ AUI.add(
 							}
 						}
 
-						var message = TPL_ERROR_NOTIFICATION.parse({
-							invalidFiles: currentUploadData.invalidFiles,
-							title: Liferay.Util.sub(
-								instance._strings.xInvalidFilesUploaded,
-								invalidFilesLength
-							),
-						});
-
-						Liferay.Util.openToast({
-							message,
+						var openToastErrorProps = {
+							message: TPL_ERROR_NOTIFICATION.parse({
+								invalidFiles: currentUploadData.invalidFiles,
+								title: Liferay.Util.sub(
+									instance._strings.xInvalidFilesUploaded,
+									invalidFilesLength
+								),
+							}),
 							toastProps: {
 								className: 'alert-full',
 							},
 							type: 'danger',
-						});
+						};
+
+						if (invalidFilesLength < 3) {
+							openToastErrorProps.autoClose = false;
+						}
+
+						Liferay.Util.openToast(openToastErrorProps);
 					}
 				},
 

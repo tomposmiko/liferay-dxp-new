@@ -14,14 +14,16 @@
 
 /// <reference types="react" />
 
-import {CustomItem} from '../Form/CustomSelect/CustomSelect';
+import {CustomItem} from '@liferay/object-js-components-web';
 export default function EditObjectAction({
+	ffNotificationTemplates,
 	objectAction: {id, ...values},
 	objectActionExecutors,
 	objectActionTriggers,
 	readOnly,
 }: IProps): JSX.Element;
 interface IProps {
+	ffNotificationTemplates: boolean;
 	objectAction: ObjectAction;
 	objectActionExecutors: CustomItem[];
 	objectActionTriggers: CustomItem[];

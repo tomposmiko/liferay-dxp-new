@@ -20,7 +20,7 @@ import {useEffect, useState} from 'react';
 import {useForm} from 'react-hook-form';
 import {useOutletContext, useParams} from 'react-router-dom';
 
-import Input from '../../../components/Input';
+import Form from '../../../components/Form';
 import Container from '../../../components/Layout/Container';
 import {CreateSuite, UpdateSuite} from '../../../graphql/mutations';
 import {CreateSuiteCaseBatch} from '../../../graphql/mutations/testraySuiteCase';
@@ -86,17 +86,20 @@ const SuiteForm = () => {
 			{refetchQueries: [{query: getSuites}]}
 		)
 			.then((response) => {
-				const suiteId =
-					response.data?.createSuite?.id || context.testraySuite?.id;
+				if (cases.length) {
+					const suiteId =
+						response.data?.createSuite?.id ||
+						context.testraySuite?.id;
 
-				return createSuiteCaseBatch({
-					variables: {
-						data: cases.map((caseId) => ({
-							caseId,
-							suiteId,
-						})),
-					},
-				});
+					return createSuiteCaseBatch({
+						variables: {
+							data: cases.map((caseId) => ({
+								caseId,
+								suiteId,
+							})),
+						},
+					});
+				}
 			})
 			.then(() => onSave())
 			.catch(() => onError());
@@ -120,9 +123,13 @@ const SuiteForm = () => {
 
 	return (
 		<Container className="container">
-			<Input {...inputProps} label={i18n.translate('name')} name="name" />
+			<Form.Input
+				{...inputProps}
+				label={i18n.translate('name')}
+				name="name"
+			/>
 
-			<Input
+			<Form.Input
 				{...inputProps}
 				label={i18n.translate('description')}
 				name="description"

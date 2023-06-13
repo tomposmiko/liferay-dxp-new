@@ -20,6 +20,8 @@ import com.liferay.object.admin.rest.dto.v1_0.ObjectLayoutColumn;
 import com.liferay.object.admin.rest.dto.v1_0.ObjectLayoutRow;
 import com.liferay.object.admin.rest.dto.v1_0.ObjectLayoutTab;
 import com.liferay.object.util.LocalizedMapUtil;
+import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.vulcan.util.TransformUtil;
 
 import java.util.Map;
@@ -91,6 +93,23 @@ public class ObjectLayoutUtil {
 			return null;
 		}
 
+		if (!GetterUtil.getBoolean(PropsUtil.get("feature.flag.LPS-149014"))) {
+			return new ObjectLayoutBox() {
+				{
+					collapsable =
+						serviceBuilderObjectLayoutBox.getCollapsable();
+					id = serviceBuilderObjectLayoutBox.getObjectLayoutBoxId();
+					name = LocalizedMapUtil.getLanguageIdMap(
+						serviceBuilderObjectLayoutBox.getNameMap());
+					objectLayoutRows = TransformUtil.transformToArray(
+						serviceBuilderObjectLayoutBox.getObjectLayoutRows(),
+						ObjectLayoutUtil::_toObjectLayoutRow,
+						ObjectLayoutRow.class);
+					priority = serviceBuilderObjectLayoutBox.getPriority();
+				}
+			};
+		}
+
 		return new ObjectLayoutBox() {
 			{
 				collapsable = serviceBuilderObjectLayoutBox.getCollapsable();
@@ -102,6 +121,8 @@ public class ObjectLayoutUtil {
 					ObjectLayoutUtil::_toObjectLayoutRow,
 					ObjectLayoutRow.class);
 				priority = serviceBuilderObjectLayoutBox.getPriority();
+				type = ObjectLayoutBox.Type.create(
+					serviceBuilderObjectLayoutBox.getType());
 			}
 		};
 	}
