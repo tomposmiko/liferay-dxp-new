@@ -99,7 +99,7 @@ public class AssetVocabularySiteNavigationMenuTypeDisplayContext {
 					return _typeSettingsUnicodeProperties.get("title");
 				}
 			).put(
-				"type", "type"
+				"type", "asset-vocabulary"
 			).put(
 				"uuid", _typeSettingsUnicodeProperties.get("uuid")
 			).build()
@@ -196,7 +196,7 @@ public class AssetVocabularySiteNavigationMenuTypeDisplayContext {
 			}
 		).put(
 			"eventName",
-			_liferayPortletResponse.getNamespace() + "selectVocabulary"
+			_liferayPortletResponse.getNamespace() + "selectAssetVocabulary"
 		).put(
 			"getAssetVocabularyDetailsURL",
 			() -> {
@@ -211,10 +211,6 @@ public class AssetVocabularySiteNavigationMenuTypeDisplayContext {
 
 				return itemDetailsURL.toString();
 			}
-		).put(
-			"modalTitle",
-			LanguageUtil.format(
-				_themeDisplay.getLocale(), "select-x", "vocabulary")
 		).build();
 	}
 

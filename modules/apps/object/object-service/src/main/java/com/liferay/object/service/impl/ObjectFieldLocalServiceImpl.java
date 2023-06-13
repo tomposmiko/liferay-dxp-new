@@ -57,6 +57,7 @@ import com.liferay.portal.kernel.systemevent.SystemEvent;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.LocaleUtil;
+import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
@@ -260,7 +261,14 @@ public class ObjectFieldLocalServiceImpl
 	public ObjectField getObjectField(long objectDefinitionId, String name)
 		throws PortalException {
 
-		return objectFieldPersistence.findByODI_N(objectDefinitionId, name);
+		ObjectField objectField = objectFieldPersistence.findByODI_N(
+			objectDefinitionId, name);
+
+		objectField.setObjectFieldSettings(
+			_objectFieldSettingPersistence.findByObjectFieldId(
+				objectField.getObjectFieldId()));
+
+		return objectField;
 	}
 
 	@Override
@@ -483,7 +491,11 @@ public class ObjectFieldLocalServiceImpl
 		if ((objectDefinition.isApproved() || objectDefinition.isSystem()) &&
 			!Objects.equals(
 				objectDefinition.getExtensionDBTableName(),
-				objectField.getDBTableName())) {
+				objectField.getDBTableName()) &&
+			(!GetterUtil.getBoolean(PropsUtil.get("feature.flag.LPS-152508")) ||
+			 !Objects.equals(
+				 objectField.getBusinessType(),
+				 ObjectFieldConstants.BUSINESS_TYPE_RELATIONSHIP))) {
 
 			throw new RequiredObjectFieldException();
 		}
@@ -513,7 +525,12 @@ public class ObjectFieldLocalServiceImpl
 
 		if (Objects.equals(
 				objectDefinition.getExtensionDBTableName(),
-				objectField.getDBTableName())) {
+				objectField.getDBTableName()) ||
+			(GetterUtil.getBoolean(PropsUtil.get("feature.flag.LPS-152508")) &&
+			 objectDefinition.isApproved() &&
+			 Objects.equals(
+				 objectField.getBusinessType(),
+				 ObjectFieldConstants.BUSINESS_TYPE_RELATIONSHIP))) {
 
 			if (Objects.equals(objectFieldSettingFileSource, "userComputer")) {
 				_deleteFileEntries(

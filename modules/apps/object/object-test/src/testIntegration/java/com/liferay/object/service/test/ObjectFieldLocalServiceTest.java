@@ -16,7 +16,6 @@ package com.liferay.object.service.test;
 
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
 import com.liferay.document.library.kernel.exception.NoSuchFileEntryException;
-import com.liferay.document.library.kernel.model.DLFolderConstants;
 import com.liferay.document.library.kernel.service.DLAppLocalService;
 import com.liferay.object.constants.ObjectDefinitionConstants;
 import com.liferay.object.constants.ObjectFieldConstants;
@@ -30,6 +29,7 @@ import com.liferay.object.exception.ObjectFieldSettingNameException;
 import com.liferay.object.exception.ObjectFieldSettingValueException;
 import com.liferay.object.exception.RequiredObjectFieldException;
 import com.liferay.object.model.ObjectDefinition;
+import com.liferay.object.model.ObjectEntry;
 import com.liferay.object.model.ObjectField;
 import com.liferay.object.model.ObjectFieldSetting;
 import com.liferay.object.service.ObjectDefinitionLocalService;
@@ -46,16 +46,16 @@ import com.liferay.portal.kernel.dao.jdbc.DataAccess;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
-import com.liferay.portal.kernel.test.util.PropsTestUtil;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.ServiceContextTestUtil;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.kernel.util.ContentTypes;
+import com.liferay.portal.kernel.util.FileUtil;
+import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.LocaleUtil;
-import com.liferay.portal.kernel.util.Props;
-import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.kernel.util.StringUtil;
+import com.liferay.portal.kernel.util.TempFileEntryUtil;
 import com.liferay.portal.kernel.util.TextFormatter;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
@@ -67,11 +67,10 @@ import java.sql.Connection;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
-import org.junit.AfterClass;
 import org.junit.Assert;
-import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
@@ -88,18 +87,6 @@ public class ObjectFieldLocalServiceTest {
 	@Rule
 	public static final AggregateTestRule aggregateTestRule =
 		new LiferayIntegrationTestRule();
-
-	@BeforeClass
-	public static void setUpClass() {
-		_props = PropsUtil.getProps();
-
-		PropsTestUtil.setProps("feature.flag.LPS-146889", "true");
-	}
-
-	@AfterClass
-	public static void tearDownClass() {
-		PropsUtil.setProps(_props);
-	}
 
 	@Test
 	public void testAddSystemObjectField() throws Exception {
@@ -567,14 +554,15 @@ public class ObjectFieldLocalServiceTest {
 				_createObjectFieldSetting("fileSource", "userComputer"),
 				_createObjectFieldSetting("maximumFileSize", "100")));
 
-		FileEntry fileEntry = _dlAppLocalService.addFileEntry(
-			null, TestPropsValues.getUserId(), TestPropsValues.getGroupId(),
-			DLFolderConstants.DEFAULT_PARENT_FOLDER_ID,
-			StringUtil.randomString() + ".txt", ContentTypes.TEXT_PLAIN,
-			RandomTestUtil.randomBytes(), null, null,
-			ServiceContextTestUtil.getServiceContext());
+		FileEntry fileEntry = TempFileEntryUtil.addTempFileEntry(
+			TestPropsValues.getGroupId(), TestPropsValues.getUserId(),
+			objectDefinition.getPortletId(),
+			TempFileEntryUtil.getTempFileName(
+				StringUtil.randomString() + ".txt"),
+			FileUtil.createTempFile(RandomTestUtil.randomBytes()),
+			ContentTypes.TEXT_PLAIN);
 
-		_objectEntryLocalService.addObjectEntry(
+		ObjectEntry objectEntry = _objectEntryLocalService.addObjectEntry(
 			TestPropsValues.getUserId(), 0,
 			objectDefinition.getObjectDefinitionId(),
 			HashMapBuilder.<String, Serializable>put(
@@ -582,11 +570,12 @@ public class ObjectFieldLocalServiceTest {
 			).build(),
 			ServiceContextTestUtil.getServiceContext());
 
-		Assert.assertNotNull(
-			_dlAppLocalService.getFileEntry(fileEntry.getFileEntryId()));
+		Map<String, Serializable> values = objectEntry.getValues();
 
-		_objectFieldLocalService.deleteObjectField(
-			objectField.getObjectFieldId());
+		long persistedFileEntryId = GetterUtil.getLong(values.get("upload"));
+
+		Assert.assertNotNull(
+			_dlAppLocalService.getFileEntry(persistedFileEntryId));
 
 		try {
 			_dlAppLocalService.getFileEntry(fileEntry.getFileEntryId());
@@ -598,6 +587,22 @@ public class ObjectFieldLocalServiceTest {
 				StringBundler.concat(
 					"No FileEntry exists with the key {fileEntryId=",
 					fileEntry.getFileEntryId(), "}"),
+				noSuchFileEntryException.getMessage());
+		}
+
+		_objectFieldLocalService.deleteObjectField(
+			objectField.getObjectFieldId());
+
+		try {
+			_dlAppLocalService.getFileEntry(persistedFileEntryId);
+
+			Assert.fail();
+		}
+		catch (NoSuchFileEntryException noSuchFileEntryException) {
+			Assert.assertEquals(
+				StringBundler.concat(
+					"No FileEntry exists with the key {fileEntryId=",
+					persistedFileEntryId, "}"),
 				noSuchFileEntryException.getMessage());
 		}
 
@@ -642,13 +647,15 @@ public class ObjectFieldLocalServiceTest {
 				objectDefinition.getObjectDefinitionId(), "Text", "String",
 				true, false, null,
 				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
-				"text", false, Collections.emptyList());
+				"text", false,
+				Collections.singletonList(
+					_createObjectFieldSetting("showCounter", "true")));
 		}
 		catch (ObjectFieldSettingValueException.MissingRequiredValues
 					objectFieldSettingValueException) {
 
 			Assert.assertEquals(
-				"The settings showCounter are required for object field text",
+				"The settings maxLength are required for object field text",
 				objectFieldSettingValueException.getMessage());
 		}
 
@@ -670,6 +677,42 @@ public class ObjectFieldLocalServiceTest {
 
 			Assert.assertEquals(
 				"The settings anySetting are not allowed for object field text",
+				objectFieldSettingNameException.getMessage());
+		}
+
+		try {
+			_objectFieldLocalService.addCustomObjectField(
+				TestPropsValues.getUserId(), 0,
+				objectDefinition.getObjectDefinitionId(), "Text", "String",
+				true, false, null,
+				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
+				"text", false,
+				Arrays.asList(_createObjectFieldSetting("maxLength", null)));
+		}
+		catch (ObjectFieldSettingNameException.NotAllowedNames
+					objectFieldSettingNameException) {
+
+			Assert.assertEquals(
+				"The settings maxLength are not allowed for object field text",
+				objectFieldSettingNameException.getMessage());
+		}
+
+		try {
+			_objectFieldLocalService.addCustomObjectField(
+				TestPropsValues.getUserId(), 0,
+				objectDefinition.getObjectDefinitionId(), "Text", "String",
+				true, false, null,
+				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
+				"text", false,
+				Arrays.asList(
+					_createObjectFieldSetting("maxLength", "10"),
+					_createObjectFieldSetting("showCounter", "false")));
+		}
+		catch (ObjectFieldSettingNameException.NotAllowedNames
+					objectFieldSettingNameException) {
+
+			Assert.assertEquals(
+				"The settings maxLength are not allowed for object field text",
 				objectFieldSettingNameException.getMessage());
 		}
 
@@ -999,8 +1042,6 @@ public class ObjectFieldLocalServiceTest {
 				objectDefinition2);
 		}
 	}
-
-	private static Props _props;
 
 	@Inject
 	private DLAppLocalService _dlAppLocalService;

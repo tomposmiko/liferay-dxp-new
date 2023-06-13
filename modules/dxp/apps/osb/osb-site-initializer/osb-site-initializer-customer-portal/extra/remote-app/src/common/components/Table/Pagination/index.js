@@ -10,6 +10,7 @@
  */
 
 import {ClayPaginationBarWithBasicItems} from '@clayui/pagination-bar';
+import classNames from 'classnames';
 import {getIconSpriteMap} from '../../../providers/ClayProvider';
 
 const TablePagination = ({
@@ -35,6 +36,10 @@ const TablePagination = ({
 				<ClayPaginationBarWithBasicItems
 					activeDelta={itemsPerPage}
 					activePage={activePage}
+					className={classNames({
+						'cp-hide-pagination-activation-keys':
+							itemsPerPage >= totalItems,
+					})}
 					deltas={listItemsPerPage}
 					ellipsisBuffer={ellipsisBuffer}
 					labels={labels || defaultLabels}

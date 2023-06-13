@@ -34,6 +34,7 @@ import com.liferay.portal.kernel.portlet.LiferayWindowState;
 import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermission;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.ListUtil;
+import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.UnicodeFormatter;
 import com.liferay.portal.util.PropsValues;
@@ -202,14 +203,8 @@ public class ObjectDefinitionsFieldsDisplayContext
 
 		ListUtil.isNotEmptyForEach(
 			objectField.getObjectFieldSettings(),
-			objectFieldSetting -> jsonArray.put(
-				JSONUtil.put(
-					"name", objectFieldSetting.getName()
-				).put(
-					"value",
-					_getObjectFieldSettingValue(
-						objectField.getBusinessType(), objectFieldSetting)
-				)));
+			objectFieldSetting -> _putObjectFieldSettingJSONObject(
+				objectField.getBusinessType(), jsonArray, objectFieldSetting));
 
 		return jsonArray;
 	}
@@ -218,10 +213,19 @@ public class ObjectDefinitionsFieldsDisplayContext
 		String businessType, ObjectFieldSetting objectFieldSetting) {
 
 		if (Objects.equals(
-				ObjectFieldConstants.BUSINESS_TYPE_ATTACHMENT, businessType) &&
-			Objects.equals(objectFieldSetting.getName(), "maximumFileSize")) {
+				ObjectFieldConstants.BUSINESS_TYPE_ATTACHMENT, businessType)) {
 
-			return GetterUtil.getInteger(objectFieldSetting.getValue());
+			if (Objects.equals(
+					objectFieldSetting.getName(), "maximumFileSize")) {
+
+				return GetterUtil.getInteger(objectFieldSetting.getValue());
+			}
+			else if (Objects.equals(
+						objectFieldSetting.getName(),
+						"showFilesInDocumentsAndMedia")) {
+
+				return GetterUtil.getBoolean(objectFieldSetting.getValue());
+			}
 		}
 		else if (Objects.equals(
 					ObjectFieldConstants.BUSINESS_TYPE_LONG_TEXT,
@@ -240,6 +244,28 @@ public class ObjectDefinitionsFieldsDisplayContext
 		}
 
 		return objectFieldSetting.getValue();
+	}
+
+	private void _putObjectFieldSettingJSONObject(
+		String businessType, JSONArray jsonArray,
+		ObjectFieldSetting objectFieldSetting) {
+
+		if (!GetterUtil.getBoolean(PropsUtil.get("feature.flag.LPS-148112")) &&
+			(Objects.equals(
+				objectFieldSetting.getName(), "showFilesInDocumentsAndMedia") ||
+			 Objects.equals(
+				 objectFieldSetting.getName(), "storageDLFolderPath"))) {
+
+			return;
+		}
+
+		jsonArray.put(
+			JSONUtil.put(
+				"name", objectFieldSetting.getName()
+			).put(
+				"value",
+				_getObjectFieldSettingValue(businessType, objectFieldSetting)
+			));
 	}
 
 	private final ObjectFieldBusinessTypeServicesTracker

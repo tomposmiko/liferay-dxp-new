@@ -26,6 +26,7 @@ import {
 	updateFieldSettings,
 } from '../utils/fieldSettings';
 import {defaultLanguageId, defaultLocale} from '../utils/locale';
+import Card from './Card/Card';
 import Input from './Form/Input';
 import InputLocalized from './Form/InputLocalized/InputLocalized';
 import Select from './Form/Select';
@@ -33,10 +34,9 @@ import ObjectFieldFormBase, {
 	ObjectFieldErrors,
 	useObjectFieldForm,
 } from './ObjectFieldFormBase';
-import Sheet from './Sheet';
+import {SidePanelForm, closeSidePanel, openToast} from './SidePanelContent';
 
 import './EditObjectField.scss';
-import {SidePanelForm, closeSidePanel, openToast} from './SidePanelContent';
 
 const locales: {label: string; symbol: string}[] = [];
 const languageLabels: string[] = [];
@@ -61,8 +61,6 @@ export default function EditObjectField({
 	objectName,
 	readOnly,
 }: IProps) {
-	const flags = useFeatureFlag();
-
 	const onSubmit = async ({id, ...objectField}: ObjectField) => {
 		const response = await fetch(
 			`/o/object-admin/v1.0/object-fields/${id}`,
@@ -135,7 +133,7 @@ export default function EditObjectField({
 			readOnly={readOnly}
 			title={Liferay.Language.get('field')}
 		>
-			<Sheet title={Liferay.Language.get('basic-info')}>
+			<Card title={Liferay.Language.get('basic-info')}>
 				<InputLocalized
 					disabled={readOnly}
 					error={errors.label}
@@ -167,22 +165,21 @@ export default function EditObjectField({
 						/>
 					)}
 
-					{flags['LPS-146889'] &&
-						(values.businessType === 'Text' ||
-							values.businessType === 'LongText') && (
-							<MaxLengthProperties
-								disabled={readOnly}
-								errors={errors}
-								objectField={values}
-								objectFieldSettings={
-									values.objectFieldSettings as ObjectFieldSetting[]
-								}
-								onSettingsChange={handleSettingsChange}
-								setValues={setValues}
-							/>
-						)}
+					{(values.businessType === 'Text' ||
+						values.businessType === 'LongText') && (
+						<MaxLengthProperties
+							disabled={readOnly}
+							errors={errors}
+							objectField={values}
+							objectFieldSettings={
+								values.objectFieldSettings as ObjectFieldSetting[]
+							}
+							onSettingsChange={handleSettingsChange}
+							setValues={setValues}
+						/>
+					)}
 				</ObjectFieldFormBase>
-			</Sheet>
+			</Card>
 
 			{values.DBType !== 'Blob' && (
 				<SearchableContainer
@@ -222,7 +219,7 @@ function SearchableContainer({
 	}, [objectField.indexedLanguageId]);
 
 	return (
-		<Sheet title={Liferay.Language.get('searchable')}>
+		<Card title={Liferay.Language.get('searchable')}>
 			<ClayForm.Group>
 				<ClayToggle
 					disabled={disabled}
@@ -236,7 +233,7 @@ function SearchableContainer({
 			{isSearchableString && (
 				<ClayForm.Group>
 					<ClayRadioGroup
-						onSelectedValueChange={(selected) => {
+						onChange={(selected: string | number) => {
 							const indexedAsKeyword = selected === 'true';
 							const indexedLanguageId = indexedAsKeyword
 								? null
@@ -247,7 +244,7 @@ function SearchableContainer({
 								indexedLanguageId,
 							});
 						}}
-						selectedValue={new Boolean(
+						value={new Boolean(
 							objectField.indexedAsKeyword
 						).toString()}
 					>
@@ -286,7 +283,7 @@ function SearchableContainer({
 					value={selectedLanguage}
 				/>
 			)}
-		</Sheet>
+		</Card>
 	);
 }
 

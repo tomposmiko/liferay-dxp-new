@@ -1328,16 +1328,11 @@ definition {
 			key_rowEntry = "${dmDocumentTitle}",
 			locator1 = "Icon#ROW_VERTICAL_ELLIPSIS");
 
-		if (isSet(noDownloadOption)) {
-			AssertElementNotPresent(locator1 = "MenuItem#DOWNLOAD");
-		}
-		else {
-			AssertClick.assertPartialTextClickAt(
-				locator1 = "MenuItem#DOWNLOAD",
-				value1 = "Download");
+		AssertClick.assertPartialTextClickAt(
+			locator1 = "MenuItem#DOWNLOAD",
+			value1 = "Download");
 
-			DownloadTempFile();
-		}
+		DownloadTempFile();
 	}
 
 	macro downloadMultipleCP {
@@ -2201,7 +2196,13 @@ definition {
 	macro revertPG {
 		DMNavigator.gotoDocumentVersion();
 
-		var key_dmDocumentVersionNumber = "Version ${dmDocumentVersionNumber}";
+		var key_dmDocumentVersionNumber = "${dmDocumentVersionNumber}";
+		var documentCreationDate = DateUtil.getFormattedCurrentDate("M/d/yy");
+
+		AssertTextEquals.assertPartialText(
+			locator1 = "DocumentsAndMediaDocument#DOCUMENT_VERSIONS_CREATION_DATE",
+			value1 = "${documentCreationDate}",
+			versionNumber = "${key_dmDocumentVersionNumber}");
 
 		Click(locator1 = "DocumentsAndMedia#DOCUMENT_VERSION_VERTICAL_ELLIPSIS");
 

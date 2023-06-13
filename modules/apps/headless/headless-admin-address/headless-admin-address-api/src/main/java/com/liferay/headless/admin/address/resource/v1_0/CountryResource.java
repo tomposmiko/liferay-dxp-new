@@ -38,6 +38,7 @@ import javax.annotation.Generated;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
 import org.osgi.annotation.versioning.ProviderType;
@@ -62,6 +63,11 @@ public interface CountryResource {
 			Boolean active, String search, Pagination pagination, Sort[] sorts)
 		throws Exception;
 
+	public Country postCountry(Country country) throws Exception;
+
+	public Response postCountryBatch(String callbackURL, Object object)
+		throws Exception;
+
 	public Country getCountryByA2(String a2) throws Exception;
 
 	public Country getCountryByA3(String a3) throws Exception;
@@ -69,6 +75,11 @@ public interface CountryResource {
 	public Country getCountryByName(String name) throws Exception;
 
 	public Country getCountryByNumber(Integer number) throws Exception;
+
+	public void deleteCountry(Long countryId) throws Exception;
+
+	public Response deleteCountryBatch(String callbackURL, Object object)
+		throws Exception;
 
 	public Country getCountry(Long countryId) throws Exception;
 

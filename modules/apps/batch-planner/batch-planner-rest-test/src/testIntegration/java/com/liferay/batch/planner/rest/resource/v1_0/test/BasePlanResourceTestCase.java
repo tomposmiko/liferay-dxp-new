@@ -22,6 +22,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.util.ISO8601DateFormat;
 
+import com.liferay.batch.planner.rest.client.dto.v1_0.Field;
 import com.liferay.batch.planner.rest.client.dto.v1_0.Plan;
 import com.liferay.batch.planner.rest.client.http.HttpInvoker;
 import com.liferay.batch.planner.rest.client.pagination.Page;

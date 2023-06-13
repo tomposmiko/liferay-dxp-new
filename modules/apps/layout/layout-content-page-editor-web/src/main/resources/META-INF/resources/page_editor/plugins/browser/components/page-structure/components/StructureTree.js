@@ -21,6 +21,7 @@ import getAllPortals from '../../../../../app/components/layout-data-items/getAl
 import hasDropZoneChild from '../../../../../app/components/layout-data-items/hasDropZoneChild';
 import {EDITABLE_FRAGMENT_ENTRY_PROCESSOR} from '../../../../../app/config/constants/editableFragmentEntryProcessor';
 import {EDITABLE_TYPES} from '../../../../../app/config/constants/editableTypes';
+import {FRAGMENT_ENTRY_TYPES} from '../../../../../app/config/constants/fragmentEntryTypes';
 import {ITEM_TYPES} from '../../../../../app/config/constants/itemTypes';
 import {LAYOUT_DATA_ITEM_TYPES} from '../../../../../app/config/constants/layoutDataItemTypes';
 import {LAYOUT_TYPES} from '../../../../../app/config/constants/layoutTypes';
@@ -35,6 +36,7 @@ import canActivateEditable from '../../../../../app/utils/canActivateEditable';
 import {DragAndDropContextProvider} from '../../../../../app/utils/drag-and-drop/useDragAndDrop';
 import isMapped from '../../../../../app/utils/editable-value/isMapped';
 import isMappedToCollection from '../../../../../app/utils/editable-value/isMappedToCollection';
+import {formIsMapped} from '../../../../../app/utils/formIsMapped';
 import getMappingFieldsKey from '../../../../../app/utils/getMappingFieldsKey';
 import {getResponsiveConfig} from '../../../../../app/utils/getResponsiveConfig';
 import getSelectedField from '../../../../../app/utils/getSelectedField';
@@ -54,7 +56,7 @@ const LAYOUT_DATA_ITEM_TYPE_ICONS = {
 	[LAYOUT_DATA_ITEM_TYPES.collection]: 'list',
 	[LAYOUT_DATA_ITEM_TYPES.collectionItem]: 'document',
 	[LAYOUT_DATA_ITEM_TYPES.container]: 'container',
-	[LAYOUT_DATA_ITEM_TYPES.form]: 'forms',
+	[LAYOUT_DATA_ITEM_TYPES.form]: 'container',
 	[LAYOUT_DATA_ITEM_TYPES.dropZone]: 'box-container',
 	[LAYOUT_DATA_ITEM_TYPES.fragment]: 'code',
 	[LAYOUT_DATA_ITEM_TYPES.fragmentDropZone]: 'box-container',
@@ -279,6 +281,21 @@ function isItemHidden(item, selectedViewportSize) {
 	return responsiveConfig.styles.display === 'none';
 }
 
+function isHidable(item, fragmentEntryLinks, layoutData) {
+	if (!isRemovable(item, layoutData)) {
+		return false;
+	}
+
+	if (item.type !== LAYOUT_DATA_ITEM_TYPES.fragment) {
+		return true;
+	}
+
+	const fragmentEntryLink =
+		fragmentEntryLinks[item.config.fragmentEntryLinkId];
+
+	return fragmentEntryLink.fragmentEntryType !== FRAGMENT_ENTRY_TYPES.input;
+}
+
 function isRemovable(item, layoutData) {
 	if (
 		item.type === LAYOUT_DATA_ITEM_TYPES.dropZone ||
@@ -380,6 +397,7 @@ function visit(
 					dragAndDropHoveredItemId,
 					draggable: false,
 					expanded: childId === activeItemId,
+					hidable: false,
 					hidden: false,
 					hiddenAncestor: hasHiddenAncestor || hidden,
 					icon: EDITABLE_TYPE_ICONS[type],
@@ -421,14 +439,16 @@ function visit(
 	}
 	else {
 		item.children.forEach((childId) => {
-			const childItem = items[childId];
-
 			if (
-				item.type === LAYOUT_DATA_ITEM_TYPES.collection &&
-				!item.config.collection
+				(item.type === LAYOUT_DATA_ITEM_TYPES.collection &&
+					!item.config.collection) ||
+				(item.type === LAYOUT_DATA_ITEM_TYPES.form &&
+					!formIsMapped(item))
 			) {
 				return;
 			}
+
+			const childItem = items[childId];
 
 			if (
 				!isMasterPage &&
@@ -489,12 +509,19 @@ function visit(
 		expanded:
 			item.itemId === activeItemId ||
 			dragAndDropHoveredItemId === item.itemId,
+		hidable:
+			!itemInMasterLayout &&
+			isHidable(item, fragmentEntryLinks, layoutData),
 		hidden,
 		hiddenAncestor: hasHiddenAncestor,
 		icon,
 		id: item.itemId,
 		isMasterItem: !isMasterPage && itemInMasterLayout,
 		itemType: ITEM_TYPES.layoutDataItem,
+		mapped:
+			item.type === LAYOUT_DATA_ITEM_TYPES.form
+				? formIsMapped(item)
+				: false,
 		name: selectLayoutDataItemLabel({fragmentEntryLinks}, item),
 		nameInfo: getNameInfo(item),
 		onHoverNode,

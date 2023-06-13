@@ -95,9 +95,7 @@ definition {
 		}
 
 		task ("Assert that the Content Performance panel button disappears") {
-			AssertElementNotPresent(
-				locator1 = "ContentPerformance#CONTENT_PERFORMANCE_BUTTON",
-				value1 = "Content Performance");
+			AssertElementNotPresent(locator1 = "ContentPerformance#CONTENT_PERFORMANCE_BUTTON");
 		}
 	}
 
@@ -245,13 +243,11 @@ definition {
 		}
 
 		task ("Check if elements present") {
-			AssertElementPresent(
-				locator1 = "ContentPerformance#CONTENT_PERFORMANCE_START_FREE_TRIAL",
-				value1 = "Start Free Trial");
+			AssertVisible(
+				key_text = "Start Free Trial",
+				locator1 = "Button#ANY");
 
-			AssertElementPresent(
-				locator1 = "ContentPerformance#CONTENT_PERFORMANCE_DO_NOT_SHOW_AGAIN",
-				value1 = "Do not show me this again.");
+			AssertVisible(locator1 = "ContentPerformance#CONTENT_PERFORMANCE_DO_NOT_SHOW_AGAIN");
 		}
 	}
 
@@ -281,13 +277,9 @@ definition {
 		}
 
 		task ("Assert if button is not present and instructions are present") {
-			AssertElementNotPresent(
-				locator1 = "ContentPerformance#CONTENT_PERFORMANCE_DO_NOT_SHOW_AGAIN",
-				value1 = "Do not show me this again.");
+			AssertElementNotPresent(locator1 = "ContentPerformance#CONTENT_PERFORMANCE_DO_NOT_SHOW_AGAIN");
 
-			AssertElementPresent(
-				locator1 = "ContentPerformance#INSTRUCTIONS_SYNC_AC",
-				value1 = "Sync to Liferay Analytics Cloud");
+			AssertElementPresent(locator1 = "ContentPerformance#INSTRUCTIONS_SYNC_AC");
 		}
 
 		task ("End connection with Analytics Cloud") {

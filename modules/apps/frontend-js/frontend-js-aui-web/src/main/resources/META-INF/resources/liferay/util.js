@@ -121,6 +121,9 @@
 			return editable;
 		},
 
+		/**
+		 * @deprecated As of Cavanaugh (7.4.x), with no direct replacement
+		 */
 		addInputCancel() {
 			A.use('aui-button-search-cancel', (A) => {
 				new A.ButtonSearchCancel({
@@ -273,6 +276,9 @@
 			}
 		},
 
+		/**
+		 * @deprecated As of Cavanaugh (7.4.x), with no direct replacement
+		 */
 		disableFormButtons(inputs, form) {
 			inputs.attr('disabled', true);
 			inputs.setStyle('opacity', 0.5);
@@ -304,6 +310,9 @@
 			}
 		},
 
+		/**
+		 * @deprecated As of Cavanaugh (7.4.x), with no direct replacement
+		 */
 		enableFormButtons(inputs) {
 			Util._submitLocked = null;
 
@@ -328,6 +337,9 @@
 			});
 		},
 
+		/**
+		 * @deprecated As of Cavanaugh (7.4.x), with no direct replacement
+		 */
 		forcePost(link) {
 			const currentElement = Util.getElement(link);
 

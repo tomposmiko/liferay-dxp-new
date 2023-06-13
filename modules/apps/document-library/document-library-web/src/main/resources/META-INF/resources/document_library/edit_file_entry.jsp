@@ -209,7 +209,7 @@ renderResponse.setTitle(headerTitle);
 			<liferay-ui:error exception="<%= DuplicateFolderNameException.class %>" message="please-enter-a-unique-document-name" />
 
 			<liferay-ui:error exception="<%= LiferayFileItemException.class %>">
-				<liferay-ui:message arguments="<%= LanguageUtil.formatStorageSize(LiferayFileItem.THRESHOLD_SIZE, locale) %>" key="please-enter-valid-content-with-valid-content-size-no-larger-than-x" translateArguments="<%= false %>" />
+				<liferay-ui:message arguments="<%= LanguageUtil.formatStorageSize(FileItem.THRESHOLD_SIZE, locale) %>" key="please-enter-valid-content-with-valid-content-size-no-larger-than-x" translateArguments="<%= false %>" />
 			</liferay-ui:error>
 
 			<liferay-ui:error exception="<%= FileExtensionException.class %>">
@@ -554,7 +554,7 @@ renderResponse.setTitle(headerTitle);
 
 						<c:if test="<%= (fileEntry != null) && dlAdminDisplayContext.isAutoTaggingEnabled() %>">
 							<clay:checkbox
-								checked="<%= false %>"
+								checked="<%= dlAdminDisplayContext.isUpdateAutoTags() %>"
 								id='<%= liferayPortletResponse.getNamespace() + "updateAutoTags" %>'
 								label='<%= LanguageUtil.get(request, "update-auto-tags") %>'
 								name='<%= liferayPortletResponse.getNamespace() + "updateAutoTags" %>'

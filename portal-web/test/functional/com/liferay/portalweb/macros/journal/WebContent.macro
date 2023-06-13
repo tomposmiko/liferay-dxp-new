@@ -951,8 +951,6 @@ definition {
 			entry = "${entryTitle}",
 			menuItem = "Delete");
 
-		AssertConfirm(value1 = "Are you sure you want to delete this? It will be deleted immediately.");
-
 		Alert.viewSuccessMessage();
 	}
 
@@ -1524,8 +1522,6 @@ definition {
 				entry = "${webContentTitle}",
 				menuItem = "Move to Recycle Bin");
 		}
-
-		AssertConfirm(value1 = "Are you sure you want to move this to the Recycle Bin?");
 
 		VerifyElementPresent(locator1 = "Message#SUCCESS");
 
@@ -2508,6 +2504,21 @@ definition {
 
 				SelectFrameTop(value1 = "relative=top");
 			}
+		}
+
+		if ("${webContentBoolean}" == "true") {
+			var webContentBooleanFieldLabel = "Boolean";
+
+			AssertChecked.assertCheckedNotVisible(
+				checkboxName = "${webContentBooleanFieldLabel}",
+				locator1 = "Checkbox#ANY_CHECKBOX");
+		}
+		else if ("${webContentBoolean}" == "false") {
+			var webContentBooleanFieldLabel = "Boolean";
+
+			AssertNotChecked.assertNotCheckedNotVisible(
+				checkboxName = "${webContentBooleanFieldLabel}",
+				locator1 = "Checkbox#ANY_CHECKBOX");
 		}
 
 		if (isSet(webContentColor)) {

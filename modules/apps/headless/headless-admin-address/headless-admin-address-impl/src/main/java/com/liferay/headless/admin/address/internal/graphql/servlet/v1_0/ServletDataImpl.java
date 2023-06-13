@@ -17,6 +17,7 @@ package com.liferay.headless.admin.address.internal.graphql.servlet.v1_0;
 import com.liferay.headless.admin.address.internal.graphql.mutation.v1_0.Mutation;
 import com.liferay.headless.admin.address.internal.graphql.query.v1_0.Query;
 import com.liferay.headless.admin.address.resource.v1_0.CountryResource;
+import com.liferay.headless.admin.address.resource.v1_0.RegionResource;
 import com.liferay.portal.vulcan.graphql.servlet.ServletData;
 
 import javax.annotation.Generated;
@@ -38,8 +39,13 @@ public class ServletDataImpl implements ServletData {
 
 	@Activate
 	public void activate(BundleContext bundleContext) {
+		Mutation.setCountryResourceComponentServiceObjects(
+			_countryResourceComponentServiceObjects);
+
 		Query.setCountryResourceComponentServiceObjects(
 			_countryResourceComponentServiceObjects);
+		Query.setRegionResourceComponentServiceObjects(
+			_regionResourceComponentServiceObjects);
 	}
 
 	@Override
@@ -60,5 +66,9 @@ public class ServletDataImpl implements ServletData {
 	@Reference(scope = ReferenceScope.PROTOTYPE_REQUIRED)
 	private ComponentServiceObjects<CountryResource>
 		_countryResourceComponentServiceObjects;
+
+	@Reference(scope = ReferenceScope.PROTOTYPE_REQUIRED)
+	private ComponentServiceObjects<RegionResource>
+		_regionResourceComponentServiceObjects;
 
 }

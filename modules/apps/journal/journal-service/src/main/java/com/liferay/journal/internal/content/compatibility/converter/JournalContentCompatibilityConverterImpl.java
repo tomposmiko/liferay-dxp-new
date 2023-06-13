@@ -260,7 +260,7 @@ public class JournalContentCompatibilityConverterImpl
 			"privateLayout", privateLayout
 		);
 
-		return jsonObject.toJSONString();
+		return jsonObject.toString();
 	}
 
 	private void _convertNestedFields(Element newElement, Element oldElement) {
