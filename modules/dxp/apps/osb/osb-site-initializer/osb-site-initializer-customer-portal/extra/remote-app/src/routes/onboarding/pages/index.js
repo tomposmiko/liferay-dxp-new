@@ -63,6 +63,7 @@ const Pages = () => {
 
 	const invitesPageHandle = () => {
 		if (
+			Liferay.FeatureFlags['LPS-153478'] &&
 			subscriptionLiferayExperienceCloud &&
 			!liferayExperienceCloudActivationSubmittedStatus
 		) {

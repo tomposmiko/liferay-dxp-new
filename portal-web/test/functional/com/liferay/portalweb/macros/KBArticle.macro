@@ -91,6 +91,11 @@ definition {
 		if (isSet(kbTemplateTitle)) {
 			LexiconEntry.gotoAddMenuItem(menuItem = "${kbTemplateTitle}");
 		}
+		else if (isSet(centerPaneButton)) {
+			Button.click(button = "New");
+
+			MenuItem.click(menuItem = "Basic Article");
+		}
 		else {
 			LexiconEntry.gotoAddMenuItem(menuItem = "Basic Article");
 		}
@@ -854,7 +859,14 @@ definition {
 	}
 
 	macro importCP {
-		LexiconEntry.gotoAddDropdownMenuItem(menuItem = "Import");
+		if (isSet(centerPaneButton)) {
+			Button.click(button = "New");
+
+			MenuItem.click(menuItem = "Import");
+		}
+		else {
+			LexiconEntry.gotoAddDropdownMenuItem(menuItem = "Import");
+		}
 
 		UploadDependencyFile.uploadArchiveFile(fileName = "${kbZipFile}");
 
