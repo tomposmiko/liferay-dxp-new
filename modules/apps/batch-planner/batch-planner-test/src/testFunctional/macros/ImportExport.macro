@@ -4,18 +4,9 @@ definition {
 		AssertElementPresent(
 			key_entityType = "${entityType}",
 			key_executionAction = "${executionAction}",
+			key_executionName = "${executionName}",
 			key_executionStatus = "${executionStatus}",
 			locator1 = "ImportExport#EXECUTION_ENTRY");
-	}
-
-	macro assertExecutionNotification {
-		var executionStatus = StringUtil.upperCase("${executionStatus}");
-
-		AssertElementPresent(
-			key_entityType = "${entityType}",
-			key_executionAction = "${executionAction}",
-			key_jobStatus = "${executionStatus}",
-			locator1 = "ImportExport#EXECUTION_NOTIFICATION");
 	}
 
 	macro assertExportFileContent {
@@ -173,10 +164,20 @@ definition {
 		}
 
 		ImportExport.mapExport(exportFields = "${exportFields}");
+
+		if (isSet(templateName)) {
+			ImportExport.saveAsTemplate(templateName = "${templateName}");
+		}
 	}
 
 	macro configureImport {
 		UploadDependencyFile.uploadFile(fileName = "${fileName}");
+
+		if (isSet(importName)) {
+			Type(
+				locator1 = "TextInput#NAME",
+				value1 = "${importName}");
+		}
 
 		if (isSet(csvSeparator)) {
 			Type(
@@ -202,6 +203,10 @@ definition {
 		}
 
 		ImportExport.mapImport(fieldMappings = "${fieldMappings}");
+
+		if (isSet(templateName)) {
+			ImportExport.saveAsTemplate(templateName = "${templateName}");
+		}
 	}
 
 	macro exportFile {
@@ -259,6 +264,12 @@ definition {
 		MenuItem.click(menuItem = "Import File");
 
 		UploadDependencyFile.uploadFile(fileName = "${fileName}");
+
+		if (isSet(importName)) {
+			Type(
+				locator1 = "TextInput#NAME",
+				value1 = "${importName}");
+		}
 
 		if (isSet(csvSeparator)) {
 			Type(
@@ -340,7 +351,8 @@ definition {
 		Button.click(button = "Save as Template");
 
 		Type(
-			locator1 = "TextInput#NAME",
+			key_placeHolder = "Template Name",
+			locator1 = "TextInput#ANY_PLACEHOLDER",
 			value1 = "${templateName}");
 
 		Button.clickSave();

@@ -311,7 +311,7 @@
 </tr>
 <tr>
 	<td>RADIO_BUTTON</td>
-	<td>//label[contains(.,'${key_radioOption}')]/input[@type='radio']</td>
+	<td>//label[contains(.,'${key_radioOption}')]/input[@type='radio'] | //div[contains(@class,'justify')][contains(.,'${key_radioOption}')]//preceding::input[@type='radio'][1]</td>
 	<td></td>
 </tr>
 <tr>
@@ -535,13 +535,28 @@
 	<td></td>
 </tr>
 <tr>
+	<td>ENTRY_ROW_VERTICAL_ELLIPSIS</td>
+	<td>//*[contains(.,'${key_entryName}')]/td//span[*[name()='svg'][contains(@class,'icon-ellipsis')]]</td>
+	<td></td>
+</tr>
+<tr>
 	<td>ROW_VERTICAL_ELLIPSIS</td>
 	<td>//td//span[*[name()='svg'][contains(@class,'icon-ellipsis')]]</td>
 	<td></td>
 </tr>
 <tr>
+	<td>TABLE_ENTRY_DESCRIPTION</td>
+	<td>//h4[contains(.,'${key_table}')]//..//div/a[contains(.,'${key_entryName}')]/parent::div/parent::div/parent::div//div[@class='dnd-td'][2][contains(.,'${key_entryDescription}')]</td>
+	<td></td>
+</tr>
+<tr>
 	<td>TABLE_ENTRY_NAME</td>
 	<td>//h4[contains(.,'${key_table}')]//..//div/a[contains(.,'${key_entryName}')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>TABLE_ENTRY_STATUS</td>
+	<td>//h4[contains(.,'${key_table}')]//..//div/a[contains(.,'${key_entryName}')]/parent::div/parent::div/parent::div//div[@class='dnd-td']/span[contains(@class,'label')][contains(.,'${key_entryStatus}')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -603,7 +618,7 @@
 <!--CHANNEL-->
 <tr>
 	<td>PAYMENT_METHODS_SIDE_PANEL_NAV_ITEMS</td>
-	<td>//div[contains(@class,'side-panel')]//li[a[contains(text(),'${navItem}')]]</td>
+	<td>//div[contains(@class,'side-panel')]//li[a[span[contains(text(),'${navItem}')]]]</td>
 	<td></td>
 </tr>
 <tr>
@@ -909,6 +924,11 @@
 <tr>
 	<td>SEARCH_PRODUCT_RELATIONS</td>
 	<td>//input[@data-qa-id='searchInput']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>TABLE_SEARCH_BY_NAME_AND_COLUMN_CONTENT</td>
+	<td>//div[@class='dnd-td' and contains(.,'${key_productName}')]/following-sibling::div[${key_columnNumber}][contains(text(),'${key_value}')]</td>
 	<td></td>
 </tr>
 <tr>

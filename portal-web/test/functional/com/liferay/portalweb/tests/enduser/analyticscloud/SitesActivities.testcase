@@ -16,6 +16,8 @@ definition {
 		ACUtils.launchDXP();
 
 		ACUtils.addSiteAndPage();
+
+		ACUtils.createBlogsAndAddToPage();
 	}
 
 	tearDown {
@@ -106,84 +108,6 @@ definition {
 			ACTimeFilter.clickTimeFilterButton();
 
 			ACTimeFilter.setLast180Days();
-		}
-	}
-
-	@description = "Feature ID: Legacy | Automation ID: LRAC-8282 | Test Summary: Anonymous converts to known"
-	@priority = "4"
-	test CanAnonymousIndividualsConvertsToKnownIndividuals {
-		var nameList = "ac";
-
-		task ("Connect Analytics Cloud to DXP") {
-			var propertyName = ACDXPSettings.connectDXPtoAnalyticsCloud(siteName = "Site Name");
-		}
-
-		task ("Create new user") {
-			JSONUser.addUser(
-				userEmailAddress = "${nameList}@liferay.com",
-				userFirstName = "${nameList}",
-				userLastName = "${nameList}",
-				userScreenName = "${nameList}");
-		}
-
-		task ("Login with new user and see Site") {
-			User.logoutAndLoginPG(
-				userLoginEmailAddress = "${nameList}@liferay.com",
-				userLoginFullName = "${nameList} ${nameList}");
-
-			ACUtils.navigateToSitePage(
-				pageName = "AC Page",
-				siteName = "Site Name");
-		}
-
-		task ("Close all sessions and switch to new property in AC and go to Individuals") {
-			ACUtils.closeAllSessionsAndWait();
-
-			ACUtils.launchAC();
-
-			ACProperties.switchProperty(propertyName = "${propertyName}");
-
-			ACNavigation.goToIndividuals();
-		}
-
-		task ("Hover on the Active Individuals graph and assert the elements that are shown on the tooltip") {
-			ACSites.viewVisitorsOnGraph(
-				valueVisitorsList = "0,1,1",
-				visitorsTypeList = "Known,Anonymous,Total");
-		}
-
-		task ("Open DXP") {
-			ACUtils.launchDXP();
-		}
-
-		task ("Sync the Contact Data") {
-			ACDXPSettings.syncNewContactData();
-		}
-
-		task ("Login with new user and see Site") {
-			User.logoutAndLoginPG(
-				userLoginEmailAddress = "${nameList}@liferay.com",
-				userLoginFullName = "${nameList} ${nameList}");
-
-			ACUtils.navigateToSitePage(
-				pageName = "AC Page",
-				siteName = "Site Name");
-		}
-
-		task ("Close all sessions and switch to new property in AC and go to Individuals") {
-			ACUtils.closeAllSessionsAndWait();
-
-			ACUtils.launchAC();
-
-			ACProperties.switchProperty(propertyName = "${propertyName}");
-
-			ACNavigation.goToIndividuals();
-		}
-
-		task ("Hover on the Active Individuals graph and assert the elements that are shown on the tooltip") {
-			ACSites.viewVisitorsOnGraph(
-				valueVisitorsList = "1,0,1",
-				visitorsTypeList = "Known,Anonymous,Total");
 		}
 	}
 
@@ -327,7 +251,7 @@ definition {
 		var nameList = "ac ac,liferay liferay";
 
 		task ("Connect Analytics Cloud to DXP") {
-			var propertyName = ACDXPSettings.connectDXPtoAnalyticsCloud(siteName = "Site Name");
+			ACDXPSettings.connectDXPtoAnalyticsCloud(siteName = "Site Name");
 		}
 
 		task ("Add two new users") {
@@ -344,6 +268,8 @@ definition {
 
 		task ("Login with the users and open the site") {
 			ACUtils.navigateToSitePageWithUser(
+				actionType = "View Blog",
+				documentTitleList = "Blogs AC Title",
 				emailList = "${emailList}",
 				pageName = "AC Page",
 				siteName = "Site Name");
@@ -353,6 +279,8 @@ definition {
 			User.logoutPG();
 
 			ACUtils.navigateToSitePage(
+				actionType = "View Blog",
+				documentTitleList = "Blogs AC Title",
 				pageName = "AC Page",
 				siteName = "Site Name");
 		}
@@ -364,7 +292,7 @@ definition {
 		task ("Launch AC and go to Sites overview") {
 			ACUtils.launchAC();
 
-			ACProperties.switchProperty(propertyName = "${propertyName}");
+			ACProperties.switchProperty(propertyName = "${assignedPropertyName}");
 
 			ACNavigation.goToSites();
 		}

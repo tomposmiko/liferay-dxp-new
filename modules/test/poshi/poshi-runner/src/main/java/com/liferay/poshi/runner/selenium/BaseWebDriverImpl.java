@@ -151,7 +151,18 @@ public abstract class BaseWebDriverImpl implements LiferaySelenium, WebDriver {
 
 		window.setSize(new Dimension(1280, 1040));
 
-		webDriver.get(browserURL);
+		try {
+			webDriver.get(browserURL);
+		}
+		catch (WebDriverException webDriverException) {
+			String message = webDriverException.getMessage();
+
+			if (!message.contains("ERR_CONNECTION_REFUSED")) {
+				throw webDriverException;
+			}
+
+			System.out.println(browserURL + " is unavailable");
+		}
 
 		ocularConfig();
 	}

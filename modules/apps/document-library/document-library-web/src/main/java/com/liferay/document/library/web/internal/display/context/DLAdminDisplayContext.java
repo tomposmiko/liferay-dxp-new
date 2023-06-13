@@ -711,7 +711,7 @@ public class DLAdminDisplayContext {
 
 							results.add(
 								DLAppLocalServiceUtil.getFileEntry(
-									assetEntry.getClassNameId()));
+									assetEntry.getClassPK()));
 						}
 						else {
 							results.add(
@@ -916,6 +916,7 @@ public class DLAdminDisplayContext {
 
 			try {
 				portletPreferences.setValue(name, value);
+
 				portletPreferences.store();
 			}
 			catch (Exception exception) {

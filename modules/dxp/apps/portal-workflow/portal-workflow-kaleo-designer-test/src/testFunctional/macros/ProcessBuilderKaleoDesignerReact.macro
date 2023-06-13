@@ -221,6 +221,12 @@ definition {
 			locator1 = "ProcessBuilderKaleoDesignerReact#DIAGRAM_NODE");
 	}
 
+	macro selectNodeByLabel {
+		Click(
+			key_nodeLabel = "${nodeLabel}",
+			locator1 = "ProcessBuilderKaleoDesignerReact#DIAGRAM_NODE_LABEL");
+	}
+
 	macro selectTranslationLanguage {
 		var key_translationOptionSelected = "${translationOptionSelected}";
 		var key_translationOption = "${newTranslationOption}";
@@ -550,6 +556,12 @@ definition {
 		}
 	}
 
+	macro viewDefinitionTitle {
+		AssertTextEquals(
+			locator1 = "TextInput#TITLE",
+			value1 = "${definitionTitle}");
+	}
+
 	macro viewDiagramEditor {
 		AssertElementPresent(locator1 = "ProcessBuilderKaleoDesignerReact#REACT_PANEL");
 
@@ -820,6 +832,12 @@ definition {
 		Button.viewNotPresent(button = "Publish");
 	}
 
+	macro viewPublishButtonPresent {
+		AssertElementPresent(
+			key_text = "Publish",
+			locator1 = "Button#ANY");
+	}
+
 	macro viewRequiredField {
 		AssertElementPresent(
 			key_requiredField = "${requiredField}",
@@ -834,6 +852,10 @@ definition {
 
 			Alert.viewErrorMessage(errorMessage = "Some fields need to be filled.:Please fill out the fields before saving or publishing.");
 		}
+	}
+
+	macro viewSaveButtonPresent {
+		AssertElementPresent(locator1 = "KaleoDesigner#SAVE_BUTTON");
 	}
 
 	macro viewSelectedAssignments {

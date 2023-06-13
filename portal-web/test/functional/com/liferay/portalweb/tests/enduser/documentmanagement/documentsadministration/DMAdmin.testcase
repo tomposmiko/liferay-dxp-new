@@ -38,30 +38,42 @@ definition {
 	}
 
 	@description = "This is a test for LPS-80187. It checks that the Email configuration changes can be canceled."
-	@ignore = "Test Stub"
 	@priority = "4"
 	test CancelingEmailConfigurationScreenDoesNotSaveChanges {
+		DMNavigator.openDocumentsAndMediaAdmin(siteURLKey = "guest");
 
-		// TODO LPS-149976 CancelingEmailConfigurationScreenDoesNotSaveChanges pending implementation
+		DMDocument.configureDocumentEmailSenderInfo(
+			cancel = "true",
+			senderName = "Test Test");
 
+		Portlet.gotoPortletOptions(portletOption = "Configuration");
+
+		SelectFrame(locator1 = "IFrame#CONFIGURATION");
+
+		InputField.viewText(
+			fieldLabel = "Name",
+			text = "Joe Bloggs");
 	}
 
 	@description = "This is a test for LPS-91199. It checks that all files selected on different pages can be deleted."
-	@ignore = "Test Stub"
 	@priority = "5"
 	test CanDeleteAllDocumentsOnDifferentPagesAtOnce {
+		for (var entryCount : list "1,2,3,4,5") {
+			JSONDocument.addFileWithUploadedFile(
+				dmDocumentDescription = "DM Document Description",
+				dmDocumentTitle = "DM Document Title ${entryCount}",
+				groupName = "Guest",
+				mimeType = "text/txt",
+				sourceFileName = "Document_${entryCount}.txt");
+		}
 
-		// TODO LPS-148508 CanDeleteAllDocumentsOnDifferentPagesAtOnce pending implementation
+		DMNavigator.openDocumentsAndMediaAdmin(siteURLKey = "guest");
 
-	}
+		Pagination.changePagination(itemsPerPage = "4");
 
-	@description = "This is a test for LPS-89025. It checks that document edits are saved when hard links are enabled."
-	@ignore = "Test Stub"
-	@priority = "5"
-	test CanEditDocumentWithHardLinksEnabled {
+		DMDocument.deleteCP(deleteAll = "true");
 
-		// TODO LPS-149385 CanEditDocumentWithHardLinksEnabled pending implementation
-
+		DMDocument.viewDefault();
 	}
 
 	@description = "This test ensures that user is not able to upload the mimetypes files that bigger than the limit set when the admin sets a size limit for multiple mimetypes."
@@ -96,12 +108,65 @@ definition {
 	}
 
 	@description = "This is a test for LPS-91861. It checks that the counts can be reset in management toolbar."
-	@ignore = "Test Stub"
 	@priority = "5"
 	test CanResetCountsInManagementToolbar {
+		JSONFolder.addFolder(
+			dmFolderDescription = "DM Folder Description",
+			dmFolderName = "DM Folder Name",
+			groupName = "Guest");
 
-		// TODO LPS-148592 CanResetCountsInManagementToolbar pending implementation
+		JSONDocument.addFileWithUploadedFile(
+			dmDocumentDescription = "DM Description",
+			dmDocumentTitle = "Document_1.doc",
+			folderName = "DM Folder Name",
+			groupName = "Guest",
+			mimeType = "application/msword",
+			sourceFileName = "Document_1.doc");
 
+		JSONDocument.addFileWithUploadedFile(
+			dmDocumentDescription = "DM Description",
+			dmDocumentTitle = "Document_2.doc",
+			folderName = "DM Folder Name",
+			groupName = "Guest",
+			mimeType = "application/msword",
+			sourceFileName = "Document_2.doc");
+
+		JSONDocument.addFileWithUploadedFile(
+			dmDocumentDescription = "DM Image Description",
+			dmDocumentTitle = "Document_1.jpg",
+			groupName = "Guest",
+			mimeType = "image/jpg",
+			sourceFileName = "Document_1.jpg");
+
+		JSONDocument.addFileWithUploadedFile(
+			dmDocumentDescription = "DM Image Description",
+			dmDocumentTitle = "Document_2.jpg",
+			groupName = "Guest",
+			mimeType = "image/jpg",
+			sourceFileName = "Document_2.jpg");
+
+		DMNavigator.openDocumentsAndMediaAdmin(siteURLKey = "guest");
+
+		PortletEntry.selectAll();
+
+		AssertTextEquals(
+			locator1 = "ManagementBar#NAVBAR_TEXT",
+			value1 = "All Selected");
+
+		Button.click(button = "Clear");
+
+		DMNavigator.openToFolderInAdmin(
+			dmFolderName = "DM Folder Name",
+			groupName = "Guest",
+			siteURLKey = "guest");
+
+		LexiconEntry.changeDisplayStyle(displayStyle = "list");
+
+		DMDocument.checkDocumentCheckboxCP(dmDocumentTitle = "Document_1.doc");
+
+		AssertTextEquals(
+			locator1 = "ManagementBar#NAVBAR_TEXT",
+			value1 = "1 of 2 Selected");
 	}
 
 	@description = "This test covers LPS-141587. It validates that if the 'Delete Application Data Before Importing' option is selected the Doc Lib will not increase in size after the LAR import."

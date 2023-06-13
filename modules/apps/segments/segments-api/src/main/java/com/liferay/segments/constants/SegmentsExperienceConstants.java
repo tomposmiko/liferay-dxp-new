@@ -14,28 +14,19 @@
 
 package com.liferay.segments.constants;
 
-import com.liferay.portal.kernel.language.LanguageUtil;
-import com.liferay.portal.kernel.util.ResourceBundleUtil;
-
-import java.util.Locale;
-import java.util.ResourceBundle;
-
 /**
  * @author Sarai Díaz
  */
 public class SegmentsExperienceConstants {
 
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x), with no direct replacement
+	 */
+	@Deprecated
 	public static final long ID_DEFAULT = 0;
 
 	public static final String KEY_DEFAULT = "DEFAULT";
 
 	public static final int PRIORITY_DEFAULT = -1;
-
-	public static String getDefaultSegmentsExperienceName(Locale locale) {
-		ResourceBundle resourceBundle = ResourceBundleUtil.getBundle(
-			"content.Language", locale, SegmentsExperienceConstants.class);
-
-		return LanguageUtil.get(resourceBundle, "default-experience-name");
-	}
 
 }
