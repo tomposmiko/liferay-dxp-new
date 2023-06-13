@@ -32,7 +32,6 @@ import com.liferay.message.boards.model.MBMessage;
 import com.liferay.message.boards.model.MBThread;
 import com.liferay.message.boards.service.MBMessageService;
 import com.liferay.message.boards.service.MBThreadLocalService;
-import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.search.BooleanClauseOccur;
 import com.liferay.portal.kernel.search.Field;
 import com.liferay.portal.kernel.search.Sort;
@@ -55,7 +54,6 @@ import java.util.Collections;
 import java.util.Map;
 
 import javax.ws.rs.BadRequestException;
-import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MultivaluedMap;
 
 import org.osgi.service.component.annotations.Component;
@@ -223,6 +221,20 @@ public class MessageBoardMessageResourceImpl
 			rating.getRatingValue(), messageBoardMessageId);
 	}
 
+	@Override
+	public void putMessageBoardMessageSubscribe(Long messageBoardMessageId)
+		throws Exception {
+
+		_mbMessageService.subscribeMessage(messageBoardMessageId);
+	}
+
+	@Override
+	public void putMessageBoardMessageUnsubscribe(Long messageBoardMessageId)
+		throws Exception {
+
+		_mbMessageService.unsubscribeMessage(messageBoardMessageId);
+	}
+
 	private MessageBoardMessage _addMessageBoardThread(
 			Long messageBoardMessageId, MessageBoardMessage messageBoardMessage)
 		throws Exception {
@@ -300,14 +312,15 @@ public class MessageBoardMessageResourceImpl
 			MBMessage.class.getName(), _ratingsEntryLocalService,
 			ratingsEntry -> RatingUtil.toRating(
 				_portal, ratingsEntry, _userLocalService),
-			_user);
+			contextUser);
 	}
 
 	private MessageBoardMessage _toMessageBoardMessage(MBMessage mbMessage)
 		throws Exception {
 
 		return _messageBoardMessageDTOConverter.toDTO(
-			new DefaultDTOConverterContext(null, mbMessage.getPrimaryKey()));
+			new DefaultDTOConverterContext(
+				null, mbMessage.getPrimaryKey(), contextUriInfo, contextUser));
 	}
 
 	private void _updateAnswer(
@@ -344,9 +357,6 @@ public class MessageBoardMessageResourceImpl
 
 	@Reference
 	private RatingsEntryLocalService _ratingsEntryLocalService;
-
-	@Context
-	private User _user;
 
 	@Reference
 	private UserLocalService _userLocalService;

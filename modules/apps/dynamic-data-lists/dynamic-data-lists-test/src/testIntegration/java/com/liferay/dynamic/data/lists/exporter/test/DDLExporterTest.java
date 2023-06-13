@@ -35,6 +35,7 @@ import com.liferay.dynamic.data.mapping.storage.DDMFormValues;
 import com.liferay.dynamic.data.mapping.test.util.DDMFormTestUtil;
 import com.liferay.dynamic.data.mapping.test.util.DDMFormValuesTestUtil;
 import com.liferay.dynamic.data.mapping.test.util.DDMStructureTestHelper;
+import com.liferay.layout.test.util.LayoutTestUtil;
 import com.liferay.petra.string.CharPool;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.json.JSONArray;
@@ -62,7 +63,6 @@ import com.liferay.portal.kernel.xml.SAXReaderUtil;
 import com.liferay.portal.security.permission.SimplePermissionChecker;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
-import com.liferay.portal.util.test.LayoutTestUtil;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
@@ -172,7 +172,7 @@ public class DDLExporterTest {
 			sb.append("No");
 			sb.append(CharPool.COMMA);
 
-			sb.append("1/1/70");
+			sb.append("1/1/1970");
 			sb.append(CharPool.COMMA);
 
 			sb.append("1");
@@ -467,7 +467,7 @@ public class DDLExporterTest {
 
 			cell = row.getCell(1);
 
-			Assert.assertEquals("1/1/70", cell.getStringCellValue());
+			Assert.assertEquals("1/1/1970", cell.getStringCellValue());
 
 			cell = row.getCell(2);
 
@@ -569,7 +569,7 @@ public class DDLExporterTest {
 		Element fieldsElement = rootElement.addElement("fields");
 
 		addFieldElement(fieldsElement, "Field0", "No");
-		addFieldElement(fieldsElement, "Field1", "1/1/70");
+		addFieldElement(fieldsElement, "Field1", "1/1/1970");
 		addFieldElement(fieldsElement, "Field2", "1");
 		addFieldElement(fieldsElement, "Field3", "file.txt");
 		addFieldElement(

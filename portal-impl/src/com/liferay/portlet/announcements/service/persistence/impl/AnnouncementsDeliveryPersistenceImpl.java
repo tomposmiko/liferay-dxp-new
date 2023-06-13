@@ -18,7 +18,6 @@ import com.liferay.announcements.kernel.exception.NoSuchDeliveryException;
 import com.liferay.announcements.kernel.model.AnnouncementsDelivery;
 import com.liferay.announcements.kernel.service.persistence.AnnouncementsDeliveryPersistence;
 import com.liferay.petra.string.StringBundler;
-import com.liferay.portal.kernel.bean.BeanReference;
 import com.liferay.portal.kernel.dao.orm.EntityCache;
 import com.liferay.portal.kernel.dao.orm.EntityCacheUtil;
 import com.liferay.portal.kernel.dao.orm.FinderCacheUtil;
@@ -29,8 +28,7 @@ import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.dao.orm.Session;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.service.persistence.CompanyProvider;
-import com.liferay.portal.kernel.service.persistence.CompanyProviderWrapper;
+import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
 import com.liferay.portal.kernel.service.persistence.impl.BasePersistenceImpl;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.ProxyUtil;
@@ -42,14 +40,11 @@ import java.io.Serializable;
 
 import java.lang.reflect.InvocationHandler;
 
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-
-import org.osgi.annotation.versioning.ProviderType;
 
 /**
  * The persistence implementation for the announcements delivery service.
@@ -61,12 +56,11 @@ import org.osgi.annotation.versioning.ProviderType;
  * @author Brian Wing Shun Chan
  * @generated
  */
-@ProviderType
 public class AnnouncementsDeliveryPersistenceImpl
 	extends BasePersistenceImpl<AnnouncementsDelivery>
 	implements AnnouncementsDeliveryPersistence {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this class directly. Always use <code>AnnouncementsDeliveryUtil</code> to access the announcements delivery persistence. Modify <code>service.xml</code> and rerun ServiceBuilder to regenerate this class.
@@ -83,6 +77,519 @@ public class AnnouncementsDeliveryPersistenceImpl
 	private FinderPath _finderPathWithPaginationFindAll;
 	private FinderPath _finderPathWithoutPaginationFindAll;
 	private FinderPath _finderPathCountAll;
+	private FinderPath _finderPathWithPaginationFindByCompanyId;
+	private FinderPath _finderPathWithoutPaginationFindByCompanyId;
+	private FinderPath _finderPathCountByCompanyId;
+
+	/**
+	 * Returns all the announcements deliveries where companyId = &#63;.
+	 *
+	 * @param companyId the company ID
+	 * @return the matching announcements deliveries
+	 */
+	@Override
+	public List<AnnouncementsDelivery> findByCompanyId(long companyId) {
+		return findByCompanyId(
+			companyId, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
+	}
+
+	/**
+	 * Returns a range of all the announcements deliveries where companyId = &#63;.
+	 *
+	 * <p>
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>AnnouncementsDeliveryModelImpl</code>.
+	 * </p>
+	 *
+	 * @param companyId the company ID
+	 * @param start the lower bound of the range of announcements deliveries
+	 * @param end the upper bound of the range of announcements deliveries (not inclusive)
+	 * @return the range of matching announcements deliveries
+	 */
+	@Override
+	public List<AnnouncementsDelivery> findByCompanyId(
+		long companyId, int start, int end) {
+
+		return findByCompanyId(companyId, start, end, null);
+	}
+
+	/**
+	 * Returns an ordered range of all the announcements deliveries where companyId = &#63;.
+	 *
+	 * <p>
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>AnnouncementsDeliveryModelImpl</code>.
+	 * </p>
+	 *
+	 * @param companyId the company ID
+	 * @param start the lower bound of the range of announcements deliveries
+	 * @param end the upper bound of the range of announcements deliveries (not inclusive)
+	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
+	 * @return the ordered range of matching announcements deliveries
+	 */
+	@Override
+	public List<AnnouncementsDelivery> findByCompanyId(
+		long companyId, int start, int end,
+		OrderByComparator<AnnouncementsDelivery> orderByComparator) {
+
+		return findByCompanyId(companyId, start, end, orderByComparator, true);
+	}
+
+	/**
+	 * Returns an ordered range of all the announcements deliveries where companyId = &#63;.
+	 *
+	 * <p>
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>AnnouncementsDeliveryModelImpl</code>.
+	 * </p>
+	 *
+	 * @param companyId the company ID
+	 * @param start the lower bound of the range of announcements deliveries
+	 * @param end the upper bound of the range of announcements deliveries (not inclusive)
+	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
+	 * @param useFinderCache whether to use the finder cache
+	 * @return the ordered range of matching announcements deliveries
+	 */
+	@Override
+	public List<AnnouncementsDelivery> findByCompanyId(
+		long companyId, int start, int end,
+		OrderByComparator<AnnouncementsDelivery> orderByComparator,
+		boolean useFinderCache) {
+
+		FinderPath finderPath = null;
+		Object[] finderArgs = null;
+
+		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
+			(orderByComparator == null)) {
+
+			if (useFinderCache) {
+				finderPath = _finderPathWithoutPaginationFindByCompanyId;
+				finderArgs = new Object[] {companyId};
+			}
+		}
+		else if (useFinderCache) {
+			finderPath = _finderPathWithPaginationFindByCompanyId;
+			finderArgs = new Object[] {
+				companyId, start, end, orderByComparator
+			};
+		}
+
+		List<AnnouncementsDelivery> list = null;
+
+		if (useFinderCache) {
+			list = (List<AnnouncementsDelivery>)FinderCacheUtil.getResult(
+				finderPath, finderArgs, this);
+
+			if ((list != null) && !list.isEmpty()) {
+				for (AnnouncementsDelivery announcementsDelivery : list) {
+					if (companyId != announcementsDelivery.getCompanyId()) {
+						list = null;
+
+						break;
+					}
+				}
+			}
+		}
+
+		if (list == null) {
+			StringBundler query = null;
+
+			if (orderByComparator != null) {
+				query = new StringBundler(
+					3 + (orderByComparator.getOrderByFields().length * 2));
+			}
+			else {
+				query = new StringBundler(3);
+			}
+
+			query.append(_SQL_SELECT_ANNOUNCEMENTSDELIVERY_WHERE);
+
+			query.append(_FINDER_COLUMN_COMPANYID_COMPANYID_2);
+
+			if (orderByComparator != null) {
+				appendOrderByComparator(
+					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
+			}
+			else {
+				query.append(AnnouncementsDeliveryModelImpl.ORDER_BY_JPQL);
+			}
+
+			String sql = query.toString();
+
+			Session session = null;
+
+			try {
+				session = openSession();
+
+				Query q = session.createQuery(sql);
+
+				QueryPos qPos = QueryPos.getInstance(q);
+
+				qPos.add(companyId);
+
+				list = (List<AnnouncementsDelivery>)QueryUtil.list(
+					q, getDialect(), start, end);
+
+				cacheResult(list);
+
+				if (useFinderCache) {
+					FinderCacheUtil.putResult(finderPath, finderArgs, list);
+				}
+			}
+			catch (Exception e) {
+				if (useFinderCache) {
+					FinderCacheUtil.removeResult(finderPath, finderArgs);
+				}
+
+				throw processException(e);
+			}
+			finally {
+				closeSession(session);
+			}
+		}
+
+		return list;
+	}
+
+	/**
+	 * Returns the first announcements delivery in the ordered set where companyId = &#63;.
+	 *
+	 * @param companyId the company ID
+	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	 * @return the first matching announcements delivery
+	 * @throws NoSuchDeliveryException if a matching announcements delivery could not be found
+	 */
+	@Override
+	public AnnouncementsDelivery findByCompanyId_First(
+			long companyId,
+			OrderByComparator<AnnouncementsDelivery> orderByComparator)
+		throws NoSuchDeliveryException {
+
+		AnnouncementsDelivery announcementsDelivery = fetchByCompanyId_First(
+			companyId, orderByComparator);
+
+		if (announcementsDelivery != null) {
+			return announcementsDelivery;
+		}
+
+		StringBundler msg = new StringBundler(4);
+
+		msg.append(_NO_SUCH_ENTITY_WITH_KEY);
+
+		msg.append("companyId=");
+		msg.append(companyId);
+
+		msg.append("}");
+
+		throw new NoSuchDeliveryException(msg.toString());
+	}
+
+	/**
+	 * Returns the first announcements delivery in the ordered set where companyId = &#63;.
+	 *
+	 * @param companyId the company ID
+	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	 * @return the first matching announcements delivery, or <code>null</code> if a matching announcements delivery could not be found
+	 */
+	@Override
+	public AnnouncementsDelivery fetchByCompanyId_First(
+		long companyId,
+		OrderByComparator<AnnouncementsDelivery> orderByComparator) {
+
+		List<AnnouncementsDelivery> list = findByCompanyId(
+			companyId, 0, 1, orderByComparator);
+
+		if (!list.isEmpty()) {
+			return list.get(0);
+		}
+
+		return null;
+	}
+
+	/**
+	 * Returns the last announcements delivery in the ordered set where companyId = &#63;.
+	 *
+	 * @param companyId the company ID
+	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	 * @return the last matching announcements delivery
+	 * @throws NoSuchDeliveryException if a matching announcements delivery could not be found
+	 */
+	@Override
+	public AnnouncementsDelivery findByCompanyId_Last(
+			long companyId,
+			OrderByComparator<AnnouncementsDelivery> orderByComparator)
+		throws NoSuchDeliveryException {
+
+		AnnouncementsDelivery announcementsDelivery = fetchByCompanyId_Last(
+			companyId, orderByComparator);
+
+		if (announcementsDelivery != null) {
+			return announcementsDelivery;
+		}
+
+		StringBundler msg = new StringBundler(4);
+
+		msg.append(_NO_SUCH_ENTITY_WITH_KEY);
+
+		msg.append("companyId=");
+		msg.append(companyId);
+
+		msg.append("}");
+
+		throw new NoSuchDeliveryException(msg.toString());
+	}
+
+	/**
+	 * Returns the last announcements delivery in the ordered set where companyId = &#63;.
+	 *
+	 * @param companyId the company ID
+	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	 * @return the last matching announcements delivery, or <code>null</code> if a matching announcements delivery could not be found
+	 */
+	@Override
+	public AnnouncementsDelivery fetchByCompanyId_Last(
+		long companyId,
+		OrderByComparator<AnnouncementsDelivery> orderByComparator) {
+
+		int count = countByCompanyId(companyId);
+
+		if (count == 0) {
+			return null;
+		}
+
+		List<AnnouncementsDelivery> list = findByCompanyId(
+			companyId, count - 1, count, orderByComparator);
+
+		if (!list.isEmpty()) {
+			return list.get(0);
+		}
+
+		return null;
+	}
+
+	/**
+	 * Returns the announcements deliveries before and after the current announcements delivery in the ordered set where companyId = &#63;.
+	 *
+	 * @param deliveryId the primary key of the current announcements delivery
+	 * @param companyId the company ID
+	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	 * @return the previous, current, and next announcements delivery
+	 * @throws NoSuchDeliveryException if a announcements delivery with the primary key could not be found
+	 */
+	@Override
+	public AnnouncementsDelivery[] findByCompanyId_PrevAndNext(
+			long deliveryId, long companyId,
+			OrderByComparator<AnnouncementsDelivery> orderByComparator)
+		throws NoSuchDeliveryException {
+
+		AnnouncementsDelivery announcementsDelivery = findByPrimaryKey(
+			deliveryId);
+
+		Session session = null;
+
+		try {
+			session = openSession();
+
+			AnnouncementsDelivery[] array = new AnnouncementsDeliveryImpl[3];
+
+			array[0] = getByCompanyId_PrevAndNext(
+				session, announcementsDelivery, companyId, orderByComparator,
+				true);
+
+			array[1] = announcementsDelivery;
+
+			array[2] = getByCompanyId_PrevAndNext(
+				session, announcementsDelivery, companyId, orderByComparator,
+				false);
+
+			return array;
+		}
+		catch (Exception e) {
+			throw processException(e);
+		}
+		finally {
+			closeSession(session);
+		}
+	}
+
+	protected AnnouncementsDelivery getByCompanyId_PrevAndNext(
+		Session session, AnnouncementsDelivery announcementsDelivery,
+		long companyId,
+		OrderByComparator<AnnouncementsDelivery> orderByComparator,
+		boolean previous) {
+
+		StringBundler query = null;
+
+		if (orderByComparator != null) {
+			query = new StringBundler(
+				4 + (orderByComparator.getOrderByConditionFields().length * 3) +
+					(orderByComparator.getOrderByFields().length * 3));
+		}
+		else {
+			query = new StringBundler(3);
+		}
+
+		query.append(_SQL_SELECT_ANNOUNCEMENTSDELIVERY_WHERE);
+
+		query.append(_FINDER_COLUMN_COMPANYID_COMPANYID_2);
+
+		if (orderByComparator != null) {
+			String[] orderByConditionFields =
+				orderByComparator.getOrderByConditionFields();
+
+			if (orderByConditionFields.length > 0) {
+				query.append(WHERE_AND);
+			}
+
+			for (int i = 0; i < orderByConditionFields.length; i++) {
+				query.append(_ORDER_BY_ENTITY_ALIAS);
+				query.append(orderByConditionFields[i]);
+
+				if ((i + 1) < orderByConditionFields.length) {
+					if (orderByComparator.isAscending() ^ previous) {
+						query.append(WHERE_GREATER_THAN_HAS_NEXT);
+					}
+					else {
+						query.append(WHERE_LESSER_THAN_HAS_NEXT);
+					}
+				}
+				else {
+					if (orderByComparator.isAscending() ^ previous) {
+						query.append(WHERE_GREATER_THAN);
+					}
+					else {
+						query.append(WHERE_LESSER_THAN);
+					}
+				}
+			}
+
+			query.append(ORDER_BY_CLAUSE);
+
+			String[] orderByFields = orderByComparator.getOrderByFields();
+
+			for (int i = 0; i < orderByFields.length; i++) {
+				query.append(_ORDER_BY_ENTITY_ALIAS);
+				query.append(orderByFields[i]);
+
+				if ((i + 1) < orderByFields.length) {
+					if (orderByComparator.isAscending() ^ previous) {
+						query.append(ORDER_BY_ASC_HAS_NEXT);
+					}
+					else {
+						query.append(ORDER_BY_DESC_HAS_NEXT);
+					}
+				}
+				else {
+					if (orderByComparator.isAscending() ^ previous) {
+						query.append(ORDER_BY_ASC);
+					}
+					else {
+						query.append(ORDER_BY_DESC);
+					}
+				}
+			}
+		}
+		else {
+			query.append(AnnouncementsDeliveryModelImpl.ORDER_BY_JPQL);
+		}
+
+		String sql = query.toString();
+
+		Query q = session.createQuery(sql);
+
+		q.setFirstResult(0);
+		q.setMaxResults(2);
+
+		QueryPos qPos = QueryPos.getInstance(q);
+
+		qPos.add(companyId);
+
+		if (orderByComparator != null) {
+			for (Object orderByConditionValue :
+					orderByComparator.getOrderByConditionValues(
+						announcementsDelivery)) {
+
+				qPos.add(orderByConditionValue);
+			}
+		}
+
+		List<AnnouncementsDelivery> list = q.list();
+
+		if (list.size() == 2) {
+			return list.get(1);
+		}
+		else {
+			return null;
+		}
+	}
+
+	/**
+	 * Removes all the announcements deliveries where companyId = &#63; from the database.
+	 *
+	 * @param companyId the company ID
+	 */
+	@Override
+	public void removeByCompanyId(long companyId) {
+		for (AnnouncementsDelivery announcementsDelivery :
+				findByCompanyId(
+					companyId, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null)) {
+
+			remove(announcementsDelivery);
+		}
+	}
+
+	/**
+	 * Returns the number of announcements deliveries where companyId = &#63;.
+	 *
+	 * @param companyId the company ID
+	 * @return the number of matching announcements deliveries
+	 */
+	@Override
+	public int countByCompanyId(long companyId) {
+		FinderPath finderPath = _finderPathCountByCompanyId;
+
+		Object[] finderArgs = new Object[] {companyId};
+
+		Long count = (Long)FinderCacheUtil.getResult(
+			finderPath, finderArgs, this);
+
+		if (count == null) {
+			StringBundler query = new StringBundler(2);
+
+			query.append(_SQL_COUNT_ANNOUNCEMENTSDELIVERY_WHERE);
+
+			query.append(_FINDER_COLUMN_COMPANYID_COMPANYID_2);
+
+			String sql = query.toString();
+
+			Session session = null;
+
+			try {
+				session = openSession();
+
+				Query q = session.createQuery(sql);
+
+				QueryPos qPos = QueryPos.getInstance(q);
+
+				qPos.add(companyId);
+
+				count = (Long)q.uniqueResult();
+
+				FinderCacheUtil.putResult(finderPath, finderArgs, count);
+			}
+			catch (Exception e) {
+				FinderCacheUtil.removeResult(finderPath, finderArgs);
+
+				throw processException(e);
+			}
+			finally {
+				closeSession(session);
+			}
+		}
+
+		return count.intValue();
+	}
+
+	private static final String _FINDER_COLUMN_COMPANYID_COMPANYID_2 =
+		"announcementsDelivery.companyId = ?";
+
 	private FinderPath _finderPathWithPaginationFindByUserId;
 	private FinderPath _finderPathWithoutPaginationFindByUserId;
 	private FinderPath _finderPathCountByUserId;
@@ -102,7 +609,7 @@ public class AnnouncementsDeliveryPersistenceImpl
 	 * Returns a range of all the announcements deliveries where userId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>AnnouncementsDeliveryModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>AnnouncementsDeliveryModelImpl</code>.
 	 * </p>
 	 *
 	 * @param userId the user ID
@@ -121,7 +628,7 @@ public class AnnouncementsDeliveryPersistenceImpl
 	 * Returns an ordered range of all the announcements deliveries where userId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>AnnouncementsDeliveryModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>AnnouncementsDeliveryModelImpl</code>.
 	 * </p>
 	 *
 	 * @param userId the user ID
@@ -142,47 +649,47 @@ public class AnnouncementsDeliveryPersistenceImpl
 	 * Returns an ordered range of all the announcements deliveries where userId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>AnnouncementsDeliveryModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>AnnouncementsDeliveryModelImpl</code>.
 	 * </p>
 	 *
 	 * @param userId the user ID
 	 * @param start the lower bound of the range of announcements deliveries
 	 * @param end the upper bound of the range of announcements deliveries (not inclusive)
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
-	 * @param retrieveFromCache whether to retrieve from the finder cache
+	 * @param useFinderCache whether to use the finder cache
 	 * @return the ordered range of matching announcements deliveries
 	 */
 	@Override
 	public List<AnnouncementsDelivery> findByUserId(
 		long userId, int start, int end,
 		OrderByComparator<AnnouncementsDelivery> orderByComparator,
-		boolean retrieveFromCache) {
+		boolean useFinderCache) {
 
-		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
 			(orderByComparator == null)) {
 
-			pagination = false;
-			finderPath = _finderPathWithoutPaginationFindByUserId;
-			finderArgs = new Object[] {userId};
+			if (useFinderCache) {
+				finderPath = _finderPathWithoutPaginationFindByUserId;
+				finderArgs = new Object[] {userId};
+			}
 		}
-		else {
+		else if (useFinderCache) {
 			finderPath = _finderPathWithPaginationFindByUserId;
 			finderArgs = new Object[] {userId, start, end, orderByComparator};
 		}
 
 		List<AnnouncementsDelivery> list = null;
 
-		if (retrieveFromCache) {
+		if (useFinderCache) {
 			list = (List<AnnouncementsDelivery>)FinderCacheUtil.getResult(
 				finderPath, finderArgs, this);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (AnnouncementsDelivery announcementsDelivery : list) {
-					if ((userId != announcementsDelivery.getUserId())) {
+					if (userId != announcementsDelivery.getUserId()) {
 						list = null;
 
 						break;
@@ -210,7 +717,7 @@ public class AnnouncementsDeliveryPersistenceImpl
 				appendOrderByComparator(
 					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
 			}
-			else if (pagination) {
+			else {
 				query.append(AnnouncementsDeliveryModelImpl.ORDER_BY_JPQL);
 			}
 
@@ -227,25 +734,19 @@ public class AnnouncementsDeliveryPersistenceImpl
 
 				qPos.add(userId);
 
-				if (!pagination) {
-					list = (List<AnnouncementsDelivery>)QueryUtil.list(
-						q, getDialect(), start, end, false);
-
-					Collections.sort(list);
-
-					list = Collections.unmodifiableList(list);
-				}
-				else {
-					list = (List<AnnouncementsDelivery>)QueryUtil.list(
-						q, getDialect(), start, end);
-				}
+				list = (List<AnnouncementsDelivery>)QueryUtil.list(
+					q, getDialect(), start, end);
 
 				cacheResult(list);
 
-				FinderCacheUtil.putResult(finderPath, finderArgs, list);
+				if (useFinderCache) {
+					FinderCacheUtil.putResult(finderPath, finderArgs, list);
+				}
 			}
 			catch (Exception e) {
-				FinderCacheUtil.removeResult(finderPath, finderArgs);
+				if (useFinderCache) {
+					FinderCacheUtil.removeResult(finderPath, finderArgs);
+				}
 
 				throw processException(e);
 			}
@@ -655,20 +1156,24 @@ public class AnnouncementsDeliveryPersistenceImpl
 	 *
 	 * @param userId the user ID
 	 * @param type the type
-	 * @param retrieveFromCache whether to retrieve from the finder cache
+	 * @param useFinderCache whether to use the finder cache
 	 * @return the matching announcements delivery, or <code>null</code> if a matching announcements delivery could not be found
 	 */
 	@Override
 	public AnnouncementsDelivery fetchByU_T(
-		long userId, String type, boolean retrieveFromCache) {
+		long userId, String type, boolean useFinderCache) {
 
 		type = Objects.toString(type, "");
 
-		Object[] finderArgs = new Object[] {userId, type};
+		Object[] finderArgs = null;
+
+		if (useFinderCache) {
+			finderArgs = new Object[] {userId, type};
+		}
 
 		Object result = null;
 
-		if (retrieveFromCache) {
+		if (useFinderCache) {
 			result = FinderCacheUtil.getResult(
 				_finderPathFetchByU_T, finderArgs, this);
 		}
@@ -722,8 +1227,10 @@ public class AnnouncementsDeliveryPersistenceImpl
 				List<AnnouncementsDelivery> list = q.list();
 
 				if (list.isEmpty()) {
-					FinderCacheUtil.putResult(
-						_finderPathFetchByU_T, finderArgs, list);
+					if (useFinderCache) {
+						FinderCacheUtil.putResult(
+							_finderPathFetchByU_T, finderArgs, list);
+					}
 				}
 				else {
 					AnnouncementsDelivery announcementsDelivery = list.get(0);
@@ -734,7 +1241,10 @@ public class AnnouncementsDeliveryPersistenceImpl
 				}
 			}
 			catch (Exception e) {
-				FinderCacheUtil.removeResult(_finderPathFetchByU_T, finderArgs);
+				if (useFinderCache) {
+					FinderCacheUtil.removeResult(
+						_finderPathFetchByU_T, finderArgs);
+				}
 
 				throw processException(e);
 			}
@@ -1021,7 +1531,7 @@ public class AnnouncementsDeliveryPersistenceImpl
 		announcementsDelivery.setNew(true);
 		announcementsDelivery.setPrimaryKey(deliveryId);
 
-		announcementsDelivery.setCompanyId(companyProvider.getCompanyId());
+		announcementsDelivery.setCompanyId(CompanyThreadLocal.getCompanyId());
 
 		return announcementsDelivery;
 	}
@@ -1173,8 +1683,14 @@ public class AnnouncementsDeliveryPersistenceImpl
 		}
 		else if (isNew) {
 			Object[] args = new Object[] {
-				announcementsDeliveryModelImpl.getUserId()
+				announcementsDeliveryModelImpl.getCompanyId()
 			};
+
+			FinderCacheUtil.removeResult(_finderPathCountByCompanyId, args);
+			FinderCacheUtil.removeResult(
+				_finderPathWithoutPaginationFindByCompanyId, args);
+
+			args = new Object[] {announcementsDeliveryModelImpl.getUserId()};
 
 			FinderCacheUtil.removeResult(_finderPathCountByUserId, args);
 			FinderCacheUtil.removeResult(
@@ -1186,6 +1702,27 @@ public class AnnouncementsDeliveryPersistenceImpl
 				_finderPathWithoutPaginationFindAll, FINDER_ARGS_EMPTY);
 		}
 		else {
+			if ((announcementsDeliveryModelImpl.getColumnBitmask() &
+				 _finderPathWithoutPaginationFindByCompanyId.
+					 getColumnBitmask()) != 0) {
+
+				Object[] args = new Object[] {
+					announcementsDeliveryModelImpl.getOriginalCompanyId()
+				};
+
+				FinderCacheUtil.removeResult(_finderPathCountByCompanyId, args);
+				FinderCacheUtil.removeResult(
+					_finderPathWithoutPaginationFindByCompanyId, args);
+
+				args = new Object[] {
+					announcementsDeliveryModelImpl.getCompanyId()
+				};
+
+				FinderCacheUtil.removeResult(_finderPathCountByCompanyId, args);
+				FinderCacheUtil.removeResult(
+					_finderPathWithoutPaginationFindByCompanyId, args);
+			}
+
 			if ((announcementsDeliveryModelImpl.getColumnBitmask() &
 				 _finderPathWithoutPaginationFindByUserId.getColumnBitmask()) !=
 					 0) {
@@ -1287,7 +1824,7 @@ public class AnnouncementsDeliveryPersistenceImpl
 	 * Returns a range of all the announcements deliveries.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>AnnouncementsDeliveryModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>AnnouncementsDeliveryModelImpl</code>.
 	 * </p>
 	 *
 	 * @param start the lower bound of the range of announcements deliveries
@@ -1303,7 +1840,7 @@ public class AnnouncementsDeliveryPersistenceImpl
 	 * Returns an ordered range of all the announcements deliveries.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>AnnouncementsDeliveryModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>AnnouncementsDeliveryModelImpl</code>.
 	 * </p>
 	 *
 	 * @param start the lower bound of the range of announcements deliveries
@@ -1323,40 +1860,40 @@ public class AnnouncementsDeliveryPersistenceImpl
 	 * Returns an ordered range of all the announcements deliveries.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>AnnouncementsDeliveryModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>AnnouncementsDeliveryModelImpl</code>.
 	 * </p>
 	 *
 	 * @param start the lower bound of the range of announcements deliveries
 	 * @param end the upper bound of the range of announcements deliveries (not inclusive)
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
-	 * @param retrieveFromCache whether to retrieve from the finder cache
+	 * @param useFinderCache whether to use the finder cache
 	 * @return the ordered range of announcements deliveries
 	 */
 	@Override
 	public List<AnnouncementsDelivery> findAll(
 		int start, int end,
 		OrderByComparator<AnnouncementsDelivery> orderByComparator,
-		boolean retrieveFromCache) {
+		boolean useFinderCache) {
 
-		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
 			(orderByComparator == null)) {
 
-			pagination = false;
-			finderPath = _finderPathWithoutPaginationFindAll;
-			finderArgs = FINDER_ARGS_EMPTY;
+			if (useFinderCache) {
+				finderPath = _finderPathWithoutPaginationFindAll;
+				finderArgs = FINDER_ARGS_EMPTY;
+			}
 		}
-		else {
+		else if (useFinderCache) {
 			finderPath = _finderPathWithPaginationFindAll;
 			finderArgs = new Object[] {start, end, orderByComparator};
 		}
 
 		List<AnnouncementsDelivery> list = null;
 
-		if (retrieveFromCache) {
+		if (useFinderCache) {
 			list = (List<AnnouncementsDelivery>)FinderCacheUtil.getResult(
 				finderPath, finderArgs, this);
 		}
@@ -1379,10 +1916,7 @@ public class AnnouncementsDeliveryPersistenceImpl
 			else {
 				sql = _SQL_SELECT_ANNOUNCEMENTSDELIVERY;
 
-				if (pagination) {
-					sql = sql.concat(
-						AnnouncementsDeliveryModelImpl.ORDER_BY_JPQL);
-				}
+				sql = sql.concat(AnnouncementsDeliveryModelImpl.ORDER_BY_JPQL);
 			}
 
 			Session session = null;
@@ -1392,25 +1926,19 @@ public class AnnouncementsDeliveryPersistenceImpl
 
 				Query q = session.createQuery(sql);
 
-				if (!pagination) {
-					list = (List<AnnouncementsDelivery>)QueryUtil.list(
-						q, getDialect(), start, end, false);
-
-					Collections.sort(list);
-
-					list = Collections.unmodifiableList(list);
-				}
-				else {
-					list = (List<AnnouncementsDelivery>)QueryUtil.list(
-						q, getDialect(), start, end);
-				}
+				list = (List<AnnouncementsDelivery>)QueryUtil.list(
+					q, getDialect(), start, end);
 
 				cacheResult(list);
 
-				FinderCacheUtil.putResult(finderPath, finderArgs, list);
+				if (useFinderCache) {
+					FinderCacheUtil.putResult(finderPath, finderArgs, list);
+				}
 			}
 			catch (Exception e) {
-				FinderCacheUtil.removeResult(finderPath, finderArgs);
+				if (useFinderCache) {
+					FinderCacheUtil.removeResult(finderPath, finderArgs);
+				}
 
 				throw processException(e);
 			}
@@ -1518,6 +2046,30 @@ public class AnnouncementsDeliveryPersistenceImpl
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countAll",
 			new String[0]);
 
+		_finderPathWithPaginationFindByCompanyId = new FinderPath(
+			AnnouncementsDeliveryModelImpl.ENTITY_CACHE_ENABLED,
+			AnnouncementsDeliveryModelImpl.FINDER_CACHE_ENABLED,
+			AnnouncementsDeliveryImpl.class,
+			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByCompanyId",
+			new String[] {
+				Long.class.getName(), Integer.class.getName(),
+				Integer.class.getName(), OrderByComparator.class.getName()
+			});
+
+		_finderPathWithoutPaginationFindByCompanyId = new FinderPath(
+			AnnouncementsDeliveryModelImpl.ENTITY_CACHE_ENABLED,
+			AnnouncementsDeliveryModelImpl.FINDER_CACHE_ENABLED,
+			AnnouncementsDeliveryImpl.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByCompanyId",
+			new String[] {Long.class.getName()},
+			AnnouncementsDeliveryModelImpl.COMPANYID_COLUMN_BITMASK);
+
+		_finderPathCountByCompanyId = new FinderPath(
+			AnnouncementsDeliveryModelImpl.ENTITY_CACHE_ENABLED,
+			AnnouncementsDeliveryModelImpl.FINDER_CACHE_ENABLED, Long.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByCompanyId",
+			new String[] {Long.class.getName()});
+
 		_finderPathWithPaginationFindByUserId = new FinderPath(
 			AnnouncementsDeliveryModelImpl.ENTITY_CACHE_ENABLED,
 			AnnouncementsDeliveryModelImpl.FINDER_CACHE_ENABLED,
@@ -1564,9 +2116,6 @@ public class AnnouncementsDeliveryPersistenceImpl
 		FinderCacheUtil.removeCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
 		FinderCacheUtil.removeCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
 	}
-
-	@BeanReference(type = CompanyProviderWrapper.class)
-	protected CompanyProvider companyProvider;
 
 	private static final String _SQL_SELECT_ANNOUNCEMENTSDELIVERY =
 		"SELECT announcementsDelivery FROM AnnouncementsDelivery announcementsDelivery";

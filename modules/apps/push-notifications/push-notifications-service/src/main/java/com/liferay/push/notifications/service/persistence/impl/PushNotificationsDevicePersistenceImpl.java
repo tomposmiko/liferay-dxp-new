@@ -15,6 +15,7 @@
 package com.liferay.push.notifications.service.persistence.impl;
 
 import com.liferay.petra.string.StringBundler;
+import com.liferay.portal.kernel.configuration.Configuration;
 import com.liferay.portal.kernel.dao.orm.EntityCache;
 import com.liferay.portal.kernel.dao.orm.FinderCache;
 import com.liferay.portal.kernel.dao.orm.FinderPath;
@@ -22,32 +23,37 @@ import com.liferay.portal.kernel.dao.orm.Query;
 import com.liferay.portal.kernel.dao.orm.QueryPos;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.dao.orm.Session;
+import com.liferay.portal.kernel.dao.orm.SessionFactory;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.service.persistence.CompanyProvider;
-import com.liferay.portal.kernel.service.persistence.CompanyProviderWrapper;
+import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
 import com.liferay.portal.kernel.service.persistence.impl.BasePersistenceImpl;
 import com.liferay.portal.kernel.util.ArrayUtil;
+import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.StringUtil;
-import com.liferay.portal.spring.extender.service.ServiceReference;
 import com.liferay.push.notifications.exception.NoSuchDeviceException;
 import com.liferay.push.notifications.model.PushNotificationsDevice;
 import com.liferay.push.notifications.model.impl.PushNotificationsDeviceImpl;
 import com.liferay.push.notifications.model.impl.PushNotificationsDeviceModelImpl;
 import com.liferay.push.notifications.service.persistence.PushNotificationsDevicePersistence;
+import com.liferay.push.notifications.service.persistence.impl.constants.PushNotificationsPersistenceConstants;
 
 import java.io.Serializable;
 
 import java.lang.reflect.InvocationHandler;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-import org.osgi.annotation.versioning.ProviderType;
+import javax.sql.DataSource;
+
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
+import org.osgi.service.component.annotations.Reference;
 
 /**
  * The persistence implementation for the push notifications device service.
@@ -59,12 +65,12 @@ import org.osgi.annotation.versioning.ProviderType;
  * @author Bruno Farache
  * @generated
  */
-@ProviderType
+@Component(service = PushNotificationsDevicePersistence.class)
 public class PushNotificationsDevicePersistenceImpl
 	extends BasePersistenceImpl<PushNotificationsDevice>
 	implements PushNotificationsDevicePersistence {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this class directly. Always use <code>PushNotificationsDeviceUtil</code> to access the push notifications device persistence. Modify <code>service.xml</code> and rerun ServiceBuilder to regenerate this class.
@@ -132,20 +138,24 @@ public class PushNotificationsDevicePersistenceImpl
 	 * Returns the push notifications device where token = &#63; or returns <code>null</code> if it could not be found, optionally using the finder cache.
 	 *
 	 * @param token the token
-	 * @param retrieveFromCache whether to retrieve from the finder cache
+	 * @param useFinderCache whether to use the finder cache
 	 * @return the matching push notifications device, or <code>null</code> if a matching push notifications device could not be found
 	 */
 	@Override
 	public PushNotificationsDevice fetchByToken(
-		String token, boolean retrieveFromCache) {
+		String token, boolean useFinderCache) {
 
 		token = Objects.toString(token, "");
 
-		Object[] finderArgs = new Object[] {token};
+		Object[] finderArgs = null;
+
+		if (useFinderCache) {
+			finderArgs = new Object[] {token};
+		}
 
 		Object result = null;
 
-		if (retrieveFromCache) {
+		if (useFinderCache) {
 			result = finderCache.getResult(
 				_finderPathFetchByToken, finderArgs, this);
 		}
@@ -193,8 +203,10 @@ public class PushNotificationsDevicePersistenceImpl
 				List<PushNotificationsDevice> list = q.list();
 
 				if (list.isEmpty()) {
-					finderCache.putResult(
-						_finderPathFetchByToken, finderArgs, list);
+					if (useFinderCache) {
+						finderCache.putResult(
+							_finderPathFetchByToken, finderArgs, list);
+					}
 				}
 				else {
 					PushNotificationsDevice pushNotificationsDevice = list.get(
@@ -206,7 +218,10 @@ public class PushNotificationsDevicePersistenceImpl
 				}
 			}
 			catch (Exception e) {
-				finderCache.removeResult(_finderPathFetchByToken, finderArgs);
+				if (useFinderCache) {
+					finderCache.removeResult(
+						_finderPathFetchByToken, finderArgs);
+				}
 
 				throw processException(e);
 			}
@@ -332,7 +347,7 @@ public class PushNotificationsDevicePersistenceImpl
 	 * Returns a range of all the push notifications devices where userId = &#63; and platform = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>PushNotificationsDeviceModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>PushNotificationsDeviceModelImpl</code>.
 	 * </p>
 	 *
 	 * @param userId the user ID
@@ -352,7 +367,7 @@ public class PushNotificationsDevicePersistenceImpl
 	 * Returns an ordered range of all the push notifications devices where userId = &#63; and platform = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>PushNotificationsDeviceModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>PushNotificationsDeviceModelImpl</code>.
 	 * </p>
 	 *
 	 * @param userId the user ID
@@ -374,7 +389,7 @@ public class PushNotificationsDevicePersistenceImpl
 	 * Returns an ordered range of all the push notifications devices where userId = &#63; and platform = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>PushNotificationsDeviceModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>PushNotificationsDeviceModelImpl</code>.
 	 * </p>
 	 *
 	 * @param userId the user ID
@@ -382,29 +397,29 @@ public class PushNotificationsDevicePersistenceImpl
 	 * @param start the lower bound of the range of push notifications devices
 	 * @param end the upper bound of the range of push notifications devices (not inclusive)
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
-	 * @param retrieveFromCache whether to retrieve from the finder cache
+	 * @param useFinderCache whether to use the finder cache
 	 * @return the ordered range of matching push notifications devices
 	 */
 	@Override
 	public List<PushNotificationsDevice> findByU_P(
 		long userId, String platform, int start, int end,
 		OrderByComparator<PushNotificationsDevice> orderByComparator,
-		boolean retrieveFromCache) {
+		boolean useFinderCache) {
 
 		platform = Objects.toString(platform, "");
 
-		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
 			(orderByComparator == null)) {
 
-			pagination = false;
-			finderPath = _finderPathWithoutPaginationFindByU_P;
-			finderArgs = new Object[] {userId, platform};
+			if (useFinderCache) {
+				finderPath = _finderPathWithoutPaginationFindByU_P;
+				finderArgs = new Object[] {userId, platform};
+			}
 		}
-		else {
+		else if (useFinderCache) {
 			finderPath = _finderPathWithPaginationFindByU_P;
 			finderArgs = new Object[] {
 				userId, platform, start, end, orderByComparator
@@ -413,7 +428,7 @@ public class PushNotificationsDevicePersistenceImpl
 
 		List<PushNotificationsDevice> list = null;
 
-		if (retrieveFromCache) {
+		if (useFinderCache) {
 			list = (List<PushNotificationsDevice>)finderCache.getResult(
 				finderPath, finderArgs, this);
 
@@ -461,7 +476,7 @@ public class PushNotificationsDevicePersistenceImpl
 				appendOrderByComparator(
 					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
 			}
-			else if (pagination) {
+			else {
 				query.append(PushNotificationsDeviceModelImpl.ORDER_BY_JPQL);
 			}
 
@@ -482,25 +497,19 @@ public class PushNotificationsDevicePersistenceImpl
 					qPos.add(platform);
 				}
 
-				if (!pagination) {
-					list = (List<PushNotificationsDevice>)QueryUtil.list(
-						q, getDialect(), start, end, false);
-
-					Collections.sort(list);
-
-					list = Collections.unmodifiableList(list);
-				}
-				else {
-					list = (List<PushNotificationsDevice>)QueryUtil.list(
-						q, getDialect(), start, end);
-				}
+				list = (List<PushNotificationsDevice>)QueryUtil.list(
+					q, getDialect(), start, end);
 
 				cacheResult(list);
 
-				finderCache.putResult(finderPath, finderArgs, list);
+				if (useFinderCache) {
+					finderCache.putResult(finderPath, finderArgs, list);
+				}
 			}
 			catch (Exception e) {
-				finderCache.removeResult(finderPath, finderArgs);
+				if (useFinderCache) {
+					finderCache.removeResult(finderPath, finderArgs);
+				}
 
 				throw processException(e);
 			}
@@ -817,7 +826,7 @@ public class PushNotificationsDevicePersistenceImpl
 	 * Returns all the push notifications devices where userId = any &#63; and platform = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>PushNotificationsDeviceModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>PushNotificationsDeviceModelImpl</code>.
 	 * </p>
 	 *
 	 * @param userIds the user IDs
@@ -836,7 +845,7 @@ public class PushNotificationsDevicePersistenceImpl
 	 * Returns a range of all the push notifications devices where userId = any &#63; and platform = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>PushNotificationsDeviceModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>PushNotificationsDeviceModelImpl</code>.
 	 * </p>
 	 *
 	 * @param userIds the user IDs
@@ -856,7 +865,7 @@ public class PushNotificationsDevicePersistenceImpl
 	 * Returns an ordered range of all the push notifications devices where userId = any &#63; and platform = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>PushNotificationsDeviceModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>PushNotificationsDeviceModelImpl</code>.
 	 * </p>
 	 *
 	 * @param userIds the user IDs
@@ -879,7 +888,7 @@ public class PushNotificationsDevicePersistenceImpl
 	 * Returns an ordered range of all the push notifications devices where userId = &#63; and platform = &#63;, optionally using the finder cache.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>PushNotificationsDeviceModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>PushNotificationsDeviceModelImpl</code>.
 	 * </p>
 	 *
 	 * @param userId the user ID
@@ -887,14 +896,14 @@ public class PushNotificationsDevicePersistenceImpl
 	 * @param start the lower bound of the range of push notifications devices
 	 * @param end the upper bound of the range of push notifications devices (not inclusive)
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
-	 * @param retrieveFromCache whether to retrieve from the finder cache
+	 * @param useFinderCache whether to use the finder cache
 	 * @return the ordered range of matching push notifications devices
 	 */
 	@Override
 	public List<PushNotificationsDevice> findByU_P(
 		long[] userIds, String platform, int start, int end,
 		OrderByComparator<PushNotificationsDevice> orderByComparator,
-		boolean retrieveFromCache) {
+		boolean useFinderCache) {
 
 		if (userIds == null) {
 			userIds = new long[0];
@@ -910,16 +919,16 @@ public class PushNotificationsDevicePersistenceImpl
 				userIds[0], platform, start, end, orderByComparator);
 		}
 
-		boolean pagination = true;
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
 			(orderByComparator == null)) {
 
-			pagination = false;
-			finderArgs = new Object[] {StringUtil.merge(userIds), platform};
+			if (useFinderCache) {
+				finderArgs = new Object[] {StringUtil.merge(userIds), platform};
+			}
 		}
-		else {
+		else if (useFinderCache) {
 			finderArgs = new Object[] {
 				StringUtil.merge(userIds), platform, start, end,
 				orderByComparator
@@ -928,7 +937,7 @@ public class PushNotificationsDevicePersistenceImpl
 
 		List<PushNotificationsDevice> list = null;
 
-		if (retrieveFromCache) {
+		if (useFinderCache) {
 			list = (List<PushNotificationsDevice>)finderCache.getResult(
 				_finderPathWithPaginationFindByU_P, finderArgs, this);
 
@@ -985,7 +994,7 @@ public class PushNotificationsDevicePersistenceImpl
 				appendOrderByComparator(
 					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
 			}
-			else if (pagination) {
+			else {
 				query.append(PushNotificationsDeviceModelImpl.ORDER_BY_JPQL);
 			}
 
@@ -1004,27 +1013,21 @@ public class PushNotificationsDevicePersistenceImpl
 					qPos.add(platform);
 				}
 
-				if (!pagination) {
-					list = (List<PushNotificationsDevice>)QueryUtil.list(
-						q, getDialect(), start, end, false);
-
-					Collections.sort(list);
-
-					list = Collections.unmodifiableList(list);
-				}
-				else {
-					list = (List<PushNotificationsDevice>)QueryUtil.list(
-						q, getDialect(), start, end);
-				}
+				list = (List<PushNotificationsDevice>)QueryUtil.list(
+					q, getDialect(), start, end);
 
 				cacheResult(list);
 
-				finderCache.putResult(
-					_finderPathWithPaginationFindByU_P, finderArgs, list);
+				if (useFinderCache) {
+					finderCache.putResult(
+						_finderPathWithPaginationFindByU_P, finderArgs, list);
+				}
 			}
 			catch (Exception e) {
-				finderCache.removeResult(
-					_finderPathWithPaginationFindByU_P, finderArgs);
+				if (useFinderCache) {
+					finderCache.removeResult(
+						_finderPathWithPaginationFindByU_P, finderArgs);
+				}
 
 				throw processException(e);
 			}
@@ -1232,8 +1235,6 @@ public class PushNotificationsDevicePersistenceImpl
 
 		setModelImplClass(PushNotificationsDeviceImpl.class);
 		setModelPKClass(long.class);
-		setEntityCacheEnabled(
-			PushNotificationsDeviceModelImpl.ENTITY_CACHE_ENABLED);
 	}
 
 	/**
@@ -1244,8 +1245,7 @@ public class PushNotificationsDevicePersistenceImpl
 	@Override
 	public void cacheResult(PushNotificationsDevice pushNotificationsDevice) {
 		entityCache.putResult(
-			PushNotificationsDeviceModelImpl.ENTITY_CACHE_ENABLED,
-			PushNotificationsDeviceImpl.class,
+			entityCacheEnabled, PushNotificationsDeviceImpl.class,
 			pushNotificationsDevice.getPrimaryKey(), pushNotificationsDevice);
 
 		finderCache.putResult(
@@ -1269,8 +1269,7 @@ public class PushNotificationsDevicePersistenceImpl
 				pushNotificationsDevices) {
 
 			if (entityCache.getResult(
-					PushNotificationsDeviceModelImpl.ENTITY_CACHE_ENABLED,
-					PushNotificationsDeviceImpl.class,
+					entityCacheEnabled, PushNotificationsDeviceImpl.class,
 					pushNotificationsDevice.getPrimaryKey()) == null) {
 
 				cacheResult(pushNotificationsDevice);
@@ -1307,8 +1306,7 @@ public class PushNotificationsDevicePersistenceImpl
 	@Override
 	public void clearCache(PushNotificationsDevice pushNotificationsDevice) {
 		entityCache.removeResult(
-			PushNotificationsDeviceModelImpl.ENTITY_CACHE_ENABLED,
-			PushNotificationsDeviceImpl.class,
+			entityCacheEnabled, PushNotificationsDeviceImpl.class,
 			pushNotificationsDevice.getPrimaryKey());
 
 		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
@@ -1329,8 +1327,7 @@ public class PushNotificationsDevicePersistenceImpl
 				pushNotificationsDevices) {
 
 			entityCache.removeResult(
-				PushNotificationsDeviceModelImpl.ENTITY_CACHE_ENABLED,
-				PushNotificationsDeviceImpl.class,
+				entityCacheEnabled, PushNotificationsDeviceImpl.class,
 				pushNotificationsDevice.getPrimaryKey());
 
 			clearUniqueFindersCache(
@@ -1392,7 +1389,7 @@ public class PushNotificationsDevicePersistenceImpl
 		pushNotificationsDevice.setNew(true);
 		pushNotificationsDevice.setPrimaryKey(pushNotificationsDeviceId);
 
-		pushNotificationsDevice.setCompanyId(companyProvider.getCompanyId());
+		pushNotificationsDevice.setCompanyId(CompanyThreadLocal.getCompanyId());
 
 		return pushNotificationsDevice;
 	}
@@ -1539,7 +1536,7 @@ public class PushNotificationsDevicePersistenceImpl
 
 		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
 
-		if (!PushNotificationsDeviceModelImpl.COLUMN_BITMASK_ENABLED) {
+		if (!_columnBitmaskEnabled) {
 			finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
 		}
 		else if (isNew) {
@@ -1582,8 +1579,7 @@ public class PushNotificationsDevicePersistenceImpl
 		}
 
 		entityCache.putResult(
-			PushNotificationsDeviceModelImpl.ENTITY_CACHE_ENABLED,
-			PushNotificationsDeviceImpl.class,
+			entityCacheEnabled, PushNotificationsDeviceImpl.class,
 			pushNotificationsDevice.getPrimaryKey(), pushNotificationsDevice,
 			false);
 
@@ -1663,7 +1659,7 @@ public class PushNotificationsDevicePersistenceImpl
 	 * Returns a range of all the push notifications devices.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>PushNotificationsDeviceModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>PushNotificationsDeviceModelImpl</code>.
 	 * </p>
 	 *
 	 * @param start the lower bound of the range of push notifications devices
@@ -1679,7 +1675,7 @@ public class PushNotificationsDevicePersistenceImpl
 	 * Returns an ordered range of all the push notifications devices.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>PushNotificationsDeviceModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>PushNotificationsDeviceModelImpl</code>.
 	 * </p>
 	 *
 	 * @param start the lower bound of the range of push notifications devices
@@ -1699,40 +1695,40 @@ public class PushNotificationsDevicePersistenceImpl
 	 * Returns an ordered range of all the push notifications devices.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>PushNotificationsDeviceModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>PushNotificationsDeviceModelImpl</code>.
 	 * </p>
 	 *
 	 * @param start the lower bound of the range of push notifications devices
 	 * @param end the upper bound of the range of push notifications devices (not inclusive)
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
-	 * @param retrieveFromCache whether to retrieve from the finder cache
+	 * @param useFinderCache whether to use the finder cache
 	 * @return the ordered range of push notifications devices
 	 */
 	@Override
 	public List<PushNotificationsDevice> findAll(
 		int start, int end,
 		OrderByComparator<PushNotificationsDevice> orderByComparator,
-		boolean retrieveFromCache) {
+		boolean useFinderCache) {
 
-		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
 			(orderByComparator == null)) {
 
-			pagination = false;
-			finderPath = _finderPathWithoutPaginationFindAll;
-			finderArgs = FINDER_ARGS_EMPTY;
+			if (useFinderCache) {
+				finderPath = _finderPathWithoutPaginationFindAll;
+				finderArgs = FINDER_ARGS_EMPTY;
+			}
 		}
-		else {
+		else if (useFinderCache) {
 			finderPath = _finderPathWithPaginationFindAll;
 			finderArgs = new Object[] {start, end, orderByComparator};
 		}
 
 		List<PushNotificationsDevice> list = null;
 
-		if (retrieveFromCache) {
+		if (useFinderCache) {
 			list = (List<PushNotificationsDevice>)finderCache.getResult(
 				finderPath, finderArgs, this);
 		}
@@ -1755,10 +1751,8 @@ public class PushNotificationsDevicePersistenceImpl
 			else {
 				sql = _SQL_SELECT_PUSHNOTIFICATIONSDEVICE;
 
-				if (pagination) {
-					sql = sql.concat(
-						PushNotificationsDeviceModelImpl.ORDER_BY_JPQL);
-				}
+				sql = sql.concat(
+					PushNotificationsDeviceModelImpl.ORDER_BY_JPQL);
 			}
 
 			Session session = null;
@@ -1768,25 +1762,19 @@ public class PushNotificationsDevicePersistenceImpl
 
 				Query q = session.createQuery(sql);
 
-				if (!pagination) {
-					list = (List<PushNotificationsDevice>)QueryUtil.list(
-						q, getDialect(), start, end, false);
-
-					Collections.sort(list);
-
-					list = Collections.unmodifiableList(list);
-				}
-				else {
-					list = (List<PushNotificationsDevice>)QueryUtil.list(
-						q, getDialect(), start, end);
-				}
+				list = (List<PushNotificationsDevice>)QueryUtil.list(
+					q, getDialect(), start, end);
 
 				cacheResult(list);
 
-				finderCache.putResult(finderPath, finderArgs, list);
+				if (useFinderCache) {
+					finderCache.putResult(finderPath, finderArgs, list);
+				}
 			}
 			catch (Exception e) {
-				finderCache.removeResult(finderPath, finderArgs);
+				if (useFinderCache) {
+					finderCache.removeResult(finderPath, finderArgs);
+				}
 
 				throw processException(e);
 			}
@@ -1870,42 +1858,42 @@ public class PushNotificationsDevicePersistenceImpl
 	/**
 	 * Initializes the push notifications device persistence.
 	 */
-	public void afterPropertiesSet() {
+	@Activate
+	public void activate() {
+		PushNotificationsDeviceModelImpl.setEntityCacheEnabled(
+			entityCacheEnabled);
+		PushNotificationsDeviceModelImpl.setFinderCacheEnabled(
+			finderCacheEnabled);
+
 		_finderPathWithPaginationFindAll = new FinderPath(
-			PushNotificationsDeviceModelImpl.ENTITY_CACHE_ENABLED,
-			PushNotificationsDeviceModelImpl.FINDER_CACHE_ENABLED,
+			entityCacheEnabled, finderCacheEnabled,
 			PushNotificationsDeviceImpl.class,
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findAll", new String[0]);
 
 		_finderPathWithoutPaginationFindAll = new FinderPath(
-			PushNotificationsDeviceModelImpl.ENTITY_CACHE_ENABLED,
-			PushNotificationsDeviceModelImpl.FINDER_CACHE_ENABLED,
+			entityCacheEnabled, finderCacheEnabled,
 			PushNotificationsDeviceImpl.class,
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findAll",
 			new String[0]);
 
 		_finderPathCountAll = new FinderPath(
-			PushNotificationsDeviceModelImpl.ENTITY_CACHE_ENABLED,
-			PushNotificationsDeviceModelImpl.FINDER_CACHE_ENABLED, Long.class,
+			entityCacheEnabled, finderCacheEnabled, Long.class,
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countAll",
 			new String[0]);
 
 		_finderPathFetchByToken = new FinderPath(
-			PushNotificationsDeviceModelImpl.ENTITY_CACHE_ENABLED,
-			PushNotificationsDeviceModelImpl.FINDER_CACHE_ENABLED,
+			entityCacheEnabled, finderCacheEnabled,
 			PushNotificationsDeviceImpl.class, FINDER_CLASS_NAME_ENTITY,
 			"fetchByToken", new String[] {String.class.getName()},
 			PushNotificationsDeviceModelImpl.TOKEN_COLUMN_BITMASK);
 
 		_finderPathCountByToken = new FinderPath(
-			PushNotificationsDeviceModelImpl.ENTITY_CACHE_ENABLED,
-			PushNotificationsDeviceModelImpl.FINDER_CACHE_ENABLED, Long.class,
+			entityCacheEnabled, finderCacheEnabled, Long.class,
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByToken",
 			new String[] {String.class.getName()});
 
 		_finderPathWithPaginationFindByU_P = new FinderPath(
-			PushNotificationsDeviceModelImpl.ENTITY_CACHE_ENABLED,
-			PushNotificationsDeviceModelImpl.FINDER_CACHE_ENABLED,
+			entityCacheEnabled, finderCacheEnabled,
 			PushNotificationsDeviceImpl.class,
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByU_P",
 			new String[] {
@@ -1915,8 +1903,7 @@ public class PushNotificationsDevicePersistenceImpl
 			});
 
 		_finderPathWithoutPaginationFindByU_P = new FinderPath(
-			PushNotificationsDeviceModelImpl.ENTITY_CACHE_ENABLED,
-			PushNotificationsDeviceModelImpl.FINDER_CACHE_ENABLED,
+			entityCacheEnabled, finderCacheEnabled,
 			PushNotificationsDeviceImpl.class,
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByU_P",
 			new String[] {Long.class.getName(), String.class.getName()},
@@ -1924,32 +1911,62 @@ public class PushNotificationsDevicePersistenceImpl
 			PushNotificationsDeviceModelImpl.PLATFORM_COLUMN_BITMASK);
 
 		_finderPathCountByU_P = new FinderPath(
-			PushNotificationsDeviceModelImpl.ENTITY_CACHE_ENABLED,
-			PushNotificationsDeviceModelImpl.FINDER_CACHE_ENABLED, Long.class,
+			entityCacheEnabled, finderCacheEnabled, Long.class,
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByU_P",
 			new String[] {Long.class.getName(), String.class.getName()});
 
 		_finderPathWithPaginationCountByU_P = new FinderPath(
-			PushNotificationsDeviceModelImpl.ENTITY_CACHE_ENABLED,
-			PushNotificationsDeviceModelImpl.FINDER_CACHE_ENABLED, Long.class,
+			entityCacheEnabled, finderCacheEnabled, Long.class,
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "countByU_P",
 			new String[] {Long.class.getName(), String.class.getName()});
 	}
 
-	public void destroy() {
+	@Deactivate
+	public void deactivate() {
 		entityCache.removeCache(PushNotificationsDeviceImpl.class.getName());
 		finderCache.removeCache(FINDER_CLASS_NAME_ENTITY);
 		finderCache.removeCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
 		finderCache.removeCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
 	}
 
-	@ServiceReference(type = CompanyProviderWrapper.class)
-	protected CompanyProvider companyProvider;
+	@Override
+	@Reference(
+		target = PushNotificationsPersistenceConstants.SERVICE_CONFIGURATION_FILTER,
+		unbind = "-"
+	)
+	public void setConfiguration(Configuration configuration) {
+		super.setConfiguration(configuration);
 
-	@ServiceReference(type = EntityCache.class)
+		_columnBitmaskEnabled = GetterUtil.getBoolean(
+			configuration.get(
+				"value.object.column.bitmask.enabled.com.liferay.push.notifications.model.PushNotificationsDevice"),
+			true);
+	}
+
+	@Override
+	@Reference(
+		target = PushNotificationsPersistenceConstants.ORIGIN_BUNDLE_SYMBOLIC_NAME_FILTER,
+		unbind = "-"
+	)
+	public void setDataSource(DataSource dataSource) {
+		super.setDataSource(dataSource);
+	}
+
+	@Override
+	@Reference(
+		target = PushNotificationsPersistenceConstants.ORIGIN_BUNDLE_SYMBOLIC_NAME_FILTER,
+		unbind = "-"
+	)
+	public void setSessionFactory(SessionFactory sessionFactory) {
+		super.setSessionFactory(sessionFactory);
+	}
+
+	private boolean _columnBitmaskEnabled;
+
+	@Reference
 	protected EntityCache entityCache;
 
-	@ServiceReference(type = FinderCache.class)
+	@Reference
 	protected FinderCache finderCache;
 
 	private static final String _SQL_SELECT_PUSHNOTIFICATIONSDEVICE =
@@ -1975,5 +1992,15 @@ public class PushNotificationsDevicePersistenceImpl
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		PushNotificationsDevicePersistenceImpl.class);
+
+	static {
+		try {
+			Class.forName(
+				PushNotificationsPersistenceConstants.class.getName());
+		}
+		catch (ClassNotFoundException cnfe) {
+			throw new ExceptionInInitializerError(cnfe);
+		}
+	}
 
 }

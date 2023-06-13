@@ -77,35 +77,25 @@ catch (Exception e) {
 	<aui:button type="submit" value="generate" />
 </aui:form>
 
-<aui:script use="aui-io-request,aui-parse-content">
+<aui:script use="aui-parse-content">
 	var form = A.one('#<portlet:namespace />fm');
 
 	var parentNode = form.get('parentNode');
 
 	parentNode.plug(A.Plugin.ParseContent);
 
-	form.on(
-		'submit',
-		function(event) {
-			var uri = form.getAttribute('action');
+	form.on('submit', function(event) {
+		Liferay.Util.fetch(form.getAttribute('action'), {
+			body: new FormData(form.getDOM()),
+			method: 'POST'
+		})
+			.then(function(response) {
+				return response.text();
+			})
+			.then(function(response) {
+				parentNode.setContent(response);
+			});
 
-			A.io.request(
-				uri,
-				{
-					form: {
-						id: form
-					},
-					on: {
-						success: function(event, id, obj) {
-							var responseData = this.get('responseData');
-
-							parentNode.setContent(responseData);
-						}
-					}
-				}
-			);
-
-			event.halt();
-		}
-	);
+		event.halt();
+	});
 </aui:script>

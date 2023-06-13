@@ -35,19 +35,16 @@ import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 import org.xml.sax.InputSource;
 import org.xml.sax.XMLReader;
 
 /**
  * @author Zsolt Berentey
  */
-@ProviderType
 public class DeletionSystemEventImporter {
 
 	public static DeletionSystemEventImporter getInstance() {
-		return _instance;
+		return _deletionSystemEventImporter;
 	}
 
 	public void importDeletionSystemEvents(
@@ -161,7 +158,7 @@ public class DeletionSystemEventImporter {
 	private static final Log _log = LogFactoryUtil.getLog(
 		DeletionSystemEventImporter.class);
 
-	private static final DeletionSystemEventImporter _instance =
-		new DeletionSystemEventImporter();
+	private static final DeletionSystemEventImporter
+		_deletionSystemEventImporter = new DeletionSystemEventImporter();
 
 }

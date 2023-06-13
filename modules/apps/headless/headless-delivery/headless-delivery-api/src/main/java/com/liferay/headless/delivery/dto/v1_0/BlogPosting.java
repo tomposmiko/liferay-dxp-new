@@ -22,9 +22,8 @@ import com.fasterxml.jackson.annotation.JsonValue;
 
 import com.liferay.petra.function.UnsafeSupplier;
 import com.liferay.petra.string.StringBundler;
-
-import graphql.annotations.annotationTypes.GraphQLField;
-import graphql.annotations.annotationTypes.GraphQLName;
+import com.liferay.portal.vulcan.graphql.annotation.GraphQLField;
+import com.liferay.portal.vulcan.graphql.annotation.GraphQLName;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 
@@ -39,6 +38,7 @@ import java.util.Set;
 
 import javax.annotation.Generated;
 
+import javax.validation.Valid;
 import javax.validation.constraints.NotEmpty;
 
 import javax.xml.bind.annotation.XmlRootElement;
@@ -54,6 +54,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement(name = "BlogPosting")
 public class BlogPosting {
 
+	@GraphQLName("ViewableBy")
 	public static enum ViewableBy {
 
 		ANYONE("Anyone"), MEMBERS("Members"), OWNER("Owner");
@@ -88,6 +89,7 @@ public class BlogPosting {
 	}
 
 	@Schema(description = "The blog post's average rating.")
+	@Valid
 	public AggregateRating getAggregateRating() {
 		return aggregateRating;
 	}
@@ -174,6 +176,7 @@ public class BlogPosting {
 	protected String articleBody;
 
 	@Schema(description = "The blog post's author.")
+	@Valid
 	public Creator getCreator() {
 		return creator;
 	}
@@ -202,6 +205,7 @@ public class BlogPosting {
 	protected Creator creator;
 
 	@Schema
+	@Valid
 	public CustomField[] getCustomFields() {
 		return customFields;
 	}
@@ -455,6 +459,7 @@ public class BlogPosting {
 	protected Long id;
 
 	@Schema(description = "The blog post's cover image.")
+	@Valid
 	public Image getImage() {
 		return image;
 	}
@@ -537,6 +542,7 @@ public class BlogPosting {
 	protected Integer numberOfComments;
 
 	@Schema
+	@Valid
 	public RelatedContent[] getRelatedContents() {
 		return relatedContents;
 	}
@@ -596,6 +602,7 @@ public class BlogPosting {
 	protected Long siteId;
 
 	@Schema(description = "The categories associated with this blog post.")
+	@Valid
 	public TaxonomyCategory[] getTaxonomyCategories() {
 		return taxonomyCategories;
 	}
@@ -657,6 +664,7 @@ public class BlogPosting {
 	@Schema(
 		description = "A write-only property that specifies the default permissions."
 	)
+	@Valid
 	public ViewableBy getViewableBy() {
 		return viewableBy;
 	}
@@ -1031,6 +1039,12 @@ public class BlogPosting {
 
 		return sb.toString();
 	}
+
+	@Schema(
+		defaultValue = "com.liferay.headless.delivery.dto.v1_0.BlogPosting",
+		name = "x-class-name"
+	)
+	public String xClassName;
 
 	private static String _escape(Object object) {
 		String string = String.valueOf(object);

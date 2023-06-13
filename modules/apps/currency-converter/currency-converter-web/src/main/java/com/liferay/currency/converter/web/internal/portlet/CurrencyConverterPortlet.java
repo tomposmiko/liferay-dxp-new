@@ -14,7 +14,7 @@
 
 package com.liferay.currency.converter.web.internal.portlet;
 
-import com.liferay.currency.converter.web.configuration.CurrencyConverterConfiguration;
+import com.liferay.currency.converter.web.internal.configuration.CurrencyConverterConfiguration;
 import com.liferay.currency.converter.web.internal.constants.CurrencyConverterPortletKeys;
 import com.liferay.portal.configuration.metatype.bnd.util.ConfigurableUtil;
 import com.liferay.portal.kernel.model.Release;
@@ -40,7 +40,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Peter Fellwock
  */
 @Component(
-	configurationPid = "com.liferay.currency.converter.web.configuration.CurrencyConverterConfiguration",
+	configurationPid = "com.liferay.currency.converter.web.internal.configuration.CurrencyConverterConfiguration",
 	configurationPolicy = ConfigurationPolicy.OPTIONAL, immediate = true,
 	property = {
 		"com.liferay.portlet.css-class-wrapper=portlet-currency-converter",
@@ -110,7 +110,7 @@ public class CurrencyConverterPortlet extends MVCPortlet {
 	}
 
 	@Reference(
-		target = "(&(release.bundle.symbolic.name=com.liferay.currency.converter.web)(&(release.schema.version>=1.0.0)(!(release.schema.version>=1.1.0))))",
+		target = "(&(release.bundle.symbolic.name=com.liferay.currency.converter.web)(&(release.schema.version>=1.0.0)(!(release.schema.version>=2.0.0))))",
 		unbind = "-"
 	)
 	protected void setRelease(Release release) {

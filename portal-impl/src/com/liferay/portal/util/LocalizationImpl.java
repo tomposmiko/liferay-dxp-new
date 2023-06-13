@@ -247,14 +247,13 @@ public class LocalizationImpl implements Localization {
 
 		if (useDefault &&
 			LanguageUtil.isDuplicateLanguageCode(
-				requestedLocale.getLanguage())) {
+				requestedLocale.getLanguage()) &&
+			!requestedLanguageId.equals(priorityLanguageId)) {
 
-			if (!requestedLanguageId.equals(priorityLanguageId)) {
-				Locale priorityLocale = LanguageUtil.getLocale(
-					requestedLocale.getLanguage());
+			Locale priorityLocale = LanguageUtil.getLocale(
+				requestedLocale.getLanguage());
 
-				priorityLanguageId = LocaleUtil.toLanguageId(priorityLocale);
-			}
+			priorityLanguageId = LocaleUtil.toLanguageId(priorityLocale);
 		}
 
 		XMLStreamReader xmlStreamReader = null;
@@ -995,6 +994,7 @@ public class LocalizationImpl implements Localization {
 
 				availableLocales = xmlStreamReader.getAttributeValue(
 					null, _AVAILABLE_LOCALES);
+
 				defaultLanguageId = xmlStreamReader.getAttributeValue(
 					null, _DEFAULT_LOCALE);
 
@@ -1083,9 +1083,9 @@ public class LocalizationImpl implements Localization {
 
 		for (Map.Entry<Locale, String> entry : map.entrySet()) {
 			String languageId = LocaleUtil.toLanguageId(entry.getKey());
-			String value = entry.getValue();
 
-			setPreferencesValue(preferences, parameter, languageId, value);
+			setPreferencesValue(
+				preferences, parameter, languageId, entry.getValue());
 		}
 	}
 

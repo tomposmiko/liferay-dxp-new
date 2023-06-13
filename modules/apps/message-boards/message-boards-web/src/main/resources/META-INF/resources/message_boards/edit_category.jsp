@@ -92,6 +92,7 @@ if (portletTitleBasedNavigation) {
 		<aui:input name="parentCategoryId" type="hidden" value="<%= parentCategoryId %>" />
 
 		<liferay-ui:error exception="<%= CaptchaConfigurationException.class %>" message="a-captcha-error-occurred-please-contact-an-administrator" />
+		<liferay-ui:error exception="<%= CaptchaException.class %>" message="captcha-verification-failed" />
 		<liferay-ui:error exception="<%= CaptchaTextException.class %>" message="text-verification-failed" />
 		<liferay-ui:error exception="<%= CategoryNameException.class %>" message="please-enter-a-valid-name" />
 		<liferay-ui:error exception="<%= MailingListEmailAddressException.class %>" message="please-enter-a-valid-email-address" />
@@ -239,11 +240,18 @@ if (portletTitleBasedNavigation) {
 
 <aui:script>
 	function <portlet:namespace />saveCategory() {
-		document.<portlet:namespace />fm.<portlet:namespace /><%= Constants.CMD %>.value = '<%= (category == null) ? Constants.ADD : Constants.UPDATE %>';
+		document.<portlet:namespace />fm.<portlet:namespace /><%= Constants.CMD %>.value =
+			'<%= (category == null) ? Constants.ADD : Constants.UPDATE %>';
 
 		submitForm(document.<portlet:namespace />fm);
 	}
 
-	Liferay.Util.toggleBoxes('<portlet:namespace />mailingListActive', '<portlet:namespace />mailingListSettings');
-	Liferay.Util.toggleBoxes('<portlet:namespace />outCustom', '<portlet:namespace />outCustomSettings');
+	Liferay.Util.toggleBoxes(
+		'<portlet:namespace />mailingListActive',
+		'<portlet:namespace />mailingListSettings'
+	);
+	Liferay.Util.toggleBoxes(
+		'<portlet:namespace />outCustom',
+		'<portlet:namespace />outCustomSettings'
+	);
 </aui:script>

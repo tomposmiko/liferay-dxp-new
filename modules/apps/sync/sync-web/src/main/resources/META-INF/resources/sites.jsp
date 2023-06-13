@@ -68,19 +68,19 @@ portletURL.setParameter("delta", String.valueOf(delta));
 	<liferay-frontend:management-bar-action-buttons>
 		<liferay-frontend:management-bar-button
 			href='<%= "javascript:" + renderResponse.getNamespace() + "enableSites();" %>'
-			iconCssClass="icon-ok"
+			icon="check"
 			label="enable-sync-sites"
 		/>
 
 		<liferay-frontend:management-bar-button
 			href='<%= "javascript:" + renderResponse.getNamespace() + "disableSites();" %>'
-			iconCssClass="icon-remove"
+			icon="times"
 			label="disable-sync-sites"
 		/>
 
 		<liferay-frontend:management-bar-button
 			href='<%= "javascript:" + renderResponse.getNamespace() + "editSitesDefaultFilePermissions();" %>'
-			iconCssClass="icon-lock"
+			icon="lock"
 			label="default-file-permissions"
 		/>
 	</liferay-frontend:management-bar-action-buttons>
@@ -210,13 +210,26 @@ portletURL.setParameter("delta", String.valueOf(delta));
 		var form = document.querySelector('#document.<portlet:namespace />fm');
 
 		if (form) {
-			var groupIds = Liferay.Util.listCheckedExcept(form, '<portlet:namespace />allRowIds');
+			var groupIds = Liferay.Util.listCheckedExcept(
+				form,
+				'<portlet:namespace />allRowIds'
+			);
 
-			if (groupIds && confirm('<liferay-ui:message key="disabling-a-sync-site-will-delete-all-associated-files-from-all-clients" />')) {
-				form.querySelector('#<portlet:namespace />groupIds').value = groupIds;
+			if (
+				groupIds &&
+				confirm(
+					'<liferay-ui:message key="disabling-a-sync-site-will-delete-all-associated-files-from-all-clients" />'
+				)
+			) {
+				form.querySelector(
+					'#<portlet:namespace />groupIds'
+				).value = groupIds;
 				form.querySelector('#<portlet:namespace />enabled').value = false;
 
-				submitForm(form, '<liferay-portlet:actionURL name="updateSites" />');
+				submitForm(
+					form,
+					'<liferay-portlet:actionURL name="updateSites" />'
+				);
 			}
 		}
 	}
@@ -227,35 +240,40 @@ portletURL.setParameter("delta", String.valueOf(delta));
 		var form = document.querySelector('#<portlet:namespace />fm');
 
 		if (form) {
-			var groupIds = Liferay.Util.listCheckedExcept(form, '<portlet:namespace />allRowIds');
+			var groupIds = Liferay.Util.listCheckedExcept(
+				form,
+				'<portlet:namespace />allRowIds'
+			);
 
 			if (groupIds) {
-				Liferay.Util.openWindow(
-					{
-						dialog: {
-							destroyOnHide: true,
-							on: {
-								destroy: function() {
-									Liferay.Portlet.refresh('#p_p_id<portlet:namespace />');
-								}
+				Liferay.Util.openWindow({
+					dialog: {
+						destroyOnHide: true,
+						on: {
+							destroy: function() {
+								Liferay.Portlet.refresh(
+									'#p_p_id<portlet:namespace />'
+								);
 							}
-						},
-						id: '<portlet:namespace />editDefaultFilePermissionsDialog',
-						title: '<liferay-ui:message key="default-file-permissions" />',
+						}
+					},
+					id: '<portlet:namespace />editDefaultFilePermissionsDialog',
+					title: '<liferay-ui:message key="default-file-permissions" />',
 
-						<portlet:renderURL var="editSitesDefaultFilePermissionsURL" windowState="<%= LiferayWindowState.POP_UP.toString() %>">
-							<portlet:param name="groupIds" value="{groupIds}" />
-							<portlet:param name="mvcPath" value="/edit_default_file_permissions.jsp" />
-						</portlet:renderURL>
+					<portlet:renderURL var="editSitesDefaultFilePermissionsURL" windowState="<%= LiferayWindowState.POP_UP.toString() %>">
+						<portlet:param name="groupIds" value="{groupIds}" />
+						<portlet:param name="mvcPath" value="/edit_default_file_permissions.jsp" />
+					</portlet:renderURL>
 
-						uri: A.Lang.sub(
-							decodeURIComponent('<%= editSitesDefaultFilePermissionsURL %>'),
-							{
-								groupIds: groupIds
-							}
-						)
-					}
-				);
+					uri: A.Lang.sub(
+						decodeURIComponent(
+							'<%= editSitesDefaultFilePermissionsURL %>'
+						),
+						{
+							groupIds: groupIds
+						}
+					)
+				});
 			}
 		}
 	}
@@ -264,13 +282,21 @@ portletURL.setParameter("delta", String.valueOf(delta));
 		var form = document.querySelector('#<portlet:namespace />fm');
 
 		if (form) {
-			var groupIds = Liferay.Util.listCheckedExcept(form, '<portlet:namespace />allRowIds');
+			var groupIds = Liferay.Util.listCheckedExcept(
+				form,
+				'<portlet:namespace />allRowIds'
+			);
 
 			if (groupIds) {
-				form.querySelector('#<portlet:namespace />groupIds').value = groupIds;
+				form.querySelector(
+					'#<portlet:namespace />groupIds'
+				).value = groupIds;
 				form.querySelector('#<portlet:namespace />enabled').value = true;
 
-				submitForm(form, '<liferay-portlet:actionURL name="updateSites" />');
+				submitForm(
+					form,
+					'<liferay-portlet:actionURL name="updateSites" />'
+				);
 			}
 		}
 	}

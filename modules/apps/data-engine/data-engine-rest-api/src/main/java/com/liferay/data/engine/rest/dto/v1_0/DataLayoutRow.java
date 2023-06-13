@@ -20,9 +20,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import com.liferay.petra.function.UnsafeSupplier;
 import com.liferay.petra.string.StringBundler;
-
-import graphql.annotations.annotationTypes.GraphQLField;
-import graphql.annotations.annotationTypes.GraphQLName;
+import com.liferay.portal.vulcan.graphql.annotation.GraphQLField;
+import com.liferay.portal.vulcan.graphql.annotation.GraphQLName;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 
@@ -32,6 +31,8 @@ import java.util.Objects;
 import java.util.Set;
 
 import javax.annotation.Generated;
+
+import javax.validation.Valid;
 
 import javax.xml.bind.annotation.XmlRootElement;
 
@@ -46,21 +47,22 @@ import javax.xml.bind.annotation.XmlRootElement;
 public class DataLayoutRow {
 
 	@Schema
-	public DataLayoutColumn[] getDataLayoutColums() {
-		return dataLayoutColums;
+	@Valid
+	public DataLayoutColumn[] getDataLayoutColumns() {
+		return dataLayoutColumns;
 	}
 
-	public void setDataLayoutColums(DataLayoutColumn[] dataLayoutColums) {
-		this.dataLayoutColums = dataLayoutColums;
+	public void setDataLayoutColumns(DataLayoutColumn[] dataLayoutColumns) {
+		this.dataLayoutColumns = dataLayoutColumns;
 	}
 
 	@JsonIgnore
-	public void setDataLayoutColums(
+	public void setDataLayoutColumns(
 		UnsafeSupplier<DataLayoutColumn[], Exception>
-			dataLayoutColumsUnsafeSupplier) {
+			dataLayoutColumnsUnsafeSupplier) {
 
 		try {
-			dataLayoutColums = dataLayoutColumsUnsafeSupplier.get();
+			dataLayoutColumns = dataLayoutColumnsUnsafeSupplier.get();
 		}
 		catch (RuntimeException re) {
 			throw re;
@@ -72,7 +74,7 @@ public class DataLayoutRow {
 
 	@GraphQLField
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
-	protected DataLayoutColumn[] dataLayoutColums;
+	protected DataLayoutColumn[] dataLayoutColumns;
 
 	@Override
 	public boolean equals(Object object) {
@@ -101,19 +103,19 @@ public class DataLayoutRow {
 
 		sb.append("{");
 
-		if (dataLayoutColums != null) {
+		if (dataLayoutColumns != null) {
 			if (sb.length() > 1) {
 				sb.append(", ");
 			}
 
-			sb.append("\"dataLayoutColums\": ");
+			sb.append("\"dataLayoutColumns\": ");
 
 			sb.append("[");
 
-			for (int i = 0; i < dataLayoutColums.length; i++) {
-				sb.append(String.valueOf(dataLayoutColums[i]));
+			for (int i = 0; i < dataLayoutColumns.length; i++) {
+				sb.append(String.valueOf(dataLayoutColumns[i]));
 
-				if ((i + 1) < dataLayoutColums.length) {
+				if ((i + 1) < dataLayoutColumns.length) {
 					sb.append(", ");
 				}
 			}
@@ -125,6 +127,12 @@ public class DataLayoutRow {
 
 		return sb.toString();
 	}
+
+	@Schema(
+		defaultValue = "com.liferay.data.engine.rest.dto.v1_0.DataLayoutRow",
+		name = "x-class-name"
+	)
+	public String xClassName;
 
 	private static String _escape(Object object) {
 		String string = String.valueOf(object);

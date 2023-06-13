@@ -185,6 +185,7 @@ else {
 							classNameId="<%= classNameId %>"
 							classPK="<%= classPK %>"
 							ddmFormValues="<%= ddmFormValues %>"
+							defaultLocale="<%= LocaleUtil.fromLanguageId(defaultLanguageId) %>"
 							groupId="<%= recordSet.getGroupId() %>"
 							repeatable="<%= translating ? false : true %>"
 							requestedLocale="<%= locale %>"
@@ -197,6 +198,7 @@ else {
 									classNameId="<%= classNameId %>"
 									classPK="<%= classPK %>"
 									ddmFormValues="<%= ddmFormValues %>"
+									defaultLocale="<%= LocaleUtil.fromLanguageId(defaultLanguageId) %>"
 									groupId="<%= recordSet.getGroupId() %>"
 									repeatable="<%= translating ? false : true %>"
 									requestedLocale="<%= locale %>"
@@ -261,8 +263,7 @@ else {
 	function <portlet:namespace />setWorkflowAction(draft) {
 		if (draft) {
 			document.<portlet:namespace />fm.<portlet:namespace />workflowAction.value = <%= WorkflowConstants.ACTION_SAVE_DRAFT %>;
-		}
-		else {
+		} else {
 			document.<portlet:namespace />fm.<portlet:namespace />workflowAction.value = <%= WorkflowConstants.ACTION_PUBLISH %>;
 		}
 	}

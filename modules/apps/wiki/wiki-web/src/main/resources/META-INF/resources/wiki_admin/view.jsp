@@ -166,11 +166,11 @@ WikiNodesManagementToolbarDisplayContext wikiNodesManagementToolbarDisplayContex
 							<liferay-ui:search-container-column-text
 								colspan="<%= 2 %>"
 							>
-								<h2 class="h5">
+								<p class="h5">
 									<aui:a href="<%= rowURL.toString() %>">
 										<%= HtmlUtil.escape(node.getName()) %>
 									</aui:a>
-								</h2>
+								</p>
 
 								<%
 								Date lastPostDate = node.getLastPostDate();
@@ -229,37 +229,37 @@ WikiNodesManagementToolbarDisplayContext wikiNodesManagementToolbarDisplayContex
 
 <script>
 	var deleteNodes = function() {
-		if (<%= trashHelper.isTrashEnabled(scopeGroupId) %> || confirm(' <%= UnicodeLanguageUtil.get(request, "are-you-sure-you-want-to-delete-the-selected-entries") %>')) {
+		if (
+			<%= trashHelper.isTrashEnabled(scopeGroupId) %> ||
+			confirm(
+				' <%= UnicodeLanguageUtil.get(request, "are-you-sure-you-want-to-delete-the-selected-entries") %>'
+			)
+		) {
 			var form = document.<portlet:namespace />fm;
 
-			Liferay.Util.postForm(
-				form,
-				{
-					data: {
-						'<%= Constants.CMD %>': '<%= trashHelper.isTrashEnabled(scopeGroupId) ? Constants.MOVE_TO_TRASH : Constants.DELETE %>'
-					},
-					url: '<portlet:actionURL name="/wiki/edit_node" />'
-				}
-			);
+			Liferay.Util.postForm(form, {
+				data: {
+					<%= Constants.CMD %>:
+						'<%= trashHelper.isTrashEnabled(scopeGroupId) ? Constants.MOVE_TO_TRASH : Constants.DELETE %>'
+				},
+				url: '<portlet:actionURL name="/wiki/edit_node" />'
+			});
 		}
 	};
 
 	var ACTIONS = {
-		'deleteNodes': deleteNodes
+		deleteNodes: deleteNodes
 	};
 
-	Liferay.componentReady('wikiNodesManagementToolbar').then(
-		function(managementToolbar) {
-			managementToolbar.on(
-				'actionItemClicked',
-				function(event) {
-					var itemData = event.data.item.data;
+	Liferay.componentReady('wikiNodesManagementToolbar').then(function(
+		managementToolbar
+	) {
+		managementToolbar.on('actionItemClicked', function(event) {
+			var itemData = event.data.item.data;
 
-					if (itemData && itemData.action && ACTIONS[itemData.action]) {
-						ACTIONS[itemData.action]();
-					}
-				}
-			);
-		}
-	);
+			if (itemData && itemData.action && ACTIONS[itemData.action]) {
+				ACTIONS[itemData.action]();
+			}
+		});
+	});
 </script>

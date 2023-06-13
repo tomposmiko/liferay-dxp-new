@@ -14,6 +14,7 @@
 
 package com.liferay.wiki.internal.exportimport.portlet.preferences.processor;
 
+import com.liferay.exportimport.kernel.lar.ExportImportHelper;
 import com.liferay.exportimport.kernel.lar.ExportImportThreadLocal;
 import com.liferay.exportimport.kernel.lar.PortletDataContext;
 import com.liferay.exportimport.kernel.lar.PortletDataException;
@@ -56,20 +57,16 @@ public class WikiExportImportPortletPreferencesProcessor
 
 	@Override
 	public List<Capability> getExportCapabilities() {
-		return ListUtil.toList(
-			new Capability[] {
-				_portletDisplayTemplateExporter,
-				_wikiCommentsAndRatingsExporterImporterCapability
-			});
+		return ListUtil.fromArray(
+			_portletDisplayTemplateExporter,
+			_wikiCommentsAndRatingsExporterImporterCapability);
 	}
 
 	@Override
 	public List<Capability> getImportCapabilities() {
-		return ListUtil.toList(
-			new Capability[] {
-				_wikiCommentsAndRatingsExporterImporterCapability,
-				_referencedStagedModelImporter, _portletDisplayTemplateImporter
-			});
+		return ListUtil.fromArray(
+			_wikiCommentsAndRatingsExporterImporterCapability,
+			_referencedStagedModelImporter, _portletDisplayTemplateImporter);
 	}
 
 	@Override
@@ -78,7 +75,8 @@ public class WikiExportImportPortletPreferencesProcessor
 			PortletPreferences portletPreferences)
 		throws PortletDataException {
 
-		if (!portletDataContext.getBooleanParameter(
+		if (!_exportImportHelper.isExportPortletData(portletDataContext) ||
+			!portletDataContext.getBooleanParameter(
 				_wikiPortletDataHandler.getNamespace(), "wiki-pages")) {
 
 			return portletPreferences;
@@ -220,10 +218,8 @@ public class WikiExportImportPortletPreferencesProcessor
 			return;
 		}
 
-		String portletId = portletDataContext.getPortletId();
-
 		StagedModelDataHandlerUtil.exportReferenceStagedModel(
-			portletDataContext, portletId, node);
+			portletDataContext, portletDataContext.getPortletId(), node);
 	}
 
 	@Reference(unbind = "-")
@@ -247,6 +243,9 @@ public class WikiExportImportPortletPreferencesProcessor
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		WikiExportImportPortletPreferencesProcessor.class);
+
+	@Reference
+	private ExportImportHelper _exportImportHelper;
 
 	private GroupLocalService _groupLocalService;
 

@@ -1,0 +1,13 @@
+dependencies {
+	compileOnly group: "com.liferay", name: "com.liferay.petra.string", version: "3.0.0"
+	compileOnly group: "com.liferay.portal", name: "com.liferay.portal.impl", version: "4.0.0"
+	compileOnly group: "com.liferay.portal", name: "com.liferay.portal.kernel", version: "4.34.0"
+	compileOnly group: "com.liferay.portal", name: "com.liferay.portal.test", version: "6.0.0"
+	compileOnly group: "com.liferay.portal", name: "com.liferay.portal.test.integration", version: "6.0.0"
+	compileOnly group: "javax.portlet", name: "portlet-api", version: "3.0.1"
+	compileOnly group: "org.apache.felix", name: "org.apache.felix.http.servlet-api", version: "1.1.2"
+}
+
+liferay {
+	deployDir = file("${liferayHome}/osgi/test")
+}

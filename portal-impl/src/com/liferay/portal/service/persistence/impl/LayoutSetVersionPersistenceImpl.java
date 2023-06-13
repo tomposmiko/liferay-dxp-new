@@ -15,7 +15,6 @@
 package com.liferay.portal.service.persistence.impl;
 
 import com.liferay.petra.string.StringBundler;
-import com.liferay.portal.kernel.bean.BeanReference;
 import com.liferay.portal.kernel.dao.orm.EntityCache;
 import com.liferay.portal.kernel.dao.orm.EntityCacheUtil;
 import com.liferay.portal.kernel.dao.orm.FinderCacheUtil;
@@ -28,10 +27,9 @@ import com.liferay.portal.kernel.exception.NoSuchLayoutSetVersionException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.LayoutSetVersion;
+import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
-import com.liferay.portal.kernel.service.persistence.CompanyProvider;
-import com.liferay.portal.kernel.service.persistence.CompanyProviderWrapper;
 import com.liferay.portal.kernel.service.persistence.LayoutSetVersionPersistence;
 import com.liferay.portal.kernel.service.persistence.impl.BasePersistenceImpl;
 import com.liferay.portal.kernel.util.OrderByComparator;
@@ -44,15 +42,12 @@ import java.io.Serializable;
 
 import java.lang.reflect.InvocationHandler;
 
-import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-
-import org.osgi.annotation.versioning.ProviderType;
 
 /**
  * The persistence implementation for the layout set version service.
@@ -64,12 +59,11 @@ import org.osgi.annotation.versioning.ProviderType;
  * @author Brian Wing Shun Chan
  * @generated
  */
-@ProviderType
 public class LayoutSetVersionPersistenceImpl
 	extends BasePersistenceImpl<LayoutSetVersion>
 	implements LayoutSetVersionPersistence {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this class directly. Always use <code>LayoutSetVersionUtil</code> to access the layout set version persistence. Modify <code>service.xml</code> and rerun ServiceBuilder to regenerate this class.
@@ -106,7 +100,7 @@ public class LayoutSetVersionPersistenceImpl
 	 * Returns a range of all the layout set versions where layoutSetId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>LayoutSetVersionModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>LayoutSetVersionModelImpl</code>.
 	 * </p>
 	 *
 	 * @param layoutSetId the layout set ID
@@ -125,7 +119,7 @@ public class LayoutSetVersionPersistenceImpl
 	 * Returns an ordered range of all the layout set versions where layoutSetId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>LayoutSetVersionModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>LayoutSetVersionModelImpl</code>.
 	 * </p>
 	 *
 	 * @param layoutSetId the layout set ID
@@ -147,34 +141,34 @@ public class LayoutSetVersionPersistenceImpl
 	 * Returns an ordered range of all the layout set versions where layoutSetId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>LayoutSetVersionModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>LayoutSetVersionModelImpl</code>.
 	 * </p>
 	 *
 	 * @param layoutSetId the layout set ID
 	 * @param start the lower bound of the range of layout set versions
 	 * @param end the upper bound of the range of layout set versions (not inclusive)
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
-	 * @param retrieveFromCache whether to retrieve from the finder cache
+	 * @param useFinderCache whether to use the finder cache
 	 * @return the ordered range of matching layout set versions
 	 */
 	@Override
 	public List<LayoutSetVersion> findByLayoutSetId(
 		long layoutSetId, int start, int end,
 		OrderByComparator<LayoutSetVersion> orderByComparator,
-		boolean retrieveFromCache) {
+		boolean useFinderCache) {
 
-		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
 			(orderByComparator == null)) {
 
-			pagination = false;
-			finderPath = _finderPathWithoutPaginationFindByLayoutSetId;
-			finderArgs = new Object[] {layoutSetId};
+			if (useFinderCache) {
+				finderPath = _finderPathWithoutPaginationFindByLayoutSetId;
+				finderArgs = new Object[] {layoutSetId};
+			}
 		}
-		else {
+		else if (useFinderCache) {
 			finderPath = _finderPathWithPaginationFindByLayoutSetId;
 			finderArgs = new Object[] {
 				layoutSetId, start, end, orderByComparator
@@ -183,13 +177,13 @@ public class LayoutSetVersionPersistenceImpl
 
 		List<LayoutSetVersion> list = null;
 
-		if (retrieveFromCache) {
+		if (useFinderCache) {
 			list = (List<LayoutSetVersion>)FinderCacheUtil.getResult(
 				finderPath, finderArgs, this);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (LayoutSetVersion layoutSetVersion : list) {
-					if ((layoutSetId != layoutSetVersion.getLayoutSetId())) {
+					if (layoutSetId != layoutSetVersion.getLayoutSetId()) {
 						list = null;
 
 						break;
@@ -217,7 +211,7 @@ public class LayoutSetVersionPersistenceImpl
 				appendOrderByComparator(
 					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
 			}
-			else if (pagination) {
+			else {
 				query.append(LayoutSetVersionModelImpl.ORDER_BY_JPQL);
 			}
 
@@ -234,25 +228,19 @@ public class LayoutSetVersionPersistenceImpl
 
 				qPos.add(layoutSetId);
 
-				if (!pagination) {
-					list = (List<LayoutSetVersion>)QueryUtil.list(
-						q, getDialect(), start, end, false);
-
-					Collections.sort(list);
-
-					list = Collections.unmodifiableList(list);
-				}
-				else {
-					list = (List<LayoutSetVersion>)QueryUtil.list(
-						q, getDialect(), start, end);
-				}
+				list = (List<LayoutSetVersion>)QueryUtil.list(
+					q, getDialect(), start, end);
 
 				cacheResult(list);
 
-				FinderCacheUtil.putResult(finderPath, finderArgs, list);
+				if (useFinderCache) {
+					FinderCacheUtil.putResult(finderPath, finderArgs, list);
+				}
 			}
 			catch (Exception e) {
-				FinderCacheUtil.removeResult(finderPath, finderArgs);
+				if (useFinderCache) {
+					FinderCacheUtil.removeResult(finderPath, finderArgs);
+				}
 
 				throw processException(e);
 			}
@@ -666,18 +654,22 @@ public class LayoutSetVersionPersistenceImpl
 	 *
 	 * @param layoutSetId the layout set ID
 	 * @param version the version
-	 * @param retrieveFromCache whether to retrieve from the finder cache
+	 * @param useFinderCache whether to use the finder cache
 	 * @return the matching layout set version, or <code>null</code> if a matching layout set version could not be found
 	 */
 	@Override
 	public LayoutSetVersion fetchByLayoutSetId_Version(
-		long layoutSetId, int version, boolean retrieveFromCache) {
+		long layoutSetId, int version, boolean useFinderCache) {
 
-		Object[] finderArgs = new Object[] {layoutSetId, version};
+		Object[] finderArgs = null;
+
+		if (useFinderCache) {
+			finderArgs = new Object[] {layoutSetId, version};
+		}
 
 		Object result = null;
 
-		if (retrieveFromCache) {
+		if (useFinderCache) {
 			result = FinderCacheUtil.getResult(
 				_finderPathFetchByLayoutSetId_Version, finderArgs, this);
 		}
@@ -719,9 +711,11 @@ public class LayoutSetVersionPersistenceImpl
 				List<LayoutSetVersion> list = q.list();
 
 				if (list.isEmpty()) {
-					FinderCacheUtil.putResult(
-						_finderPathFetchByLayoutSetId_Version, finderArgs,
-						list);
+					if (useFinderCache) {
+						FinderCacheUtil.putResult(
+							_finderPathFetchByLayoutSetId_Version, finderArgs,
+							list);
+					}
 				}
 				else {
 					LayoutSetVersion layoutSetVersion = list.get(0);
@@ -732,8 +726,10 @@ public class LayoutSetVersionPersistenceImpl
 				}
 			}
 			catch (Exception e) {
-				FinderCacheUtil.removeResult(
-					_finderPathFetchByLayoutSetId_Version, finderArgs);
+				if (useFinderCache) {
+					FinderCacheUtil.removeResult(
+						_finderPathFetchByLayoutSetId_Version, finderArgs);
+				}
 
 				throw processException(e);
 			}
@@ -852,7 +848,7 @@ public class LayoutSetVersionPersistenceImpl
 	 * Returns a range of all the layout set versions where groupId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>LayoutSetVersionModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>LayoutSetVersionModelImpl</code>.
 	 * </p>
 	 *
 	 * @param groupId the group ID
@@ -871,7 +867,7 @@ public class LayoutSetVersionPersistenceImpl
 	 * Returns an ordered range of all the layout set versions where groupId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>LayoutSetVersionModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>LayoutSetVersionModelImpl</code>.
 	 * </p>
 	 *
 	 * @param groupId the group ID
@@ -892,47 +888,47 @@ public class LayoutSetVersionPersistenceImpl
 	 * Returns an ordered range of all the layout set versions where groupId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>LayoutSetVersionModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>LayoutSetVersionModelImpl</code>.
 	 * </p>
 	 *
 	 * @param groupId the group ID
 	 * @param start the lower bound of the range of layout set versions
 	 * @param end the upper bound of the range of layout set versions (not inclusive)
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
-	 * @param retrieveFromCache whether to retrieve from the finder cache
+	 * @param useFinderCache whether to use the finder cache
 	 * @return the ordered range of matching layout set versions
 	 */
 	@Override
 	public List<LayoutSetVersion> findByGroupId(
 		long groupId, int start, int end,
 		OrderByComparator<LayoutSetVersion> orderByComparator,
-		boolean retrieveFromCache) {
+		boolean useFinderCache) {
 
-		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
 			(orderByComparator == null)) {
 
-			pagination = false;
-			finderPath = _finderPathWithoutPaginationFindByGroupId;
-			finderArgs = new Object[] {groupId};
+			if (useFinderCache) {
+				finderPath = _finderPathWithoutPaginationFindByGroupId;
+				finderArgs = new Object[] {groupId};
+			}
 		}
-		else {
+		else if (useFinderCache) {
 			finderPath = _finderPathWithPaginationFindByGroupId;
 			finderArgs = new Object[] {groupId, start, end, orderByComparator};
 		}
 
 		List<LayoutSetVersion> list = null;
 
-		if (retrieveFromCache) {
+		if (useFinderCache) {
 			list = (List<LayoutSetVersion>)FinderCacheUtil.getResult(
 				finderPath, finderArgs, this);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (LayoutSetVersion layoutSetVersion : list) {
-					if ((groupId != layoutSetVersion.getGroupId())) {
+					if (groupId != layoutSetVersion.getGroupId()) {
 						list = null;
 
 						break;
@@ -960,7 +956,7 @@ public class LayoutSetVersionPersistenceImpl
 				appendOrderByComparator(
 					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
 			}
-			else if (pagination) {
+			else {
 				query.append(LayoutSetVersionModelImpl.ORDER_BY_JPQL);
 			}
 
@@ -977,25 +973,19 @@ public class LayoutSetVersionPersistenceImpl
 
 				qPos.add(groupId);
 
-				if (!pagination) {
-					list = (List<LayoutSetVersion>)QueryUtil.list(
-						q, getDialect(), start, end, false);
-
-					Collections.sort(list);
-
-					list = Collections.unmodifiableList(list);
-				}
-				else {
-					list = (List<LayoutSetVersion>)QueryUtil.list(
-						q, getDialect(), start, end);
-				}
+				list = (List<LayoutSetVersion>)QueryUtil.list(
+					q, getDialect(), start, end);
 
 				cacheResult(list);
 
-				FinderCacheUtil.putResult(finderPath, finderArgs, list);
+				if (useFinderCache) {
+					FinderCacheUtil.putResult(finderPath, finderArgs, list);
+				}
 			}
 			catch (Exception e) {
-				FinderCacheUtil.removeResult(finderPath, finderArgs);
+				if (useFinderCache) {
+					FinderCacheUtil.removeResult(finderPath, finderArgs);
+				}
 
 				throw processException(e);
 			}
@@ -1365,7 +1355,7 @@ public class LayoutSetVersionPersistenceImpl
 	 * Returns a range of all the layout set versions where groupId = &#63; and version = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>LayoutSetVersionModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>LayoutSetVersionModelImpl</code>.
 	 * </p>
 	 *
 	 * @param groupId the group ID
@@ -1385,7 +1375,7 @@ public class LayoutSetVersionPersistenceImpl
 	 * Returns an ordered range of all the layout set versions where groupId = &#63; and version = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>LayoutSetVersionModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>LayoutSetVersionModelImpl</code>.
 	 * </p>
 	 *
 	 * @param groupId the group ID
@@ -1408,7 +1398,7 @@ public class LayoutSetVersionPersistenceImpl
 	 * Returns an ordered range of all the layout set versions where groupId = &#63; and version = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>LayoutSetVersionModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>LayoutSetVersionModelImpl</code>.
 	 * </p>
 	 *
 	 * @param groupId the group ID
@@ -1416,27 +1406,27 @@ public class LayoutSetVersionPersistenceImpl
 	 * @param start the lower bound of the range of layout set versions
 	 * @param end the upper bound of the range of layout set versions (not inclusive)
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
-	 * @param retrieveFromCache whether to retrieve from the finder cache
+	 * @param useFinderCache whether to use the finder cache
 	 * @return the ordered range of matching layout set versions
 	 */
 	@Override
 	public List<LayoutSetVersion> findByGroupId_Version(
 		long groupId, int version, int start, int end,
 		OrderByComparator<LayoutSetVersion> orderByComparator,
-		boolean retrieveFromCache) {
+		boolean useFinderCache) {
 
-		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
 			(orderByComparator == null)) {
 
-			pagination = false;
-			finderPath = _finderPathWithoutPaginationFindByGroupId_Version;
-			finderArgs = new Object[] {groupId, version};
+			if (useFinderCache) {
+				finderPath = _finderPathWithoutPaginationFindByGroupId_Version;
+				finderArgs = new Object[] {groupId, version};
+			}
 		}
-		else {
+		else if (useFinderCache) {
 			finderPath = _finderPathWithPaginationFindByGroupId_Version;
 			finderArgs = new Object[] {
 				groupId, version, start, end, orderByComparator
@@ -1445,7 +1435,7 @@ public class LayoutSetVersionPersistenceImpl
 
 		List<LayoutSetVersion> list = null;
 
-		if (retrieveFromCache) {
+		if (useFinderCache) {
 			list = (List<LayoutSetVersion>)FinderCacheUtil.getResult(
 				finderPath, finderArgs, this);
 
@@ -1483,7 +1473,7 @@ public class LayoutSetVersionPersistenceImpl
 				appendOrderByComparator(
 					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
 			}
-			else if (pagination) {
+			else {
 				query.append(LayoutSetVersionModelImpl.ORDER_BY_JPQL);
 			}
 
@@ -1502,25 +1492,19 @@ public class LayoutSetVersionPersistenceImpl
 
 				qPos.add(version);
 
-				if (!pagination) {
-					list = (List<LayoutSetVersion>)QueryUtil.list(
-						q, getDialect(), start, end, false);
-
-					Collections.sort(list);
-
-					list = Collections.unmodifiableList(list);
-				}
-				else {
-					list = (List<LayoutSetVersion>)QueryUtil.list(
-						q, getDialect(), start, end);
-				}
+				list = (List<LayoutSetVersion>)QueryUtil.list(
+					q, getDialect(), start, end);
 
 				cacheResult(list);
 
-				FinderCacheUtil.putResult(finderPath, finderArgs, list);
+				if (useFinderCache) {
+					FinderCacheUtil.putResult(finderPath, finderArgs, list);
+				}
 			}
 			catch (Exception e) {
-				FinderCacheUtil.removeResult(finderPath, finderArgs);
+				if (useFinderCache) {
+					FinderCacheUtil.removeResult(finderPath, finderArgs);
+				}
 
 				throw processException(e);
 			}
@@ -1920,7 +1904,7 @@ public class LayoutSetVersionPersistenceImpl
 	 * Returns a range of all the layout set versions where layoutSetPrototypeUuid = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>LayoutSetVersionModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>LayoutSetVersionModelImpl</code>.
 	 * </p>
 	 *
 	 * @param layoutSetPrototypeUuid the layout set prototype uuid
@@ -1940,7 +1924,7 @@ public class LayoutSetVersionPersistenceImpl
 	 * Returns an ordered range of all the layout set versions where layoutSetPrototypeUuid = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>LayoutSetVersionModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>LayoutSetVersionModelImpl</code>.
 	 * </p>
 	 *
 	 * @param layoutSetPrototypeUuid the layout set prototype uuid
@@ -1962,37 +1946,37 @@ public class LayoutSetVersionPersistenceImpl
 	 * Returns an ordered range of all the layout set versions where layoutSetPrototypeUuid = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>LayoutSetVersionModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>LayoutSetVersionModelImpl</code>.
 	 * </p>
 	 *
 	 * @param layoutSetPrototypeUuid the layout set prototype uuid
 	 * @param start the lower bound of the range of layout set versions
 	 * @param end the upper bound of the range of layout set versions (not inclusive)
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
-	 * @param retrieveFromCache whether to retrieve from the finder cache
+	 * @param useFinderCache whether to use the finder cache
 	 * @return the ordered range of matching layout set versions
 	 */
 	@Override
 	public List<LayoutSetVersion> findByLayoutSetPrototypeUuid(
 		String layoutSetPrototypeUuid, int start, int end,
 		OrderByComparator<LayoutSetVersion> orderByComparator,
-		boolean retrieveFromCache) {
+		boolean useFinderCache) {
 
 		layoutSetPrototypeUuid = Objects.toString(layoutSetPrototypeUuid, "");
 
-		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
 			(orderByComparator == null)) {
 
-			pagination = false;
-			finderPath =
-				_finderPathWithoutPaginationFindByLayoutSetPrototypeUuid;
-			finderArgs = new Object[] {layoutSetPrototypeUuid};
+			if (useFinderCache) {
+				finderPath =
+					_finderPathWithoutPaginationFindByLayoutSetPrototypeUuid;
+				finderArgs = new Object[] {layoutSetPrototypeUuid};
+			}
 		}
-		else {
+		else if (useFinderCache) {
 			finderPath = _finderPathWithPaginationFindByLayoutSetPrototypeUuid;
 			finderArgs = new Object[] {
 				layoutSetPrototypeUuid, start, end, orderByComparator
@@ -2001,7 +1985,7 @@ public class LayoutSetVersionPersistenceImpl
 
 		List<LayoutSetVersion> list = null;
 
-		if (retrieveFromCache) {
+		if (useFinderCache) {
 			list = (List<LayoutSetVersion>)FinderCacheUtil.getResult(
 				finderPath, finderArgs, this);
 
@@ -2048,7 +2032,7 @@ public class LayoutSetVersionPersistenceImpl
 				appendOrderByComparator(
 					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
 			}
-			else if (pagination) {
+			else {
 				query.append(LayoutSetVersionModelImpl.ORDER_BY_JPQL);
 			}
 
@@ -2067,25 +2051,19 @@ public class LayoutSetVersionPersistenceImpl
 					qPos.add(layoutSetPrototypeUuid);
 				}
 
-				if (!pagination) {
-					list = (List<LayoutSetVersion>)QueryUtil.list(
-						q, getDialect(), start, end, false);
-
-					Collections.sort(list);
-
-					list = Collections.unmodifiableList(list);
-				}
-				else {
-					list = (List<LayoutSetVersion>)QueryUtil.list(
-						q, getDialect(), start, end);
-				}
+				list = (List<LayoutSetVersion>)QueryUtil.list(
+					q, getDialect(), start, end);
 
 				cacheResult(list);
 
-				FinderCacheUtil.putResult(finderPath, finderArgs, list);
+				if (useFinderCache) {
+					FinderCacheUtil.putResult(finderPath, finderArgs, list);
+				}
 			}
 			catch (Exception e) {
-				FinderCacheUtil.removeResult(finderPath, finderArgs);
+				if (useFinderCache) {
+					FinderCacheUtil.removeResult(finderPath, finderArgs);
+				}
 
 				throw processException(e);
 			}
@@ -2501,7 +2479,7 @@ public class LayoutSetVersionPersistenceImpl
 	 * Returns a range of all the layout set versions where layoutSetPrototypeUuid = &#63; and version = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>LayoutSetVersionModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>LayoutSetVersionModelImpl</code>.
 	 * </p>
 	 *
 	 * @param layoutSetPrototypeUuid the layout set prototype uuid
@@ -2522,7 +2500,7 @@ public class LayoutSetVersionPersistenceImpl
 	 * Returns an ordered range of all the layout set versions where layoutSetPrototypeUuid = &#63; and version = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>LayoutSetVersionModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>LayoutSetVersionModelImpl</code>.
 	 * </p>
 	 *
 	 * @param layoutSetPrototypeUuid the layout set prototype uuid
@@ -2546,7 +2524,7 @@ public class LayoutSetVersionPersistenceImpl
 	 * Returns an ordered range of all the layout set versions where layoutSetPrototypeUuid = &#63; and version = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>LayoutSetVersionModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>LayoutSetVersionModelImpl</code>.
 	 * </p>
 	 *
 	 * @param layoutSetPrototypeUuid the layout set prototype uuid
@@ -2554,30 +2532,30 @@ public class LayoutSetVersionPersistenceImpl
 	 * @param start the lower bound of the range of layout set versions
 	 * @param end the upper bound of the range of layout set versions (not inclusive)
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
-	 * @param retrieveFromCache whether to retrieve from the finder cache
+	 * @param useFinderCache whether to use the finder cache
 	 * @return the ordered range of matching layout set versions
 	 */
 	@Override
 	public List<LayoutSetVersion> findByLayoutSetPrototypeUuid_Version(
 		String layoutSetPrototypeUuid, int version, int start, int end,
 		OrderByComparator<LayoutSetVersion> orderByComparator,
-		boolean retrieveFromCache) {
+		boolean useFinderCache) {
 
 		layoutSetPrototypeUuid = Objects.toString(layoutSetPrototypeUuid, "");
 
-		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
 			(orderByComparator == null)) {
 
-			pagination = false;
-			finderPath =
-				_finderPathWithoutPaginationFindByLayoutSetPrototypeUuid_Version;
-			finderArgs = new Object[] {layoutSetPrototypeUuid, version};
+			if (useFinderCache) {
+				finderPath =
+					_finderPathWithoutPaginationFindByLayoutSetPrototypeUuid_Version;
+				finderArgs = new Object[] {layoutSetPrototypeUuid, version};
+			}
 		}
-		else {
+		else if (useFinderCache) {
 			finderPath =
 				_finderPathWithPaginationFindByLayoutSetPrototypeUuid_Version;
 			finderArgs = new Object[] {
@@ -2587,7 +2565,7 @@ public class LayoutSetVersionPersistenceImpl
 
 		List<LayoutSetVersion> list = null;
 
-		if (retrieveFromCache) {
+		if (useFinderCache) {
 			list = (List<LayoutSetVersion>)FinderCacheUtil.getResult(
 				finderPath, finderArgs, this);
 
@@ -2638,7 +2616,7 @@ public class LayoutSetVersionPersistenceImpl
 				appendOrderByComparator(
 					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
 			}
-			else if (pagination) {
+			else {
 				query.append(LayoutSetVersionModelImpl.ORDER_BY_JPQL);
 			}
 
@@ -2659,25 +2637,19 @@ public class LayoutSetVersionPersistenceImpl
 
 				qPos.add(version);
 
-				if (!pagination) {
-					list = (List<LayoutSetVersion>)QueryUtil.list(
-						q, getDialect(), start, end, false);
-
-					Collections.sort(list);
-
-					list = Collections.unmodifiableList(list);
-				}
-				else {
-					list = (List<LayoutSetVersion>)QueryUtil.list(
-						q, getDialect(), start, end);
-				}
+				list = (List<LayoutSetVersion>)QueryUtil.list(
+					q, getDialect(), start, end);
 
 				cacheResult(list);
 
-				FinderCacheUtil.putResult(finderPath, finderArgs, list);
+				if (useFinderCache) {
+					FinderCacheUtil.putResult(finderPath, finderArgs, list);
+				}
 			}
 			catch (Exception e) {
-				FinderCacheUtil.removeResult(finderPath, finderArgs);
+				if (useFinderCache) {
+					FinderCacheUtil.removeResult(finderPath, finderArgs);
+				}
 
 				throw processException(e);
 			}
@@ -3125,7 +3097,7 @@ public class LayoutSetVersionPersistenceImpl
 	 * Returns a range of all the layout set versions where groupId = &#63; and privateLayout = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>LayoutSetVersionModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>LayoutSetVersionModelImpl</code>.
 	 * </p>
 	 *
 	 * @param groupId the group ID
@@ -3145,7 +3117,7 @@ public class LayoutSetVersionPersistenceImpl
 	 * Returns an ordered range of all the layout set versions where groupId = &#63; and privateLayout = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>LayoutSetVersionModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>LayoutSetVersionModelImpl</code>.
 	 * </p>
 	 *
 	 * @param groupId the group ID
@@ -3168,7 +3140,7 @@ public class LayoutSetVersionPersistenceImpl
 	 * Returns an ordered range of all the layout set versions where groupId = &#63; and privateLayout = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>LayoutSetVersionModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>LayoutSetVersionModelImpl</code>.
 	 * </p>
 	 *
 	 * @param groupId the group ID
@@ -3176,27 +3148,27 @@ public class LayoutSetVersionPersistenceImpl
 	 * @param start the lower bound of the range of layout set versions
 	 * @param end the upper bound of the range of layout set versions (not inclusive)
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
-	 * @param retrieveFromCache whether to retrieve from the finder cache
+	 * @param useFinderCache whether to use the finder cache
 	 * @return the ordered range of matching layout set versions
 	 */
 	@Override
 	public List<LayoutSetVersion> findByG_P(
 		long groupId, boolean privateLayout, int start, int end,
 		OrderByComparator<LayoutSetVersion> orderByComparator,
-		boolean retrieveFromCache) {
+		boolean useFinderCache) {
 
-		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
 			(orderByComparator == null)) {
 
-			pagination = false;
-			finderPath = _finderPathWithoutPaginationFindByG_P;
-			finderArgs = new Object[] {groupId, privateLayout};
+			if (useFinderCache) {
+				finderPath = _finderPathWithoutPaginationFindByG_P;
+				finderArgs = new Object[] {groupId, privateLayout};
+			}
 		}
-		else {
+		else if (useFinderCache) {
 			finderPath = _finderPathWithPaginationFindByG_P;
 			finderArgs = new Object[] {
 				groupId, privateLayout, start, end, orderByComparator
@@ -3205,7 +3177,7 @@ public class LayoutSetVersionPersistenceImpl
 
 		List<LayoutSetVersion> list = null;
 
-		if (retrieveFromCache) {
+		if (useFinderCache) {
 			list = (List<LayoutSetVersion>)FinderCacheUtil.getResult(
 				finderPath, finderArgs, this);
 
@@ -3243,7 +3215,7 @@ public class LayoutSetVersionPersistenceImpl
 				appendOrderByComparator(
 					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
 			}
-			else if (pagination) {
+			else {
 				query.append(LayoutSetVersionModelImpl.ORDER_BY_JPQL);
 			}
 
@@ -3262,25 +3234,19 @@ public class LayoutSetVersionPersistenceImpl
 
 				qPos.add(privateLayout);
 
-				if (!pagination) {
-					list = (List<LayoutSetVersion>)QueryUtil.list(
-						q, getDialect(), start, end, false);
-
-					Collections.sort(list);
-
-					list = Collections.unmodifiableList(list);
-				}
-				else {
-					list = (List<LayoutSetVersion>)QueryUtil.list(
-						q, getDialect(), start, end);
-				}
+				list = (List<LayoutSetVersion>)QueryUtil.list(
+					q, getDialect(), start, end);
 
 				cacheResult(list);
 
-				FinderCacheUtil.putResult(finderPath, finderArgs, list);
+				if (useFinderCache) {
+					FinderCacheUtil.putResult(finderPath, finderArgs, list);
+				}
 			}
 			catch (Exception e) {
-				FinderCacheUtil.removeResult(finderPath, finderArgs);
+				if (useFinderCache) {
+					FinderCacheUtil.removeResult(finderPath, finderArgs);
+				}
 
 				throw processException(e);
 			}
@@ -3726,19 +3692,23 @@ public class LayoutSetVersionPersistenceImpl
 	 * @param groupId the group ID
 	 * @param privateLayout the private layout
 	 * @param version the version
-	 * @param retrieveFromCache whether to retrieve from the finder cache
+	 * @param useFinderCache whether to use the finder cache
 	 * @return the matching layout set version, or <code>null</code> if a matching layout set version could not be found
 	 */
 	@Override
 	public LayoutSetVersion fetchByG_P_Version(
 		long groupId, boolean privateLayout, int version,
-		boolean retrieveFromCache) {
+		boolean useFinderCache) {
 
-		Object[] finderArgs = new Object[] {groupId, privateLayout, version};
+		Object[] finderArgs = null;
+
+		if (useFinderCache) {
+			finderArgs = new Object[] {groupId, privateLayout, version};
+		}
 
 		Object result = null;
 
-		if (retrieveFromCache) {
+		if (useFinderCache) {
 			result = FinderCacheUtil.getResult(
 				_finderPathFetchByG_P_Version, finderArgs, this);
 		}
@@ -3785,8 +3755,10 @@ public class LayoutSetVersionPersistenceImpl
 				List<LayoutSetVersion> list = q.list();
 
 				if (list.isEmpty()) {
-					FinderCacheUtil.putResult(
-						_finderPathFetchByG_P_Version, finderArgs, list);
+					if (useFinderCache) {
+						FinderCacheUtil.putResult(
+							_finderPathFetchByG_P_Version, finderArgs, list);
+					}
 				}
 				else {
 					LayoutSetVersion layoutSetVersion = list.get(0);
@@ -3797,8 +3769,10 @@ public class LayoutSetVersionPersistenceImpl
 				}
 			}
 			catch (Exception e) {
-				FinderCacheUtil.removeResult(
-					_finderPathFetchByG_P_Version, finderArgs);
+				if (useFinderCache) {
+					FinderCacheUtil.removeResult(
+						_finderPathFetchByG_P_Version, finderArgs);
+				}
 
 				throw processException(e);
 			}
@@ -3907,6 +3881,1254 @@ public class LayoutSetVersionPersistenceImpl
 	private static final String _FINDER_COLUMN_G_P_VERSION_VERSION_2 =
 		"layoutSetVersion.version = ?";
 
+	private FinderPath _finderPathWithPaginationFindByC_L;
+	private FinderPath _finderPathWithoutPaginationFindByC_L;
+	private FinderPath _finderPathCountByC_L;
+
+	/**
+	 * Returns all the layout set versions where companyId = &#63; and layoutSetPrototypeUuid = &#63;.
+	 *
+	 * @param companyId the company ID
+	 * @param layoutSetPrototypeUuid the layout set prototype uuid
+	 * @return the matching layout set versions
+	 */
+	@Override
+	public List<LayoutSetVersion> findByC_L(
+		long companyId, String layoutSetPrototypeUuid) {
+
+		return findByC_L(
+			companyId, layoutSetPrototypeUuid, QueryUtil.ALL_POS,
+			QueryUtil.ALL_POS, null);
+	}
+
+	/**
+	 * Returns a range of all the layout set versions where companyId = &#63; and layoutSetPrototypeUuid = &#63;.
+	 *
+	 * <p>
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>LayoutSetVersionModelImpl</code>.
+	 * </p>
+	 *
+	 * @param companyId the company ID
+	 * @param layoutSetPrototypeUuid the layout set prototype uuid
+	 * @param start the lower bound of the range of layout set versions
+	 * @param end the upper bound of the range of layout set versions (not inclusive)
+	 * @return the range of matching layout set versions
+	 */
+	@Override
+	public List<LayoutSetVersion> findByC_L(
+		long companyId, String layoutSetPrototypeUuid, int start, int end) {
+
+		return findByC_L(companyId, layoutSetPrototypeUuid, start, end, null);
+	}
+
+	/**
+	 * Returns an ordered range of all the layout set versions where companyId = &#63; and layoutSetPrototypeUuid = &#63;.
+	 *
+	 * <p>
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>LayoutSetVersionModelImpl</code>.
+	 * </p>
+	 *
+	 * @param companyId the company ID
+	 * @param layoutSetPrototypeUuid the layout set prototype uuid
+	 * @param start the lower bound of the range of layout set versions
+	 * @param end the upper bound of the range of layout set versions (not inclusive)
+	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
+	 * @return the ordered range of matching layout set versions
+	 */
+	@Override
+	public List<LayoutSetVersion> findByC_L(
+		long companyId, String layoutSetPrototypeUuid, int start, int end,
+		OrderByComparator<LayoutSetVersion> orderByComparator) {
+
+		return findByC_L(
+			companyId, layoutSetPrototypeUuid, start, end, orderByComparator,
+			true);
+	}
+
+	/**
+	 * Returns an ordered range of all the layout set versions where companyId = &#63; and layoutSetPrototypeUuid = &#63;.
+	 *
+	 * <p>
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>LayoutSetVersionModelImpl</code>.
+	 * </p>
+	 *
+	 * @param companyId the company ID
+	 * @param layoutSetPrototypeUuid the layout set prototype uuid
+	 * @param start the lower bound of the range of layout set versions
+	 * @param end the upper bound of the range of layout set versions (not inclusive)
+	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
+	 * @param useFinderCache whether to use the finder cache
+	 * @return the ordered range of matching layout set versions
+	 */
+	@Override
+	public List<LayoutSetVersion> findByC_L(
+		long companyId, String layoutSetPrototypeUuid, int start, int end,
+		OrderByComparator<LayoutSetVersion> orderByComparator,
+		boolean useFinderCache) {
+
+		layoutSetPrototypeUuid = Objects.toString(layoutSetPrototypeUuid, "");
+
+		FinderPath finderPath = null;
+		Object[] finderArgs = null;
+
+		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
+			(orderByComparator == null)) {
+
+			if (useFinderCache) {
+				finderPath = _finderPathWithoutPaginationFindByC_L;
+				finderArgs = new Object[] {companyId, layoutSetPrototypeUuid};
+			}
+		}
+		else if (useFinderCache) {
+			finderPath = _finderPathWithPaginationFindByC_L;
+			finderArgs = new Object[] {
+				companyId, layoutSetPrototypeUuid, start, end, orderByComparator
+			};
+		}
+
+		List<LayoutSetVersion> list = null;
+
+		if (useFinderCache) {
+			list = (List<LayoutSetVersion>)FinderCacheUtil.getResult(
+				finderPath, finderArgs, this);
+
+			if ((list != null) && !list.isEmpty()) {
+				for (LayoutSetVersion layoutSetVersion : list) {
+					if ((companyId != layoutSetVersion.getCompanyId()) ||
+						!layoutSetPrototypeUuid.equals(
+							layoutSetVersion.getLayoutSetPrototypeUuid())) {
+
+						list = null;
+
+						break;
+					}
+				}
+			}
+		}
+
+		if (list == null) {
+			StringBundler query = null;
+
+			if (orderByComparator != null) {
+				query = new StringBundler(
+					4 + (orderByComparator.getOrderByFields().length * 2));
+			}
+			else {
+				query = new StringBundler(4);
+			}
+
+			query.append(_SQL_SELECT_LAYOUTSETVERSION_WHERE);
+
+			query.append(_FINDER_COLUMN_C_L_COMPANYID_2);
+
+			boolean bindLayoutSetPrototypeUuid = false;
+
+			if (layoutSetPrototypeUuid.isEmpty()) {
+				query.append(_FINDER_COLUMN_C_L_LAYOUTSETPROTOTYPEUUID_3);
+			}
+			else {
+				bindLayoutSetPrototypeUuid = true;
+
+				query.append(_FINDER_COLUMN_C_L_LAYOUTSETPROTOTYPEUUID_2);
+			}
+
+			if (orderByComparator != null) {
+				appendOrderByComparator(
+					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
+			}
+			else {
+				query.append(LayoutSetVersionModelImpl.ORDER_BY_JPQL);
+			}
+
+			String sql = query.toString();
+
+			Session session = null;
+
+			try {
+				session = openSession();
+
+				Query q = session.createQuery(sql);
+
+				QueryPos qPos = QueryPos.getInstance(q);
+
+				qPos.add(companyId);
+
+				if (bindLayoutSetPrototypeUuid) {
+					qPos.add(layoutSetPrototypeUuid);
+				}
+
+				list = (List<LayoutSetVersion>)QueryUtil.list(
+					q, getDialect(), start, end);
+
+				cacheResult(list);
+
+				if (useFinderCache) {
+					FinderCacheUtil.putResult(finderPath, finderArgs, list);
+				}
+			}
+			catch (Exception e) {
+				if (useFinderCache) {
+					FinderCacheUtil.removeResult(finderPath, finderArgs);
+				}
+
+				throw processException(e);
+			}
+			finally {
+				closeSession(session);
+			}
+		}
+
+		return list;
+	}
+
+	/**
+	 * Returns the first layout set version in the ordered set where companyId = &#63; and layoutSetPrototypeUuid = &#63;.
+	 *
+	 * @param companyId the company ID
+	 * @param layoutSetPrototypeUuid the layout set prototype uuid
+	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	 * @return the first matching layout set version
+	 * @throws NoSuchLayoutSetVersionException if a matching layout set version could not be found
+	 */
+	@Override
+	public LayoutSetVersion findByC_L_First(
+			long companyId, String layoutSetPrototypeUuid,
+			OrderByComparator<LayoutSetVersion> orderByComparator)
+		throws NoSuchLayoutSetVersionException {
+
+		LayoutSetVersion layoutSetVersion = fetchByC_L_First(
+			companyId, layoutSetPrototypeUuid, orderByComparator);
+
+		if (layoutSetVersion != null) {
+			return layoutSetVersion;
+		}
+
+		StringBundler msg = new StringBundler(6);
+
+		msg.append(_NO_SUCH_ENTITY_WITH_KEY);
+
+		msg.append("companyId=");
+		msg.append(companyId);
+
+		msg.append(", layoutSetPrototypeUuid=");
+		msg.append(layoutSetPrototypeUuid);
+
+		msg.append("}");
+
+		throw new NoSuchLayoutSetVersionException(msg.toString());
+	}
+
+	/**
+	 * Returns the first layout set version in the ordered set where companyId = &#63; and layoutSetPrototypeUuid = &#63;.
+	 *
+	 * @param companyId the company ID
+	 * @param layoutSetPrototypeUuid the layout set prototype uuid
+	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	 * @return the first matching layout set version, or <code>null</code> if a matching layout set version could not be found
+	 */
+	@Override
+	public LayoutSetVersion fetchByC_L_First(
+		long companyId, String layoutSetPrototypeUuid,
+		OrderByComparator<LayoutSetVersion> orderByComparator) {
+
+		List<LayoutSetVersion> list = findByC_L(
+			companyId, layoutSetPrototypeUuid, 0, 1, orderByComparator);
+
+		if (!list.isEmpty()) {
+			return list.get(0);
+		}
+
+		return null;
+	}
+
+	/**
+	 * Returns the last layout set version in the ordered set where companyId = &#63; and layoutSetPrototypeUuid = &#63;.
+	 *
+	 * @param companyId the company ID
+	 * @param layoutSetPrototypeUuid the layout set prototype uuid
+	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	 * @return the last matching layout set version
+	 * @throws NoSuchLayoutSetVersionException if a matching layout set version could not be found
+	 */
+	@Override
+	public LayoutSetVersion findByC_L_Last(
+			long companyId, String layoutSetPrototypeUuid,
+			OrderByComparator<LayoutSetVersion> orderByComparator)
+		throws NoSuchLayoutSetVersionException {
+
+		LayoutSetVersion layoutSetVersion = fetchByC_L_Last(
+			companyId, layoutSetPrototypeUuid, orderByComparator);
+
+		if (layoutSetVersion != null) {
+			return layoutSetVersion;
+		}
+
+		StringBundler msg = new StringBundler(6);
+
+		msg.append(_NO_SUCH_ENTITY_WITH_KEY);
+
+		msg.append("companyId=");
+		msg.append(companyId);
+
+		msg.append(", layoutSetPrototypeUuid=");
+		msg.append(layoutSetPrototypeUuid);
+
+		msg.append("}");
+
+		throw new NoSuchLayoutSetVersionException(msg.toString());
+	}
+
+	/**
+	 * Returns the last layout set version in the ordered set where companyId = &#63; and layoutSetPrototypeUuid = &#63;.
+	 *
+	 * @param companyId the company ID
+	 * @param layoutSetPrototypeUuid the layout set prototype uuid
+	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	 * @return the last matching layout set version, or <code>null</code> if a matching layout set version could not be found
+	 */
+	@Override
+	public LayoutSetVersion fetchByC_L_Last(
+		long companyId, String layoutSetPrototypeUuid,
+		OrderByComparator<LayoutSetVersion> orderByComparator) {
+
+		int count = countByC_L(companyId, layoutSetPrototypeUuid);
+
+		if (count == 0) {
+			return null;
+		}
+
+		List<LayoutSetVersion> list = findByC_L(
+			companyId, layoutSetPrototypeUuid, count - 1, count,
+			orderByComparator);
+
+		if (!list.isEmpty()) {
+			return list.get(0);
+		}
+
+		return null;
+	}
+
+	/**
+	 * Returns the layout set versions before and after the current layout set version in the ordered set where companyId = &#63; and layoutSetPrototypeUuid = &#63;.
+	 *
+	 * @param layoutSetVersionId the primary key of the current layout set version
+	 * @param companyId the company ID
+	 * @param layoutSetPrototypeUuid the layout set prototype uuid
+	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	 * @return the previous, current, and next layout set version
+	 * @throws NoSuchLayoutSetVersionException if a layout set version with the primary key could not be found
+	 */
+	@Override
+	public LayoutSetVersion[] findByC_L_PrevAndNext(
+			long layoutSetVersionId, long companyId,
+			String layoutSetPrototypeUuid,
+			OrderByComparator<LayoutSetVersion> orderByComparator)
+		throws NoSuchLayoutSetVersionException {
+
+		layoutSetPrototypeUuid = Objects.toString(layoutSetPrototypeUuid, "");
+
+		LayoutSetVersion layoutSetVersion = findByPrimaryKey(
+			layoutSetVersionId);
+
+		Session session = null;
+
+		try {
+			session = openSession();
+
+			LayoutSetVersion[] array = new LayoutSetVersionImpl[3];
+
+			array[0] = getByC_L_PrevAndNext(
+				session, layoutSetVersion, companyId, layoutSetPrototypeUuid,
+				orderByComparator, true);
+
+			array[1] = layoutSetVersion;
+
+			array[2] = getByC_L_PrevAndNext(
+				session, layoutSetVersion, companyId, layoutSetPrototypeUuid,
+				orderByComparator, false);
+
+			return array;
+		}
+		catch (Exception e) {
+			throw processException(e);
+		}
+		finally {
+			closeSession(session);
+		}
+	}
+
+	protected LayoutSetVersion getByC_L_PrevAndNext(
+		Session session, LayoutSetVersion layoutSetVersion, long companyId,
+		String layoutSetPrototypeUuid,
+		OrderByComparator<LayoutSetVersion> orderByComparator,
+		boolean previous) {
+
+		StringBundler query = null;
+
+		if (orderByComparator != null) {
+			query = new StringBundler(
+				5 + (orderByComparator.getOrderByConditionFields().length * 3) +
+					(orderByComparator.getOrderByFields().length * 3));
+		}
+		else {
+			query = new StringBundler(4);
+		}
+
+		query.append(_SQL_SELECT_LAYOUTSETVERSION_WHERE);
+
+		query.append(_FINDER_COLUMN_C_L_COMPANYID_2);
+
+		boolean bindLayoutSetPrototypeUuid = false;
+
+		if (layoutSetPrototypeUuid.isEmpty()) {
+			query.append(_FINDER_COLUMN_C_L_LAYOUTSETPROTOTYPEUUID_3);
+		}
+		else {
+			bindLayoutSetPrototypeUuid = true;
+
+			query.append(_FINDER_COLUMN_C_L_LAYOUTSETPROTOTYPEUUID_2);
+		}
+
+		if (orderByComparator != null) {
+			String[] orderByConditionFields =
+				orderByComparator.getOrderByConditionFields();
+
+			if (orderByConditionFields.length > 0) {
+				query.append(WHERE_AND);
+			}
+
+			for (int i = 0; i < orderByConditionFields.length; i++) {
+				query.append(_ORDER_BY_ENTITY_ALIAS);
+				query.append(orderByConditionFields[i]);
+
+				if ((i + 1) < orderByConditionFields.length) {
+					if (orderByComparator.isAscending() ^ previous) {
+						query.append(WHERE_GREATER_THAN_HAS_NEXT);
+					}
+					else {
+						query.append(WHERE_LESSER_THAN_HAS_NEXT);
+					}
+				}
+				else {
+					if (orderByComparator.isAscending() ^ previous) {
+						query.append(WHERE_GREATER_THAN);
+					}
+					else {
+						query.append(WHERE_LESSER_THAN);
+					}
+				}
+			}
+
+			query.append(ORDER_BY_CLAUSE);
+
+			String[] orderByFields = orderByComparator.getOrderByFields();
+
+			for (int i = 0; i < orderByFields.length; i++) {
+				query.append(_ORDER_BY_ENTITY_ALIAS);
+				query.append(orderByFields[i]);
+
+				if ((i + 1) < orderByFields.length) {
+					if (orderByComparator.isAscending() ^ previous) {
+						query.append(ORDER_BY_ASC_HAS_NEXT);
+					}
+					else {
+						query.append(ORDER_BY_DESC_HAS_NEXT);
+					}
+				}
+				else {
+					if (orderByComparator.isAscending() ^ previous) {
+						query.append(ORDER_BY_ASC);
+					}
+					else {
+						query.append(ORDER_BY_DESC);
+					}
+				}
+			}
+		}
+		else {
+			query.append(LayoutSetVersionModelImpl.ORDER_BY_JPQL);
+		}
+
+		String sql = query.toString();
+
+		Query q = session.createQuery(sql);
+
+		q.setFirstResult(0);
+		q.setMaxResults(2);
+
+		QueryPos qPos = QueryPos.getInstance(q);
+
+		qPos.add(companyId);
+
+		if (bindLayoutSetPrototypeUuid) {
+			qPos.add(layoutSetPrototypeUuid);
+		}
+
+		if (orderByComparator != null) {
+			for (Object orderByConditionValue :
+					orderByComparator.getOrderByConditionValues(
+						layoutSetVersion)) {
+
+				qPos.add(orderByConditionValue);
+			}
+		}
+
+		List<LayoutSetVersion> list = q.list();
+
+		if (list.size() == 2) {
+			return list.get(1);
+		}
+		else {
+			return null;
+		}
+	}
+
+	/**
+	 * Removes all the layout set versions where companyId = &#63; and layoutSetPrototypeUuid = &#63; from the database.
+	 *
+	 * @param companyId the company ID
+	 * @param layoutSetPrototypeUuid the layout set prototype uuid
+	 */
+	@Override
+	public void removeByC_L(long companyId, String layoutSetPrototypeUuid) {
+		for (LayoutSetVersion layoutSetVersion :
+				findByC_L(
+					companyId, layoutSetPrototypeUuid, QueryUtil.ALL_POS,
+					QueryUtil.ALL_POS, null)) {
+
+			remove(layoutSetVersion);
+		}
+	}
+
+	/**
+	 * Returns the number of layout set versions where companyId = &#63; and layoutSetPrototypeUuid = &#63;.
+	 *
+	 * @param companyId the company ID
+	 * @param layoutSetPrototypeUuid the layout set prototype uuid
+	 * @return the number of matching layout set versions
+	 */
+	@Override
+	public int countByC_L(long companyId, String layoutSetPrototypeUuid) {
+		layoutSetPrototypeUuid = Objects.toString(layoutSetPrototypeUuid, "");
+
+		FinderPath finderPath = _finderPathCountByC_L;
+
+		Object[] finderArgs = new Object[] {companyId, layoutSetPrototypeUuid};
+
+		Long count = (Long)FinderCacheUtil.getResult(
+			finderPath, finderArgs, this);
+
+		if (count == null) {
+			StringBundler query = new StringBundler(3);
+
+			query.append(_SQL_COUNT_LAYOUTSETVERSION_WHERE);
+
+			query.append(_FINDER_COLUMN_C_L_COMPANYID_2);
+
+			boolean bindLayoutSetPrototypeUuid = false;
+
+			if (layoutSetPrototypeUuid.isEmpty()) {
+				query.append(_FINDER_COLUMN_C_L_LAYOUTSETPROTOTYPEUUID_3);
+			}
+			else {
+				bindLayoutSetPrototypeUuid = true;
+
+				query.append(_FINDER_COLUMN_C_L_LAYOUTSETPROTOTYPEUUID_2);
+			}
+
+			String sql = query.toString();
+
+			Session session = null;
+
+			try {
+				session = openSession();
+
+				Query q = session.createQuery(sql);
+
+				QueryPos qPos = QueryPos.getInstance(q);
+
+				qPos.add(companyId);
+
+				if (bindLayoutSetPrototypeUuid) {
+					qPos.add(layoutSetPrototypeUuid);
+				}
+
+				count = (Long)q.uniqueResult();
+
+				FinderCacheUtil.putResult(finderPath, finderArgs, count);
+			}
+			catch (Exception e) {
+				FinderCacheUtil.removeResult(finderPath, finderArgs);
+
+				throw processException(e);
+			}
+			finally {
+				closeSession(session);
+			}
+		}
+
+		return count.intValue();
+	}
+
+	private static final String _FINDER_COLUMN_C_L_COMPANYID_2 =
+		"layoutSetVersion.companyId = ? AND ";
+
+	private static final String _FINDER_COLUMN_C_L_LAYOUTSETPROTOTYPEUUID_2 =
+		"layoutSetVersion.layoutSetPrototypeUuid = ?";
+
+	private static final String _FINDER_COLUMN_C_L_LAYOUTSETPROTOTYPEUUID_3 =
+		"(layoutSetVersion.layoutSetPrototypeUuid IS NULL OR layoutSetVersion.layoutSetPrototypeUuid = '')";
+
+	private FinderPath _finderPathWithPaginationFindByC_L_Version;
+	private FinderPath _finderPathWithoutPaginationFindByC_L_Version;
+	private FinderPath _finderPathCountByC_L_Version;
+
+	/**
+	 * Returns all the layout set versions where companyId = &#63; and layoutSetPrototypeUuid = &#63; and version = &#63;.
+	 *
+	 * @param companyId the company ID
+	 * @param layoutSetPrototypeUuid the layout set prototype uuid
+	 * @param version the version
+	 * @return the matching layout set versions
+	 */
+	@Override
+	public List<LayoutSetVersion> findByC_L_Version(
+		long companyId, String layoutSetPrototypeUuid, int version) {
+
+		return findByC_L_Version(
+			companyId, layoutSetPrototypeUuid, version, QueryUtil.ALL_POS,
+			QueryUtil.ALL_POS, null);
+	}
+
+	/**
+	 * Returns a range of all the layout set versions where companyId = &#63; and layoutSetPrototypeUuid = &#63; and version = &#63;.
+	 *
+	 * <p>
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>LayoutSetVersionModelImpl</code>.
+	 * </p>
+	 *
+	 * @param companyId the company ID
+	 * @param layoutSetPrototypeUuid the layout set prototype uuid
+	 * @param version the version
+	 * @param start the lower bound of the range of layout set versions
+	 * @param end the upper bound of the range of layout set versions (not inclusive)
+	 * @return the range of matching layout set versions
+	 */
+	@Override
+	public List<LayoutSetVersion> findByC_L_Version(
+		long companyId, String layoutSetPrototypeUuid, int version, int start,
+		int end) {
+
+		return findByC_L_Version(
+			companyId, layoutSetPrototypeUuid, version, start, end, null);
+	}
+
+	/**
+	 * Returns an ordered range of all the layout set versions where companyId = &#63; and layoutSetPrototypeUuid = &#63; and version = &#63;.
+	 *
+	 * <p>
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>LayoutSetVersionModelImpl</code>.
+	 * </p>
+	 *
+	 * @param companyId the company ID
+	 * @param layoutSetPrototypeUuid the layout set prototype uuid
+	 * @param version the version
+	 * @param start the lower bound of the range of layout set versions
+	 * @param end the upper bound of the range of layout set versions (not inclusive)
+	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
+	 * @return the ordered range of matching layout set versions
+	 */
+	@Override
+	public List<LayoutSetVersion> findByC_L_Version(
+		long companyId, String layoutSetPrototypeUuid, int version, int start,
+		int end, OrderByComparator<LayoutSetVersion> orderByComparator) {
+
+		return findByC_L_Version(
+			companyId, layoutSetPrototypeUuid, version, start, end,
+			orderByComparator, true);
+	}
+
+	/**
+	 * Returns an ordered range of all the layout set versions where companyId = &#63; and layoutSetPrototypeUuid = &#63; and version = &#63;.
+	 *
+	 * <p>
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>LayoutSetVersionModelImpl</code>.
+	 * </p>
+	 *
+	 * @param companyId the company ID
+	 * @param layoutSetPrototypeUuid the layout set prototype uuid
+	 * @param version the version
+	 * @param start the lower bound of the range of layout set versions
+	 * @param end the upper bound of the range of layout set versions (not inclusive)
+	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
+	 * @param useFinderCache whether to use the finder cache
+	 * @return the ordered range of matching layout set versions
+	 */
+	@Override
+	public List<LayoutSetVersion> findByC_L_Version(
+		long companyId, String layoutSetPrototypeUuid, int version, int start,
+		int end, OrderByComparator<LayoutSetVersion> orderByComparator,
+		boolean useFinderCache) {
+
+		layoutSetPrototypeUuid = Objects.toString(layoutSetPrototypeUuid, "");
+
+		FinderPath finderPath = null;
+		Object[] finderArgs = null;
+
+		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
+			(orderByComparator == null)) {
+
+			if (useFinderCache) {
+				finderPath = _finderPathWithoutPaginationFindByC_L_Version;
+				finderArgs = new Object[] {
+					companyId, layoutSetPrototypeUuid, version
+				};
+			}
+		}
+		else if (useFinderCache) {
+			finderPath = _finderPathWithPaginationFindByC_L_Version;
+			finderArgs = new Object[] {
+				companyId, layoutSetPrototypeUuid, version, start, end,
+				orderByComparator
+			};
+		}
+
+		List<LayoutSetVersion> list = null;
+
+		if (useFinderCache) {
+			list = (List<LayoutSetVersion>)FinderCacheUtil.getResult(
+				finderPath, finderArgs, this);
+
+			if ((list != null) && !list.isEmpty()) {
+				for (LayoutSetVersion layoutSetVersion : list) {
+					if ((companyId != layoutSetVersion.getCompanyId()) ||
+						!layoutSetPrototypeUuid.equals(
+							layoutSetVersion.getLayoutSetPrototypeUuid()) ||
+						(version != layoutSetVersion.getVersion())) {
+
+						list = null;
+
+						break;
+					}
+				}
+			}
+		}
+
+		if (list == null) {
+			StringBundler query = null;
+
+			if (orderByComparator != null) {
+				query = new StringBundler(
+					5 + (orderByComparator.getOrderByFields().length * 2));
+			}
+			else {
+				query = new StringBundler(5);
+			}
+
+			query.append(_SQL_SELECT_LAYOUTSETVERSION_WHERE);
+
+			query.append(_FINDER_COLUMN_C_L_VERSION_COMPANYID_2);
+
+			boolean bindLayoutSetPrototypeUuid = false;
+
+			if (layoutSetPrototypeUuid.isEmpty()) {
+				query.append(
+					_FINDER_COLUMN_C_L_VERSION_LAYOUTSETPROTOTYPEUUID_3);
+			}
+			else {
+				bindLayoutSetPrototypeUuid = true;
+
+				query.append(
+					_FINDER_COLUMN_C_L_VERSION_LAYOUTSETPROTOTYPEUUID_2);
+			}
+
+			query.append(_FINDER_COLUMN_C_L_VERSION_VERSION_2);
+
+			if (orderByComparator != null) {
+				appendOrderByComparator(
+					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
+			}
+			else {
+				query.append(LayoutSetVersionModelImpl.ORDER_BY_JPQL);
+			}
+
+			String sql = query.toString();
+
+			Session session = null;
+
+			try {
+				session = openSession();
+
+				Query q = session.createQuery(sql);
+
+				QueryPos qPos = QueryPos.getInstance(q);
+
+				qPos.add(companyId);
+
+				if (bindLayoutSetPrototypeUuid) {
+					qPos.add(layoutSetPrototypeUuid);
+				}
+
+				qPos.add(version);
+
+				list = (List<LayoutSetVersion>)QueryUtil.list(
+					q, getDialect(), start, end);
+
+				cacheResult(list);
+
+				if (useFinderCache) {
+					FinderCacheUtil.putResult(finderPath, finderArgs, list);
+				}
+			}
+			catch (Exception e) {
+				if (useFinderCache) {
+					FinderCacheUtil.removeResult(finderPath, finderArgs);
+				}
+
+				throw processException(e);
+			}
+			finally {
+				closeSession(session);
+			}
+		}
+
+		return list;
+	}
+
+	/**
+	 * Returns the first layout set version in the ordered set where companyId = &#63; and layoutSetPrototypeUuid = &#63; and version = &#63;.
+	 *
+	 * @param companyId the company ID
+	 * @param layoutSetPrototypeUuid the layout set prototype uuid
+	 * @param version the version
+	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	 * @return the first matching layout set version
+	 * @throws NoSuchLayoutSetVersionException if a matching layout set version could not be found
+	 */
+	@Override
+	public LayoutSetVersion findByC_L_Version_First(
+			long companyId, String layoutSetPrototypeUuid, int version,
+			OrderByComparator<LayoutSetVersion> orderByComparator)
+		throws NoSuchLayoutSetVersionException {
+
+		LayoutSetVersion layoutSetVersion = fetchByC_L_Version_First(
+			companyId, layoutSetPrototypeUuid, version, orderByComparator);
+
+		if (layoutSetVersion != null) {
+			return layoutSetVersion;
+		}
+
+		StringBundler msg = new StringBundler(8);
+
+		msg.append(_NO_SUCH_ENTITY_WITH_KEY);
+
+		msg.append("companyId=");
+		msg.append(companyId);
+
+		msg.append(", layoutSetPrototypeUuid=");
+		msg.append(layoutSetPrototypeUuid);
+
+		msg.append(", version=");
+		msg.append(version);
+
+		msg.append("}");
+
+		throw new NoSuchLayoutSetVersionException(msg.toString());
+	}
+
+	/**
+	 * Returns the first layout set version in the ordered set where companyId = &#63; and layoutSetPrototypeUuid = &#63; and version = &#63;.
+	 *
+	 * @param companyId the company ID
+	 * @param layoutSetPrototypeUuid the layout set prototype uuid
+	 * @param version the version
+	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	 * @return the first matching layout set version, or <code>null</code> if a matching layout set version could not be found
+	 */
+	@Override
+	public LayoutSetVersion fetchByC_L_Version_First(
+		long companyId, String layoutSetPrototypeUuid, int version,
+		OrderByComparator<LayoutSetVersion> orderByComparator) {
+
+		List<LayoutSetVersion> list = findByC_L_Version(
+			companyId, layoutSetPrototypeUuid, version, 0, 1,
+			orderByComparator);
+
+		if (!list.isEmpty()) {
+			return list.get(0);
+		}
+
+		return null;
+	}
+
+	/**
+	 * Returns the last layout set version in the ordered set where companyId = &#63; and layoutSetPrototypeUuid = &#63; and version = &#63;.
+	 *
+	 * @param companyId the company ID
+	 * @param layoutSetPrototypeUuid the layout set prototype uuid
+	 * @param version the version
+	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	 * @return the last matching layout set version
+	 * @throws NoSuchLayoutSetVersionException if a matching layout set version could not be found
+	 */
+	@Override
+	public LayoutSetVersion findByC_L_Version_Last(
+			long companyId, String layoutSetPrototypeUuid, int version,
+			OrderByComparator<LayoutSetVersion> orderByComparator)
+		throws NoSuchLayoutSetVersionException {
+
+		LayoutSetVersion layoutSetVersion = fetchByC_L_Version_Last(
+			companyId, layoutSetPrototypeUuid, version, orderByComparator);
+
+		if (layoutSetVersion != null) {
+			return layoutSetVersion;
+		}
+
+		StringBundler msg = new StringBundler(8);
+
+		msg.append(_NO_SUCH_ENTITY_WITH_KEY);
+
+		msg.append("companyId=");
+		msg.append(companyId);
+
+		msg.append(", layoutSetPrototypeUuid=");
+		msg.append(layoutSetPrototypeUuid);
+
+		msg.append(", version=");
+		msg.append(version);
+
+		msg.append("}");
+
+		throw new NoSuchLayoutSetVersionException(msg.toString());
+	}
+
+	/**
+	 * Returns the last layout set version in the ordered set where companyId = &#63; and layoutSetPrototypeUuid = &#63; and version = &#63;.
+	 *
+	 * @param companyId the company ID
+	 * @param layoutSetPrototypeUuid the layout set prototype uuid
+	 * @param version the version
+	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	 * @return the last matching layout set version, or <code>null</code> if a matching layout set version could not be found
+	 */
+	@Override
+	public LayoutSetVersion fetchByC_L_Version_Last(
+		long companyId, String layoutSetPrototypeUuid, int version,
+		OrderByComparator<LayoutSetVersion> orderByComparator) {
+
+		int count = countByC_L_Version(
+			companyId, layoutSetPrototypeUuid, version);
+
+		if (count == 0) {
+			return null;
+		}
+
+		List<LayoutSetVersion> list = findByC_L_Version(
+			companyId, layoutSetPrototypeUuid, version, count - 1, count,
+			orderByComparator);
+
+		if (!list.isEmpty()) {
+			return list.get(0);
+		}
+
+		return null;
+	}
+
+	/**
+	 * Returns the layout set versions before and after the current layout set version in the ordered set where companyId = &#63; and layoutSetPrototypeUuid = &#63; and version = &#63;.
+	 *
+	 * @param layoutSetVersionId the primary key of the current layout set version
+	 * @param companyId the company ID
+	 * @param layoutSetPrototypeUuid the layout set prototype uuid
+	 * @param version the version
+	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	 * @return the previous, current, and next layout set version
+	 * @throws NoSuchLayoutSetVersionException if a layout set version with the primary key could not be found
+	 */
+	@Override
+	public LayoutSetVersion[] findByC_L_Version_PrevAndNext(
+			long layoutSetVersionId, long companyId,
+			String layoutSetPrototypeUuid, int version,
+			OrderByComparator<LayoutSetVersion> orderByComparator)
+		throws NoSuchLayoutSetVersionException {
+
+		layoutSetPrototypeUuid = Objects.toString(layoutSetPrototypeUuid, "");
+
+		LayoutSetVersion layoutSetVersion = findByPrimaryKey(
+			layoutSetVersionId);
+
+		Session session = null;
+
+		try {
+			session = openSession();
+
+			LayoutSetVersion[] array = new LayoutSetVersionImpl[3];
+
+			array[0] = getByC_L_Version_PrevAndNext(
+				session, layoutSetVersion, companyId, layoutSetPrototypeUuid,
+				version, orderByComparator, true);
+
+			array[1] = layoutSetVersion;
+
+			array[2] = getByC_L_Version_PrevAndNext(
+				session, layoutSetVersion, companyId, layoutSetPrototypeUuid,
+				version, orderByComparator, false);
+
+			return array;
+		}
+		catch (Exception e) {
+			throw processException(e);
+		}
+		finally {
+			closeSession(session);
+		}
+	}
+
+	protected LayoutSetVersion getByC_L_Version_PrevAndNext(
+		Session session, LayoutSetVersion layoutSetVersion, long companyId,
+		String layoutSetPrototypeUuid, int version,
+		OrderByComparator<LayoutSetVersion> orderByComparator,
+		boolean previous) {
+
+		StringBundler query = null;
+
+		if (orderByComparator != null) {
+			query = new StringBundler(
+				6 + (orderByComparator.getOrderByConditionFields().length * 3) +
+					(orderByComparator.getOrderByFields().length * 3));
+		}
+		else {
+			query = new StringBundler(5);
+		}
+
+		query.append(_SQL_SELECT_LAYOUTSETVERSION_WHERE);
+
+		query.append(_FINDER_COLUMN_C_L_VERSION_COMPANYID_2);
+
+		boolean bindLayoutSetPrototypeUuid = false;
+
+		if (layoutSetPrototypeUuid.isEmpty()) {
+			query.append(_FINDER_COLUMN_C_L_VERSION_LAYOUTSETPROTOTYPEUUID_3);
+		}
+		else {
+			bindLayoutSetPrototypeUuid = true;
+
+			query.append(_FINDER_COLUMN_C_L_VERSION_LAYOUTSETPROTOTYPEUUID_2);
+		}
+
+		query.append(_FINDER_COLUMN_C_L_VERSION_VERSION_2);
+
+		if (orderByComparator != null) {
+			String[] orderByConditionFields =
+				orderByComparator.getOrderByConditionFields();
+
+			if (orderByConditionFields.length > 0) {
+				query.append(WHERE_AND);
+			}
+
+			for (int i = 0; i < orderByConditionFields.length; i++) {
+				query.append(_ORDER_BY_ENTITY_ALIAS);
+				query.append(orderByConditionFields[i]);
+
+				if ((i + 1) < orderByConditionFields.length) {
+					if (orderByComparator.isAscending() ^ previous) {
+						query.append(WHERE_GREATER_THAN_HAS_NEXT);
+					}
+					else {
+						query.append(WHERE_LESSER_THAN_HAS_NEXT);
+					}
+				}
+				else {
+					if (orderByComparator.isAscending() ^ previous) {
+						query.append(WHERE_GREATER_THAN);
+					}
+					else {
+						query.append(WHERE_LESSER_THAN);
+					}
+				}
+			}
+
+			query.append(ORDER_BY_CLAUSE);
+
+			String[] orderByFields = orderByComparator.getOrderByFields();
+
+			for (int i = 0; i < orderByFields.length; i++) {
+				query.append(_ORDER_BY_ENTITY_ALIAS);
+				query.append(orderByFields[i]);
+
+				if ((i + 1) < orderByFields.length) {
+					if (orderByComparator.isAscending() ^ previous) {
+						query.append(ORDER_BY_ASC_HAS_NEXT);
+					}
+					else {
+						query.append(ORDER_BY_DESC_HAS_NEXT);
+					}
+				}
+				else {
+					if (orderByComparator.isAscending() ^ previous) {
+						query.append(ORDER_BY_ASC);
+					}
+					else {
+						query.append(ORDER_BY_DESC);
+					}
+				}
+			}
+		}
+		else {
+			query.append(LayoutSetVersionModelImpl.ORDER_BY_JPQL);
+		}
+
+		String sql = query.toString();
+
+		Query q = session.createQuery(sql);
+
+		q.setFirstResult(0);
+		q.setMaxResults(2);
+
+		QueryPos qPos = QueryPos.getInstance(q);
+
+		qPos.add(companyId);
+
+		if (bindLayoutSetPrototypeUuid) {
+			qPos.add(layoutSetPrototypeUuid);
+		}
+
+		qPos.add(version);
+
+		if (orderByComparator != null) {
+			for (Object orderByConditionValue :
+					orderByComparator.getOrderByConditionValues(
+						layoutSetVersion)) {
+
+				qPos.add(orderByConditionValue);
+			}
+		}
+
+		List<LayoutSetVersion> list = q.list();
+
+		if (list.size() == 2) {
+			return list.get(1);
+		}
+		else {
+			return null;
+		}
+	}
+
+	/**
+	 * Removes all the layout set versions where companyId = &#63; and layoutSetPrototypeUuid = &#63; and version = &#63; from the database.
+	 *
+	 * @param companyId the company ID
+	 * @param layoutSetPrototypeUuid the layout set prototype uuid
+	 * @param version the version
+	 */
+	@Override
+	public void removeByC_L_Version(
+		long companyId, String layoutSetPrototypeUuid, int version) {
+
+		for (LayoutSetVersion layoutSetVersion :
+				findByC_L_Version(
+					companyId, layoutSetPrototypeUuid, version,
+					QueryUtil.ALL_POS, QueryUtil.ALL_POS, null)) {
+
+			remove(layoutSetVersion);
+		}
+	}
+
+	/**
+	 * Returns the number of layout set versions where companyId = &#63; and layoutSetPrototypeUuid = &#63; and version = &#63;.
+	 *
+	 * @param companyId the company ID
+	 * @param layoutSetPrototypeUuid the layout set prototype uuid
+	 * @param version the version
+	 * @return the number of matching layout set versions
+	 */
+	@Override
+	public int countByC_L_Version(
+		long companyId, String layoutSetPrototypeUuid, int version) {
+
+		layoutSetPrototypeUuid = Objects.toString(layoutSetPrototypeUuid, "");
+
+		FinderPath finderPath = _finderPathCountByC_L_Version;
+
+		Object[] finderArgs = new Object[] {
+			companyId, layoutSetPrototypeUuid, version
+		};
+
+		Long count = (Long)FinderCacheUtil.getResult(
+			finderPath, finderArgs, this);
+
+		if (count == null) {
+			StringBundler query = new StringBundler(4);
+
+			query.append(_SQL_COUNT_LAYOUTSETVERSION_WHERE);
+
+			query.append(_FINDER_COLUMN_C_L_VERSION_COMPANYID_2);
+
+			boolean bindLayoutSetPrototypeUuid = false;
+
+			if (layoutSetPrototypeUuid.isEmpty()) {
+				query.append(
+					_FINDER_COLUMN_C_L_VERSION_LAYOUTSETPROTOTYPEUUID_3);
+			}
+			else {
+				bindLayoutSetPrototypeUuid = true;
+
+				query.append(
+					_FINDER_COLUMN_C_L_VERSION_LAYOUTSETPROTOTYPEUUID_2);
+			}
+
+			query.append(_FINDER_COLUMN_C_L_VERSION_VERSION_2);
+
+			String sql = query.toString();
+
+			Session session = null;
+
+			try {
+				session = openSession();
+
+				Query q = session.createQuery(sql);
+
+				QueryPos qPos = QueryPos.getInstance(q);
+
+				qPos.add(companyId);
+
+				if (bindLayoutSetPrototypeUuid) {
+					qPos.add(layoutSetPrototypeUuid);
+				}
+
+				qPos.add(version);
+
+				count = (Long)q.uniqueResult();
+
+				FinderCacheUtil.putResult(finderPath, finderArgs, count);
+			}
+			catch (Exception e) {
+				FinderCacheUtil.removeResult(finderPath, finderArgs);
+
+				throw processException(e);
+			}
+			finally {
+				closeSession(session);
+			}
+		}
+
+		return count.intValue();
+	}
+
+	private static final String _FINDER_COLUMN_C_L_VERSION_COMPANYID_2 =
+		"layoutSetVersion.companyId = ? AND ";
+
+	private static final String
+		_FINDER_COLUMN_C_L_VERSION_LAYOUTSETPROTOTYPEUUID_2 =
+			"layoutSetVersion.layoutSetPrototypeUuid = ? AND ";
+
+	private static final String
+		_FINDER_COLUMN_C_L_VERSION_LAYOUTSETPROTOTYPEUUID_3 =
+			"(layoutSetVersion.layoutSetPrototypeUuid IS NULL OR layoutSetVersion.layoutSetPrototypeUuid = '') AND ";
+
+	private static final String _FINDER_COLUMN_C_L_VERSION_VERSION_2 =
+		"layoutSetVersion.version = ?";
+
 	private FinderPath _finderPathWithPaginationFindByP_L;
 	private FinderPath _finderPathWithoutPaginationFindByP_L;
 	private FinderPath _finderPathCountByP_L;
@@ -3930,7 +5152,7 @@ public class LayoutSetVersionPersistenceImpl
 	 * Returns a range of all the layout set versions where privateLayout = &#63; and logoId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>LayoutSetVersionModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>LayoutSetVersionModelImpl</code>.
 	 * </p>
 	 *
 	 * @param privateLayout the private layout
@@ -3950,7 +5172,7 @@ public class LayoutSetVersionPersistenceImpl
 	 * Returns an ordered range of all the layout set versions where privateLayout = &#63; and logoId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>LayoutSetVersionModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>LayoutSetVersionModelImpl</code>.
 	 * </p>
 	 *
 	 * @param privateLayout the private layout
@@ -3973,7 +5195,7 @@ public class LayoutSetVersionPersistenceImpl
 	 * Returns an ordered range of all the layout set versions where privateLayout = &#63; and logoId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>LayoutSetVersionModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>LayoutSetVersionModelImpl</code>.
 	 * </p>
 	 *
 	 * @param privateLayout the private layout
@@ -3981,27 +5203,27 @@ public class LayoutSetVersionPersistenceImpl
 	 * @param start the lower bound of the range of layout set versions
 	 * @param end the upper bound of the range of layout set versions (not inclusive)
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
-	 * @param retrieveFromCache whether to retrieve from the finder cache
+	 * @param useFinderCache whether to use the finder cache
 	 * @return the ordered range of matching layout set versions
 	 */
 	@Override
 	public List<LayoutSetVersion> findByP_L(
 		boolean privateLayout, long logoId, int start, int end,
 		OrderByComparator<LayoutSetVersion> orderByComparator,
-		boolean retrieveFromCache) {
+		boolean useFinderCache) {
 
-		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
 			(orderByComparator == null)) {
 
-			pagination = false;
-			finderPath = _finderPathWithoutPaginationFindByP_L;
-			finderArgs = new Object[] {privateLayout, logoId};
+			if (useFinderCache) {
+				finderPath = _finderPathWithoutPaginationFindByP_L;
+				finderArgs = new Object[] {privateLayout, logoId};
+			}
 		}
-		else {
+		else if (useFinderCache) {
 			finderPath = _finderPathWithPaginationFindByP_L;
 			finderArgs = new Object[] {
 				privateLayout, logoId, start, end, orderByComparator
@@ -4010,7 +5232,7 @@ public class LayoutSetVersionPersistenceImpl
 
 		List<LayoutSetVersion> list = null;
 
-		if (retrieveFromCache) {
+		if (useFinderCache) {
 			list = (List<LayoutSetVersion>)FinderCacheUtil.getResult(
 				finderPath, finderArgs, this);
 
@@ -4048,7 +5270,7 @@ public class LayoutSetVersionPersistenceImpl
 				appendOrderByComparator(
 					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
 			}
-			else if (pagination) {
+			else {
 				query.append(LayoutSetVersionModelImpl.ORDER_BY_JPQL);
 			}
 
@@ -4067,25 +5289,19 @@ public class LayoutSetVersionPersistenceImpl
 
 				qPos.add(logoId);
 
-				if (!pagination) {
-					list = (List<LayoutSetVersion>)QueryUtil.list(
-						q, getDialect(), start, end, false);
-
-					Collections.sort(list);
-
-					list = Collections.unmodifiableList(list);
-				}
-				else {
-					list = (List<LayoutSetVersion>)QueryUtil.list(
-						q, getDialect(), start, end);
-				}
+				list = (List<LayoutSetVersion>)QueryUtil.list(
+					q, getDialect(), start, end);
 
 				cacheResult(list);
 
-				FinderCacheUtil.putResult(finderPath, finderArgs, list);
+				if (useFinderCache) {
+					FinderCacheUtil.putResult(finderPath, finderArgs, list);
+				}
 			}
 			catch (Exception e) {
-				FinderCacheUtil.removeResult(finderPath, finderArgs);
+				if (useFinderCache) {
+					FinderCacheUtil.removeResult(finderPath, finderArgs);
+				}
 
 				throw processException(e);
 			}
@@ -4489,7 +5705,7 @@ public class LayoutSetVersionPersistenceImpl
 	 * Returns a range of all the layout set versions where privateLayout = &#63; and logoId = &#63; and version = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>LayoutSetVersionModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>LayoutSetVersionModelImpl</code>.
 	 * </p>
 	 *
 	 * @param privateLayout the private layout
@@ -4511,7 +5727,7 @@ public class LayoutSetVersionPersistenceImpl
 	 * Returns an ordered range of all the layout set versions where privateLayout = &#63; and logoId = &#63; and version = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>LayoutSetVersionModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>LayoutSetVersionModelImpl</code>.
 	 * </p>
 	 *
 	 * @param privateLayout the private layout
@@ -4536,7 +5752,7 @@ public class LayoutSetVersionPersistenceImpl
 	 * Returns an ordered range of all the layout set versions where privateLayout = &#63; and logoId = &#63; and version = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>LayoutSetVersionModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>LayoutSetVersionModelImpl</code>.
 	 * </p>
 	 *
 	 * @param privateLayout the private layout
@@ -4545,27 +5761,27 @@ public class LayoutSetVersionPersistenceImpl
 	 * @param start the lower bound of the range of layout set versions
 	 * @param end the upper bound of the range of layout set versions (not inclusive)
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
-	 * @param retrieveFromCache whether to retrieve from the finder cache
+	 * @param useFinderCache whether to use the finder cache
 	 * @return the ordered range of matching layout set versions
 	 */
 	@Override
 	public List<LayoutSetVersion> findByP_L_Version(
 		boolean privateLayout, long logoId, int version, int start, int end,
 		OrderByComparator<LayoutSetVersion> orderByComparator,
-		boolean retrieveFromCache) {
+		boolean useFinderCache) {
 
-		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
 			(orderByComparator == null)) {
 
-			pagination = false;
-			finderPath = _finderPathWithoutPaginationFindByP_L_Version;
-			finderArgs = new Object[] {privateLayout, logoId, version};
+			if (useFinderCache) {
+				finderPath = _finderPathWithoutPaginationFindByP_L_Version;
+				finderArgs = new Object[] {privateLayout, logoId, version};
+			}
 		}
-		else {
+		else if (useFinderCache) {
 			finderPath = _finderPathWithPaginationFindByP_L_Version;
 			finderArgs = new Object[] {
 				privateLayout, logoId, version, start, end, orderByComparator
@@ -4574,7 +5790,7 @@ public class LayoutSetVersionPersistenceImpl
 
 		List<LayoutSetVersion> list = null;
 
-		if (retrieveFromCache) {
+		if (useFinderCache) {
 			list = (List<LayoutSetVersion>)FinderCacheUtil.getResult(
 				finderPath, finderArgs, this);
 
@@ -4615,7 +5831,7 @@ public class LayoutSetVersionPersistenceImpl
 				appendOrderByComparator(
 					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
 			}
-			else if (pagination) {
+			else {
 				query.append(LayoutSetVersionModelImpl.ORDER_BY_JPQL);
 			}
 
@@ -4636,25 +5852,19 @@ public class LayoutSetVersionPersistenceImpl
 
 				qPos.add(version);
 
-				if (!pagination) {
-					list = (List<LayoutSetVersion>)QueryUtil.list(
-						q, getDialect(), start, end, false);
-
-					Collections.sort(list);
-
-					list = Collections.unmodifiableList(list);
-				}
-				else {
-					list = (List<LayoutSetVersion>)QueryUtil.list(
-						q, getDialect(), start, end);
-				}
+				list = (List<LayoutSetVersion>)QueryUtil.list(
+					q, getDialect(), start, end);
 
 				cacheResult(list);
 
-				FinderCacheUtil.putResult(finderPath, finderArgs, list);
+				if (useFinderCache) {
+					FinderCacheUtil.putResult(finderPath, finderArgs, list);
+				}
 			}
 			catch (Exception e) {
-				FinderCacheUtil.removeResult(finderPath, finderArgs);
+				if (useFinderCache) {
+					FinderCacheUtil.removeResult(finderPath, finderArgs);
+				}
 
 				throw processException(e);
 			}
@@ -5275,7 +6485,7 @@ public class LayoutSetVersionPersistenceImpl
 		layoutSetVersion.setNew(true);
 		layoutSetVersion.setPrimaryKey(layoutSetVersionId);
 
-		layoutSetVersion.setCompanyId(companyProvider.getCompanyId());
+		layoutSetVersion.setCompanyId(CompanyThreadLocal.getCompanyId());
 
 		return layoutSetVersion;
 	}
@@ -5498,6 +6708,25 @@ public class LayoutSetVersionPersistenceImpl
 				_finderPathWithoutPaginationFindByG_P, args);
 
 			args = new Object[] {
+				layoutSetVersionModelImpl.getCompanyId(),
+				layoutSetVersionModelImpl.getLayoutSetPrototypeUuid()
+			};
+
+			FinderCacheUtil.removeResult(_finderPathCountByC_L, args);
+			FinderCacheUtil.removeResult(
+				_finderPathWithoutPaginationFindByC_L, args);
+
+			args = new Object[] {
+				layoutSetVersionModelImpl.getCompanyId(),
+				layoutSetVersionModelImpl.getLayoutSetPrototypeUuid(),
+				layoutSetVersionModelImpl.getVersion()
+			};
+
+			FinderCacheUtil.removeResult(_finderPathCountByC_L_Version, args);
+			FinderCacheUtil.removeResult(
+				_finderPathWithoutPaginationFindByC_L_Version, args);
+
+			args = new Object[] {
 				layoutSetVersionModelImpl.isPrivateLayout(),
 				layoutSetVersionModelImpl.getLogoId()
 			};
@@ -5667,6 +6896,58 @@ public class LayoutSetVersionPersistenceImpl
 			}
 
 			if ((layoutSetVersionModelImpl.getColumnBitmask() &
+				 _finderPathWithoutPaginationFindByC_L.getColumnBitmask()) !=
+					 0) {
+
+				Object[] args = new Object[] {
+					layoutSetVersionModelImpl.getOriginalCompanyId(),
+					layoutSetVersionModelImpl.
+						getOriginalLayoutSetPrototypeUuid()
+				};
+
+				FinderCacheUtil.removeResult(_finderPathCountByC_L, args);
+				FinderCacheUtil.removeResult(
+					_finderPathWithoutPaginationFindByC_L, args);
+
+				args = new Object[] {
+					layoutSetVersionModelImpl.getCompanyId(),
+					layoutSetVersionModelImpl.getLayoutSetPrototypeUuid()
+				};
+
+				FinderCacheUtil.removeResult(_finderPathCountByC_L, args);
+				FinderCacheUtil.removeResult(
+					_finderPathWithoutPaginationFindByC_L, args);
+			}
+
+			if ((layoutSetVersionModelImpl.getColumnBitmask() &
+				 _finderPathWithoutPaginationFindByC_L_Version.
+					 getColumnBitmask()) != 0) {
+
+				Object[] args = new Object[] {
+					layoutSetVersionModelImpl.getOriginalCompanyId(),
+					layoutSetVersionModelImpl.
+						getOriginalLayoutSetPrototypeUuid(),
+					layoutSetVersionModelImpl.getOriginalVersion()
+				};
+
+				FinderCacheUtil.removeResult(
+					_finderPathCountByC_L_Version, args);
+				FinderCacheUtil.removeResult(
+					_finderPathWithoutPaginationFindByC_L_Version, args);
+
+				args = new Object[] {
+					layoutSetVersionModelImpl.getCompanyId(),
+					layoutSetVersionModelImpl.getLayoutSetPrototypeUuid(),
+					layoutSetVersionModelImpl.getVersion()
+				};
+
+				FinderCacheUtil.removeResult(
+					_finderPathCountByC_L_Version, args);
+				FinderCacheUtil.removeResult(
+					_finderPathWithoutPaginationFindByC_L_Version, args);
+			}
+
+			if ((layoutSetVersionModelImpl.getColumnBitmask() &
 				 _finderPathWithoutPaginationFindByP_L.getColumnBitmask()) !=
 					 0) {
 
@@ -5794,7 +7075,7 @@ public class LayoutSetVersionPersistenceImpl
 	 * Returns a range of all the layout set versions.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>LayoutSetVersionModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>LayoutSetVersionModelImpl</code>.
 	 * </p>
 	 *
 	 * @param start the lower bound of the range of layout set versions
@@ -5810,7 +7091,7 @@ public class LayoutSetVersionPersistenceImpl
 	 * Returns an ordered range of all the layout set versions.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>LayoutSetVersionModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>LayoutSetVersionModelImpl</code>.
 	 * </p>
 	 *
 	 * @param start the lower bound of the range of layout set versions
@@ -5830,40 +7111,40 @@ public class LayoutSetVersionPersistenceImpl
 	 * Returns an ordered range of all the layout set versions.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>LayoutSetVersionModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>LayoutSetVersionModelImpl</code>.
 	 * </p>
 	 *
 	 * @param start the lower bound of the range of layout set versions
 	 * @param end the upper bound of the range of layout set versions (not inclusive)
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
-	 * @param retrieveFromCache whether to retrieve from the finder cache
+	 * @param useFinderCache whether to use the finder cache
 	 * @return the ordered range of layout set versions
 	 */
 	@Override
 	public List<LayoutSetVersion> findAll(
 		int start, int end,
 		OrderByComparator<LayoutSetVersion> orderByComparator,
-		boolean retrieveFromCache) {
+		boolean useFinderCache) {
 
-		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
 			(orderByComparator == null)) {
 
-			pagination = false;
-			finderPath = _finderPathWithoutPaginationFindAll;
-			finderArgs = FINDER_ARGS_EMPTY;
+			if (useFinderCache) {
+				finderPath = _finderPathWithoutPaginationFindAll;
+				finderArgs = FINDER_ARGS_EMPTY;
+			}
 		}
-		else {
+		else if (useFinderCache) {
 			finderPath = _finderPathWithPaginationFindAll;
 			finderArgs = new Object[] {start, end, orderByComparator};
 		}
 
 		List<LayoutSetVersion> list = null;
 
-		if (retrieveFromCache) {
+		if (useFinderCache) {
 			list = (List<LayoutSetVersion>)FinderCacheUtil.getResult(
 				finderPath, finderArgs, this);
 		}
@@ -5886,9 +7167,7 @@ public class LayoutSetVersionPersistenceImpl
 			else {
 				sql = _SQL_SELECT_LAYOUTSETVERSION;
 
-				if (pagination) {
-					sql = sql.concat(LayoutSetVersionModelImpl.ORDER_BY_JPQL);
-				}
+				sql = sql.concat(LayoutSetVersionModelImpl.ORDER_BY_JPQL);
 			}
 
 			Session session = null;
@@ -5898,25 +7177,19 @@ public class LayoutSetVersionPersistenceImpl
 
 				Query q = session.createQuery(sql);
 
-				if (!pagination) {
-					list = (List<LayoutSetVersion>)QueryUtil.list(
-						q, getDialect(), start, end, false);
-
-					Collections.sort(list);
-
-					list = Collections.unmodifiableList(list);
-				}
-				else {
-					list = (List<LayoutSetVersion>)QueryUtil.list(
-						q, getDialect(), start, end);
-				}
+				list = (List<LayoutSetVersion>)QueryUtil.list(
+					q, getDialect(), start, end);
 
 				cacheResult(list);
 
-				FinderCacheUtil.putResult(finderPath, finderArgs, list);
+				if (useFinderCache) {
+					FinderCacheUtil.putResult(finderPath, finderArgs, list);
+				}
 			}
 			catch (Exception e) {
-				FinderCacheUtil.removeResult(finderPath, finderArgs);
+				if (useFinderCache) {
+					FinderCacheUtil.removeResult(finderPath, finderArgs);
+				}
 
 				throw processException(e);
 			}
@@ -6226,6 +7499,66 @@ public class LayoutSetVersionPersistenceImpl
 				Integer.class.getName()
 			});
 
+		_finderPathWithPaginationFindByC_L = new FinderPath(
+			LayoutSetVersionModelImpl.ENTITY_CACHE_ENABLED,
+			LayoutSetVersionModelImpl.FINDER_CACHE_ENABLED,
+			LayoutSetVersionImpl.class, FINDER_CLASS_NAME_LIST_WITH_PAGINATION,
+			"findByC_L",
+			new String[] {
+				Long.class.getName(), String.class.getName(),
+				Integer.class.getName(), Integer.class.getName(),
+				OrderByComparator.class.getName()
+			});
+
+		_finderPathWithoutPaginationFindByC_L = new FinderPath(
+			LayoutSetVersionModelImpl.ENTITY_CACHE_ENABLED,
+			LayoutSetVersionModelImpl.FINDER_CACHE_ENABLED,
+			LayoutSetVersionImpl.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByC_L",
+			new String[] {Long.class.getName(), String.class.getName()},
+			LayoutSetVersionModelImpl.COMPANYID_COLUMN_BITMASK |
+			LayoutSetVersionModelImpl.LAYOUTSETPROTOTYPEUUID_COLUMN_BITMASK |
+			LayoutSetVersionModelImpl.VERSION_COLUMN_BITMASK);
+
+		_finderPathCountByC_L = new FinderPath(
+			LayoutSetVersionModelImpl.ENTITY_CACHE_ENABLED,
+			LayoutSetVersionModelImpl.FINDER_CACHE_ENABLED, Long.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByC_L",
+			new String[] {Long.class.getName(), String.class.getName()});
+
+		_finderPathWithPaginationFindByC_L_Version = new FinderPath(
+			LayoutSetVersionModelImpl.ENTITY_CACHE_ENABLED,
+			LayoutSetVersionModelImpl.FINDER_CACHE_ENABLED,
+			LayoutSetVersionImpl.class, FINDER_CLASS_NAME_LIST_WITH_PAGINATION,
+			"findByC_L_Version",
+			new String[] {
+				Long.class.getName(), String.class.getName(),
+				Integer.class.getName(), Integer.class.getName(),
+				Integer.class.getName(), OrderByComparator.class.getName()
+			});
+
+		_finderPathWithoutPaginationFindByC_L_Version = new FinderPath(
+			LayoutSetVersionModelImpl.ENTITY_CACHE_ENABLED,
+			LayoutSetVersionModelImpl.FINDER_CACHE_ENABLED,
+			LayoutSetVersionImpl.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByC_L_Version",
+			new String[] {
+				Long.class.getName(), String.class.getName(),
+				Integer.class.getName()
+			},
+			LayoutSetVersionModelImpl.COMPANYID_COLUMN_BITMASK |
+			LayoutSetVersionModelImpl.LAYOUTSETPROTOTYPEUUID_COLUMN_BITMASK |
+			LayoutSetVersionModelImpl.VERSION_COLUMN_BITMASK);
+
+		_finderPathCountByC_L_Version = new FinderPath(
+			LayoutSetVersionModelImpl.ENTITY_CACHE_ENABLED,
+			LayoutSetVersionModelImpl.FINDER_CACHE_ENABLED, Long.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByC_L_Version",
+			new String[] {
+				Long.class.getName(), String.class.getName(),
+				Integer.class.getName()
+			});
+
 		_finderPathWithPaginationFindByP_L = new FinderPath(
 			LayoutSetVersionModelImpl.ENTITY_CACHE_ENABLED,
 			LayoutSetVersionModelImpl.FINDER_CACHE_ENABLED,
@@ -6293,9 +7626,6 @@ public class LayoutSetVersionPersistenceImpl
 		FinderCacheUtil.removeCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
 		FinderCacheUtil.removeCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
 	}
-
-	@BeanReference(type = CompanyProviderWrapper.class)
-	protected CompanyProvider companyProvider;
 
 	private static final String _SQL_SELECT_LAYOUTSETVERSION =
 		"SELECT layoutSetVersion FROM LayoutSetVersion layoutSetVersion";

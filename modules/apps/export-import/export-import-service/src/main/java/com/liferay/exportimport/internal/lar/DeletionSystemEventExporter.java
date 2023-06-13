@@ -31,6 +31,7 @@ import com.liferay.portal.kernel.dao.orm.RestrictionsFactoryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.model.SystemEvent;
 import com.liferay.portal.kernel.model.SystemEventConstants;
 import com.liferay.portal.kernel.service.SystemEventLocalServiceUtil;
@@ -40,19 +41,15 @@ import com.liferay.portal.kernel.xml.Document;
 import com.liferay.portal.kernel.xml.Element;
 import com.liferay.portal.kernel.xml.SAXReaderUtil;
 
-import java.util.Date;
 import java.util.Set;
-
-import org.osgi.annotation.versioning.ProviderType;
 
 /**
  * @author Zsolt Berentey
  */
-@ProviderType
 public class DeletionSystemEventExporter {
 
 	public static DeletionSystemEventExporter getInstance() {
-		return _instance;
+		return _deletionSystemEventExporter;
 	}
 
 	public void exportDeletionSystemEvents(
@@ -70,6 +67,14 @@ public class DeletionSystemEventExporter {
 			MapUtil.getBoolean(
 				portletDataContext.getParameterMap(),
 				PortletDataHandlerKeys.DELETIONS)) {
+
+			if (!MapUtil.getBoolean(
+					portletDataContext.getParameterMap(),
+					PortletDataHandlerKeys.DELETE_LAYOUTS)) {
+
+				deletionSystemEventStagedModelTypes.remove(
+					new StagedModelType(Layout.class));
+			}
 
 			doExportDeletionSystemEvents(
 				portletDataContext, rootElement,
@@ -91,13 +96,11 @@ public class DeletionSystemEventExporter {
 
 		Property createDateProperty = PropertyFactoryUtil.forName("createDate");
 
-		Date startDate = portletDataContext.getStartDate();
+		dynamicQuery.add(
+			createDateProperty.ge(portletDataContext.getStartDate()));
 
-		dynamicQuery.add(createDateProperty.ge(startDate));
-
-		Date endDate = portletDataContext.getEndDate();
-
-		dynamicQuery.add(createDateProperty.le(endDate));
+		dynamicQuery.add(
+			createDateProperty.le(portletDataContext.getEndDate()));
 	}
 
 	protected void doAddCriteria(
@@ -137,6 +140,18 @@ public class DeletionSystemEventExporter {
 					conjunction.add(
 						referrerClassNameIdProperty.eq(
 							stagedModelType.getReferrerClassNameId()));
+				}
+
+				String className = stagedModelType.getClassName();
+
+				if (className.equals(Layout.class.getName())) {
+					Property extraDataProperty = PropertyFactoryUtil.forName(
+						"extraData");
+
+					conjunction.add(
+						extraDataProperty.like(
+							"%\"privateLayout\":\"" +
+								portletDataContext.isPrivateLayout() + "\"%"));
 				}
 
 				referrerClassNameIdDisjunction.add(conjunction);
@@ -229,7 +244,7 @@ public class DeletionSystemEventExporter {
 	private static final Log _log = LogFactoryUtil.getLog(
 		DeletionSystemEventExporter.class);
 
-	private static final DeletionSystemEventExporter _instance =
-		new DeletionSystemEventExporter();
+	private static final DeletionSystemEventExporter
+		_deletionSystemEventExporter = new DeletionSystemEventExporter();
 
 }

@@ -58,7 +58,12 @@ definition {
 			MetalComponent.waitForManagementBar();
 		}
 
-		Click(locator1 = "Button#PLUS");
+		if ("${browserType}" == "internetexplorer") {
+			Click(locator1 = "Button#PLUS_IE");
+		}
+		else {
+			Click(locator1 = "Button#PLUS");
+		}
 	}
 
 	macro gotoAddDropdownMenuItem {
@@ -71,6 +76,16 @@ definition {
 		LexiconEntry.gotoAdd();
 
 		MenuItem.click(menuItem = "${menuItem}");
+	}
+
+	macro gotoAddReport {
+		var browserType = PropsUtil.get("browser.type");
+
+		if ("${browserType}" == "chrome") {
+			MetalComponent.waitForReportsManagementBar();
+		}
+
+		Click(locator1 = "Button#PLUS");
 	}
 
 	macro gotoEllipsisMenuItem {
@@ -130,17 +145,25 @@ definition {
 		MenuItem.click(menuItem = "${menuItem}");
 	}
 
-	macro openEntryMenu {
-		Click.waitForMenuToggleJSClick(
-			key_rowEntry = "${rowEntry}",
-			locator1 = "Icon#ROW_VERTICAL_ELLIPSIS");
+	macro gotoVerticalEllipsisMenuItemNoError {
+		Click.waitForMenuToggleJSClick(locator1 = "Icon#VERTICAL_ELLIPSIS_BUTTON");
+
+		MenuItem.clickNoError(menuItem = "${menuItem}");
 	}
 
-	macro rate {
-		var key_ratingResult = StringUtil.replace("${ratingResult}", " ", "-");
-		var key_ratingResult = StringUtil.lowerCase("${key_ratingResult}");
+	macro openEntryMenu {
+		var browserType = PropsUtil.get("browser.type");
 
-		Click(locator1 = "Ratings#THUMB");
+		if ("${browserType}" == "internetexplorer") {
+			Click.waitForMenuToggleJSClick(
+				key_rowEntry = "${rowEntry}",
+				locator1 = "Icon#ROW_VERTICAL_ELLIPSIS_IE");
+		}
+		else {
+			Click.waitForMenuToggleJSClick(
+				key_rowEntry = "${rowEntry}",
+				locator1 = "Icon#ROW_VERTICAL_ELLIPSIS");
+		}
 	}
 
 	macro selectEntry {
@@ -190,22 +213,6 @@ definition {
 		AssertElementNotPresent(
 			key_menuItem = "${menuItem}",
 			locator1 = "MenuItem#ANY_MENU_ITEM");
-	}
-
-	macro viewRating {
-		var key_ratingResult = StringUtil.replace("${ratingResult}", " ", "-");
-		var key_ratingResult = StringUtil.lowerCase("${key_ratingResult}");
-
-		if (isSet(ratingResult)) {
-			AssertTextEquals(
-				locator1 = "Ratings#THUMB",
-				value1 = "${voteCount}");
-		}
-		else {
-			AssertTextEquals(
-				locator1 = "Ratings#DISPLAY_VOTES",
-				value1 = "${voteCount}");
-		}
 	}
 
 }

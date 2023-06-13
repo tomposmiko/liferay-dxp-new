@@ -14,8 +14,6 @@
 
 package com.liferay.portal.kernel.service;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 /**
  * Provides a wrapper for {@link ResourceTypePermissionLocalService}.
  *
@@ -25,7 +23,6 @@ import org.osgi.annotation.versioning.ProviderType;
  * @generated
  */
 @Deprecated
-@ProviderType
 public class ResourceTypePermissionLocalServiceWrapper
 	implements ResourceTypePermissionLocalService,
 			   ServiceWrapper<ResourceTypePermissionLocalService> {
@@ -133,7 +130,7 @@ public class ResourceTypePermissionLocalServiceWrapper
 	 * Performs a dynamic query on the database and returns a range of the matching rows.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>com.liferay.portal.model.impl.ResourceTypePermissionModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>com.liferay.portal.model.impl.ResourceTypePermissionModelImpl</code>.
 	 * </p>
 	 *
 	 * @param dynamicQuery the dynamic query
@@ -154,7 +151,7 @@ public class ResourceTypePermissionLocalServiceWrapper
 	 * Performs a dynamic query on the database and returns an ordered range of the matching rows.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>com.liferay.portal.model.impl.ResourceTypePermissionModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>com.liferay.portal.model.impl.ResourceTypePermissionModelImpl</code>.
 	 * </p>
 	 *
 	 * @param dynamicQuery the dynamic query
@@ -214,7 +211,7 @@ public class ResourceTypePermissionLocalServiceWrapper
 	@Override
 	public com.liferay.portal.kernel.model.ResourceTypePermission
 		fetchResourceTypePermission(
-			long companyId, long groupId, String name, long roleId) {
+			long companyId, long groupId, java.lang.String name, long roleId) {
 
 		return _resourceTypePermissionLocalService.fetchResourceTypePermission(
 			companyId, groupId, name, roleId);
@@ -229,7 +226,7 @@ public class ResourceTypePermissionLocalServiceWrapper
 
 	@Override
 	public long getCompanyScopeActionIds(
-		long companyId, String name, long roleId) {
+		long companyId, java.lang.String name, long roleId) {
 
 		return _resourceTypePermissionLocalService.getCompanyScopeActionIds(
 			companyId, name, roleId);
@@ -237,7 +234,7 @@ public class ResourceTypePermissionLocalServiceWrapper
 
 	@Override
 	public long getGroupScopeActionIds(
-		long companyId, long groupId, String name, long roleId) {
+		long companyId, long groupId, java.lang.String name, long roleId) {
 
 		return _resourceTypePermissionLocalService.getGroupScopeActionIds(
 			companyId, groupId, name, roleId);
@@ -247,7 +244,7 @@ public class ResourceTypePermissionLocalServiceWrapper
 	public java.util.List
 		<com.liferay.portal.kernel.model.ResourceTypePermission>
 			getGroupScopeResourceTypePermissions(
-				long companyId, String name, long roleId) {
+				long companyId, java.lang.String name, long roleId) {
 
 		return _resourceTypePermissionLocalService.
 			getGroupScopeResourceTypePermissions(companyId, name, roleId);
@@ -267,7 +264,7 @@ public class ResourceTypePermissionLocalServiceWrapper
 	 * @return the OSGi service identifier
 	 */
 	@Override
-	public String getOSGiServiceIdentifier() {
+	public java.lang.String getOSGiServiceIdentifier() {
 		return _resourceTypePermissionLocalService.getOSGiServiceIdentifier();
 	}
 
@@ -283,7 +280,7 @@ public class ResourceTypePermissionLocalServiceWrapper
 	@Override
 	public com.liferay.portal.kernel.model.ResourceBlockPermissionsContainer
 		getResourceBlockPermissionsContainer(
-			long companyId, long groupId, String name) {
+			long companyId, long groupId, java.lang.String name) {
 
 		return _resourceTypePermissionLocalService.
 			getResourceBlockPermissionsContainer(companyId, groupId, name);
@@ -309,7 +306,7 @@ public class ResourceTypePermissionLocalServiceWrapper
 	 * Returns a range of all the resource type permissions.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>com.liferay.portal.model.impl.ResourceTypePermissionModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>com.liferay.portal.model.impl.ResourceTypePermissionModelImpl</code>.
 	 * </p>
 	 *
 	 * @param start the lower bound of the range of resource type permissions
@@ -347,7 +344,8 @@ public class ResourceTypePermissionLocalServiceWrapper
 
 	@Override
 	public boolean hasCompanyScopePermission(
-			long companyId, String name, long roleId, String actionId)
+			long companyId, java.lang.String name, long roleId,
+			java.lang.String actionId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _resourceTypePermissionLocalService.hasCompanyScopePermission(
@@ -356,7 +354,8 @@ public class ResourceTypePermissionLocalServiceWrapper
 
 	@Override
 	public boolean hasEitherScopePermission(
-			long companyId, String name, long roleId, String actionId)
+			long companyId, java.lang.String name, long roleId,
+			java.lang.String actionId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _resourceTypePermissionLocalService.hasEitherScopePermission(
@@ -365,8 +364,8 @@ public class ResourceTypePermissionLocalServiceWrapper
 
 	@Override
 	public boolean hasGroupScopePermission(
-			long companyId, long groupId, String name, long roleId,
-			String actionId)
+			long companyId, long groupId, java.lang.String name, long roleId,
+			java.lang.String actionId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _resourceTypePermissionLocalService.hasGroupScopePermission(
@@ -375,7 +374,7 @@ public class ResourceTypePermissionLocalServiceWrapper
 
 	@Override
 	public void updateCompanyScopeResourceTypePermissions(
-		long companyId, String name, long roleId, long actionIdsLong,
+		long companyId, java.lang.String name, long roleId, long actionIdsLong,
 		long operator) {
 
 		_resourceTypePermissionLocalService.
@@ -385,7 +384,7 @@ public class ResourceTypePermissionLocalServiceWrapper
 
 	@Override
 	public void updateGroupScopeResourceTypePermissions(
-		long companyId, long groupId, String name, long roleId,
+		long companyId, long groupId, java.lang.String name, long roleId,
 		long actionIdsLong, long operator) {
 
 		_resourceTypePermissionLocalService.

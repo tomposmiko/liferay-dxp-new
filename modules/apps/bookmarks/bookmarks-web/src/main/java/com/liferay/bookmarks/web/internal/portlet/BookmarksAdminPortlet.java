@@ -15,6 +15,7 @@
 package com.liferay.bookmarks.web.internal.portlet;
 
 import com.liferay.bookmarks.constants.BookmarksPortletKeys;
+import com.liferay.bookmarks.service.BookmarksFolderService;
 import com.liferay.portal.kernel.model.Release;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCPortlet;
 import com.liferay.trash.TrashHelper;
@@ -53,8 +54,7 @@ import org.osgi.service.component.annotations.Reference;
 		"javax.portlet.init-param.template-path=/META-INF/resources/",
 		"javax.portlet.name=" + BookmarksPortletKeys.BOOKMARKS_ADMIN,
 		"javax.portlet.resource-bundle=content.Language",
-		"javax.portlet.security-role-ref=administrator",
-		"javax.portlet.supports.mime-type=text/html"
+		"javax.portlet.security-role-ref=administrator"
 	},
 	service = Portlet.class
 )
@@ -70,8 +70,11 @@ public class BookmarksAdminPortlet extends MVCPortlet {
 		super.render(renderRequest, renderResponse);
 	}
 
+	@Reference
+	private BookmarksFolderService _bookmarksFolderService;
+
 	@Reference(
-		target = "(&(release.bundle.symbolic.name=com.liferay.bookmarks.web)(&(release.schema.version>=1.0.0)(!(release.schema.version>=1.1.0))))"
+		target = "(&(release.bundle.symbolic.name=com.liferay.bookmarks.web)(&(release.schema.version>=1.0.0)(!(release.schema.version>=2.0.0))))"
 	)
 	private Release _release;
 

@@ -86,7 +86,7 @@ public class ChildSitesItemSelectorViewDisplayContext
 	private List<Group> _filterGroups(
 		List<Group> groups, PermissionChecker permissionChecker) {
 
-		List<Group> filteredGroups = new ArrayList();
+		List<Group> filteredGroups = new ArrayList<>();
 
 		for (Group group : groups) {
 			if (permissionChecker.isGroupAdmin(group.getGroupId())) {
@@ -112,7 +112,7 @@ public class ChildSitesItemSelectorViewDisplayContext
 			WebKeys.THEME_DISPLAY);
 
 		_groupParams.put(
-			"groupsTree", ListUtil.toList(themeDisplay.getSiteGroup()));
+			"groupsTree", ListUtil.fromArray(themeDisplay.getSiteGroup()));
 
 		_groupParams.put("site", Boolean.TRUE);
 

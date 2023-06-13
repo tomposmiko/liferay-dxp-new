@@ -15,6 +15,7 @@
 package com.liferay.trash.service.persistence.impl;
 
 import com.liferay.petra.string.StringBundler;
+import com.liferay.portal.kernel.configuration.Configuration;
 import com.liferay.portal.kernel.dao.orm.EntityCache;
 import com.liferay.portal.kernel.dao.orm.FinderCache;
 import com.liferay.portal.kernel.dao.orm.FinderPath;
@@ -22,29 +23,34 @@ import com.liferay.portal.kernel.dao.orm.Query;
 import com.liferay.portal.kernel.dao.orm.QueryPos;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.dao.orm.Session;
+import com.liferay.portal.kernel.dao.orm.SessionFactory;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.service.persistence.CompanyProvider;
-import com.liferay.portal.kernel.service.persistence.CompanyProviderWrapper;
+import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
 import com.liferay.portal.kernel.service.persistence.impl.BasePersistenceImpl;
+import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.ProxyUtil;
-import com.liferay.portal.spring.extender.service.ServiceReference;
 import com.liferay.trash.exception.NoSuchVersionException;
 import com.liferay.trash.model.TrashVersion;
 import com.liferay.trash.model.impl.TrashVersionImpl;
 import com.liferay.trash.model.impl.TrashVersionModelImpl;
 import com.liferay.trash.service.persistence.TrashVersionPersistence;
+import com.liferay.trash.service.persistence.impl.constants.TrashPersistenceConstants;
 
 import java.io.Serializable;
 
 import java.lang.reflect.InvocationHandler;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import org.osgi.annotation.versioning.ProviderType;
+import javax.sql.DataSource;
+
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
+import org.osgi.service.component.annotations.Reference;
 
 /**
  * The persistence implementation for the trash version service.
@@ -56,12 +62,12 @@ import org.osgi.annotation.versioning.ProviderType;
  * @author Brian Wing Shun Chan
  * @generated
  */
-@ProviderType
+@Component(service = TrashVersionPersistence.class)
 public class TrashVersionPersistenceImpl
 	extends BasePersistenceImpl<TrashVersion>
 	implements TrashVersionPersistence {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this class directly. Always use <code>TrashVersionUtil</code> to access the trash version persistence. Modify <code>service.xml</code> and rerun ServiceBuilder to regenerate this class.
@@ -98,7 +104,7 @@ public class TrashVersionPersistenceImpl
 	 * Returns a range of all the trash versions where entryId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>TrashVersionModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>TrashVersionModelImpl</code>.
 	 * </p>
 	 *
 	 * @param entryId the entry ID
@@ -115,7 +121,7 @@ public class TrashVersionPersistenceImpl
 	 * Returns an ordered range of all the trash versions where entryId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>TrashVersionModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>TrashVersionModelImpl</code>.
 	 * </p>
 	 *
 	 * @param entryId the entry ID
@@ -136,47 +142,47 @@ public class TrashVersionPersistenceImpl
 	 * Returns an ordered range of all the trash versions where entryId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>TrashVersionModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>TrashVersionModelImpl</code>.
 	 * </p>
 	 *
 	 * @param entryId the entry ID
 	 * @param start the lower bound of the range of trash versions
 	 * @param end the upper bound of the range of trash versions (not inclusive)
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
-	 * @param retrieveFromCache whether to retrieve from the finder cache
+	 * @param useFinderCache whether to use the finder cache
 	 * @return the ordered range of matching trash versions
 	 */
 	@Override
 	public List<TrashVersion> findByEntryId(
 		long entryId, int start, int end,
 		OrderByComparator<TrashVersion> orderByComparator,
-		boolean retrieveFromCache) {
+		boolean useFinderCache) {
 
-		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
 			(orderByComparator == null)) {
 
-			pagination = false;
-			finderPath = _finderPathWithoutPaginationFindByEntryId;
-			finderArgs = new Object[] {entryId};
+			if (useFinderCache) {
+				finderPath = _finderPathWithoutPaginationFindByEntryId;
+				finderArgs = new Object[] {entryId};
+			}
 		}
-		else {
+		else if (useFinderCache) {
 			finderPath = _finderPathWithPaginationFindByEntryId;
 			finderArgs = new Object[] {entryId, start, end, orderByComparator};
 		}
 
 		List<TrashVersion> list = null;
 
-		if (retrieveFromCache) {
+		if (useFinderCache) {
 			list = (List<TrashVersion>)finderCache.getResult(
 				finderPath, finderArgs, this);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (TrashVersion trashVersion : list) {
-					if ((entryId != trashVersion.getEntryId())) {
+					if (entryId != trashVersion.getEntryId()) {
 						list = null;
 
 						break;
@@ -204,7 +210,7 @@ public class TrashVersionPersistenceImpl
 				appendOrderByComparator(
 					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
 			}
-			else if (pagination) {
+			else {
 				query.append(TrashVersionModelImpl.ORDER_BY_JPQL);
 			}
 
@@ -221,25 +227,19 @@ public class TrashVersionPersistenceImpl
 
 				qPos.add(entryId);
 
-				if (!pagination) {
-					list = (List<TrashVersion>)QueryUtil.list(
-						q, getDialect(), start, end, false);
-
-					Collections.sort(list);
-
-					list = Collections.unmodifiableList(list);
-				}
-				else {
-					list = (List<TrashVersion>)QueryUtil.list(
-						q, getDialect(), start, end);
-				}
+				list = (List<TrashVersion>)QueryUtil.list(
+					q, getDialect(), start, end);
 
 				cacheResult(list);
 
-				finderCache.putResult(finderPath, finderArgs, list);
+				if (useFinderCache) {
+					finderCache.putResult(finderPath, finderArgs, list);
+				}
 			}
 			catch (Exception e) {
-				finderCache.removeResult(finderPath, finderArgs);
+				if (useFinderCache) {
+					finderCache.removeResult(finderPath, finderArgs);
+				}
 
 				throw processException(e);
 			}
@@ -603,7 +603,7 @@ public class TrashVersionPersistenceImpl
 	 * Returns a range of all the trash versions where entryId = &#63; and classNameId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>TrashVersionModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>TrashVersionModelImpl</code>.
 	 * </p>
 	 *
 	 * @param entryId the entry ID
@@ -623,7 +623,7 @@ public class TrashVersionPersistenceImpl
 	 * Returns an ordered range of all the trash versions where entryId = &#63; and classNameId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>TrashVersionModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>TrashVersionModelImpl</code>.
 	 * </p>
 	 *
 	 * @param entryId the entry ID
@@ -646,7 +646,7 @@ public class TrashVersionPersistenceImpl
 	 * Returns an ordered range of all the trash versions where entryId = &#63; and classNameId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>TrashVersionModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>TrashVersionModelImpl</code>.
 	 * </p>
 	 *
 	 * @param entryId the entry ID
@@ -654,27 +654,27 @@ public class TrashVersionPersistenceImpl
 	 * @param start the lower bound of the range of trash versions
 	 * @param end the upper bound of the range of trash versions (not inclusive)
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
-	 * @param retrieveFromCache whether to retrieve from the finder cache
+	 * @param useFinderCache whether to use the finder cache
 	 * @return the ordered range of matching trash versions
 	 */
 	@Override
 	public List<TrashVersion> findByE_C(
 		long entryId, long classNameId, int start, int end,
 		OrderByComparator<TrashVersion> orderByComparator,
-		boolean retrieveFromCache) {
+		boolean useFinderCache) {
 
-		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
 			(orderByComparator == null)) {
 
-			pagination = false;
-			finderPath = _finderPathWithoutPaginationFindByE_C;
-			finderArgs = new Object[] {entryId, classNameId};
+			if (useFinderCache) {
+				finderPath = _finderPathWithoutPaginationFindByE_C;
+				finderArgs = new Object[] {entryId, classNameId};
+			}
 		}
-		else {
+		else if (useFinderCache) {
 			finderPath = _finderPathWithPaginationFindByE_C;
 			finderArgs = new Object[] {
 				entryId, classNameId, start, end, orderByComparator
@@ -683,7 +683,7 @@ public class TrashVersionPersistenceImpl
 
 		List<TrashVersion> list = null;
 
-		if (retrieveFromCache) {
+		if (useFinderCache) {
 			list = (List<TrashVersion>)finderCache.getResult(
 				finderPath, finderArgs, this);
 
@@ -721,7 +721,7 @@ public class TrashVersionPersistenceImpl
 				appendOrderByComparator(
 					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
 			}
-			else if (pagination) {
+			else {
 				query.append(TrashVersionModelImpl.ORDER_BY_JPQL);
 			}
 
@@ -740,25 +740,19 @@ public class TrashVersionPersistenceImpl
 
 				qPos.add(classNameId);
 
-				if (!pagination) {
-					list = (List<TrashVersion>)QueryUtil.list(
-						q, getDialect(), start, end, false);
-
-					Collections.sort(list);
-
-					list = Collections.unmodifiableList(list);
-				}
-				else {
-					list = (List<TrashVersion>)QueryUtil.list(
-						q, getDialect(), start, end);
-				}
+				list = (List<TrashVersion>)QueryUtil.list(
+					q, getDialect(), start, end);
 
 				cacheResult(list);
 
-				finderCache.putResult(finderPath, finderArgs, list);
+				if (useFinderCache) {
+					finderCache.putResult(finderPath, finderArgs, list);
+				}
 			}
 			catch (Exception e) {
-				finderCache.removeResult(finderPath, finderArgs);
+				if (useFinderCache) {
+					finderCache.removeResult(finderPath, finderArgs);
+				}
 
 				throw processException(e);
 			}
@@ -1190,18 +1184,22 @@ public class TrashVersionPersistenceImpl
 	 *
 	 * @param classNameId the class name ID
 	 * @param classPK the class pk
-	 * @param retrieveFromCache whether to retrieve from the finder cache
+	 * @param useFinderCache whether to use the finder cache
 	 * @return the matching trash version, or <code>null</code> if a matching trash version could not be found
 	 */
 	@Override
 	public TrashVersion fetchByC_C(
-		long classNameId, long classPK, boolean retrieveFromCache) {
+		long classNameId, long classPK, boolean useFinderCache) {
 
-		Object[] finderArgs = new Object[] {classNameId, classPK};
+		Object[] finderArgs = null;
+
+		if (useFinderCache) {
+			finderArgs = new Object[] {classNameId, classPK};
+		}
 
 		Object result = null;
 
-		if (retrieveFromCache) {
+		if (useFinderCache) {
 			result = finderCache.getResult(
 				_finderPathFetchByC_C, finderArgs, this);
 		}
@@ -1243,8 +1241,10 @@ public class TrashVersionPersistenceImpl
 				List<TrashVersion> list = q.list();
 
 				if (list.isEmpty()) {
-					finderCache.putResult(
-						_finderPathFetchByC_C, finderArgs, list);
+					if (useFinderCache) {
+						finderCache.putResult(
+							_finderPathFetchByC_C, finderArgs, list);
+					}
 				}
 				else {
 					TrashVersion trashVersion = list.get(0);
@@ -1255,7 +1255,9 @@ public class TrashVersionPersistenceImpl
 				}
 			}
 			catch (Exception e) {
-				finderCache.removeResult(_finderPathFetchByC_C, finderArgs);
+				if (useFinderCache) {
+					finderCache.removeResult(_finderPathFetchByC_C, finderArgs);
+				}
 
 				throw processException(e);
 			}
@@ -1355,7 +1357,6 @@ public class TrashVersionPersistenceImpl
 
 		setModelImplClass(TrashVersionImpl.class);
 		setModelPKClass(long.class);
-		setEntityCacheEnabled(TrashVersionModelImpl.ENTITY_CACHE_ENABLED);
 	}
 
 	/**
@@ -1366,7 +1367,7 @@ public class TrashVersionPersistenceImpl
 	@Override
 	public void cacheResult(TrashVersion trashVersion) {
 		entityCache.putResult(
-			TrashVersionModelImpl.ENTITY_CACHE_ENABLED, TrashVersionImpl.class,
+			entityCacheEnabled, TrashVersionImpl.class,
 			trashVersion.getPrimaryKey(), trashVersion);
 
 		finderCache.putResult(
@@ -1388,9 +1389,8 @@ public class TrashVersionPersistenceImpl
 	public void cacheResult(List<TrashVersion> trashVersions) {
 		for (TrashVersion trashVersion : trashVersions) {
 			if (entityCache.getResult(
-					TrashVersionModelImpl.ENTITY_CACHE_ENABLED,
-					TrashVersionImpl.class, trashVersion.getPrimaryKey()) ==
-						null) {
+					entityCacheEnabled, TrashVersionImpl.class,
+					trashVersion.getPrimaryKey()) == null) {
 
 				cacheResult(trashVersion);
 			}
@@ -1426,7 +1426,7 @@ public class TrashVersionPersistenceImpl
 	@Override
 	public void clearCache(TrashVersion trashVersion) {
 		entityCache.removeResult(
-			TrashVersionModelImpl.ENTITY_CACHE_ENABLED, TrashVersionImpl.class,
+			entityCacheEnabled, TrashVersionImpl.class,
 			trashVersion.getPrimaryKey());
 
 		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
@@ -1442,8 +1442,8 @@ public class TrashVersionPersistenceImpl
 
 		for (TrashVersion trashVersion : trashVersions) {
 			entityCache.removeResult(
-				TrashVersionModelImpl.ENTITY_CACHE_ENABLED,
-				TrashVersionImpl.class, trashVersion.getPrimaryKey());
+				entityCacheEnabled, TrashVersionImpl.class,
+				trashVersion.getPrimaryKey());
 
 			clearUniqueFindersCache((TrashVersionModelImpl)trashVersion, true);
 		}
@@ -1502,7 +1502,7 @@ public class TrashVersionPersistenceImpl
 		trashVersion.setNew(true);
 		trashVersion.setPrimaryKey(versionId);
 
-		trashVersion.setCompanyId(companyProvider.getCompanyId());
+		trashVersion.setCompanyId(CompanyThreadLocal.getCompanyId());
 
 		return trashVersion;
 	}
@@ -1637,7 +1637,7 @@ public class TrashVersionPersistenceImpl
 
 		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
 
-		if (!TrashVersionModelImpl.COLUMN_BITMASK_ENABLED) {
+		if (!_columnBitmaskEnabled) {
 			finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
 		}
 		else if (isNew) {
@@ -1705,7 +1705,7 @@ public class TrashVersionPersistenceImpl
 		}
 
 		entityCache.putResult(
-			TrashVersionModelImpl.ENTITY_CACHE_ENABLED, TrashVersionImpl.class,
+			entityCacheEnabled, TrashVersionImpl.class,
 			trashVersion.getPrimaryKey(), trashVersion, false);
 
 		clearUniqueFindersCache(trashVersionModelImpl, false);
@@ -1780,7 +1780,7 @@ public class TrashVersionPersistenceImpl
 	 * Returns a range of all the trash versions.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>TrashVersionModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>TrashVersionModelImpl</code>.
 	 * </p>
 	 *
 	 * @param start the lower bound of the range of trash versions
@@ -1796,7 +1796,7 @@ public class TrashVersionPersistenceImpl
 	 * Returns an ordered range of all the trash versions.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>TrashVersionModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>TrashVersionModelImpl</code>.
 	 * </p>
 	 *
 	 * @param start the lower bound of the range of trash versions
@@ -1815,39 +1815,39 @@ public class TrashVersionPersistenceImpl
 	 * Returns an ordered range of all the trash versions.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>TrashVersionModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>TrashVersionModelImpl</code>.
 	 * </p>
 	 *
 	 * @param start the lower bound of the range of trash versions
 	 * @param end the upper bound of the range of trash versions (not inclusive)
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
-	 * @param retrieveFromCache whether to retrieve from the finder cache
+	 * @param useFinderCache whether to use the finder cache
 	 * @return the ordered range of trash versions
 	 */
 	@Override
 	public List<TrashVersion> findAll(
 		int start, int end, OrderByComparator<TrashVersion> orderByComparator,
-		boolean retrieveFromCache) {
+		boolean useFinderCache) {
 
-		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
 			(orderByComparator == null)) {
 
-			pagination = false;
-			finderPath = _finderPathWithoutPaginationFindAll;
-			finderArgs = FINDER_ARGS_EMPTY;
+			if (useFinderCache) {
+				finderPath = _finderPathWithoutPaginationFindAll;
+				finderArgs = FINDER_ARGS_EMPTY;
+			}
 		}
-		else {
+		else if (useFinderCache) {
 			finderPath = _finderPathWithPaginationFindAll;
 			finderArgs = new Object[] {start, end, orderByComparator};
 		}
 
 		List<TrashVersion> list = null;
 
-		if (retrieveFromCache) {
+		if (useFinderCache) {
 			list = (List<TrashVersion>)finderCache.getResult(
 				finderPath, finderArgs, this);
 		}
@@ -1870,9 +1870,7 @@ public class TrashVersionPersistenceImpl
 			else {
 				sql = _SQL_SELECT_TRASHVERSION;
 
-				if (pagination) {
-					sql = sql.concat(TrashVersionModelImpl.ORDER_BY_JPQL);
-				}
+				sql = sql.concat(TrashVersionModelImpl.ORDER_BY_JPQL);
 			}
 
 			Session session = null;
@@ -1882,25 +1880,19 @@ public class TrashVersionPersistenceImpl
 
 				Query q = session.createQuery(sql);
 
-				if (!pagination) {
-					list = (List<TrashVersion>)QueryUtil.list(
-						q, getDialect(), start, end, false);
-
-					Collections.sort(list);
-
-					list = Collections.unmodifiableList(list);
-				}
-				else {
-					list = (List<TrashVersion>)QueryUtil.list(
-						q, getDialect(), start, end);
-				}
+				list = (List<TrashVersion>)QueryUtil.list(
+					q, getDialect(), start, end);
 
 				cacheResult(list);
 
-				finderCache.putResult(finderPath, finderArgs, list);
+				if (useFinderCache) {
+					finderCache.putResult(finderPath, finderArgs, list);
+				}
 			}
 			catch (Exception e) {
-				finderCache.removeResult(finderPath, finderArgs);
+				if (useFinderCache) {
+					finderCache.removeResult(finderPath, finderArgs);
+				}
 
 				throw processException(e);
 			}
@@ -1983,27 +1975,27 @@ public class TrashVersionPersistenceImpl
 	/**
 	 * Initializes the trash version persistence.
 	 */
-	public void afterPropertiesSet() {
+	@Activate
+	public void activate() {
+		TrashVersionModelImpl.setEntityCacheEnabled(entityCacheEnabled);
+		TrashVersionModelImpl.setFinderCacheEnabled(finderCacheEnabled);
+
 		_finderPathWithPaginationFindAll = new FinderPath(
-			TrashVersionModelImpl.ENTITY_CACHE_ENABLED,
-			TrashVersionModelImpl.FINDER_CACHE_ENABLED, TrashVersionImpl.class,
+			entityCacheEnabled, finderCacheEnabled, TrashVersionImpl.class,
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findAll", new String[0]);
 
 		_finderPathWithoutPaginationFindAll = new FinderPath(
-			TrashVersionModelImpl.ENTITY_CACHE_ENABLED,
-			TrashVersionModelImpl.FINDER_CACHE_ENABLED, TrashVersionImpl.class,
+			entityCacheEnabled, finderCacheEnabled, TrashVersionImpl.class,
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findAll",
 			new String[0]);
 
 		_finderPathCountAll = new FinderPath(
-			TrashVersionModelImpl.ENTITY_CACHE_ENABLED,
-			TrashVersionModelImpl.FINDER_CACHE_ENABLED, Long.class,
+			entityCacheEnabled, finderCacheEnabled, Long.class,
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countAll",
 			new String[0]);
 
 		_finderPathWithPaginationFindByEntryId = new FinderPath(
-			TrashVersionModelImpl.ENTITY_CACHE_ENABLED,
-			TrashVersionModelImpl.FINDER_CACHE_ENABLED, TrashVersionImpl.class,
+			entityCacheEnabled, finderCacheEnabled, TrashVersionImpl.class,
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByEntryId",
 			new String[] {
 				Long.class.getName(), Integer.class.getName(),
@@ -2011,21 +2003,18 @@ public class TrashVersionPersistenceImpl
 			});
 
 		_finderPathWithoutPaginationFindByEntryId = new FinderPath(
-			TrashVersionModelImpl.ENTITY_CACHE_ENABLED,
-			TrashVersionModelImpl.FINDER_CACHE_ENABLED, TrashVersionImpl.class,
+			entityCacheEnabled, finderCacheEnabled, TrashVersionImpl.class,
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByEntryId",
 			new String[] {Long.class.getName()},
 			TrashVersionModelImpl.ENTRYID_COLUMN_BITMASK);
 
 		_finderPathCountByEntryId = new FinderPath(
-			TrashVersionModelImpl.ENTITY_CACHE_ENABLED,
-			TrashVersionModelImpl.FINDER_CACHE_ENABLED, Long.class,
+			entityCacheEnabled, finderCacheEnabled, Long.class,
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByEntryId",
 			new String[] {Long.class.getName()});
 
 		_finderPathWithPaginationFindByE_C = new FinderPath(
-			TrashVersionModelImpl.ENTITY_CACHE_ENABLED,
-			TrashVersionModelImpl.FINDER_CACHE_ENABLED, TrashVersionImpl.class,
+			entityCacheEnabled, finderCacheEnabled, TrashVersionImpl.class,
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByE_C",
 			new String[] {
 				Long.class.getName(), Long.class.getName(),
@@ -2034,48 +2023,76 @@ public class TrashVersionPersistenceImpl
 			});
 
 		_finderPathWithoutPaginationFindByE_C = new FinderPath(
-			TrashVersionModelImpl.ENTITY_CACHE_ENABLED,
-			TrashVersionModelImpl.FINDER_CACHE_ENABLED, TrashVersionImpl.class,
+			entityCacheEnabled, finderCacheEnabled, TrashVersionImpl.class,
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByE_C",
 			new String[] {Long.class.getName(), Long.class.getName()},
 			TrashVersionModelImpl.ENTRYID_COLUMN_BITMASK |
 			TrashVersionModelImpl.CLASSNAMEID_COLUMN_BITMASK);
 
 		_finderPathCountByE_C = new FinderPath(
-			TrashVersionModelImpl.ENTITY_CACHE_ENABLED,
-			TrashVersionModelImpl.FINDER_CACHE_ENABLED, Long.class,
+			entityCacheEnabled, finderCacheEnabled, Long.class,
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByE_C",
 			new String[] {Long.class.getName(), Long.class.getName()});
 
 		_finderPathFetchByC_C = new FinderPath(
-			TrashVersionModelImpl.ENTITY_CACHE_ENABLED,
-			TrashVersionModelImpl.FINDER_CACHE_ENABLED, TrashVersionImpl.class,
+			entityCacheEnabled, finderCacheEnabled, TrashVersionImpl.class,
 			FINDER_CLASS_NAME_ENTITY, "fetchByC_C",
 			new String[] {Long.class.getName(), Long.class.getName()},
 			TrashVersionModelImpl.CLASSNAMEID_COLUMN_BITMASK |
 			TrashVersionModelImpl.CLASSPK_COLUMN_BITMASK);
 
 		_finderPathCountByC_C = new FinderPath(
-			TrashVersionModelImpl.ENTITY_CACHE_ENABLED,
-			TrashVersionModelImpl.FINDER_CACHE_ENABLED, Long.class,
+			entityCacheEnabled, finderCacheEnabled, Long.class,
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByC_C",
 			new String[] {Long.class.getName(), Long.class.getName()});
 	}
 
-	public void destroy() {
+	@Deactivate
+	public void deactivate() {
 		entityCache.removeCache(TrashVersionImpl.class.getName());
 		finderCache.removeCache(FINDER_CLASS_NAME_ENTITY);
 		finderCache.removeCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
 		finderCache.removeCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
 	}
 
-	@ServiceReference(type = CompanyProviderWrapper.class)
-	protected CompanyProvider companyProvider;
+	@Override
+	@Reference(
+		target = TrashPersistenceConstants.SERVICE_CONFIGURATION_FILTER,
+		unbind = "-"
+	)
+	public void setConfiguration(Configuration configuration) {
+		super.setConfiguration(configuration);
 
-	@ServiceReference(type = EntityCache.class)
+		_columnBitmaskEnabled = GetterUtil.getBoolean(
+			configuration.get(
+				"value.object.column.bitmask.enabled.com.liferay.trash.model.TrashVersion"),
+			true);
+	}
+
+	@Override
+	@Reference(
+		target = TrashPersistenceConstants.ORIGIN_BUNDLE_SYMBOLIC_NAME_FILTER,
+		unbind = "-"
+	)
+	public void setDataSource(DataSource dataSource) {
+		super.setDataSource(dataSource);
+	}
+
+	@Override
+	@Reference(
+		target = TrashPersistenceConstants.ORIGIN_BUNDLE_SYMBOLIC_NAME_FILTER,
+		unbind = "-"
+	)
+	public void setSessionFactory(SessionFactory sessionFactory) {
+		super.setSessionFactory(sessionFactory);
+	}
+
+	private boolean _columnBitmaskEnabled;
+
+	@Reference
 	protected EntityCache entityCache;
 
-	@ServiceReference(type = FinderCache.class)
+	@Reference
 	protected FinderCache finderCache;
 
 	private static final String _SQL_SELECT_TRASHVERSION =
@@ -2100,5 +2117,14 @@ public class TrashVersionPersistenceImpl
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		TrashVersionPersistenceImpl.class);
+
+	static {
+		try {
+			Class.forName(TrashPersistenceConstants.class.getName());
+		}
+		catch (ClassNotFoundException cnfe) {
+			throw new ExceptionInInitializerError(cnfe);
+		}
+	}
 
 }

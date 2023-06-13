@@ -46,6 +46,7 @@ import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
+import com.liferay.portal.test.rule.PermissionCheckerMethodTestRule;
 import com.liferay.portal.test.rule.TransactionalTestRule;
 
 import java.util.ArrayList;
@@ -83,6 +84,7 @@ public class JournalArticleFinderTest {
 	public static final AggregateTestRule aggregateTestRule =
 		new AggregateTestRule(
 			new LiferayIntegrationTestRule(),
+			PermissionCheckerMethodTestRule.INSTANCE,
 			new TransactionalTestRule(
 				Propagation.SUPPORTS, "com.liferay.journal.service"));
 
@@ -267,6 +269,30 @@ public class JournalArticleFinderTest {
 	}
 
 	@Test
+	public void testFindByG_F_C_L() throws Exception {
+		List<Long> folderIds = new ArrayList<>();
+
+		folderIds.add(_folder.getFolderId());
+
+		QueryDefinition<JournalArticle> queryDefinition =
+			new QueryDefinition<>();
+
+		queryDefinition.setIncludeOwner(true);
+		queryDefinition.setOwnerUserId(TestPropsValues.getUserId());
+		queryDefinition.setStatus(WorkflowConstants.STATUS_ANY);
+
+		List<JournalArticle> articles =
+			_journalArticleFinder.filterFindByG_F_C_L(
+				_group.getGroupId(), folderIds,
+				JournalArticleConstants.CLASSNAME_ID_DEFAULT,
+				LocaleUtil.getSiteDefault(), queryDefinition);
+
+		Assert.assertEquals(articles.toString(), 1, articles.size());
+
+		Assert.assertEquals(articles.get(0), _article);
+	}
+
+	@Test
 	public void testFindByR_D() throws Exception {
 		JournalArticle article = _journalArticleFinder.findByR_D(
 			_article.getResourcePrimKey(), new Date());
@@ -303,8 +329,8 @@ public class JournalArticleFinderTest {
 
 		Map<Locale, String> titleMap = new HashMap<>();
 
-		titleMap.put(LocaleUtil.US, "Localized Article");
 		titleMap.put(LocaleUtil.FRANCE, "Localized Article");
+		titleMap.put(LocaleUtil.US, "Localized Article");
 
 		JournalTestUtil.addArticle(
 			_group.getGroupId(), _folder.getFolderId(),
@@ -511,6 +537,9 @@ public class JournalArticleFinderTest {
 
 			JournalArticle article = _articles.get(i);
 
+			article = JournalArticleLocalServiceUtil.getArticle(
+				article.getId());
+
 			article.setCreateDate(calendar.getTime());
 			article.setModifiedDate(calendar.getTime());
 			article.setArticleId("a" + i);
@@ -518,7 +547,10 @@ public class JournalArticleFinderTest {
 			article.setDisplayDate(calendar.getTime());
 			article.setReviewDate(calendar.getTime());
 
-			JournalArticleLocalServiceUtil.updateJournalArticle(article);
+			article = JournalArticleLocalServiceUtil.updateJournalArticle(
+				article);
+
+			_articles.set(i, article);
 		}
 	}
 

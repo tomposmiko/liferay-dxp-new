@@ -139,7 +139,7 @@
 			<finder-column name="value" />
 		</finder>
 	</entity>
-	<entity local-service="true" name="ClusterGroup" remote-service="false">
+	<entity deprecated="true" local-service="true" name="ClusterGroup" remote-service="false">
 
 		<!-- PK fields -->
 
@@ -1054,6 +1054,10 @@
 		<finder name="G_P" return-type="LayoutSet" unique="true">
 			<finder-column name="groupId" />
 			<finder-column name="privateLayout" />
+		</finder>
+		<finder name="C_L" return-type="Collection">
+			<finder-column name="companyId" />
+			<finder-column name="layoutSetPrototypeUuid" />
 		</finder>
 		<finder name="P_L" return-type="Layout">
 			<finder-column name="privateLayout" />
@@ -3457,6 +3461,7 @@
 		<exception>GroupFriendlyURL</exception>
 		<exception>GroupInheritContent</exception>
 		<exception>GroupKey</exception>
+		<exception>GroupName</exception>
 		<exception>GroupParent</exception>
 		<exception>ImageResolution</exception>
 		<exception>ImageType</exception>

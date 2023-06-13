@@ -65,7 +65,7 @@ JournalArticleDisplay articleDisplay = journalPreviewArticleContentTemplateDispl
 	<c:if test="<%= articleDisplay.isPaginate() %>">
 		<liferay-ui:page-iterator
 			cur="<%= articleDisplay.getCurrentPage() %>"
-			curParam='<%= "page" %>'
+			curParam="page"
 			delta="<%= 1 %>"
 			id="articleDisplayPages"
 			maxPages="<%= 25 %>"
@@ -78,10 +78,18 @@ JournalArticleDisplay articleDisplay = journalPreviewArticleContentTemplateDispl
 
 <script>
 	function previewArticleContentTemplate() {
-		var ddmTemplateId = document.getElementById('<portlet:namespace />ddmTemplateId');
+		var ddmTemplateId = document.getElementById(
+			'<portlet:namespace />ddmTemplateId'
+		);
 
-		location.href = Liferay.Util.addParams('<portlet:namespace />ddmTemplateId=' + ddmTemplateId.value, '<%= journalPreviewArticleContentTemplateDisplayContext.getPortletURL() %>');
+		location.href = Liferay.Util.addParams(
+			'<portlet:namespace />ddmTemplateId=' + ddmTemplateId.value,
+			'<%= journalPreviewArticleContentTemplateDisplayContext.getPortletURL() %>'
+		);
 	}
 
-	Liferay.Util.selectEntityHandler('#<portlet:namespace />previewFm', '<%= HtmlUtil.escapeJS(journalPreviewArticleContentTemplateDisplayContext.getEventName()) %>');
+	Liferay.Util.selectEntityHandler(
+		'#<portlet:namespace />previewFm',
+		'<%= HtmlUtil.escapeJS(journalPreviewArticleContentTemplateDisplayContext.getEventName()) %>'
+	);
 </script>

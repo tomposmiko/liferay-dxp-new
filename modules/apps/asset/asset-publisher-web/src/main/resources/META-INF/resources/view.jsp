@@ -134,19 +134,15 @@ if (assetPublisherDisplayContext.isEnableTagBasedNavigation() && !assetPublisher
 SearchContainer searchContainer = assetPublisherDisplayContext.getSearchContainer();
 %>
 
-<c:if test="<%= !assetPublisherDisplayContext.isPaginationTypeNone() && (searchContainer.getTotal() > searchContainer.getResults().size()) %>">
+<c:if test="<%= !assetPublisherDisplayContext.isPaginationTypeNone() && (searchContainer.getTotal() > searchContainer.getDelta()) %>">
 	<liferay-ui:search-paginator
 		searchContainer="<%= searchContainer %>"
 		type="<%= assetPublisherDisplayContext.getPaginationType() %>"
 	/>
 </c:if>
 
-<aui:script use="querystring-parse">
-	var queryString = window.location.search.substring(1);
-
-	var queryParamObj = new A.QueryString.parse(queryString);
-
-	var assetEntryId = queryParamObj['<portlet:namespace />assetEntryId'];
+<aui:script sandbox="<%= true %>">
+	const assetEntryId = '<%= assetPublisherDisplayContext.getAssetEntryId() %>';
 
 	if (assetEntryId) {
 		window.location.hash = assetEntryId;

@@ -104,6 +104,11 @@
 	<td></td>
 </tr>
 <tr>
+	<td>SHARING</td>
+	<td>//iframe[contains(@id,'sharing')]</td>
+	<td></td>
+</tr>
+<tr>
 	<td>MODAL_IFRAME</td>
 	<td>//div[contains(@class,'modal')]//iframe</td>
 	<td></td>
@@ -111,6 +116,11 @@
 <tr>
 	<td>RECAPTCHA</td>
 	<td>//iframe[contains(@src,'recaptcha')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>SELECT_MEDIA_GALLERY_VIDEO</td>
+	<td>//iframe[@class='image-viewer-base-image']</td>
 	<td></td>
 </tr>
 <tr>
@@ -146,6 +156,11 @@
 <tr>
 	<td>SITE_VARIATION_IFRAME</td>
 	<td>//iframe[contains(@id,'sitePagesVariationDialog_iframe_')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>WEB_APPLICATION</td>
+	<td>//iframe[contains(@id,'WebApplicationFrame')]</td>
 	<td></td>
 </tr>
 <tr>

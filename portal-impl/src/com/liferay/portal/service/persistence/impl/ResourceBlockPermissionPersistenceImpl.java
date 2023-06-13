@@ -15,7 +15,6 @@
 package com.liferay.portal.service.persistence.impl;
 
 import com.liferay.petra.string.StringBundler;
-import com.liferay.portal.kernel.bean.BeanReference;
 import com.liferay.portal.kernel.dao.orm.EntityCache;
 import com.liferay.portal.kernel.dao.orm.EntityCacheUtil;
 import com.liferay.portal.kernel.dao.orm.FinderCacheUtil;
@@ -28,8 +27,7 @@ import com.liferay.portal.kernel.exception.NoSuchResourceBlockPermissionExceptio
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.ResourceBlockPermission;
-import com.liferay.portal.kernel.service.persistence.CompanyProvider;
-import com.liferay.portal.kernel.service.persistence.CompanyProviderWrapper;
+import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
 import com.liferay.portal.kernel.service.persistence.ResourceBlockPermissionPersistence;
 import com.liferay.portal.kernel.service.persistence.impl.BasePersistenceImpl;
 import com.liferay.portal.kernel.util.OrderByComparator;
@@ -41,11 +39,8 @@ import java.io.Serializable;
 
 import java.lang.reflect.InvocationHandler;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-
-import org.osgi.annotation.versioning.ProviderType;
 
 /**
  * The persistence implementation for the resource block permission service.
@@ -59,12 +54,11 @@ import org.osgi.annotation.versioning.ProviderType;
  * @generated
  */
 @Deprecated
-@ProviderType
 public class ResourceBlockPermissionPersistenceImpl
 	extends BasePersistenceImpl<ResourceBlockPermission>
 	implements ResourceBlockPermissionPersistence {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this class directly. Always use <code>ResourceBlockPermissionUtil</code> to access the resource block permission persistence. Modify <code>service.xml</code> and rerun ServiceBuilder to regenerate this class.
@@ -103,7 +97,7 @@ public class ResourceBlockPermissionPersistenceImpl
 	 * Returns a range of all the resource block permissions where resourceBlockId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>ResourceBlockPermissionModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>ResourceBlockPermissionModelImpl</code>.
 	 * </p>
 	 *
 	 * @param resourceBlockId the resource block ID
@@ -122,7 +116,7 @@ public class ResourceBlockPermissionPersistenceImpl
 	 * Returns an ordered range of all the resource block permissions where resourceBlockId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>ResourceBlockPermissionModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>ResourceBlockPermissionModelImpl</code>.
 	 * </p>
 	 *
 	 * @param resourceBlockId the resource block ID
@@ -144,34 +138,34 @@ public class ResourceBlockPermissionPersistenceImpl
 	 * Returns an ordered range of all the resource block permissions where resourceBlockId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>ResourceBlockPermissionModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>ResourceBlockPermissionModelImpl</code>.
 	 * </p>
 	 *
 	 * @param resourceBlockId the resource block ID
 	 * @param start the lower bound of the range of resource block permissions
 	 * @param end the upper bound of the range of resource block permissions (not inclusive)
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
-	 * @param retrieveFromCache whether to retrieve from the finder cache
+	 * @param useFinderCache whether to use the finder cache
 	 * @return the ordered range of matching resource block permissions
 	 */
 	@Override
 	public List<ResourceBlockPermission> findByResourceBlockId(
 		long resourceBlockId, int start, int end,
 		OrderByComparator<ResourceBlockPermission> orderByComparator,
-		boolean retrieveFromCache) {
+		boolean useFinderCache) {
 
-		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
 			(orderByComparator == null)) {
 
-			pagination = false;
-			finderPath = _finderPathWithoutPaginationFindByResourceBlockId;
-			finderArgs = new Object[] {resourceBlockId};
+			if (useFinderCache) {
+				finderPath = _finderPathWithoutPaginationFindByResourceBlockId;
+				finderArgs = new Object[] {resourceBlockId};
+			}
 		}
-		else {
+		else if (useFinderCache) {
 			finderPath = _finderPathWithPaginationFindByResourceBlockId;
 			finderArgs = new Object[] {
 				resourceBlockId, start, end, orderByComparator
@@ -180,14 +174,14 @@ public class ResourceBlockPermissionPersistenceImpl
 
 		List<ResourceBlockPermission> list = null;
 
-		if (retrieveFromCache) {
+		if (useFinderCache) {
 			list = (List<ResourceBlockPermission>)FinderCacheUtil.getResult(
 				finderPath, finderArgs, this);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (ResourceBlockPermission resourceBlockPermission : list) {
-					if ((resourceBlockId !=
-							resourceBlockPermission.getResourceBlockId())) {
+					if (resourceBlockId !=
+							resourceBlockPermission.getResourceBlockId()) {
 
 						list = null;
 
@@ -216,7 +210,7 @@ public class ResourceBlockPermissionPersistenceImpl
 				appendOrderByComparator(
 					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
 			}
-			else if (pagination) {
+			else {
 				query.append(ResourceBlockPermissionModelImpl.ORDER_BY_JPQL);
 			}
 
@@ -233,25 +227,19 @@ public class ResourceBlockPermissionPersistenceImpl
 
 				qPos.add(resourceBlockId);
 
-				if (!pagination) {
-					list = (List<ResourceBlockPermission>)QueryUtil.list(
-						q, getDialect(), start, end, false);
-
-					Collections.sort(list);
-
-					list = Collections.unmodifiableList(list);
-				}
-				else {
-					list = (List<ResourceBlockPermission>)QueryUtil.list(
-						q, getDialect(), start, end);
-				}
+				list = (List<ResourceBlockPermission>)QueryUtil.list(
+					q, getDialect(), start, end);
 
 				cacheResult(list);
 
-				FinderCacheUtil.putResult(finderPath, finderArgs, list);
+				if (useFinderCache) {
+					FinderCacheUtil.putResult(finderPath, finderArgs, list);
+				}
 			}
 			catch (Exception e) {
-				FinderCacheUtil.removeResult(finderPath, finderArgs);
+				if (useFinderCache) {
+					FinderCacheUtil.removeResult(finderPath, finderArgs);
+				}
 
 				throw processException(e);
 			}
@@ -627,7 +615,7 @@ public class ResourceBlockPermissionPersistenceImpl
 	 * Returns a range of all the resource block permissions where roleId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>ResourceBlockPermissionModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>ResourceBlockPermissionModelImpl</code>.
 	 * </p>
 	 *
 	 * @param roleId the role ID
@@ -646,7 +634,7 @@ public class ResourceBlockPermissionPersistenceImpl
 	 * Returns an ordered range of all the resource block permissions where roleId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>ResourceBlockPermissionModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>ResourceBlockPermissionModelImpl</code>.
 	 * </p>
 	 *
 	 * @param roleId the role ID
@@ -667,47 +655,47 @@ public class ResourceBlockPermissionPersistenceImpl
 	 * Returns an ordered range of all the resource block permissions where roleId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>ResourceBlockPermissionModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>ResourceBlockPermissionModelImpl</code>.
 	 * </p>
 	 *
 	 * @param roleId the role ID
 	 * @param start the lower bound of the range of resource block permissions
 	 * @param end the upper bound of the range of resource block permissions (not inclusive)
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
-	 * @param retrieveFromCache whether to retrieve from the finder cache
+	 * @param useFinderCache whether to use the finder cache
 	 * @return the ordered range of matching resource block permissions
 	 */
 	@Override
 	public List<ResourceBlockPermission> findByRoleId(
 		long roleId, int start, int end,
 		OrderByComparator<ResourceBlockPermission> orderByComparator,
-		boolean retrieveFromCache) {
+		boolean useFinderCache) {
 
-		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
 			(orderByComparator == null)) {
 
-			pagination = false;
-			finderPath = _finderPathWithoutPaginationFindByRoleId;
-			finderArgs = new Object[] {roleId};
+			if (useFinderCache) {
+				finderPath = _finderPathWithoutPaginationFindByRoleId;
+				finderArgs = new Object[] {roleId};
+			}
 		}
-		else {
+		else if (useFinderCache) {
 			finderPath = _finderPathWithPaginationFindByRoleId;
 			finderArgs = new Object[] {roleId, start, end, orderByComparator};
 		}
 
 		List<ResourceBlockPermission> list = null;
 
-		if (retrieveFromCache) {
+		if (useFinderCache) {
 			list = (List<ResourceBlockPermission>)FinderCacheUtil.getResult(
 				finderPath, finderArgs, this);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (ResourceBlockPermission resourceBlockPermission : list) {
-					if ((roleId != resourceBlockPermission.getRoleId())) {
+					if (roleId != resourceBlockPermission.getRoleId()) {
 						list = null;
 
 						break;
@@ -735,7 +723,7 @@ public class ResourceBlockPermissionPersistenceImpl
 				appendOrderByComparator(
 					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
 			}
-			else if (pagination) {
+			else {
 				query.append(ResourceBlockPermissionModelImpl.ORDER_BY_JPQL);
 			}
 
@@ -752,25 +740,19 @@ public class ResourceBlockPermissionPersistenceImpl
 
 				qPos.add(roleId);
 
-				if (!pagination) {
-					list = (List<ResourceBlockPermission>)QueryUtil.list(
-						q, getDialect(), start, end, false);
-
-					Collections.sort(list);
-
-					list = Collections.unmodifiableList(list);
-				}
-				else {
-					list = (List<ResourceBlockPermission>)QueryUtil.list(
-						q, getDialect(), start, end);
-				}
+				list = (List<ResourceBlockPermission>)QueryUtil.list(
+					q, getDialect(), start, end);
 
 				cacheResult(list);
 
-				FinderCacheUtil.putResult(finderPath, finderArgs, list);
+				if (useFinderCache) {
+					FinderCacheUtil.putResult(finderPath, finderArgs, list);
+				}
 			}
 			catch (Exception e) {
-				FinderCacheUtil.removeResult(finderPath, finderArgs);
+				if (useFinderCache) {
+					FinderCacheUtil.removeResult(finderPath, finderArgs);
+				}
 
 				throw processException(e);
 			}
@@ -1185,18 +1167,22 @@ public class ResourceBlockPermissionPersistenceImpl
 	 *
 	 * @param resourceBlockId the resource block ID
 	 * @param roleId the role ID
-	 * @param retrieveFromCache whether to retrieve from the finder cache
+	 * @param useFinderCache whether to use the finder cache
 	 * @return the matching resource block permission, or <code>null</code> if a matching resource block permission could not be found
 	 */
 	@Override
 	public ResourceBlockPermission fetchByR_R(
-		long resourceBlockId, long roleId, boolean retrieveFromCache) {
+		long resourceBlockId, long roleId, boolean useFinderCache) {
 
-		Object[] finderArgs = new Object[] {resourceBlockId, roleId};
+		Object[] finderArgs = null;
+
+		if (useFinderCache) {
+			finderArgs = new Object[] {resourceBlockId, roleId};
+		}
 
 		Object result = null;
 
-		if (retrieveFromCache) {
+		if (useFinderCache) {
 			result = FinderCacheUtil.getResult(
 				_finderPathFetchByR_R, finderArgs, this);
 		}
@@ -1240,8 +1226,10 @@ public class ResourceBlockPermissionPersistenceImpl
 				List<ResourceBlockPermission> list = q.list();
 
 				if (list.isEmpty()) {
-					FinderCacheUtil.putResult(
-						_finderPathFetchByR_R, finderArgs, list);
+					if (useFinderCache) {
+						FinderCacheUtil.putResult(
+							_finderPathFetchByR_R, finderArgs, list);
+					}
 				}
 				else {
 					ResourceBlockPermission resourceBlockPermission = list.get(
@@ -1253,7 +1241,10 @@ public class ResourceBlockPermissionPersistenceImpl
 				}
 			}
 			catch (Exception e) {
-				FinderCacheUtil.removeResult(_finderPathFetchByR_R, finderArgs);
+				if (useFinderCache) {
+					FinderCacheUtil.removeResult(
+						_finderPathFetchByR_R, finderArgs);
+				}
 
 				throw processException(e);
 			}
@@ -1522,7 +1513,7 @@ public class ResourceBlockPermissionPersistenceImpl
 		resourceBlockPermission.setNew(true);
 		resourceBlockPermission.setPrimaryKey(resourceBlockPermissionId);
 
-		resourceBlockPermission.setCompanyId(companyProvider.getCompanyId());
+		resourceBlockPermission.setCompanyId(CompanyThreadLocal.getCompanyId());
 
 		return resourceBlockPermission;
 	}
@@ -1823,7 +1814,7 @@ public class ResourceBlockPermissionPersistenceImpl
 	 * Returns a range of all the resource block permissions.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>ResourceBlockPermissionModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>ResourceBlockPermissionModelImpl</code>.
 	 * </p>
 	 *
 	 * @param start the lower bound of the range of resource block permissions
@@ -1839,7 +1830,7 @@ public class ResourceBlockPermissionPersistenceImpl
 	 * Returns an ordered range of all the resource block permissions.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>ResourceBlockPermissionModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>ResourceBlockPermissionModelImpl</code>.
 	 * </p>
 	 *
 	 * @param start the lower bound of the range of resource block permissions
@@ -1859,40 +1850,40 @@ public class ResourceBlockPermissionPersistenceImpl
 	 * Returns an ordered range of all the resource block permissions.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>ResourceBlockPermissionModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>ResourceBlockPermissionModelImpl</code>.
 	 * </p>
 	 *
 	 * @param start the lower bound of the range of resource block permissions
 	 * @param end the upper bound of the range of resource block permissions (not inclusive)
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
-	 * @param retrieveFromCache whether to retrieve from the finder cache
+	 * @param useFinderCache whether to use the finder cache
 	 * @return the ordered range of resource block permissions
 	 */
 	@Override
 	public List<ResourceBlockPermission> findAll(
 		int start, int end,
 		OrderByComparator<ResourceBlockPermission> orderByComparator,
-		boolean retrieveFromCache) {
+		boolean useFinderCache) {
 
-		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
 			(orderByComparator == null)) {
 
-			pagination = false;
-			finderPath = _finderPathWithoutPaginationFindAll;
-			finderArgs = FINDER_ARGS_EMPTY;
+			if (useFinderCache) {
+				finderPath = _finderPathWithoutPaginationFindAll;
+				finderArgs = FINDER_ARGS_EMPTY;
+			}
 		}
-		else {
+		else if (useFinderCache) {
 			finderPath = _finderPathWithPaginationFindAll;
 			finderArgs = new Object[] {start, end, orderByComparator};
 		}
 
 		List<ResourceBlockPermission> list = null;
 
-		if (retrieveFromCache) {
+		if (useFinderCache) {
 			list = (List<ResourceBlockPermission>)FinderCacheUtil.getResult(
 				finderPath, finderArgs, this);
 		}
@@ -1915,10 +1906,8 @@ public class ResourceBlockPermissionPersistenceImpl
 			else {
 				sql = _SQL_SELECT_RESOURCEBLOCKPERMISSION;
 
-				if (pagination) {
-					sql = sql.concat(
-						ResourceBlockPermissionModelImpl.ORDER_BY_JPQL);
-				}
+				sql = sql.concat(
+					ResourceBlockPermissionModelImpl.ORDER_BY_JPQL);
 			}
 
 			Session session = null;
@@ -1928,25 +1917,19 @@ public class ResourceBlockPermissionPersistenceImpl
 
 				Query q = session.createQuery(sql);
 
-				if (!pagination) {
-					list = (List<ResourceBlockPermission>)QueryUtil.list(
-						q, getDialect(), start, end, false);
-
-					Collections.sort(list);
-
-					list = Collections.unmodifiableList(list);
-				}
-				else {
-					list = (List<ResourceBlockPermission>)QueryUtil.list(
-						q, getDialect(), start, end);
-				}
+				list = (List<ResourceBlockPermission>)QueryUtil.list(
+					q, getDialect(), start, end);
 
 				cacheResult(list);
 
-				FinderCacheUtil.putResult(finderPath, finderArgs, list);
+				if (useFinderCache) {
+					FinderCacheUtil.putResult(finderPath, finderArgs, list);
+				}
 			}
 			catch (Exception e) {
-				FinderCacheUtil.removeResult(finderPath, finderArgs);
+				if (useFinderCache) {
+					FinderCacheUtil.removeResult(finderPath, finderArgs);
+				}
 
 				throw processException(e);
 			}
@@ -2121,9 +2104,6 @@ public class ResourceBlockPermissionPersistenceImpl
 		FinderCacheUtil.removeCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
 		FinderCacheUtil.removeCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
 	}
-
-	@BeanReference(type = CompanyProviderWrapper.class)
-	protected CompanyProvider companyProvider;
 
 	private static final String _SQL_SELECT_RESOURCEBLOCKPERMISSION =
 		"SELECT resourceBlockPermission FROM ResourceBlockPermission resourceBlockPermission";

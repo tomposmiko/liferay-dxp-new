@@ -165,7 +165,7 @@
 </tr>
 <tr>
 	<td>ERROR_SPECIFIC_FORM_FIELD_REQUIRED</td>
-	<td>//div[contains(@data-fieldname,'${key_fieldName}')]/../../div[contains(@class,'has-error')]//div[contains(@class,'help-block')] | //div[contains(@data-fieldname,'${key_fieldName}')]/../../div[contains(@class,'has-error')]//div[contains(@class,'form-feedback-indicator')]</td>
+	<td>//div[contains(@data-field-name,'${key_fieldName}')]//div[contains(@class,'form-feedback-item')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -176,6 +176,11 @@
 <tr>
 	<td>ERROR_MOVE_DUPLICATE_CONTENT</td>
 	<td>//div[contains(@class,'alert-danger') and contains(.,'The folder you selected already has an entry with this name. Please select a different folder')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>ERROR_SELECT_VALID_DATE_RANGE</td>
+	<td>//div[@role='alert' and contains(.,'Please select a valid date range.')]</td>
 	<td></td>
 </tr>
 <tr>

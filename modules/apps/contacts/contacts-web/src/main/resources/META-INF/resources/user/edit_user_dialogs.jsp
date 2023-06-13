@@ -89,74 +89,69 @@ if (extension) {
 	</aui:form>
 </div>
 
-<aui:script position="inline" use="aui-base,aui-io-request-deprecated">
+<aui:script position="inline" use="aui-base">
 	var form = A.one('#<%= portletNamespace %>dialogForm');
 
-	form.on(
-		'submit',
-		function(event) {
-			event.halt(true);
+	form.on('submit', function(event) {
+		event.halt(true);
 
-			Liferay.fire(
-				'saveAutoFields',
-				{
-					form: form
-				}
-			);
+		Liferay.fire('saveAutoFields', {
+			form: form
+		});
 
-			var uri;
+		var uri;
 
-			<c:choose>
-				<c:when test="<%= extension %>">
+		<c:choose>
+			<c:when test="<%= extension %>">
 
-					<%
-					Group controlPanelGroup = GroupLocalServiceUtil.getGroup(themeDisplay.getCompanyId(), GroupConstants.CONTROL_PANEL);
+				<%
+				Group controlPanelGroup = GroupLocalServiceUtil.getGroup(themeDisplay.getCompanyId(), GroupConstants.CONTROL_PANEL);
 
-					long controlPanelPlid = LayoutLocalServiceUtil.getDefaultPlid(controlPanelGroup.getGroupId(), true);
-					%>
+				long controlPanelPlid = LayoutLocalServiceUtil.getDefaultPlid(controlPanelGroup.getGroupId(), true);
+				%>
 
-					uri = '<liferay-portlet:actionURL name="updateFieldGroup" plid="<%= controlPanelPlid %>" portletName="<%= PortletKeys.MY_ACCOUNT %>" windowState="<%= LiferayWindowState.NORMAL.toString() %>"><portlet:param name="mvcActionCommand" value="/users_admin/edit_user" /></liferay-portlet:actionURL>';
-				</c:when>
-				<c:otherwise>
-					uri = '<liferay-portlet:actionURL name="updateFieldGroup" windowState="<%= LiferayWindowState.NORMAL.toString() %>" />';
-				</c:otherwise>
-			</c:choose>
+				uri =
+					'<liferay-portlet:actionURL name="updateFieldGroup" plid="<%= controlPanelPlid %>" portletName="<%= PortletKeys.MY_ACCOUNT %>" windowState="<%= LiferayWindowState.NORMAL.toString() %>"><portlet:param name="mvcActionCommand" value="/users_admin/edit_user" /></liferay-portlet:actionURL>';
+			</c:when>
+			<c:otherwise>
+				uri =
+					'<liferay-portlet:actionURL name="updateFieldGroup" windowState="<%= LiferayWindowState.NORMAL.toString() %>" />';
+			</c:otherwise>
+		</c:choose>
 
-			A.io.request(
-				uri,
-				{
-					after: {
-						success: function(event, id, obj) {
-							var responseData = this.get('responseData');
+		var formData = new FormData(form.getDOMNode());
 
-							if (!responseData.success) {
-								var message = A.one('#<%= portletNamespace %>errorMessage');
+		Liferay.Util.fetch(uri, {
+			body: formData,
+			method: 'POST'
+		})
+			.then(function(response) {
+				return response.json();
+			})
+			.then(function(data) {
+				if (!data.success) {
+					var message = A.one('#<%= portletNamespace %>errorMessage');
 
-								if (message) {
-									message.html('<span class="alert alert-danger">' + responseData.message + '</span>');
-								}
-							}
-							else {
-								Liferay.Util.getWindow('<portlet:namespace />Dialog').hide();
+					if (message) {
+						message.html(
+							'<span class="alert alert-danger">' +
+								data.message +
+								'</span>'
+						);
+					}
+				} else {
+					Liferay.Util.getWindow('<portlet:namespace />Dialog').hide();
 
-								var redirect = responseData.redirect;
+					var redirect = data.redirect;
 
-								if (redirect) {
-									var topWindow = Liferay.Util.getTop();
+					if (redirect) {
+						var topWindow = Liferay.Util.getTop();
 
-									topWindow.location.href = redirect;
-								}
-							}
-						}
-					},
-					dataType: 'JSON',
-					form: {
-						id: form
+						topWindow.location.href = redirect;
 					}
 				}
-			);
-		}
-	);
+			});
+	});
 </aui:script>
 
 <aui:script use="liferay-auto-fields">

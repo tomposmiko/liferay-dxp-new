@@ -82,8 +82,7 @@ import org.osgi.service.component.annotations.Reference;
 		"javax.portlet.init-param.view-template=/view.jsp",
 		"javax.portlet.name=" + TrashPortletKeys.TRASH,
 		"javax.portlet.resource-bundle=content.Language",
-		"javax.portlet.security-role-ref=administrator",
-		"javax.portlet.supports.mime-type=text/html"
+		"javax.portlet.security-role-ref=administrator"
 	},
 	service = {Portlet.class, TrashPortlet.class}
 )
@@ -152,6 +151,8 @@ public class TrashPortlet extends MVCPortlet {
 
 		TrashUndoUtil.addRestoreData(actionRequest, className, classPK);
 
+		hideDefaultSuccessMessage(actionRequest);
+
 		sendRedirect(actionRequest, actionResponse);
 	}
 
@@ -198,6 +199,8 @@ public class TrashPortlet extends MVCPortlet {
 
 		TrashUndoUtil.addRestoreData(actionRequest, entries);
 
+		hideDefaultSuccessMessage(actionRequest);
+
 		sendRedirect(actionRequest, actionResponse);
 	}
 
@@ -232,6 +235,8 @@ public class TrashPortlet extends MVCPortlet {
 		TrashUndoUtil.addRestoreData(
 			actionRequest, entry.getClassName(), entry.getClassPK());
 
+		hideDefaultSuccessMessage(actionRequest);
+
 		sendRedirect(actionRequest, actionResponse);
 	}
 
@@ -257,6 +262,8 @@ public class TrashPortlet extends MVCPortlet {
 
 		TrashUndoUtil.addRestoreData(
 			actionRequest, entry.getClassName(), entry.getClassPK());
+
+		hideDefaultSuccessMessage(actionRequest);
 
 		sendRedirect(actionRequest, actionResponse);
 	}
@@ -324,7 +331,7 @@ public class TrashPortlet extends MVCPortlet {
 	}
 
 	@Reference(
-		target = "(&(release.bundle.symbolic.name=com.liferay.trash.web)(&(release.schema.version>=1.0.0)(!(release.schema.version>=1.1.0))))",
+		target = "(&(release.bundle.symbolic.name=com.liferay.trash.web)(&(release.schema.version>=1.0.0)(!(release.schema.version>=2.0.0))))",
 		unbind = "-"
 	)
 	protected void setRelease(Release release) {

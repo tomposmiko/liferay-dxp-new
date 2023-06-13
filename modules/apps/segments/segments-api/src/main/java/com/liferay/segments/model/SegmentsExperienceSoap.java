@@ -20,20 +20,18 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 /**
  * This class is used by SOAP remote services, specifically {@link com.liferay.segments.service.http.SegmentsExperienceServiceSoap}.
  *
  * @author Eduardo Garcia
  * @generated
  */
-@ProviderType
 public class SegmentsExperienceSoap implements Serializable {
 
 	public static SegmentsExperienceSoap toSoapModel(SegmentsExperience model) {
 		SegmentsExperienceSoap soapModel = new SegmentsExperienceSoap();
 
+		soapModel.setMvccVersion(model.getMvccVersion());
 		soapModel.setUuid(model.getUuid());
 		soapModel.setSegmentsExperienceId(model.getSegmentsExperienceId());
 		soapModel.setGroupId(model.getGroupId());
@@ -43,6 +41,7 @@ public class SegmentsExperienceSoap implements Serializable {
 		soapModel.setCreateDate(model.getCreateDate());
 		soapModel.setModifiedDate(model.getModifiedDate());
 		soapModel.setSegmentsEntryId(model.getSegmentsEntryId());
+		soapModel.setSegmentsExperienceKey(model.getSegmentsExperienceKey());
 		soapModel.setClassNameId(model.getClassNameId());
 		soapModel.setClassPK(model.getClassPK());
 		soapModel.setName(model.getName());
@@ -109,6 +108,14 @@ public class SegmentsExperienceSoap implements Serializable {
 
 	public void setPrimaryKey(long pk) {
 		setSegmentsExperienceId(pk);
+	}
+
+	public long getMvccVersion() {
+		return _mvccVersion;
+	}
+
+	public void setMvccVersion(long mvccVersion) {
+		_mvccVersion = mvccVersion;
 	}
 
 	public String getUuid() {
@@ -183,6 +190,14 @@ public class SegmentsExperienceSoap implements Serializable {
 		_segmentsEntryId = segmentsEntryId;
 	}
 
+	public String getSegmentsExperienceKey() {
+		return _segmentsExperienceKey;
+	}
+
+	public void setSegmentsExperienceKey(String segmentsExperienceKey) {
+		_segmentsExperienceKey = segmentsExperienceKey;
+	}
+
 	public long getClassNameId() {
 		return _classNameId;
 	}
@@ -235,6 +250,7 @@ public class SegmentsExperienceSoap implements Serializable {
 		_lastPublishDate = lastPublishDate;
 	}
 
+	private long _mvccVersion;
 	private String _uuid;
 	private long _segmentsExperienceId;
 	private long _groupId;
@@ -244,6 +260,7 @@ public class SegmentsExperienceSoap implements Serializable {
 	private Date _createDate;
 	private Date _modifiedDate;
 	private long _segmentsEntryId;
+	private String _segmentsExperienceKey;
 	private long _classNameId;
 	private long _classPK;
 	private String _name;

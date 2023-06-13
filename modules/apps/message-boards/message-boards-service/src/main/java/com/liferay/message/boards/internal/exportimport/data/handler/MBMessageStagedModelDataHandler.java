@@ -19,6 +19,7 @@ import com.liferay.document.library.kernel.model.DLFolderConstants;
 import com.liferay.exportimport.data.handler.base.BaseStagedModelDataHandler;
 import com.liferay.exportimport.kernel.lar.ExportImportPathUtil;
 import com.liferay.exportimport.kernel.lar.PortletDataContext;
+import com.liferay.exportimport.kernel.lar.PortletDataException;
 import com.liferay.exportimport.kernel.lar.StagedModelDataHandler;
 import com.liferay.exportimport.kernel.lar.StagedModelDataHandlerUtil;
 import com.liferay.exportimport.kernel.lar.StagedModelModifiedDateComparator;
@@ -112,6 +113,24 @@ public class MBMessageStagedModelDataHandler
 	@Override
 	public String getDisplayName(MBMessage message) {
 		return message.getSubject();
+	}
+
+	@Override
+	public void importStagedModel(
+			PortletDataContext portletDataContext, MBMessage message)
+		throws PortletDataException {
+
+		if (message.isDiscussion()) {
+			Map<Long, Long> relatedClassPKs =
+				(Map<Long, Long>)portletDataContext.getNewPrimaryKeysMap(
+					message.getClassName());
+
+			if (!relatedClassPKs.containsKey(message.getClassPK())) {
+				return;
+			}
+		}
+
+		super.importStagedModel(portletDataContext, message);
 	}
 
 	@Override
@@ -372,6 +391,12 @@ public class MBMessageStagedModelDataHandler
 			thread.setUuid(messageElement.attributeValue("threadUuid"));
 
 			_mbThreadLocalService.updateMBThread(thread);
+
+			if (importedMessage.getCategoryId() != parentCategoryId) {
+				_mbThreadLocalService.moveThread(
+					thread.getGroupId(), parentCategoryId,
+					thread.getThreadId());
+			}
 
 			portletDataContext.importClassedModel(message, importedMessage);
 		}

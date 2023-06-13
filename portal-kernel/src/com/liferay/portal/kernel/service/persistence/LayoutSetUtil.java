@@ -26,8 +26,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 /**
  * The persistence utility for the layout set service. This utility wraps <code>com.liferay.portal.service.persistence.impl.LayoutSetPersistenceImpl</code> and provides direct access to the database for CRUD operations. This utility should only be used by the service layer, as it must operate within a transaction. Never access this utility in a JSP, controller, model, or other front-end class.
  *
@@ -39,10 +37,9 @@ import org.osgi.annotation.versioning.ProviderType;
  * @see LayoutSetPersistence
  * @generated
  */
-@ProviderType
 public class LayoutSetUtil {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify this class directly. Modify <code>service.xml</code> and rerun ServiceBuilder to regenerate this class.
@@ -137,7 +134,7 @@ public class LayoutSetUtil {
 	 * Returns a range of all the layout sets where groupId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>LayoutSetModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>LayoutSetModelImpl</code>.
 	 * </p>
 	 *
 	 * @param groupId the group ID
@@ -155,7 +152,7 @@ public class LayoutSetUtil {
 	 * Returns an ordered range of all the layout sets where groupId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>LayoutSetModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>LayoutSetModelImpl</code>.
 	 * </p>
 	 *
 	 * @param groupId the group ID
@@ -176,23 +173,23 @@ public class LayoutSetUtil {
 	 * Returns an ordered range of all the layout sets where groupId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>LayoutSetModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>LayoutSetModelImpl</code>.
 	 * </p>
 	 *
 	 * @param groupId the group ID
 	 * @param start the lower bound of the range of layout sets
 	 * @param end the upper bound of the range of layout sets (not inclusive)
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
-	 * @param retrieveFromCache whether to retrieve from the finder cache
+	 * @param useFinderCache whether to use the finder cache
 	 * @return the ordered range of matching layout sets
 	 */
 	public static List<LayoutSet> findByGroupId(
 		long groupId, int start, int end,
 		OrderByComparator<LayoutSet> orderByComparator,
-		boolean retrieveFromCache) {
+		boolean useFinderCache) {
 
 		return getPersistence().findByGroupId(
-			groupId, start, end, orderByComparator, retrieveFromCache);
+			groupId, start, end, orderByComparator, useFinderCache);
 	}
 
 	/**
@@ -306,7 +303,7 @@ public class LayoutSetUtil {
 	 * Returns a range of all the layout sets where groupId = &#63; and head = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>LayoutSetModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>LayoutSetModelImpl</code>.
 	 * </p>
 	 *
 	 * @param groupId the group ID
@@ -325,7 +322,7 @@ public class LayoutSetUtil {
 	 * Returns an ordered range of all the layout sets where groupId = &#63; and head = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>LayoutSetModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>LayoutSetModelImpl</code>.
 	 * </p>
 	 *
 	 * @param groupId the group ID
@@ -347,7 +344,7 @@ public class LayoutSetUtil {
 	 * Returns an ordered range of all the layout sets where groupId = &#63; and head = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>LayoutSetModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>LayoutSetModelImpl</code>.
 	 * </p>
 	 *
 	 * @param groupId the group ID
@@ -355,16 +352,16 @@ public class LayoutSetUtil {
 	 * @param start the lower bound of the range of layout sets
 	 * @param end the upper bound of the range of layout sets (not inclusive)
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
-	 * @param retrieveFromCache whether to retrieve from the finder cache
+	 * @param useFinderCache whether to use the finder cache
 	 * @return the ordered range of matching layout sets
 	 */
 	public static List<LayoutSet> findByGroupId_Head(
 		long groupId, boolean head, int start, int end,
 		OrderByComparator<LayoutSet> orderByComparator,
-		boolean retrieveFromCache) {
+		boolean useFinderCache) {
 
 		return getPersistence().findByGroupId_Head(
-			groupId, head, start, end, orderByComparator, retrieveFromCache);
+			groupId, head, start, end, orderByComparator, useFinderCache);
 	}
 
 	/**
@@ -492,7 +489,7 @@ public class LayoutSetUtil {
 	 * Returns a range of all the layout sets where layoutSetPrototypeUuid = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>LayoutSetModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>LayoutSetModelImpl</code>.
 	 * </p>
 	 *
 	 * @param layoutSetPrototypeUuid the layout set prototype uuid
@@ -511,7 +508,7 @@ public class LayoutSetUtil {
 	 * Returns an ordered range of all the layout sets where layoutSetPrototypeUuid = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>LayoutSetModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>LayoutSetModelImpl</code>.
 	 * </p>
 	 *
 	 * @param layoutSetPrototypeUuid the layout set prototype uuid
@@ -532,24 +529,24 @@ public class LayoutSetUtil {
 	 * Returns an ordered range of all the layout sets where layoutSetPrototypeUuid = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>LayoutSetModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>LayoutSetModelImpl</code>.
 	 * </p>
 	 *
 	 * @param layoutSetPrototypeUuid the layout set prototype uuid
 	 * @param start the lower bound of the range of layout sets
 	 * @param end the upper bound of the range of layout sets (not inclusive)
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
-	 * @param retrieveFromCache whether to retrieve from the finder cache
+	 * @param useFinderCache whether to use the finder cache
 	 * @return the ordered range of matching layout sets
 	 */
 	public static List<LayoutSet> findByLayoutSetPrototypeUuid(
 		String layoutSetPrototypeUuid, int start, int end,
 		OrderByComparator<LayoutSet> orderByComparator,
-		boolean retrieveFromCache) {
+		boolean useFinderCache) {
 
 		return getPersistence().findByLayoutSetPrototypeUuid(
 			layoutSetPrototypeUuid, start, end, orderByComparator,
-			retrieveFromCache);
+			useFinderCache);
 	}
 
 	/**
@@ -676,7 +673,7 @@ public class LayoutSetUtil {
 	 * Returns a range of all the layout sets where layoutSetPrototypeUuid = &#63; and head = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>LayoutSetModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>LayoutSetModelImpl</code>.
 	 * </p>
 	 *
 	 * @param layoutSetPrototypeUuid the layout set prototype uuid
@@ -696,7 +693,7 @@ public class LayoutSetUtil {
 	 * Returns an ordered range of all the layout sets where layoutSetPrototypeUuid = &#63; and head = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>LayoutSetModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>LayoutSetModelImpl</code>.
 	 * </p>
 	 *
 	 * @param layoutSetPrototypeUuid the layout set prototype uuid
@@ -718,7 +715,7 @@ public class LayoutSetUtil {
 	 * Returns an ordered range of all the layout sets where layoutSetPrototypeUuid = &#63; and head = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>LayoutSetModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>LayoutSetModelImpl</code>.
 	 * </p>
 	 *
 	 * @param layoutSetPrototypeUuid the layout set prototype uuid
@@ -726,17 +723,17 @@ public class LayoutSetUtil {
 	 * @param start the lower bound of the range of layout sets
 	 * @param end the upper bound of the range of layout sets (not inclusive)
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
-	 * @param retrieveFromCache whether to retrieve from the finder cache
+	 * @param useFinderCache whether to use the finder cache
 	 * @return the ordered range of matching layout sets
 	 */
 	public static List<LayoutSet> findByLayoutSetPrototypeUuid_Head(
 		String layoutSetPrototypeUuid, boolean head, int start, int end,
 		OrderByComparator<LayoutSet> orderByComparator,
-		boolean retrieveFromCache) {
+		boolean useFinderCache) {
 
 		return getPersistence().findByLayoutSetPrototypeUuid_Head(
 			layoutSetPrototypeUuid, head, start, end, orderByComparator,
-			retrieveFromCache);
+			useFinderCache);
 	}
 
 	/**
@@ -870,7 +867,7 @@ public class LayoutSetUtil {
 	 * Returns a range of all the layout sets where groupId = &#63; and privateLayout = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>LayoutSetModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>LayoutSetModelImpl</code>.
 	 * </p>
 	 *
 	 * @param groupId the group ID
@@ -889,7 +886,7 @@ public class LayoutSetUtil {
 	 * Returns an ordered range of all the layout sets where groupId = &#63; and privateLayout = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>LayoutSetModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>LayoutSetModelImpl</code>.
 	 * </p>
 	 *
 	 * @param groupId the group ID
@@ -911,7 +908,7 @@ public class LayoutSetUtil {
 	 * Returns an ordered range of all the layout sets where groupId = &#63; and privateLayout = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>LayoutSetModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>LayoutSetModelImpl</code>.
 	 * </p>
 	 *
 	 * @param groupId the group ID
@@ -919,17 +916,17 @@ public class LayoutSetUtil {
 	 * @param start the lower bound of the range of layout sets
 	 * @param end the upper bound of the range of layout sets (not inclusive)
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
-	 * @param retrieveFromCache whether to retrieve from the finder cache
+	 * @param useFinderCache whether to use the finder cache
 	 * @return the ordered range of matching layout sets
 	 */
 	public static List<LayoutSet> findByG_P(
 		long groupId, boolean privateLayout, int start, int end,
 		OrderByComparator<LayoutSet> orderByComparator,
-		boolean retrieveFromCache) {
+		boolean useFinderCache) {
 
 		return getPersistence().findByG_P(
 			groupId, privateLayout, start, end, orderByComparator,
-			retrieveFromCache);
+			useFinderCache);
 	}
 
 	/**
@@ -1076,15 +1073,15 @@ public class LayoutSetUtil {
 	 * @param groupId the group ID
 	 * @param privateLayout the private layout
 	 * @param head the head
-	 * @param retrieveFromCache whether to retrieve from the finder cache
+	 * @param useFinderCache whether to use the finder cache
 	 * @return the matching layout set, or <code>null</code> if a matching layout set could not be found
 	 */
 	public static LayoutSet fetchByG_P_Head(
 		long groupId, boolean privateLayout, boolean head,
-		boolean retrieveFromCache) {
+		boolean useFinderCache) {
 
 		return getPersistence().fetchByG_P_Head(
-			groupId, privateLayout, head, retrieveFromCache);
+			groupId, privateLayout, head, useFinderCache);
 	}
 
 	/**
@@ -1117,6 +1114,407 @@ public class LayoutSetUtil {
 	}
 
 	/**
+	 * Returns all the layout sets where companyId = &#63; and layoutSetPrototypeUuid = &#63;.
+	 *
+	 * @param companyId the company ID
+	 * @param layoutSetPrototypeUuid the layout set prototype uuid
+	 * @return the matching layout sets
+	 */
+	public static List<LayoutSet> findByC_L(
+		long companyId, String layoutSetPrototypeUuid) {
+
+		return getPersistence().findByC_L(companyId, layoutSetPrototypeUuid);
+	}
+
+	/**
+	 * Returns a range of all the layout sets where companyId = &#63; and layoutSetPrototypeUuid = &#63;.
+	 *
+	 * <p>
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>LayoutSetModelImpl</code>.
+	 * </p>
+	 *
+	 * @param companyId the company ID
+	 * @param layoutSetPrototypeUuid the layout set prototype uuid
+	 * @param start the lower bound of the range of layout sets
+	 * @param end the upper bound of the range of layout sets (not inclusive)
+	 * @return the range of matching layout sets
+	 */
+	public static List<LayoutSet> findByC_L(
+		long companyId, String layoutSetPrototypeUuid, int start, int end) {
+
+		return getPersistence().findByC_L(
+			companyId, layoutSetPrototypeUuid, start, end);
+	}
+
+	/**
+	 * Returns an ordered range of all the layout sets where companyId = &#63; and layoutSetPrototypeUuid = &#63;.
+	 *
+	 * <p>
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>LayoutSetModelImpl</code>.
+	 * </p>
+	 *
+	 * @param companyId the company ID
+	 * @param layoutSetPrototypeUuid the layout set prototype uuid
+	 * @param start the lower bound of the range of layout sets
+	 * @param end the upper bound of the range of layout sets (not inclusive)
+	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
+	 * @return the ordered range of matching layout sets
+	 */
+	public static List<LayoutSet> findByC_L(
+		long companyId, String layoutSetPrototypeUuid, int start, int end,
+		OrderByComparator<LayoutSet> orderByComparator) {
+
+		return getPersistence().findByC_L(
+			companyId, layoutSetPrototypeUuid, start, end, orderByComparator);
+	}
+
+	/**
+	 * Returns an ordered range of all the layout sets where companyId = &#63; and layoutSetPrototypeUuid = &#63;.
+	 *
+	 * <p>
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>LayoutSetModelImpl</code>.
+	 * </p>
+	 *
+	 * @param companyId the company ID
+	 * @param layoutSetPrototypeUuid the layout set prototype uuid
+	 * @param start the lower bound of the range of layout sets
+	 * @param end the upper bound of the range of layout sets (not inclusive)
+	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
+	 * @param useFinderCache whether to use the finder cache
+	 * @return the ordered range of matching layout sets
+	 */
+	public static List<LayoutSet> findByC_L(
+		long companyId, String layoutSetPrototypeUuid, int start, int end,
+		OrderByComparator<LayoutSet> orderByComparator,
+		boolean useFinderCache) {
+
+		return getPersistence().findByC_L(
+			companyId, layoutSetPrototypeUuid, start, end, orderByComparator,
+			useFinderCache);
+	}
+
+	/**
+	 * Returns the first layout set in the ordered set where companyId = &#63; and layoutSetPrototypeUuid = &#63;.
+	 *
+	 * @param companyId the company ID
+	 * @param layoutSetPrototypeUuid the layout set prototype uuid
+	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	 * @return the first matching layout set
+	 * @throws NoSuchLayoutSetException if a matching layout set could not be found
+	 */
+	public static LayoutSet findByC_L_First(
+			long companyId, String layoutSetPrototypeUuid,
+			OrderByComparator<LayoutSet> orderByComparator)
+		throws com.liferay.portal.kernel.exception.NoSuchLayoutSetException {
+
+		return getPersistence().findByC_L_First(
+			companyId, layoutSetPrototypeUuid, orderByComparator);
+	}
+
+	/**
+	 * Returns the first layout set in the ordered set where companyId = &#63; and layoutSetPrototypeUuid = &#63;.
+	 *
+	 * @param companyId the company ID
+	 * @param layoutSetPrototypeUuid the layout set prototype uuid
+	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	 * @return the first matching layout set, or <code>null</code> if a matching layout set could not be found
+	 */
+	public static LayoutSet fetchByC_L_First(
+		long companyId, String layoutSetPrototypeUuid,
+		OrderByComparator<LayoutSet> orderByComparator) {
+
+		return getPersistence().fetchByC_L_First(
+			companyId, layoutSetPrototypeUuid, orderByComparator);
+	}
+
+	/**
+	 * Returns the last layout set in the ordered set where companyId = &#63; and layoutSetPrototypeUuid = &#63;.
+	 *
+	 * @param companyId the company ID
+	 * @param layoutSetPrototypeUuid the layout set prototype uuid
+	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	 * @return the last matching layout set
+	 * @throws NoSuchLayoutSetException if a matching layout set could not be found
+	 */
+	public static LayoutSet findByC_L_Last(
+			long companyId, String layoutSetPrototypeUuid,
+			OrderByComparator<LayoutSet> orderByComparator)
+		throws com.liferay.portal.kernel.exception.NoSuchLayoutSetException {
+
+		return getPersistence().findByC_L_Last(
+			companyId, layoutSetPrototypeUuid, orderByComparator);
+	}
+
+	/**
+	 * Returns the last layout set in the ordered set where companyId = &#63; and layoutSetPrototypeUuid = &#63;.
+	 *
+	 * @param companyId the company ID
+	 * @param layoutSetPrototypeUuid the layout set prototype uuid
+	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	 * @return the last matching layout set, or <code>null</code> if a matching layout set could not be found
+	 */
+	public static LayoutSet fetchByC_L_Last(
+		long companyId, String layoutSetPrototypeUuid,
+		OrderByComparator<LayoutSet> orderByComparator) {
+
+		return getPersistence().fetchByC_L_Last(
+			companyId, layoutSetPrototypeUuid, orderByComparator);
+	}
+
+	/**
+	 * Returns the layout sets before and after the current layout set in the ordered set where companyId = &#63; and layoutSetPrototypeUuid = &#63;.
+	 *
+	 * @param layoutSetId the primary key of the current layout set
+	 * @param companyId the company ID
+	 * @param layoutSetPrototypeUuid the layout set prototype uuid
+	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	 * @return the previous, current, and next layout set
+	 * @throws NoSuchLayoutSetException if a layout set with the primary key could not be found
+	 */
+	public static LayoutSet[] findByC_L_PrevAndNext(
+			long layoutSetId, long companyId, String layoutSetPrototypeUuid,
+			OrderByComparator<LayoutSet> orderByComparator)
+		throws com.liferay.portal.kernel.exception.NoSuchLayoutSetException {
+
+		return getPersistence().findByC_L_PrevAndNext(
+			layoutSetId, companyId, layoutSetPrototypeUuid, orderByComparator);
+	}
+
+	/**
+	 * Removes all the layout sets where companyId = &#63; and layoutSetPrototypeUuid = &#63; from the database.
+	 *
+	 * @param companyId the company ID
+	 * @param layoutSetPrototypeUuid the layout set prototype uuid
+	 */
+	public static void removeByC_L(
+		long companyId, String layoutSetPrototypeUuid) {
+
+		getPersistence().removeByC_L(companyId, layoutSetPrototypeUuid);
+	}
+
+	/**
+	 * Returns the number of layout sets where companyId = &#63; and layoutSetPrototypeUuid = &#63;.
+	 *
+	 * @param companyId the company ID
+	 * @param layoutSetPrototypeUuid the layout set prototype uuid
+	 * @return the number of matching layout sets
+	 */
+	public static int countByC_L(
+		long companyId, String layoutSetPrototypeUuid) {
+
+		return getPersistence().countByC_L(companyId, layoutSetPrototypeUuid);
+	}
+
+	/**
+	 * Returns all the layout sets where companyId = &#63; and layoutSetPrototypeUuid = &#63; and head = &#63;.
+	 *
+	 * @param companyId the company ID
+	 * @param layoutSetPrototypeUuid the layout set prototype uuid
+	 * @param head the head
+	 * @return the matching layout sets
+	 */
+	public static List<LayoutSet> findByC_L_Head(
+		long companyId, String layoutSetPrototypeUuid, boolean head) {
+
+		return getPersistence().findByC_L_Head(
+			companyId, layoutSetPrototypeUuid, head);
+	}
+
+	/**
+	 * Returns a range of all the layout sets where companyId = &#63; and layoutSetPrototypeUuid = &#63; and head = &#63;.
+	 *
+	 * <p>
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>LayoutSetModelImpl</code>.
+	 * </p>
+	 *
+	 * @param companyId the company ID
+	 * @param layoutSetPrototypeUuid the layout set prototype uuid
+	 * @param head the head
+	 * @param start the lower bound of the range of layout sets
+	 * @param end the upper bound of the range of layout sets (not inclusive)
+	 * @return the range of matching layout sets
+	 */
+	public static List<LayoutSet> findByC_L_Head(
+		long companyId, String layoutSetPrototypeUuid, boolean head, int start,
+		int end) {
+
+		return getPersistence().findByC_L_Head(
+			companyId, layoutSetPrototypeUuid, head, start, end);
+	}
+
+	/**
+	 * Returns an ordered range of all the layout sets where companyId = &#63; and layoutSetPrototypeUuid = &#63; and head = &#63;.
+	 *
+	 * <p>
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>LayoutSetModelImpl</code>.
+	 * </p>
+	 *
+	 * @param companyId the company ID
+	 * @param layoutSetPrototypeUuid the layout set prototype uuid
+	 * @param head the head
+	 * @param start the lower bound of the range of layout sets
+	 * @param end the upper bound of the range of layout sets (not inclusive)
+	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
+	 * @return the ordered range of matching layout sets
+	 */
+	public static List<LayoutSet> findByC_L_Head(
+		long companyId, String layoutSetPrototypeUuid, boolean head, int start,
+		int end, OrderByComparator<LayoutSet> orderByComparator) {
+
+		return getPersistence().findByC_L_Head(
+			companyId, layoutSetPrototypeUuid, head, start, end,
+			orderByComparator);
+	}
+
+	/**
+	 * Returns an ordered range of all the layout sets where companyId = &#63; and layoutSetPrototypeUuid = &#63; and head = &#63;.
+	 *
+	 * <p>
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>LayoutSetModelImpl</code>.
+	 * </p>
+	 *
+	 * @param companyId the company ID
+	 * @param layoutSetPrototypeUuid the layout set prototype uuid
+	 * @param head the head
+	 * @param start the lower bound of the range of layout sets
+	 * @param end the upper bound of the range of layout sets (not inclusive)
+	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
+	 * @param useFinderCache whether to use the finder cache
+	 * @return the ordered range of matching layout sets
+	 */
+	public static List<LayoutSet> findByC_L_Head(
+		long companyId, String layoutSetPrototypeUuid, boolean head, int start,
+		int end, OrderByComparator<LayoutSet> orderByComparator,
+		boolean useFinderCache) {
+
+		return getPersistence().findByC_L_Head(
+			companyId, layoutSetPrototypeUuid, head, start, end,
+			orderByComparator, useFinderCache);
+	}
+
+	/**
+	 * Returns the first layout set in the ordered set where companyId = &#63; and layoutSetPrototypeUuid = &#63; and head = &#63;.
+	 *
+	 * @param companyId the company ID
+	 * @param layoutSetPrototypeUuid the layout set prototype uuid
+	 * @param head the head
+	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	 * @return the first matching layout set
+	 * @throws NoSuchLayoutSetException if a matching layout set could not be found
+	 */
+	public static LayoutSet findByC_L_Head_First(
+			long companyId, String layoutSetPrototypeUuid, boolean head,
+			OrderByComparator<LayoutSet> orderByComparator)
+		throws com.liferay.portal.kernel.exception.NoSuchLayoutSetException {
+
+		return getPersistence().findByC_L_Head_First(
+			companyId, layoutSetPrototypeUuid, head, orderByComparator);
+	}
+
+	/**
+	 * Returns the first layout set in the ordered set where companyId = &#63; and layoutSetPrototypeUuid = &#63; and head = &#63;.
+	 *
+	 * @param companyId the company ID
+	 * @param layoutSetPrototypeUuid the layout set prototype uuid
+	 * @param head the head
+	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	 * @return the first matching layout set, or <code>null</code> if a matching layout set could not be found
+	 */
+	public static LayoutSet fetchByC_L_Head_First(
+		long companyId, String layoutSetPrototypeUuid, boolean head,
+		OrderByComparator<LayoutSet> orderByComparator) {
+
+		return getPersistence().fetchByC_L_Head_First(
+			companyId, layoutSetPrototypeUuid, head, orderByComparator);
+	}
+
+	/**
+	 * Returns the last layout set in the ordered set where companyId = &#63; and layoutSetPrototypeUuid = &#63; and head = &#63;.
+	 *
+	 * @param companyId the company ID
+	 * @param layoutSetPrototypeUuid the layout set prototype uuid
+	 * @param head the head
+	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	 * @return the last matching layout set
+	 * @throws NoSuchLayoutSetException if a matching layout set could not be found
+	 */
+	public static LayoutSet findByC_L_Head_Last(
+			long companyId, String layoutSetPrototypeUuid, boolean head,
+			OrderByComparator<LayoutSet> orderByComparator)
+		throws com.liferay.portal.kernel.exception.NoSuchLayoutSetException {
+
+		return getPersistence().findByC_L_Head_Last(
+			companyId, layoutSetPrototypeUuid, head, orderByComparator);
+	}
+
+	/**
+	 * Returns the last layout set in the ordered set where companyId = &#63; and layoutSetPrototypeUuid = &#63; and head = &#63;.
+	 *
+	 * @param companyId the company ID
+	 * @param layoutSetPrototypeUuid the layout set prototype uuid
+	 * @param head the head
+	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	 * @return the last matching layout set, or <code>null</code> if a matching layout set could not be found
+	 */
+	public static LayoutSet fetchByC_L_Head_Last(
+		long companyId, String layoutSetPrototypeUuid, boolean head,
+		OrderByComparator<LayoutSet> orderByComparator) {
+
+		return getPersistence().fetchByC_L_Head_Last(
+			companyId, layoutSetPrototypeUuid, head, orderByComparator);
+	}
+
+	/**
+	 * Returns the layout sets before and after the current layout set in the ordered set where companyId = &#63; and layoutSetPrototypeUuid = &#63; and head = &#63;.
+	 *
+	 * @param layoutSetId the primary key of the current layout set
+	 * @param companyId the company ID
+	 * @param layoutSetPrototypeUuid the layout set prototype uuid
+	 * @param head the head
+	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	 * @return the previous, current, and next layout set
+	 * @throws NoSuchLayoutSetException if a layout set with the primary key could not be found
+	 */
+	public static LayoutSet[] findByC_L_Head_PrevAndNext(
+			long layoutSetId, long companyId, String layoutSetPrototypeUuid,
+			boolean head, OrderByComparator<LayoutSet> orderByComparator)
+		throws com.liferay.portal.kernel.exception.NoSuchLayoutSetException {
+
+		return getPersistence().findByC_L_Head_PrevAndNext(
+			layoutSetId, companyId, layoutSetPrototypeUuid, head,
+			orderByComparator);
+	}
+
+	/**
+	 * Removes all the layout sets where companyId = &#63; and layoutSetPrototypeUuid = &#63; and head = &#63; from the database.
+	 *
+	 * @param companyId the company ID
+	 * @param layoutSetPrototypeUuid the layout set prototype uuid
+	 * @param head the head
+	 */
+	public static void removeByC_L_Head(
+		long companyId, String layoutSetPrototypeUuid, boolean head) {
+
+		getPersistence().removeByC_L_Head(
+			companyId, layoutSetPrototypeUuid, head);
+	}
+
+	/**
+	 * Returns the number of layout sets where companyId = &#63; and layoutSetPrototypeUuid = &#63; and head = &#63;.
+	 *
+	 * @param companyId the company ID
+	 * @param layoutSetPrototypeUuid the layout set prototype uuid
+	 * @param head the head
+	 * @return the number of matching layout sets
+	 */
+	public static int countByC_L_Head(
+		long companyId, String layoutSetPrototypeUuid, boolean head) {
+
+		return getPersistence().countByC_L_Head(
+			companyId, layoutSetPrototypeUuid, head);
+	}
+
+	/**
 	 * Returns all the layout sets where privateLayout = &#63; and logoId = &#63;.
 	 *
 	 * @param privateLayout the private layout
@@ -1133,7 +1531,7 @@ public class LayoutSetUtil {
 	 * Returns a range of all the layout sets where privateLayout = &#63; and logoId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>LayoutSetModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>LayoutSetModelImpl</code>.
 	 * </p>
 	 *
 	 * @param privateLayout the private layout
@@ -1152,7 +1550,7 @@ public class LayoutSetUtil {
 	 * Returns an ordered range of all the layout sets where privateLayout = &#63; and logoId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>LayoutSetModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>LayoutSetModelImpl</code>.
 	 * </p>
 	 *
 	 * @param privateLayout the private layout
@@ -1174,7 +1572,7 @@ public class LayoutSetUtil {
 	 * Returns an ordered range of all the layout sets where privateLayout = &#63; and logoId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>LayoutSetModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>LayoutSetModelImpl</code>.
 	 * </p>
 	 *
 	 * @param privateLayout the private layout
@@ -1182,17 +1580,17 @@ public class LayoutSetUtil {
 	 * @param start the lower bound of the range of layout sets
 	 * @param end the upper bound of the range of layout sets (not inclusive)
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
-	 * @param retrieveFromCache whether to retrieve from the finder cache
+	 * @param useFinderCache whether to use the finder cache
 	 * @return the ordered range of matching layout sets
 	 */
 	public static List<LayoutSet> findByP_L(
 		boolean privateLayout, long logoId, int start, int end,
 		OrderByComparator<LayoutSet> orderByComparator,
-		boolean retrieveFromCache) {
+		boolean useFinderCache) {
 
 		return getPersistence().findByP_L(
 			privateLayout, logoId, start, end, orderByComparator,
-			retrieveFromCache);
+			useFinderCache);
 	}
 
 	/**
@@ -1339,15 +1737,15 @@ public class LayoutSetUtil {
 	 * @param privateLayout the private layout
 	 * @param logoId the logo ID
 	 * @param head the head
-	 * @param retrieveFromCache whether to retrieve from the finder cache
+	 * @param useFinderCache whether to use the finder cache
 	 * @return the matching layout set, or <code>null</code> if a matching layout set could not be found
 	 */
 	public static LayoutSet fetchByP_L_Head(
 		boolean privateLayout, long logoId, boolean head,
-		boolean retrieveFromCache) {
+		boolean useFinderCache) {
 
 		return getPersistence().fetchByP_L_Head(
-			privateLayout, logoId, head, retrieveFromCache);
+			privateLayout, logoId, head, useFinderCache);
 	}
 
 	/**
@@ -1406,13 +1804,11 @@ public class LayoutSetUtil {
 	 * Returns the layout set where headId = &#63; or returns <code>null</code> if it could not be found, optionally using the finder cache.
 	 *
 	 * @param headId the head ID
-	 * @param retrieveFromCache whether to retrieve from the finder cache
+	 * @param useFinderCache whether to use the finder cache
 	 * @return the matching layout set, or <code>null</code> if a matching layout set could not be found
 	 */
-	public static LayoutSet fetchByHeadId(
-		long headId, boolean retrieveFromCache) {
-
-		return getPersistence().fetchByHeadId(headId, retrieveFromCache);
+	public static LayoutSet fetchByHeadId(long headId, boolean useFinderCache) {
+		return getPersistence().fetchByHeadId(headId, useFinderCache);
 	}
 
 	/**
@@ -1518,7 +1914,7 @@ public class LayoutSetUtil {
 	 * Returns a range of all the layout sets.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>LayoutSetModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>LayoutSetModelImpl</code>.
 	 * </p>
 	 *
 	 * @param start the lower bound of the range of layout sets
@@ -1533,7 +1929,7 @@ public class LayoutSetUtil {
 	 * Returns an ordered range of all the layout sets.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>LayoutSetModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>LayoutSetModelImpl</code>.
 	 * </p>
 	 *
 	 * @param start the lower bound of the range of layout sets
@@ -1551,21 +1947,21 @@ public class LayoutSetUtil {
 	 * Returns an ordered range of all the layout sets.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>LayoutSetModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>LayoutSetModelImpl</code>.
 	 * </p>
 	 *
 	 * @param start the lower bound of the range of layout sets
 	 * @param end the upper bound of the range of layout sets (not inclusive)
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
-	 * @param retrieveFromCache whether to retrieve from the finder cache
+	 * @param useFinderCache whether to use the finder cache
 	 * @return the ordered range of layout sets
 	 */
 	public static List<LayoutSet> findAll(
 		int start, int end, OrderByComparator<LayoutSet> orderByComparator,
-		boolean retrieveFromCache) {
+		boolean useFinderCache) {
 
 		return getPersistence().findAll(
-			start, end, orderByComparator, retrieveFromCache);
+			start, end, orderByComparator, useFinderCache);
 	}
 
 	/**

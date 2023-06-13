@@ -78,38 +78,36 @@ renderResponse.setTitle(selLayout.getName(locale));
 
 			<script>
 				(function() {
-					var enableLayoutButton = document.getElementById('<portlet:namespace />enableLayoutButton');
+					var enableLayoutButton = document.getElementById(
+						'<portlet:namespace />enableLayoutButton'
+					);
 
 					if (enableLayoutButton) {
-						enableLayoutButton.addEventListener(
-							'click',
-							function(event) {
-								<portlet:actionURL name="/layout/enable_layout" var="enableLayoutURL">
-									<portlet:param name="redirect" value="<%= redirectURL.toString() %>" />
-									<portlet:param name="incompleteLayoutRevisionId" value="<%= String.valueOf(layoutRevision.getLayoutRevisionId()) %>" />
-								</portlet:actionURL>
+						enableLayoutButton.addEventListener('click', function(event) {
+							<portlet:actionURL name="/layout/enable_layout" var="enableLayoutURL">
+								<portlet:param name="redirect" value="<%= redirectURL.toString() %>" />
+								<portlet:param name="incompleteLayoutRevisionId" value="<%= String.valueOf(layoutRevision.getLayoutRevisionId()) %>" />
+							</portlet:actionURL>
 
-								submitForm(document.hrefFm, '<%= enableLayoutURL %>');
-							}
-						);
+							submitForm(document.hrefFm, '<%= enableLayoutURL %>');
+						});
 					}
 
-					var deleteLayoutButton = document.getElementById('<portlet:namespace />deleteLayoutButton');
+					var deleteLayoutButton = document.getElementById(
+						'<portlet:namespace />deleteLayoutButton'
+					);
 
 					if (deleteLayoutButton) {
-						deleteLayoutButton.addEventListener(
-							'click',
-							function(event) {
-								<portlet:actionURL name="/layout/delete_layout" var="deleteLayoutURL">
-									<portlet:param name="redirect" value='<%= HttpUtil.addParameter(redirectURL.toString(), liferayPortletResponse.getNamespace() + "selPlid", selLayout.getParentPlid()) %>' />
-									<portlet:param name="selPlid" value="<%= String.valueOf(layoutsAdminDisplayContext.getSelPlid()) %>" />
-									<portlet:param name="layoutSetBranchId" value="0" />
-									<portlet:param name="selPlid" value="<%= String.valueOf(selLayout.getParentPlid()) %>" />
-								</portlet:actionURL>
+						deleteLayoutButton.addEventListener('click', function(event) {
+							<portlet:actionURL name="/layout/delete_layout" var="deleteLayoutURL">
+								<portlet:param name="redirect" value='<%= HttpUtil.addParameter(redirectURL.toString(), liferayPortletResponse.getNamespace() + "selPlid", selLayout.getParentPlid()) %>' />
+								<portlet:param name="selPlid" value="<%= String.valueOf(layoutsAdminDisplayContext.getSelPlid()) %>" />
+								<portlet:param name="layoutSetBranchId" value="0" />
+								<portlet:param name="selPlid" value="<%= String.valueOf(selLayout.getParentPlid()) %>" />
+							</portlet:actionURL>
 
-								submitForm(document.hrefFm, '<%= deleteLayoutURL %>');
-							}
-						);
+							submitForm(document.hrefFm, '<%= deleteLayoutURL %>');
+						});
 					}
 				})();
 			</script>
@@ -194,6 +192,8 @@ renderResponse.setTitle(selLayout.getName(locale));
 					</c:if>
 				</liferay-ui:error>
 
+				<liferay-ui:error exception="<%= RequiredSegmentsExperienceException.MustNotDeleteSegmentsExperienceReferencedBySegmentsExperiments.class %>" message="this-page-cannot-be-deleted-because-it-has-ab-tests-in-progress" />
+
 				<c:if test="<%= layoutRevision != null %>">
 					<aui:input name="layoutSetBranchId" type="hidden" value="<%= layoutRevision.getLayoutSetBranchId() %>" />
 				</c:if>
@@ -212,12 +212,12 @@ renderResponse.setTitle(selLayout.getName(locale));
 					<c:choose>
 						<c:when test="<%= !SitesUtil.isLayoutUpdateable(selLayout) %>">
 							<div class="alert alert-warning">
-								<liferay-ui:message key="this-page-cannot-be-modified-because-it-is-associated-to-a-site-template-does-not-allow-modifications-to-it" />
+								<liferay-ui:message key="this-page-cannot-be-modified-because-it-is-associated-with-a-site-template-does-not-allow-modifications-to-it" />
 							</div>
 						</c:when>
 						<c:when test="<%= !SitesUtil.isLayoutDeleteable(selLayout) %>">
 							<div class="alert alert-warning">
-								<liferay-ui:message key="this-page-cannot-be-deleted-and-cannot-have-child-pages-because-it-is-associated-to-a-site-template" />
+								<liferay-ui:message key="this-page-cannot-be-deleted-and-cannot-have-child-pages-because-it-is-associated-with-a-site-template" />
 							</div>
 						</c:when>
 					</c:choose>
@@ -257,15 +257,21 @@ renderResponse.setTitle(selLayout.getName(locale));
 <aui:script>
 	var form = document.getElementById('<portlet:namespace />editLayoutFm');
 
-	form.addEventListener(
-		'submit',
-		function(event) {
-			var applyLayoutPrototype = document.getElementById('<portlet:namespace />applyLayoutPrototype');
+	form.addEventListener('submit', function(event) {
+		var applyLayoutPrototype = document.getElementById(
+			'<portlet:namespace />applyLayoutPrototype'
+		);
 
-			if (!applyLayoutPrototype || (applyLayoutPrototype.value === 'false') || (applyLayoutPrototype && (applyLayoutPrototype.value === 'true') && confirm('<%= UnicodeLanguageUtil.get(request, "reactivating-inherited-changes-may-update-the-page-with-the-possible-changes-that-could-have-been-made-in-the-original-template") %>'))) {
-				submitForm(form);
-			}
+		if (
+			!applyLayoutPrototype ||
+			applyLayoutPrototype.value === 'false' ||
+			(applyLayoutPrototype &&
+				applyLayoutPrototype.value === 'true' &&
+				confirm(
+					'<%= UnicodeLanguageUtil.get(request, "reactivating-inherited-changes-may-update-the-page-with-the-possible-changes-that-could-have-been-made-in-the-original-template") %>'
+				))
+		) {
+			submitForm(form);
 		}
-	);
-
+	});
 </aui:script>

@@ -50,7 +50,7 @@ public class DefaultLayoutTypeAccessPolicyImpl
 	implements LayoutTypeAccessPolicy {
 
 	public static LayoutTypeAccessPolicy create() {
-		return _instance;
+		return _layoutTypeAccessPolicy;
 	}
 
 	@Override
@@ -61,7 +61,7 @@ public class DefaultLayoutTypeAccessPolicyImpl
 
 		String checkAccessAllowedToPortletCacheKey = StringBundler.concat(
 			DefaultLayoutTypeAccessPolicyImpl.class.getName(), "#",
-			layout.getPlid(), "#", portlet.getPrimaryKey());
+			layout.getPlid(), "#", portlet.getPortletId());
 
 		Boolean allowed = (Boolean)httpServletRequest.getAttribute(
 			checkAccessAllowedToPortletCacheKey);
@@ -290,7 +290,7 @@ public class DefaultLayoutTypeAccessPolicyImpl
 			PropsUtil.get(
 				PropsKeys.PORTLET_ADD_DEFAULT_RESOURCE_CHECK_ENABLED));
 
-	private static final LayoutTypeAccessPolicy _instance =
+	private static final LayoutTypeAccessPolicy _layoutTypeAccessPolicy =
 		new DefaultLayoutTypeAccessPolicyImpl();
 
 }

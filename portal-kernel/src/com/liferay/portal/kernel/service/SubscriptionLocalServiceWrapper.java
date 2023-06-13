@@ -14,8 +14,6 @@
 
 package com.liferay.portal.kernel.service;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 /**
  * Provides a wrapper for {@link SubscriptionLocalService}.
  *
@@ -26,10 +24,9 @@ import org.osgi.annotation.versioning.ProviderType;
  * @generated
  */
 @Deprecated
-@ProviderType
 public class SubscriptionLocalServiceWrapper
-	implements SubscriptionLocalService,
-			   ServiceWrapper<SubscriptionLocalService> {
+	implements ServiceWrapper<SubscriptionLocalService>,
+			   SubscriptionLocalService {
 
 	public SubscriptionLocalServiceWrapper(
 		SubscriptionLocalService subscriptionLocalService) {
@@ -60,7 +57,7 @@ public class SubscriptionLocalServiceWrapper
 	 */
 	@Override
 	public com.liferay.portal.kernel.model.Subscription addSubscription(
-			long userId, long groupId, String className, long classPK)
+			long userId, long groupId, java.lang.String className, long classPK)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _subscriptionLocalService.addSubscription(
@@ -90,8 +87,8 @@ public class SubscriptionLocalServiceWrapper
 	 */
 	@Override
 	public com.liferay.portal.kernel.model.Subscription addSubscription(
-			long userId, long groupId, String className, long classPK,
-			String frequency)
+			long userId, long groupId, java.lang.String className, long classPK,
+			java.lang.String frequency)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _subscriptionLocalService.addSubscription(
@@ -159,7 +156,8 @@ public class SubscriptionLocalServiceWrapper
 	 * @param classPK the primary key of the entity's instance
 	 */
 	@Override
-	public void deleteSubscription(long userId, String className, long classPK)
+	public void deleteSubscription(
+			long userId, java.lang.String className, long classPK)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		_subscriptionLocalService.deleteSubscription(
@@ -209,7 +207,7 @@ public class SubscriptionLocalServiceWrapper
 	 */
 	@Override
 	public void deleteSubscriptions(
-			long companyId, String className, long classPK)
+			long companyId, java.lang.String className, long classPK)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		_subscriptionLocalService.deleteSubscriptions(
@@ -238,7 +236,7 @@ public class SubscriptionLocalServiceWrapper
 	 * Performs a dynamic query on the database and returns a range of the matching rows.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>com.liferay.portal.model.impl.SubscriptionModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>com.liferay.portal.model.impl.SubscriptionModelImpl</code>.
 	 * </p>
 	 *
 	 * @param dynamicQuery the dynamic query
@@ -258,7 +256,7 @@ public class SubscriptionLocalServiceWrapper
 	 * Performs a dynamic query on the database and returns an ordered range of the matching rows.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>com.liferay.portal.model.impl.SubscriptionModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>com.liferay.portal.model.impl.SubscriptionModelImpl</code>.
 	 * </p>
 	 *
 	 * @param dynamicQuery the dynamic query
@@ -315,7 +313,7 @@ public class SubscriptionLocalServiceWrapper
 
 	@Override
 	public com.liferay.portal.kernel.model.Subscription fetchSubscription(
-		long companyId, long userId, String className, long classPK) {
+		long companyId, long userId, java.lang.String className, long classPK) {
 
 		return _subscriptionLocalService.fetchSubscription(
 			companyId, userId, className, classPK);
@@ -341,7 +339,7 @@ public class SubscriptionLocalServiceWrapper
 	 * @return the OSGi service identifier
 	 */
 	@Override
-	public String getOSGiServiceIdentifier() {
+	public java.lang.String getOSGiServiceIdentifier() {
 		return _subscriptionLocalService.getOSGiServiceIdentifier();
 	}
 
@@ -379,7 +377,8 @@ public class SubscriptionLocalServiceWrapper
 	 */
 	@Override
 	public com.liferay.portal.kernel.model.Subscription getSubscription(
-			long companyId, long userId, String className, long classPK)
+			long companyId, long userId, java.lang.String className,
+			long classPK)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _subscriptionLocalService.getSubscription(
@@ -390,7 +389,7 @@ public class SubscriptionLocalServiceWrapper
 	 * Returns a range of all the subscriptions.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>com.liferay.portal.model.impl.SubscriptionModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>com.liferay.portal.model.impl.SubscriptionModelImpl</code>.
 	 * </p>
 	 *
 	 * @param start the lower bound of the range of subscriptions
@@ -416,7 +415,8 @@ public class SubscriptionLocalServiceWrapper
 	@Override
 	public java.util.List<com.liferay.portal.kernel.model.Subscription>
 		getSubscriptions(
-			long companyId, long userId, String className, long[] classPKs) {
+			long companyId, long userId, java.lang.String className,
+			long[] classPKs) {
 
 		return _subscriptionLocalService.getSubscriptions(
 			companyId, userId, className, classPKs);
@@ -432,7 +432,8 @@ public class SubscriptionLocalServiceWrapper
 	 */
 	@Override
 	public java.util.List<com.liferay.portal.kernel.model.Subscription>
-		getSubscriptions(long companyId, String className, long classPK) {
+		getSubscriptions(
+			long companyId, java.lang.String className, long classPK) {
 
 		return _subscriptionLocalService.getSubscriptions(
 			companyId, className, classPK);
@@ -479,7 +480,7 @@ public class SubscriptionLocalServiceWrapper
 	 */
 	@Override
 	public java.util.List<com.liferay.portal.kernel.model.Subscription>
-		getUserSubscriptions(long userId, String className) {
+		getUserSubscriptions(long userId, java.lang.String className) {
 
 		return _subscriptionLocalService.getUserSubscriptions(
 			userId, className);
@@ -508,7 +509,7 @@ public class SubscriptionLocalServiceWrapper
 	 */
 	@Override
 	public boolean isSubscribed(
-		long companyId, long userId, String className, long classPK) {
+		long companyId, long userId, java.lang.String className, long classPK) {
 
 		return _subscriptionLocalService.isSubscribed(
 			companyId, userId, className, classPK);
@@ -527,7 +528,8 @@ public class SubscriptionLocalServiceWrapper
 	 */
 	@Override
 	public boolean isSubscribed(
-		long companyId, long userId, String className, long[] classPKs) {
+		long companyId, long userId, java.lang.String className,
+		long[] classPKs) {
 
 		return _subscriptionLocalService.isSubscribed(
 			companyId, userId, className, classPKs);

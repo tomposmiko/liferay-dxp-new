@@ -19,7 +19,7 @@ import com.liferay.exportimport.kernel.lar.ManifestSummary;
 import com.liferay.exportimport.kernel.lar.PortletDataContext;
 import com.liferay.exportimport.kernel.lar.StagedModelDataHandlerUtil;
 import com.liferay.exportimport.kernel.lar.StagedModelType;
-import com.liferay.portal.kernel.bean.BeanReference;
+import com.liferay.portal.aop.AopService;
 import com.liferay.portal.kernel.dao.db.DB;
 import com.liferay.portal.kernel.dao.db.DBManagerUtil;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdate;
@@ -38,12 +38,10 @@ import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiServic
 import com.liferay.portal.kernel.search.Indexable;
 import com.liferay.portal.kernel.search.IndexableType;
 import com.liferay.portal.kernel.service.BaseLocalServiceImpl;
-import com.liferay.portal.kernel.service.PersistedModelLocalServiceRegistry;
-import com.liferay.portal.kernel.service.persistence.UserPersistence;
+import com.liferay.portal.kernel.service.PersistedModelLocalService;
 import com.liferay.portal.kernel.transaction.Transactional;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.PortalUtil;
-import com.liferay.portal.spring.extender.service.ServiceReference;
 import com.liferay.site.navigation.model.SiteNavigationMenuItem;
 import com.liferay.site.navigation.service.SiteNavigationMenuItemLocalService;
 import com.liferay.site.navigation.service.persistence.SiteNavigationMenuItemPersistence;
@@ -55,7 +53,7 @@ import java.util.List;
 
 import javax.sql.DataSource;
 
-import org.osgi.annotation.versioning.ProviderType;
+import org.osgi.service.component.annotations.Reference;
 
 /**
  * Provides the base implementation for the site navigation menu item local service.
@@ -68,12 +66,12 @@ import org.osgi.annotation.versioning.ProviderType;
  * @see com.liferay.site.navigation.service.impl.SiteNavigationMenuItemLocalServiceImpl
  * @generated
  */
-@ProviderType
 public abstract class SiteNavigationMenuItemLocalServiceBaseImpl
 	extends BaseLocalServiceImpl
-	implements SiteNavigationMenuItemLocalService, IdentifiableOSGiService {
+	implements AopService, IdentifiableOSGiService,
+			   SiteNavigationMenuItemLocalService {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this class directly. Use <code>SiteNavigationMenuItemLocalService</code> via injection or a <code>org.osgi.util.tracker.ServiceTracker</code> or use <code>com.liferay.site.navigation.service.SiteNavigationMenuItemLocalServiceUtil</code>.
@@ -165,7 +163,7 @@ public abstract class SiteNavigationMenuItemLocalServiceBaseImpl
 	 * Performs a dynamic query on the database and returns a range of the matching rows.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>com.liferay.site.navigation.model.impl.SiteNavigationMenuItemModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>com.liferay.site.navigation.model.impl.SiteNavigationMenuItemModelImpl</code>.
 	 * </p>
 	 *
 	 * @param dynamicQuery the dynamic query
@@ -185,7 +183,7 @@ public abstract class SiteNavigationMenuItemLocalServiceBaseImpl
 	 * Performs a dynamic query on the database and returns an ordered range of the matching rows.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>com.liferay.site.navigation.model.impl.SiteNavigationMenuItemModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>com.liferay.site.navigation.model.impl.SiteNavigationMenuItemModelImpl</code>.
 	 * </p>
 	 *
 	 * @param dynamicQuery the dynamic query
@@ -461,7 +459,7 @@ public abstract class SiteNavigationMenuItemLocalServiceBaseImpl
 	 * Returns a range of all the site navigation menu items.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>com.liferay.site.navigation.model.impl.SiteNavigationMenuItemModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>com.liferay.site.navigation.model.impl.SiteNavigationMenuItemModelImpl</code>.
 	 * </p>
 	 *
 	 * @param start the lower bound of the range of site navigation menu items
@@ -499,167 +497,18 @@ public abstract class SiteNavigationMenuItemLocalServiceBaseImpl
 		return siteNavigationMenuItemPersistence.update(siteNavigationMenuItem);
 	}
 
-	/**
-	 * Returns the site navigation menu item local service.
-	 *
-	 * @return the site navigation menu item local service
-	 */
-	public SiteNavigationMenuItemLocalService
-		getSiteNavigationMenuItemLocalService() {
-
-		return siteNavigationMenuItemLocalService;
+	@Override
+	public Class<?>[] getAopInterfaces() {
+		return new Class<?>[] {
+			SiteNavigationMenuItemLocalService.class,
+			IdentifiableOSGiService.class, PersistedModelLocalService.class
+		};
 	}
 
-	/**
-	 * Sets the site navigation menu item local service.
-	 *
-	 * @param siteNavigationMenuItemLocalService the site navigation menu item local service
-	 */
-	public void setSiteNavigationMenuItemLocalService(
-		SiteNavigationMenuItemLocalService siteNavigationMenuItemLocalService) {
-
-		this.siteNavigationMenuItemLocalService =
-			siteNavigationMenuItemLocalService;
-	}
-
-	/**
-	 * Returns the site navigation menu item persistence.
-	 *
-	 * @return the site navigation menu item persistence
-	 */
-	public SiteNavigationMenuItemPersistence
-		getSiteNavigationMenuItemPersistence() {
-
-		return siteNavigationMenuItemPersistence;
-	}
-
-	/**
-	 * Sets the site navigation menu item persistence.
-	 *
-	 * @param siteNavigationMenuItemPersistence the site navigation menu item persistence
-	 */
-	public void setSiteNavigationMenuItemPersistence(
-		SiteNavigationMenuItemPersistence siteNavigationMenuItemPersistence) {
-
-		this.siteNavigationMenuItemPersistence =
-			siteNavigationMenuItemPersistence;
-	}
-
-	/**
-	 * Returns the counter local service.
-	 *
-	 * @return the counter local service
-	 */
-	public com.liferay.counter.kernel.service.CounterLocalService
-		getCounterLocalService() {
-
-		return counterLocalService;
-	}
-
-	/**
-	 * Sets the counter local service.
-	 *
-	 * @param counterLocalService the counter local service
-	 */
-	public void setCounterLocalService(
-		com.liferay.counter.kernel.service.CounterLocalService
-			counterLocalService) {
-
-		this.counterLocalService = counterLocalService;
-	}
-
-	/**
-	 * Returns the user local service.
-	 *
-	 * @return the user local service
-	 */
-	public com.liferay.portal.kernel.service.UserLocalService
-		getUserLocalService() {
-
-		return userLocalService;
-	}
-
-	/**
-	 * Sets the user local service.
-	 *
-	 * @param userLocalService the user local service
-	 */
-	public void setUserLocalService(
-		com.liferay.portal.kernel.service.UserLocalService userLocalService) {
-
-		this.userLocalService = userLocalService;
-	}
-
-	/**
-	 * Returns the user persistence.
-	 *
-	 * @return the user persistence
-	 */
-	public UserPersistence getUserPersistence() {
-		return userPersistence;
-	}
-
-	/**
-	 * Sets the user persistence.
-	 *
-	 * @param userPersistence the user persistence
-	 */
-	public void setUserPersistence(UserPersistence userPersistence) {
-		this.userPersistence = userPersistence;
-	}
-
-	/**
-	 * Returns the site navigation menu local service.
-	 *
-	 * @return the site navigation menu local service
-	 */
-	public com.liferay.site.navigation.service.SiteNavigationMenuLocalService
-		getSiteNavigationMenuLocalService() {
-
-		return siteNavigationMenuLocalService;
-	}
-
-	/**
-	 * Sets the site navigation menu local service.
-	 *
-	 * @param siteNavigationMenuLocalService the site navigation menu local service
-	 */
-	public void setSiteNavigationMenuLocalService(
-		com.liferay.site.navigation.service.SiteNavigationMenuLocalService
-			siteNavigationMenuLocalService) {
-
-		this.siteNavigationMenuLocalService = siteNavigationMenuLocalService;
-	}
-
-	/**
-	 * Returns the site navigation menu persistence.
-	 *
-	 * @return the site navigation menu persistence
-	 */
-	public SiteNavigationMenuPersistence getSiteNavigationMenuPersistence() {
-		return siteNavigationMenuPersistence;
-	}
-
-	/**
-	 * Sets the site navigation menu persistence.
-	 *
-	 * @param siteNavigationMenuPersistence the site navigation menu persistence
-	 */
-	public void setSiteNavigationMenuPersistence(
-		SiteNavigationMenuPersistence siteNavigationMenuPersistence) {
-
-		this.siteNavigationMenuPersistence = siteNavigationMenuPersistence;
-	}
-
-	public void afterPropertiesSet() {
-		persistedModelLocalServiceRegistry.register(
-			"com.liferay.site.navigation.model.SiteNavigationMenuItem",
-			siteNavigationMenuItemLocalService);
-	}
-
-	public void destroy() {
-		persistedModelLocalServiceRegistry.unregister(
-			"com.liferay.site.navigation.model.SiteNavigationMenuItem");
+	@Override
+	public void setAopProxy(Object aopProxy) {
+		siteNavigationMenuItemLocalService =
+			(SiteNavigationMenuItemLocalService)aopProxy;
 	}
 
 	/**
@@ -705,40 +554,22 @@ public abstract class SiteNavigationMenuItemLocalServiceBaseImpl
 		}
 	}
 
-	@BeanReference(type = SiteNavigationMenuItemLocalService.class)
 	protected SiteNavigationMenuItemLocalService
 		siteNavigationMenuItemLocalService;
 
-	@BeanReference(type = SiteNavigationMenuItemPersistence.class)
+	@Reference
 	protected SiteNavigationMenuItemPersistence
 		siteNavigationMenuItemPersistence;
 
-	@ServiceReference(
-		type = com.liferay.counter.kernel.service.CounterLocalService.class
-	)
+	@Reference
 	protected com.liferay.counter.kernel.service.CounterLocalService
 		counterLocalService;
 
-	@ServiceReference(
-		type = com.liferay.portal.kernel.service.UserLocalService.class
-	)
+	@Reference
 	protected com.liferay.portal.kernel.service.UserLocalService
 		userLocalService;
 
-	@ServiceReference(type = UserPersistence.class)
-	protected UserPersistence userPersistence;
-
-	@BeanReference(
-		type = com.liferay.site.navigation.service.SiteNavigationMenuLocalService.class
-	)
-	protected com.liferay.site.navigation.service.SiteNavigationMenuLocalService
-		siteNavigationMenuLocalService;
-
-	@BeanReference(type = SiteNavigationMenuPersistence.class)
+	@Reference
 	protected SiteNavigationMenuPersistence siteNavigationMenuPersistence;
-
-	@ServiceReference(type = PersistedModelLocalServiceRegistry.class)
-	protected PersistedModelLocalServiceRegistry
-		persistedModelLocalServiceRegistry;
 
 }

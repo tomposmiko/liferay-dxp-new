@@ -40,20 +40,13 @@
 		</div>
 	</div>
 
-	<aui:script use="liferay-store,io-request,parse-content">
-		var addToggle = $('#<%= portletNamespace %>addToggleId');
+	<aui:script>
+		var addToggle = document.getElementById('<%= portletNamespace %>addToggleId');
 
-		addToggle.sideNavigation();
+		Liferay.SideNavigation.initialize(addToggle);
 
-		Liferay.once(
-			'screenLoad',
-			function() {
-				var sideNavigation = addToggle.data('lexicon.sidenav');
-
-				if (sideNavigation) {
-					sideNavigation.destroy();
-				}
-			}
-		);
+		Liferay.once('screenLoad', function() {
+			Liferay.SideNavigation.destroy(addToggle);
+		});
 	</aui:script>
 </liferay-util:body-bottom>

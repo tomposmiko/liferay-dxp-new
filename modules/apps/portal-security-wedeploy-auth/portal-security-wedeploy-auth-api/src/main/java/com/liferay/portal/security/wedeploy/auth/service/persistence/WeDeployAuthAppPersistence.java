@@ -35,7 +35,7 @@ import org.osgi.annotation.versioning.ProviderType;
 public interface WeDeployAuthAppPersistence
 	extends BasePersistence<WeDeployAuthApp> {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this interface directly. Always use {@link WeDeployAuthAppUtil} to access the we deploy auth app persistence. Modify <code>service.xml</code> and rerun ServiceBuilder to regenerate this interface.
@@ -66,11 +66,11 @@ public interface WeDeployAuthAppPersistence
 	 *
 	 * @param redirectURI the redirect uri
 	 * @param clientId the client ID
-	 * @param retrieveFromCache whether to retrieve from the finder cache
+	 * @param useFinderCache whether to use the finder cache
 	 * @return the matching we deploy auth app, or <code>null</code> if a matching we deploy auth app could not be found
 	 */
 	public WeDeployAuthApp fetchByRU_CI(
-		String redirectURI, String clientId, boolean retrieveFromCache);
+		String redirectURI, String clientId, boolean useFinderCache);
 
 	/**
 	 * Removes the we deploy auth app where redirectURI = &#63; and clientId = &#63; from the database.
@@ -116,11 +116,11 @@ public interface WeDeployAuthAppPersistence
 	 *
 	 * @param clientId the client ID
 	 * @param clientSecret the client secret
-	 * @param retrieveFromCache whether to retrieve from the finder cache
+	 * @param useFinderCache whether to use the finder cache
 	 * @return the matching we deploy auth app, or <code>null</code> if a matching we deploy auth app could not be found
 	 */
 	public WeDeployAuthApp fetchByCI_CS(
-		String clientId, String clientSecret, boolean retrieveFromCache);
+		String clientId, String clientSecret, boolean useFinderCache);
 
 	/**
 	 * Removes the we deploy auth app where clientId = &#63; and clientSecret = &#63; from the database.
@@ -204,7 +204,7 @@ public interface WeDeployAuthAppPersistence
 	 * Returns a range of all the we deploy auth apps.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>WeDeployAuthAppModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>WeDeployAuthAppModelImpl</code>.
 	 * </p>
 	 *
 	 * @param start the lower bound of the range of we deploy auth apps
@@ -217,7 +217,7 @@ public interface WeDeployAuthAppPersistence
 	 * Returns an ordered range of all the we deploy auth apps.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>WeDeployAuthAppModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>WeDeployAuthAppModelImpl</code>.
 	 * </p>
 	 *
 	 * @param start the lower bound of the range of we deploy auth apps
@@ -234,20 +234,20 @@ public interface WeDeployAuthAppPersistence
 	 * Returns an ordered range of all the we deploy auth apps.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>WeDeployAuthAppModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>WeDeployAuthAppModelImpl</code>.
 	 * </p>
 	 *
 	 * @param start the lower bound of the range of we deploy auth apps
 	 * @param end the upper bound of the range of we deploy auth apps (not inclusive)
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
-	 * @param retrieveFromCache whether to retrieve from the finder cache
+	 * @param useFinderCache whether to use the finder cache
 	 * @return the ordered range of we deploy auth apps
 	 */
 	public java.util.List<WeDeployAuthApp> findAll(
 		int start, int end,
 		com.liferay.portal.kernel.util.OrderByComparator<WeDeployAuthApp>
 			orderByComparator,
-		boolean retrieveFromCache);
+		boolean useFinderCache);
 
 	/**
 	 * Removes all the we deploy auth apps from the database.

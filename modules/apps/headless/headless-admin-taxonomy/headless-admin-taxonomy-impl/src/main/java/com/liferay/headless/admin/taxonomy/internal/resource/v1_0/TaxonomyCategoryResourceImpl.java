@@ -52,10 +52,7 @@ import com.liferay.portal.vulcan.util.SearchUtil;
 import java.util.AbstractMap;
 import java.util.Collections;
 
-import javax.servlet.http.HttpServletResponse;
-
 import javax.ws.rs.BadRequestException;
-import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MultivaluedMap;
 
 import org.osgi.service.component.annotations.Component;
@@ -93,7 +90,7 @@ public class TaxonomyCategoryResourceImpl
 
 		ContentLanguageUtil.addContentLanguageHeader(
 			assetCategory.getAvailableLanguageIds(),
-			assetCategory.getDefaultLanguageId(), _httpServletResponse,
+			assetCategory.getDefaultLanguageId(), contextHttpServletResponse,
 			contextAcceptLanguage.getPreferredLocale());
 
 		return _toTaxonomyCategory(assetCategory);
@@ -286,13 +283,13 @@ public class TaxonomyCategoryResourceImpl
 			sorts);
 	}
 
-	private ParentTaxonomyCategory _toParentCategory(
-		AssetCategory parentCategory) {
+	private ParentTaxonomyCategory _toParentTaxonomyCategory(
+		AssetCategory parentAssetCategory) {
 
 		return new ParentTaxonomyCategory() {
 			{
-				id = parentCategory.getCategoryId();
-				name = parentCategory.getTitle(
+				id = parentAssetCategory.getCategoryId();
+				name = parentAssetCategory.getTitle(
 					contextAcceptLanguage.getPreferredLocale());
 			}
 		};
@@ -339,7 +336,7 @@ public class TaxonomyCategoryResourceImpl
 							return null;
 						}
 
-						return _toParentCategory(
+						return _toParentTaxonomyCategory(
 							assetCategory.getParentCategory());
 					});
 			}
@@ -353,9 +350,6 @@ public class TaxonomyCategoryResourceImpl
 
 	@Reference
 	private AssetVocabularyService _assetVocabularyService;
-
-	@Context
-	private HttpServletResponse _httpServletResponse;
 
 	@Reference
 	private Portal _portal;

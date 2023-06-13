@@ -35,8 +35,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
@@ -67,7 +65,8 @@ public class SAPEntryScopeDescriptorFinderRegistrator {
 			List<SAPEntryScope> sapEntryScopes = loadSAPEntryScopes(companyId);
 
 			SAPEntryScopeDescriptorFinder sapEntryScopeDescriptorFinder =
-				new SAPEntryScopeDescriptorFinder(sapEntryScopes);
+				new SAPEntryScopeDescriptorFinder(
+					sapEntryScopes, _defaultScopeDescriptor);
 
 			_scopeDescriptorServiceRegistrations.compute(
 				companyId,
@@ -153,8 +152,15 @@ public class SAPEntryScopeDescriptorFinderRegistrator {
 
 			ServiceRegistration serviceRegistration = entry.getValue();
 
-			serviceRegistration.setProperties(
-				_buildScopeDescriptorProperties(entry.getKey()));
+			try {
+				serviceRegistration.setProperties(
+					_buildScopeDescriptorProperties(entry.getKey()));
+			}
+			catch (IllegalStateException ise) {
+
+				// Concurrent unregistration from register(long)
+
+			}
 		}
 	}
 
@@ -182,20 +188,19 @@ public class SAPEntryScopeDescriptorFinderRegistrator {
 	}
 
 	protected List<SAPEntryScope> loadSAPEntryScopes(long companyId) {
-		List<SAPEntry> sapEntries = _sapEntryLocalService.getCompanySAPEntries(
-			companyId, QueryUtil.ALL_POS, QueryUtil.ALL_POS);
+		List<SAPEntryScope> sapEntryScopes = new ArrayList<>();
 
-		Stream<SAPEntry> stream = sapEntries.stream();
+		for (SAPEntry sapEntry :
+				_sapEntryLocalService.getCompanySAPEntries(
+					companyId, QueryUtil.ALL_POS, QueryUtil.ALL_POS)) {
 
-		return stream.filter(
-			this::isOAuth2ExportedSAPEntry
-		).filter(
-			SAPEntry::isEnabled
-		).map(
-			sapEntry -> new SAPEntryScope(sapEntry, _parseScope(sapEntry))
-		).collect(
-			Collectors.toList()
-		);
+			if (isOAuth2ExportedSAPEntry(sapEntry)) {
+				sapEntryScopes.add(
+					new SAPEntryScope(sapEntry, _parseScope(sapEntry)));
+			}
+		}
+
+		return sapEntryScopes;
 	}
 
 	protected void removeJaxRsApplicationName(
@@ -210,8 +215,15 @@ public class SAPEntryScopeDescriptorFinderRegistrator {
 
 			ServiceRegistration serviceRegistration = entry.getValue();
 
-			serviceRegistration.setProperties(
-				_buildScopeDescriptorProperties(entry.getKey()));
+			try {
+				serviceRegistration.setProperties(
+					_buildScopeDescriptorProperties(entry.getKey()));
+			}
+			catch (IllegalStateException ise) {
+
+				// Concurrent unregistration from register(long)
+
+			}
 		}
 	}
 
@@ -242,6 +254,10 @@ public class SAPEntryScopeDescriptorFinderRegistrator {
 		SAPEntryScopeDescriptorFinderRegistrator.class);
 
 	private BundleContext _bundleContext;
+
+	@Reference(target = "(default=true)")
+	private ScopeDescriptor _defaultScopeDescriptor;
+
 	private final Set<String> _jaxRsApplicationNames =
 		Collections.newSetFromMap(new ConcurrentHashMap<>());
 	private final Map<Long, List<SAPEntryScope>> _registeredSAPEntryScopes =

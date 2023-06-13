@@ -14,7 +14,7 @@
 
 package com.liferay.trash.service.base;
 
-import com.liferay.portal.kernel.bean.BeanReference;
+import com.liferay.portal.aop.AopService;
 import com.liferay.portal.kernel.dao.db.DB;
 import com.liferay.portal.kernel.dao.db.DBManagerUtil;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdate;
@@ -32,12 +32,10 @@ import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiServic
 import com.liferay.portal.kernel.search.Indexable;
 import com.liferay.portal.kernel.search.IndexableType;
 import com.liferay.portal.kernel.service.BaseLocalServiceImpl;
-import com.liferay.portal.kernel.service.PersistedModelLocalServiceRegistry;
-import com.liferay.portal.kernel.service.persistence.ClassNamePersistence;
+import com.liferay.portal.kernel.service.PersistedModelLocalService;
 import com.liferay.portal.kernel.transaction.Transactional;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.PortalUtil;
-import com.liferay.portal.spring.extender.service.ServiceReference;
 import com.liferay.trash.model.TrashVersion;
 import com.liferay.trash.service.TrashVersionLocalService;
 import com.liferay.trash.service.persistence.TrashVersionPersistence;
@@ -48,7 +46,7 @@ import java.util.List;
 
 import javax.sql.DataSource;
 
-import org.osgi.annotation.versioning.ProviderType;
+import org.osgi.service.component.annotations.Reference;
 
 /**
  * Provides the base implementation for the trash version local service.
@@ -61,12 +59,11 @@ import org.osgi.annotation.versioning.ProviderType;
  * @see com.liferay.trash.service.impl.TrashVersionLocalServiceImpl
  * @generated
  */
-@ProviderType
 public abstract class TrashVersionLocalServiceBaseImpl
 	extends BaseLocalServiceImpl
-	implements TrashVersionLocalService, IdentifiableOSGiService {
+	implements AopService, IdentifiableOSGiService, TrashVersionLocalService {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this class directly. Use <code>TrashVersionLocalService</code> via injection or a <code>org.osgi.util.tracker.ServiceTracker</code> or use <code>com.liferay.trash.service.TrashVersionLocalServiceUtil</code>.
@@ -148,7 +145,7 @@ public abstract class TrashVersionLocalServiceBaseImpl
 	 * Performs a dynamic query on the database and returns a range of the matching rows.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>com.liferay.trash.model.impl.TrashVersionModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>com.liferay.trash.model.impl.TrashVersionModelImpl</code>.
 	 * </p>
 	 *
 	 * @param dynamicQuery the dynamic query
@@ -168,7 +165,7 @@ public abstract class TrashVersionLocalServiceBaseImpl
 	 * Performs a dynamic query on the database and returns an ordered range of the matching rows.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>com.liferay.trash.model.impl.TrashVersionModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>com.liferay.trash.model.impl.TrashVersionModelImpl</code>.
 	 * </p>
 	 *
 	 * @param dynamicQuery the dynamic query
@@ -292,7 +289,7 @@ public abstract class TrashVersionLocalServiceBaseImpl
 	 * Returns a range of all the trash versions.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>com.liferay.trash.model.impl.TrashVersionModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>com.liferay.trash.model.impl.TrashVersionModelImpl</code>.
 	 * </p>
 	 *
 	 * @param start the lower bound of the range of trash versions
@@ -326,120 +323,17 @@ public abstract class TrashVersionLocalServiceBaseImpl
 		return trashVersionPersistence.update(trashVersion);
 	}
 
-	/**
-	 * Returns the trash version local service.
-	 *
-	 * @return the trash version local service
-	 */
-	public TrashVersionLocalService getTrashVersionLocalService() {
-		return trashVersionLocalService;
+	@Override
+	public Class<?>[] getAopInterfaces() {
+		return new Class<?>[] {
+			TrashVersionLocalService.class, IdentifiableOSGiService.class,
+			PersistedModelLocalService.class
+		};
 	}
 
-	/**
-	 * Sets the trash version local service.
-	 *
-	 * @param trashVersionLocalService the trash version local service
-	 */
-	public void setTrashVersionLocalService(
-		TrashVersionLocalService trashVersionLocalService) {
-
-		this.trashVersionLocalService = trashVersionLocalService;
-	}
-
-	/**
-	 * Returns the trash version persistence.
-	 *
-	 * @return the trash version persistence
-	 */
-	public TrashVersionPersistence getTrashVersionPersistence() {
-		return trashVersionPersistence;
-	}
-
-	/**
-	 * Sets the trash version persistence.
-	 *
-	 * @param trashVersionPersistence the trash version persistence
-	 */
-	public void setTrashVersionPersistence(
-		TrashVersionPersistence trashVersionPersistence) {
-
-		this.trashVersionPersistence = trashVersionPersistence;
-	}
-
-	/**
-	 * Returns the counter local service.
-	 *
-	 * @return the counter local service
-	 */
-	public com.liferay.counter.kernel.service.CounterLocalService
-		getCounterLocalService() {
-
-		return counterLocalService;
-	}
-
-	/**
-	 * Sets the counter local service.
-	 *
-	 * @param counterLocalService the counter local service
-	 */
-	public void setCounterLocalService(
-		com.liferay.counter.kernel.service.CounterLocalService
-			counterLocalService) {
-
-		this.counterLocalService = counterLocalService;
-	}
-
-	/**
-	 * Returns the class name local service.
-	 *
-	 * @return the class name local service
-	 */
-	public com.liferay.portal.kernel.service.ClassNameLocalService
-		getClassNameLocalService() {
-
-		return classNameLocalService;
-	}
-
-	/**
-	 * Sets the class name local service.
-	 *
-	 * @param classNameLocalService the class name local service
-	 */
-	public void setClassNameLocalService(
-		com.liferay.portal.kernel.service.ClassNameLocalService
-			classNameLocalService) {
-
-		this.classNameLocalService = classNameLocalService;
-	}
-
-	/**
-	 * Returns the class name persistence.
-	 *
-	 * @return the class name persistence
-	 */
-	public ClassNamePersistence getClassNamePersistence() {
-		return classNamePersistence;
-	}
-
-	/**
-	 * Sets the class name persistence.
-	 *
-	 * @param classNamePersistence the class name persistence
-	 */
-	public void setClassNamePersistence(
-		ClassNamePersistence classNamePersistence) {
-
-		this.classNamePersistence = classNamePersistence;
-	}
-
-	public void afterPropertiesSet() {
-		persistedModelLocalServiceRegistry.register(
-			"com.liferay.trash.model.TrashVersion", trashVersionLocalService);
-	}
-
-	public void destroy() {
-		persistedModelLocalServiceRegistry.unregister(
-			"com.liferay.trash.model.TrashVersion");
+	@Override
+	public void setAopProxy(Object aopProxy) {
+		trashVersionLocalService = (TrashVersionLocalService)aopProxy;
 	}
 
 	/**
@@ -484,29 +378,17 @@ public abstract class TrashVersionLocalServiceBaseImpl
 		}
 	}
 
-	@BeanReference(type = TrashVersionLocalService.class)
 	protected TrashVersionLocalService trashVersionLocalService;
 
-	@BeanReference(type = TrashVersionPersistence.class)
+	@Reference
 	protected TrashVersionPersistence trashVersionPersistence;
 
-	@ServiceReference(
-		type = com.liferay.counter.kernel.service.CounterLocalService.class
-	)
+	@Reference
 	protected com.liferay.counter.kernel.service.CounterLocalService
 		counterLocalService;
 
-	@ServiceReference(
-		type = com.liferay.portal.kernel.service.ClassNameLocalService.class
-	)
+	@Reference
 	protected com.liferay.portal.kernel.service.ClassNameLocalService
 		classNameLocalService;
-
-	@ServiceReference(type = ClassNamePersistence.class)
-	protected ClassNamePersistence classNamePersistence;
-
-	@ServiceReference(type = PersistedModelLocalServiceRegistry.class)
-	protected PersistedModelLocalServiceRegistry
-		persistedModelLocalServiceRegistry;
 
 }

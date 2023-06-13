@@ -27,7 +27,9 @@ import com.liferay.portal.kernel.model.LayoutStagingHandler;
 import com.liferay.portal.kernel.model.ModelWrapper;
 import com.liferay.portal.kernel.model.SystemEventConstants;
 import com.liferay.portal.kernel.model.User;
+import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
 import com.liferay.portal.kernel.security.auth.PrincipalThreadLocal;
+import com.liferay.portal.kernel.service.BaseLocalService;
 import com.liferay.portal.kernel.service.LayoutFriendlyURLLocalServiceUtil;
 import com.liferay.portal.kernel.service.LayoutLocalService;
 import com.liferay.portal.kernel.service.LayoutRevisionLocalServiceUtil;
@@ -90,7 +92,10 @@ public class LayoutLocalServiceStagingAdvice implements BeanFactoryAware {
 		aopInvocationHandler.setTarget(
 			ProxyUtil.newProxyInstance(
 				LayoutLocalServiceStagingAdvice.class.getClassLoader(),
-				new Class<?>[] {LayoutLocalService.class},
+				new Class<?>[] {
+					IdentifiableOSGiService.class, LayoutLocalService.class,
+					BaseLocalService.class
+				},
 				new LayoutLocalServiceStagingInvocationHandler(
 					this, aopInvocationHandler.getTarget())));
 
@@ -152,7 +157,7 @@ public class LayoutLocalServiceStagingAdvice implements BeanFactoryAware {
 			Map<Locale, String> nameMap, Map<Locale, String> titleMap,
 			Map<Locale, String> descriptionMap, Map<Locale, String> keywordsMap,
 			Map<Locale, String> robotsMap, String type, boolean hidden,
-			Map<Locale, String> friendlyURLMap, boolean iconImage,
+			Map<Locale, String> friendlyURLMap, boolean hasIconImage,
 			byte[] iconBytes, ServiceContext serviceContext)
 		throws PortalException {
 
@@ -160,6 +165,7 @@ public class LayoutLocalServiceStagingAdvice implements BeanFactoryAware {
 
 		parentLayoutId = layoutLocalServiceHelper.getParentLayoutId(
 			groupId, privateLayout, parentLayoutId);
+
 		String name = nameMap.get(LocaleUtil.getSiteDefault());
 
 		Map<Locale, String> layoutFriendlyURLMap =
@@ -190,7 +196,7 @@ public class LayoutLocalServiceStagingAdvice implements BeanFactoryAware {
 			return layoutLocalService.updateLayout(
 				groupId, privateLayout, layoutId, parentLayoutId, nameMap,
 				titleMap, descriptionMap, keywordsMap, robotsMap, type, hidden,
-				friendlyURLMap, iconImage, iconBytes, serviceContext);
+				friendlyURLMap, hasIconImage, iconBytes, serviceContext);
 		}
 
 		layoutLocalService.updateAsset(
@@ -216,13 +222,13 @@ public class LayoutLocalServiceStagingAdvice implements BeanFactoryAware {
 		layout.setHidden(hidden);
 		layout.setFriendlyURL(friendlyURL);
 
-		if (!iconImage) {
+		if (!hasIconImage) {
 			layout.setIconImageId(0);
 			layoutRevision.setIconImageId(0);
 		}
 		else {
 			PortalUtil.updateImageId(
-				layout, iconImage, iconBytes, "iconImageId", 0, 0, 0);
+				layout, hasIconImage, iconBytes, "iconImageId", 0, 0, 0);
 		}
 
 		boolean layoutPrototypeLinkEnabled = ParamUtil.getBoolean(
@@ -413,9 +419,11 @@ public class LayoutLocalServiceStagingAdvice implements BeanFactoryAware {
 			boolean updateLayoutSet, ServiceContext serviceContext)
 		throws PortalException {
 
-		if (SystemEventHierarchyEntryThreadLocal.push(
-				Layout.class, layout.getPlid()) == null) {
+		SystemEventHierarchyEntry systemEventHierarchyEntry =
+			SystemEventHierarchyEntryThreadLocal.push(
+				Layout.class, layout.getPlid());
 
+		if (systemEventHierarchyEntry == null) {
 			layoutLocalService.deleteLayout(
 				layout, updateLayoutSet, serviceContext);
 		}
@@ -424,7 +432,7 @@ public class LayoutLocalServiceStagingAdvice implements BeanFactoryAware {
 				layoutLocalService.deleteLayout(
 					layout, updateLayoutSet, serviceContext);
 
-				SystemEventHierarchyEntry systemEventHierarchyEntry =
+				systemEventHierarchyEntry =
 					SystemEventHierarchyEntryThreadLocal.peek();
 
 				SystemEventLocalServiceUtil.addSystemEvent(

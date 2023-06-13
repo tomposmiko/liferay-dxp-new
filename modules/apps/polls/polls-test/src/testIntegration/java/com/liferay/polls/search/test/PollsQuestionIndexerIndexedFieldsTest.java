@@ -22,6 +22,7 @@ import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.search.Document;
 import com.liferay.portal.kernel.search.Field;
+import com.liferay.portal.kernel.search.SearchEngine;
 import com.liferay.portal.kernel.search.SearchEngineHelper;
 import com.liferay.portal.kernel.service.ResourcePermissionLocalService;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
@@ -42,6 +43,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.junit.Assume;
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Rule;
@@ -76,6 +78,9 @@ public class PollsQuestionIndexerIndexedFieldsTest {
 
 	@Test
 	public void testIndexedFields() throws Exception {
+		Assume.assumeFalse(
+			isNumberSortableImplementedAsDoubleForSearchEngine());
+
 		PollsQuestion pollsQuestion =
 			pollsQuestionFixture.createPollsQuestion();
 
@@ -88,6 +93,19 @@ public class PollsQuestionIndexerIndexedFieldsTest {
 
 		FieldValuesAssert.assertFieldValues(
 			_expectedFieldValues(pollsQuestion), document, searchTerm);
+	}
+
+	protected boolean isNumberSortableImplementedAsDoubleForSearchEngine() {
+		SearchEngine searchEngine = searchEngineHelper.getSearchEngine(
+			searchEngineHelper.getDefaultSearchEngineId());
+
+		String vendor = searchEngine.getVendor();
+
+		if (vendor.equals("Solr")) {
+			return true;
+		}
+
+		return false;
 	}
 
 	protected void setUpIndexedFieldsFixture() {
@@ -137,10 +155,10 @@ public class PollsQuestionIndexerIndexedFieldsTest {
 
 		map.put(Field.COMPANY_ID, String.valueOf(pollsQuestion.getCompanyId()));
 		map.put(Field.DESCRIPTION, _getDescriptionField(pollsQuestion));
+		map.put(Field.ENTRY_CLASS_NAME, PollsQuestion.class.getName());
 		map.put(
 			Field.ENTRY_CLASS_PK,
 			String.valueOf(pollsQuestion.getQuestionId()));
-		map.put(Field.ENTRY_CLASS_NAME, PollsQuestion.class.getName());
 		map.put(Field.GROUP_ID, String.valueOf(pollsQuestion.getGroupId()));
 		map.put(
 			Field.SCOPE_GROUP_ID, String.valueOf(pollsQuestion.getGroupId()));

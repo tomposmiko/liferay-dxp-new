@@ -80,20 +80,20 @@ public class MBMessageIndexerIndexedFieldsTest {
 	public void testIndexedFields() throws Exception {
 		Locale locale = LocaleUtil.JAPAN;
 
-		String title = "新規";
+		String searchTerm = "新規";
 
 		mbMessageFixture.updateDisplaySettings(locale);
 
 		MBMessage mbMessage = mbMessageFixture.createMBMessageWithCategory(
-			title, _user.getUserId());
+			searchTerm);
 
 		Document document = mbMessageIndexerFixture.searchOnlyOne(
-			title, locale);
+			searchTerm, locale);
 
 		indexedFieldsFixture.postProcessDocument(document);
 
 		FieldValuesAssert.assertFieldValues(
-			_expectedFieldValues(mbMessage), document, title);
+			_expectedFieldValues(mbMessage), document, searchTerm);
 	}
 
 	protected void setUpIndexedFieldsFixture() {
@@ -152,8 +152,8 @@ public class MBMessageIndexerIndexedFieldsTest {
 			Field.CLASS_NAME_ID, String.valueOf(mbMessage.getClassNameId()));
 		map.put(Field.CLASS_PK, String.valueOf(mbMessage.getClassPK()));
 		map.put(Field.COMPANY_ID, String.valueOf(mbMessage.getCompanyId()));
-		map.put(Field.ENTRY_CLASS_PK, String.valueOf(mbMessage.getMessageId()));
 		map.put(Field.ENTRY_CLASS_NAME, MBMessage.class.getName());
+		map.put(Field.ENTRY_CLASS_PK, String.valueOf(mbMessage.getMessageId()));
 		map.put(Field.GROUP_ID, String.valueOf(mbMessage.getGroupId()));
 		map.put(
 			Field.ROOT_ENTRY_CLASS_PK,
@@ -163,9 +163,12 @@ public class MBMessageIndexerIndexedFieldsTest {
 		map.put(Field.STATUS, String.valueOf(mbMessage.getStatus()));
 		map.put(Field.USER_ID, String.valueOf(mbMessage.getUserId()));
 		map.put(Field.USER_NAME, StringUtil.lowerCase(mbMessage.getUserName()));
+		map.put("answer", "false");
+		map.put("answer_String_sortable", "false");
 		map.put("discussion", "false");
 		map.put(
 			"parentMessageId", String.valueOf(mbMessage.getParentMessageId()));
+		map.put("question", "false");
 		map.put("threadId", String.valueOf(mbMessage.getThreadId()));
 		map.put("visible", "true");
 
@@ -219,8 +222,8 @@ public class MBMessageIndexerIndexedFieldsTest {
 				LocalizationUtil.getLocalizedName(Field.TITLE, languageId),
 				mbMessage.getSubject());
 
-			map.put("localized_title", title);
 			map.put(key, title);
+			map.put("localized_title", title);
 			map.put(key.concat("_sortable"), title);
 		}
 	}

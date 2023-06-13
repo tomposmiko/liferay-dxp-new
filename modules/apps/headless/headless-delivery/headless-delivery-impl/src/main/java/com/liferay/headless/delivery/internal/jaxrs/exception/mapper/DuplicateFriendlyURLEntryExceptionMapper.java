@@ -40,13 +40,15 @@ public class DuplicateFriendlyURLEntryExceptionMapper
 	implements ExceptionMapper<DuplicateFriendlyURLEntryException> {
 
 	@Override
-	public Response toResponse(DuplicateFriendlyURLEntryException dfurlee) {
+	public Response toResponse(
+		DuplicateFriendlyURLEntryException duplicateFriendlyURLEntryException) {
+
 		return Response.status(
 			409
-		).type(
-			MediaType.TEXT_PLAIN
 		).entity(
 			"Duplicate friendly URL"
+		).type(
+			MediaType.TEXT_PLAIN
 		).build();
 	}
 

@@ -1,4 +1,18 @@
 /**
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
+ *
+ * This library is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU Lesser General Public License as published by the Free
+ * Software Foundation; either version 2.1 of the License, or (at your option)
+ * any later version.
+ *
+ * This library is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
+ * details.
+ */
+
+/**
  * Available values for containerType config key
  */
 export const CONTAINER_TYPES = [
@@ -69,31 +83,31 @@ export const NUMBER_OF_COLUMNS_OPTIONS = [
  */
 export const PADDING_OPTIONS = [
 	{
-		label: 'x0',
+		label: '0',
 		paddingSize: '0'
 	},
 	{
-		label: 'x1',
+		label: '1',
 		paddingSize: '3'
 	},
 	{
-		label: 'x2',
+		label: '2',
 		paddingSize: '4'
 	},
 	{
-		label: 'x4',
+		label: '4',
 		paddingSize: '5'
 	},
 	{
-		label: 'x6',
+		label: '6',
 		paddingSize: '6'
 	},
 	{
-		label: 'x8',
+		label: '8',
 		paddingSize: '7'
 	},
 	{
-		label: 'x10',
+		label: '10',
 		paddingSize: '8'
 	}
 ];

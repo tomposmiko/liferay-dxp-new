@@ -95,7 +95,7 @@ WikiPagesManagementToolbarDisplayContext wikiPagesManagementToolbarDisplayContex
 	searchActionURL="<%= String.valueOf(wikiPagesManagementToolbarDisplayContext.getSearchActionURL()) %>"
 	searchContainerId="wikiPages"
 	selectable="<%= wikiPagesManagementToolbarDisplayContext.isSelectable() %>"
-	showInfoButton="<%= true %>"
+	showInfoButton="<%= wikiPagesManagementToolbarDisplayContext.isShowInfoButton() %>"
 	showSearch="<%= wikiPagesManagementToolbarDisplayContext.isShowSearch() %>"
 	sortingOrder="<%= wikiPagesManagementToolbarDisplayContext.getSortingOrder() %>"
 	sortingURL="<%= String.valueOf(wikiPagesManagementToolbarDisplayContext.getSortingURL()) %>"
@@ -293,37 +293,37 @@ WikiPagesManagementToolbarDisplayContext wikiPagesManagementToolbarDisplayContex
 
 <script>
 	var deletePages = function() {
-		if (<%= trashHelper.isTrashEnabled(scopeGroupId) %> || confirm(' <%= UnicodeLanguageUtil.get(request, "are-you-sure-you-want-to-delete-the-selected-entries") %>')) {
+		if (
+			<%= trashHelper.isTrashEnabled(scopeGroupId) %> ||
+			confirm(
+				' <%= UnicodeLanguageUtil.get(request, "are-you-sure-you-want-to-delete-the-selected-entries") %>'
+			)
+		) {
 			var form = document.<portlet:namespace />fm;
 
-			Liferay.Util.postForm(
-				form,
-				{
-					data: {
-						'<%= Constants.CMD %>': '<%= trashHelper.isTrashEnabled(scopeGroupId) ? Constants.MOVE_TO_TRASH : Constants.DELETE %>'
-					},
-					url: '<portlet:actionURL name="/wiki/edit_page" />'
-				}
-			);
+			Liferay.Util.postForm(form, {
+				data: {
+					<%= Constants.CMD %>:
+						'<%= trashHelper.isTrashEnabled(scopeGroupId) ? Constants.MOVE_TO_TRASH : Constants.DELETE %>'
+				},
+				url: '<portlet:actionURL name="/wiki/edit_page" />'
+			});
 		}
 	};
 
 	var ACTIONS = {
-		'deletePages': deletePages
+		deletePages: deletePages
 	};
 
-	Liferay.componentReady('wikiPagesManagementToolbar').then(
-		function(managementToolbar) {
-			managementToolbar.on(
-				'actionItemClicked',
-				function(event) {
-					var itemData = event.data.item.data;
+	Liferay.componentReady('wikiPagesManagementToolbar').then(function(
+		managementToolbar
+	) {
+		managementToolbar.on('actionItemClicked', function(event) {
+			var itemData = event.data.item.data;
 
-					if (itemData && itemData.action && ACTIONS[itemData.action]) {
-						ACTIONS[itemData.action]();
-					}
-				}
-			);
-		}
-	);
+			if (itemData && itemData.action && ACTIONS[itemData.action]) {
+				ACTIONS[itemData.action]();
+			}
+		});
+	});
 </script>

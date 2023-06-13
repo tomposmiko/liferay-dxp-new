@@ -255,6 +255,27 @@ public class SubscriptionSender implements Serializable {
 		return serviceContext;
 	}
 
+	public boolean hasSubscribers() {
+		if (!_runtimeSubscribersOVPs.isEmpty()) {
+			return true;
+		}
+
+		for (ObjectValuePair<String, Long> ovp : _persistestedSubscribersOVPs) {
+			String className = ovp.getKey();
+			long classPK = ovp.getValue();
+
+			List<Subscription> subscriptions =
+				SubscriptionLocalServiceUtil.getSubscriptions(
+					companyId, className, classPK);
+
+			if (!subscriptions.isEmpty()) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
 	public void initialize() throws Exception {
 		if (_initialized) {
 			return;
@@ -694,11 +715,10 @@ public class SubscriptionSender implements Serializable {
 	protected void processMailMessage(MailMessage mailMessage, Locale locale)
 		throws Exception {
 
-		InternetAddress from = mailMessage.getFrom();
 		InternetAddress to = mailMessage.getTo()[0];
 
 		MailTemplateContext mailTemplateContext = _getBodyMailTemplateContext(
-			locale, from, to);
+			locale, mailMessage.getFrom(), to);
 
 		MailTemplate subjectMailTemplate =
 			MailTemplateFactoryUtil.createMailTemplate(

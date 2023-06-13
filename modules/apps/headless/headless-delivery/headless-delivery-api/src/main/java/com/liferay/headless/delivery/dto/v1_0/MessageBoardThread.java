@@ -22,9 +22,8 @@ import com.fasterxml.jackson.annotation.JsonValue;
 
 import com.liferay.petra.function.UnsafeSupplier;
 import com.liferay.petra.string.StringBundler;
-
-import graphql.annotations.annotationTypes.GraphQLField;
-import graphql.annotations.annotationTypes.GraphQLName;
+import com.liferay.portal.vulcan.graphql.annotation.GraphQLField;
+import com.liferay.portal.vulcan.graphql.annotation.GraphQLName;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 
@@ -39,6 +38,7 @@ import java.util.Set;
 
 import javax.annotation.Generated;
 
+import javax.validation.Valid;
 import javax.validation.constraints.NotEmpty;
 
 import javax.xml.bind.annotation.XmlRootElement;
@@ -54,6 +54,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement(name = "MessageBoardThread")
 public class MessageBoardThread {
 
+	@GraphQLName("ViewableBy")
 	public static enum ViewableBy {
 
 		ANYONE("Anyone"), MEMBERS("Members"), OWNER("Owner");
@@ -88,6 +89,7 @@ public class MessageBoardThread {
 	}
 
 	@Schema(description = "The thread's average rating.")
+	@Valid
 	public AggregateRating getAggregateRating() {
 		return aggregateRating;
 	}
@@ -147,6 +149,7 @@ public class MessageBoardThread {
 	protected String articleBody;
 
 	@Schema(description = "The thread's creator.")
+	@Valid
 	public Creator getCreator() {
 		return creator;
 	}
@@ -175,6 +178,7 @@ public class MessageBoardThread {
 	protected Creator creator;
 
 	@Schema
+	@Valid
 	public CustomField[] getCustomFields() {
 		return customFields;
 	}
@@ -436,6 +440,7 @@ public class MessageBoardThread {
 	protected Integer numberOfMessageBoardMessages;
 
 	@Schema
+	@Valid
 	public RelatedContent[] getRelatedContents() {
 		return relatedContents;
 	}
@@ -522,6 +527,34 @@ public class MessageBoardThread {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Long siteId;
 
+	@Schema
+	public Boolean getSubscribed() {
+		return subscribed;
+	}
+
+	public void setSubscribed(Boolean subscribed) {
+		this.subscribed = subscribed;
+	}
+
+	@JsonIgnore
+	public void setSubscribed(
+		UnsafeSupplier<Boolean, Exception> subscribedUnsafeSupplier) {
+
+		try {
+			subscribed = subscribedUnsafeSupplier.get();
+		}
+		catch (RuntimeException re) {
+			throw re;
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	@GraphQLField
+	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
+	protected Boolean subscribed;
+
 	@Schema(description = "The thread's type.")
 	public String getThreadType() {
 		return threadType;
@@ -550,9 +583,38 @@ public class MessageBoardThread {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected String threadType;
 
+	@Schema(description = "The number of views of this thread.")
+	public Integer getViewCount() {
+		return viewCount;
+	}
+
+	public void setViewCount(Integer viewCount) {
+		this.viewCount = viewCount;
+	}
+
+	@JsonIgnore
+	public void setViewCount(
+		UnsafeSupplier<Integer, Exception> viewCountUnsafeSupplier) {
+
+		try {
+			viewCount = viewCountUnsafeSupplier.get();
+		}
+		catch (RuntimeException re) {
+			throw re;
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	@GraphQLField
+	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
+	protected Integer viewCount;
+
 	@Schema(
 		description = "A write-only property that specifies the thread's default permissions."
 	)
+	@Valid
 	public ViewableBy getViewableBy() {
 		return viewableBy;
 	}
@@ -823,6 +885,16 @@ public class MessageBoardThread {
 			sb.append(siteId);
 		}
 
+		if (subscribed != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"subscribed\": ");
+
+			sb.append(subscribed);
+		}
+
 		if (threadType != null) {
 			if (sb.length() > 1) {
 				sb.append(", ");
@@ -835,6 +907,16 @@ public class MessageBoardThread {
 			sb.append(_escape(threadType));
 
 			sb.append("\"");
+		}
+
+		if (viewCount != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"viewCount\": ");
+
+			sb.append(viewCount);
 		}
 
 		if (viewableBy != null) {
@@ -855,6 +937,12 @@ public class MessageBoardThread {
 
 		return sb.toString();
 	}
+
+	@Schema(
+		defaultValue = "com.liferay.headless.delivery.dto.v1_0.MessageBoardThread",
+		name = "x-class-name"
+	)
+	public String xClassName;
 
 	private static String _escape(Object object) {
 		String string = String.valueOf(object);

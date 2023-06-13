@@ -33,8 +33,8 @@ definition {
 
 		var i = "0";
 
-		while (!("${i}" == "${portletCount}")) {
-			var i = MathUtil.sum("${i}", "1");
+		while ("${i}" != "${portletCount}") {
+			var i = ${i} + 1;
 
 			Refresh();
 
@@ -58,7 +58,7 @@ definition {
 		var key_portletName = "${portletName}";
 
 		while (!((IsElementPresent(locator1 = "Home#PORTLET")) || ("${i}" == "3"))) {
-			var i = MathUtil.sum("${i}", "1");
+			var i = ${i} + 1;
 
 			Pause(locator1 = "30000");
 
@@ -105,12 +105,12 @@ definition {
 	macro assertServerShutdown {
 		var shutdownPauseCount = "0";
 
-		while ((IsElementPresent(locator1 = "//body")) && (!("${shutdownPauseCount}" == "12"))) {
+		while ((IsElementPresent(locator1 = "//body")) && ("${shutdownPauseCount}" != "12")) {
 			Refresh();
 
 			Pause(locator1 = "10000");
 
-			var shutdownPauseCount = MathUtil.sum("${shutdownPauseCount}", "1");
+			var shutdownPauseCount = ${shutdownPauseCount} + 1;
 
 			echo("Shutdown pause count: ${shutdownPauseCount}");
 		}
@@ -119,12 +119,12 @@ definition {
 	macro assertServerStartup {
 		var startupPauseCount = "0";
 
-		while ((!(IsElementPresent(locator1 = "UserBar#USER_SIGN_IN"))) && (!("${startupPauseCount}" == "12"))) {
+		while ((!(IsElementPresent(locator1 = "UserBar#USER_SIGN_IN"))) && ("${startupPauseCount}" != "12")) {
 			Refresh();
 
 			Pause(locator1 = "10000");
 
-			var startupPauseCount = MathUtil.sum("${startupPauseCount}", "1");
+			var startupPauseCount = ${startupPauseCount} + 1;
 
 			echo("Startup pause count: ${startupPauseCount}");
 		}
@@ -287,6 +287,16 @@ definition {
 			value1 = "${decorator}");
 	}
 
+	macro selectScope {
+		Navigator.gotoNavTab(navTab = "Scope");
+
+		Select(
+			locator1 = "Select#SCOPE",
+			value1 = "${scope}");
+
+		Portlet.saveAndCloseConfig();
+	}
+
 	macro selectTreeNode {
 		if (IsElementPresent(locator1 = "Treeview#NODE_UNSELECTED", key_nodeName = "${nodeName}")) {
 			AssertClick.assertPartialTextClickAt(
@@ -341,18 +351,18 @@ definition {
 			value1 = "${portletBody}");
 	}
 
-	@description = "View Cannot Add ${portletName} portlet."
 	macro viewCannotAddPG {
-		if ("${portletName}" == "Map") {
-			var portletName = "Where are the Liferay members?";
-		}
-		else if ("${portletName}" == "Requests") {
-			var portletTypeKey = "PORTLET_BORDERLESS";
+		if (IsNotVisible(locator1 = "ControlMenuAddPanel#CLOSE_ADD_PANEL")) {
+			Click.clickAt(locator1 = "ControlMenu#ADD");
 		}
 
-		Click.clickAtSidebarClickAtWaitForScript(
-			locator1 = "ControlMenu#ADD",
-			value1 = "Add");
+		AssertElementPresent(locator1 = "ControlMenuAddPanel#APPLICATIONS_ACCORDION_PANEL_TITLE");
+
+		AssertVisible(
+			locator1 = "ControlMenuAddPanel#APPLICATIONS_ACCORDION_PANEL_TITLE",
+			value1 = "Widgets");
+
+		Pause(locator1 = "5000");
 
 		Panel.expandSidebarApplicationsPanel();
 
@@ -360,9 +370,9 @@ definition {
 			locator1 = "NavBar#APPLICATION_SEARCH_FIELD",
 			value1 = "${portletName}");
 
-		var portletLocator = "//span[@data-title=&quot;${portletName}&quot; and contains(@class,&apos;add-content-item&apos;)]";
-
-		AssertElementNotPresent(locator1 = "${portletLocator}");
+		AssertElementNotPresent(
+			locator1 = "ControlMenuAddPanel#ADD_PORTLET_DRAG_LINK",
+			portletName = "${portletName}");
 	}
 
 	macro viewCannotEdit {
@@ -384,8 +394,8 @@ definition {
 	macro viewDuplicatePG {
 		var i = "0";
 
-		while (!("${i}" == "${totalPortletCount}")) {
-			var i = MathUtil.sum("${i}", "1");
+		while ("${i}" != "${totalPortletCount}") {
+			var i = ${i} + 1;
 
 			AssertElementPresent(locator1 = "xpath=(//h2[contains(.,'${portletName}')])[${i}]");
 		}

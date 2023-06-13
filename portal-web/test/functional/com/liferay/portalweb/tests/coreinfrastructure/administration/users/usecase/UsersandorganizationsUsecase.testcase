@@ -112,7 +112,7 @@ definition {
 		UserBar.gotoDropdownItem(dropdownItem = "My Profile");
 
 		AssertTextEquals(
-			locator1 = "Home#USER_NAME_HEADER",
+			locator1 = "Home#SITE_NAME",
 			value1 = "<userfn> userln");
 	}
 
@@ -183,7 +183,7 @@ definition {
 				orgName = "${suborgName}");
 		}
 
-		ProductMenu.gotoSite(site = "College of Agricultural Science");
+		Navigator.openSiteURL(siteName = "College of Agricultural Science");
 
 		ProductMenu.gotoPortlet(
 			category = "People",
@@ -192,7 +192,7 @@ definition {
 
 		Site.assignUserGroupAsMemberCP(userGroupName = "Agricultural Science");
 
-		ProductMenu.gotoSite(site = "College of Business");
+		Navigator.openSiteURL(siteName = "College of Business");
 
 		ProductMenu.gotoPortlet(
 			category = "People",
@@ -204,7 +204,7 @@ definition {
 		}
 
 		for (var siteName : list "Accounting,Business Administration") {
-			ProductMenu.gotoSite(site = "${siteName}");
+			Navigator.openSiteURL(siteName = "${siteName}");
 
 			ProductMenu.gotoPortlet(
 				category = "People",
@@ -223,7 +223,9 @@ definition {
 
 		ProductMenuHelper.expandCategory(category = "Configuration");
 
-		AssertElementNotPresent(locator1 = "ProductMenu#PRODUCT_MENU_PANEL_MENU_ITEM");
+		AssertElementNotPresent(
+			key_portlet = "Settings",
+			locator1 = "ProductMenu#PORTLET");
 	}
 
 	@priority = "4"
@@ -785,7 +787,7 @@ definition {
 
 		var count = "1";
 
-		while (!("${count}" == "6")) {
+		while ("${count}" != "6") {
 			ProductMenu.gotoPortlet(
 				category = "Users",
 				panel = "Control Panel",
@@ -797,7 +799,7 @@ definition {
 				userLastName = "userln${count}",
 				userScreenName = "usersn${count}");
 
-			var count = MathUtil.sum("${count}", "1");
+			var count = ${count} + 1;
 		}
 
 		ProductMenu.gotoPortlet(
@@ -853,7 +855,7 @@ definition {
 
 		var count = "1";
 
-		while (!("${count}" == "5")) {
+		while ("${count}" != "5") {
 			ProductMenu.gotoPortlet(
 				category = "Users",
 				panel = "Control Panel",
@@ -887,11 +889,10 @@ definition {
 
 			Organization.viewParentOrganizationCP(
 				orgName = "Suborganization Name ${count}",
-				parentOrgExist = "true",
 				parentOrgName = "Organization Name 2",
 				subOrgName = "Suborganization Name ${count}");
 
-			var count = MathUtil.sum("${count}", "1");
+			var count = ${count} + 1;
 		}
 
 		ProductMenu.gotoPortlet(
@@ -1104,6 +1105,54 @@ definition {
 			searchTerm = "Suborganization");
 	}
 
+	@description = "This is a use case for LPS-75084."
+	@priority = "5"
+	test NoPermissionUserCannotAddOrganizationViaURL {
+		var portalURL = PropsUtil.get("portal.url");
+
+		ProductMenu.gotoPortlet(
+			category = "Users",
+			panel = "Control Panel",
+			portlet = "Users and Organizations");
+
+		Organization.addCP(
+			orgName = "Organization for Test",
+			orgType = "Organization");
+
+		JSONUser.addUser(
+			userEmailAddress = "userea@liferay.com",
+			userFirstName = "userfn",
+			userLastName = "userln",
+			userScreenName = "usersn");
+
+		ProductMenu.gotoPortlet(
+			category = "Users",
+			panel = "Control Panel",
+			portlet = "Users and Organizations");
+
+		User.editPasswordCP(
+			userEmailAddress = "userea@liferay.com",
+			userScreenName = "usersn");
+
+		User.logoutAndLoginPG(
+			userLoginEmailAddress = "userea@liferay.com",
+			userLoginFullName = "userfn userln");
+
+		Navigator.openSpecificURL(url = "${portalURL}/group/control_panel/manage?p_p_id=com_liferay_users_admin_web_portlet_MyOrganizationsPortlet&p_p_lifecycle=0&p_p_state=maximized&p_p_mode=view&_com_liferay_users_admin_web_portlet_MyOrganizationsPortlet_mvcRenderCommandName=%2Fusers_admin%2Fedit_organization&_com_liferay_users_admin_web_portlet_MyOrganizationsPortlet_type=organization");
+
+		Alert.viewErrorMessage(errorMessage = "You do not have the required permissions.");
+
+		Navigator.openSpecificURL(url = "${portalURL}/group/control_panel/manage?p_p_id=com_liferay_users_admin_web_portlet_MyOrganizationsPortlet&p_p_lifecycle=0&p_p_state=maximized&p_p_mode=view&_com_liferay_users_admin_web_portlet_MyOrganizationsPortlet_mvcPath=%2Fedit_organization.jsp&_com_liferay_users_admin_web_portlet_MyOrganizationsPortlet_type=organization");
+
+		Alert.viewErrorMessage(errorMessage = "You do not have the required permissions.");
+
+		Navigator.openSpecificURL(url = "${portalURL}/group/control_panel/manage?p_p_id=com_liferay_users_admin_web_portlet_MyOrganizationsPortlet&p_p_lifecycle=0&p_p_state=pop_up&p_p_mode=view&_com_liferay_users_admin_web_portlet_MyOrganizationsPortlet_mvcPath=%2Fselect_organization.jsp&_com_liferay_users_admin_web_portlet_MyOrganizationsPortlet_p_u_i_d=0");
+
+		AssertTextEquals(
+			locator1 = "Message#EMPTY_INFO",
+			value1 = "No organizations were found.");
+	}
+
 	@priority = "5"
 	test OrganizationAdministratorActivate {
 		property testray.component.names = "Training";
@@ -1214,8 +1263,10 @@ definition {
 			panel = "Control Panel",
 			portlet = "Users and Organizations");
 
-		User.deactivateCP(
-			deactivateType = "Actions",
+		UsersAndOrganizationsNavigator.gotoOrganizations();
+
+		Organization.deactivateMemberCP(
+			orgName = "Organization Name",
 			userFirstName = "userfn2");
 
 		ProductMenu.gotoPortlet(
@@ -1223,9 +1274,11 @@ definition {
 			panel = "Control Panel",
 			portlet = "Users and Organizations");
 
-		User.activateCP(
-			userName = "userfn2 userln2",
-			userScreenName = "usersn2");
+		UsersAndOrganizationsNavigator.gotoOrganizations();
+
+		Organization.activateMemberCP(
+			orgName = "Organization Name",
+			userFirstName = "userfn2");
 
 		User.logoutUserPG();
 
@@ -1806,6 +1859,37 @@ definition {
 		Navigator.openSpecificURL(url = "${portalURL}/web/canada");
 
 		MessageboardsThread.viewDoNotHaveRequiredPermissionsPG(threadSubject = "Canada Message Subject");
+	}
+
+	@description = "This is a use case for LPS-85534"
+	@priority = "4"
+	test ViewEmailWithPasswordSetupLinkSendToNewUser {
+		property custom.properties = "mail.send.blacklist=noreply@liferay.com,noreply@domain.invalid,test@domain.invalid";
+		property test.smtp.server.enabled = "true";
+
+		var portalURL = PropsUtil.get("portal.url");
+
+		PortalSettings.gotoConfiguration(
+			configurationCategory = "Email",
+			configurationName = "Email Sender",
+			configurationScope = "Virtual Instance Scope");
+
+		PortalSettings.configureEmailSender(
+			emailAddress = "test@liferay.com",
+			emailSenderName = "Joe Bloggs");
+
+		JSONUser.addUser(
+			userEmailAddress = "userea@liferay.com",
+			userFirstName = "userfn",
+			userLastName = "userln",
+			userScreenName = "usersn");
+
+		MockMock.viewMail(
+			asset = "${portalURL}: Your New Account",
+			content = "Your can setup your password here: ${portalURL}/c/portal/update_password?",
+			recipient = "userfn userln",
+			sender = "Joe Bloggs",
+			subject = "${portalURL}: Your New Account");
 	}
 
 	@priority = "4"

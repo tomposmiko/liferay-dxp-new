@@ -14,8 +14,6 @@
 
 package com.liferay.portal.kernel.service;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 /**
  * Provides a wrapper for {@link LayoutPrototypeLocalService}.
  *
@@ -23,7 +21,6 @@ import org.osgi.annotation.versioning.ProviderType;
  * @see LayoutPrototypeLocalService
  * @generated
  */
-@ProviderType
 public class LayoutPrototypeLocalServiceWrapper
 	implements LayoutPrototypeLocalService,
 			   ServiceWrapper<LayoutPrototypeLocalService> {
@@ -50,8 +47,8 @@ public class LayoutPrototypeLocalServiceWrapper
 	@Override
 	public com.liferay.portal.kernel.model.LayoutPrototype addLayoutPrototype(
 			long userId, long companyId,
-			java.util.Map<java.util.Locale, String> nameMap,
-			java.util.Map<java.util.Locale, String> descriptionMap,
+			java.util.Map<java.util.Locale, java.lang.String> nameMap,
+			java.util.Map<java.util.Locale, java.lang.String> descriptionMap,
 			boolean active, ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
@@ -148,7 +145,7 @@ public class LayoutPrototypeLocalServiceWrapper
 	 * Performs a dynamic query on the database and returns a range of the matching rows.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>com.liferay.portal.model.impl.LayoutPrototypeModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>com.liferay.portal.model.impl.LayoutPrototypeModelImpl</code>.
 	 * </p>
 	 *
 	 * @param dynamicQuery the dynamic query
@@ -169,7 +166,7 @@ public class LayoutPrototypeLocalServiceWrapper
 	 * Performs a dynamic query on the database and returns an ordered range of the matching rows.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>com.liferay.portal.model.impl.LayoutPrototypeModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>com.liferay.portal.model.impl.LayoutPrototypeModelImpl</code>.
 	 * </p>
 	 *
 	 * @param dynamicQuery the dynamic query
@@ -227,7 +224,7 @@ public class LayoutPrototypeLocalServiceWrapper
 
 	@Override
 	public com.liferay.portal.kernel.model.LayoutPrototype fetchLayoutPrototype(
-		long companyId, String name, java.util.Locale locale) {
+		long companyId, java.lang.String name, java.util.Locale locale) {
 
 		return _layoutPrototypeLocalService.fetchLayoutPrototype(
 			companyId, name, locale);
@@ -242,7 +239,8 @@ public class LayoutPrototypeLocalServiceWrapper
 	 */
 	@Override
 	public com.liferay.portal.kernel.model.LayoutPrototype
-		fetchLayoutPrototypeByUuidAndCompanyId(String uuid, long companyId) {
+		fetchLayoutPrototypeByUuidAndCompanyId(
+			java.lang.String uuid, long companyId) {
 
 		return _layoutPrototypeLocalService.
 			fetchLayoutPrototypeByUuidAndCompanyId(uuid, companyId);
@@ -250,7 +248,7 @@ public class LayoutPrototypeLocalServiceWrapper
 
 	@Override
 	public com.liferay.portal.kernel.model.LayoutPrototype fetchLayoutProtoype(
-		long companyId, String name) {
+		long companyId, java.lang.String name) {
 
 		return _layoutPrototypeLocalService.fetchLayoutProtoype(
 			companyId, name);
@@ -299,7 +297,7 @@ public class LayoutPrototypeLocalServiceWrapper
 
 	@Override
 	public com.liferay.portal.kernel.model.LayoutPrototype getLayoutPrototype(
-			long companyId, String name)
+			long companyId, java.lang.String name)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _layoutPrototypeLocalService.getLayoutPrototype(companyId, name);
@@ -307,7 +305,7 @@ public class LayoutPrototypeLocalServiceWrapper
 
 	@Override
 	public com.liferay.portal.kernel.model.LayoutPrototype getLayoutPrototype(
-			long companyId, String name, java.util.Locale locale)
+			long companyId, java.lang.String name, java.util.Locale locale)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _layoutPrototypeLocalService.getLayoutPrototype(
@@ -324,7 +322,8 @@ public class LayoutPrototypeLocalServiceWrapper
 	 */
 	@Override
 	public com.liferay.portal.kernel.model.LayoutPrototype
-			getLayoutPrototypeByUuidAndCompanyId(String uuid, long companyId)
+			getLayoutPrototypeByUuidAndCompanyId(
+				java.lang.String uuid, long companyId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _layoutPrototypeLocalService.
@@ -335,7 +334,7 @@ public class LayoutPrototypeLocalServiceWrapper
 	 * Returns a range of all the layout prototypes.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>com.liferay.portal.model.impl.LayoutPrototypeModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>com.liferay.portal.model.impl.LayoutPrototypeModelImpl</code>.
 	 * </p>
 	 *
 	 * @param start the lower bound of the range of layout prototypes
@@ -365,7 +364,7 @@ public class LayoutPrototypeLocalServiceWrapper
 	 * @return the OSGi service identifier
 	 */
 	@Override
-	public String getOSGiServiceIdentifier() {
+	public java.lang.String getOSGiServiceIdentifier() {
 		return _layoutPrototypeLocalService.getOSGiServiceIdentifier();
 	}
 
@@ -380,7 +379,7 @@ public class LayoutPrototypeLocalServiceWrapper
 	@Override
 	public java.util.List<com.liferay.portal.kernel.model.LayoutPrototype>
 		search(
-			long companyId, Boolean active, int start, int end,
+			long companyId, java.lang.Boolean active, int start, int end,
 			com.liferay.portal.kernel.util.OrderByComparator
 				<com.liferay.portal.kernel.model.LayoutPrototype> obc) {
 
@@ -389,7 +388,7 @@ public class LayoutPrototypeLocalServiceWrapper
 	}
 
 	@Override
-	public int searchCount(long companyId, Boolean active) {
+	public int searchCount(long companyId, java.lang.Boolean active) {
 		return _layoutPrototypeLocalService.searchCount(companyId, active);
 	}
 
@@ -412,8 +411,9 @@ public class LayoutPrototypeLocalServiceWrapper
 	public com.liferay.portal.kernel.model.LayoutPrototype
 			updateLayoutPrototype(
 				long layoutPrototypeId,
-				java.util.Map<java.util.Locale, String> nameMap,
-				java.util.Map<java.util.Locale, String> descriptionMap,
+				java.util.Map<java.util.Locale, java.lang.String> nameMap,
+				java.util.Map<java.util.Locale, java.lang.String>
+					descriptionMap,
 				boolean active, ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
 

@@ -71,6 +71,7 @@ BackgroundTask lastCompletedInitialPublicationBackgroundTask = BackgroundTaskMan
 				<aui:input name="groupId" type="hidden" value="<%= liveGroupId %>" />
 				<aui:input name="liveGroupId" type="hidden" value="<%= liveGroupId %>" />
 				<aui:input name="stagingGroupId" type="hidden" value="<%= stagingGroupId %>" />
+				<aui:input name="forceDisable" type="hidden" value="<%= false %>" />
 
 				<c:if test="<%= !privateLayoutSet.isLayoutSetPrototypeLinkActive() && !publicLayoutSet.isLayoutSetPrototypeLinkActive() %>">
 					<div class="sheet-header">
@@ -99,48 +100,49 @@ BackgroundTask lastCompletedInitialPublicationBackgroundTask = BackgroundTaskMan
 
 					<aui:script require="metal-dom/src/dom as dom">
 						var pwcWarning = document.getElementById('<portlet:namespace />pwcWarning');
-						var remoteStagingOptions = document.getElementById('<portlet:namespace />remoteStagingOptions');
-						var stagedPortlets = document.getElementById('<portlet:namespace />stagedPortlets');
+						var remoteStagingOptions = document.getElementById(
+							'<portlet:namespace />remoteStagingOptions'
+						);
+						var stagedPortlets = document.getElementById(
+							'<portlet:namespace />stagedPortlets'
+						);
 						var trashWarning = document.getElementById('<portlet:namespace />trashWarning');
 						var stagingTypes = document.getElementById('<portlet:namespace />stagingTypes');
 
-						if (stagingTypes && pwcWarning && stagedPortlets && remoteStagingOptions && trashWarning) {
-							dom.delegate(
-								stagingTypes,
-								'click',
-								'input',
-								function(event) {
-									var value = event.delegateTarget.value;
+						if (
+							stagingTypes &&
+							pwcWarning &&
+							stagedPortlets &&
+							remoteStagingOptions &&
+							trashWarning
+						) {
+							dom.delegate(stagingTypes, 'click', 'input', function(event) {
+								var value = event.delegateTarget.value;
 
-									if (value != '<%= StagingConstants.TYPE_LOCAL_STAGING %>') {
-										pwcWarning.classList.add('hide');
-									}
-									else {
-										pwcWarning.classList.remove('hide');
-									}
-
-									if (value == '<%= StagingConstants.TYPE_NOT_STAGED %>') {
-										stagedPortlets.classList.add('hide');
-									}
-									else {
-										stagedPortlets.classList.remove('hide');
-									}
-
-									if (value != '<%= StagingConstants.TYPE_REMOTE_STAGING %>') {
-										remoteStagingOptions.classList.add('hide');
-									}
-									else {
-										remoteStagingOptions.classList.remove('hide');
-									}
-
-									if (value != '<%= StagingConstants.TYPE_LOCAL_STAGING %>') {
-										trashWarning.classList.add('hide');
-									}
-									else {
-										trashWarning.classList.remove('hide');
-									}
+								if (value != '<%= StagingConstants.TYPE_LOCAL_STAGING %>') {
+									pwcWarning.classList.add('hide');
+								} else {
+									pwcWarning.classList.remove('hide');
 								}
-							);
+
+								if (value == '<%= StagingConstants.TYPE_NOT_STAGED %>') {
+									stagedPortlets.classList.add('hide');
+								} else {
+									stagedPortlets.classList.remove('hide');
+								}
+
+								if (value != '<%= StagingConstants.TYPE_REMOTE_STAGING %>') {
+									remoteStagingOptions.classList.add('hide');
+								} else {
+									remoteStagingOptions.classList.remove('hide');
+								}
+
+								if (value != '<%= StagingConstants.TYPE_LOCAL_STAGING %>') {
+									trashWarning.classList.add('hide');
+								} else {
+									trashWarning.classList.remove('hide');
+								}
+							});
 						}
 					</aui:script>
 				</c:if>
@@ -157,7 +159,7 @@ BackgroundTask lastCompletedInitialPublicationBackgroundTask = BackgroundTaskMan
 </c:choose>
 
 <script>
-	function <portlet:namespace />saveGroup() {
+	function <portlet:namespace />saveGroup(forceDisable) {
 		var form = document.<portlet:namespace />fm;
 		var ok = true;
 
@@ -176,7 +178,9 @@ BackgroundTask lastCompletedInitialPublicationBackgroundTask = BackgroundTaskMan
 				</c:otherwise>
 			</c:choose>
 
-			var selectedStagingTypeInput = document.querySelector('input[name=<portlet:namespace />stagingType]:checked');
+			var selectedStagingTypeInput = document.querySelector(
+				'input[name=<portlet:namespace />stagingType]:checked'
+			);
 
 			if (selectedStagingTypeInput) {
 				var currentValue = selectedStagingTypeInput.value;
@@ -185,39 +189,49 @@ BackgroundTask lastCompletedInitialPublicationBackgroundTask = BackgroundTaskMan
 					ok = false;
 
 					if (currentValue == <%= StagingConstants.TYPE_NOT_STAGED %>) {
-						ok = confirm('<%= UnicodeLanguageUtil.format(request, "are-you-sure-you-want-to-deactivate-staging-for-x", liveGroup.getDescriptiveName(locale), false) %>');
-					}
-					else if (currentValue == <%= StagingConstants.TYPE_LOCAL_STAGING %>) {
-						ok = confirm('<%= UnicodeLanguageUtil.format(request, "are-you-sure-you-want-to-activate-local-staging-for-x", liveGroup.getDescriptiveName(locale), false) %>');
-					}
-					else if (currentValue == <%= StagingConstants.TYPE_REMOTE_STAGING %>) {
-						ok = confirm('<%= UnicodeLanguageUtil.format(request, "are-you-sure-you-want-to-activate-remote-staging-for-x", liveGroup.getDescriptiveName(locale), false) %>');
+						ok = confirm(
+							'<%= UnicodeLanguageUtil.format(request, "are-you-sure-you-want-to-deactivate-staging-for-x", liveGroup.getDescriptiveName(locale), false) %>'
+						);
+					} else if (
+						currentValue == <%= StagingConstants.TYPE_LOCAL_STAGING %>
+					) {
+						ok = confirm(
+							'<%= UnicodeLanguageUtil.format(request, "are-you-sure-you-want-to-activate-local-staging-for-x", liveGroup.getDescriptiveName(locale), false) %>'
+						);
+					} else if (
+						currentValue == <%= StagingConstants.TYPE_REMOTE_STAGING %>
+					) {
+						ok = confirm(
+							'<%= UnicodeLanguageUtil.format(request, "are-you-sure-you-want-to-activate-remote-staging-for-x", liveGroup.getDescriptiveName(locale), false) %>'
+						);
 					}
 				}
 			}
 		</c:if>
 
 		if (ok) {
+			if (forceDisable) {
+				form.elements['<portlet:namespace />forceDisable'].value = true;
+			}
+
 			submitForm(form);
 		}
 	}
 
 	(function() {
-		var allCheckboxes = document.querySelectorAll('#stagingConfigurationControls input[type=checkbox]');
-		var selectAllCheckbox = document.getElementById('<portlet:namespace />selectAllCheckbox');
+		var allCheckboxes = document.querySelectorAll(
+			'#stagingConfigurationControls input[type=checkbox]'
+		);
+		var selectAllCheckbox = document.getElementById(
+			'<portlet:namespace />selectAllCheckbox'
+		);
 
 		if (selectAllCheckbox) {
-			selectAllCheckbox.addEventListener(
-				'change',
-				function() {
-					Array.prototype.forEach.call(
-						allCheckboxes,
-						function(checkbox) {
-							checkbox.checked = selectAllCheckbox.checked;
-						}
-					);
-				}
-			);
+			selectAllCheckbox.addEventListener('change', function() {
+				Array.prototype.forEach.call(allCheckboxes, function(checkbox) {
+					checkbox.checked = selectAllCheckbox.checked;
+				});
+			});
 		}
 
 		<c:if test="<%= StagingUtil.isChangeTrackingEnabled(company.getCompanyId()) %>">

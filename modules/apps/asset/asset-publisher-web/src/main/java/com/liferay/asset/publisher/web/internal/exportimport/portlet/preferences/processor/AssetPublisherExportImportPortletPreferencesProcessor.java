@@ -124,12 +124,12 @@ public class AssetPublisherExportImportPortletPreferencesProcessor
 
 	@Override
 	public List<Capability> getExportCapabilities() {
-		return ListUtil.toList(new Capability[] {assetExportCapability});
+		return ListUtil.fromArray(assetExportCapability);
 	}
 
 	@Override
 	public List<Capability> getImportCapabilities() {
-		return ListUtil.toList(new Capability[] {assetImportCapability});
+		return ListUtil.fromArray(assetImportCapability);
 	}
 
 	@Override
@@ -981,9 +981,8 @@ public class AssetPublisherExportImportPortletPreferencesProcessor
 			}
 
 			try {
-				long classNameId = portal.getClassNameId(oldValue);
-
-				newValues[i++] = String.valueOf(classNameId);
+				newValues[i++] = String.valueOf(
+					portal.getClassNameId(oldValue));
 			}
 			catch (Exception e) {
 				if (_log.isWarnEnabled()) {

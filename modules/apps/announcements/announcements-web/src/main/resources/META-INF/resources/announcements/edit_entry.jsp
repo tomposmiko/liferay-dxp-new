@@ -28,11 +28,7 @@ String content = BeanParamUtil.getString(entry, request, "content");
 
 boolean alert = BeanParamUtil.getBoolean(entry, request, "alert");
 
-boolean displayImmediately = ParamUtil.getBoolean(request, "displayImmediately");
-
-if (entry == null) {
-	displayImmediately = true;
-}
+boolean displayImmediately = ParamUtil.getBoolean(request, "displayImmediately", (entry == null));
 
 String headerTitle = null;
 
@@ -171,25 +167,37 @@ if (portletTitleBasedNavigation) {
 		var form = document.getElementById('<portlet:namespace />fm');
 
 		if (form) {
-			form.action = '<portlet:actionURL name="/announcements/edit_entry"><portlet:param name="mvcRenderCommandName" value="/announcements/edit_entry" /></portlet:actionURL>';
+			form.action =
+				'<portlet:actionURL name="/announcements/edit_entry"><portlet:param name="mvcRenderCommandName" value="/announcements/edit_entry" /></portlet:actionURL>';
 			form.target = '';
 
-			var cmd = form.querySelector('#<portlet:namespace /><%= Constants.CMD %>');
+			var cmd = form.querySelector(
+				'#<portlet:namespace /><%= Constants.CMD %>'
+			);
 
 			if (cmd) {
-				cmd.setAttribute('value', '<%= (entry == null) ? Constants.ADD : Constants.UPDATE %>');
+				cmd.setAttribute(
+					'value',
+					'<%= (entry == null) ? Constants.ADD : Constants.UPDATE %>'
+				);
 			}
 
 			var content = form.querySelector('#<portlet:namespace />content');
 
 			if (content) {
-				content.setAttribute('value', window.<portlet:namespace />contentEditor.getHTML());
+				content.setAttribute(
+					'value',
+					window.<portlet:namespace />contentEditor.getHTML()
+				);
 			}
 
 			var title = form.querySelector('#<portlet:namespace />title');
 
 			if (title) {
-				title.setAttribute('value', window.<portlet:namespace />titleEditor.getText());
+				title.setAttribute(
+					'value',
+					window.<portlet:namespace />titleEditor.getText()
+				);
 			}
 
 			submitForm(form);

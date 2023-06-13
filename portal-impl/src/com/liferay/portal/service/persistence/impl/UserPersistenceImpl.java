@@ -28,10 +28,9 @@ import com.liferay.portal.kernel.exception.NoSuchUserException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.User;
+import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
-import com.liferay.portal.kernel.service.persistence.CompanyProvider;
-import com.liferay.portal.kernel.service.persistence.CompanyProviderWrapper;
 import com.liferay.portal.kernel.service.persistence.GroupPersistence;
 import com.liferay.portal.kernel.service.persistence.OrganizationPersistence;
 import com.liferay.portal.kernel.service.persistence.RolePersistence;
@@ -67,8 +66,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 /**
  * The persistence implementation for the user service.
  *
@@ -79,11 +76,10 @@ import org.osgi.annotation.versioning.ProviderType;
  * @author Brian Wing Shun Chan
  * @generated
  */
-@ProviderType
 public class UserPersistenceImpl
 	extends BasePersistenceImpl<User> implements UserPersistence {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this class directly. Always use <code>UserUtil</code> to access the user persistence. Modify <code>service.xml</code> and rerun ServiceBuilder to regenerate this class.
@@ -119,7 +115,7 @@ public class UserPersistenceImpl
 	 * Returns a range of all the users where uuid = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>UserModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>UserModelImpl</code>.
 	 * </p>
 	 *
 	 * @param uuid the uuid
@@ -136,7 +132,7 @@ public class UserPersistenceImpl
 	 * Returns an ordered range of all the users where uuid = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>UserModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>UserModelImpl</code>.
 	 * </p>
 	 *
 	 * @param uuid the uuid
@@ -157,42 +153,42 @@ public class UserPersistenceImpl
 	 * Returns an ordered range of all the users where uuid = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>UserModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>UserModelImpl</code>.
 	 * </p>
 	 *
 	 * @param uuid the uuid
 	 * @param start the lower bound of the range of users
 	 * @param end the upper bound of the range of users (not inclusive)
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
-	 * @param retrieveFromCache whether to retrieve from the finder cache
+	 * @param useFinderCache whether to use the finder cache
 	 * @return the ordered range of matching users
 	 */
 	@Override
 	public List<User> findByUuid(
 		String uuid, int start, int end,
-		OrderByComparator<User> orderByComparator, boolean retrieveFromCache) {
+		OrderByComparator<User> orderByComparator, boolean useFinderCache) {
 
 		uuid = Objects.toString(uuid, "");
 
-		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
 			(orderByComparator == null)) {
 
-			pagination = false;
-			finderPath = _finderPathWithoutPaginationFindByUuid;
-			finderArgs = new Object[] {uuid};
+			if (useFinderCache) {
+				finderPath = _finderPathWithoutPaginationFindByUuid;
+				finderArgs = new Object[] {uuid};
+			}
 		}
-		else {
+		else if (useFinderCache) {
 			finderPath = _finderPathWithPaginationFindByUuid;
 			finderArgs = new Object[] {uuid, start, end, orderByComparator};
 		}
 
 		List<User> list = null;
 
-		if (retrieveFromCache) {
+		if (useFinderCache) {
 			list = (List<User>)FinderCacheUtil.getResult(
 				finderPath, finderArgs, this);
 
@@ -235,7 +231,7 @@ public class UserPersistenceImpl
 				appendOrderByComparator(
 					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
 			}
-			else if (pagination) {
+			else {
 				query.append(UserModelImpl.ORDER_BY_JPQL);
 			}
 
@@ -254,25 +250,18 @@ public class UserPersistenceImpl
 					qPos.add(uuid);
 				}
 
-				if (!pagination) {
-					list = (List<User>)QueryUtil.list(
-						q, getDialect(), start, end, false);
-
-					Collections.sort(list);
-
-					list = Collections.unmodifiableList(list);
-				}
-				else {
-					list = (List<User>)QueryUtil.list(
-						q, getDialect(), start, end);
-				}
+				list = (List<User>)QueryUtil.list(q, getDialect(), start, end);
 
 				cacheResult(list);
 
-				FinderCacheUtil.putResult(finderPath, finderArgs, list);
+				if (useFinderCache) {
+					FinderCacheUtil.putResult(finderPath, finderArgs, list);
+				}
 			}
 			catch (Exception e) {
-				FinderCacheUtil.removeResult(finderPath, finderArgs);
+				if (useFinderCache) {
+					FinderCacheUtil.removeResult(finderPath, finderArgs);
+				}
 
 				throw processException(e);
 			}
@@ -659,7 +648,7 @@ public class UserPersistenceImpl
 	 * Returns a range of all the users where uuid = &#63; and companyId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>UserModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>UserModelImpl</code>.
 	 * </p>
 	 *
 	 * @param uuid the uuid
@@ -679,7 +668,7 @@ public class UserPersistenceImpl
 	 * Returns an ordered range of all the users where uuid = &#63; and companyId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>UserModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>UserModelImpl</code>.
 	 * </p>
 	 *
 	 * @param uuid the uuid
@@ -702,7 +691,7 @@ public class UserPersistenceImpl
 	 * Returns an ordered range of all the users where uuid = &#63; and companyId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>UserModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>UserModelImpl</code>.
 	 * </p>
 	 *
 	 * @param uuid the uuid
@@ -710,28 +699,28 @@ public class UserPersistenceImpl
 	 * @param start the lower bound of the range of users
 	 * @param end the upper bound of the range of users (not inclusive)
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
-	 * @param retrieveFromCache whether to retrieve from the finder cache
+	 * @param useFinderCache whether to use the finder cache
 	 * @return the ordered range of matching users
 	 */
 	@Override
 	public List<User> findByUuid_C(
 		String uuid, long companyId, int start, int end,
-		OrderByComparator<User> orderByComparator, boolean retrieveFromCache) {
+		OrderByComparator<User> orderByComparator, boolean useFinderCache) {
 
 		uuid = Objects.toString(uuid, "");
 
-		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
 			(orderByComparator == null)) {
 
-			pagination = false;
-			finderPath = _finderPathWithoutPaginationFindByUuid_C;
-			finderArgs = new Object[] {uuid, companyId};
+			if (useFinderCache) {
+				finderPath = _finderPathWithoutPaginationFindByUuid_C;
+				finderArgs = new Object[] {uuid, companyId};
+			}
 		}
-		else {
+		else if (useFinderCache) {
 			finderPath = _finderPathWithPaginationFindByUuid_C;
 			finderArgs = new Object[] {
 				uuid, companyId, start, end, orderByComparator
@@ -740,7 +729,7 @@ public class UserPersistenceImpl
 
 		List<User> list = null;
 
-		if (retrieveFromCache) {
+		if (useFinderCache) {
 			list = (List<User>)FinderCacheUtil.getResult(
 				finderPath, finderArgs, this);
 
@@ -787,7 +776,7 @@ public class UserPersistenceImpl
 				appendOrderByComparator(
 					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
 			}
-			else if (pagination) {
+			else {
 				query.append(UserModelImpl.ORDER_BY_JPQL);
 			}
 
@@ -808,25 +797,18 @@ public class UserPersistenceImpl
 
 				qPos.add(companyId);
 
-				if (!pagination) {
-					list = (List<User>)QueryUtil.list(
-						q, getDialect(), start, end, false);
-
-					Collections.sort(list);
-
-					list = Collections.unmodifiableList(list);
-				}
-				else {
-					list = (List<User>)QueryUtil.list(
-						q, getDialect(), start, end);
-				}
+				list = (List<User>)QueryUtil.list(q, getDialect(), start, end);
 
 				cacheResult(list);
 
-				FinderCacheUtil.putResult(finderPath, finderArgs, list);
+				if (useFinderCache) {
+					FinderCacheUtil.putResult(finderPath, finderArgs, list);
+				}
 			}
 			catch (Exception e) {
-				FinderCacheUtil.removeResult(finderPath, finderArgs);
+				if (useFinderCache) {
+					FinderCacheUtil.removeResult(finderPath, finderArgs);
+				}
 
 				throw processException(e);
 			}
@@ -1246,7 +1228,7 @@ public class UserPersistenceImpl
 	 * Returns a range of all the users where companyId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>UserModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>UserModelImpl</code>.
 	 * </p>
 	 *
 	 * @param companyId the company ID
@@ -1263,7 +1245,7 @@ public class UserPersistenceImpl
 	 * Returns an ordered range of all the users where companyId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>UserModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>UserModelImpl</code>.
 	 * </p>
 	 *
 	 * @param companyId the company ID
@@ -1284,33 +1266,33 @@ public class UserPersistenceImpl
 	 * Returns an ordered range of all the users where companyId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>UserModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>UserModelImpl</code>.
 	 * </p>
 	 *
 	 * @param companyId the company ID
 	 * @param start the lower bound of the range of users
 	 * @param end the upper bound of the range of users (not inclusive)
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
-	 * @param retrieveFromCache whether to retrieve from the finder cache
+	 * @param useFinderCache whether to use the finder cache
 	 * @return the ordered range of matching users
 	 */
 	@Override
 	public List<User> findByCompanyId(
 		long companyId, int start, int end,
-		OrderByComparator<User> orderByComparator, boolean retrieveFromCache) {
+		OrderByComparator<User> orderByComparator, boolean useFinderCache) {
 
-		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
 			(orderByComparator == null)) {
 
-			pagination = false;
-			finderPath = _finderPathWithoutPaginationFindByCompanyId;
-			finderArgs = new Object[] {companyId};
+			if (useFinderCache) {
+				finderPath = _finderPathWithoutPaginationFindByCompanyId;
+				finderArgs = new Object[] {companyId};
+			}
 		}
-		else {
+		else if (useFinderCache) {
 			finderPath = _finderPathWithPaginationFindByCompanyId;
 			finderArgs = new Object[] {
 				companyId, start, end, orderByComparator
@@ -1319,13 +1301,13 @@ public class UserPersistenceImpl
 
 		List<User> list = null;
 
-		if (retrieveFromCache) {
+		if (useFinderCache) {
 			list = (List<User>)FinderCacheUtil.getResult(
 				finderPath, finderArgs, this);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (User user : list) {
-					if ((companyId != user.getCompanyId())) {
+					if (companyId != user.getCompanyId()) {
 						list = null;
 
 						break;
@@ -1353,7 +1335,7 @@ public class UserPersistenceImpl
 				appendOrderByComparator(
 					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
 			}
-			else if (pagination) {
+			else {
 				query.append(UserModelImpl.ORDER_BY_JPQL);
 			}
 
@@ -1370,25 +1352,18 @@ public class UserPersistenceImpl
 
 				qPos.add(companyId);
 
-				if (!pagination) {
-					list = (List<User>)QueryUtil.list(
-						q, getDialect(), start, end, false);
-
-					Collections.sort(list);
-
-					list = Collections.unmodifiableList(list);
-				}
-				else {
-					list = (List<User>)QueryUtil.list(
-						q, getDialect(), start, end);
-				}
+				list = (List<User>)QueryUtil.list(q, getDialect(), start, end);
 
 				cacheResult(list);
 
-				FinderCacheUtil.putResult(finderPath, finderArgs, list);
+				if (useFinderCache) {
+					FinderCacheUtil.putResult(finderPath, finderArgs, list);
+				}
 			}
 			catch (Exception e) {
-				FinderCacheUtil.removeResult(finderPath, finderArgs);
+				if (useFinderCache) {
+					FinderCacheUtil.removeResult(finderPath, finderArgs);
+				}
 
 				throw processException(e);
 			}
@@ -1778,16 +1753,20 @@ public class UserPersistenceImpl
 	 * Returns the user where contactId = &#63; or returns <code>null</code> if it could not be found, optionally using the finder cache.
 	 *
 	 * @param contactId the contact ID
-	 * @param retrieveFromCache whether to retrieve from the finder cache
+	 * @param useFinderCache whether to use the finder cache
 	 * @return the matching user, or <code>null</code> if a matching user could not be found
 	 */
 	@Override
-	public User fetchByContactId(long contactId, boolean retrieveFromCache) {
-		Object[] finderArgs = new Object[] {contactId};
+	public User fetchByContactId(long contactId, boolean useFinderCache) {
+		Object[] finderArgs = null;
+
+		if (useFinderCache) {
+			finderArgs = new Object[] {contactId};
+		}
 
 		Object result = null;
 
-		if (retrieveFromCache) {
+		if (useFinderCache) {
 			result = FinderCacheUtil.getResult(
 				_finderPathFetchByContactId, finderArgs, this);
 		}
@@ -1795,7 +1774,7 @@ public class UserPersistenceImpl
 		if (result instanceof User) {
 			User user = (User)result;
 
-			if ((contactId != user.getContactId())) {
+			if (contactId != user.getContactId()) {
 				result = null;
 			}
 		}
@@ -1823,8 +1802,10 @@ public class UserPersistenceImpl
 				List<User> list = q.list();
 
 				if (list.isEmpty()) {
-					FinderCacheUtil.putResult(
-						_finderPathFetchByContactId, finderArgs, list);
+					if (useFinderCache) {
+						FinderCacheUtil.putResult(
+							_finderPathFetchByContactId, finderArgs, list);
+					}
 				}
 				else {
 					User user = list.get(0);
@@ -1835,8 +1816,10 @@ public class UserPersistenceImpl
 				}
 			}
 			catch (Exception e) {
-				FinderCacheUtil.removeResult(
-					_finderPathFetchByContactId, finderArgs);
+				if (useFinderCache) {
+					FinderCacheUtil.removeResult(
+						_finderPathFetchByContactId, finderArgs);
+				}
 
 				throw processException(e);
 			}
@@ -1941,7 +1924,7 @@ public class UserPersistenceImpl
 	 * Returns a range of all the users where emailAddress = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>UserModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>UserModelImpl</code>.
 	 * </p>
 	 *
 	 * @param emailAddress the email address
@@ -1960,7 +1943,7 @@ public class UserPersistenceImpl
 	 * Returns an ordered range of all the users where emailAddress = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>UserModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>UserModelImpl</code>.
 	 * </p>
 	 *
 	 * @param emailAddress the email address
@@ -1982,35 +1965,35 @@ public class UserPersistenceImpl
 	 * Returns an ordered range of all the users where emailAddress = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>UserModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>UserModelImpl</code>.
 	 * </p>
 	 *
 	 * @param emailAddress the email address
 	 * @param start the lower bound of the range of users
 	 * @param end the upper bound of the range of users (not inclusive)
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
-	 * @param retrieveFromCache whether to retrieve from the finder cache
+	 * @param useFinderCache whether to use the finder cache
 	 * @return the ordered range of matching users
 	 */
 	@Override
 	public List<User> findByEmailAddress(
 		String emailAddress, int start, int end,
-		OrderByComparator<User> orderByComparator, boolean retrieveFromCache) {
+		OrderByComparator<User> orderByComparator, boolean useFinderCache) {
 
 		emailAddress = Objects.toString(emailAddress, "");
 
-		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
 			(orderByComparator == null)) {
 
-			pagination = false;
-			finderPath = _finderPathWithoutPaginationFindByEmailAddress;
-			finderArgs = new Object[] {emailAddress};
+			if (useFinderCache) {
+				finderPath = _finderPathWithoutPaginationFindByEmailAddress;
+				finderArgs = new Object[] {emailAddress};
+			}
 		}
-		else {
+		else if (useFinderCache) {
 			finderPath = _finderPathWithPaginationFindByEmailAddress;
 			finderArgs = new Object[] {
 				emailAddress, start, end, orderByComparator
@@ -2019,7 +2002,7 @@ public class UserPersistenceImpl
 
 		List<User> list = null;
 
-		if (retrieveFromCache) {
+		if (useFinderCache) {
 			list = (List<User>)FinderCacheUtil.getResult(
 				finderPath, finderArgs, this);
 
@@ -2062,7 +2045,7 @@ public class UserPersistenceImpl
 				appendOrderByComparator(
 					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
 			}
-			else if (pagination) {
+			else {
 				query.append(UserModelImpl.ORDER_BY_JPQL);
 			}
 
@@ -2081,25 +2064,18 @@ public class UserPersistenceImpl
 					qPos.add(emailAddress);
 				}
 
-				if (!pagination) {
-					list = (List<User>)QueryUtil.list(
-						q, getDialect(), start, end, false);
-
-					Collections.sort(list);
-
-					list = Collections.unmodifiableList(list);
-				}
-				else {
-					list = (List<User>)QueryUtil.list(
-						q, getDialect(), start, end);
-				}
+				list = (List<User>)QueryUtil.list(q, getDialect(), start, end);
 
 				cacheResult(list);
 
-				FinderCacheUtil.putResult(finderPath, finderArgs, list);
+				if (useFinderCache) {
+					FinderCacheUtil.putResult(finderPath, finderArgs, list);
+				}
 			}
 			catch (Exception e) {
-				FinderCacheUtil.removeResult(finderPath, finderArgs);
+				if (useFinderCache) {
+					FinderCacheUtil.removeResult(finderPath, finderArgs);
+				}
 
 				throw processException(e);
 			}
@@ -2519,16 +2495,20 @@ public class UserPersistenceImpl
 	 * Returns the user where portraitId = &#63; or returns <code>null</code> if it could not be found, optionally using the finder cache.
 	 *
 	 * @param portraitId the portrait ID
-	 * @param retrieveFromCache whether to retrieve from the finder cache
+	 * @param useFinderCache whether to use the finder cache
 	 * @return the matching user, or <code>null</code> if a matching user could not be found
 	 */
 	@Override
-	public User fetchByPortraitId(long portraitId, boolean retrieveFromCache) {
-		Object[] finderArgs = new Object[] {portraitId};
+	public User fetchByPortraitId(long portraitId, boolean useFinderCache) {
+		Object[] finderArgs = null;
+
+		if (useFinderCache) {
+			finderArgs = new Object[] {portraitId};
+		}
 
 		Object result = null;
 
-		if (retrieveFromCache) {
+		if (useFinderCache) {
 			result = FinderCacheUtil.getResult(
 				_finderPathFetchByPortraitId, finderArgs, this);
 		}
@@ -2536,7 +2516,7 @@ public class UserPersistenceImpl
 		if (result instanceof User) {
 			User user = (User)result;
 
-			if ((portraitId != user.getPortraitId())) {
+			if (portraitId != user.getPortraitId()) {
 				result = null;
 			}
 		}
@@ -2564,14 +2544,20 @@ public class UserPersistenceImpl
 				List<User> list = q.list();
 
 				if (list.isEmpty()) {
-					FinderCacheUtil.putResult(
-						_finderPathFetchByPortraitId, finderArgs, list);
+					if (useFinderCache) {
+						FinderCacheUtil.putResult(
+							_finderPathFetchByPortraitId, finderArgs, list);
+					}
 				}
 				else {
 					if (list.size() > 1) {
 						Collections.sort(list, Collections.reverseOrder());
 
 						if (_log.isWarnEnabled()) {
+							if (!useFinderCache) {
+								finderArgs = new Object[] {portraitId};
+							}
+
 							_log.warn(
 								"UserPersistenceImpl.fetchByPortraitId(long, boolean) with parameters (" +
 									StringUtil.merge(finderArgs) +
@@ -2587,8 +2573,10 @@ public class UserPersistenceImpl
 				}
 			}
 			catch (Exception e) {
-				FinderCacheUtil.removeResult(
-					_finderPathFetchByPortraitId, finderArgs);
+				if (useFinderCache) {
+					FinderCacheUtil.removeResult(
+						_finderPathFetchByPortraitId, finderArgs);
+				}
 
 				throw processException(e);
 			}
@@ -2693,7 +2681,7 @@ public class UserPersistenceImpl
 	 * Returns a range of all the users where userId &gt; &#63; and companyId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>UserModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>UserModelImpl</code>.
 	 * </p>
 	 *
 	 * @param userId the user ID
@@ -2713,7 +2701,7 @@ public class UserPersistenceImpl
 	 * Returns an ordered range of all the users where userId &gt; &#63; and companyId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>UserModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>UserModelImpl</code>.
 	 * </p>
 	 *
 	 * @param userId the user ID
@@ -2736,7 +2724,7 @@ public class UserPersistenceImpl
 	 * Returns an ordered range of all the users where userId &gt; &#63; and companyId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>UserModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>UserModelImpl</code>.
 	 * </p>
 	 *
 	 * @param userId the user ID
@@ -2744,15 +2732,14 @@ public class UserPersistenceImpl
 	 * @param start the lower bound of the range of users
 	 * @param end the upper bound of the range of users (not inclusive)
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
-	 * @param retrieveFromCache whether to retrieve from the finder cache
+	 * @param useFinderCache whether to use the finder cache
 	 * @return the ordered range of matching users
 	 */
 	@Override
 	public List<User> findByU_C(
 		long userId, long companyId, int start, int end,
-		OrderByComparator<User> orderByComparator, boolean retrieveFromCache) {
+		OrderByComparator<User> orderByComparator, boolean useFinderCache) {
 
-		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
@@ -2763,7 +2750,7 @@ public class UserPersistenceImpl
 
 		List<User> list = null;
 
-		if (retrieveFromCache) {
+		if (useFinderCache) {
 			list = (List<User>)FinderCacheUtil.getResult(
 				finderPath, finderArgs, this);
 
@@ -2801,7 +2788,7 @@ public class UserPersistenceImpl
 				appendOrderByComparator(
 					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
 			}
-			else if (pagination) {
+			else {
 				query.append(UserModelImpl.ORDER_BY_JPQL);
 			}
 
@@ -2820,25 +2807,18 @@ public class UserPersistenceImpl
 
 				qPos.add(companyId);
 
-				if (!pagination) {
-					list = (List<User>)QueryUtil.list(
-						q, getDialect(), start, end, false);
-
-					Collections.sort(list);
-
-					list = Collections.unmodifiableList(list);
-				}
-				else {
-					list = (List<User>)QueryUtil.list(
-						q, getDialect(), start, end);
-				}
+				list = (List<User>)QueryUtil.list(q, getDialect(), start, end);
 
 				cacheResult(list);
 
-				FinderCacheUtil.putResult(finderPath, finderArgs, list);
+				if (useFinderCache) {
+					FinderCacheUtil.putResult(finderPath, finderArgs, list);
+				}
 			}
 			catch (Exception e) {
-				FinderCacheUtil.removeResult(finderPath, finderArgs);
+				if (useFinderCache) {
+					FinderCacheUtil.removeResult(finderPath, finderArgs);
+				}
 
 				throw processException(e);
 			}
@@ -2875,7 +2855,7 @@ public class UserPersistenceImpl
 
 		msg.append(_NO_SUCH_ENTITY_WITH_KEY);
 
-		msg.append("userId=");
+		msg.append("userId>");
 		msg.append(userId);
 
 		msg.append(", companyId=");
@@ -2933,7 +2913,7 @@ public class UserPersistenceImpl
 
 		msg.append(_NO_SUCH_ENTITY_WITH_KEY);
 
-		msg.append("userId=");
+		msg.append("userId>");
 		msg.append(userId);
 
 		msg.append(", companyId=");
@@ -3110,18 +3090,22 @@ public class UserPersistenceImpl
 	 *
 	 * @param companyId the company ID
 	 * @param userId the user ID
-	 * @param retrieveFromCache whether to retrieve from the finder cache
+	 * @param useFinderCache whether to use the finder cache
 	 * @return the matching user, or <code>null</code> if a matching user could not be found
 	 */
 	@Override
 	public User fetchByC_U(
-		long companyId, long userId, boolean retrieveFromCache) {
+		long companyId, long userId, boolean useFinderCache) {
 
-		Object[] finderArgs = new Object[] {companyId, userId};
+		Object[] finderArgs = null;
+
+		if (useFinderCache) {
+			finderArgs = new Object[] {companyId, userId};
+		}
 
 		Object result = null;
 
-		if (retrieveFromCache) {
+		if (useFinderCache) {
 			result = FinderCacheUtil.getResult(
 				_finderPathFetchByC_U, finderArgs, this);
 		}
@@ -3163,8 +3147,10 @@ public class UserPersistenceImpl
 				List<User> list = q.list();
 
 				if (list.isEmpty()) {
-					FinderCacheUtil.putResult(
-						_finderPathFetchByC_U, finderArgs, list);
+					if (useFinderCache) {
+						FinderCacheUtil.putResult(
+							_finderPathFetchByC_U, finderArgs, list);
+					}
 				}
 				else {
 					User user = list.get(0);
@@ -3175,7 +3161,10 @@ public class UserPersistenceImpl
 				}
 			}
 			catch (Exception e) {
-				FinderCacheUtil.removeResult(_finderPathFetchByC_U, finderArgs);
+				if (useFinderCache) {
+					FinderCacheUtil.removeResult(
+						_finderPathFetchByC_U, finderArgs);
+				}
 
 				throw processException(e);
 			}
@@ -3291,7 +3280,7 @@ public class UserPersistenceImpl
 	 * Returns a range of all the users where companyId = &#63; and createDate = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>UserModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>UserModelImpl</code>.
 	 * </p>
 	 *
 	 * @param companyId the company ID
@@ -3311,7 +3300,7 @@ public class UserPersistenceImpl
 	 * Returns an ordered range of all the users where companyId = &#63; and createDate = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>UserModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>UserModelImpl</code>.
 	 * </p>
 	 *
 	 * @param companyId the company ID
@@ -3334,7 +3323,7 @@ public class UserPersistenceImpl
 	 * Returns an ordered range of all the users where companyId = &#63; and createDate = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>UserModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>UserModelImpl</code>.
 	 * </p>
 	 *
 	 * @param companyId the company ID
@@ -3342,26 +3331,26 @@ public class UserPersistenceImpl
 	 * @param start the lower bound of the range of users
 	 * @param end the upper bound of the range of users (not inclusive)
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
-	 * @param retrieveFromCache whether to retrieve from the finder cache
+	 * @param useFinderCache whether to use the finder cache
 	 * @return the ordered range of matching users
 	 */
 	@Override
 	public List<User> findByC_CD(
 		long companyId, Date createDate, int start, int end,
-		OrderByComparator<User> orderByComparator, boolean retrieveFromCache) {
+		OrderByComparator<User> orderByComparator, boolean useFinderCache) {
 
-		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
 			(orderByComparator == null)) {
 
-			pagination = false;
-			finderPath = _finderPathWithoutPaginationFindByC_CD;
-			finderArgs = new Object[] {companyId, _getTime(createDate)};
+			if (useFinderCache) {
+				finderPath = _finderPathWithoutPaginationFindByC_CD;
+				finderArgs = new Object[] {companyId, _getTime(createDate)};
+			}
 		}
-		else {
+		else if (useFinderCache) {
 			finderPath = _finderPathWithPaginationFindByC_CD;
 			finderArgs = new Object[] {
 				companyId, _getTime(createDate), start, end, orderByComparator
@@ -3370,7 +3359,7 @@ public class UserPersistenceImpl
 
 		List<User> list = null;
 
-		if (retrieveFromCache) {
+		if (useFinderCache) {
 			list = (List<User>)FinderCacheUtil.getResult(
 				finderPath, finderArgs, this);
 
@@ -3417,7 +3406,7 @@ public class UserPersistenceImpl
 				appendOrderByComparator(
 					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
 			}
-			else if (pagination) {
+			else {
 				query.append(UserModelImpl.ORDER_BY_JPQL);
 			}
 
@@ -3438,25 +3427,18 @@ public class UserPersistenceImpl
 					qPos.add(new Timestamp(createDate.getTime()));
 				}
 
-				if (!pagination) {
-					list = (List<User>)QueryUtil.list(
-						q, getDialect(), start, end, false);
-
-					Collections.sort(list);
-
-					list = Collections.unmodifiableList(list);
-				}
-				else {
-					list = (List<User>)QueryUtil.list(
-						q, getDialect(), start, end);
-				}
+				list = (List<User>)QueryUtil.list(q, getDialect(), start, end);
 
 				cacheResult(list);
 
-				FinderCacheUtil.putResult(finderPath, finderArgs, list);
+				if (useFinderCache) {
+					FinderCacheUtil.putResult(finderPath, finderArgs, list);
+				}
 			}
 			catch (Exception e) {
-				FinderCacheUtil.removeResult(finderPath, finderArgs);
+				if (useFinderCache) {
+					FinderCacheUtil.removeResult(finderPath, finderArgs);
+				}
 
 				throw processException(e);
 			}
@@ -3874,7 +3856,7 @@ public class UserPersistenceImpl
 	 * Returns a range of all the users where companyId = &#63; and modifiedDate = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>UserModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>UserModelImpl</code>.
 	 * </p>
 	 *
 	 * @param companyId the company ID
@@ -3894,7 +3876,7 @@ public class UserPersistenceImpl
 	 * Returns an ordered range of all the users where companyId = &#63; and modifiedDate = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>UserModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>UserModelImpl</code>.
 	 * </p>
 	 *
 	 * @param companyId the company ID
@@ -3917,7 +3899,7 @@ public class UserPersistenceImpl
 	 * Returns an ordered range of all the users where companyId = &#63; and modifiedDate = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>UserModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>UserModelImpl</code>.
 	 * </p>
 	 *
 	 * @param companyId the company ID
@@ -3925,26 +3907,26 @@ public class UserPersistenceImpl
 	 * @param start the lower bound of the range of users
 	 * @param end the upper bound of the range of users (not inclusive)
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
-	 * @param retrieveFromCache whether to retrieve from the finder cache
+	 * @param useFinderCache whether to use the finder cache
 	 * @return the ordered range of matching users
 	 */
 	@Override
 	public List<User> findByC_MD(
 		long companyId, Date modifiedDate, int start, int end,
-		OrderByComparator<User> orderByComparator, boolean retrieveFromCache) {
+		OrderByComparator<User> orderByComparator, boolean useFinderCache) {
 
-		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
 			(orderByComparator == null)) {
 
-			pagination = false;
-			finderPath = _finderPathWithoutPaginationFindByC_MD;
-			finderArgs = new Object[] {companyId, _getTime(modifiedDate)};
+			if (useFinderCache) {
+				finderPath = _finderPathWithoutPaginationFindByC_MD;
+				finderArgs = new Object[] {companyId, _getTime(modifiedDate)};
+			}
 		}
-		else {
+		else if (useFinderCache) {
 			finderPath = _finderPathWithPaginationFindByC_MD;
 			finderArgs = new Object[] {
 				companyId, _getTime(modifiedDate), start, end, orderByComparator
@@ -3953,7 +3935,7 @@ public class UserPersistenceImpl
 
 		List<User> list = null;
 
-		if (retrieveFromCache) {
+		if (useFinderCache) {
 			list = (List<User>)FinderCacheUtil.getResult(
 				finderPath, finderArgs, this);
 
@@ -4000,7 +3982,7 @@ public class UserPersistenceImpl
 				appendOrderByComparator(
 					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
 			}
-			else if (pagination) {
+			else {
 				query.append(UserModelImpl.ORDER_BY_JPQL);
 			}
 
@@ -4021,25 +4003,18 @@ public class UserPersistenceImpl
 					qPos.add(new Timestamp(modifiedDate.getTime()));
 				}
 
-				if (!pagination) {
-					list = (List<User>)QueryUtil.list(
-						q, getDialect(), start, end, false);
-
-					Collections.sort(list);
-
-					list = Collections.unmodifiableList(list);
-				}
-				else {
-					list = (List<User>)QueryUtil.list(
-						q, getDialect(), start, end);
-				}
+				list = (List<User>)QueryUtil.list(q, getDialect(), start, end);
 
 				cacheResult(list);
 
-				FinderCacheUtil.putResult(finderPath, finderArgs, list);
+				if (useFinderCache) {
+					FinderCacheUtil.putResult(finderPath, finderArgs, list);
+				}
 			}
 			catch (Exception e) {
-				FinderCacheUtil.removeResult(finderPath, finderArgs);
+				if (useFinderCache) {
+					FinderCacheUtil.removeResult(finderPath, finderArgs);
+				}
 
 				throw processException(e);
 			}
@@ -4496,18 +4471,22 @@ public class UserPersistenceImpl
 	 *
 	 * @param companyId the company ID
 	 * @param defaultUser the default user
-	 * @param retrieveFromCache whether to retrieve from the finder cache
+	 * @param useFinderCache whether to use the finder cache
 	 * @return the matching user, or <code>null</code> if a matching user could not be found
 	 */
 	@Override
 	public User fetchByC_DU(
-		long companyId, boolean defaultUser, boolean retrieveFromCache) {
+		long companyId, boolean defaultUser, boolean useFinderCache) {
 
-		Object[] finderArgs = new Object[] {companyId, defaultUser};
+		Object[] finderArgs = null;
+
+		if (useFinderCache) {
+			finderArgs = new Object[] {companyId, defaultUser};
+		}
 
 		Object result = null;
 
-		if (retrieveFromCache) {
+		if (useFinderCache) {
 			result = FinderCacheUtil.getResult(
 				_finderPathFetchByC_DU, finderArgs, this);
 		}
@@ -4549,14 +4528,22 @@ public class UserPersistenceImpl
 				List<User> list = q.list();
 
 				if (list.isEmpty()) {
-					FinderCacheUtil.putResult(
-						_finderPathFetchByC_DU, finderArgs, list);
+					if (useFinderCache) {
+						FinderCacheUtil.putResult(
+							_finderPathFetchByC_DU, finderArgs, list);
+					}
 				}
 				else {
 					if (list.size() > 1) {
 						Collections.sort(list, Collections.reverseOrder());
 
 						if (_log.isWarnEnabled()) {
+							if (!useFinderCache) {
+								finderArgs = new Object[] {
+									companyId, defaultUser
+								};
+							}
+
 							_log.warn(
 								"UserPersistenceImpl.fetchByC_DU(long, boolean, boolean) with parameters (" +
 									StringUtil.merge(finderArgs) +
@@ -4572,8 +4559,10 @@ public class UserPersistenceImpl
 				}
 			}
 			catch (Exception e) {
-				FinderCacheUtil.removeResult(
-					_finderPathFetchByC_DU, finderArgs);
+				if (useFinderCache) {
+					FinderCacheUtil.removeResult(
+						_finderPathFetchByC_DU, finderArgs);
+				}
 
 				throw processException(e);
 			}
@@ -4726,20 +4715,24 @@ public class UserPersistenceImpl
 	 *
 	 * @param companyId the company ID
 	 * @param screenName the screen name
-	 * @param retrieveFromCache whether to retrieve from the finder cache
+	 * @param useFinderCache whether to use the finder cache
 	 * @return the matching user, or <code>null</code> if a matching user could not be found
 	 */
 	@Override
 	public User fetchByC_SN(
-		long companyId, String screenName, boolean retrieveFromCache) {
+		long companyId, String screenName, boolean useFinderCache) {
 
 		screenName = Objects.toString(screenName, "");
 
-		Object[] finderArgs = new Object[] {companyId, screenName};
+		Object[] finderArgs = null;
+
+		if (useFinderCache) {
+			finderArgs = new Object[] {companyId, screenName};
+		}
 
 		Object result = null;
 
-		if (retrieveFromCache) {
+		if (useFinderCache) {
 			result = FinderCacheUtil.getResult(
 				_finderPathFetchByC_SN, finderArgs, this);
 		}
@@ -4792,8 +4785,10 @@ public class UserPersistenceImpl
 				List<User> list = q.list();
 
 				if (list.isEmpty()) {
-					FinderCacheUtil.putResult(
-						_finderPathFetchByC_SN, finderArgs, list);
+					if (useFinderCache) {
+						FinderCacheUtil.putResult(
+							_finderPathFetchByC_SN, finderArgs, list);
+					}
 				}
 				else {
 					User user = list.get(0);
@@ -4804,8 +4799,10 @@ public class UserPersistenceImpl
 				}
 			}
 			catch (Exception e) {
-				FinderCacheUtil.removeResult(
-					_finderPathFetchByC_SN, finderArgs);
+				if (useFinderCache) {
+					FinderCacheUtil.removeResult(
+						_finderPathFetchByC_SN, finderArgs);
+				}
 
 				throw processException(e);
 			}
@@ -4974,20 +4971,24 @@ public class UserPersistenceImpl
 	 *
 	 * @param companyId the company ID
 	 * @param emailAddress the email address
-	 * @param retrieveFromCache whether to retrieve from the finder cache
+	 * @param useFinderCache whether to use the finder cache
 	 * @return the matching user, or <code>null</code> if a matching user could not be found
 	 */
 	@Override
 	public User fetchByC_EA(
-		long companyId, String emailAddress, boolean retrieveFromCache) {
+		long companyId, String emailAddress, boolean useFinderCache) {
 
 		emailAddress = Objects.toString(emailAddress, "");
 
-		Object[] finderArgs = new Object[] {companyId, emailAddress};
+		Object[] finderArgs = null;
+
+		if (useFinderCache) {
+			finderArgs = new Object[] {companyId, emailAddress};
+		}
 
 		Object result = null;
 
-		if (retrieveFromCache) {
+		if (useFinderCache) {
 			result = FinderCacheUtil.getResult(
 				_finderPathFetchByC_EA, finderArgs, this);
 		}
@@ -5040,8 +5041,10 @@ public class UserPersistenceImpl
 				List<User> list = q.list();
 
 				if (list.isEmpty()) {
-					FinderCacheUtil.putResult(
-						_finderPathFetchByC_EA, finderArgs, list);
+					if (useFinderCache) {
+						FinderCacheUtil.putResult(
+							_finderPathFetchByC_EA, finderArgs, list);
+					}
 				}
 				else {
 					User user = list.get(0);
@@ -5052,8 +5055,10 @@ public class UserPersistenceImpl
 				}
 			}
 			catch (Exception e) {
-				FinderCacheUtil.removeResult(
-					_finderPathFetchByC_EA, finderArgs);
+				if (useFinderCache) {
+					FinderCacheUtil.removeResult(
+						_finderPathFetchByC_EA, finderArgs);
+				}
 
 				throw processException(e);
 			}
@@ -5222,18 +5227,22 @@ public class UserPersistenceImpl
 	 *
 	 * @param companyId the company ID
 	 * @param facebookId the facebook ID
-	 * @param retrieveFromCache whether to retrieve from the finder cache
+	 * @param useFinderCache whether to use the finder cache
 	 * @return the matching user, or <code>null</code> if a matching user could not be found
 	 */
 	@Override
 	public User fetchByC_FID(
-		long companyId, long facebookId, boolean retrieveFromCache) {
+		long companyId, long facebookId, boolean useFinderCache) {
 
-		Object[] finderArgs = new Object[] {companyId, facebookId};
+		Object[] finderArgs = null;
+
+		if (useFinderCache) {
+			finderArgs = new Object[] {companyId, facebookId};
+		}
 
 		Object result = null;
 
-		if (retrieveFromCache) {
+		if (useFinderCache) {
 			result = FinderCacheUtil.getResult(
 				_finderPathFetchByC_FID, finderArgs, this);
 		}
@@ -5275,14 +5284,22 @@ public class UserPersistenceImpl
 				List<User> list = q.list();
 
 				if (list.isEmpty()) {
-					FinderCacheUtil.putResult(
-						_finderPathFetchByC_FID, finderArgs, list);
+					if (useFinderCache) {
+						FinderCacheUtil.putResult(
+							_finderPathFetchByC_FID, finderArgs, list);
+					}
 				}
 				else {
 					if (list.size() > 1) {
 						Collections.sort(list, Collections.reverseOrder());
 
 						if (_log.isWarnEnabled()) {
+							if (!useFinderCache) {
+								finderArgs = new Object[] {
+									companyId, facebookId
+								};
+							}
+
 							_log.warn(
 								"UserPersistenceImpl.fetchByC_FID(long, long, boolean) with parameters (" +
 									StringUtil.merge(finderArgs) +
@@ -5298,8 +5315,10 @@ public class UserPersistenceImpl
 				}
 			}
 			catch (Exception e) {
-				FinderCacheUtil.removeResult(
-					_finderPathFetchByC_FID, finderArgs);
+				if (useFinderCache) {
+					FinderCacheUtil.removeResult(
+						_finderPathFetchByC_FID, finderArgs);
+				}
 
 				throw processException(e);
 			}
@@ -5452,20 +5471,24 @@ public class UserPersistenceImpl
 	 *
 	 * @param companyId the company ID
 	 * @param googleUserId the google user ID
-	 * @param retrieveFromCache whether to retrieve from the finder cache
+	 * @param useFinderCache whether to use the finder cache
 	 * @return the matching user, or <code>null</code> if a matching user could not be found
 	 */
 	@Override
 	public User fetchByC_GUID(
-		long companyId, String googleUserId, boolean retrieveFromCache) {
+		long companyId, String googleUserId, boolean useFinderCache) {
 
 		googleUserId = Objects.toString(googleUserId, "");
 
-		Object[] finderArgs = new Object[] {companyId, googleUserId};
+		Object[] finderArgs = null;
+
+		if (useFinderCache) {
+			finderArgs = new Object[] {companyId, googleUserId};
+		}
 
 		Object result = null;
 
-		if (retrieveFromCache) {
+		if (useFinderCache) {
 			result = FinderCacheUtil.getResult(
 				_finderPathFetchByC_GUID, finderArgs, this);
 		}
@@ -5518,14 +5541,22 @@ public class UserPersistenceImpl
 				List<User> list = q.list();
 
 				if (list.isEmpty()) {
-					FinderCacheUtil.putResult(
-						_finderPathFetchByC_GUID, finderArgs, list);
+					if (useFinderCache) {
+						FinderCacheUtil.putResult(
+							_finderPathFetchByC_GUID, finderArgs, list);
+					}
 				}
 				else {
 					if (list.size() > 1) {
 						Collections.sort(list, Collections.reverseOrder());
 
 						if (_log.isWarnEnabled()) {
+							if (!useFinderCache) {
+								finderArgs = new Object[] {
+									companyId, googleUserId
+								};
+							}
+
 							_log.warn(
 								"UserPersistenceImpl.fetchByC_GUID(long, String, boolean) with parameters (" +
 									StringUtil.merge(finderArgs) +
@@ -5541,8 +5572,10 @@ public class UserPersistenceImpl
 				}
 			}
 			catch (Exception e) {
-				FinderCacheUtil.removeResult(
-					_finderPathFetchByC_GUID, finderArgs);
+				if (useFinderCache) {
+					FinderCacheUtil.removeResult(
+						_finderPathFetchByC_GUID, finderArgs);
+				}
 
 				throw processException(e);
 			}
@@ -5711,20 +5744,24 @@ public class UserPersistenceImpl
 	 *
 	 * @param companyId the company ID
 	 * @param openId the open ID
-	 * @param retrieveFromCache whether to retrieve from the finder cache
+	 * @param useFinderCache whether to use the finder cache
 	 * @return the matching user, or <code>null</code> if a matching user could not be found
 	 */
 	@Override
 	public User fetchByC_O(
-		long companyId, String openId, boolean retrieveFromCache) {
+		long companyId, String openId, boolean useFinderCache) {
 
 		openId = Objects.toString(openId, "");
 
-		Object[] finderArgs = new Object[] {companyId, openId};
+		Object[] finderArgs = null;
+
+		if (useFinderCache) {
+			finderArgs = new Object[] {companyId, openId};
+		}
 
 		Object result = null;
 
-		if (retrieveFromCache) {
+		if (useFinderCache) {
 			result = FinderCacheUtil.getResult(
 				_finderPathFetchByC_O, finderArgs, this);
 		}
@@ -5777,14 +5814,20 @@ public class UserPersistenceImpl
 				List<User> list = q.list();
 
 				if (list.isEmpty()) {
-					FinderCacheUtil.putResult(
-						_finderPathFetchByC_O, finderArgs, list);
+					if (useFinderCache) {
+						FinderCacheUtil.putResult(
+							_finderPathFetchByC_O, finderArgs, list);
+					}
 				}
 				else {
 					if (list.size() > 1) {
 						Collections.sort(list, Collections.reverseOrder());
 
 						if (_log.isWarnEnabled()) {
+							if (!useFinderCache) {
+								finderArgs = new Object[] {companyId, openId};
+							}
+
 							_log.warn(
 								"UserPersistenceImpl.fetchByC_O(long, String, boolean) with parameters (" +
 									StringUtil.merge(finderArgs) +
@@ -5800,7 +5843,10 @@ public class UserPersistenceImpl
 				}
 			}
 			catch (Exception e) {
-				FinderCacheUtil.removeResult(_finderPathFetchByC_O, finderArgs);
+				if (useFinderCache) {
+					FinderCacheUtil.removeResult(
+						_finderPathFetchByC_O, finderArgs);
+				}
 
 				throw processException(e);
 			}
@@ -5932,7 +5978,7 @@ public class UserPersistenceImpl
 	 * Returns a range of all the users where companyId = &#63; and status = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>UserModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>UserModelImpl</code>.
 	 * </p>
 	 *
 	 * @param companyId the company ID
@@ -5952,7 +5998,7 @@ public class UserPersistenceImpl
 	 * Returns an ordered range of all the users where companyId = &#63; and status = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>UserModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>UserModelImpl</code>.
 	 * </p>
 	 *
 	 * @param companyId the company ID
@@ -5975,7 +6021,7 @@ public class UserPersistenceImpl
 	 * Returns an ordered range of all the users where companyId = &#63; and status = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>UserModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>UserModelImpl</code>.
 	 * </p>
 	 *
 	 * @param companyId the company ID
@@ -5983,26 +6029,26 @@ public class UserPersistenceImpl
 	 * @param start the lower bound of the range of users
 	 * @param end the upper bound of the range of users (not inclusive)
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
-	 * @param retrieveFromCache whether to retrieve from the finder cache
+	 * @param useFinderCache whether to use the finder cache
 	 * @return the ordered range of matching users
 	 */
 	@Override
 	public List<User> findByC_S(
 		long companyId, int status, int start, int end,
-		OrderByComparator<User> orderByComparator, boolean retrieveFromCache) {
+		OrderByComparator<User> orderByComparator, boolean useFinderCache) {
 
-		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
 			(orderByComparator == null)) {
 
-			pagination = false;
-			finderPath = _finderPathWithoutPaginationFindByC_S;
-			finderArgs = new Object[] {companyId, status};
+			if (useFinderCache) {
+				finderPath = _finderPathWithoutPaginationFindByC_S;
+				finderArgs = new Object[] {companyId, status};
+			}
 		}
-		else {
+		else if (useFinderCache) {
 			finderPath = _finderPathWithPaginationFindByC_S;
 			finderArgs = new Object[] {
 				companyId, status, start, end, orderByComparator
@@ -6011,7 +6057,7 @@ public class UserPersistenceImpl
 
 		List<User> list = null;
 
-		if (retrieveFromCache) {
+		if (useFinderCache) {
 			list = (List<User>)FinderCacheUtil.getResult(
 				finderPath, finderArgs, this);
 
@@ -6049,7 +6095,7 @@ public class UserPersistenceImpl
 				appendOrderByComparator(
 					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
 			}
-			else if (pagination) {
+			else {
 				query.append(UserModelImpl.ORDER_BY_JPQL);
 			}
 
@@ -6068,25 +6114,18 @@ public class UserPersistenceImpl
 
 				qPos.add(status);
 
-				if (!pagination) {
-					list = (List<User>)QueryUtil.list(
-						q, getDialect(), start, end, false);
-
-					Collections.sort(list);
-
-					list = Collections.unmodifiableList(list);
-				}
-				else {
-					list = (List<User>)QueryUtil.list(
-						q, getDialect(), start, end);
-				}
+				list = (List<User>)QueryUtil.list(q, getDialect(), start, end);
 
 				cacheResult(list);
 
-				FinderCacheUtil.putResult(finderPath, finderArgs, list);
+				if (useFinderCache) {
+					FinderCacheUtil.putResult(finderPath, finderArgs, list);
+				}
 			}
 			catch (Exception e) {
-				FinderCacheUtil.removeResult(finderPath, finderArgs);
+				if (useFinderCache) {
+					FinderCacheUtil.removeResult(finderPath, finderArgs);
+				}
 
 				throw processException(e);
 			}
@@ -6479,7 +6518,7 @@ public class UserPersistenceImpl
 	 * Returns a range of all the users where companyId = &#63; and createDate = &#63; and modifiedDate = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>UserModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>UserModelImpl</code>.
 	 * </p>
 	 *
 	 * @param companyId the company ID
@@ -6502,7 +6541,7 @@ public class UserPersistenceImpl
 	 * Returns an ordered range of all the users where companyId = &#63; and createDate = &#63; and modifiedDate = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>UserModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>UserModelImpl</code>.
 	 * </p>
 	 *
 	 * @param companyId the company ID
@@ -6527,7 +6566,7 @@ public class UserPersistenceImpl
 	 * Returns an ordered range of all the users where companyId = &#63; and createDate = &#63; and modifiedDate = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>UserModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>UserModelImpl</code>.
 	 * </p>
 	 *
 	 * @param companyId the company ID
@@ -6536,28 +6575,28 @@ public class UserPersistenceImpl
 	 * @param start the lower bound of the range of users
 	 * @param end the upper bound of the range of users (not inclusive)
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
-	 * @param retrieveFromCache whether to retrieve from the finder cache
+	 * @param useFinderCache whether to use the finder cache
 	 * @return the ordered range of matching users
 	 */
 	@Override
 	public List<User> findByC_CD_MD(
 		long companyId, Date createDate, Date modifiedDate, int start, int end,
-		OrderByComparator<User> orderByComparator, boolean retrieveFromCache) {
+		OrderByComparator<User> orderByComparator, boolean useFinderCache) {
 
-		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
 			(orderByComparator == null)) {
 
-			pagination = false;
-			finderPath = _finderPathWithoutPaginationFindByC_CD_MD;
-			finderArgs = new Object[] {
-				companyId, _getTime(createDate), _getTime(modifiedDate)
-			};
+			if (useFinderCache) {
+				finderPath = _finderPathWithoutPaginationFindByC_CD_MD;
+				finderArgs = new Object[] {
+					companyId, _getTime(createDate), _getTime(modifiedDate)
+				};
+			}
 		}
-		else {
+		else if (useFinderCache) {
 			finderPath = _finderPathWithPaginationFindByC_CD_MD;
 			finderArgs = new Object[] {
 				companyId, _getTime(createDate), _getTime(modifiedDate), start,
@@ -6567,7 +6606,7 @@ public class UserPersistenceImpl
 
 		List<User> list = null;
 
-		if (retrieveFromCache) {
+		if (useFinderCache) {
 			list = (List<User>)FinderCacheUtil.getResult(
 				finderPath, finderArgs, this);
 
@@ -6626,7 +6665,7 @@ public class UserPersistenceImpl
 				appendOrderByComparator(
 					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
 			}
-			else if (pagination) {
+			else {
 				query.append(UserModelImpl.ORDER_BY_JPQL);
 			}
 
@@ -6651,25 +6690,18 @@ public class UserPersistenceImpl
 					qPos.add(new Timestamp(modifiedDate.getTime()));
 				}
 
-				if (!pagination) {
-					list = (List<User>)QueryUtil.list(
-						q, getDialect(), start, end, false);
-
-					Collections.sort(list);
-
-					list = Collections.unmodifiableList(list);
-				}
-				else {
-					list = (List<User>)QueryUtil.list(
-						q, getDialect(), start, end);
-				}
+				list = (List<User>)QueryUtil.list(q, getDialect(), start, end);
 
 				cacheResult(list);
 
-				FinderCacheUtil.putResult(finderPath, finderArgs, list);
+				if (useFinderCache) {
+					FinderCacheUtil.putResult(finderPath, finderArgs, list);
+				}
 			}
 			catch (Exception e) {
-				FinderCacheUtil.removeResult(finderPath, finderArgs);
+				if (useFinderCache) {
+					FinderCacheUtil.removeResult(finderPath, finderArgs);
+				}
 
 				throw processException(e);
 			}
@@ -7151,7 +7183,7 @@ public class UserPersistenceImpl
 	 * Returns a range of all the users where companyId = &#63; and defaultUser = &#63; and status = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>UserModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>UserModelImpl</code>.
 	 * </p>
 	 *
 	 * @param companyId the company ID
@@ -7172,7 +7204,7 @@ public class UserPersistenceImpl
 	 * Returns an ordered range of all the users where companyId = &#63; and defaultUser = &#63; and status = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>UserModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>UserModelImpl</code>.
 	 * </p>
 	 *
 	 * @param companyId the company ID
@@ -7197,7 +7229,7 @@ public class UserPersistenceImpl
 	 * Returns an ordered range of all the users where companyId = &#63; and defaultUser = &#63; and status = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>UserModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>UserModelImpl</code>.
 	 * </p>
 	 *
 	 * @param companyId the company ID
@@ -7206,26 +7238,26 @@ public class UserPersistenceImpl
 	 * @param start the lower bound of the range of users
 	 * @param end the upper bound of the range of users (not inclusive)
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
-	 * @param retrieveFromCache whether to retrieve from the finder cache
+	 * @param useFinderCache whether to use the finder cache
 	 * @return the ordered range of matching users
 	 */
 	@Override
 	public List<User> findByC_DU_S(
 		long companyId, boolean defaultUser, int status, int start, int end,
-		OrderByComparator<User> orderByComparator, boolean retrieveFromCache) {
+		OrderByComparator<User> orderByComparator, boolean useFinderCache) {
 
-		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
 			(orderByComparator == null)) {
 
-			pagination = false;
-			finderPath = _finderPathWithoutPaginationFindByC_DU_S;
-			finderArgs = new Object[] {companyId, defaultUser, status};
+			if (useFinderCache) {
+				finderPath = _finderPathWithoutPaginationFindByC_DU_S;
+				finderArgs = new Object[] {companyId, defaultUser, status};
+			}
 		}
-		else {
+		else if (useFinderCache) {
 			finderPath = _finderPathWithPaginationFindByC_DU_S;
 			finderArgs = new Object[] {
 				companyId, defaultUser, status, start, end, orderByComparator
@@ -7234,7 +7266,7 @@ public class UserPersistenceImpl
 
 		List<User> list = null;
 
-		if (retrieveFromCache) {
+		if (useFinderCache) {
 			list = (List<User>)FinderCacheUtil.getResult(
 				finderPath, finderArgs, this);
 
@@ -7275,7 +7307,7 @@ public class UserPersistenceImpl
 				appendOrderByComparator(
 					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
 			}
-			else if (pagination) {
+			else {
 				query.append(UserModelImpl.ORDER_BY_JPQL);
 			}
 
@@ -7296,25 +7328,18 @@ public class UserPersistenceImpl
 
 				qPos.add(status);
 
-				if (!pagination) {
-					list = (List<User>)QueryUtil.list(
-						q, getDialect(), start, end, false);
-
-					Collections.sort(list);
-
-					list = Collections.unmodifiableList(list);
-				}
-				else {
-					list = (List<User>)QueryUtil.list(
-						q, getDialect(), start, end);
-				}
+				list = (List<User>)QueryUtil.list(q, getDialect(), start, end);
 
 				cacheResult(list);
 
-				FinderCacheUtil.putResult(finderPath, finderArgs, list);
+				if (useFinderCache) {
+					FinderCacheUtil.putResult(finderPath, finderArgs, list);
+				}
 			}
 			catch (Exception e) {
-				FinderCacheUtil.removeResult(finderPath, finderArgs);
+				if (useFinderCache) {
+					FinderCacheUtil.removeResult(finderPath, finderArgs);
+				}
 
 				throw processException(e);
 			}
@@ -7774,21 +7799,24 @@ public class UserPersistenceImpl
 	 *
 	 * @param companyId the company ID
 	 * @param externalReferenceCode the external reference code
-	 * @param retrieveFromCache whether to retrieve from the finder cache
+	 * @param useFinderCache whether to use the finder cache
 	 * @return the matching user, or <code>null</code> if a matching user could not be found
 	 */
 	@Override
 	public User fetchByC_ERC(
-		long companyId, String externalReferenceCode,
-		boolean retrieveFromCache) {
+		long companyId, String externalReferenceCode, boolean useFinderCache) {
 
 		externalReferenceCode = Objects.toString(externalReferenceCode, "");
 
-		Object[] finderArgs = new Object[] {companyId, externalReferenceCode};
+		Object[] finderArgs = null;
+
+		if (useFinderCache) {
+			finderArgs = new Object[] {companyId, externalReferenceCode};
+		}
 
 		Object result = null;
 
-		if (retrieveFromCache) {
+		if (useFinderCache) {
 			result = FinderCacheUtil.getResult(
 				_finderPathFetchByC_ERC, finderArgs, this);
 		}
@@ -7842,14 +7870,22 @@ public class UserPersistenceImpl
 				List<User> list = q.list();
 
 				if (list.isEmpty()) {
-					FinderCacheUtil.putResult(
-						_finderPathFetchByC_ERC, finderArgs, list);
+					if (useFinderCache) {
+						FinderCacheUtil.putResult(
+							_finderPathFetchByC_ERC, finderArgs, list);
+					}
 				}
 				else {
 					if (list.size() > 1) {
 						Collections.sort(list, Collections.reverseOrder());
 
 						if (_log.isWarnEnabled()) {
+							if (!useFinderCache) {
+								finderArgs = new Object[] {
+									companyId, externalReferenceCode
+								};
+							}
+
 							_log.warn(
 								"UserPersistenceImpl.fetchByC_ERC(long, String, boolean) with parameters (" +
 									StringUtil.merge(finderArgs) +
@@ -7865,8 +7901,10 @@ public class UserPersistenceImpl
 				}
 			}
 			catch (Exception e) {
-				FinderCacheUtil.removeResult(
-					_finderPathFetchByC_ERC, finderArgs);
+				if (useFinderCache) {
+					FinderCacheUtil.removeResult(
+						_finderPathFetchByC_ERC, finderArgs);
+				}
 
 				throw processException(e);
 			}
@@ -8431,7 +8469,7 @@ public class UserPersistenceImpl
 
 		user.setUuid(uuid);
 
-		user.setCompanyId(companyProvider.getCompanyId());
+		user.setCompanyId(CompanyThreadLocal.getCompanyId());
 
 		return user;
 	}
@@ -8953,7 +8991,7 @@ public class UserPersistenceImpl
 	 * Returns a range of all the users.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>UserModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>UserModelImpl</code>.
 	 * </p>
 	 *
 	 * @param start the lower bound of the range of users
@@ -8969,7 +9007,7 @@ public class UserPersistenceImpl
 	 * Returns an ordered range of all the users.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>UserModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>UserModelImpl</code>.
 	 * </p>
 	 *
 	 * @param start the lower bound of the range of users
@@ -8988,39 +9026,39 @@ public class UserPersistenceImpl
 	 * Returns an ordered range of all the users.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>UserModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>UserModelImpl</code>.
 	 * </p>
 	 *
 	 * @param start the lower bound of the range of users
 	 * @param end the upper bound of the range of users (not inclusive)
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
-	 * @param retrieveFromCache whether to retrieve from the finder cache
+	 * @param useFinderCache whether to use the finder cache
 	 * @return the ordered range of users
 	 */
 	@Override
 	public List<User> findAll(
 		int start, int end, OrderByComparator<User> orderByComparator,
-		boolean retrieveFromCache) {
+		boolean useFinderCache) {
 
-		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
 			(orderByComparator == null)) {
 
-			pagination = false;
-			finderPath = _finderPathWithoutPaginationFindAll;
-			finderArgs = FINDER_ARGS_EMPTY;
+			if (useFinderCache) {
+				finderPath = _finderPathWithoutPaginationFindAll;
+				finderArgs = FINDER_ARGS_EMPTY;
+			}
 		}
-		else {
+		else if (useFinderCache) {
 			finderPath = _finderPathWithPaginationFindAll;
 			finderArgs = new Object[] {start, end, orderByComparator};
 		}
 
 		List<User> list = null;
 
-		if (retrieveFromCache) {
+		if (useFinderCache) {
 			list = (List<User>)FinderCacheUtil.getResult(
 				finderPath, finderArgs, this);
 		}
@@ -9043,9 +9081,7 @@ public class UserPersistenceImpl
 			else {
 				sql = _SQL_SELECT_USER;
 
-				if (pagination) {
-					sql = sql.concat(UserModelImpl.ORDER_BY_JPQL);
-				}
+				sql = sql.concat(UserModelImpl.ORDER_BY_JPQL);
 			}
 
 			Session session = null;
@@ -9055,25 +9091,18 @@ public class UserPersistenceImpl
 
 				Query q = session.createQuery(sql);
 
-				if (!pagination) {
-					list = (List<User>)QueryUtil.list(
-						q, getDialect(), start, end, false);
-
-					Collections.sort(list);
-
-					list = Collections.unmodifiableList(list);
-				}
-				else {
-					list = (List<User>)QueryUtil.list(
-						q, getDialect(), start, end);
-				}
+				list = (List<User>)QueryUtil.list(q, getDialect(), start, end);
 
 				cacheResult(list);
 
-				FinderCacheUtil.putResult(finderPath, finderArgs, list);
+				if (useFinderCache) {
+					FinderCacheUtil.putResult(finderPath, finderArgs, list);
+				}
 			}
 			catch (Exception e) {
-				FinderCacheUtil.removeResult(finderPath, finderArgs);
+				if (useFinderCache) {
+					FinderCacheUtil.removeResult(finderPath, finderArgs);
+				}
 
 				throw processException(e);
 			}
@@ -9161,7 +9190,7 @@ public class UserPersistenceImpl
 	 * Returns a range of all the groups associated with the user.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>UserModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>UserModelImpl</code>.
 	 * </p>
 	 *
 	 * @param pk the primary key of the user
@@ -9180,7 +9209,7 @@ public class UserPersistenceImpl
 	 * Returns an ordered range of all the groups associated with the user.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>UserModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>UserModelImpl</code>.
 	 * </p>
 	 *
 	 * @param pk the primary key of the user
@@ -9252,7 +9281,7 @@ public class UserPersistenceImpl
 
 		if (user == null) {
 			userToGroupTableMapper.addTableMapping(
-				companyProvider.getCompanyId(), pk, groupPK);
+				CompanyThreadLocal.getCompanyId(), pk, groupPK);
 		}
 		else {
 			userToGroupTableMapper.addTableMapping(
@@ -9272,7 +9301,7 @@ public class UserPersistenceImpl
 
 		if (user == null) {
 			userToGroupTableMapper.addTableMapping(
-				companyProvider.getCompanyId(), pk, group.getPrimaryKey());
+				CompanyThreadLocal.getCompanyId(), pk, group.getPrimaryKey());
 		}
 		else {
 			userToGroupTableMapper.addTableMapping(
@@ -9293,7 +9322,7 @@ public class UserPersistenceImpl
 		User user = fetchByPrimaryKey(pk);
 
 		if (user == null) {
-			companyId = companyProvider.getCompanyId();
+			companyId = CompanyThreadLocal.getCompanyId();
 		}
 		else {
 			companyId = user.getCompanyId();
@@ -9407,7 +9436,7 @@ public class UserPersistenceImpl
 		User user = fetchByPrimaryKey(pk);
 
 		if (user == null) {
-			companyId = companyProvider.getCompanyId();
+			companyId = CompanyThreadLocal.getCompanyId();
 		}
 		else {
 			companyId = user.getCompanyId();
@@ -9473,7 +9502,7 @@ public class UserPersistenceImpl
 	 * Returns a range of all the organizations associated with the user.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>UserModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>UserModelImpl</code>.
 	 * </p>
 	 *
 	 * @param pk the primary key of the user
@@ -9492,7 +9521,7 @@ public class UserPersistenceImpl
 	 * Returns an ordered range of all the organizations associated with the user.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>UserModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>UserModelImpl</code>.
 	 * </p>
 	 *
 	 * @param pk the primary key of the user
@@ -9565,7 +9594,7 @@ public class UserPersistenceImpl
 
 		if (user == null) {
 			userToOrganizationTableMapper.addTableMapping(
-				companyProvider.getCompanyId(), pk, organizationPK);
+				CompanyThreadLocal.getCompanyId(), pk, organizationPK);
 		}
 		else {
 			userToOrganizationTableMapper.addTableMapping(
@@ -9587,7 +9616,7 @@ public class UserPersistenceImpl
 
 		if (user == null) {
 			userToOrganizationTableMapper.addTableMapping(
-				companyProvider.getCompanyId(), pk,
+				CompanyThreadLocal.getCompanyId(), pk,
 				organization.getPrimaryKey());
 		}
 		else {
@@ -9609,7 +9638,7 @@ public class UserPersistenceImpl
 		User user = fetchByPrimaryKey(pk);
 
 		if (user == null) {
-			companyId = companyProvider.getCompanyId();
+			companyId = CompanyThreadLocal.getCompanyId();
 		}
 		else {
 			companyId = user.getCompanyId();
@@ -9730,7 +9759,7 @@ public class UserPersistenceImpl
 		User user = fetchByPrimaryKey(pk);
 
 		if (user == null) {
-			companyId = companyProvider.getCompanyId();
+			companyId = CompanyThreadLocal.getCompanyId();
 		}
 		else {
 			companyId = user.getCompanyId();
@@ -9796,7 +9825,7 @@ public class UserPersistenceImpl
 	 * Returns a range of all the roles associated with the user.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>UserModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>UserModelImpl</code>.
 	 * </p>
 	 *
 	 * @param pk the primary key of the user
@@ -9815,7 +9844,7 @@ public class UserPersistenceImpl
 	 * Returns an ordered range of all the roles associated with the user.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>UserModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>UserModelImpl</code>.
 	 * </p>
 	 *
 	 * @param pk the primary key of the user
@@ -9887,7 +9916,7 @@ public class UserPersistenceImpl
 
 		if (user == null) {
 			userToRoleTableMapper.addTableMapping(
-				companyProvider.getCompanyId(), pk, rolePK);
+				CompanyThreadLocal.getCompanyId(), pk, rolePK);
 		}
 		else {
 			userToRoleTableMapper.addTableMapping(
@@ -9907,7 +9936,7 @@ public class UserPersistenceImpl
 
 		if (user == null) {
 			userToRoleTableMapper.addTableMapping(
-				companyProvider.getCompanyId(), pk, role.getPrimaryKey());
+				CompanyThreadLocal.getCompanyId(), pk, role.getPrimaryKey());
 		}
 		else {
 			userToRoleTableMapper.addTableMapping(
@@ -9928,7 +9957,7 @@ public class UserPersistenceImpl
 		User user = fetchByPrimaryKey(pk);
 
 		if (user == null) {
-			companyId = companyProvider.getCompanyId();
+			companyId = CompanyThreadLocal.getCompanyId();
 		}
 		else {
 			companyId = user.getCompanyId();
@@ -10038,7 +10067,7 @@ public class UserPersistenceImpl
 		User user = fetchByPrimaryKey(pk);
 
 		if (user == null) {
-			companyId = companyProvider.getCompanyId();
+			companyId = CompanyThreadLocal.getCompanyId();
 		}
 		else {
 			companyId = user.getCompanyId();
@@ -10102,7 +10131,7 @@ public class UserPersistenceImpl
 	 * Returns a range of all the teams associated with the user.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>UserModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>UserModelImpl</code>.
 	 * </p>
 	 *
 	 * @param pk the primary key of the user
@@ -10121,7 +10150,7 @@ public class UserPersistenceImpl
 	 * Returns an ordered range of all the teams associated with the user.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>UserModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>UserModelImpl</code>.
 	 * </p>
 	 *
 	 * @param pk the primary key of the user
@@ -10193,7 +10222,7 @@ public class UserPersistenceImpl
 
 		if (user == null) {
 			userToTeamTableMapper.addTableMapping(
-				companyProvider.getCompanyId(), pk, teamPK);
+				CompanyThreadLocal.getCompanyId(), pk, teamPK);
 		}
 		else {
 			userToTeamTableMapper.addTableMapping(
@@ -10213,7 +10242,7 @@ public class UserPersistenceImpl
 
 		if (user == null) {
 			userToTeamTableMapper.addTableMapping(
-				companyProvider.getCompanyId(), pk, team.getPrimaryKey());
+				CompanyThreadLocal.getCompanyId(), pk, team.getPrimaryKey());
 		}
 		else {
 			userToTeamTableMapper.addTableMapping(
@@ -10234,7 +10263,7 @@ public class UserPersistenceImpl
 		User user = fetchByPrimaryKey(pk);
 
 		if (user == null) {
-			companyId = companyProvider.getCompanyId();
+			companyId = CompanyThreadLocal.getCompanyId();
 		}
 		else {
 			companyId = user.getCompanyId();
@@ -10344,7 +10373,7 @@ public class UserPersistenceImpl
 		User user = fetchByPrimaryKey(pk);
 
 		if (user == null) {
-			companyId = companyProvider.getCompanyId();
+			companyId = CompanyThreadLocal.getCompanyId();
 		}
 		else {
 			companyId = user.getCompanyId();
@@ -10410,7 +10439,7 @@ public class UserPersistenceImpl
 	 * Returns a range of all the user groups associated with the user.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>UserModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>UserModelImpl</code>.
 	 * </p>
 	 *
 	 * @param pk the primary key of the user
@@ -10429,7 +10458,7 @@ public class UserPersistenceImpl
 	 * Returns an ordered range of all the user groups associated with the user.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>UserModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>UserModelImpl</code>.
 	 * </p>
 	 *
 	 * @param pk the primary key of the user
@@ -10501,7 +10530,7 @@ public class UserPersistenceImpl
 
 		if (user == null) {
 			userToUserGroupTableMapper.addTableMapping(
-				companyProvider.getCompanyId(), pk, userGroupPK);
+				CompanyThreadLocal.getCompanyId(), pk, userGroupPK);
 		}
 		else {
 			userToUserGroupTableMapper.addTableMapping(
@@ -10523,7 +10552,8 @@ public class UserPersistenceImpl
 
 		if (user == null) {
 			userToUserGroupTableMapper.addTableMapping(
-				companyProvider.getCompanyId(), pk, userGroup.getPrimaryKey());
+				CompanyThreadLocal.getCompanyId(), pk,
+				userGroup.getPrimaryKey());
 		}
 		else {
 			userToUserGroupTableMapper.addTableMapping(
@@ -10544,7 +10574,7 @@ public class UserPersistenceImpl
 		User user = fetchByPrimaryKey(pk);
 
 		if (user == null) {
-			companyId = companyProvider.getCompanyId();
+			companyId = CompanyThreadLocal.getCompanyId();
 		}
 		else {
 			companyId = user.getCompanyId();
@@ -10662,7 +10692,7 @@ public class UserPersistenceImpl
 		User user = fetchByPrimaryKey(pk);
 
 		if (user == null) {
-			companyId = companyProvider.getCompanyId();
+			companyId = CompanyThreadLocal.getCompanyId();
 		}
 		else {
 			companyId = user.getCompanyId();
@@ -11154,9 +11184,6 @@ public class UserPersistenceImpl
 		TableMapperFactory.removeTableMapper("Users_Teams");
 		TableMapperFactory.removeTableMapper("Users_UserGroups");
 	}
-
-	@BeanReference(type = CompanyProviderWrapper.class)
-	protected CompanyProvider companyProvider;
 
 	@BeanReference(type = GroupPersistence.class)
 	protected GroupPersistence groupPersistence;

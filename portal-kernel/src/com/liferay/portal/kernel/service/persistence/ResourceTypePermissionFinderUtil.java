@@ -16,15 +16,12 @@ package com.liferay.portal.kernel.service.persistence;
 
 import com.liferay.portal.kernel.bean.PortalBeanLocatorUtil;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 /**
  * @author Brian Wing Shun Chan
  * @deprecated
  * @generated
  */
 @Deprecated
-@ProviderType
 public class ResourceTypePermissionFinderUtil {
 
 	public static java.util.List

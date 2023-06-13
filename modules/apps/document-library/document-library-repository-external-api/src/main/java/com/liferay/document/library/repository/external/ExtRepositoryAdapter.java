@@ -19,6 +19,7 @@ import com.liferay.document.library.kernel.exception.NoSuchFileVersionException;
 import com.liferay.document.library.kernel.exception.NoSuchFolderException;
 import com.liferay.document.library.kernel.model.DLFileEntryTypeConstants;
 import com.liferay.document.library.kernel.model.DLFolder;
+import com.liferay.document.library.kernel.model.DLFolderConstants;
 import com.liferay.document.library.kernel.model.DLVersionNumberIncrease;
 import com.liferay.document.library.kernel.service.DLFolderLocalServiceUtil;
 import com.liferay.document.library.repository.external.model.ExtRepositoryFileEntryAdapter;
@@ -691,6 +692,10 @@ public class ExtRepositoryAdapter extends BaseRepositoryImpl {
 			_extRepository.getExtRepositoryParentFolder(
 				extRepositoryObjectAdapter.getExtRepositoryModel());
 
+		if (parentFolder == null) {
+			return null;
+		}
+
 		return _toExtRepositoryObjectAdapter(
 			ExtRepositoryObjectAdapterType.FOLDER, parentFolder);
 	}
@@ -1188,6 +1193,10 @@ public class ExtRepositoryAdapter extends BaseRepositoryImpl {
 	protected String getExtRepositoryObjectKey(long repositoryEntryId)
 		throws PortalException {
 
+		if (repositoryEntryId == DLFolderConstants.DEFAULT_PARENT_FOLDER_ID) {
+			return _extRepository.getRootFolderKey();
+		}
+
 		RepositoryEntry repositoryEntry =
 			repositoryEntryLocalService.fetchRepositoryEntry(repositoryEntryId);
 
@@ -1206,9 +1215,7 @@ public class ExtRepositoryAdapter extends BaseRepositoryImpl {
 	protected boolean isCheckedOut(
 		ExtRepositoryFileEntry extRepositoryFileEntry) {
 
-		String checkedOutBy = extRepositoryFileEntry.getCheckedOutBy();
-
-		if (Validator.isNull(checkedOutBy)) {
+		if (Validator.isNull(extRepositoryFileEntry.getCheckedOutBy())) {
 			return false;
 		}
 

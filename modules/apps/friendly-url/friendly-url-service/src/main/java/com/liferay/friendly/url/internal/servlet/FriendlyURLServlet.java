@@ -40,6 +40,7 @@ import com.liferay.portal.kernel.service.ServiceContextFactory;
 import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
 import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.servlet.PortalMessages;
+import com.liferay.portal.kernel.servlet.ServletContextPool;
 import com.liferay.portal.kernel.servlet.SessionMessages;
 import com.liferay.portal.kernel.struts.LastPath;
 import com.liferay.portal.kernel.util.FriendlyURLNormalizerUtil;
@@ -247,14 +248,13 @@ public class FriendlyURLServlet extends HttpServlet {
 					String redirect = portal.getLocalizedFriendlyURL(
 						httpServletRequest, layout, locale, originalLocale);
 
-					Boolean forcePermanentRedirect = Boolean.TRUE;
+					boolean forcePermanentRedirect = true;
 
 					if (Validator.isNull(i18nLanguageId)) {
-						forcePermanentRedirect = Boolean.FALSE;
+						forcePermanentRedirect = false;
 					}
 
-					return new Redirect(
-						redirect, Boolean.TRUE, forcePermanentRedirect);
+					return new Redirect(redirect, true, forcePermanentRedirect);
 				}
 			}
 		}
@@ -306,6 +306,14 @@ public class FriendlyURLServlet extends HttpServlet {
 
 	@Override
 	public void init(ServletConfig servletConfig) throws ServletException {
+		ServletContext servletContext = servletConfig.getServletContext();
+
+		if (servletContext != ServletContextPool.get(
+				portal.getServletContextName())) {
+
+			return;
+		}
+
 		super.init(servletConfig);
 
 		_private = GetterUtil.getBoolean(
@@ -373,10 +381,6 @@ public class FriendlyURLServlet extends HttpServlet {
 			redirect = new Redirect();
 		}
 
-		if (_log.isDebugEnabled()) {
-			_log.debug("Redirect " + redirect.getPath());
-		}
-
 		if (redirect.isValidForward()) {
 			ServletContext servletContext = getServletContext();
 
@@ -395,17 +399,40 @@ public class FriendlyURLServlet extends HttpServlet {
 			}
 
 			if (requestDispatcher != null) {
+				if (_log.isDebugEnabled()) {
+					_log.debug(
+						StringBundler.concat(
+							"Forward from ", httpServletRequest.getRequestURI(),
+							" to ", redirect.getPath()));
+				}
+
 				requestDispatcher.forward(
 					httpServletRequest, httpServletResponse);
 			}
 		}
 		else {
 			if (redirect.isPermanent()) {
+				if (_log.isDebugEnabled()) {
+					_log.debug(
+						StringBundler.concat(
+							"Location moved permanently from ",
+							httpServletRequest.getRequestURI(), " to ",
+							redirect.getPath()));
+				}
+
 				httpServletResponse.setHeader("Location", redirect.getPath());
 				httpServletResponse.setStatus(
 					HttpServletResponse.SC_MOVED_PERMANENTLY);
 			}
 			else {
+				if (_log.isDebugEnabled()) {
+					_log.debug(
+						StringBundler.concat(
+							"Redirect from ",
+							httpServletRequest.getRequestURI(), " to ",
+							redirect.getPath()));
+				}
+
 				httpServletResponse.sendRedirect(redirect.getPath());
 			}
 		}
@@ -476,17 +503,17 @@ public class FriendlyURLServlet extends HttpServlet {
 		}
 
 		public boolean isValidForward() {
-			String path = getPath();
-
-			if (!path.startsWith(Portal.PATH_MAIN)) {
-				return false;
-			}
-
 			if (isForce()) {
 				return false;
 			}
 
-			return true;
+			String path = getPath();
+
+			if (path.equals(Portal.PATH_MAIN) || path.startsWith("/c/")) {
+				return true;
+			}
+
+			return false;
 		}
 
 		private final boolean _force;
@@ -610,7 +637,7 @@ public class FriendlyURLServlet extends HttpServlet {
 
 		Long realUserId = (Long)session.getAttribute(WebKeys.USER_ID);
 
-		if (userId == realUserId) {
+		if ((realUserId == null) || (userId == realUserId)) {
 			return false;
 		}
 

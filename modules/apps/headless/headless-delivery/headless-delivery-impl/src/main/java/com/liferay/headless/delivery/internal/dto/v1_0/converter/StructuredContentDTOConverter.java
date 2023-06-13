@@ -24,6 +24,7 @@ import com.liferay.document.library.util.DLURLHelper;
 import com.liferay.dynamic.data.mapping.model.DDMFormField;
 import com.liferay.dynamic.data.mapping.model.DDMFormFieldType;
 import com.liferay.dynamic.data.mapping.model.DDMStructure;
+import com.liferay.dynamic.data.mapping.model.LocalizedValue;
 import com.liferay.dynamic.data.mapping.storage.DDMFormFieldValue;
 import com.liferay.dynamic.data.mapping.storage.DDMFormValues;
 import com.liferay.dynamic.data.mapping.storage.Fields;
@@ -51,7 +52,6 @@ import com.liferay.portal.kernel.comment.CommentManager;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.model.Layout;
-import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.service.LayoutLocalService;
 import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.util.DateUtil;
@@ -62,6 +62,7 @@ import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.vulcan.util.JaxRsLinkUtil;
 import com.liferay.portal.vulcan.util.TransformUtil;
 import com.liferay.ratings.kernel.service.RatingsStatsLocalService;
+import com.liferay.subscription.service.SubscriptionLocalService;
 
 import java.text.ParseException;
 
@@ -148,6 +149,11 @@ public class StructuredContentDTOConverter implements DTOConverter {
 					dtoConverterContext.getLocale(),
 					dtoConverterContext.getUriInfoOptional());
 				siteId = journalArticle.getGroupId();
+				subscribed = _subscriptionLocalService.isSubscribed(
+					journalArticle.getCompanyId(),
+					dtoConverterContext.getUserId(),
+					JournalArticle.class.getName(),
+					journalArticle.getResourcePrimKey());
 				taxonomyCategories = TransformUtil.transformToArray(
 					_assetCategoryLocalService.getCategories(
 						JournalArticle.class.getName(),
@@ -181,7 +187,7 @@ public class StructuredContentDTOConverter implements DTOConverter {
 				inputControl = ContentStructureUtil.toInputControl(
 					ddmFormField);
 				name = ddmFormField.getName();
-				nestedFields = TransformUtil.transformToArray(
+				nestedContentFields = TransformUtil.transformToArray(
 					ddmFormFieldValue.getNestedDDMFormFieldValues(),
 					value -> _toContentField(
 						value, locale, dlAppService, dlURLHelper,
@@ -191,6 +197,13 @@ public class StructuredContentDTOConverter implements DTOConverter {
 				value = _toValue(
 					ddmFormFieldValue, dlAppService, dlURLHelper,
 					journalArticleService, layoutLocalService, locale);
+
+				setLabel(
+					() -> {
+						LocalizedValue localizedValue = ddmFormField.getLabel();
+
+						return localizedValue.getString(locale);
+					});
 			}
 		};
 	}
@@ -299,12 +312,10 @@ public class StructuredContentDTOConverter implements DTOConverter {
 				return new Value();
 			}
 
-			FileEntry fileEntry = dlAppService.getFileEntry(classPK);
-
 			return new Value() {
 				{
 					document = ContentDocumentUtil.toContentDocument(
-						dlURLHelper, fileEntry);
+						dlURLHelper, dlAppService.getFileEntry(classPK));
 				}
 			};
 		}
@@ -337,12 +348,10 @@ public class StructuredContentDTOConverter implements DTOConverter {
 				return new Value();
 			}
 
-			FileEntry fileEntry = dlAppService.getFileEntry(fileEntryId);
-
 			return new Value() {
 				{
 					image = ContentDocumentUtil.toContentDocument(
-						dlURLHelper, fileEntry);
+						dlURLHelper, dlAppService.getFileEntry(fileEntryId));
 
 					image.setDescription(jsonObject.getString("alt"));
 				}
@@ -446,6 +455,9 @@ public class StructuredContentDTOConverter implements DTOConverter {
 
 	@Reference
 	private RatingsStatsLocalService _ratingsStatsLocalService;
+
+	@Reference
+	private SubscriptionLocalService _subscriptionLocalService;
 
 	@Reference
 	private UserLocalService _userLocalService;

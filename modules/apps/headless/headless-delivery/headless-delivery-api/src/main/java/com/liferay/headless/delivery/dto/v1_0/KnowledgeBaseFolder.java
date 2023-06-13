@@ -22,9 +22,8 @@ import com.fasterxml.jackson.annotation.JsonValue;
 
 import com.liferay.petra.function.UnsafeSupplier;
 import com.liferay.petra.string.StringBundler;
-
-import graphql.annotations.annotationTypes.GraphQLField;
-import graphql.annotations.annotationTypes.GraphQLName;
+import com.liferay.portal.vulcan.graphql.annotation.GraphQLField;
+import com.liferay.portal.vulcan.graphql.annotation.GraphQLName;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 
@@ -39,6 +38,7 @@ import java.util.Set;
 
 import javax.annotation.Generated;
 
+import javax.validation.Valid;
 import javax.validation.constraints.NotEmpty;
 
 import javax.xml.bind.annotation.XmlRootElement;
@@ -54,6 +54,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement(name = "KnowledgeBaseFolder")
 public class KnowledgeBaseFolder {
 
+	@GraphQLName("ViewableBy")
 	public static enum ViewableBy {
 
 		ANYONE("Anyone"), MEMBERS("Members"), OWNER("Owner");
@@ -88,6 +89,7 @@ public class KnowledgeBaseFolder {
 	}
 
 	@Schema(description = "The folder's creator.")
+	@Valid
 	public Creator getCreator() {
 		return creator;
 	}
@@ -116,6 +118,7 @@ public class KnowledgeBaseFolder {
 	protected Creator creator;
 
 	@Schema
+	@Valid
 	public CustomField[] getCustomFields() {
 		return customFields;
 	}
@@ -351,6 +354,7 @@ public class KnowledgeBaseFolder {
 	@Schema(
 		description = "The folder's parent Knowledge Base folder, if it exists."
 	)
+	@Valid
 	public ParentKnowledgeBaseFolder getParentKnowledgeBaseFolder() {
 		return parentKnowledgeBaseFolder;
 	}
@@ -447,6 +451,7 @@ public class KnowledgeBaseFolder {
 	@Schema(
 		description = "A write-only property that specifies the folder's default permissions."
 	)
+	@Valid
 	public ViewableBy getViewableBy() {
 		return viewableBy;
 	}
@@ -677,6 +682,12 @@ public class KnowledgeBaseFolder {
 
 		return sb.toString();
 	}
+
+	@Schema(
+		defaultValue = "com.liferay.headless.delivery.dto.v1_0.KnowledgeBaseFolder",
+		name = "x-class-name"
+	)
+	public String xClassName;
 
 	private static String _escape(Object object) {
 		String string = String.valueOf(object);

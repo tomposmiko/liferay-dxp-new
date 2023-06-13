@@ -20,9 +20,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import com.liferay.petra.function.UnsafeSupplier;
 import com.liferay.petra.string.StringBundler;
-
-import graphql.annotations.annotationTypes.GraphQLField;
-import graphql.annotations.annotationTypes.GraphQLName;
+import com.liferay.portal.vulcan.graphql.annotation.GraphQLField;
+import com.liferay.portal.vulcan.graphql.annotation.GraphQLName;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 
@@ -32,6 +31,8 @@ import java.util.Objects;
 import java.util.Set;
 
 import javax.annotation.Generated;
+
+import javax.validation.Valid;
 
 import javax.xml.bind.annotation.XmlRootElement;
 
@@ -48,6 +49,7 @@ public class ContactInformation {
 	@Schema(
 		description = "A list of the user's email addresses, with one optionally marked as primary."
 	)
+	@Valid
 	public EmailAddress[] getEmailAddresses() {
 		return emailAddresses;
 	}
@@ -161,6 +163,7 @@ public class ContactInformation {
 	@Schema(
 		description = "A list of user's postal addresses, with one optionally marked as primary."
 	)
+	@Valid
 	public PostalAddress[] getPostalAddresses() {
 		return postalAddresses;
 	}
@@ -246,6 +249,7 @@ public class ContactInformation {
 	@Schema(
 		description = "A list of the user's phone numbers, with one optionally marked as primary."
 	)
+	@Valid
 	public Phone[] getTelephones() {
 		return telephones;
 	}
@@ -304,6 +308,7 @@ public class ContactInformation {
 	@Schema(
 		description = "A list of the user's web URLs, with one optionally marked as primary."
 	)
+	@Valid
 	public WebUrl[] getWebUrls() {
 		return webUrls;
 	}
@@ -522,6 +527,12 @@ public class ContactInformation {
 
 		return sb.toString();
 	}
+
+	@Schema(
+		defaultValue = "com.liferay.headless.admin.user.dto.v1_0.ContactInformation",
+		name = "x-class-name"
+	)
+	public String xClassName;
 
 	private static String _escape(Object object) {
 		String string = String.valueOf(object);

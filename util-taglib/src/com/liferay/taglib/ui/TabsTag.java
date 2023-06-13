@@ -17,7 +17,6 @@ package com.liferay.taglib.ui;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
-import com.liferay.portal.kernel.util.ServerDetector;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.taglib.util.IncludeTag;
@@ -25,6 +24,7 @@ import com.liferay.util.JS;
 
 import javax.portlet.PortletURL;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.jsp.JspException;
 
 /**
@@ -35,27 +35,30 @@ public class TabsTag extends IncludeTag {
 	@Override
 	public int doEndTag() throws JspException {
 		try {
-			request.setAttribute("liferay-ui:tabs:namesJS", _namesJS);
-			request.setAttribute("liferay-ui:tabs:param", _param);
-			request.setAttribute("liferay-ui:tabs:value", _value);
+			HttpServletRequest httpServletRequest = getRequest();
+
+			httpServletRequest.setAttribute(
+				"liferay-ui:tabs:namesJS", _namesJS);
+			httpServletRequest.setAttribute("liferay-ui:tabs:param", _param);
+			httpServletRequest.setAttribute("liferay-ui:tabs:value", _value);
 
 			include(getEndPage(), false);
 
-			request.removeAttribute("liferay-ui:tabs:backLabel");
-			request.removeAttribute("liferay-ui:tabs:backURL");
-			request.removeAttribute("liferay-ui:tabs:cssClass");
-			request.removeAttribute("liferay-ui:tabs:formName");
-			request.removeAttribute("liferay-ui:tabs:names");
-			request.removeAttribute("liferay-ui:tabs:namesJS");
-			request.removeAttribute("liferay-ui:tabs:onClick");
-			request.removeAttribute("liferay-ui:tabs:param");
-			request.removeAttribute("liferay-ui:tabs:portletURL");
-			request.removeAttribute("liferay-ui:tabs:refresh");
-			request.removeAttribute("liferay-ui:tabs:type");
-			request.removeAttribute("liferay-ui:tabs:url");
-			request.removeAttribute("liferay-ui:tabs:urls");
-			request.removeAttribute("liferay-ui:tabs:value");
-			request.removeAttribute("liferay-ui:tabs:values");
+			httpServletRequest.removeAttribute("liferay-ui:tabs:backLabel");
+			httpServletRequest.removeAttribute("liferay-ui:tabs:backURL");
+			httpServletRequest.removeAttribute("liferay-ui:tabs:cssClass");
+			httpServletRequest.removeAttribute("liferay-ui:tabs:formName");
+			httpServletRequest.removeAttribute("liferay-ui:tabs:names");
+			httpServletRequest.removeAttribute("liferay-ui:tabs:namesJS");
+			httpServletRequest.removeAttribute("liferay-ui:tabs:onClick");
+			httpServletRequest.removeAttribute("liferay-ui:tabs:param");
+			httpServletRequest.removeAttribute("liferay-ui:tabs:portletURL");
+			httpServletRequest.removeAttribute("liferay-ui:tabs:refresh");
+			httpServletRequest.removeAttribute("liferay-ui:tabs:type");
+			httpServletRequest.removeAttribute("liferay-ui:tabs:url");
+			httpServletRequest.removeAttribute("liferay-ui:tabs:urls");
+			httpServletRequest.removeAttribute("liferay-ui:tabs:value");
+			httpServletRequest.removeAttribute("liferay-ui:tabs:values");
 
 			return EVAL_PAGE;
 		}
@@ -63,67 +66,74 @@ public class TabsTag extends IncludeTag {
 			throw new JspException(e);
 		}
 		finally {
-			if (!ServerDetector.isResin()) {
-				_backLabel = null;
-				_backURL = null;
-				_cssClass = StringPool.BLANK;
-				_endPage = null;
-				_formName = StringPool.BLANK;
-				_names = null;
-				_namesJS = null;
-				_namesPos = 0;
-				_onClick = null;
-				_param = "tabs1";
-				_portletURL = null;
-				_refresh = true;
-				_startPage = null;
-				_tabsValues = null;
-				_type = null;
-				_url = null;
-				_url0 = null;
-				_url1 = null;
-				_url2 = null;
-				_url3 = null;
-				_url4 = null;
-				_url5 = null;
-				_url6 = null;
-				_url7 = null;
-				_url8 = null;
-				_url9 = null;
-				_urls = null;
-				_value = null;
-			}
+			_backLabel = null;
+			_backURL = null;
+			_cssClass = StringPool.BLANK;
+			_endPage = null;
+			_formName = StringPool.BLANK;
+			_names = null;
+			_namesJS = null;
+			_namesPos = 0;
+			_onClick = null;
+			_param = "tabs1";
+			_portletURL = null;
+			_refresh = true;
+			_startPage = null;
+			_tabsValues = null;
+			_type = null;
+			_url = null;
+			_url0 = null;
+			_url1 = null;
+			_url2 = null;
+			_url3 = null;
+			_url4 = null;
+			_url5 = null;
+			_url6 = null;
+			_url7 = null;
+			_url8 = null;
+			_url9 = null;
+			_urls = null;
+			_value = null;
 		}
 	}
 
 	@Override
 	public int doStartTag() throws JspException {
 		try {
-			request.setAttribute("liferay-ui:tabs:backLabel", _backLabel);
-			request.setAttribute("liferay-ui:tabs:backURL", _backURL);
-			request.setAttribute("liferay-ui:tabs:cssClass", _cssClass);
-			request.setAttribute("liferay-ui:tabs:formName", _formName);
-			request.setAttribute("liferay-ui:tabs:names", _names);
+			HttpServletRequest httpServletRequest = getRequest();
+
+			httpServletRequest.setAttribute(
+				"liferay-ui:tabs:backLabel", _backLabel);
+			httpServletRequest.setAttribute(
+				"liferay-ui:tabs:backURL", _backURL);
+			httpServletRequest.setAttribute(
+				"liferay-ui:tabs:cssClass", _cssClass);
+			httpServletRequest.setAttribute(
+				"liferay-ui:tabs:formName", _formName);
+			httpServletRequest.setAttribute("liferay-ui:tabs:names", _names);
 
 			_namesJS = JS.toScript(_names);
 
-			request.setAttribute("liferay-ui:tabs:namesJS", _namesJS);
+			httpServletRequest.setAttribute(
+				"liferay-ui:tabs:namesJS", _namesJS);
 
-			request.setAttribute(
+			httpServletRequest.setAttribute(
 				"liferay-ui:tabs:onClick", String.valueOf(_onClick));
-			request.setAttribute("liferay-ui:tabs:param", _param);
-			request.setAttribute("liferay-ui:tabs:portletURL", _portletURL);
-			request.setAttribute(
+			httpServletRequest.setAttribute("liferay-ui:tabs:param", _param);
+			httpServletRequest.setAttribute(
+				"liferay-ui:tabs:portletURL", _portletURL);
+			httpServletRequest.setAttribute(
 				"liferay-ui:tabs:refresh", String.valueOf(_refresh));
 
 			if ((_tabsValues == null) || (_tabsValues.length < _names.length)) {
 				_tabsValues = _names;
 			}
 
-			request.setAttribute("liferay-ui:tabs:values", _tabsValues);
+			httpServletRequest.setAttribute(
+				"liferay-ui:tabs:values", _tabsValues);
 
-			request.setAttribute("liferay-ui:tabs:type", _type);
-			request.setAttribute("liferay-ui:tabs:url", _url);
+			httpServletRequest.setAttribute("liferay-ui:tabs:type", _type);
+			httpServletRequest.setAttribute("liferay-ui:tabs:url", _url);
 
 			if ((_urls == null) &&
 				((_url0 != null) || (_url1 != null) || (_url2 != null) ||
@@ -174,13 +184,11 @@ public class TabsTag extends IncludeTag {
 				}
 			}
 
-			request.setAttribute("liferay-ui:tabs:urls", _urls);
+			httpServletRequest.setAttribute("liferay-ui:tabs:urls", _urls);
 
-			if (_value == null) {
-				if (_tabsValues.length > 0) {
-					_value = ParamUtil.getString(
-						request, _param, _tabsValues[0]);
-				}
+			if ((_value == null) && (_tabsValues.length > 0)) {
+				_value = ParamUtil.getString(
+					httpServletRequest, _param, _tabsValues[0]);
 			}
 
 			if (Validator.isNull(_value)) {
@@ -202,10 +210,11 @@ public class TabsTag extends IncludeTag {
 			}
 
 			if (_value == null) {
-				_value = ParamUtil.getString(request, _param, _tabsValues[0]);
+				_value = ParamUtil.getString(
+					httpServletRequest, _param, _tabsValues[0]);
 			}
 
-			request.setAttribute("liferay-ui:tabs:value", _value);
+			httpServletRequest.setAttribute("liferay-ui:tabs:value", _value);
 
 			include(getStartPage(), true);
 

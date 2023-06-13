@@ -33,7 +33,6 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
-import java.util.ResourceBundle;
 
 import javax.portlet.PortletURL;
 
@@ -69,9 +68,8 @@ public class LayoutScopesItemSelectorView
 
 	@Override
 	public String getTitle(Locale locale) {
-		ResourceBundle resourceBundle = _portal.getResourceBundle(locale);
-
-		return ResourceBundleUtil.getString(resourceBundle, "pages");
+		return ResourceBundleUtil.getString(
+			_portal.getResourceBundle(locale), "pages");
 	}
 
 	@Override
@@ -91,7 +89,7 @@ public class LayoutScopesItemSelectorView
 
 	@Override
 	public void renderHTML(
-			ServletRequest request, ServletResponse response,
+			ServletRequest servletRequest, ServletResponse servletResponse,
 			SiteItemSelectorCriterion siteItemSelectorCriterion,
 			PortletURL portletURL, String itemSelectedEventName, boolean search)
 		throws IOException, ServletException {
@@ -99,18 +97,18 @@ public class LayoutScopesItemSelectorView
 		LayoutScopesItemSelectorViewDisplayContext
 			layoutScopesItemSelectorViewDisplayContext =
 				new LayoutScopesItemSelectorViewDisplayContext(
-					(HttpServletRequest)request, _assetPublisherHelper,
+					(HttpServletRequest)servletRequest, _assetPublisherHelper,
 					siteItemSelectorCriterion, itemSelectedEventName,
 					portletURL);
 
-		request.setAttribute(
+		servletRequest.setAttribute(
 			AssetPublisherWebKeys.ITEM_SELECTOR_DISPLAY_CONTEXT,
 			layoutScopesItemSelectorViewDisplayContext);
 
 		RequestDispatcher requestDispatcher =
 			_servletContext.getRequestDispatcher("/view_sites.jsp");
 
-		requestDispatcher.include(request, response);
+		requestDispatcher.include(servletRequest, servletResponse);
 	}
 
 	private static final List<ItemSelectorReturnType>

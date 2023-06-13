@@ -50,12 +50,12 @@ public class SiteNavigationMenuExportImportPortletPreferencesProcessor
 
 	@Override
 	public List<Capability> getExportCapabilities() {
-		return ListUtil.toList(new Capability[] {_exportCapability});
+		return ListUtil.fromArray(_exportCapability);
 	}
 
 	@Override
 	public List<Capability> getImportCapabilities() {
-		return ListUtil.toList(new Capability[] {_importCapability});
+		return ListUtil.fromArray(_importCapability);
 	}
 
 	@Override
@@ -84,12 +84,11 @@ public class SiteNavigationMenuExportImportPortletPreferencesProcessor
 			if (siteNavigationMenu != null) {
 				String siteNavigationMenuUuid = siteNavigationMenu.getUuid();
 
-				long scopeGroupId = portletDataContext.getScopeGroupId();
-
 				SiteNavigationMenu siteNavigationMenuToExport =
 					_siteNavigationMenuLocalService.
 						fetchSiteNavigationMenuByUuidAndGroupId(
-							siteNavigationMenuUuid, scopeGroupId);
+							siteNavigationMenuUuid,
+							portletDataContext.getScopeGroupId());
 
 				if (siteNavigationMenuToExport != null) {
 					StagedModelDataHandlerUtil.exportReferenceStagedModel(

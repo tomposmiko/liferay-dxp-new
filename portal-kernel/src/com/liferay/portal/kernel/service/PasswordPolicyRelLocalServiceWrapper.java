@@ -14,8 +14,6 @@
 
 package com.liferay.portal.kernel.service;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 /**
  * Provides a wrapper for {@link PasswordPolicyRelLocalService}.
  *
@@ -23,7 +21,6 @@ import org.osgi.annotation.versioning.ProviderType;
  * @see PasswordPolicyRelLocalService
  * @generated
  */
-@ProviderType
 public class PasswordPolicyRelLocalServiceWrapper
 	implements PasswordPolicyRelLocalService,
 			   ServiceWrapper<PasswordPolicyRelLocalService> {
@@ -34,10 +31,15 @@ public class PasswordPolicyRelLocalServiceWrapper
 		_passwordPolicyRelLocalService = passwordPolicyRelLocalService;
 	}
 
+	/**
+	 * NOTE FOR DEVELOPERS:
+	 *
+	 * Never modify or reference this interface directly. Always use {@link PasswordPolicyRelLocalServiceUtil} to access the password policy rel local service. Add custom service methods to <code>com.liferay.portal.service.impl.PasswordPolicyRelLocalServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
+	 */
 	@Override
 	public com.liferay.portal.kernel.model.PasswordPolicyRel
 		addPasswordPolicyRel(
-			long passwordPolicyId, String className, long classPK) {
+			long passwordPolicyId, java.lang.String className, long classPK) {
 
 		return _passwordPolicyRelLocalService.addPasswordPolicyRel(
 			passwordPolicyId, className, classPK);
@@ -61,7 +63,7 @@ public class PasswordPolicyRelLocalServiceWrapper
 
 	@Override
 	public void addPasswordPolicyRels(
-		long passwordPolicyId, String className, long[] classPKs) {
+		long passwordPolicyId, java.lang.String className, long[] classPKs) {
 
 		_passwordPolicyRelLocalService.addPasswordPolicyRels(
 			passwordPolicyId, className, classPKs);
@@ -99,7 +101,7 @@ public class PasswordPolicyRelLocalServiceWrapper
 
 	@Override
 	public void deletePasswordPolicyRel(
-		long passwordPolicyId, String className, long classPK) {
+		long passwordPolicyId, java.lang.String className, long classPK) {
 
 		_passwordPolicyRelLocalService.deletePasswordPolicyRel(
 			passwordPolicyId, className, classPK);
@@ -122,7 +124,9 @@ public class PasswordPolicyRelLocalServiceWrapper
 	}
 
 	@Override
-	public void deletePasswordPolicyRel(String className, long classPK) {
+	public void deletePasswordPolicyRel(
+		java.lang.String className, long classPK) {
+
 		_passwordPolicyRelLocalService.deletePasswordPolicyRel(
 			className, classPK);
 	}
@@ -135,7 +139,7 @@ public class PasswordPolicyRelLocalServiceWrapper
 
 	@Override
 	public void deletePasswordPolicyRels(
-		long passwordPolicyId, String className, long[] classPKs) {
+		long passwordPolicyId, java.lang.String className, long[] classPKs) {
 
 		_passwordPolicyRelLocalService.deletePasswordPolicyRels(
 			passwordPolicyId, className, classPKs);
@@ -175,7 +179,7 @@ public class PasswordPolicyRelLocalServiceWrapper
 	 * Performs a dynamic query on the database and returns a range of the matching rows.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>com.liferay.portal.model.impl.PasswordPolicyRelModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>com.liferay.portal.model.impl.PasswordPolicyRelModelImpl</code>.
 	 * </p>
 	 *
 	 * @param dynamicQuery the dynamic query
@@ -196,7 +200,7 @@ public class PasswordPolicyRelLocalServiceWrapper
 	 * Performs a dynamic query on the database and returns an ordered range of the matching rows.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>com.liferay.portal.model.impl.PasswordPolicyRelModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>com.liferay.portal.model.impl.PasswordPolicyRelModelImpl</code>.
 	 * </p>
 	 *
 	 * @param dynamicQuery the dynamic query
@@ -254,7 +258,7 @@ public class PasswordPolicyRelLocalServiceWrapper
 
 	@Override
 	public com.liferay.portal.kernel.model.PasswordPolicyRel
-		fetchPasswordPolicyRel(String className, long classPK) {
+		fetchPasswordPolicyRel(java.lang.String className, long classPK) {
 
 		return _passwordPolicyRelLocalService.fetchPasswordPolicyRel(
 			className, classPK);
@@ -281,7 +285,7 @@ public class PasswordPolicyRelLocalServiceWrapper
 	 * @return the OSGi service identifier
 	 */
 	@Override
-	public String getOSGiServiceIdentifier() {
+	public java.lang.String getOSGiServiceIdentifier() {
 		return _passwordPolicyRelLocalService.getOSGiServiceIdentifier();
 	}
 
@@ -304,7 +308,7 @@ public class PasswordPolicyRelLocalServiceWrapper
 	@Override
 	public com.liferay.portal.kernel.model.PasswordPolicyRel
 			getPasswordPolicyRel(
-				long passwordPolicyId, String className, long classPK)
+				long passwordPolicyId, java.lang.String className, long classPK)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _passwordPolicyRelLocalService.getPasswordPolicyRel(
@@ -313,7 +317,7 @@ public class PasswordPolicyRelLocalServiceWrapper
 
 	@Override
 	public com.liferay.portal.kernel.model.PasswordPolicyRel
-			getPasswordPolicyRel(String className, long classPK)
+			getPasswordPolicyRel(java.lang.String className, long classPK)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _passwordPolicyRelLocalService.getPasswordPolicyRel(
@@ -324,7 +328,7 @@ public class PasswordPolicyRelLocalServiceWrapper
 	 * Returns a range of all the password policy rels.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>com.liferay.portal.model.impl.PasswordPolicyRelModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>com.liferay.portal.model.impl.PasswordPolicyRelModelImpl</code>.
 	 * </p>
 	 *
 	 * @param start the lower bound of the range of password policy rels
@@ -358,7 +362,7 @@ public class PasswordPolicyRelLocalServiceWrapper
 
 	@Override
 	public boolean hasPasswordPolicyRel(
-		long passwordPolicyId, String className, long classPK) {
+		long passwordPolicyId, java.lang.String className, long classPK) {
 
 		return _passwordPolicyRelLocalService.hasPasswordPolicyRel(
 			passwordPolicyId, className, classPK);

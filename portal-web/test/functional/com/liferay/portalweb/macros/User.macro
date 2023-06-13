@@ -37,12 +37,24 @@ definition {
 	}
 
 	macro acceptEndUserLicenseAgreement {
-		if (IsElementPresent(locator1 = "Button#I_AGREE", value1 = "I Agree")) {
+		if (IsElementPresent(locator1 = "Button#I_AGREE")) {
 			AssertClick(
 				locator1 = "Button#I_AGREE",
 				value1 = "I Agree");
 
 			AssertElementNotPresent(locator1 = "Button#I_AGREE");
+		}
+	}
+
+	macro acceptEndUserLicenseAgreementLocalized {
+		var key_localizedAgree = "${localizedAgree}";
+
+		if (IsElementPresent(locator1 = "Button#I_AGREE_LOCALIZED")) {
+			AssertClick(
+				locator1 = "Button#I_AGREE_LOCALIZED",
+				value1 = "${localizedAgree}");
+
+			AssertElementNotPresent(locator1 = "Button#I_AGREE_LOCALIZED");
 		}
 	}
 
@@ -76,6 +88,8 @@ definition {
 	macro addAddressViaMyAccount {
 		Click(locator1 = "NavBar#ADDRESSES");
 
+		Click(locator1 = "Button#ADD_ADDRESS");
+
 		Type(
 			locator1 = "TextInput#STREET_1",
 			value1 = "${userAddressStreet1}");
@@ -108,7 +122,7 @@ definition {
 			locator1 = "TextInput#CITY",
 			value1 = "${userAddressCity}");
 
-		Click(locator1 = "Radio#PRIMARY");
+		Check(locator1 = "Checkbox#MAKE_PRIMARY");
 
 		Check(locator1 = "Checkbox#MAILING");
 
@@ -675,14 +689,28 @@ definition {
 	macro answerPasswordReminder {
 		Pause(locator1 = "3000");
 
-		if (IsElementPresent.pauseIsElementPresent(locator1 = "TextInput#ANSWER")) {
+		if (IsElementPresent.pauseIsElementPresent(locator1 = "TextInput#REMINDER_QUERY")) {
 			Type(
-				locator1 = "TextInput#ANSWER",
+				locator1 = "TextInput#REMINDER_QUERY",
 				value1 = "test");
 
-			Button.clickSave();
+			Click(locator1 = "Button#SUBMIT");
+		}
+	}
 
-			AssertElementNotPresent(locator1 = "Button#SAVE");
+	macro answerPasswordReminderLocalized {
+		Pause(locator1 = "3000");
+
+		var key_localizedAnswer = "${localizedAnswer}";
+
+		if (IsElementPresent.pauseIsElementPresent(locator1 = "TextInput#ANSWER_LOCALIZED")) {
+			Type(
+				locator1 = "TextInput#ANSWER_LOCALIZED",
+				value1 = "test");
+
+			Button.click(button = "${localizedSaveButton}");
+
+			Button.viewNotPresent(button = "${localizedSaveButton}");
 		}
 	}
 
@@ -1084,12 +1112,67 @@ definition {
 		}
 	}
 
+	macro deletePersonalDataCP {
+		Search.searchCP(searchTerm = "${userFirstName}");
+
+		LexiconEntry.gotoEntryMenuItemNoError(
+			menuItem = "Delete Personal Data",
+			rowEntry = "${userFirstName}");
+
+		AssertConfirm(value1 = "The user must be deactivated before starting the data erasure process. Are you sure you want to deactivate the user?");
+
+		Alert.viewSuccessMessage();
+
+		AssertElementPresent(
+			key_firstName = "${userFirstName}",
+			key_lastName = "${userLastName}",
+			locator1 = "DataErasure#HEADER");
+	}
+
 	macro deleteProfileImage {
 		Button.click(button = "Delete");
 
 		AssertVisible(
 			key_imageName = "user_portrait",
 			locator1 = "UsersAndOrganizationsEditUser#DETAILS_PROFILE_IMAGE");
+	}
+
+	macro editAddressCP {
+		UserNavigator.gotoContact();
+
+		LexiconEntry.gotoEllipsisMenuItem(menuItem = "Edit");
+
+		if (isSet(addressType)) {
+			Select(
+				locator1 = "Select#TYPE",
+				value1 = "${addressType}");
+		}
+
+		if (isSet(street1)) {
+			Type(
+				locator1 = "TextInput#STREET_1",
+				value1 = "${street1}");
+		}
+
+		if (isSet(city)) {
+			Type(
+				locator1 = "TextInput#CITY",
+				value1 = "${city}");
+		}
+
+		if (isSet(country)) {
+			Select(
+				locator1 = "Select#COUNTRY",
+				value1 = "${country}");
+		}
+
+		if (isSet(postalCode)) {
+			Type(
+				locator1 = "TextInput#POSTAL_CODE",
+				value1 = "${postalCode}");
+		}
+
+		PortletEntry.save();
 	}
 
 	macro editDetailsViaMyAccount {
@@ -1166,6 +1249,12 @@ definition {
 		Type(
 			locator1 = "UsersAndOrganizationsEditUser#PASSWORD_ENTER_AGAIN_FIELD",
 			value1 = "${newPassword}");
+
+		if ("${requirePasswordReset}" == "true") {
+			Check(
+				checkboxName = "Require Password Reset",
+				locator1 = "Checkbox#ANY_CHECKBOX");
+		}
 
 		PortletEntry.save();
 
@@ -1441,16 +1530,21 @@ definition {
 		PortletEntry.save();
 	}
 
+	macro exportPersonalDataCP {
+		Search.searchCP(searchTerm = "${userFirstName}");
+
+		LexiconEntry.gotoEntryMenuItemNoError(
+			menuItem = "Export Personal Data",
+			rowEntry = "${userFirstName}");
+
+		AssertElementPresent(
+			key_firstName = "${userFirstName}",
+			key_lastName = "${userLastName}",
+			locator1 = "ExportPersonalData#HEADER");
+	}
+
 	@summary = "Log into Liferay Portal as '${userEmailAddress}' using the password '${password}'; if not logged in as '${userEmailAddress}', then log out first"
 	macro firstLoginPG {
-		echo("Checking to see if TCat is enabled...");
-
-		var tcatEnabled = selenium.isTCatEnabled();
-
-		if ("${tcatEnabled}" == "true") {
-			TCat.deployLiferayPortalWar();
-		}
-
 		if (isSet(virtualHostsURL)) {
 			Navigator.openSpecificURL(url = "${virtualHostsURL}");
 		}
@@ -1466,6 +1560,9 @@ definition {
 		else {
 			User.loginPG(
 				localization = "${localization}",
+				localizedAgree = "${localizedAgree}",
+				localizedAnswer = "${localizedAnswer}",
+				localizedSaveButton = "${localizedSaveButton}",
 				samlEnabled = "${samlEnabled}",
 				setupWizardEnabled = "${setupWizardEnabled}",
 				specificURL = "${virtualHostsURL}",
@@ -1545,7 +1642,7 @@ definition {
 			Alert.closePortalLocalizationWarning();
 		}
 
-		if (!("${samlEnabled}" == "true")) {
+		if ("${samlEnabled}" != "true") {
 			User.loginLocalizationPG(localization = "${localization}");
 		}
 
@@ -1577,8 +1674,6 @@ definition {
 			Check(locator1 = "Checkbox#REMEMBER_ME");
 		}
 
-		takeScreenshot();
-
 		if (isSet(localization)) {
 			var localizedSignIn = User._signInLocalization(localization = "${localization}");
 
@@ -1588,7 +1683,7 @@ definition {
 			Button.click(button = "Sign In");
 		}
 
-		if (IsElementPresent(locator1 = "Message#ERROR_FORM_FIELD_REQUIRED")) {
+		if (IsElementPresent(locator1 = "Message#ERROR_FORM_FIELD_REQUIRED") && (IsElementNotPresent(locator1 = "TextInput#ENTER_AGAIN"))) {
 			echo("Sign in failed due to empty required field. Retrying...");
 
 			if ((isSet(authenticationMethod)) && ("${authenticationMethod}" == "By Screen Name")) {
@@ -1611,14 +1706,26 @@ definition {
 
 		Button.viewNotPresent(button = "Sign In");
 
-		User.acceptEndUserLicenseAgreement();
+		if (isSet(localizedAgree)) {
+			User.acceptEndUserLicenseAgreementLocalized(localizedAgree = "${localizedAgree}");
+		}
+		else {
+			User.acceptEndUserLicenseAgreement();
+		}
 
 		User.resetPassword(
 			resetPassword = "${resetPassword}",
 			setupWizardEnabled = "${setupWizardEnabled}",
 			syntaxCheckingEnabled = "${syntaxCheckingEnabled}");
 
-		User.answerPasswordReminder();
+		if (isSet(localizedAnswer)) {
+			User.answerPasswordReminderLocalized(
+				localizedAnswer = "${localizedAnswer}",
+				localizedSaveButton = "${localizedSaveButton}");
+		}
+		else {
+			User.answerPasswordReminder();
+		}
 
 		AssertElementPresent(locator1 = "UserBar#USER_AVATAR_IMAGE");
 	}
@@ -1636,8 +1743,8 @@ definition {
 			var maxLoginAttempts = "0";
 		}
 
-		while (!("${count}" == "${loginAttempts}")) {
-			var count = MathUtil.sum("${count}", "1");
+		while ("${count}" != "${loginAttempts}") {
+			var count = ${count} + 1;
 
 			User._login(
 				password = "${password}",
@@ -1697,8 +1804,6 @@ definition {
 		AssertClick(
 			locator1 = "UserBar#USER_SIGN_IN",
 			value1 = "Sign In");
-
-		AssertElementPresent(locator1 = "Icon#FACEBOOK");
 
 		AssertClick(
 			locator1 = "Link#FACEBOOK",
@@ -1922,35 +2027,35 @@ definition {
 		if (IsElementPresent.pauseIsElementPresent(locator1 = "TextInput#PASSWORD")) {
 			if ((isSet(syntaxCheckingEnabled)) && ("${syntaxCheckingEnabled}" == "true")) {
 				Type(
-					locator1 = "TextInput#PASSWORD",
+					locator1 = "TextInput#PASSWORD_1",
 					value1 = "${resetPassword}");
 
 				Type(
-					locator1 = "TextInput#ENTER_AGAIN",
+					locator1 = "TextInput#PASSWORD_2",
 					value1 = "${resetPassword}");
 			}
 			else {
 				if ((isSet(setupWizardEnabled)) && ("${setupWizardEnabled}" == "true")) {
 					Type(
-						locator1 = "TextInput#PASSWORD",
+						locator1 = "TextInput#PASSWORD_1",
 						value1 = "test2");
 
 					Type(
-						locator1 = "TextInput#ENTER_AGAIN",
+						locator1 = "TextInput#PASSWORD_2",
 						value1 = "test2");
 				}
 				else {
 					Type(
-						locator1 = "TextInput#PASSWORD",
+						locator1 = "TextInput#PASSWORD_1",
 						value1 = "test");
 
 					Type(
-						locator1 = "TextInput#ENTER_AGAIN",
+						locator1 = "TextInput#PASSWORD_2",
 						value1 = "test");
 				}
 			}
 
-			Button.clickSave();
+			Button.clickSubmitButton();
 
 			AssertElementNotPresent(locator1 = "TextInput#ENTER_AGAIN");
 		}
@@ -1975,7 +2080,7 @@ definition {
 
 		Button.clickSave();
 
-		if (!("${newPassword1}" == "${newPassword2}")) {
+		if ("${newPassword1}" != "${newPassword2}") {
 			AssertTextEquals.assertPartialText(
 				locator1 = "TextInput#ALERT",
 				value1 = "Please enter the same value again.");
@@ -2201,6 +2306,12 @@ definition {
 		AssertTextEquals.assertPartialText(
 			locator1 = "UsersAndOrganizations#USER_ADDRESS_TABLE",
 			value1 = "${street1}");
+
+		if (isSet(addressType)) {
+			AssertTextEquals.assertPartialText(
+				locator1 = "UsersAndOrganizations#USER_ADDRESS_TABLE_ADDRESS_TYPE",
+				value1 = "${addressType}");
+		}
 	}
 
 	macro viewCaptchaPG {
@@ -2226,6 +2337,12 @@ definition {
 					value1 = "${number}");
 			}
 
+			if (isSet(numberType)) {
+				AssertTextEquals.assertPartialText(
+					locator1 = "UsersAndOrganizations#USER_CONTACT_INFORMATION_TYPE_TABLE",
+					value1 = "${numberType}");
+			}
+
 			if (isSet(extension)) {
 				AssertTextEquals.assertPartialText(
 					locator1 = "UsersAndOrganizations#USER_CONTACT_INFORMATION_EXTENSION_TABLE",
@@ -2240,12 +2357,30 @@ definition {
 					value1 = "${address}");
 			}
 
+			if (isSet(addressCount)) {
+				var i = "0";
+
+				while ("${i}" != "${addressCount}") {
+					var i = ${i} + 1;
+
+					AssertTextEquals.assertPartialText(
+						locator1 = "UsersAndOrganizations#USER_CONTACT_INFORMATION_CONTAINER_TABLE",
+						value1 = "${addressPrefix}${i}@liferay.com");
+				}
+			}
+
 			// Websites
 
 			if (isSet(url)) {
 				AssertTextEquals.assertPartialText(
 					locator1 = "UsersAndOrganizations#USER_CONTACT_INFORMATION_EMAIL_ADDRESS_TABLE",
 					value1 = "${url}");
+			}
+
+			if (isSet(websiteType)) {
+				AssertTextEquals.assertPartialText(
+					locator1 = "UsersAndOrganizations#USER_CONTACT_INFORMATION_TYPE_TABLE",
+					value1 = "${websiteType}");
 			}
 		}
 
@@ -2318,6 +2453,18 @@ definition {
 			AssertTextEquals(
 				locator1 = "UsersAndOrganizationsEditUser#DETAILS_LAST_NAME_FIELD",
 				value1 = "${userLastName}");
+
+			if (isSet(userBirthday)) {
+				AssertTextEquals(
+					locator1 = "UsersAndOrganizationsEditUser#DETAILS_BIRTHDAY_FIELD",
+					value1 = "${userBirthday}");
+			}
+
+			if (isSet(userJobTitle)) {
+				AssertTextEquals(
+					locator1 = "UsersAndOrganizationsEditUser#DETAILS_JOB_TITLE_FIELD",
+					value1 = "${userJobTitle}");
+			}
 		}
 	}
 

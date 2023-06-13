@@ -39,13 +39,15 @@ public class DocumentSourceFileNameExceptionMapper
 	implements ExceptionMapper<SourceFileNameException> {
 
 	@Override
-	public Response toResponse(SourceFileNameException sfne) {
+	public Response toResponse(
+		SourceFileNameException sourceFileNameException) {
+
 		return Response.status(
 			400
+		).entity(
+			sourceFileNameException.getMessage()
 		).type(
 			MediaType.TEXT_PLAIN
-		).entity(
-			sfne.getMessage()
 		).build();
 	}
 

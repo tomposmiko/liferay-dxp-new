@@ -17,10 +17,10 @@ package com.liferay.site.memberships.service.persistence.test;
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.Role;
-import com.liferay.portal.kernel.model.RoleConstants;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.model.UserGroup;
 import com.liferay.portal.kernel.model.UserGroupGroupRole;
+import com.liferay.portal.kernel.model.role.RoleConstants;
 import com.liferay.portal.kernel.service.UserGroupGroupRoleLocalService;
 import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.service.persistence.UserGroupGroupRoleFinder;
@@ -58,6 +58,7 @@ public class UserGroupGroupRoleFinderTest {
 	public void testFindByUserGroupsUsers() throws Exception {
 		_group = GroupTestUtil.addGroup();
 		_role = RoleTestUtil.addRole(RoleConstants.TYPE_SITE);
+
 		_user = UserTestUtil.addUser();
 		_userGroup = UserGroupTestUtil.addUserGroup();
 

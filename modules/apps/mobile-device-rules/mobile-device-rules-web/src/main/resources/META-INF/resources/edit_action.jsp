@@ -103,30 +103,32 @@ MDRRuleGroupInstance ruleGroupInstance = (MDRRuleGroupInstance)renderRequest.get
 		var actionPlid = Liferay.Util.getFormElement(form, 'actionPlid');
 
 		if (actionGroupId && actionPlid) {
-			formData.append('<portlet:namespace />actionGroupId', actionGroupId.value);
+			formData.append(
+				'<portlet:namespace />actionGroupId',
+				actionGroupId.value
+			);
 			formData.append('<portlet:namespace />actionPlid', actionPlid.value);
 		}
 
-		fetch(
+		Liferay.Util.fetch(
 			'<%= HtmlUtil.escapeJS(siteURLLayoutsURL.toString()) %>',
 			{
 				body: formData,
-				credentials: 'include',
 				method: 'POST'
 			}
-		).then(
-			function(response) {
+		)
+			.then(function(response) {
 				return response.text();
-			}
-		).then(
-			function(response) {
-				var layouts = document.getElementById('<portlet:namespace />layouts');
+			})
+			.then(function(response) {
+				var layouts = document.getElementById(
+					'<portlet:namespace />layouts'
+				);
 
 				if (layouts) {
 					layouts.innerHTML = response;
 				}
-			}
-		);
+			});
 	}
 
 	function <portlet:namespace />changeType() {
@@ -146,25 +148,21 @@ MDRRuleGroupInstance ruleGroupInstance = (MDRRuleGroupInstance)renderRequest.get
 
 		formData.append('<portlet:namespace /><%= actionId %>', '<%= actionId %>');
 
-		fetch(
-			'<%= HtmlUtil.escapeJS(editorURL.toString()) %>',
-			{
-				credentials: 'include',
-				data: formData,
-				method: 'POST'
-			}
-		).then(
-			function(response) {
+		Liferay.Util.fetch('<%= HtmlUtil.escapeJS(editorURL.toString()) %>', {
+			data: formData,
+			method: 'POST'
+		})
+			.then(function(response) {
 				return response.text();
-			}
-		).then(
-			function(response) {
-				var typeSettings = document.getElementById('<portlet:namespace />typeSettings');
+			})
+			.then(function(response) {
+				var typeSettings = document.getElementById(
+					'<portlet:namespace />typeSettings'
+				);
 
 				if (typeSettings) {
 					typeSettings.innerHTML = response;
 				}
-			}
-		);
+			});
 	}
 </aui:script>

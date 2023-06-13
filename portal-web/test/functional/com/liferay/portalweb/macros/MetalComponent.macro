@@ -36,11 +36,17 @@ else {
 		''';
 		var metalComponentReady = "";
 
-		while (!("${metalComponentReady}" == "ready") && (maxIterations = "30")) {
+		while ("${metalComponentReady}" != "ready" && (maxIterations = "30")) {
 			var metalComponentReady = selenium.getEval("${javaScript}");
 
 			Pause(locator1 = "1000");
 		}
+	}
+
+	macro waitForReportsManagementBar {
+		AssertVisible(locator1 = "//div[contains(@class,'management-bar')]");
+
+		MetalComponent.waitForMetalComponent(id = '''document.querySelector("div.management-bar").parentNode.id''');
 	}
 
 }

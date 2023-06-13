@@ -20,6 +20,9 @@ import com.liferay.headless.admin.user.client.pagination.Page;
 import com.liferay.headless.admin.user.client.pagination.Pagination;
 import com.liferay.headless.admin.user.client.serdes.v1_0.OrganizationSerDes;
 
+import java.util.LinkedHashMap;
+import java.util.Locale;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -30,165 +33,331 @@ import javax.annotation.Generated;
  * @generated
  */
 @Generated("")
-public class OrganizationResource {
+public interface OrganizationResource {
 
-	public static Page<Organization> getOrganizationsPage(
-			String search, String filterString, Pagination pagination,
-			String sortString)
-		throws Exception {
-
-		HttpInvoker.HttpResponse httpResponse =
-			getOrganizationsPageHttpResponse(
-				search, filterString, pagination, sortString);
-
-		String content = httpResponse.getContent();
-
-		_logger.fine("HTTP response content: " + content);
-
-		_logger.fine("HTTP response message: " + httpResponse.getMessage());
-		_logger.fine(
-			"HTTP response status code: " + httpResponse.getStatusCode());
-
-		return Page.of(content, OrganizationSerDes::toDTO);
+	public static Builder builder() {
+		return new Builder();
 	}
 
-	public static HttpInvoker.HttpResponse getOrganizationsPageHttpResponse(
-			String search, String filterString, Pagination pagination,
-			String sortString)
-		throws Exception {
-
-		HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
-
-		httpInvoker.httpMethod(HttpInvoker.HttpMethod.GET);
-
-		if (search != null) {
-			httpInvoker.parameter("search", String.valueOf(search));
-		}
-
-		if (filterString != null) {
-			httpInvoker.parameter("filter", filterString);
-		}
-
-		if (pagination != null) {
-			httpInvoker.parameter("page", String.valueOf(pagination.getPage()));
-			httpInvoker.parameter(
-				"pageSize", String.valueOf(pagination.getPageSize()));
-		}
-
-		if (sortString != null) {
-			httpInvoker.parameter("sort", sortString);
-		}
-
-		httpInvoker.path(
-			"http://localhost:8080/o/headless-admin-user/v1.0/organizations");
-
-		httpInvoker.userNameAndPassword("test@liferay.com:test");
-
-		return httpInvoker.invoke();
-	}
-
-	public static Organization getOrganization(Long organizationId)
-		throws Exception {
-
-		HttpInvoker.HttpResponse httpResponse = getOrganizationHttpResponse(
-			organizationId);
-
-		String content = httpResponse.getContent();
-
-		_logger.fine("HTTP response content: " + content);
-
-		_logger.fine("HTTP response message: " + httpResponse.getMessage());
-		_logger.fine(
-			"HTTP response status code: " + httpResponse.getStatusCode());
-
-		try {
-			return OrganizationSerDes.toDTO(content);
-		}
-		catch (Exception e) {
-			_logger.log(
-				Level.WARNING, "Unable to process HTTP response: " + content,
-				e);
-
-			throw e;
-		}
-	}
-
-	public static HttpInvoker.HttpResponse getOrganizationHttpResponse(
-			Long organizationId)
-		throws Exception {
-
-		HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
-
-		httpInvoker.httpMethod(HttpInvoker.HttpMethod.GET);
-
-		httpInvoker.path(
-			"http://localhost:8080/o/headless-admin-user/v1.0/organizations/{organizationId}",
-			organizationId);
-
-		httpInvoker.userNameAndPassword("test@liferay.com:test");
-
-		return httpInvoker.invoke();
-	}
-
-	public static Page<Organization> getOrganizationOrganizationsPage(
-			Long parentOrganizationId, String search, String filterString,
+	public Page<Organization> getOrganizationsPage(
+			Boolean flatten, String search, String filterString,
 			Pagination pagination, String sortString)
-		throws Exception {
+		throws Exception;
 
-		HttpInvoker.HttpResponse httpResponse =
+	public HttpInvoker.HttpResponse getOrganizationsPageHttpResponse(
+			Boolean flatten, String search, String filterString,
+			Pagination pagination, String sortString)
+		throws Exception;
+
+	public Organization getOrganization(Long organizationId) throws Exception;
+
+	public HttpInvoker.HttpResponse getOrganizationHttpResponse(
+			Long organizationId)
+		throws Exception;
+
+	public Page<Organization> getOrganizationOrganizationsPage(
+			Long parentOrganizationId, Boolean flatten, String search,
+			String filterString, Pagination pagination, String sortString)
+		throws Exception;
+
+	public HttpInvoker.HttpResponse
 			getOrganizationOrganizationsPageHttpResponse(
-				parentOrganizationId, search, filterString, pagination,
-				sortString);
+				Long parentOrganizationId, Boolean flatten, String search,
+				String filterString, Pagination pagination, String sortString)
+		throws Exception;
 
-		String content = httpResponse.getContent();
+	public static class Builder {
 
-		_logger.fine("HTTP response content: " + content);
+		public Builder authentication(String login, String password) {
+			_login = login;
+			_password = password;
 
-		_logger.fine("HTTP response message: " + httpResponse.getMessage());
-		_logger.fine(
-			"HTTP response status code: " + httpResponse.getStatusCode());
+			return this;
+		}
 
-		return Page.of(content, OrganizationSerDes::toDTO);
+		public OrganizationResource build() {
+			return new OrganizationResourceImpl(this);
+		}
+
+		public Builder endpoint(String host, int port, String scheme) {
+			_host = host;
+			_port = port;
+			_scheme = scheme;
+
+			return this;
+		}
+
+		public Builder header(String key, String value) {
+			_headers.put(key, value);
+
+			return this;
+		}
+
+		public Builder locale(Locale locale) {
+			_locale = locale;
+
+			return this;
+		}
+
+		public Builder parameter(String key, String value) {
+			_parameters.put(key, value);
+
+			return this;
+		}
+
+		private Builder() {
+		}
+
+		private Map<String, String> _headers = new LinkedHashMap<>();
+		private String _host = "localhost";
+		private Locale _locale;
+		private String _login = "test@liferay.com";
+		private String _password = "test";
+		private Map<String, String> _parameters = new LinkedHashMap<>();
+		private int _port = 8080;
+		private String _scheme = "http";
+
 	}
 
-	public static HttpInvoker.HttpResponse
-			getOrganizationOrganizationsPageHttpResponse(
-				Long parentOrganizationId, String search, String filterString,
+	public static class OrganizationResourceImpl
+		implements OrganizationResource {
+
+		public Page<Organization> getOrganizationsPage(
+				Boolean flatten, String search, String filterString,
 				Pagination pagination, String sortString)
-		throws Exception {
+			throws Exception {
 
-		HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
+			HttpInvoker.HttpResponse httpResponse =
+				getOrganizationsPageHttpResponse(
+					flatten, search, filterString, pagination, sortString);
 
-		httpInvoker.httpMethod(HttpInvoker.HttpMethod.GET);
+			String content = httpResponse.getContent();
 
-		if (search != null) {
-			httpInvoker.parameter("search", String.valueOf(search));
+			_logger.fine("HTTP response content: " + content);
+
+			_logger.fine("HTTP response message: " + httpResponse.getMessage());
+			_logger.fine(
+				"HTTP response status code: " + httpResponse.getStatusCode());
+
+			return Page.of(content, OrganizationSerDes::toDTO);
 		}
 
-		if (filterString != null) {
-			httpInvoker.parameter("filter", filterString);
+		public HttpInvoker.HttpResponse getOrganizationsPageHttpResponse(
+				Boolean flatten, String search, String filterString,
+				Pagination pagination, String sortString)
+			throws Exception {
+
+			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
+
+			if (_builder._locale != null) {
+				httpInvoker.header(
+					"Accept-Language", _builder._locale.toLanguageTag());
+			}
+
+			for (Map.Entry<String, String> entry :
+					_builder._headers.entrySet()) {
+
+				httpInvoker.header(entry.getKey(), entry.getValue());
+			}
+
+			for (Map.Entry<String, String> entry :
+					_builder._parameters.entrySet()) {
+
+				httpInvoker.parameter(entry.getKey(), entry.getValue());
+			}
+
+			httpInvoker.httpMethod(HttpInvoker.HttpMethod.GET);
+
+			if (flatten != null) {
+				httpInvoker.parameter("flatten", String.valueOf(flatten));
+			}
+
+			if (search != null) {
+				httpInvoker.parameter("search", String.valueOf(search));
+			}
+
+			if (filterString != null) {
+				httpInvoker.parameter("filter", filterString);
+			}
+
+			if (pagination != null) {
+				httpInvoker.parameter(
+					"page", String.valueOf(pagination.getPage()));
+				httpInvoker.parameter(
+					"pageSize", String.valueOf(pagination.getPageSize()));
+			}
+
+			if (sortString != null) {
+				httpInvoker.parameter("sort", sortString);
+			}
+
+			httpInvoker.path(
+				_builder._scheme + "://" + _builder._host + ":" +
+					_builder._port +
+						"/o/headless-admin-user/v1.0/organizations");
+
+			httpInvoker.userNameAndPassword(
+				_builder._login + ":" + _builder._password);
+
+			return httpInvoker.invoke();
 		}
 
-		if (pagination != null) {
-			httpInvoker.parameter("page", String.valueOf(pagination.getPage()));
-			httpInvoker.parameter(
-				"pageSize", String.valueOf(pagination.getPageSize()));
+		public Organization getOrganization(Long organizationId)
+			throws Exception {
+
+			HttpInvoker.HttpResponse httpResponse = getOrganizationHttpResponse(
+				organizationId);
+
+			String content = httpResponse.getContent();
+
+			_logger.fine("HTTP response content: " + content);
+
+			_logger.fine("HTTP response message: " + httpResponse.getMessage());
+			_logger.fine(
+				"HTTP response status code: " + httpResponse.getStatusCode());
+
+			try {
+				return OrganizationSerDes.toDTO(content);
+			}
+			catch (Exception e) {
+				_logger.log(
+					Level.WARNING,
+					"Unable to process HTTP response: " + content, e);
+
+				throw e;
+			}
 		}
 
-		if (sortString != null) {
-			httpInvoker.parameter("sort", sortString);
+		public HttpInvoker.HttpResponse getOrganizationHttpResponse(
+				Long organizationId)
+			throws Exception {
+
+			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
+
+			if (_builder._locale != null) {
+				httpInvoker.header(
+					"Accept-Language", _builder._locale.toLanguageTag());
+			}
+
+			for (Map.Entry<String, String> entry :
+					_builder._headers.entrySet()) {
+
+				httpInvoker.header(entry.getKey(), entry.getValue());
+			}
+
+			for (Map.Entry<String, String> entry :
+					_builder._parameters.entrySet()) {
+
+				httpInvoker.parameter(entry.getKey(), entry.getValue());
+			}
+
+			httpInvoker.httpMethod(HttpInvoker.HttpMethod.GET);
+
+			httpInvoker.path(
+				_builder._scheme + "://" + _builder._host + ":" +
+					_builder._port +
+						"/o/headless-admin-user/v1.0/organizations/{organizationId}",
+				organizationId);
+
+			httpInvoker.userNameAndPassword(
+				_builder._login + ":" + _builder._password);
+
+			return httpInvoker.invoke();
 		}
 
-		httpInvoker.path(
-			"http://localhost:8080/o/headless-admin-user/v1.0/organizations/{parentOrganizationId}/organizations",
-			parentOrganizationId);
+		public Page<Organization> getOrganizationOrganizationsPage(
+				Long parentOrganizationId, Boolean flatten, String search,
+				String filterString, Pagination pagination, String sortString)
+			throws Exception {
 
-		httpInvoker.userNameAndPassword("test@liferay.com:test");
+			HttpInvoker.HttpResponse httpResponse =
+				getOrganizationOrganizationsPageHttpResponse(
+					parentOrganizationId, flatten, search, filterString,
+					pagination, sortString);
 
-		return httpInvoker.invoke();
+			String content = httpResponse.getContent();
+
+			_logger.fine("HTTP response content: " + content);
+
+			_logger.fine("HTTP response message: " + httpResponse.getMessage());
+			_logger.fine(
+				"HTTP response status code: " + httpResponse.getStatusCode());
+
+			return Page.of(content, OrganizationSerDes::toDTO);
+		}
+
+		public HttpInvoker.HttpResponse
+				getOrganizationOrganizationsPageHttpResponse(
+					Long parentOrganizationId, Boolean flatten, String search,
+					String filterString, Pagination pagination,
+					String sortString)
+			throws Exception {
+
+			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
+
+			if (_builder._locale != null) {
+				httpInvoker.header(
+					"Accept-Language", _builder._locale.toLanguageTag());
+			}
+
+			for (Map.Entry<String, String> entry :
+					_builder._headers.entrySet()) {
+
+				httpInvoker.header(entry.getKey(), entry.getValue());
+			}
+
+			for (Map.Entry<String, String> entry :
+					_builder._parameters.entrySet()) {
+
+				httpInvoker.parameter(entry.getKey(), entry.getValue());
+			}
+
+			httpInvoker.httpMethod(HttpInvoker.HttpMethod.GET);
+
+			if (flatten != null) {
+				httpInvoker.parameter("flatten", String.valueOf(flatten));
+			}
+
+			if (search != null) {
+				httpInvoker.parameter("search", String.valueOf(search));
+			}
+
+			if (filterString != null) {
+				httpInvoker.parameter("filter", filterString);
+			}
+
+			if (pagination != null) {
+				httpInvoker.parameter(
+					"page", String.valueOf(pagination.getPage()));
+				httpInvoker.parameter(
+					"pageSize", String.valueOf(pagination.getPageSize()));
+			}
+
+			if (sortString != null) {
+				httpInvoker.parameter("sort", sortString);
+			}
+
+			httpInvoker.path(
+				_builder._scheme + "://" + _builder._host + ":" +
+					_builder._port +
+						"/o/headless-admin-user/v1.0/organizations/{parentOrganizationId}/organizations",
+				parentOrganizationId);
+
+			httpInvoker.userNameAndPassword(
+				_builder._login + ":" + _builder._password);
+
+			return httpInvoker.invoke();
+		}
+
+		private OrganizationResourceImpl(Builder builder) {
+			_builder = builder;
+		}
+
+		private static final Logger _logger = Logger.getLogger(
+			OrganizationResource.class.getName());
+
+		private Builder _builder;
+
 	}
-
-	private static final Logger _logger = Logger.getLogger(
-		OrganizationResource.class.getName());
 
 }

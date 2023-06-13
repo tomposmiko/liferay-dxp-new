@@ -36,7 +36,7 @@ import org.osgi.annotation.versioning.ProviderType;
 public interface LayoutSetVersionModel
 	extends BaseModel<LayoutSetVersion>, ShardedModel, VersionModel<LayoutSet> {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this interface directly. All methods that expect a layout set version model instance should use the {@link LayoutSetVersion} interface instead.

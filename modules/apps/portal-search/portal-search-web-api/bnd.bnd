@@ -1,7 +1,8 @@
 Bundle-Name: Liferay Portal Search Web API
 Bundle-SymbolicName: com.liferay.portal.search.web.api
-Bundle-Version: 3.0.4
+Bundle-Version: 3.1.4
 Export-Package:\
+	com.liferay.portal.search.web.application.list.constants,\
 	com.liferay.portal.search.web.constants,\
 	com.liferay.portal.search.web.facet,\
 	com.liferay.portal.search.web.facet.util.comparator,\

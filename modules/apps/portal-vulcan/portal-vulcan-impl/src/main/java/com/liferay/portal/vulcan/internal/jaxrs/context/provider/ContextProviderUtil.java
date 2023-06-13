@@ -17,11 +17,14 @@ package com.liferay.portal.vulcan.internal.jaxrs.context.provider;
 import com.liferay.portal.odata.entity.EntityModel;
 import com.liferay.portal.vulcan.resource.EntityModelResource;
 
+import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
 import javax.ws.rs.container.ResourceContext;
+import javax.ws.rs.core.MultivaluedHashMap;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.UriInfo;
 
@@ -42,7 +45,7 @@ import org.apache.cxf.message.Message;
 public class ContextProviderUtil {
 
 	public static EntityModel getEntityModel(Message message) throws Exception {
-		Object matchedResource = _getMatchedResource(message);
+		Object matchedResource = getMatchedResource(message);
 
 		if (matchedResource instanceof EntityModelResource) {
 			EntityModelResource entityModelResource =
@@ -60,7 +63,7 @@ public class ContextProviderUtil {
 			"HTTP.REQUEST");
 	}
 
-	private static Object _getMatchedResource(Message message) {
+	public static Object getMatchedResource(Message message) {
 		Exchange exchange = message.getExchange();
 
 		Object root = exchange.get(JAXRSUtils.ROOT_INSTANCE);
@@ -98,12 +101,24 @@ public class ContextProviderUtil {
 		return resourceContext.getResource(matchedResourceClass);
 	}
 
+	public static MultivaluedHashMap<String, String> getMultivaluedHashMap(
+		Map<String, String[]> parameterMap) {
+
+		return new MultivaluedHashMap<String, String>() {
+			{
+				for (Entry<String, String[]> entry : parameterMap.entrySet()) {
+					put(entry.getKey(), Arrays.asList(entry.getValue()));
+				}
+			}
+		};
+	}
+
 	private static MultivaluedMap<String, String> _getPathParameters(
 		Message message) {
 
-		UriInfoImpl uriInfo = new UriInfoImpl(message);
+		UriInfoImpl uriInfoImpl = new UriInfoImpl(message);
 
-		return uriInfo.getPathParameters();
+		return uriInfoImpl.getPathParameters();
 	}
 
 }

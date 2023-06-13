@@ -91,8 +91,7 @@ public class LiferaySecureUberspector extends SecureUberspector {
 			_restrictedMethodNames = Collections.emptyMap();
 		}
 		else {
-			_restrictedMethodNames = new HashMap<>(
-				restrictedMethodNames.length);
+			_restrictedMethodNames = new HashMap<>();
 
 			for (String restrictedMethodName : restrictedMethodNames) {
 				int index = restrictedMethodName.indexOf(CharPool.POUND);
@@ -257,9 +256,11 @@ public class LiferaySecureUberspector extends SecureUberspector {
 					"Executing method " + methodName + " is not allowed");
 			}
 
-			_checkClassIsRestricted(clazz);
+			if (RestrictedTemplateThreadLocal.isRestricted()) {
+				_checkClassIsRestricted(clazz);
 
-			_checkMethodIsRestricted(clazz, methodName);
+				_checkMethodIsRestricted(clazz, methodName);
+			}
 
 			return true;
 		}

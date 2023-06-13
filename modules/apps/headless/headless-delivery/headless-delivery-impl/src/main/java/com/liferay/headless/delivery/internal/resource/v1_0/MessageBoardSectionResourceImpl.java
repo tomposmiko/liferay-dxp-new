@@ -26,7 +26,6 @@ import com.liferay.headless.delivery.resource.v1_0.MessageBoardSectionResource;
 import com.liferay.message.boards.model.MBCategory;
 import com.liferay.message.boards.service.MBCategoryService;
 import com.liferay.petra.function.UnsafeConsumer;
-import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.search.BooleanClauseOccur;
 import com.liferay.portal.kernel.search.BooleanQuery;
 import com.liferay.portal.kernel.search.Field;
@@ -42,13 +41,13 @@ import com.liferay.portal.vulcan.pagination.Page;
 import com.liferay.portal.vulcan.pagination.Pagination;
 import com.liferay.portal.vulcan.resource.EntityModelResource;
 import com.liferay.portal.vulcan.util.SearchUtil;
+import com.liferay.subscription.service.SubscriptionLocalService;
 
 import java.io.Serializable;
 
 import java.util.ArrayList;
 import java.util.Map;
 
-import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MultivaluedMap;
 
 import org.osgi.service.component.annotations.Component;
@@ -177,6 +176,28 @@ public class MessageBoardSectionResourceImpl
 					mbCategory.getGroupId(), null)));
 	}
 
+	@Override
+	public void putMessageBoardSectionSubscribe(Long messageBoardSectionId)
+		throws Exception {
+
+		MBCategory mbCategory = _mbCategoryService.getCategory(
+			messageBoardSectionId);
+
+		_mbCategoryService.subscribeCategory(
+			mbCategory.getGroupId(), mbCategory.getCategoryId());
+	}
+
+	@Override
+	public void putMessageBoardSectionUnsubscribe(Long messageBoardSectionId)
+		throws Exception {
+
+		MBCategory mbCategory = _mbCategoryService.getCategory(
+			messageBoardSectionId);
+
+		_mbCategoryService.unsubscribeCategory(
+			mbCategory.getGroupId(), mbCategory.getCategoryId());
+	}
+
 	private MessageBoardSection _addMessageBoardSection(
 			long siteId, Long parentMessageBoardSectionId,
 			MessageBoardSection messageBoardSection)
@@ -184,7 +205,7 @@ public class MessageBoardSectionResourceImpl
 
 		return _toMessageBoardSection(
 			_mbCategoryService.addCategory(
-				_user.getUserId(), parentMessageBoardSectionId,
+				contextUser.getUserId(), parentMessageBoardSectionId,
 				messageBoardSection.getTitle(),
 				messageBoardSection.getDescription(),
 				ServiceContextUtil.createServiceContext(
@@ -243,6 +264,9 @@ public class MessageBoardSectionResourceImpl
 						mbCategory.getGroupId(), mbCategory.getCategoryId());
 				numberOfMessageBoardThreads = mbCategory.getThreadCount();
 				siteId = mbCategory.getGroupId();
+				subscribed = _subscriptionLocalService.isSubscribed(
+					mbCategory.getCompanyId(), contextUser.getUserId(),
+					MBCategory.class.getName(), mbCategory.getCategoryId());
 				title = mbCategory.getName();
 			}
 		};
@@ -260,8 +284,8 @@ public class MessageBoardSectionResourceImpl
 	@Reference
 	private Portal _portal;
 
-	@Context
-	private User _user;
+	@Reference
+	private SubscriptionLocalService _subscriptionLocalService;
 
 	@Reference
 	private UserLocalService _userLocalService;

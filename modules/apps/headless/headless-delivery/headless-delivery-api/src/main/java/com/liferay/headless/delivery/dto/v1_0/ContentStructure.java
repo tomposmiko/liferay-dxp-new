@@ -20,9 +20,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import com.liferay.petra.function.UnsafeSupplier;
 import com.liferay.petra.string.StringBundler;
-
-import graphql.annotations.annotationTypes.GraphQLField;
-import graphql.annotations.annotationTypes.GraphQLName;
+import com.liferay.portal.vulcan.graphql.annotation.GraphQLField;
+import com.liferay.portal.vulcan.graphql.annotation.GraphQLName;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 
@@ -36,6 +35,8 @@ import java.util.Objects;
 import java.util.Set;
 
 import javax.annotation.Generated;
+
+import javax.validation.Valid;
 
 import javax.xml.bind.annotation.XmlRootElement;
 
@@ -80,6 +81,7 @@ public class ContentStructure {
 	protected String[] availableLanguages;
 
 	@Schema(description = "The list of the content structure's fields.")
+	@Valid
 	public ContentStructureField[] getContentStructureFields() {
 		return contentStructureFields;
 	}
@@ -111,6 +113,7 @@ public class ContentStructure {
 	protected ContentStructureField[] contentStructureFields;
 
 	@Schema(description = "The content structure's creator.")
+	@Valid
 	public Creator getCreator() {
 		return creator;
 	}
@@ -470,6 +473,12 @@ public class ContentStructure {
 
 		return sb.toString();
 	}
+
+	@Schema(
+		defaultValue = "com.liferay.headless.delivery.dto.v1_0.ContentStructure",
+		name = "x-class-name"
+	)
+	public String xClassName;
 
 	private static String _escape(Object object) {
 		String string = String.valueOf(object);

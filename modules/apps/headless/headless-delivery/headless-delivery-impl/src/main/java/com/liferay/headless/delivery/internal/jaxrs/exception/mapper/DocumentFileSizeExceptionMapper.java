@@ -39,13 +39,13 @@ public class DocumentFileSizeExceptionMapper
 	implements ExceptionMapper<FileSizeException> {
 
 	@Override
-	public Response toResponse(FileSizeException fse) {
+	public Response toResponse(FileSizeException fileSizeException) {
 		return Response.status(
 			400
+		).entity(
+			fileSizeException.getMessage()
 		).type(
 			MediaType.TEXT_PLAIN
-		).entity(
-			fse.getMessage()
 		).build();
 	}
 

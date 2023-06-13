@@ -136,7 +136,6 @@ else {
 					<div class="document-type-selector" id="<portlet:namespace />documentTypeSelector">
 						<liferay-ui:icon-menu
 							direction="down"
-							icon="../aui/file-alt"
 							id="groupSelector"
 							message='<%= (fileEntryTypeId > 0) ? HtmlUtil.escape(fileEntryType.getName(locale)) : "basic-document" %>'
 							showWhenSingleIcon="<%= true %>"
@@ -212,72 +211,76 @@ else {
 					%>
 
 					<aui:script position="inline" require="metal-dom/src/all/dom as dom">
-						var documentTypeMenuList = document.querySelector('#<portlet:namespace/>documentTypeSelector .lfr-menu-list');
+						var documentTypeMenuList = document.querySelector(
+							'#<portlet:namespace/>documentTypeSelector .lfr-menu-list'
+						);
 
 						if (documentTypeMenuList) {
-							dom.delegate(
-								documentTypeMenuList,
-								'click',
-								'li a',
-								function(event) {
-									event.preventDefault();
+							dom.delegate(documentTypeMenuList, 'click', 'li a', function(event) {
+								event.preventDefault();
 
-									fetch(
-										event.delegateTarget.getAttribute('href'),
-										{
-											credentials: 'include'
-										}
-									).then(
-										function(response) {
-											return response.text();
-										}
-									).then(
-										function(response) {
-											var commonFileMetadataContainer = document.getElementById('<portlet:namespace />commonFileMetadataContainer');
+								Liferay.Util.fetch(event.delegateTarget.getAttribute('href'))
+									.then(function(response) {
+										return response.text();
+									})
+									.then(function(response) {
+										var commonFileMetadataContainer = document.getElementById(
+											'<portlet:namespace />commonFileMetadataContainer'
+										);
 
-											if (commonFileMetadataContainer) {
-												commonFileMetadataContainer.innerHTML = response;
+										if (commonFileMetadataContainer) {
+											commonFileMetadataContainer.innerHTML = response;
 
-												dom.globalEval.runScriptsInElement(commonFileMetadataContainer);
-											}
-
-											var fileNodes = document.querySelectorAll('input[name=<portlet:namespace />selectUploadedFile]');
-
-											var selectedFileNodes = Array.prototype.filter.call(
-												fileNodes,
-												function(fileNode) {
-													return fileNode.checked;
-												}
+											dom.globalEval.runScriptsInElement(
+												commonFileMetadataContainer
 											);
+										}
 
-											var selectedFilesCount = selectedFileNodes.length;
+										var fileNodes = document.querySelectorAll(
+											'input[name=<portlet:namespace />selectUploadedFile]'
+										);
 
-											var selectedFilesText = '';
-
-											if (selectedFilesCount > 0) {
-												selectedFilesText = selectedFileNodes[0].dataset.title;
+										var selectedFileNodes = Array.prototype.filter.call(
+											fileNodes,
+											function(fileNode) {
+												return fileNode.checked;
 											}
+										);
 
-											if (selectedFilesCount > 1) {
-												if (selectedFilesCount === fileNodes.length) {
-													selectedFilesText = '<%= UnicodeLanguageUtil.get(request, "all-files-selected") %>';
-												}
-												else {
-													selectedFilesText = Liferay.Util.sub('<%= UnicodeLanguageUtil.get(request, "x-files-selected") %>', selectedFilesCount);
-												}
-											}
+										var selectedFilesCount = selectedFileNodes.length;
 
-											var selectedFilesCountElement = document.querySelector('.selected-files-count');
+										var selectedFilesText = '';
 
-											if (selectedFilesCountElement) {
-												selectedFilesCountElement.innerHTML = selectedFilesText;
+										if (selectedFilesCount > 0) {
+											selectedFilesText = selectedFileNodes[0].dataset.title;
+										}
 
-												selectedFilesCountElement.setAttribute('title', selectedFilesText);
+										if (selectedFilesCount > 1) {
+											if (selectedFilesCount === fileNodes.length) {
+												selectedFilesText =
+													'<%= UnicodeLanguageUtil.get(request, "all-files-selected") %>';
+											} else {
+												selectedFilesText = Liferay.Util.sub(
+													'<%= UnicodeLanguageUtil.get(request, "x-files-selected") %>',
+													selectedFilesCount
+												);
 											}
 										}
-									);
-								}
-							);
+
+										var selectedFilesCountElement = document.querySelector(
+											'.selected-files-count'
+										);
+
+										if (selectedFilesCountElement) {
+											selectedFilesCountElement.innerHTML = selectedFilesText;
+
+											selectedFilesCountElement.setAttribute(
+												'title',
+												selectedFilesText
+											);
+										}
+									});
+							});
 						}
 					</aui:script>
 				</liferay-ui:panel>

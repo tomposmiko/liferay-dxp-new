@@ -17,18 +17,15 @@ package com.liferay.portal.kernel.mobile.device;
 import java.util.Collections;
 import java.util.Map;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 /**
  * Class represents unknown device
  *
  * @author Milen Dyankov
  */
-@ProviderType
 public class UnknownDevice extends BaseDevice {
 
 	public static UnknownDevice getInstance() {
-		return _instance;
+		return _unknownDevice;
 	}
 
 	@Override
@@ -107,6 +104,6 @@ public class UnknownDevice extends BaseDevice {
 	private UnknownDevice() {
 	}
 
-	private static final UnknownDevice _instance = new UnknownDevice();
+	private static final UnknownDevice _unknownDevice = new UnknownDevice();
 
 }

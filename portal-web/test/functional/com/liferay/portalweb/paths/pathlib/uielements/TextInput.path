@@ -24,6 +24,11 @@
 	<td></td>
 </tr>
 <tr>
+	<td>ANSWER_LOCALIZED</td>
+	<td>//div[label[contains(.,'${key_localizedAnswer}')]]/input[@type='text']</td>
+	<td></td>
+</tr>
+<tr>
 	<td>BLOGS_ENTRY_URL</td>
 	<td>//input[contains(@id,'_urlTitle')]</td>
 	<td></td>
@@ -169,6 +174,11 @@
 	<td></td>
 </tr>
 <tr>
+	<td>FRIENDLY_URL_SITE_SETTINGS</td>
+	<td>//input[contains(@id,'FriendlyURL')]</td>
+	<td></td>
+</tr>
+<tr>
 	<td>GENERIC_TEXT_INPUT</td>
 	<td>//div[label[contains(.,'${key_fieldLabel}')]]//input[@type='text']</td>
 	<td></td>
@@ -299,6 +309,16 @@
 	<td></td>
 </tr>
 <tr>
+	<td>PASSWORD_1</td>
+	<td>//input[contains(@id,'password1')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>PASSWORD_2</td>
+	<td>//input[contains(@id,'password2')]</td>
+	<td></td>
+</tr>
+<tr>
 	<td>PASSWORD_TYPE</td>
 	<td>//input[@type='password']</td>
 	<td></td>
@@ -331,6 +351,11 @@
 <tr>
 	<td>PRIVATE_VIRTUAL_HOST_URL</td>
 	<td>//input[contains(@id,'privateVirtualHost')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>REMINDER_QUERY</td>
+	<td>//input[contains(@id,'reminderQueryAnswer')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -411,6 +436,11 @@
 <tr>
 	<td>SUBJECT</td>
 	<td>//input[contains(@id,'subject')] | //input[contains(@id,'Subject')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>TARGET_PAGE_FRIENDLY_URL</td>
+	<td>//input[contains(@id,'targetLayoutFriendlyUrl')]</td>
 	<td></td>
 </tr>
 <tr>

@@ -1,9 +1,24 @@
+/**
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
+ *
+ * This library is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU Lesser General Public License as published by the Free
+ * Software Foundation; either version 2.1 of the License, or (at your option)
+ * any later version.
+ *
+ * This library is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
+ * details.
+ */
+
 import 'clay-dropdown';
+
 import 'clay-modal';
-import CompatibilityEventProxy from 'frontend-js-web/liferay/CompatibilityEventProxy.es';
+import {CompatibilityEventProxy} from 'frontend-js-web';
+import {core} from 'metal';
 import Component from 'metal-component';
 import Soy from 'metal-soy';
-import {core} from 'metal';
 
 import templates from './TranslationManager.soy';
 
@@ -15,7 +30,6 @@ import templates from './TranslationManager.soy';
  * @review
  */
 class TranslationManager extends Component {
-
 	/**
 	 * @inheritDoc
 	 */
@@ -34,7 +48,7 @@ class TranslationManager extends Component {
 	 * @review
 	 */
 	addLocale(event) {
-		let locale = event.data.item;
+		const locale = event.data.item;
 
 		if (this.availableLocales.indexOf(locale) === -1) {
 			this.availableLocales.push(locale);
@@ -60,7 +74,7 @@ class TranslationManager extends Component {
 	 * @review
 	 */
 	changeDefaultLocale(event) {
-		let localeId = event.delegateTarget.getAttribute('data-locale-id');
+		const localeId = event.delegateTarget.getAttribute('data-locale-id');
 
 		this.defaultLocale = localeId;
 
@@ -73,7 +87,7 @@ class TranslationManager extends Component {
 	 * @review
 	 */
 	changeLocale(event) {
-		let localeId = event.delegateTarget.getAttribute('data-locale-id');
+		const localeId = event.delegateTarget.getAttribute('data-locale-id');
 
 		this.editingLocale = localeId;
 	}
@@ -97,11 +111,13 @@ class TranslationManager extends Component {
 		const {availableLocales} = this;
 		const {localeId} = delegateTarget.dataset;
 
-		event.stopPropagation();
+		window.event.stopPropagation();
 
 		this.refs.deleteModal.events = {
 			clickButton: ({target}) => {
 				if (target.classList.contains('btn-primary')) {
+					this.refs.deleteModal.emit('hide');
+
 					this.availableLocales = availableLocales.filter(
 						({id}) => id !== localeId
 					);
@@ -110,12 +126,9 @@ class TranslationManager extends Component {
 						this.resetEditingLocale_();
 					}
 
-					this.emit(
-						'deleteAvailableLocale',
-						{
-							locale: localeId
-						}
-					);
+					this.emit('deleteAvailableLocale', {
+						locale: localeId
+					});
 				}
 			}
 		};
@@ -141,14 +154,11 @@ class TranslationManager extends Component {
 	startCompatibility_() {
 		this.destroy = this.dispose;
 
-		this.compatibilityEventProxy_ = new CompatibilityEventProxy(
-			{
-				host: this,
-				namespace: 'translationmanager'
-			}
-		);
+		this.compatibilityEventProxy_ = new CompatibilityEventProxy({
+			host: this,
+			namespace: 'translationmanager'
+		});
 	}
-
 }
 
 /**
@@ -159,16 +169,6 @@ class TranslationManager extends Component {
  * @type {!Object}
  */
 TranslationManager.STATE = {
-
-	/**
-	 * Current editing language key.
-	 * @review
-	 * @type {String}
-	 */
-	editingLocale: {
-		validator: core.isString
-	},
-
 	/**
 	 * List of available languages keys.
 	 * @review
@@ -193,6 +193,15 @@ TranslationManager.STATE = {
 	 * @type {String}
 	 */
 	defaultLocale: {
+		validator: core.isString
+	},
+
+	/**
+	 * Current editing language key.
+	 * @review
+	 * @type {String}
+	 */
+	editingLocale: {
 		validator: core.isString
 	},
 

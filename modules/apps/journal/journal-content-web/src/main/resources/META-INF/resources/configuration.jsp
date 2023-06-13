@@ -54,19 +54,28 @@ String redirect = ParamUtil.getString(request, "redirect");
 	</liferay-frontend:edit-form-footer>
 </liferay-frontend:edit-form>
 
-<aui:script sandbox="<%= true %>" use="aui-base">
-	var form = A.one('#<portlet:namespace />fm');
+<aui:script require="metal-dom/src/all/dom as dom">
+	const articlePreview = document.getElementById(
+		'<portlet:namespace />articlePreview'
+	);
+	const assetEntryIdInput = document.getElementById(
+		'<portlet:namespace />assetEntryId'
+	);
 
-	var articlePreview = A.one('#<portlet:namespace />articlePreview');
+	dom.delegate(articlePreview, 'click', '.web-content-selector', function(event) {
+		event.preventDefault();
 
-	articlePreview.delegate(
-		'click',
-		function(event) {
-			event.preventDefault();
+		<%
+		PortletURL selectWebContentURL = PortletProviderUtil.getPortletURL(request, JournalArticle.class.getName(), PortletProvider.Action.BROWSE);
 
-			<%
-			PortletURL selectWebContentURL = PortletProviderUtil.getPortletURL(request, JournalArticle.class.getName(), PortletProvider.Action.BROWSE);
+		Group scopeGroup = GroupLocalServiceUtil.getGroup(themeDisplay.getScopeGroupId());
 
+		if (scopeGroup.isLayoutPrototype()) {
+			Group companyGroup = GroupLocalServiceUtil.getCompanyGroup(scopeGroup.getCompanyId());
+
+			selectWebContentURL.setParameter("selectedGroupIds", String.valueOf(companyGroup.getGroupId()));
+		}
+		else {
 			selectWebContentURL.setParameter("groupId", String.valueOf(journalContentDisplayContext.getGroupId()));
 
 			if (journalContentDisplayContext.getSelectedGroupIds() != null) {
@@ -75,51 +84,51 @@ String redirect = ParamUtil.getString(request, "redirect");
 			else {
 				selectWebContentURL.setParameter("selectedGroupId", String.valueOf(themeDisplay.getScopeGroupId()));
 			}
+		}
 
-			selectWebContentURL.setParameter("refererAssetEntryId", "[$ARTICLE_REFERER_ASSET_ENTRY_ID$]");
-			selectWebContentURL.setParameter("typeSelection", JournalArticle.class.getName());
-			selectWebContentURL.setParameter("showNonindexable", String.valueOf(Boolean.TRUE));
-			selectWebContentURL.setParameter("showScheduled", String.valueOf(Boolean.TRUE));
-			selectWebContentURL.setParameter("eventName", "selectContent");
-			selectWebContentURL.setWindowState(LiferayWindowState.POP_UP);
-			%>
+		selectWebContentURL.setParameter("refererAssetEntryId", "[$ARTICLE_REFERER_ASSET_ENTRY_ID$]");
+		selectWebContentURL.setParameter("typeSelection", JournalArticle.class.getName());
+		selectWebContentURL.setParameter("showNonindexable", String.valueOf(Boolean.TRUE));
+		selectWebContentURL.setParameter("showScheduled", String.valueOf(Boolean.TRUE));
+		selectWebContentURL.setParameter("eventName", "selectContent");
+		selectWebContentURL.setWindowState(LiferayWindowState.POP_UP);
+		%>
 
-			var baseSelectWebContentURI = '<%= selectWebContentURL.toString() %>';
+		var baseSelectWebContentURI = '<%= selectWebContentURL.toString() %>';
 
-			Liferay.Util.selectEntity(
-				{
-					dialog: {
-						constrain: true,
-						destroyOnHide: true,
-						modal: true
-					},
-					eventName: 'selectContent',
-					id: 'selectContent',
-					title: '<liferay-ui:message key="select-web-content" />',
-					uri: baseSelectWebContentURI.replace(encodeURIComponent('[$ARTICLE_REFERER_ASSET_ENTRY_ID$]'), form.attr('<portlet:namespace />assetEntryId').val())
+		Liferay.Util.selectEntity(
+			{
+				dialog: {
+					constrain: true,
+					destroyOnHide: true,
+					modal: true
 				},
-				function(event) {
-					retrieveWebContent(event.assetclasspk);
-				}
-			);
-		},
-		'.web-content-selector'
-	);
+				eventName: 'selectContent',
+				id: 'selectContent',
+				title: '<liferay-ui:message key="select-web-content" />',
+				uri: baseSelectWebContentURI.replace(
+					encodeURIComponent('[$ARTICLE_REFERER_ASSET_ENTRY_ID$]'),
+					assetEntryIdInput.value
+				)
+			},
+			function(event) {
+				retrieveWebContent(event.assetclasspk);
+			}
+		);
+	});
 
-	articlePreview.delegate(
-		'click',
-		function(event) {
-			event.preventDefault();
-
-			retrieveWebContent(-1);
-		},
-		'.selector-button'
-	);
+	dom.delegate(articlePreview, 'click', '.selector-button', function(event) {
+		event.preventDefault();
+		retrieveWebContent(-1);
+	});
 
 	function retrieveWebContent(assetClassPK) {
 		var uri = '<%= configurationRenderURL %>';
 
-		uri = Liferay.Util.addParams('<portlet:namespace />articleResourcePrimKey=' + assetClassPK, uri);
+		uri = Liferay.Util.addParams(
+			'<portlet:namespace />articleResourcePrimKey=' + assetClassPK,
+			uri
+		);
 
 		location.href = uri;
 	}

@@ -115,10 +115,10 @@ String privateVirtualHost = ParamUtil.getString(request, "privateVirtualHost", B
 		<liferay-ui:message arguments="<%= new Object[] {themeDisplay.getPortalURL() + themeDisplay.getPathFriendlyURLPublic(), themeDisplay.getPortalURL() + themeDisplay.getPathFriendlyURLPrivateGroup()} %>" key="the-friendly-url-is-appended-to-x-for-public-pages-and-x-for-private-pages" translateArguments="<%= false %>" />
 	</p>
 
-	<aui:input label="friendly-url" name="friendlyURL" />
+	<aui:input label="friendly-url" name="groupFriendlyURL" type="text" value="<%= HttpUtil.decodeURL(liveGroup.getFriendlyURL()) %>" />
 
 	<c:if test="<%= liveGroup.hasStagingGroup() %>">
-		<aui:input bean="<%= stagingGroup %>" field="friendlyURL" fieldParam="stagingFriendlyURL" label="staging-friendly-url" model="<%= Group.class %>" name="stagingFriendlyURL" />
+		<aui:input label="staging-friendly-url" name="stagingFriendlyURL" type="text" value="<%= HttpUtil.decodeURL(stagingGroup.getFriendlyURL()) %>" />
 	</c:if>
 
 	<p class="text-muted">
@@ -164,34 +164,29 @@ String privateVirtualHost = ParamUtil.getString(request, "privateVirtualHost", B
 </aui:fieldset>
 
 <script>
-	var friendlyURL = document.getElementById('<portlet:namespace />friendlyURL');
+	var friendlyURL = document.getElementById(
+		'<portlet:namespace />groupFriendlyURL'
+	);
 
 	if (friendlyURL) {
-		friendlyURL.addEventListener(
-			'change',
-			function(event) {
-				var value = friendlyURL.value.trim();
+		friendlyURL.addEventListener('change', function(event) {
+			var value = friendlyURL.value.trim();
 
-				if (value == '/') {
-					value = '';
-				}
-				else {
-					value = value.replace(
-						/^[^\/]|\/$/g,
-						function(match, index) {
-							var str = '';
+			if (value == '/') {
+				value = '';
+			} else {
+				value = value.replace(/^[^\/]|\/$/g, function(match, index) {
+					var str = '';
 
-							if (index == 0) {
-								str = '/' + match;
-							}
+					if (index == 0) {
+						str = '/' + match;
+					}
 
-							return str;
-						}
-					);
-				}
-
-				friendlyURL.value = value;
+					return str;
+				});
 			}
-		);
+
+			friendlyURL.value = value;
+		});
 	}
 </script>

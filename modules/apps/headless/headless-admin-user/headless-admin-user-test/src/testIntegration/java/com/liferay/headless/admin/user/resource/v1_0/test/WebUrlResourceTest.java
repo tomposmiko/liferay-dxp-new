@@ -59,7 +59,7 @@ public class WebUrlResourceTest extends BaseWebUrlResourceTestCase {
 	protected WebUrl randomWebUrl() {
 		return new WebUrl() {
 			{
-				url = "http://" + RandomTestUtil.randomString();
+				url = "http://" + RandomTestUtil.randomString() + ".com";
 			}
 		};
 	}
@@ -100,6 +100,11 @@ public class WebUrlResourceTest extends BaseWebUrlResourceTestCase {
 		return _addWebUrl(
 			randomWebUrl(), Contact.class.getName(), _user.getContactId(),
 			ListTypeConstants.CONTACT_WEBSITE);
+	}
+
+	@Override
+	protected WebUrl testGraphQLWebUrl_addWebUrl() throws Exception {
+		return testGetWebUrl_addWebUrl();
 	}
 
 	private WebUrl _addWebUrl(

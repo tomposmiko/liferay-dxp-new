@@ -41,9 +41,9 @@ import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.Organization;
 import com.liferay.portal.kernel.model.ResourceConstants;
 import com.liferay.portal.kernel.model.Role;
-import com.liferay.portal.kernel.model.RoleConstants;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.model.UserGroup;
+import com.liferay.portal.kernel.model.role.RoleConstants;
 import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
 import com.liferay.portal.kernel.util.EscapableLocalizableFunction;
 import com.liferay.portal.kernel.util.HtmlUtil;
@@ -185,6 +185,15 @@ public class AnnouncementsEntryLocalServiceImpl
 		for (AnnouncementsEntry entry : entries) {
 			notifyUsers(entry);
 		}
+	}
+
+	@Override
+	public void deleteEntries(long companyId) {
+		announcementsDeliveryPersistence.removeByCompanyId(companyId);
+
+		announcementsFlagPersistence.removeByCompanyId(companyId);
+
+		announcementsEntryPersistence.removeByCompanyId(companyId);
 	}
 
 	@Override
@@ -513,9 +522,7 @@ public class AnnouncementsEntryLocalServiceImpl
 
 				toName = organization.getName();
 
-				params.put(
-					"usersOrgsTree",
-					ListUtil.fromArray(new Organization[] {organization}));
+				params.put("usersOrgsTree", ListUtil.fromArray(organization));
 			}
 			else if (className.equals(Role.class.getName())) {
 				Role role = rolePersistence.findByPrimaryKey(classPK);
@@ -530,8 +537,7 @@ public class AnnouncementsEntryLocalServiceImpl
 					teamId = role.getClassPK();
 				}
 				else {
-					params.put(
-						"userGroupRole", new Long[] {Long.valueOf(0), classPK});
+					params.put("userGroupRole", new Long[] {0L, classPK});
 				}
 			}
 			else if (className.equals(UserGroup.class.getName())) {
@@ -552,9 +558,8 @@ public class AnnouncementsEntryLocalServiceImpl
 			}
 
 			notifyUsers(
-				ListUtil.fromArray(new User[] {user}), entry,
-				company.getLocale(), user.getEmailAddress(),
-				user.getFullName());
+				ListUtil.fromArray(user), entry, company.getLocale(),
+				user.getEmailAddress(), user.getFullName());
 		}
 		else {
 			String toAddress = PropsValues.ANNOUNCEMENTS_EMAIL_TO_ADDRESS;
@@ -584,33 +589,25 @@ public class AnnouncementsEntryLocalServiceImpl
 			new IntervalActionProcessor<>(total);
 
 		intervalActionProcessor.setPerformIntervalActionMethod(
-			new IntervalActionProcessor.PerformIntervalActionMethod<Void>() {
+			(start, end) -> {
+				List<User> users = null;
 
-				@Override
-				public Void performIntervalAction(int start, int end)
-					throws PortalException {
-
-					List<User> users = null;
-
-					if (teamId > 0) {
-						users = userLocalService.getTeamUsers(
-							teamId, start, end);
-					}
-					else {
-						users = userLocalService.search(
-							company.getCompanyId(), null,
-							WorkflowConstants.STATUS_APPROVED, params, start,
-							end, (OrderByComparator<User>)null);
-					}
-
-					notifyUsers(
-						users, entry, company.getLocale(), toAddress, toName);
-
-					intervalActionProcessor.incrementStart(users.size());
-
-					return null;
+				if (teamId > 0) {
+					users = userLocalService.getTeamUsers(teamId, start, end);
+				}
+				else {
+					users = userLocalService.search(
+						company.getCompanyId(), null,
+						WorkflowConstants.STATUS_APPROVED, params, start, end,
+						(OrderByComparator<User>)null);
 				}
 
+				notifyUsers(
+					users, entry, company.getLocale(), toAddress, toName);
+
+				intervalActionProcessor.incrementStart(users.size());
+
+				return null;
 			});
 
 		intervalActionProcessor.performIntervalActions();
@@ -669,12 +666,12 @@ public class AnnouncementsEntryLocalServiceImpl
 			fromAddress, fromName, toAddress, toName, subject, body, company,
 			entry);
 
-		for (String curToAddress : notifyUsersFullNames.keySet()) {
-			String curToName = notifyUsersFullNames.get(toAddress);
+		for (Map.Entry<String, String> curEntry :
+				notifyUsersFullNames.entrySet()) {
 
 			_sendNotificationEmail(
-				fromAddress, fromName, curToAddress, curToName, subject, body,
-				company, entry);
+				fromAddress, fromName, curEntry.getKey(), curEntry.getValue(),
+				subject, body, company, entry);
 		}
 	}
 

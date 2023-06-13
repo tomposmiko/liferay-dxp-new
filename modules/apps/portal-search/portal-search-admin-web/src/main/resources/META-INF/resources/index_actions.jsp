@@ -116,7 +116,7 @@ portletURL.setParameter("mvcRenderCommandName", "/search_admin/view");
 			<ul class="list-group system-action-group">
 				<li class="clearfix list-group-item">
 					<div class="pull-left">
-						<h5><liferay-ui:message key="reindex-all-search-indexes" /></h5>
+						<liferay-ui:message key="reindex-all-search-indexes" />
 					</div>
 
 					<%
@@ -148,7 +148,7 @@ portletURL.setParameter("mvcRenderCommandName", "/search_admin/view");
 				</li>
 				<li class="clearfix list-group-item">
 					<div class="pull-left">
-						<h5><liferay-ui:message key="reindex-all-spell-check-indexes" /></h5>
+						<liferay-ui:message key="reindex-all-spell-check-indexes" />
 					</div>
 
 					<div class="pull-right">
@@ -167,7 +167,7 @@ portletURL.setParameter("mvcRenderCommandName", "/search_admin/view");
 
 					<li class="clearfix list-group-item">
 						<div class="pull-left">
-							<h5><liferay-ui:message arguments="<%= indexer.getClassName() %>" key="reindex-x" /></h5>
+							<liferay-ui:message arguments="<%= indexer.getClassName() %>" key="reindex-x" />
 						</div>
 
 						<div class="index-action-wrapper pull-right" data-type="<%= indexer.getClassName() %>">
@@ -192,14 +192,12 @@ portletURL.setParameter("mvcRenderCommandName", "/search_admin/view");
 </aui:form>
 
 <aui:script use="liferay-admin">
-	new Liferay.Portlet.Admin(
-		{
-			form: document.<portlet:namespace />fm,
-			indexActionsPanel: '#adminSearchAdminIndexActionsPanel',
-			namespace: '<portlet:namespace />',
-			redirectUrl: '<%= redirectURL %>',
-			submitButton: '.save-server-button',
-			url: '<portlet:actionURL name="/search_admin/edit" />'
-		}
-	);
+	new Liferay.Portlet.Admin({
+		form: document.<portlet:namespace />fm,
+		indexActionsPanel: '#adminSearchAdminIndexActionsPanel',
+		namespace: '<portlet:namespace />',
+		redirectUrl: '<%= redirectURL %>',
+		submitButton: '.save-server-button',
+		url: '<portlet:actionURL name="/search_admin/edit" />'
+	});
 </aui:script>

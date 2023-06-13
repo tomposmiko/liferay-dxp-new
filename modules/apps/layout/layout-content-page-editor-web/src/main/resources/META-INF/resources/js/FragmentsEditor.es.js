@@ -1,46 +1,95 @@
+/**
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
+ *
+ * This library is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU Lesser General Public License as published by the Free
+ * Software Foundation; either version 2.1 of the License, or (at your option)
+ * any later version.
+ *
+ * This library is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
+ * details.
+ */
+
 import Component from 'metal-component';
 import dom from 'metal-dom';
 import Soy from 'metal-soy';
 import {Config} from 'metal-state';
 
-import './components/mapping_type/SelectMappingDialog.es';
-import './components/mapping_type/SelectMappingTypeDialog.es';
 import './components/fragment_entry_link/FragmentEntryLinkList.es';
+
 import './components/sidebar/FragmentsEditorSidebar.es';
+
 import './components/toolbar/FragmentsEditorToolbar.es';
-import {CLEAR_ACTIVE_ITEM, CLEAR_HOVERED_ITEM, UPDATE_ACTIVE_ITEM, UPDATE_HOVERED_ITEM} from './actions/actions.es';
-import {INITIAL_STATE} from './store/state.es';
-import {startListeningWidgetConfigurationChange, stopListeningWidgetConfigurationChange} from './utils/FragmentsEditorDialogUtils';
-import {Store} from './store/store.es';
 import templates from './FragmentsEditor.soy';
+import {
+	CLEAR_ACTIVE_ITEM,
+	CLEAR_HOVERED_ITEM,
+	UPDATE_HOVERED_ITEM
+} from './actions/actions.es';
+import {updateActiveItemAction} from './actions/updateActiveItem.es';
+import {INITIAL_STATE} from './store/state.es';
+import {Store} from './store/store.es';
+import {
+	startListeningWidgetConfigurationChange,
+	stopListeningWidgetConfigurationChange
+} from './utils/FragmentsEditorDialogUtils';
+import {getElements} from './utils/FragmentsEditorGetUtils.es';
+import {FRAGMENTS_EDITOR_ITEM_TYPES} from './utils/constants';
+
+/**
+ * @type {string}
+ */
+const ITEM_CLASS = 'fragments-editor__item';
+
+/**
+ * @type {string}
+ */
+const HOVERED_ITEM_CLASS = `${ITEM_CLASS}--hovered`;
+
+/**
+ * DOM selector where the sidebar is rendered
+ */
+const SIDEBAR_SELECTOR = '.fragments-editor-sidebar';
+
+/**
+ * DOM selector where the fragmentEntryLinks are rendered
+ */
+const WRAPPER_SELECTOR = '.fragment-entry-link-list-wrapper';
 
 /**
  * FragmentsEditor
  * @review
  */
 class FragmentsEditor extends Component {
-
 	/**
-	 * @param {MouseEvent} event
-	 * @return {{fragmentsEditorItemId: string|null, fragmentsEditorItemType: string|null}}
+	 * @param {KeyboardEvent|MouseEvent} event
+	 * @return {{targetItem: HTMLElement, targetItemId: string|null, targetItemType: string|null}}
 	 * @private
 	 * @review
 	 */
-	static _getItemTarget(event) {
-		let {fragmentsEditorItemId = null, fragmentsEditorItemType = null} = event.target.dataset || {};
+	static _getTargetItemData(event) {
+		let targetItem = event.target;
+		let {targetItemId = null, targetItemType = null} =
+			targetItem.dataset || {};
 
-		if (!fragmentsEditorItemId || !fragmentsEditorItemType) {
-			const parent = dom.closest(event.target, '[data-fragments-editor-item-id]');
+		if (!targetItemId || !targetItemType) {
+			targetItem = dom.closest(
+				event.target,
+				'[data-fragments-editor-item-id]'
+			);
 
-			if (parent) {
-				fragmentsEditorItemId = parent.dataset.fragmentsEditorItemId;
-				fragmentsEditorItemType = parent.dataset.fragmentsEditorItemType;
+			if (targetItem) {
+				targetItemId = targetItem.dataset.fragmentsEditorItemId;
+				targetItemType = targetItem.dataset.fragmentsEditorItemType;
 			}
 		}
 
 		return {
-			fragmentsEditorItemId,
-			fragmentsEditorItemType
+			targetItem,
+			targetItemId,
+			targetItemType
 		};
 	}
 
@@ -50,10 +99,14 @@ class FragmentsEditor extends Component {
 	 */
 	created() {
 		this._handleDocumentClick = this._handleDocumentClick.bind(this);
+		this._handleDocumentKeyDown = this._handleDocumentKeyDown.bind(this);
 		this._handleDocumentKeyUp = this._handleDocumentKeyUp.bind(this);
-		this._handleDocumentMouseOver = this._handleDocumentMouseOver.bind(this);
+		this._handleDocumentMouseOver = this._handleDocumentMouseOver.bind(
+			this
+		);
 
 		document.addEventListener('click', this._handleDocumentClick, true);
+		document.addEventListener('keydown', this._handleDocumentKeyDown);
 		document.addEventListener('keyup', this._handleDocumentKeyUp);
 		document.addEventListener('mouseover', this._handleDocumentMouseOver);
 	}
@@ -64,8 +117,12 @@ class FragmentsEditor extends Component {
 	 */
 	disposed() {
 		document.removeEventListener('click', this._handleDocumentClick, true);
+		document.removeEventListener('keydown', this._handleDocumentKeyDown);
 		document.removeEventListener('keyup', this._handleDocumentKeyUp);
-		document.removeEventListener('mouseover', this._handleDocumentMouseOver);
+		document.removeEventListener(
+			'mouseover',
+			this._handleDocumentMouseOver
+		);
 
 		stopListeningWidgetConfigurationChange();
 	}
@@ -94,8 +151,21 @@ class FragmentsEditor extends Component {
 	 * @private
 	 * @review
 	 */
+	_handleDocumentKeyDown(event) {
+		this._shiftPressed = event.shiftKey;
+	}
+
+	/**
+	 * @param {KeyboardEvent} event
+	 * @private
+	 * @review
+	 */
 	_handleDocumentKeyUp(event) {
-		this._updateActiveItem(event);
+		this._shiftPressed = event.shiftKey;
+
+		if (event.key !== 'Shift') {
+			this._updateActiveItem(event);
+		}
 	}
 
 	/**
@@ -104,60 +174,100 @@ class FragmentsEditor extends Component {
 	 * @review
 	 */
 	_handleDocumentMouseOver(event) {
-		const {fragmentsEditorItemId, fragmentsEditorItemType} = FragmentsEditor._getItemTarget(event);
-
-		if (fragmentsEditorItemId && fragmentsEditorItemType && this.store) {
-			this.store.dispatch(
-				{
-					hoveredItemId: fragmentsEditorItemId,
-					hoveredItemType: fragmentsEditorItemType,
-					type: UPDATE_HOVERED_ITEM
-				}
-			);
-		}
-		else if (this.store) {
-			this.store.dispatch(
-				{
-					type: CLEAR_HOVERED_ITEM
-				}
-			);
+		if (this.store) {
+			this._updateHoveredItem(event);
 		}
 	}
 
 	/**
-	 * @param {Event} event
+	 * @param {KeyboardEvent|MouseEvent} event
 	 * @private
 	 * @review
 	 */
 	_updateActiveItem(event) {
-		if (this._activeElement !== document.activeElement) {
-			const {
-				fragmentsEditorItemId,
-				fragmentsEditorItemType
-			} = FragmentsEditor._getItemTarget(event);
+		const {
+			targetItemId,
+			targetItemType
+		} = FragmentsEditor._getTargetItemData(event);
 
-			if (fragmentsEditorItemId && fragmentsEditorItemType) {
-				this.store.dispatch(
-					{
-						activeItemId: fragmentsEditorItemId,
-						activeItemType: fragmentsEditorItemType,
-						type: UPDATE_ACTIVE_ITEM
-					}
-				);
-			}
-			else if (event.target instanceof HTMLElement &&
-				event.target.parentElement !== document.body &&
-				!dom.closest(event.target, '.modal')) {
+		if (targetItemId && targetItemType) {
+			this.store.dispatch(
+				updateActiveItemAction(targetItemId, targetItemType, {
+					appendItem: this._shiftPressed
+				})
+			);
+		} else if (
+			(dom.closest(event.target, WRAPPER_SELECTOR) ||
+				event.target === document.querySelector(WRAPPER_SELECTOR)) &&
+			!dom.closest(event.target, SIDEBAR_SELECTOR)
+		) {
+			this.store.dispatch({
+				type: CLEAR_ACTIVE_ITEM
+			});
+		}
+	}
 
-				this.store.dispatch(
-					{
-						type: CLEAR_ACTIVE_ITEM
-					}
-				);
+	/**
+	 * Update hovered item
+	 * @param {MouseEvent} event
+	 * @private
+	 * @review
+	 */
+	_updateHoveredItem(event) {
+		const {
+			targetItemId,
+			targetItemType
+		} = FragmentsEditor._getTargetItemData(event);
+
+		let hoveredItemId = targetItemId;
+		let hoveredItemType = targetItemType;
+
+		document
+			.querySelectorAll(`.${HOVERED_ITEM_CLASS}`)
+			.forEach(hoveredItem => {
+				hoveredItem.classList.remove(HOVERED_ITEM_CLASS);
+			});
+
+		const targetItems = getElements(targetItemId, targetItemType);
+
+		if (targetItems.length === 0) {
+			const targetItemIsEditable =
+				targetItemType === FRAGMENTS_EDITOR_ITEM_TYPES.editable ||
+				targetItemType ===
+					FRAGMENTS_EDITOR_ITEM_TYPES.backgroundImageEditable;
+
+			if (
+				targetItemIsEditable &&
+				!targetItems[0].classList.contains(
+					'fragments-editor__editable--highlighted'
+				)
+			) {
+				const fragment = getElements(
+					targetItems[0].dataset.fragmentEntryLinkId,
+					FRAGMENTS_EDITOR_ITEM_TYPES.fragment
+				)[0];
+
+				hoveredItemId = fragment.dataset.fragmentsEditorItemId;
+				hoveredItemType = FRAGMENTS_EDITOR_ITEM_TYPES.fragment;
 			}
+		} else if (targetItems.length > 1) {
+			targetItems.forEach(targetItem => {
+				targetItem.classList.add(ITEM_CLASS);
+				targetItem.classList.add(HOVERED_ITEM_CLASS);
+			});
 		}
 
-		this._activeElement = document.activeElement;
+		if (hoveredItemId && hoveredItemType) {
+			this.store.dispatch({
+				hoveredItemId,
+				hoveredItemType,
+				type: UPDATE_HOVERED_ITEM
+			});
+		} else {
+			this.store.dispatch({
+				type: CLEAR_HOVERED_ITEM
+			});
+		}
 	}
 }
 
@@ -167,32 +277,30 @@ class FragmentsEditor extends Component {
  * @static
  * @type {object}
  */
-FragmentsEditor.STATE = Object.assign(
-	{
+FragmentsEditor.STATE = {
+	/**
+	 * @default false
+	 * @instance
+	 * @memberOf FragmentsEditor
+	 * @private
+	 * @review
+	 * @type {boolean}
+	 */
+	_shiftPressed: Config.bool()
+		.internal()
+		.value(false),
 
-		/**
-		 * Previous document active element
-		 * @default undefined
-		 * @instance
-		 * @memberOf FragmentsEditor
-		 * @review
-		 * @type {object}
-		 */
-		_activeElement: Config.object(),
-
-		/**
-		 * Store instance
-		 * @default undefined
-		 * @instance
-		 * @memberOf FragmentsEditor
-		 * @review
-		 * @type {Store}
-		 */
-		store: Config.instanceOf(Store)
-
-	},
-	INITIAL_STATE
-);
+	/**
+	 * Store instance
+	 * @default undefined
+	 * @instance
+	 * @memberOf FragmentsEditor
+	 * @review
+	 * @type {Store}
+	 */
+	store: Config.instanceOf(Store),
+	...INITIAL_STATE
+};
 
 Soy.register(FragmentsEditor, templates);
 

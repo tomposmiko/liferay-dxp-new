@@ -16,8 +16,6 @@ package com.liferay.segments.service;
 
 import com.liferay.portal.kernel.service.ServiceWrapper;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 /**
  * Provides a wrapper for {@link SegmentsExperienceLocalService}.
  *
@@ -25,7 +23,6 @@ import org.osgi.annotation.versioning.ProviderType;
  * @see SegmentsExperienceLocalService
  * @generated
  */
-@ProviderType
 public class SegmentsExperienceLocalServiceWrapper
 	implements SegmentsExperienceLocalService,
 			   ServiceWrapper<SegmentsExperienceLocalService> {
@@ -36,6 +33,11 @@ public class SegmentsExperienceLocalServiceWrapper
 		_segmentsExperienceLocalService = segmentsExperienceLocalService;
 	}
 
+	/**
+	 * NOTE FOR DEVELOPERS:
+	 *
+	 * Never modify or reference this interface directly. Always use {@link SegmentsExperienceLocalServiceUtil} to access the segments experience local service. Add custom service methods to <code>com.liferay.segments.service.impl.SegmentsExperienceLocalServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
+	 */
 	@Override
 	public com.liferay.segments.model.SegmentsExperience addSegmentsExperience(
 			long segmentsEntryId, long classNameId, long classPK,
@@ -174,7 +176,7 @@ public class SegmentsExperienceLocalServiceWrapper
 	 * Performs a dynamic query on the database and returns a range of the matching rows.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>com.liferay.segments.model.impl.SegmentsExperienceModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>com.liferay.segments.model.impl.SegmentsExperienceModelImpl</code>.
 	 * </p>
 	 *
 	 * @param dynamicQuery the dynamic query
@@ -195,7 +197,7 @@ public class SegmentsExperienceLocalServiceWrapper
 	 * Performs a dynamic query on the database and returns an ordered range of the matching rows.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>com.liferay.segments.model.impl.SegmentsExperienceModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>com.liferay.segments.model.impl.SegmentsExperienceModelImpl</code>.
 	 * </p>
 	 *
 	 * @param dynamicQuery the dynamic query
@@ -249,6 +251,14 @@ public class SegmentsExperienceLocalServiceWrapper
 
 		return _segmentsExperienceLocalService.fetchSegmentsExperience(
 			segmentsExperienceId);
+	}
+
+	@Override
+	public com.liferay.segments.model.SegmentsExperience
+		fetchSegmentsExperience(long groupId, String segmentsExperienceKey) {
+
+		return _segmentsExperienceLocalService.fetchSegmentsExperience(
+			groupId, segmentsExperienceKey);
 	}
 
 	/**
@@ -325,6 +335,15 @@ public class SegmentsExperienceLocalServiceWrapper
 			segmentsExperienceId);
 	}
 
+	@Override
+	public com.liferay.segments.model.SegmentsExperience getSegmentsExperience(
+			long groupId, String segmentsExperienceKey)
+		throws com.liferay.portal.kernel.exception.PortalException {
+
+		return _segmentsExperienceLocalService.getSegmentsExperience(
+			groupId, segmentsExperienceKey);
+	}
+
 	/**
 	 * Returns the segments experience matching the UUID and group.
 	 *
@@ -346,7 +365,7 @@ public class SegmentsExperienceLocalServiceWrapper
 	 * Returns a range of all the segments experiences.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>com.liferay.segments.model.impl.SegmentsExperienceModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>com.liferay.segments.model.impl.SegmentsExperienceModelImpl</code>.
 	 * </p>
 	 *
 	 * @param start the lower bound of the range of segments experiences
@@ -359,6 +378,14 @@ public class SegmentsExperienceLocalServiceWrapper
 
 		return _segmentsExperienceLocalService.getSegmentsExperiences(
 			start, end);
+	}
+
+	@Override
+	public java.util.List<com.liferay.segments.model.SegmentsExperience>
+		getSegmentsExperiences(long groupId, long classNameId, long classPK) {
+
+		return _segmentsExperienceLocalService.getSegmentsExperiences(
+			groupId, classNameId, classPK);
 	}
 
 	@Override
@@ -383,6 +410,16 @@ public class SegmentsExperienceLocalServiceWrapper
 		return _segmentsExperienceLocalService.getSegmentsExperiences(
 			groupId, classNameId, classPK, active, start, end,
 			orderByComparator);
+	}
+
+	@Override
+	public java.util.List<com.liferay.segments.model.SegmentsExperience>
+		getSegmentsExperiences(
+			long groupId, long[] segmentsEntryIds, long classNameId,
+			long classPK, boolean active) {
+
+		return _segmentsExperienceLocalService.getSegmentsExperiences(
+			groupId, segmentsEntryIds, classNameId, classPK, active);
 	}
 
 	@Override
@@ -487,6 +524,16 @@ public class SegmentsExperienceLocalServiceWrapper
 
 		return _segmentsExperienceLocalService.updateSegmentsExperience(
 			segmentsExperience);
+	}
+
+	@Override
+	public com.liferay.segments.model.SegmentsExperience
+			updateSegmentsExperienceActive(
+				long segmentsExperienceId, boolean active)
+		throws com.liferay.portal.kernel.exception.PortalException {
+
+		return _segmentsExperienceLocalService.updateSegmentsExperienceActive(
+			segmentsExperienceId, active);
 	}
 
 	@Override

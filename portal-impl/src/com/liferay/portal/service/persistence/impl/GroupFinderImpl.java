@@ -1054,9 +1054,7 @@ public class GroupFinderImpl
 		StringBundler sb = new StringBundler(params.size());
 
 		for (Map.Entry<String, Object> entry : params.entrySet()) {
-			Object value = entry.getValue();
-
-			if (Validator.isNull(value)) {
+			if (Validator.isNull(entry.getValue())) {
 				continue;
 			}
 
@@ -1583,7 +1581,7 @@ public class GroupFinderImpl
 	}
 
 	private final LinkedHashMap<String, Object> _emptyLinkedHashMap =
-		new LinkedHashMap<>(0);
+		new LinkedHashMap<>();
 	private final Map<String, String> _findByCompanyIdSQLCache =
 		new ConcurrentHashMap<>();
 	private final Map<String, String> _findByC_C_PG_N_DSQLCache =

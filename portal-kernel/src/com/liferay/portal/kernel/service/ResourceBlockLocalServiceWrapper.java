@@ -14,8 +14,6 @@
 
 package com.liferay.portal.kernel.service;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 /**
  * Provides a wrapper for {@link ResourceBlockLocalService}.
  *
@@ -25,7 +23,6 @@ import org.osgi.annotation.versioning.ProviderType;
  * @generated
  */
 @Deprecated
-@ProviderType
 public class ResourceBlockLocalServiceWrapper
 	implements ResourceBlockLocalService,
 			   ServiceWrapper<ResourceBlockLocalService> {
@@ -36,9 +33,15 @@ public class ResourceBlockLocalServiceWrapper
 		_resourceBlockLocalService = resourceBlockLocalService;
 	}
 
+	/**
+	 * NOTE FOR DEVELOPERS:
+	 *
+	 * Never modify or reference this interface directly. Always use {@link ResourceBlockLocalServiceUtil} to access the resource block local service. Add custom service methods to <code>com.liferay.portal.service.impl.ResourceBlockLocalServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
+	 */
 	@Override
 	public void addCompanyScopePermission(
-			long companyId, String name, long roleId, String actionId)
+			long companyId, java.lang.String name, long roleId,
+			java.lang.String actionId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		_resourceBlockLocalService.addCompanyScopePermission(
@@ -47,7 +50,8 @@ public class ResourceBlockLocalServiceWrapper
 
 	@Override
 	public void addCompanyScopePermissions(
-		long companyId, String name, long roleId, long actionIdsLong) {
+		long companyId, java.lang.String name, long roleId,
+		long actionIdsLong) {
 
 		_resourceBlockLocalService.addCompanyScopePermissions(
 			companyId, name, roleId, actionIdsLong);
@@ -55,8 +59,8 @@ public class ResourceBlockLocalServiceWrapper
 
 	@Override
 	public void addGroupScopePermission(
-			long companyId, long groupId, String name, long roleId,
-			String actionId)
+			long companyId, long groupId, java.lang.String name, long roleId,
+			java.lang.String actionId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		_resourceBlockLocalService.addGroupScopePermission(
@@ -65,7 +69,7 @@ public class ResourceBlockLocalServiceWrapper
 
 	@Override
 	public void addGroupScopePermissions(
-		long companyId, long groupId, String name, long roleId,
+		long companyId, long groupId, java.lang.String name, long roleId,
 		long actionIdsLong) {
 
 		_resourceBlockLocalService.addGroupScopePermissions(
@@ -74,8 +78,8 @@ public class ResourceBlockLocalServiceWrapper
 
 	@Override
 	public void addIndividualScopePermission(
-			long companyId, long groupId, String name, long primKey,
-			long roleId, String actionId)
+			long companyId, long groupId, java.lang.String name, long primKey,
+			long roleId, java.lang.String actionId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		_resourceBlockLocalService.addIndividualScopePermission(
@@ -84,9 +88,9 @@ public class ResourceBlockLocalServiceWrapper
 
 	@Override
 	public void addIndividualScopePermission(
-			long companyId, long groupId, String name,
+			long companyId, long groupId, java.lang.String name,
 			com.liferay.portal.kernel.model.PermissionedModel permissionedModel,
-			long roleId, String actionId)
+			long roleId, java.lang.String actionId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		_resourceBlockLocalService.addIndividualScopePermission(
@@ -95,7 +99,7 @@ public class ResourceBlockLocalServiceWrapper
 
 	@Override
 	public void addIndividualScopePermissions(
-			long companyId, long groupId, String name, long primKey,
+			long companyId, long groupId, java.lang.String name, long primKey,
 			long roleId, long actionIdsLong)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
@@ -105,7 +109,7 @@ public class ResourceBlockLocalServiceWrapper
 
 	@Override
 	public void addIndividualScopePermissions(
-		long companyId, long groupId, String name,
+		long companyId, long groupId, java.lang.String name,
 		com.liferay.portal.kernel.model.PermissionedModel permissionedModel,
 		long roleId, long actionIdsLong) {
 
@@ -128,7 +132,8 @@ public class ResourceBlockLocalServiceWrapper
 	 */
 	@Override
 	public com.liferay.portal.kernel.model.ResourceBlock addResourceBlock(
-		long companyId, long groupId, String name, String permissionsHash,
+		long companyId, long groupId, java.lang.String name,
+		java.lang.String permissionsHash,
 		com.liferay.portal.kernel.model.ResourceBlockPermissionsContainer
 			resourceBlockPermissionsContainer) {
 
@@ -224,7 +229,7 @@ public class ResourceBlockLocalServiceWrapper
 	 * Performs a dynamic query on the database and returns a range of the matching rows.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>com.liferay.portal.model.impl.ResourceBlockModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>com.liferay.portal.model.impl.ResourceBlockModelImpl</code>.
 	 * </p>
 	 *
 	 * @param dynamicQuery the dynamic query
@@ -245,7 +250,7 @@ public class ResourceBlockLocalServiceWrapper
 	 * Performs a dynamic query on the database and returns an ordered range of the matching rows.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>com.liferay.portal.model.impl.ResourceBlockModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>com.liferay.portal.model.impl.ResourceBlockModelImpl</code>.
 	 * </p>
 	 *
 	 * @param dynamicQuery the dynamic query
@@ -308,28 +313,29 @@ public class ResourceBlockLocalServiceWrapper
 	}
 
 	@Override
-	public long getActionId(String name, String actionId)
+	public long getActionId(java.lang.String name, java.lang.String actionId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _resourceBlockLocalService.getActionId(name, actionId);
 	}
 
 	@Override
-	public long getActionIds(String name, java.util.List<String> actionIds)
+	public long getActionIds(
+			java.lang.String name, java.util.List<java.lang.String> actionIds)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _resourceBlockLocalService.getActionIds(name, actionIds);
 	}
 
 	@Override
-	public java.util.List<String> getActionIds(
-		String name, long actionIdsLong) {
+	public java.util.List<java.lang.String> getActionIds(
+		java.lang.String name, long actionIdsLong) {
 
 		return _resourceBlockLocalService.getActionIds(name, actionIdsLong);
 	}
 
 	@Override
-	public java.util.List<String> getCompanyScopePermissions(
+	public java.util.List<java.lang.String> getCompanyScopePermissions(
 		com.liferay.portal.kernel.model.ResourceBlock resourceBlock,
 		long roleId) {
 
@@ -338,7 +344,7 @@ public class ResourceBlockLocalServiceWrapper
 	}
 
 	@Override
-	public java.util.List<String> getGroupScopePermissions(
+	public java.util.List<java.lang.String> getGroupScopePermissions(
 		com.liferay.portal.kernel.model.ResourceBlock resourceBlock,
 		long roleId) {
 
@@ -359,20 +365,20 @@ public class ResourceBlockLocalServiceWrapper
 	 * @return the OSGi service identifier
 	 */
 	@Override
-	public String getOSGiServiceIdentifier() {
+	public java.lang.String getOSGiServiceIdentifier() {
 		return _resourceBlockLocalService.getOSGiServiceIdentifier();
 	}
 
 	@Override
 	public com.liferay.portal.kernel.model.PermissionedModel
-			getPermissionedModel(String name, long primKey)
+			getPermissionedModel(java.lang.String name, long primKey)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _resourceBlockLocalService.getPermissionedModel(name, primKey);
 	}
 
 	@Override
-	public java.util.List<String> getPermissions(
+	public java.util.List<java.lang.String> getPermissions(
 		com.liferay.portal.kernel.model.ResourceBlock resourceBlock,
 		long roleId) {
 
@@ -404,17 +410,17 @@ public class ResourceBlockLocalServiceWrapper
 
 	@Override
 	public com.liferay.portal.kernel.model.ResourceBlock getResourceBlock(
-			String name, long primKey)
+			java.lang.String name, long primKey)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _resourceBlockLocalService.getResourceBlock(name, primKey);
 	}
 
 	@Override
-	public java.util.List<Long> getResourceBlockIds(
+	public java.util.List<java.lang.Long> getResourceBlockIds(
 			com.liferay.portal.kernel.security.permission.ResourceBlockIdsBag
 				resourceBlockIdsBag,
-			String name, String actionId)
+			java.lang.String name, java.lang.String actionId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _resourceBlockLocalService.getResourceBlockIds(
@@ -424,7 +430,8 @@ public class ResourceBlockLocalServiceWrapper
 	@Override
 	public com.liferay.portal.kernel.security.permission.ResourceBlockIdsBag
 		getResourceBlockIdsBag(
-			long companyId, long groupId, String name, long[] roleIds) {
+			long companyId, long groupId, java.lang.String name,
+			long[] roleIds) {
 
 		return _resourceBlockLocalService.getResourceBlockIdsBag(
 			companyId, groupId, name, roleIds);
@@ -434,7 +441,7 @@ public class ResourceBlockLocalServiceWrapper
 	 * Returns a range of all the resource blocks.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>com.liferay.portal.model.impl.ResourceBlockModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>com.liferay.portal.model.impl.ResourceBlockModelImpl</code>.
 	 * </p>
 	 *
 	 * @param start the lower bound of the range of resource blocks
@@ -460,7 +467,7 @@ public class ResourceBlockLocalServiceWrapper
 
 	@Override
 	public java.util.List<com.liferay.portal.kernel.model.Role> getRoles(
-			String name, long primKey, String actionId)
+			java.lang.String name, long primKey, java.lang.String actionId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _resourceBlockLocalService.getRoles(name, primKey, actionId);
@@ -468,7 +475,7 @@ public class ResourceBlockLocalServiceWrapper
 
 	@Override
 	public boolean hasPermission(
-			String name, long primKey, String actionId,
+			java.lang.String name, long primKey, java.lang.String actionId,
 			com.liferay.portal.kernel.security.permission.ResourceBlockIdsBag
 				resourceBlockIdsBag)
 		throws com.liferay.portal.kernel.exception.PortalException {
@@ -479,9 +486,9 @@ public class ResourceBlockLocalServiceWrapper
 
 	@Override
 	public boolean hasPermission(
-			String name,
+			java.lang.String name,
 			com.liferay.portal.kernel.model.PermissionedModel permissionedModel,
-			String actionId,
+			java.lang.String actionId,
 			com.liferay.portal.kernel.security.permission.ResourceBlockIdsBag
 				resourceBlockIdsBag)
 		throws com.liferay.portal.kernel.exception.PortalException {
@@ -491,7 +498,7 @@ public class ResourceBlockLocalServiceWrapper
 	}
 
 	@Override
-	public boolean isSupported(String name) {
+	public boolean isSupported(java.lang.String name) {
 		return _resourceBlockLocalService.isSupported(name);
 	}
 
@@ -504,7 +511,8 @@ public class ResourceBlockLocalServiceWrapper
 	}
 
 	@Override
-	public void releasePermissionedModelResourceBlock(String name, long primKey)
+	public void releasePermissionedModelResourceBlock(
+			java.lang.String name, long primKey)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		_resourceBlockLocalService.releasePermissionedModelResourceBlock(
@@ -539,7 +547,8 @@ public class ResourceBlockLocalServiceWrapper
 
 	@Override
 	public void removeAllGroupScopePermissions(
-		long companyId, String name, long roleId, long actionIdsLong) {
+		long companyId, java.lang.String name, long roleId,
+		long actionIdsLong) {
 
 		_resourceBlockLocalService.removeAllGroupScopePermissions(
 			companyId, name, roleId, actionIdsLong);
@@ -547,7 +556,8 @@ public class ResourceBlockLocalServiceWrapper
 
 	@Override
 	public void removeAllGroupScopePermissions(
-			long companyId, String name, long roleId, String actionId)
+			long companyId, java.lang.String name, long roleId,
+			java.lang.String actionId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		_resourceBlockLocalService.removeAllGroupScopePermissions(
@@ -556,7 +566,8 @@ public class ResourceBlockLocalServiceWrapper
 
 	@Override
 	public void removeCompanyScopePermission(
-			long companyId, String name, long roleId, String actionId)
+			long companyId, java.lang.String name, long roleId,
+			java.lang.String actionId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		_resourceBlockLocalService.removeCompanyScopePermission(
@@ -565,7 +576,8 @@ public class ResourceBlockLocalServiceWrapper
 
 	@Override
 	public void removeCompanyScopePermissions(
-		long companyId, String name, long roleId, long actionIdsLong) {
+		long companyId, java.lang.String name, long roleId,
+		long actionIdsLong) {
 
 		_resourceBlockLocalService.removeCompanyScopePermissions(
 			companyId, name, roleId, actionIdsLong);
@@ -573,8 +585,8 @@ public class ResourceBlockLocalServiceWrapper
 
 	@Override
 	public void removeGroupScopePermission(
-			long companyId, long groupId, String name, long roleId,
-			String actionId)
+			long companyId, long groupId, java.lang.String name, long roleId,
+			java.lang.String actionId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		_resourceBlockLocalService.removeGroupScopePermission(
@@ -583,7 +595,7 @@ public class ResourceBlockLocalServiceWrapper
 
 	@Override
 	public void removeGroupScopePermissions(
-		long companyId, long groupId, String name, long roleId,
+		long companyId, long groupId, java.lang.String name, long roleId,
 		long actionIdsLong) {
 
 		_resourceBlockLocalService.removeGroupScopePermissions(
@@ -592,8 +604,8 @@ public class ResourceBlockLocalServiceWrapper
 
 	@Override
 	public void removeIndividualScopePermission(
-			long companyId, long groupId, String name, long primKey,
-			long roleId, String actionId)
+			long companyId, long groupId, java.lang.String name, long primKey,
+			long roleId, java.lang.String actionId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		_resourceBlockLocalService.removeIndividualScopePermission(
@@ -602,9 +614,9 @@ public class ResourceBlockLocalServiceWrapper
 
 	@Override
 	public void removeIndividualScopePermission(
-			long companyId, long groupId, String name,
+			long companyId, long groupId, java.lang.String name,
 			com.liferay.portal.kernel.model.PermissionedModel permissionedModel,
-			long roleId, String actionId)
+			long roleId, java.lang.String actionId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		_resourceBlockLocalService.removeIndividualScopePermission(
@@ -613,7 +625,7 @@ public class ResourceBlockLocalServiceWrapper
 
 	@Override
 	public void removeIndividualScopePermissions(
-			long companyId, long groupId, String name, long primKey,
+			long companyId, long groupId, java.lang.String name, long primKey,
 			long roleId, long actionIdsLong)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
@@ -623,7 +635,7 @@ public class ResourceBlockLocalServiceWrapper
 
 	@Override
 	public void removeIndividualScopePermissions(
-		long companyId, long groupId, String name,
+		long companyId, long groupId, java.lang.String name,
 		com.liferay.portal.kernel.model.PermissionedModel permissionedModel,
 		long roleId, long actionIdsLong) {
 
@@ -633,8 +645,8 @@ public class ResourceBlockLocalServiceWrapper
 
 	@Override
 	public void setCompanyScopePermissions(
-			long companyId, String name, long roleId,
-			java.util.List<String> actionIds)
+			long companyId, java.lang.String name, long roleId,
+			java.util.List<java.lang.String> actionIds)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		_resourceBlockLocalService.setCompanyScopePermissions(
@@ -643,7 +655,8 @@ public class ResourceBlockLocalServiceWrapper
 
 	@Override
 	public void setCompanyScopePermissions(
-		long companyId, String name, long roleId, long actionIdsLong) {
+		long companyId, java.lang.String name, long roleId,
+		long actionIdsLong) {
 
 		_resourceBlockLocalService.setCompanyScopePermissions(
 			companyId, name, roleId, actionIdsLong);
@@ -651,8 +664,8 @@ public class ResourceBlockLocalServiceWrapper
 
 	@Override
 	public void setGroupScopePermissions(
-			long companyId, long groupId, String name, long roleId,
-			java.util.List<String> actionIds)
+			long companyId, long groupId, java.lang.String name, long roleId,
+			java.util.List<java.lang.String> actionIds)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		_resourceBlockLocalService.setGroupScopePermissions(
@@ -661,7 +674,7 @@ public class ResourceBlockLocalServiceWrapper
 
 	@Override
 	public void setGroupScopePermissions(
-		long companyId, long groupId, String name, long roleId,
+		long companyId, long groupId, java.lang.String name, long roleId,
 		long actionIdsLong) {
 
 		_resourceBlockLocalService.setGroupScopePermissions(
@@ -670,8 +683,8 @@ public class ResourceBlockLocalServiceWrapper
 
 	@Override
 	public void setIndividualScopePermissions(
-			long companyId, long groupId, String name, long primKey,
-			long roleId, java.util.List<String> actionIds)
+			long companyId, long groupId, java.lang.String name, long primKey,
+			long roleId, java.util.List<java.lang.String> actionIds)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		_resourceBlockLocalService.setIndividualScopePermissions(
@@ -680,7 +693,7 @@ public class ResourceBlockLocalServiceWrapper
 
 	@Override
 	public void setIndividualScopePermissions(
-			long companyId, long groupId, String name, long primKey,
+			long companyId, long groupId, java.lang.String name, long primKey,
 			long roleId, long actionIdsLong)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
@@ -690,8 +703,9 @@ public class ResourceBlockLocalServiceWrapper
 
 	@Override
 	public void setIndividualScopePermissions(
-			long companyId, long groupId, String name, long primKey,
-			java.util.Map<Long, String[]> roleIdsToActionIds)
+			long companyId, long groupId, java.lang.String name, long primKey,
+			java.util.Map<java.lang.Long, java.lang.String[]>
+				roleIdsToActionIds)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		_resourceBlockLocalService.setIndividualScopePermissions(
@@ -700,9 +714,9 @@ public class ResourceBlockLocalServiceWrapper
 
 	@Override
 	public void setIndividualScopePermissions(
-			long companyId, long groupId, String name,
+			long companyId, long groupId, java.lang.String name,
 			com.liferay.portal.kernel.model.PermissionedModel permissionedModel,
-			long roleId, java.util.List<String> actionIds)
+			long roleId, java.util.List<java.lang.String> actionIds)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		_resourceBlockLocalService.setIndividualScopePermissions(
@@ -711,7 +725,7 @@ public class ResourceBlockLocalServiceWrapper
 
 	@Override
 	public void setIndividualScopePermissions(
-		long companyId, long groupId, String name,
+		long companyId, long groupId, java.lang.String name,
 		com.liferay.portal.kernel.model.PermissionedModel permissionedModel,
 		long roleId, long actionIdsLong) {
 
@@ -721,7 +735,7 @@ public class ResourceBlockLocalServiceWrapper
 
 	@Override
 	public void updateCompanyScopePermissions(
-		long companyId, String name, long roleId, long actionIdsLong,
+		long companyId, java.lang.String name, long roleId, long actionIdsLong,
 		int operator) {
 
 		_resourceBlockLocalService.updateCompanyScopePermissions(
@@ -730,7 +744,7 @@ public class ResourceBlockLocalServiceWrapper
 
 	@Override
 	public void updateGroupScopePermissions(
-		long companyId, long groupId, String name, long roleId,
+		long companyId, long groupId, java.lang.String name, long roleId,
 		long actionIdsLong, int operator) {
 
 		_resourceBlockLocalService.updateGroupScopePermissions(
@@ -739,7 +753,7 @@ public class ResourceBlockLocalServiceWrapper
 
 	@Override
 	public void updateIndividualScopePermissions(
-		long companyId, long groupId, String name,
+		long companyId, long groupId, java.lang.String name,
 		com.liferay.portal.kernel.model.PermissionedModel permissionedModel,
 		long roleId, long actionIdsLong, int operator) {
 
@@ -763,9 +777,9 @@ public class ResourceBlockLocalServiceWrapper
 
 	@Override
 	public com.liferay.portal.kernel.model.ResourceBlock updateResourceBlockId(
-		long companyId, long groupId, String name,
+		long companyId, long groupId, java.lang.String name,
 		com.liferay.portal.kernel.model.PermissionedModel permissionedModel,
-		String permissionsHash,
+		java.lang.String permissionsHash,
 		com.liferay.portal.kernel.model.ResourceBlockPermissionsContainer
 			resourceBlockPermissionsContainer) {
 
@@ -775,7 +789,8 @@ public class ResourceBlockLocalServiceWrapper
 	}
 
 	@Override
-	public void verifyResourceBlockId(long companyId, String name, long primKey)
+	public void verifyResourceBlockId(
+			long companyId, java.lang.String name, long primKey)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		_resourceBlockLocalService.verifyResourceBlockId(

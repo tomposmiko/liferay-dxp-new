@@ -19,8 +19,6 @@ import com.liferay.portal.kernel.model.wrapper.BaseModelWrapper;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 /**
  * <p>
  * This class is a wrapper for {@link ResourceTypePermission}.
@@ -32,10 +30,9 @@ import org.osgi.annotation.versioning.ProviderType;
  * @generated
  */
 @Deprecated
-@ProviderType
 public class ResourceTypePermissionWrapper
 	extends BaseModelWrapper<ResourceTypePermission>
-	implements ResourceTypePermission, ModelWrapper<ResourceTypePermission> {
+	implements ModelWrapper<ResourceTypePermission>, ResourceTypePermission {
 
 	public ResourceTypePermissionWrapper(
 		ResourceTypePermission resourceTypePermission) {
@@ -200,6 +197,11 @@ public class ResourceTypePermissionWrapper
 		return model.isGroupScope();
 	}
 
+	/**
+	 * NOTE FOR DEVELOPERS:
+	 *
+	 * Never modify or reference this class directly. All methods that expect a resource type permission model instance should use the <code>ResourceTypePermission</code> interface instead.
+	 */
 	@Override
 	public void persist() {
 		model.persist();

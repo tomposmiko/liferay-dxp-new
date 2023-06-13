@@ -23,11 +23,11 @@ import com.liferay.headless.delivery.client.json.BaseJSONParser;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.TreeMap;
 import java.util.stream.Stream;
 
 import javax.annotation.Generated;
@@ -311,6 +311,16 @@ public class KnowledgeBaseArticleSerDes {
 			sb.append(knowledgeBaseArticle.getSiteId());
 		}
 
+		if (knowledgeBaseArticle.getSubscribed() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"subscribed\": ");
+
+			sb.append(knowledgeBaseArticle.getSubscribed());
+		}
+
 		if (knowledgeBaseArticle.getTaxonomyCategories() != null) {
 			if (sb.length() > 1) {
 				sb.append(", ");
@@ -409,7 +419,7 @@ public class KnowledgeBaseArticleSerDes {
 			return null;
 		}
 
-		Map<String, String> map = new HashMap<>();
+		Map<String, String> map = new TreeMap<>();
 
 		DateFormat liferayToJSONDateFormat = new SimpleDateFormat(
 			"yyyy-MM-dd'T'HH:mm:ss'Z'");
@@ -556,6 +566,15 @@ public class KnowledgeBaseArticleSerDes {
 			map.put("siteId", String.valueOf(knowledgeBaseArticle.getSiteId()));
 		}
 
+		if (knowledgeBaseArticle.getSubscribed() == null) {
+			map.put("subscribed", null);
+		}
+		else {
+			map.put(
+				"subscribed",
+				String.valueOf(knowledgeBaseArticle.getSubscribed()));
+		}
+
 		if (knowledgeBaseArticle.getTaxonomyCategories() == null) {
 			map.put("taxonomyCategories", null);
 		}
@@ -593,44 +612,7 @@ public class KnowledgeBaseArticleSerDes {
 		return map;
 	}
 
-	private static String _escape(Object object) {
-		String string = String.valueOf(object);
-
-		string = string.replace("\\", "\\\\");
-
-		return string.replace("\"", "\\\"");
-	}
-
-	private static String _toJSON(Map<String, ?> map) {
-		StringBuilder sb = new StringBuilder("{");
-
-		@SuppressWarnings("unchecked")
-		Set set = map.entrySet();
-
-		@SuppressWarnings("unchecked")
-		Iterator<Map.Entry<String, ?>> iterator = set.iterator();
-
-		while (iterator.hasNext()) {
-			Map.Entry<String, ?> entry = iterator.next();
-
-			sb.append("\"");
-			sb.append(entry.getKey());
-			sb.append("\":");
-			sb.append("\"");
-			sb.append(entry.getValue());
-			sb.append("\"");
-
-			if (iterator.hasNext()) {
-				sb.append(",");
-			}
-		}
-
-		sb.append("}");
-
-		return sb.toString();
-	}
-
-	private static class KnowledgeBaseArticleJSONParser
+	public static class KnowledgeBaseArticleJSONParser
 		extends BaseJSONParser<KnowledgeBaseArticle> {
 
 		@Override
@@ -772,6 +754,12 @@ public class KnowledgeBaseArticleSerDes {
 						Long.valueOf((String)jsonParserFieldValue));
 				}
 			}
+			else if (Objects.equals(jsonParserFieldName, "subscribed")) {
+				if (jsonParserFieldValue != null) {
+					knowledgeBaseArticle.setSubscribed(
+						(Boolean)jsonParserFieldValue);
+				}
+			}
 			else if (Objects.equals(
 						jsonParserFieldName, "taxonomyCategories")) {
 
@@ -813,6 +801,70 @@ public class KnowledgeBaseArticleSerDes {
 			}
 		}
 
+	}
+
+	private static String _escape(Object object) {
+		String string = String.valueOf(object);
+
+		string = string.replace("\\", "\\\\");
+
+		return string.replace("\"", "\\\"");
+	}
+
+	private static String _toJSON(Map<String, ?> map) {
+		StringBuilder sb = new StringBuilder("{");
+
+		@SuppressWarnings("unchecked")
+		Set set = map.entrySet();
+
+		@SuppressWarnings("unchecked")
+		Iterator<Map.Entry<String, ?>> iterator = set.iterator();
+
+		while (iterator.hasNext()) {
+			Map.Entry<String, ?> entry = iterator.next();
+
+			sb.append("\"");
+			sb.append(entry.getKey());
+			sb.append("\":");
+
+			Object value = entry.getValue();
+
+			Class<?> valueClass = value.getClass();
+
+			if (value instanceof Map) {
+				sb.append(_toJSON((Map)value));
+			}
+			else if (valueClass.isArray()) {
+				Object[] values = (Object[])value;
+
+				sb.append("[");
+
+				for (int i = 0; i < values.length; i++) {
+					sb.append("\"");
+					sb.append(_escape(values[i]));
+					sb.append("\"");
+
+					if ((i + 1) < values.length) {
+						sb.append(", ");
+					}
+				}
+
+				sb.append("]");
+			}
+			else {
+				sb.append("\"");
+				sb.append(_escape(entry.getValue()));
+				sb.append("\"");
+			}
+
+			if (iterator.hasNext()) {
+				sb.append(",");
+			}
+		}
+
+		sb.append("}");
+
+		return sb.toString();
 	}
 
 }

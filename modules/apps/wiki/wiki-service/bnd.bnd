@@ -1,6 +1,6 @@
 Bundle-Name: Liferay Wiki Service
 Bundle-SymbolicName: com.liferay.wiki.service
-Bundle-Version: 3.0.12
+Bundle-Version: 3.0.24
 Import-Package:\
 	!com.liferay.portal.tools.sql,\
 	\
@@ -40,5 +40,6 @@ Import-Package:\
 	com.liferay.portal.kernel.search;version="[7.0.0,8.1.0)",\
 	\
 	*
-Liferay-Require-SchemaVersion: 2.0.0
+Liferay-Require-SchemaVersion: 2.1.0
 Liferay-Service: true
+-dsannotations-options: inherit

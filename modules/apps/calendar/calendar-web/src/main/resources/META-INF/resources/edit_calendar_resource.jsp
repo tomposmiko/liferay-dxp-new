@@ -36,7 +36,8 @@ String code = BeanParamUtil.getString(calendarResource, request, "code");
 
 <liferay-ui:header
 	backURL="<%= redirect %>"
-	title='<%= (calendarResource == null) ? "new-calendar-resource" : calendarResource.getName(locale) %>'
+	localizeTitle="<%= false %>"
+	title='<%= (calendarResource == null) ? LanguageUtil.get(request, "new-calendar-resource") : calendarResource.getName(locale) %>'
 />
 
 <liferay-portlet:actionURL name="updateCalendarResource" var="updateCalendarResourceURL" />
@@ -157,10 +158,15 @@ String code = BeanParamUtil.getString(calendarResource, request, "code");
 
 	<c:choose>
 		<c:when test="<%= CalendarServiceConfigurationValues.CALENDAR_RESOURCE_FORCE_AUTOGENERATE_CODE %>">
-			Liferay.Util.focusFormField(document.<portlet:namespace />fm.<portlet:namespace />name);
+			Liferay.Util.focusFormField(
+				document.<portlet:namespace />fm.<portlet:namespace />name
+			);
 		</c:when>
 		<c:otherwise>
-			Liferay.Util.focusFormField(document.<portlet:namespace />fm.<portlet:namespace /><%= (calendarResource == null) ? "code" : "name" %>);
+			Liferay.Util.focusFormField(
+				document.<portlet:namespace />fm
+					.<portlet:namespace /><%= (calendarResource == null) ? "code" : "name" %>
+			);
 		</c:otherwise>
 	</c:choose>
 </aui:script>

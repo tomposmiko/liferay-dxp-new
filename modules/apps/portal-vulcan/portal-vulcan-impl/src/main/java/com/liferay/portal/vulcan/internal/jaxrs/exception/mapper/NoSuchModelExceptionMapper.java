@@ -37,7 +37,7 @@ public class NoSuchModelExceptionMapper
 	implements ExceptionMapper<NoSuchModelException> {
 
 	@Override
-	public Response toResponse(NoSuchModelException nsme) {
+	public Response toResponse(NoSuchModelException noSuchModelException) {
 		String method = _httpServletRequest.getMethod();
 
 		if (method.equals(HttpMethods.DELETE)) {
@@ -48,10 +48,10 @@ public class NoSuchModelExceptionMapper
 
 		return Response.status(
 			Response.Status.NOT_FOUND
+		).entity(
+			noSuchModelException.getMessage()
 		).type(
 			MediaType.TEXT_PLAIN
-		).entity(
-			nsme.getMessage()
 		).build();
 	}
 

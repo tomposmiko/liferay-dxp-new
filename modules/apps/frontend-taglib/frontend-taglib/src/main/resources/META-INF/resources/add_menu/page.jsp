@@ -133,27 +133,25 @@ String viewMoreURL = (String)request.getAttribute("liferay-frontend:add-menu:vie
 							</a>
 						</li>
 
-						<aui:script use="liferay-store,liferay-util-window">
+						<aui:script use="liferay-util-window">
 							var viewMoreAddMenuElements = A.one('#<%= namespace %>viewMoreButton');
 
-							viewMoreAddMenuElements.on(
-								'click',
-								function(event) {
-									Liferay.Store('com.liferay.addmenu_customizeAddMenuAdviceMessage', true);
+							viewMoreAddMenuElements.on('click', function(event) {
+								Liferay.Util.Session.set(
+									'com.liferay.addmenu_customizeAddMenuAdviceMessage',
+									true
+								);
 
-									Liferay.Util.openWindow(
-										{
-											dialog: {
-												destroyOnHide: true,
-												modal: true
-											},
-											id: '<%= namespace %>selectAddMenuItem',
-											title: '<liferay-ui:message key="more" />',
-											uri: '<%= viewMoreURL %>'
-										}
-									);
-								}
-							);
+								Liferay.Util.openWindow({
+									dialog: {
+										destroyOnHide: true,
+										modal: true
+									},
+									id: '<%= namespace %>selectAddMenuItem',
+									title: '<liferay-ui:message key="more" />',
+									uri: '<%= viewMoreURL %>'
+								});
+							});
 						</aui:script>
 					</c:if>
 				</c:if>

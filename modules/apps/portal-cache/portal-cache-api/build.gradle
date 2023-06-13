@@ -1,6 +1,6 @@
 dependencies {
 	compileOnly group: "com.liferay", name: "com.liferay.petra.string", version: "3.0.0"
-	compileOnly group: "com.liferay.portal", name: "com.liferay.portal.kernel", version: "4.0.0"
+	compileOnly group: "com.liferay.portal", name: "com.liferay.portal.kernel", version: "4.34.0"
 
 	testCompile project(":core:petra:petra-io")
 	testCompile project(":core:petra:petra-lang")

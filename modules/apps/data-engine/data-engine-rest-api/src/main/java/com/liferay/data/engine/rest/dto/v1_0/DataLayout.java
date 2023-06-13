@@ -20,9 +20,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import com.liferay.petra.function.UnsafeSupplier;
 import com.liferay.petra.string.StringBundler;
-
-import graphql.annotations.annotationTypes.GraphQLField;
-import graphql.annotations.annotationTypes.GraphQLName;
+import com.liferay.portal.vulcan.graphql.annotation.GraphQLField;
+import com.liferay.portal.vulcan.graphql.annotation.GraphQLName;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 
@@ -36,6 +35,8 @@ import java.util.Objects;
 import java.util.Set;
 
 import javax.annotation.Generated;
+
+import javax.validation.Valid;
 
 import javax.xml.bind.annotation.XmlRootElement;
 
@@ -78,6 +79,35 @@ public class DataLayout {
 	protected Long dataDefinitionId;
 
 	@Schema
+	public String getDataLayoutKey() {
+		return dataLayoutKey;
+	}
+
+	public void setDataLayoutKey(String dataLayoutKey) {
+		this.dataLayoutKey = dataLayoutKey;
+	}
+
+	@JsonIgnore
+	public void setDataLayoutKey(
+		UnsafeSupplier<String, Exception> dataLayoutKeyUnsafeSupplier) {
+
+		try {
+			dataLayoutKey = dataLayoutKeyUnsafeSupplier.get();
+		}
+		catch (RuntimeException re) {
+			throw re;
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	@GraphQLField
+	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
+	protected String dataLayoutKey;
+
+	@Schema
+	@Valid
 	public DataLayoutPage[] getDataLayoutPages() {
 		return dataLayoutPages;
 	}
@@ -163,34 +193,7 @@ public class DataLayout {
 	protected Date dateModified;
 
 	@Schema
-	public String getDefaultLanguageId() {
-		return defaultLanguageId;
-	}
-
-	public void setDefaultLanguageId(String defaultLanguageId) {
-		this.defaultLanguageId = defaultLanguageId;
-	}
-
-	@JsonIgnore
-	public void setDefaultLanguageId(
-		UnsafeSupplier<String, Exception> defaultLanguageIdUnsafeSupplier) {
-
-		try {
-			defaultLanguageId = defaultLanguageIdUnsafeSupplier.get();
-		}
-		catch (RuntimeException re) {
-			throw re;
-		}
-		catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	@GraphQLField
-	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
-	protected String defaultLanguageId;
-
-	@Schema
+	@Valid
 	public Map<String, Object> getDescription() {
 		return description;
 	}
@@ -246,6 +249,7 @@ public class DataLayout {
 	protected Long id;
 
 	@Schema
+	@Valid
 	public Map<String, Object> getName() {
 		return name;
 	}
@@ -300,6 +304,34 @@ public class DataLayout {
 	@GraphQLField
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected String paginationMode;
+
+	@Schema
+	public Long getSiteId() {
+		return siteId;
+	}
+
+	public void setSiteId(Long siteId) {
+		this.siteId = siteId;
+	}
+
+	@JsonIgnore
+	public void setSiteId(
+		UnsafeSupplier<Long, Exception> siteIdUnsafeSupplier) {
+
+		try {
+			siteId = siteIdUnsafeSupplier.get();
+		}
+		catch (RuntimeException re) {
+			throw re;
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	@GraphQLField
+	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
+	protected Long siteId;
 
 	@Schema
 	public Long getUserId() {
@@ -369,6 +401,20 @@ public class DataLayout {
 			sb.append(dataDefinitionId);
 		}
 
+		if (dataLayoutKey != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"dataLayoutKey\": ");
+
+			sb.append("\"");
+
+			sb.append(_escape(dataLayoutKey));
+
+			sb.append("\"");
+		}
+
 		if (dataLayoutPages != null) {
 			if (sb.length() > 1) {
 				sb.append(", ");
@@ -417,20 +463,6 @@ public class DataLayout {
 			sb.append("\"");
 		}
 
-		if (defaultLanguageId != null) {
-			if (sb.length() > 1) {
-				sb.append(", ");
-			}
-
-			sb.append("\"defaultLanguageId\": ");
-
-			sb.append("\"");
-
-			sb.append(_escape(defaultLanguageId));
-
-			sb.append("\"");
-		}
-
 		if (description != null) {
 			if (sb.length() > 1) {
 				sb.append(", ");
@@ -475,6 +507,16 @@ public class DataLayout {
 			sb.append("\"");
 		}
 
+		if (siteId != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"siteId\": ");
+
+			sb.append(siteId);
+		}
+
 		if (userId != null) {
 			if (sb.length() > 1) {
 				sb.append(", ");
@@ -489,6 +531,12 @@ public class DataLayout {
 
 		return sb.toString();
 	}
+
+	@Schema(
+		defaultValue = "com.liferay.data.engine.rest.dto.v1_0.DataLayout",
+		name = "x-class-name"
+	)
+	public String xClassName;
 
 	private static String _escape(Object object) {
 		String string = String.valueOf(object);

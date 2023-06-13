@@ -79,7 +79,7 @@ renderResponse.setTitle(oAuth2Application.getName());
 
 					<%
 					for (String applicationName : assignableScopes.getApplicationNames()) {
-						String applicationScopeDescription = StringUtil.merge(assignableScopes.getApplicationScopeDescription(applicationName), ", ");
+						String applicationScopeDescription = StringUtil.merge(assignableScopes.getApplicationScopeDescription(themeDisplay.getCompanyId(), applicationName), ", ");
 					%>
 
 						<li class="list-group-item list-group-item-flex">
@@ -131,16 +131,19 @@ renderResponse.setTitle(oAuth2Application.getName());
 </div>
 
 <script>
-	var removeAccessButton = document.getElementById('<portlet:namespace />removeAccess');
+	var removeAccessButton = document.getElementById(
+		'<portlet:namespace />removeAccess'
+	);
 
 	if (removeAccessButton) {
-		removeAccessButton.addEventListener(
-			'click',
-			function() {
-				if (confirm('<%= UnicodeLanguageUtil.format(request, "x-will-no-longer-have-access-to-your-account-removed-access-cannot-be-recovered", new String[] {oAuth2Application.getName()}) %>')) {
-					submitForm(document.<portlet:namespace/>fm);
-				}
+		removeAccessButton.addEventListener('click', function() {
+			if (
+				confirm(
+					'<%= UnicodeLanguageUtil.format(request, "x-will-no-longer-have-access-to-your-account-removed-access-cannot-be-recovered", new String[] {oAuth2Application.getName()}) %>'
+				)
+			) {
+				submitForm(document.<portlet:namespace/>fm);
 			}
-		);
+		});
 	}
 </script>

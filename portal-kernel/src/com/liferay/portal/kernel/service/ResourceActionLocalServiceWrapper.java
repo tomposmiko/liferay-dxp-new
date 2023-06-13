@@ -14,8 +14,6 @@
 
 package com.liferay.portal.kernel.service;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 /**
  * Provides a wrapper for {@link ResourceActionLocalService}.
  *
@@ -23,7 +21,6 @@ import org.osgi.annotation.versioning.ProviderType;
  * @see ResourceActionLocalService
  * @generated
  */
-@ProviderType
 public class ResourceActionLocalServiceWrapper
 	implements ResourceActionLocalService,
 			   ServiceWrapper<ResourceActionLocalService> {
@@ -49,7 +46,7 @@ public class ResourceActionLocalServiceWrapper
 
 	@Override
 	public com.liferay.portal.kernel.model.ResourceAction addResourceAction(
-		String name, String actionId, long bitwiseValue) {
+		java.lang.String name, java.lang.String actionId, long bitwiseValue) {
 
 		return _resourceActionLocalService.addResourceAction(
 			name, actionId, bitwiseValue);
@@ -62,14 +59,14 @@ public class ResourceActionLocalServiceWrapper
 
 	@Override
 	public void checkResourceActions(
-		String name, java.util.List<String> actionIds) {
+		java.lang.String name, java.util.List<java.lang.String> actionIds) {
 
 		_resourceActionLocalService.checkResourceActions(name, actionIds);
 	}
 
 	@Override
 	public void checkResourceActions(
-		String name, java.util.List<String> actionIds,
+		java.lang.String name, java.util.List<java.lang.String> actionIds,
 		boolean addDefaultActions) {
 
 		_resourceActionLocalService.checkResourceActions(
@@ -152,7 +149,7 @@ public class ResourceActionLocalServiceWrapper
 	 * Performs a dynamic query on the database and returns a range of the matching rows.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>com.liferay.portal.model.impl.ResourceActionModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>com.liferay.portal.model.impl.ResourceActionModelImpl</code>.
 	 * </p>
 	 *
 	 * @param dynamicQuery the dynamic query
@@ -173,7 +170,7 @@ public class ResourceActionLocalServiceWrapper
 	 * Performs a dynamic query on the database and returns an ordered range of the matching rows.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>com.liferay.portal.model.impl.ResourceActionModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>com.liferay.portal.model.impl.ResourceActionModelImpl</code>.
 	 * </p>
 	 *
 	 * @param dynamicQuery the dynamic query
@@ -231,7 +228,7 @@ public class ResourceActionLocalServiceWrapper
 
 	@Override
 	public com.liferay.portal.kernel.model.ResourceAction fetchResourceAction(
-		String name, String actionId) {
+		java.lang.String name, java.lang.String actionId) {
 
 		return _resourceActionLocalService.fetchResourceAction(name, actionId);
 	}
@@ -256,7 +253,7 @@ public class ResourceActionLocalServiceWrapper
 	 * @return the OSGi service identifier
 	 */
 	@Override
-	public String getOSGiServiceIdentifier() {
+	public java.lang.String getOSGiServiceIdentifier() {
 		return _resourceActionLocalService.getOSGiServiceIdentifier();
 	}
 
@@ -285,7 +282,7 @@ public class ResourceActionLocalServiceWrapper
 
 	@Override
 	public com.liferay.portal.kernel.model.ResourceAction getResourceAction(
-			String name, String actionId)
+			java.lang.String name, java.lang.String actionId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _resourceActionLocalService.getResourceAction(name, actionId);
@@ -295,7 +292,7 @@ public class ResourceActionLocalServiceWrapper
 	 * Returns a range of all the resource actions.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>com.liferay.portal.model.impl.ResourceActionModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>com.liferay.portal.model.impl.ResourceActionModelImpl</code>.
 	 * </p>
 	 *
 	 * @param start the lower bound of the range of resource actions
@@ -311,7 +308,7 @@ public class ResourceActionLocalServiceWrapper
 
 	@Override
 	public java.util.List<com.liferay.portal.kernel.model.ResourceAction>
-		getResourceActions(String name) {
+		getResourceActions(java.lang.String name) {
 
 		return _resourceActionLocalService.getResourceActions(name);
 	}
@@ -327,7 +324,7 @@ public class ResourceActionLocalServiceWrapper
 	}
 
 	@Override
-	public int getResourceActionsCount(String name) {
+	public int getResourceActionsCount(java.lang.String name) {
 		return _resourceActionLocalService.getResourceActionsCount(name);
 	}
 

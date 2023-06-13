@@ -43,8 +43,6 @@ import java.util.Map;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 /**
  * The base model implementation for the LayoutSetVersion service. Represents a row in the &quot;LayoutSetVersion&quot; database table, with each column mapped to a property of this class.
  *
@@ -56,11 +54,10 @@ import org.osgi.annotation.versioning.ProviderType;
  * @see LayoutSetVersionImpl
  * @generated
  */
-@ProviderType
 public class LayoutSetVersionModelImpl
 	extends BaseModelImpl<LayoutSetVersion> implements LayoutSetVersionModel {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this class directly. All methods that expect a layout set version model instance should use the <code>LayoutSetVersion</code> interface instead.
@@ -133,17 +130,19 @@ public class LayoutSetVersionModelImpl
 			"value.object.column.bitmask.enabled.com.liferay.portal.kernel.model.LayoutSetVersion"),
 		true);
 
-	public static final long GROUPID_COLUMN_BITMASK = 1L;
+	public static final long COMPANYID_COLUMN_BITMASK = 1L;
 
-	public static final long LAYOUTSETID_COLUMN_BITMASK = 2L;
+	public static final long GROUPID_COLUMN_BITMASK = 2L;
 
-	public static final long LAYOUTSETPROTOTYPEUUID_COLUMN_BITMASK = 4L;
+	public static final long LAYOUTSETID_COLUMN_BITMASK = 4L;
 
-	public static final long LOGOID_COLUMN_BITMASK = 8L;
+	public static final long LAYOUTSETPROTOTYPEUUID_COLUMN_BITMASK = 8L;
 
-	public static final long PRIVATELAYOUT_COLUMN_BITMASK = 16L;
+	public static final long LOGOID_COLUMN_BITMASK = 16L;
 
-	public static final long VERSION_COLUMN_BITMASK = 32L;
+	public static final long PRIVATELAYOUT_COLUMN_BITMASK = 32L;
+
+	public static final long VERSION_COLUMN_BITMASK = 64L;
 
 	public static final long LOCK_EXPIRATION_TIME = GetterUtil.getLong(
 		com.liferay.portal.util.PropsUtil.get(
@@ -493,7 +492,19 @@ public class LayoutSetVersionModelImpl
 
 	@Override
 	public void setCompanyId(long companyId) {
+		_columnBitmask |= COMPANYID_COLUMN_BITMASK;
+
+		if (!_setOriginalCompanyId) {
+			_setOriginalCompanyId = true;
+
+			_originalCompanyId = _companyId;
+		}
+
 		_companyId = companyId;
+	}
+
+	public long getOriginalCompanyId() {
+		return _originalCompanyId;
 	}
 
 	@Override
@@ -703,7 +714,12 @@ public class LayoutSetVersionModelImpl
 	@Override
 	public LayoutSetVersion toEscapedModel() {
 		if (_escapedModel == null) {
-			_escapedModel = _escapedModelProxyProviderFunction.apply(
+			Function<InvocationHandler, LayoutSetVersion>
+				escapedModelProxyProviderFunction =
+					EscapedModelProxyProviderFunctionHolder.
+						_escapedModelProxyProviderFunction;
+
+			_escapedModel = escapedModelProxyProviderFunction.apply(
 				new AutoEscapeBeanHandler(this));
 		}
 
@@ -816,6 +832,11 @@ public class LayoutSetVersionModelImpl
 			layoutSetVersionModelImpl._groupId;
 
 		layoutSetVersionModelImpl._setOriginalGroupId = false;
+
+		layoutSetVersionModelImpl._originalCompanyId =
+			layoutSetVersionModelImpl._companyId;
+
+		layoutSetVersionModelImpl._setOriginalCompanyId = false;
 
 		layoutSetVersionModelImpl._setModifiedDate = false;
 
@@ -987,8 +1008,12 @@ public class LayoutSetVersionModelImpl
 		return sb.toString();
 	}
 
-	private static final Function<InvocationHandler, LayoutSetVersion>
-		_escapedModelProxyProviderFunction = _getProxyProviderFunction();
+	private static class EscapedModelProxyProviderFunctionHolder {
+
+		private static final Function<InvocationHandler, LayoutSetVersion>
+			_escapedModelProxyProviderFunction = _getProxyProviderFunction();
+
+	}
 
 	private long _layoutSetVersionId;
 	private int _version;
@@ -1001,6 +1026,8 @@ public class LayoutSetVersionModelImpl
 	private long _originalGroupId;
 	private boolean _setOriginalGroupId;
 	private long _companyId;
+	private long _originalCompanyId;
+	private boolean _setOriginalCompanyId;
 	private Date _createDate;
 	private Date _modifiedDate;
 	private boolean _setModifiedDate;

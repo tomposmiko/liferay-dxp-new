@@ -55,6 +55,7 @@ import com.liferay.portal.kernel.portlet.PortletProvider;
 import com.liferay.portal.kernel.portlet.PortletProviderUtil;
 import com.liferay.portal.kernel.portlet.PortletURLFactoryUtil;
 import com.liferay.portal.kernel.portlet.RequestBackedPortletURLFactoryUtil;
+import com.liferay.portal.kernel.search.Indexer;
 import com.liferay.portal.kernel.search.IndexerRegistryUtil;
 import com.liferay.portal.kernel.service.GroupLocalServiceUtil;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
@@ -68,7 +69,7 @@ import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.UnicodeProperties;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
-import com.liferay.segments.constants.SegmentsConstants;
+import com.liferay.segments.constants.SegmentsEntryConstants;
 import com.liferay.segments.model.SegmentsEntry;
 import com.liferay.segments.service.SegmentsEntryLocalServiceUtil;
 import com.liferay.segments.service.SegmentsEntryServiceUtil;
@@ -106,6 +107,7 @@ public class EditAssetListDisplayContext {
 		_portletRequest = portletRequest;
 		_portletResponse = portletResponse;
 		_properties = properties;
+
 		_httpServletRequest = PortalUtil.getHttpServletRequest(portletRequest);
 
 		_themeDisplay = (ThemeDisplay)_httpServletRequest.getAttribute(
@@ -338,9 +340,12 @@ public class EditAssetListDisplayContext {
 
 		_availableClassNameIds = ArrayUtil.filter(
 			_availableClassNameIds,
-			availableClassNameId ->
-				IndexerRegistryUtil.getIndexer(
-					PortalUtil.getClassName(availableClassNameId)) != null);
+			availableClassNameId -> {
+				Indexer indexer = IndexerRegistryUtil.getIndexer(
+					PortalUtil.getClassName(availableClassNameId));
+
+				return indexer != null;
+			});
 
 		return _availableClassNameIds;
 	}
@@ -755,7 +760,7 @@ public class EditAssetListDisplayContext {
 
 		_referencedModelsGroupIds =
 			PortalUtil.getCurrentAndAncestorSiteGroupIds(
-				_themeDisplay.getScopeGroupId(), true);
+				getSelectedGroupIds(), true);
 
 		return _referencedModelsGroupIds;
 	}
@@ -803,14 +808,14 @@ public class EditAssetListDisplayContext {
 
 		_segmentsEntryId = ParamUtil.getLong(
 			_httpServletRequest, "segmentsEntryId",
-			SegmentsConstants.SEGMENTS_ENTRY_ID_DEFAULT);
+			SegmentsEntryConstants.ID_DEFAULT);
 
 		return _segmentsEntryId;
 	}
 
 	public String getSegmentsEntryName(long segmentsEntryId, Locale locale) {
-		if (segmentsEntryId == SegmentsConstants.SEGMENTS_ENTRY_ID_DEFAULT) {
-			return SegmentsConstants.getDefaultSegmentsEntryName(locale);
+		if (segmentsEntryId == SegmentsEntryConstants.ID_DEFAULT) {
+			return SegmentsEntryConstants.getDefaultSegmentsEntryName(locale);
 		}
 
 		SegmentsEntry segmentsEntry =
@@ -917,10 +922,12 @@ public class EditAssetListDisplayContext {
 		return null;
 	}
 
-	public List<Long> getVocabularyIds() {
+	public List<Long> getVocabularyIds() throws PortalException {
+		long[] groupIds = PortalUtil.getCurrentAndAncestorSiteGroupIds(
+			getReferencedModelsGroupIds());
+
 		List<AssetVocabulary> vocabularies =
-			AssetVocabularyServiceUtil.getGroupsVocabularies(
-				new long[] {_themeDisplay.getScopeGroupId()});
+			AssetVocabularyServiceUtil.getGroupsVocabularies(groupIds);
 
 		return ListUtil.toList(
 			vocabularies, AssetVocabulary.VOCABULARY_ID_ACCESSOR);
@@ -985,6 +992,7 @@ public class EditAssetListDisplayContext {
 			_httpServletRequest, "ddmStructureDisplayFieldValue",
 			_properties.getProperty(
 				"ddmStructureDisplayFieldValue", StringPool.BLANK));
+
 		_ddmStructureFieldName = ParamUtil.getString(
 			_httpServletRequest, "ddmStructureFieldName",
 			_properties.getProperty("ddmStructureFieldName", StringPool.BLANK));

@@ -146,31 +146,28 @@ if (portletTitleBasedNavigation) {
 				<c:if test="<%= !portletTitleBasedNavigation %>">
 					<c:choose>
 						<c:when test="<%= print %>">
-							<div class="popup-print">
-								<liferay-ui:icon
-									iconCssClass="icon-print"
-									label="<%= true %>"
-									message="print"
-									url="javascript:print();"
-								/>
-							</div>
+							<aui:script>
+								print();
+
+								setTimeout(function() {
+									window.close();
+								}, 100);
+							</aui:script>
 						</c:when>
 						<c:otherwise>
 							<aui:script>
 								function <portlet:namespace />printPage() {
-									window.open('<%= printPageURL %>', '', 'directories=0,height=480,left=80,location=1,menubar=1,resizable=1,scrollbars=yes,status=0,toolbar=0,top=180,width=640');
+									window.open(
+										'<%= printPageURL %>',
+										'',
+										'directories=0,height=480,left=80,location=1,menubar=1,resizable=1,scrollbars=yes,status=0,toolbar=0,top=180,width=640'
+									);
 								}
 							</aui:script>
 						</c:otherwise>
 					</c:choose>
 
 					<liferay-util:include page="/wiki/top_links.jsp" servletContext="<%= application %>" />
-				</c:if>
-
-				<c:if test="<%= print %>">
-					<aui:script>
-						print();
-					</aui:script>
 				</c:if>
 
 				<%
@@ -232,8 +229,9 @@ if (portletTitleBasedNavigation) {
 								<c:if test="<%= followRedirect || (redirectPage == null) %>">
 									<c:if test="<%= Validator.isNotNull(formattedContent) && WikiNodePermission.contains(permissionChecker, node, ActionKeys.ADD_PAGE) %>">
 										<liferay-ui:icon
-											iconCssClass="icon-plus"
+											icon="plus"
 											label="<%= true %>"
+											markupView="lexicon"
 											message="add-child-page"
 											method="get"
 											url="<%= addPageURL.toString() %>"
@@ -242,8 +240,9 @@ if (portletTitleBasedNavigation) {
 
 									<c:if test="<%= WikiPagePermission.contains(permissionChecker, wikiPage, ActionKeys.UPDATE) %>">
 										<liferay-ui:icon
-											iconCssClass="icon-edit"
+											icon="pencil"
 											label="<%= true %>"
+											markupView="lexicon"
 											message="edit"
 											url="<%= editPageURL.toString() %>"
 										/>
@@ -258,16 +257,18 @@ if (portletTitleBasedNavigation) {
 								%>
 
 								<liferay-ui:icon
-									iconCssClass="icon-file-alt"
+									icon="document"
 									label="<%= true %>"
+									markupView="lexicon"
 									message="details"
 									method="get"
 									url="<%= viewPageDetailsURL.toString() %>"
 								/>
 
 								<liferay-ui:icon
-									iconCssClass="icon-print"
+									icon="print"
 									label="<%= true %>"
+									markupView="lexicon"
 									message="print"
 									url='<%= "javascript:" + renderResponse.getNamespace() + "printPage();" %>'
 								/>

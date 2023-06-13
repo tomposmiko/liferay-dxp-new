@@ -49,7 +49,10 @@ request.setAttribute("view_user.jsp-user", user2);
 						<div class="lfr-asset-metadata">
 							<c:if test="<%= connection %>">
 								<span class="lfr-asset-icon lfr-asset-connection<%= (following || follower) ? StringPool.BLANK : " last" %>">
-									<i class="icon-user"></i>
+									<liferay-ui:icon
+										icon="user"
+										markupView="lexicon"
+									/>
 
 									<liferay-ui:message key="connection" />
 								</span>
@@ -57,7 +60,10 @@ request.setAttribute("view_user.jsp-user", user2);
 
 							<c:if test="<%= following %>">
 								<span class="lfr-asset-icon lfr-asset-following<%= follower ? StringPool.BLANK : " last" %>">
-									<i class="icon-user"></i>
+									<liferay-ui:icon
+										icon="user"
+										markupView="lexicon"
+									/>
 
 									<liferay-ui:message key="following" />
 								</span>
@@ -65,7 +71,10 @@ request.setAttribute("view_user.jsp-user", user2);
 
 							<c:if test="<%= follower %>">
 								<span class="last lfr-asset-follower lfr-asset-icon">
-									<i class="icon-user"></i>
+									<liferay-ui:icon
+										icon="user"
+										markupView="lexicon"
+									/>
 
 									<liferay-ui:message key="follower" />
 								</span>
@@ -132,7 +141,10 @@ request.setAttribute("view_user.jsp-user", user2);
 			</aui:row>
 
 			<div class="field-group lfr-detail-info" data-sectionId="details" data-title="<%= LanguageUtil.get(request, "details") %>">
-				<i class="icon-edit"></i>
+				<liferay-ui:icon
+					icon="pencil"
+					markupView="lexicon"
+				/>
 
 				<c:if test="<%= showIcon %>">
 					<div class="lfr-contact-thumb">
@@ -186,7 +198,7 @@ request.setAttribute("view_user.jsp-user", user2);
 
 									String title = extensionPath.substring(extensionPath.lastIndexOf(StringPool.SLASH) + 1, extensionPath.lastIndexOf(StringPool.PERIOD));
 
-									title = title.replace(CharPool.UNDERLINE, CharPool.DASH);
+									title = StringUtil.replace(title, CharPool.UNDERLINE, CharPool.DASH);
 
 									String cssClass = "lfr-" + title + "-container";
 								%>
@@ -276,7 +288,10 @@ request.setAttribute("view_user.jsp-user", user2);
 									<c:choose>
 										<c:when test="<%= !assetTags.isEmpty() %>">
 											<div class="field-group user-tags-wrapper" data-sectionId="categorization" data-title="<%= LanguageUtil.get(request, "tags") %>">
-												<i class="icon-edit"></i>
+												<liferay-ui:icon
+													icon="pencil"
+													markupView="lexicon"
+												/>
 
 												<ul class="user-tags">
 
@@ -346,7 +361,7 @@ request.setAttribute("view_user.jsp-user", user2);
 
 					var tagName = node.get('tagName');
 
-					if (!tagName || (tagName.toLowerCase() != 'a')) {
+					if (!tagName || tagName.toLowerCase() != 'a') {
 						<portlet:namespace />openDialog(event);
 					}
 				},
@@ -356,35 +371,44 @@ request.setAttribute("view_user.jsp-user", user2);
 			var <portlet:namespace />openDialog = function(event) {
 				var node = event.currentTarget;
 
-				var uri = '<portlet:renderURL windowState="<%= LiferayWindowState.POP_UP.toString() %>"><portlet:param name="mvcPath" value="/user/edit_user_dialogs.jsp" /></portlet:renderURL>';
+				var uri =
+					'<portlet:renderURL windowState="<%= LiferayWindowState.POP_UP.toString() %>"><portlet:param name="mvcPath" value="/user/edit_user_dialogs.jsp" /></portlet:renderURL>';
 
 				if (node.getAttribute('data-sectionId')) {
-					uri = Liferay.Util.addParams('<portlet:namespace />curSectionId=' + node.getAttribute('data-sectionId'), uri) || uri;
+					uri =
+						Liferay.Util.addParams(
+							'<portlet:namespace />curSectionId=' +
+								node.getAttribute('data-sectionId'),
+							uri
+						) || uri;
 				}
 
 				if (node.getAttribute('data-extension')) {
-					uri = Liferay.Util.addParams('<portlet:namespace />extension=' + node.getAttribute('data-extension'), uri) || uri;
+					uri =
+						Liferay.Util.addParams(
+							'<portlet:namespace />extension=' +
+								node.getAttribute('data-extension'),
+							uri
+						) || uri;
 				}
 
-				var dialog = Liferay.Util.Window.getWindow(
-					{
-						dialog: {
-							align: {
-								node: null,
-								points: ['tc', 'tc']
-							},
-							constrain2view: true,
-							cssClass: 'profile-dialog',
-							destroyOnClose: true,
-							modal: true,
-							resizable: false,
-							width: 800
+				var dialog = Liferay.Util.Window.getWindow({
+					dialog: {
+						align: {
+							node: null,
+							points: ['tc', 'tc']
 						},
-						id: '<portlet:namespace />Dialog',
-						title: node.getAttribute('data-title'),
-						uri: uri
-					}
-				)
+						constrain2view: true,
+						cssClass: 'profile-dialog',
+						destroyOnClose: true,
+						modal: true,
+						resizable: false,
+						width: 800
+					},
+					id: '<portlet:namespace />Dialog',
+					title: node.getAttribute('data-title'),
+					uri: uri
+				});
 			};
 	</aui:script>
 </c:if>

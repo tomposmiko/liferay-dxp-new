@@ -18,6 +18,7 @@ import com.liferay.dynamic.data.mapping.model.DDMStructure;
 import com.liferay.dynamic.data.mapping.model.DDMTemplate;
 import com.liferay.dynamic.data.mapping.service.DDMStructureLocalServiceUtil;
 import com.liferay.dynamic.data.mapping.service.DDMTemplateLocalServiceUtil;
+import com.liferay.dynamic.data.mapping.service.DDMTemplateServiceUtil;
 import com.liferay.dynamic.data.mapping.storage.DDMFormValues;
 import com.liferay.dynamic.data.mapping.storage.Fields;
 import com.liferay.journal.constants.JournalWebKeys;
@@ -29,7 +30,6 @@ import com.liferay.journal.service.JournalFolderLocalServiceUtil;
 import com.liferay.journal.util.JournalConverter;
 import com.liferay.journal.web.internal.security.permission.resource.JournalArticlePermission;
 import com.liferay.journal.web.internal.security.permission.resource.JournalFolderPermission;
-import com.liferay.journal.web.internal.util.JournalChangeTrackingHelperUtil;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.bean.BeanParamUtil;
@@ -52,6 +52,7 @@ import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
+import com.liferay.portal.kernel.workflow.WorkflowConstants;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -267,7 +268,7 @@ public class JournalEditArticleDisplayContext {
 		return _ddmStructureKey;
 	}
 
-	public DDMTemplate getDDMTemplate() {
+	public DDMTemplate getDDMTemplate() throws PortalException {
 		if (_ddmTemplate != null) {
 			return _ddmTemplate;
 		}
@@ -299,6 +300,24 @@ public class JournalEditArticleDisplayContext {
 				getDDMTemplateKey(), true);
 
 			return _ddmTemplate;
+		}
+
+		if (_ddmTemplate == null) {
+			DDMStructure ddmStructure = getDDMStructure();
+
+			List<DDMTemplate> ddmTemplates =
+				DDMTemplateServiceUtil.getTemplates(
+					_themeDisplay.getCompanyId(), ddmStructure.getGroupId(),
+					PortalUtil.getClassNameId(DDMStructure.class),
+					ddmStructure.getStructureId(),
+					PortalUtil.getClassNameId(JournalArticle.class), true,
+					WorkflowConstants.STATUS_APPROVED);
+
+			if (!ddmTemplates.isEmpty()) {
+				_ddmTemplate = ddmTemplates.get(0);
+
+				return _ddmTemplate;
+			}
 		}
 
 		return null;
@@ -438,12 +457,6 @@ public class JournalEditArticleDisplayContext {
 	}
 
 	public String getPublishButtonLabel() throws PortalException {
-		if (JournalChangeTrackingHelperUtil.hasActiveCTCollection(
-				_themeDisplay.getCompanyId(), _themeDisplay.getUserId())) {
-
-			return "publish-to-change-list";
-		}
-
 		if (getClassNameId() > JournalArticleConstants.CLASSNAME_ID_DEFAULT) {
 			return "save";
 		}
@@ -514,7 +527,7 @@ public class JournalEditArticleDisplayContext {
 			return _smallImageSource;
 		}
 
-		if (!_article.getSmallImage()) {
+		if (!_article.isSmallImage()) {
 			_smallImageSource = "none";
 		}
 		else if (Validator.isNotNull(_article.getSmallImageURL())) {
@@ -676,6 +689,10 @@ public class JournalEditArticleDisplayContext {
 	}
 
 	private boolean _isWorkflowEnabled() throws PortalException {
+		if (getClassNameId() > JournalArticleConstants.CLASSNAME_ID_DEFAULT) {
+			return false;
+		}
+
 		if (_hasInheritedWorkflowDefinitionLink()) {
 			return true;
 		}

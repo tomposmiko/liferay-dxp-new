@@ -188,9 +188,10 @@ public class WorkflowInstanceLinkLocalServiceImpl
 
 		long classNameId = classNameLocalService.getClassNameId(className);
 
-		if (workflowInstanceLinkPersistence.countByG_C_C(
-				groupId, companyId, classNameId) == 0) {
+		int count = workflowInstanceLinkPersistence.countByG_C_C(
+			groupId, companyId, classNameId);
 
+		if (count == 0) {
 			return Collections.emptyList();
 		}
 
@@ -271,14 +272,14 @@ public class WorkflowInstanceLinkLocalServiceImpl
 		workflowContext.put(
 			WorkflowConstants.CONTEXT_COMPANY_ID, String.valueOf(companyId));
 		workflowContext.put(
-			WorkflowConstants.CONTEXT_GROUP_ID, String.valueOf(groupId));
-		workflowContext.put(
 			WorkflowConstants.CONTEXT_ENTRY_CLASS_NAME, className);
 		workflowContext.put(
 			WorkflowConstants.CONTEXT_ENTRY_CLASS_PK, String.valueOf(classPK));
 		workflowContext.put(
 			WorkflowConstants.CONTEXT_ENTRY_TYPE,
 			workflowHandler.getType(LocaleUtil.getDefault()));
+		workflowContext.put(
+			WorkflowConstants.CONTEXT_GROUP_ID, String.valueOf(groupId));
 
 		WorkflowInstance workflowInstance =
 			WorkflowInstanceManagerUtil.startWorkflowInstance(

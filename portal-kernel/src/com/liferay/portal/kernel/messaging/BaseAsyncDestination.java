@@ -47,7 +47,10 @@ import java.util.concurrent.TimeUnit;
 /**
  * @author Michael C. Han
  * @author Shuyang Zhou
+ * @deprecated As of Athanasius (7.3.x), replaced by {@link
+ *   		com.liferay.portal.messaging.internal.BaseAsyncDestination}
  */
+@Deprecated
 public abstract class BaseAsyncDestination extends BaseDestination {
 
 	@Override

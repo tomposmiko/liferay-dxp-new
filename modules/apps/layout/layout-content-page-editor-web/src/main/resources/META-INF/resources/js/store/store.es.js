@@ -1,4 +1,19 @@
+/**
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
+ *
+ * This library is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU Lesser General Public License as published by the Free
+ * Software Foundation; either version 2.1 of the License, or (at your option)
+ * any later version.
+ *
+ * This library is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
+ * details.
+ */
+
 import State, {Config} from 'metal-state';
+
 import {DEFAULT_INITIAL_STATE} from './state.es';
 
 /**
@@ -22,9 +37,8 @@ const STORE_DEVTOOLS_ID = '__REDUX_DEVTOOLS_EXTENSION__';
  * @review
  */
 const connect = function(component, store) {
-	component._storeChangeListener = store.on(
-		'change',
-		() => syncStoreState(component, store)
+	component._storeChangeListener = store.on('change', () =>
+		syncStoreState(component, store)
 	);
 
 	syncStoreState(component, store);
@@ -46,29 +60,24 @@ const disconnect = function(component) {
  * Creates a store and links the given components to it.
  * Each component will receive the store as `store` attribute.
  * @param {object} initialState
- * @param {function[]} reducers
+ * @param {function} reducer
  * @param {string[]} componentIds
  * @return {Store}
  * @review
  */
-const createStore = function(initialState, reducers, componentIds = []) {
-	const store = new Store(initialState, reducers);
+const createStore = function(initialState, reducer, componentIds = []) {
+	const store = new Store(initialState, reducer);
 
-	componentIds.forEach(
-		componentId => {
-			Liferay
-				.componentReady(
-					componentId
-				)
-				.then(
-					component => {
-						component.store = store;
+	componentIds.forEach(componentId => {
+		Liferay.componentReady(componentId).then(component => {
+			component.store = store;
 
-						connect(component, store);
-					}
-				);
-		}
-	);
+			connect(
+				component,
+				store
+			);
+		});
+	});
 
 	return store;
 };
@@ -80,42 +89,41 @@ const createStore = function(initialState, reducers, componentIds = []) {
 const syncStoreState = function(component, store) {
 	const state = store.getState();
 
-	component.getStateKeys()
+	component
+		.getStateKeys()
 		.filter(key => key in state)
 		.filter(key => component[key] !== state[key])
-		.forEach(
-			key => {
-				component[key] = state[key];
-			}
-		);
+		.forEach(key => {
+			component[key] = state[key];
+		});
 };
 
 /**
- * Redux-like store that can be used for maintaining a State that can only be
- * modified with pure reducers.
- *
+ * Redux-like store.
  * Store emits a "change" event with the nextState every time the state has
  * been changed.
  *
  * @review
  */
 class Store extends State {
-
 	/**
 	 * @param {object} [initialState={}]
-	 * @param {function[]} [reducers=[]]
+	 * @param {function} [reducer]
 	 * @review
 	 */
-	constructor(initialState = {}, reducers = []) {
+	constructor(initialState = {}, reducer = state => state) {
 		super();
 
 		this.dispatch = this.dispatch.bind(this);
 		this.getState = this.getState.bind(this);
 
 		this._setInitialState(initialState);
-		this.registerReducers(reducers);
+		this.registerReducer(reducer);
 
-		if ((process.env.NODE_ENV === 'development') && (STORE_DEVTOOLS_ID in window)) {
+		if (
+			process.env.NODE_ENV === 'development' &&
+			STORE_DEVTOOLS_ID in window
+		) {
 			this._devTools = window[STORE_DEVTOOLS_ID].connect();
 
 			this._devTools.init(this._state);
@@ -126,7 +134,7 @@ class Store extends State {
 	 * @inheritDoc
 	 */
 	disposed() {
-		if ((process.env.NODE_ENV === 'development') && this._devTools) {
+		if (process.env.NODE_ENV === 'development' && this._devTools) {
 			this._devTools.disconnect();
 		}
 	}
@@ -141,61 +149,49 @@ class Store extends State {
 	 */
 	dispatch(action) {
 		if (typeof action === 'function') {
-			this._dispatchPromise = this._dispatchPromise.then(
-				() => Promise.resolve(action(this.dispatch, this.getState))
+			this._dispatchPromise = this._dispatchPromise.then(() =>
+				Promise.resolve(action(this.dispatch, this.getState))
 			);
-		}
-		else {
-			this._dispatchPromise = this._dispatchPromise.then(
-				() => this._reducers.reduce(
-					(promiseNextState, reducer) => promiseNextState.then(
-						nextState => Promise.resolve(
-							reducer(nextState, action)
-						)
-					),
-					Promise.resolve(this._state)
-				).then(
-					nextState => {
-						if (this._state !== nextState) {
-							this._state = this._getFrozenState(nextState);
+		} else {
+			this._dispatchPromise = this._dispatchPromise
+				.then(() => this._reducer(this._state, action))
+				.then(nextState => {
+					if (this._state !== nextState) {
+						this._state = this._getFrozenState(nextState);
 
-							this.emit('change', this._state);
+						this.emit('change', this._state);
 
-							if ((process.env.NODE_ENV === 'development') && this._devTools) {
-								this._devTools.send(
-									action,
-									this._state
-								);
-							}
+						if (
+							process.env.NODE_ENV === 'development' &&
+							this._devTools
+						) {
+							this._devTools.send(action, this._state);
 						}
-
-						return new Promise(
-							resolve => {
-								requestAnimationFrame(
-									() => {
-										resolve(this);
-									}
-								);
-							}
-						);
 					}
-				)
-			);
+
+					return new Promise(resolve => {
+						requestAnimationFrame(() => {
+							resolve(this);
+						});
+					});
+				});
 		}
 
 		return this;
 	}
 
 	done(callback) {
-		this._dispatchPromise = this._dispatchPromise
-			.then(() => callback(this));
+		this._dispatchPromise = this._dispatchPromise.then(() =>
+			callback(this)
+		);
 
 		return this;
 	}
 
 	failed(callback) {
-		this._dispatchPromise = this._dispatchPromise
-			.catch(error => callback(error));
+		this._dispatchPromise = this._dispatchPromise.catch(error =>
+			callback(error)
+		);
 
 		return this;
 	}
@@ -211,33 +207,17 @@ class Store extends State {
 	}
 
 	/**
-	 * Adds a new reducer to the store.
+	 * Set's store reducer.
 	 *
 	 * A reducer is a function that receives a state, an actionType and
 	 * an optional payload with information, and returns a new state without
 	 * altering the original one.
 	 *
-	 * @param {!function} reducer
+	 * @param {function} reducer
 	 * @review
 	 */
 	registerReducer(reducer) {
-		this._reducers = [
-			...this._reducers,
-			reducer
-		];
-	}
-
-	/**
-	 * Adds a list of reducers to the store.
-	 * @param {!Array<function>} reducers
-	 * @review
-	 * @see {Store.registerReducer}
-	 */
-	registerReducers(reducers) {
-		this._reducers = [
-			...this._reducers,
-			...reducers
-		];
+		this._reducer = reducer;
 	}
 
 	/**
@@ -248,9 +228,11 @@ class Store extends State {
 	 * @review
 	 */
 	_getFrozenState(state) {
-		const differentState = !this._state || Object.entries(state).some(
-			([key, value]) => this._state[key] !== value
-		);
+		const differentState =
+			!this._state ||
+			Object.entries(state).some(
+				([key, value]) => this._state[key] !== value
+			);
 
 		if (differentState) {
 			this._state = state;
@@ -276,17 +258,13 @@ class Store extends State {
 			throw new Error('State already initialized');
 		}
 
-		this._state = this._getFrozenState(
-			Object.assign(
-				{},
-				DEFAULT_INITIAL_STATE,
-				initialState
-			)
-		);
+		this._state = this._getFrozenState({
+			...DEFAULT_INITIAL_STATE,
+			...initialState
+		});
 
 		return this._state;
 	}
-
 }
 
 /**
@@ -296,7 +274,6 @@ class Store extends State {
  * @type {!Object}
  */
 Store.STATE = {
-
 	/**
 	 * Redux devtools
 	 * @instance
@@ -305,8 +282,7 @@ Store.STATE = {
 	 * @review
 	 * @type {any|null}
 	 */
-	_devTools: Config
-		.any()
+	_devTools: Config.any()
 		.internal()
 		.value(null),
 
@@ -318,8 +294,7 @@ Store.STATE = {
 	 * @review
 	 * @type {Promise}
 	 */
-	_dispatchPromise: Config
-		.instanceOf(Promise)
+	_dispatchPromise: Config.instanceOf(Promise)
 		.internal()
 		.value(Promise.resolve()),
 
@@ -329,10 +304,9 @@ Store.STATE = {
 	 * @memberOf Store
 	 * @private
 	 * @review
-	 * @type {function[]}
+	 * @type {function}
 	 */
-	_reducers: Config
-		.arrayOf(Config.func())
+	_reducer: Config.func()
 		.internal()
 		.value([]),
 
@@ -344,8 +318,7 @@ Store.STATE = {
 	 * @review
 	 * @type {object}
 	 */
-	_state: Config
-		.object()
+	_state: Config.object()
 		.internal()
 		.value(null)
 };

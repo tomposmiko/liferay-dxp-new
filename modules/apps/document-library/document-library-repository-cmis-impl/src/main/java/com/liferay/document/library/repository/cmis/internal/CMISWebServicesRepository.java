@@ -21,7 +21,6 @@ import com.liferay.portal.kernel.exception.InvalidRepositoryException;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.security.auth.PrincipalThreadLocal;
 import com.liferay.portal.kernel.util.LocaleUtil;
-import com.liferay.portal.kernel.util.UnicodeProperties;
 
 import java.util.HashMap;
 import java.util.Locale;
@@ -46,17 +45,14 @@ public class CMISWebServicesRepository extends CMISRepositoryHandler {
 		Locale locale = LocaleUtil.getSiteDefault();
 
 		parameters.put(
-			SessionParameter.LOCALE_ISO3166_COUNTRY, locale.getCountry());
-		parameters.put(
 			SessionParameter.LOCALE_ISO639_LANGUAGE, locale.getLanguage());
+		parameters.put(
+			SessionParameter.LOCALE_ISO3166_COUNTRY, locale.getCountry());
 
-		String password = PrincipalThreadLocal.getPassword();
+		parameters.put(
+			SessionParameter.PASSWORD, PrincipalThreadLocal.getPassword());
 
-		parameters.put(SessionParameter.PASSWORD, password);
-
-		String login = getLogin();
-
-		parameters.put(SessionParameter.USER, login);
+		parameters.put(SessionParameter.USER, getLogin());
 
 		parameters.put(
 			SessionParameter.WEBSERVICES_ACL_SERVICE,
@@ -114,10 +110,8 @@ public class CMISWebServicesRepository extends CMISRepositoryHandler {
 	protected String getTypeSettingsValue(String typeSettingsKey)
 		throws InvalidRepositoryException {
 
-		UnicodeProperties typeSettingsProperties = getTypeSettingsProperties();
-
 		return CMISRepositoryUtil.getTypeSettingsValue(
-			typeSettingsProperties, typeSettingsKey);
+			getTypeSettingsProperties(), typeSettingsKey);
 	}
 
 }

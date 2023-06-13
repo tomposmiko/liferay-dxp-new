@@ -1,4 +1,18 @@
 /**
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
+ *
+ * This library is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU Lesser General Public License as published by the Free
+ * Software Foundation; either version 2.1 of the License, or (at your option)
+ * any later version.
+ *
+ * This library is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
+ * details.
+ */
+
+/**
  * The Autocomplete Input Caretoffset Sel Component.
  *
  * @deprecated since 7.2, unused
@@ -7,16 +21,15 @@
 
 AUI.add(
 	'liferay-autocomplete-input-caretoffset-sel',
-	function(A) {
+	A => {
 		var Lang = A.Lang;
 
 		var DOC = A.config.doc;
 
-		var AutcompleteInputCaretOffset = function() {
-		};
+		var AutcompleteInputCaretOffset = function() {};
 
 		AutcompleteInputCaretOffset.prototype = {
-			_getCaretOffset: function(node) {
+			_getCaretOffset(node) {
 				var instance = this;
 
 				node = node || instance.get('inputNode');
@@ -29,7 +42,11 @@ AUI.add(
 
 				return {
 					x: range.boundingLeft - xy[0],
-					y: Lang.toInt(range.boundingTop) - xy[1] + node.get('scrollTop') + DOC.documentElement.scrollTop
+					y:
+						Lang.toInt(range.boundingTop) -
+						xy[1] +
+						node.get('scrollTop') +
+						DOC.documentElement.scrollTop
 				};
 			}
 		};

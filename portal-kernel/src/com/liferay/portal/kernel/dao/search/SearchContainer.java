@@ -118,10 +118,10 @@ public class SearchContainer<R> {
 		}
 
 		if (!_curParam.equals(DEFAULT_CUR_PARAM)) {
-			_deltaParam =
-				DEFAULT_DELTA_PARAM +
-					StringUtil.replace(
-						_curParam, DEFAULT_CUR_PARAM, StringPool.BLANK);
+			String s = StringUtil.replace(
+				_curParam, DEFAULT_CUR_PARAM, StringPool.BLANK);
+
+			_deltaParam = DEFAULT_DELTA_PARAM + s;
 		}
 
 		setDelta(ParamUtil.getInteger(portletRequest, _deltaParam, delta));
@@ -542,6 +542,7 @@ public class SearchContainer<R> {
 			_cur, _delta);
 
 		_start = startAndEnd[0];
+
 		_end = startAndEnd[1];
 
 		_resultEnd = _end;

@@ -1,4 +1,0 @@
-Bundle-Name: Liferay Fragment Demo Data Creator API
-Bundle-SymbolicName: com.liferay.fragment.demo.data.creator.api
-Bundle-Version: 2.0.2
-Export-Package: com.liferay.fragment.demo.data.creator

@@ -19,7 +19,9 @@ import com.liferay.microblogs.model.MicroblogsEntry;
 import com.liferay.microblogs.model.impl.MicroblogsEntryImpl;
 import com.liferay.microblogs.model.impl.MicroblogsEntryModelImpl;
 import com.liferay.microblogs.service.persistence.MicroblogsEntryPersistence;
+import com.liferay.microblogs.service.persistence.impl.constants.MicroblogsPersistenceConstants;
 import com.liferay.petra.string.StringBundler;
+import com.liferay.portal.kernel.configuration.Configuration;
 import com.liferay.portal.kernel.dao.orm.EntityCache;
 import com.liferay.portal.kernel.dao.orm.FinderCache;
 import com.liferay.portal.kernel.dao.orm.FinderPath;
@@ -27,19 +29,19 @@ import com.liferay.portal.kernel.dao.orm.Query;
 import com.liferay.portal.kernel.dao.orm.QueryPos;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.dao.orm.Session;
+import com.liferay.portal.kernel.dao.orm.SessionFactory;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
-import com.liferay.portal.kernel.service.persistence.CompanyProvider;
-import com.liferay.portal.kernel.service.persistence.CompanyProviderWrapper;
 import com.liferay.portal.kernel.service.persistence.impl.BasePersistenceImpl;
 import com.liferay.portal.kernel.util.ArrayUtil;
+import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.kernel.util.StringUtil;
-import com.liferay.portal.spring.extender.service.ServiceReference;
 
 import java.io.Serializable;
 
@@ -47,7 +49,6 @@ import java.lang.reflect.InvocationHandler;
 
 import java.sql.Timestamp;
 
-import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -55,7 +56,12 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
-import org.osgi.annotation.versioning.ProviderType;
+import javax.sql.DataSource;
+
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
+import org.osgi.service.component.annotations.Reference;
 
 /**
  * The persistence implementation for the microblogs entry service.
@@ -67,12 +73,12 @@ import org.osgi.annotation.versioning.ProviderType;
  * @author Brian Wing Shun Chan
  * @generated
  */
-@ProviderType
+@Component(service = MicroblogsEntryPersistence.class)
 public class MicroblogsEntryPersistenceImpl
 	extends BasePersistenceImpl<MicroblogsEntry>
 	implements MicroblogsEntryPersistence {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this class directly. Always use <code>MicroblogsEntryUtil</code> to access the microblogs entry persistence. Modify <code>service.xml</code> and rerun ServiceBuilder to regenerate this class.
@@ -109,7 +115,7 @@ public class MicroblogsEntryPersistenceImpl
 	 * Returns a range of all the microblogs entries where companyId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>MicroblogsEntryModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>MicroblogsEntryModelImpl</code>.
 	 * </p>
 	 *
 	 * @param companyId the company ID
@@ -128,7 +134,7 @@ public class MicroblogsEntryPersistenceImpl
 	 * Returns an ordered range of all the microblogs entries where companyId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>MicroblogsEntryModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>MicroblogsEntryModelImpl</code>.
 	 * </p>
 	 *
 	 * @param companyId the company ID
@@ -149,34 +155,34 @@ public class MicroblogsEntryPersistenceImpl
 	 * Returns an ordered range of all the microblogs entries where companyId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>MicroblogsEntryModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>MicroblogsEntryModelImpl</code>.
 	 * </p>
 	 *
 	 * @param companyId the company ID
 	 * @param start the lower bound of the range of microblogs entries
 	 * @param end the upper bound of the range of microblogs entries (not inclusive)
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
-	 * @param retrieveFromCache whether to retrieve from the finder cache
+	 * @param useFinderCache whether to use the finder cache
 	 * @return the ordered range of matching microblogs entries
 	 */
 	@Override
 	public List<MicroblogsEntry> findByCompanyId(
 		long companyId, int start, int end,
 		OrderByComparator<MicroblogsEntry> orderByComparator,
-		boolean retrieveFromCache) {
+		boolean useFinderCache) {
 
-		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
 			(orderByComparator == null)) {
 
-			pagination = false;
-			finderPath = _finderPathWithoutPaginationFindByCompanyId;
-			finderArgs = new Object[] {companyId};
+			if (useFinderCache) {
+				finderPath = _finderPathWithoutPaginationFindByCompanyId;
+				finderArgs = new Object[] {companyId};
+			}
 		}
-		else {
+		else if (useFinderCache) {
 			finderPath = _finderPathWithPaginationFindByCompanyId;
 			finderArgs = new Object[] {
 				companyId, start, end, orderByComparator
@@ -185,13 +191,13 @@ public class MicroblogsEntryPersistenceImpl
 
 		List<MicroblogsEntry> list = null;
 
-		if (retrieveFromCache) {
+		if (useFinderCache) {
 			list = (List<MicroblogsEntry>)finderCache.getResult(
 				finderPath, finderArgs, this);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (MicroblogsEntry microblogsEntry : list) {
-					if ((companyId != microblogsEntry.getCompanyId())) {
+					if (companyId != microblogsEntry.getCompanyId()) {
 						list = null;
 
 						break;
@@ -219,7 +225,7 @@ public class MicroblogsEntryPersistenceImpl
 				appendOrderByComparator(
 					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
 			}
-			else if (pagination) {
+			else {
 				query.append(MicroblogsEntryModelImpl.ORDER_BY_JPQL);
 			}
 
@@ -236,25 +242,19 @@ public class MicroblogsEntryPersistenceImpl
 
 				qPos.add(companyId);
 
-				if (!pagination) {
-					list = (List<MicroblogsEntry>)QueryUtil.list(
-						q, getDialect(), start, end, false);
-
-					Collections.sort(list);
-
-					list = Collections.unmodifiableList(list);
-				}
-				else {
-					list = (List<MicroblogsEntry>)QueryUtil.list(
-						q, getDialect(), start, end);
-				}
+				list = (List<MicroblogsEntry>)QueryUtil.list(
+					q, getDialect(), start, end);
 
 				cacheResult(list);
 
-				finderCache.putResult(finderPath, finderArgs, list);
+				if (useFinderCache) {
+					finderCache.putResult(finderPath, finderArgs, list);
+				}
 			}
 			catch (Exception e) {
-				finderCache.removeResult(finderPath, finderArgs);
+				if (useFinderCache) {
+					finderCache.removeResult(finderPath, finderArgs);
+				}
 
 				throw processException(e);
 			}
@@ -620,7 +620,7 @@ public class MicroblogsEntryPersistenceImpl
 	 * Returns a range of all the microblogs entries where userId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>MicroblogsEntryModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>MicroblogsEntryModelImpl</code>.
 	 * </p>
 	 *
 	 * @param userId the user ID
@@ -637,7 +637,7 @@ public class MicroblogsEntryPersistenceImpl
 	 * Returns an ordered range of all the microblogs entries where userId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>MicroblogsEntryModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>MicroblogsEntryModelImpl</code>.
 	 * </p>
 	 *
 	 * @param userId the user ID
@@ -658,47 +658,47 @@ public class MicroblogsEntryPersistenceImpl
 	 * Returns an ordered range of all the microblogs entries where userId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>MicroblogsEntryModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>MicroblogsEntryModelImpl</code>.
 	 * </p>
 	 *
 	 * @param userId the user ID
 	 * @param start the lower bound of the range of microblogs entries
 	 * @param end the upper bound of the range of microblogs entries (not inclusive)
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
-	 * @param retrieveFromCache whether to retrieve from the finder cache
+	 * @param useFinderCache whether to use the finder cache
 	 * @return the ordered range of matching microblogs entries
 	 */
 	@Override
 	public List<MicroblogsEntry> findByUserId(
 		long userId, int start, int end,
 		OrderByComparator<MicroblogsEntry> orderByComparator,
-		boolean retrieveFromCache) {
+		boolean useFinderCache) {
 
-		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
 			(orderByComparator == null)) {
 
-			pagination = false;
-			finderPath = _finderPathWithoutPaginationFindByUserId;
-			finderArgs = new Object[] {userId};
+			if (useFinderCache) {
+				finderPath = _finderPathWithoutPaginationFindByUserId;
+				finderArgs = new Object[] {userId};
+			}
 		}
-		else {
+		else if (useFinderCache) {
 			finderPath = _finderPathWithPaginationFindByUserId;
 			finderArgs = new Object[] {userId, start, end, orderByComparator};
 		}
 
 		List<MicroblogsEntry> list = null;
 
-		if (retrieveFromCache) {
+		if (useFinderCache) {
 			list = (List<MicroblogsEntry>)finderCache.getResult(
 				finderPath, finderArgs, this);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (MicroblogsEntry microblogsEntry : list) {
-					if ((userId != microblogsEntry.getUserId())) {
+					if (userId != microblogsEntry.getUserId()) {
 						list = null;
 
 						break;
@@ -726,7 +726,7 @@ public class MicroblogsEntryPersistenceImpl
 				appendOrderByComparator(
 					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
 			}
-			else if (pagination) {
+			else {
 				query.append(MicroblogsEntryModelImpl.ORDER_BY_JPQL);
 			}
 
@@ -743,25 +743,19 @@ public class MicroblogsEntryPersistenceImpl
 
 				qPos.add(userId);
 
-				if (!pagination) {
-					list = (List<MicroblogsEntry>)QueryUtil.list(
-						q, getDialect(), start, end, false);
-
-					Collections.sort(list);
-
-					list = Collections.unmodifiableList(list);
-				}
-				else {
-					list = (List<MicroblogsEntry>)QueryUtil.list(
-						q, getDialect(), start, end);
-				}
+				list = (List<MicroblogsEntry>)QueryUtil.list(
+					q, getDialect(), start, end);
 
 				cacheResult(list);
 
-				finderCache.putResult(finderPath, finderArgs, list);
+				if (useFinderCache) {
+					finderCache.putResult(finderPath, finderArgs, list);
+				}
 			}
 			catch (Exception e) {
-				finderCache.removeResult(finderPath, finderArgs);
+				if (useFinderCache) {
+					finderCache.removeResult(finderPath, finderArgs);
+				}
 
 				throw processException(e);
 			}
@@ -1127,7 +1121,7 @@ public class MicroblogsEntryPersistenceImpl
 	 * Returns a range of all the microblogs entries where userId = &#63; and type = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>MicroblogsEntryModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>MicroblogsEntryModelImpl</code>.
 	 * </p>
 	 *
 	 * @param userId the user ID
@@ -1147,7 +1141,7 @@ public class MicroblogsEntryPersistenceImpl
 	 * Returns an ordered range of all the microblogs entries where userId = &#63; and type = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>MicroblogsEntryModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>MicroblogsEntryModelImpl</code>.
 	 * </p>
 	 *
 	 * @param userId the user ID
@@ -1169,7 +1163,7 @@ public class MicroblogsEntryPersistenceImpl
 	 * Returns an ordered range of all the microblogs entries where userId = &#63; and type = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>MicroblogsEntryModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>MicroblogsEntryModelImpl</code>.
 	 * </p>
 	 *
 	 * @param userId the user ID
@@ -1177,27 +1171,27 @@ public class MicroblogsEntryPersistenceImpl
 	 * @param start the lower bound of the range of microblogs entries
 	 * @param end the upper bound of the range of microblogs entries (not inclusive)
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
-	 * @param retrieveFromCache whether to retrieve from the finder cache
+	 * @param useFinderCache whether to use the finder cache
 	 * @return the ordered range of matching microblogs entries
 	 */
 	@Override
 	public List<MicroblogsEntry> findByU_T(
 		long userId, int type, int start, int end,
 		OrderByComparator<MicroblogsEntry> orderByComparator,
-		boolean retrieveFromCache) {
+		boolean useFinderCache) {
 
-		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
 			(orderByComparator == null)) {
 
-			pagination = false;
-			finderPath = _finderPathWithoutPaginationFindByU_T;
-			finderArgs = new Object[] {userId, type};
+			if (useFinderCache) {
+				finderPath = _finderPathWithoutPaginationFindByU_T;
+				finderArgs = new Object[] {userId, type};
+			}
 		}
-		else {
+		else if (useFinderCache) {
 			finderPath = _finderPathWithPaginationFindByU_T;
 			finderArgs = new Object[] {
 				userId, type, start, end, orderByComparator
@@ -1206,7 +1200,7 @@ public class MicroblogsEntryPersistenceImpl
 
 		List<MicroblogsEntry> list = null;
 
-		if (retrieveFromCache) {
+		if (useFinderCache) {
 			list = (List<MicroblogsEntry>)finderCache.getResult(
 				finderPath, finderArgs, this);
 
@@ -1244,7 +1238,7 @@ public class MicroblogsEntryPersistenceImpl
 				appendOrderByComparator(
 					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
 			}
-			else if (pagination) {
+			else {
 				query.append(MicroblogsEntryModelImpl.ORDER_BY_JPQL);
 			}
 
@@ -1263,25 +1257,19 @@ public class MicroblogsEntryPersistenceImpl
 
 				qPos.add(type);
 
-				if (!pagination) {
-					list = (List<MicroblogsEntry>)QueryUtil.list(
-						q, getDialect(), start, end, false);
-
-					Collections.sort(list);
-
-					list = Collections.unmodifiableList(list);
-				}
-				else {
-					list = (List<MicroblogsEntry>)QueryUtil.list(
-						q, getDialect(), start, end);
-				}
+				list = (List<MicroblogsEntry>)QueryUtil.list(
+					q, getDialect(), start, end);
 
 				cacheResult(list);
 
-				finderCache.putResult(finderPath, finderArgs, list);
+				if (useFinderCache) {
+					finderCache.putResult(finderPath, finderArgs, list);
+				}
 			}
 			catch (Exception e) {
-				finderCache.removeResult(finderPath, finderArgs);
+				if (useFinderCache) {
+					finderCache.removeResult(finderPath, finderArgs);
+				}
 
 				throw processException(e);
 			}
@@ -1681,7 +1669,7 @@ public class MicroblogsEntryPersistenceImpl
 	 * Returns a range of all the microblogs entries where creatorClassNameId = &#63; and creatorClassPK = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>MicroblogsEntryModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>MicroblogsEntryModelImpl</code>.
 	 * </p>
 	 *
 	 * @param creatorClassNameId the creator class name ID
@@ -1702,7 +1690,7 @@ public class MicroblogsEntryPersistenceImpl
 	 * Returns an ordered range of all the microblogs entries where creatorClassNameId = &#63; and creatorClassPK = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>MicroblogsEntryModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>MicroblogsEntryModelImpl</code>.
 	 * </p>
 	 *
 	 * @param creatorClassNameId the creator class name ID
@@ -1726,7 +1714,7 @@ public class MicroblogsEntryPersistenceImpl
 	 * Returns an ordered range of all the microblogs entries where creatorClassNameId = &#63; and creatorClassPK = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>MicroblogsEntryModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>MicroblogsEntryModelImpl</code>.
 	 * </p>
 	 *
 	 * @param creatorClassNameId the creator class name ID
@@ -1734,27 +1722,27 @@ public class MicroblogsEntryPersistenceImpl
 	 * @param start the lower bound of the range of microblogs entries
 	 * @param end the upper bound of the range of microblogs entries (not inclusive)
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
-	 * @param retrieveFromCache whether to retrieve from the finder cache
+	 * @param useFinderCache whether to use the finder cache
 	 * @return the ordered range of matching microblogs entries
 	 */
 	@Override
 	public List<MicroblogsEntry> findByCCNI_CCPK(
 		long creatorClassNameId, long creatorClassPK, int start, int end,
 		OrderByComparator<MicroblogsEntry> orderByComparator,
-		boolean retrieveFromCache) {
+		boolean useFinderCache) {
 
-		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
 			(orderByComparator == null)) {
 
-			pagination = false;
-			finderPath = _finderPathWithoutPaginationFindByCCNI_CCPK;
-			finderArgs = new Object[] {creatorClassNameId, creatorClassPK};
+			if (useFinderCache) {
+				finderPath = _finderPathWithoutPaginationFindByCCNI_CCPK;
+				finderArgs = new Object[] {creatorClassNameId, creatorClassPK};
+			}
 		}
-		else {
+		else if (useFinderCache) {
 			finderPath = _finderPathWithPaginationFindByCCNI_CCPK;
 			finderArgs = new Object[] {
 				creatorClassNameId, creatorClassPK, start, end,
@@ -1764,7 +1752,7 @@ public class MicroblogsEntryPersistenceImpl
 
 		List<MicroblogsEntry> list = null;
 
-		if (retrieveFromCache) {
+		if (useFinderCache) {
 			list = (List<MicroblogsEntry>)finderCache.getResult(
 				finderPath, finderArgs, this);
 
@@ -1804,7 +1792,7 @@ public class MicroblogsEntryPersistenceImpl
 				appendOrderByComparator(
 					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
 			}
-			else if (pagination) {
+			else {
 				query.append(MicroblogsEntryModelImpl.ORDER_BY_JPQL);
 			}
 
@@ -1823,25 +1811,19 @@ public class MicroblogsEntryPersistenceImpl
 
 				qPos.add(creatorClassPK);
 
-				if (!pagination) {
-					list = (List<MicroblogsEntry>)QueryUtil.list(
-						q, getDialect(), start, end, false);
-
-					Collections.sort(list);
-
-					list = Collections.unmodifiableList(list);
-				}
-				else {
-					list = (List<MicroblogsEntry>)QueryUtil.list(
-						q, getDialect(), start, end);
-				}
+				list = (List<MicroblogsEntry>)QueryUtil.list(
+					q, getDialect(), start, end);
 
 				cacheResult(list);
 
-				finderCache.putResult(finderPath, finderArgs, list);
+				if (useFinderCache) {
+					finderCache.putResult(finderPath, finderArgs, list);
+				}
 			}
 			catch (Exception e) {
-				finderCache.removeResult(finderPath, finderArgs);
+				if (useFinderCache) {
+					finderCache.removeResult(finderPath, finderArgs);
+				}
 
 				throw processException(e);
 			}
@@ -2145,7 +2127,7 @@ public class MicroblogsEntryPersistenceImpl
 	 * Returns all the microblogs entries where creatorClassNameId = &#63; and creatorClassPK = any &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>MicroblogsEntryModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>MicroblogsEntryModelImpl</code>.
 	 * </p>
 	 *
 	 * @param creatorClassNameId the creator class name ID
@@ -2165,7 +2147,7 @@ public class MicroblogsEntryPersistenceImpl
 	 * Returns a range of all the microblogs entries where creatorClassNameId = &#63; and creatorClassPK = any &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>MicroblogsEntryModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>MicroblogsEntryModelImpl</code>.
 	 * </p>
 	 *
 	 * @param creatorClassNameId the creator class name ID
@@ -2186,7 +2168,7 @@ public class MicroblogsEntryPersistenceImpl
 	 * Returns an ordered range of all the microblogs entries where creatorClassNameId = &#63; and creatorClassPK = any &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>MicroblogsEntryModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>MicroblogsEntryModelImpl</code>.
 	 * </p>
 	 *
 	 * @param creatorClassNameId the creator class name ID
@@ -2210,7 +2192,7 @@ public class MicroblogsEntryPersistenceImpl
 	 * Returns an ordered range of all the microblogs entries where creatorClassNameId = &#63; and creatorClassPK = &#63;, optionally using the finder cache.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>MicroblogsEntryModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>MicroblogsEntryModelImpl</code>.
 	 * </p>
 	 *
 	 * @param creatorClassNameId the creator class name ID
@@ -2218,14 +2200,14 @@ public class MicroblogsEntryPersistenceImpl
 	 * @param start the lower bound of the range of microblogs entries
 	 * @param end the upper bound of the range of microblogs entries (not inclusive)
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
-	 * @param retrieveFromCache whether to retrieve from the finder cache
+	 * @param useFinderCache whether to use the finder cache
 	 * @return the ordered range of matching microblogs entries
 	 */
 	@Override
 	public List<MicroblogsEntry> findByCCNI_CCPK(
 		long creatorClassNameId, long[] creatorClassPKs, int start, int end,
 		OrderByComparator<MicroblogsEntry> orderByComparator,
-		boolean retrieveFromCache) {
+		boolean useFinderCache) {
 
 		if (creatorClassPKs == null) {
 			creatorClassPKs = new long[0];
@@ -2240,18 +2222,18 @@ public class MicroblogsEntryPersistenceImpl
 				orderByComparator);
 		}
 
-		boolean pagination = true;
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
 			(orderByComparator == null)) {
 
-			pagination = false;
-			finderArgs = new Object[] {
-				creatorClassNameId, StringUtil.merge(creatorClassPKs)
-			};
+			if (useFinderCache) {
+				finderArgs = new Object[] {
+					creatorClassNameId, StringUtil.merge(creatorClassPKs)
+				};
+			}
 		}
-		else {
+		else if (useFinderCache) {
 			finderArgs = new Object[] {
 				creatorClassNameId, StringUtil.merge(creatorClassPKs), start,
 				end, orderByComparator
@@ -2260,7 +2242,7 @@ public class MicroblogsEntryPersistenceImpl
 
 		List<MicroblogsEntry> list = null;
 
-		if (retrieveFromCache) {
+		if (useFinderCache) {
 			list = (List<MicroblogsEntry>)finderCache.getResult(
 				_finderPathWithPaginationFindByCCNI_CCPK, finderArgs, this);
 
@@ -2307,7 +2289,7 @@ public class MicroblogsEntryPersistenceImpl
 				appendOrderByComparator(
 					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
 			}
-			else if (pagination) {
+			else {
 				query.append(MicroblogsEntryModelImpl.ORDER_BY_JPQL);
 			}
 
@@ -2324,27 +2306,22 @@ public class MicroblogsEntryPersistenceImpl
 
 				qPos.add(creatorClassNameId);
 
-				if (!pagination) {
-					list = (List<MicroblogsEntry>)QueryUtil.list(
-						q, getDialect(), start, end, false);
-
-					Collections.sort(list);
-
-					list = Collections.unmodifiableList(list);
-				}
-				else {
-					list = (List<MicroblogsEntry>)QueryUtil.list(
-						q, getDialect(), start, end);
-				}
+				list = (List<MicroblogsEntry>)QueryUtil.list(
+					q, getDialect(), start, end);
 
 				cacheResult(list);
 
-				finderCache.putResult(
-					_finderPathWithPaginationFindByCCNI_CCPK, finderArgs, list);
+				if (useFinderCache) {
+					finderCache.putResult(
+						_finderPathWithPaginationFindByCCNI_CCPK, finderArgs,
+						list);
+				}
 			}
 			catch (Exception e) {
-				finderCache.removeResult(
-					_finderPathWithPaginationFindByCCNI_CCPK, finderArgs);
+				if (useFinderCache) {
+					finderCache.removeResult(
+						_finderPathWithPaginationFindByCCNI_CCPK, finderArgs);
+				}
 
 				throw processException(e);
 			}
@@ -2545,7 +2522,7 @@ public class MicroblogsEntryPersistenceImpl
 	 * Returns a range of all the microblogs entries where creatorClassNameId = &#63; and type = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>MicroblogsEntryModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>MicroblogsEntryModelImpl</code>.
 	 * </p>
 	 *
 	 * @param creatorClassNameId the creator class name ID
@@ -2565,7 +2542,7 @@ public class MicroblogsEntryPersistenceImpl
 	 * Returns an ordered range of all the microblogs entries where creatorClassNameId = &#63; and type = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>MicroblogsEntryModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>MicroblogsEntryModelImpl</code>.
 	 * </p>
 	 *
 	 * @param creatorClassNameId the creator class name ID
@@ -2588,7 +2565,7 @@ public class MicroblogsEntryPersistenceImpl
 	 * Returns an ordered range of all the microblogs entries where creatorClassNameId = &#63; and type = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>MicroblogsEntryModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>MicroblogsEntryModelImpl</code>.
 	 * </p>
 	 *
 	 * @param creatorClassNameId the creator class name ID
@@ -2596,27 +2573,27 @@ public class MicroblogsEntryPersistenceImpl
 	 * @param start the lower bound of the range of microblogs entries
 	 * @param end the upper bound of the range of microblogs entries (not inclusive)
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
-	 * @param retrieveFromCache whether to retrieve from the finder cache
+	 * @param useFinderCache whether to use the finder cache
 	 * @return the ordered range of matching microblogs entries
 	 */
 	@Override
 	public List<MicroblogsEntry> findByCCNI_T(
 		long creatorClassNameId, int type, int start, int end,
 		OrderByComparator<MicroblogsEntry> orderByComparator,
-		boolean retrieveFromCache) {
+		boolean useFinderCache) {
 
-		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
 			(orderByComparator == null)) {
 
-			pagination = false;
-			finderPath = _finderPathWithoutPaginationFindByCCNI_T;
-			finderArgs = new Object[] {creatorClassNameId, type};
+			if (useFinderCache) {
+				finderPath = _finderPathWithoutPaginationFindByCCNI_T;
+				finderArgs = new Object[] {creatorClassNameId, type};
+			}
 		}
-		else {
+		else if (useFinderCache) {
 			finderPath = _finderPathWithPaginationFindByCCNI_T;
 			finderArgs = new Object[] {
 				creatorClassNameId, type, start, end, orderByComparator
@@ -2625,7 +2602,7 @@ public class MicroblogsEntryPersistenceImpl
 
 		List<MicroblogsEntry> list = null;
 
-		if (retrieveFromCache) {
+		if (useFinderCache) {
 			list = (List<MicroblogsEntry>)finderCache.getResult(
 				finderPath, finderArgs, this);
 
@@ -2664,7 +2641,7 @@ public class MicroblogsEntryPersistenceImpl
 				appendOrderByComparator(
 					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
 			}
-			else if (pagination) {
+			else {
 				query.append(MicroblogsEntryModelImpl.ORDER_BY_JPQL);
 			}
 
@@ -2683,25 +2660,19 @@ public class MicroblogsEntryPersistenceImpl
 
 				qPos.add(type);
 
-				if (!pagination) {
-					list = (List<MicroblogsEntry>)QueryUtil.list(
-						q, getDialect(), start, end, false);
-
-					Collections.sort(list);
-
-					list = Collections.unmodifiableList(list);
-				}
-				else {
-					list = (List<MicroblogsEntry>)QueryUtil.list(
-						q, getDialect(), start, end);
-				}
+				list = (List<MicroblogsEntry>)QueryUtil.list(
+					q, getDialect(), start, end);
 
 				cacheResult(list);
 
-				finderCache.putResult(finderPath, finderArgs, list);
+				if (useFinderCache) {
+					finderCache.putResult(finderPath, finderArgs, list);
+				}
 			}
 			catch (Exception e) {
-				finderCache.removeResult(finderPath, finderArgs);
+				if (useFinderCache) {
+					finderCache.removeResult(finderPath, finderArgs);
+				}
 
 				throw processException(e);
 			}
@@ -3102,7 +3073,7 @@ public class MicroblogsEntryPersistenceImpl
 	 * Returns a range of all the microblogs entries where type = &#63; and parentMicroblogsEntryId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>MicroblogsEntryModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>MicroblogsEntryModelImpl</code>.
 	 * </p>
 	 *
 	 * @param type the type
@@ -3122,7 +3093,7 @@ public class MicroblogsEntryPersistenceImpl
 	 * Returns an ordered range of all the microblogs entries where type = &#63; and parentMicroblogsEntryId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>MicroblogsEntryModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>MicroblogsEntryModelImpl</code>.
 	 * </p>
 	 *
 	 * @param type the type
@@ -3145,7 +3116,7 @@ public class MicroblogsEntryPersistenceImpl
 	 * Returns an ordered range of all the microblogs entries where type = &#63; and parentMicroblogsEntryId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>MicroblogsEntryModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>MicroblogsEntryModelImpl</code>.
 	 * </p>
 	 *
 	 * @param type the type
@@ -3153,27 +3124,27 @@ public class MicroblogsEntryPersistenceImpl
 	 * @param start the lower bound of the range of microblogs entries
 	 * @param end the upper bound of the range of microblogs entries (not inclusive)
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
-	 * @param retrieveFromCache whether to retrieve from the finder cache
+	 * @param useFinderCache whether to use the finder cache
 	 * @return the ordered range of matching microblogs entries
 	 */
 	@Override
 	public List<MicroblogsEntry> findByT_P(
 		int type, long parentMicroblogsEntryId, int start, int end,
 		OrderByComparator<MicroblogsEntry> orderByComparator,
-		boolean retrieveFromCache) {
+		boolean useFinderCache) {
 
-		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
 			(orderByComparator == null)) {
 
-			pagination = false;
-			finderPath = _finderPathWithoutPaginationFindByT_P;
-			finderArgs = new Object[] {type, parentMicroblogsEntryId};
+			if (useFinderCache) {
+				finderPath = _finderPathWithoutPaginationFindByT_P;
+				finderArgs = new Object[] {type, parentMicroblogsEntryId};
+			}
 		}
-		else {
+		else if (useFinderCache) {
 			finderPath = _finderPathWithPaginationFindByT_P;
 			finderArgs = new Object[] {
 				type, parentMicroblogsEntryId, start, end, orderByComparator
@@ -3182,7 +3153,7 @@ public class MicroblogsEntryPersistenceImpl
 
 		List<MicroblogsEntry> list = null;
 
-		if (retrieveFromCache) {
+		if (useFinderCache) {
 			list = (List<MicroblogsEntry>)finderCache.getResult(
 				finderPath, finderArgs, this);
 
@@ -3221,7 +3192,7 @@ public class MicroblogsEntryPersistenceImpl
 				appendOrderByComparator(
 					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
 			}
-			else if (pagination) {
+			else {
 				query.append(MicroblogsEntryModelImpl.ORDER_BY_JPQL);
 			}
 
@@ -3240,25 +3211,19 @@ public class MicroblogsEntryPersistenceImpl
 
 				qPos.add(parentMicroblogsEntryId);
 
-				if (!pagination) {
-					list = (List<MicroblogsEntry>)QueryUtil.list(
-						q, getDialect(), start, end, false);
-
-					Collections.sort(list);
-
-					list = Collections.unmodifiableList(list);
-				}
-				else {
-					list = (List<MicroblogsEntry>)QueryUtil.list(
-						q, getDialect(), start, end);
-				}
+				list = (List<MicroblogsEntry>)QueryUtil.list(
+					q, getDialect(), start, end);
 
 				cacheResult(list);
 
-				finderCache.putResult(finderPath, finderArgs, list);
+				if (useFinderCache) {
+					finderCache.putResult(finderPath, finderArgs, list);
+				}
 			}
 			catch (Exception e) {
-				finderCache.removeResult(finderPath, finderArgs);
+				if (useFinderCache) {
+					finderCache.removeResult(finderPath, finderArgs);
+				}
 
 				throw processException(e);
 			}
@@ -3661,7 +3626,7 @@ public class MicroblogsEntryPersistenceImpl
 	 * Returns a range of all the microblogs entries where companyId = &#63; and creatorClassNameId = &#63; and creatorClassPK = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>MicroblogsEntryModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>MicroblogsEntryModelImpl</code>.
 	 * </p>
 	 *
 	 * @param companyId the company ID
@@ -3684,7 +3649,7 @@ public class MicroblogsEntryPersistenceImpl
 	 * Returns an ordered range of all the microblogs entries where companyId = &#63; and creatorClassNameId = &#63; and creatorClassPK = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>MicroblogsEntryModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>MicroblogsEntryModelImpl</code>.
 	 * </p>
 	 *
 	 * @param companyId the company ID
@@ -3709,7 +3674,7 @@ public class MicroblogsEntryPersistenceImpl
 	 * Returns an ordered range of all the microblogs entries where companyId = &#63; and creatorClassNameId = &#63; and creatorClassPK = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>MicroblogsEntryModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>MicroblogsEntryModelImpl</code>.
 	 * </p>
 	 *
 	 * @param companyId the company ID
@@ -3718,29 +3683,29 @@ public class MicroblogsEntryPersistenceImpl
 	 * @param start the lower bound of the range of microblogs entries
 	 * @param end the upper bound of the range of microblogs entries (not inclusive)
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
-	 * @param retrieveFromCache whether to retrieve from the finder cache
+	 * @param useFinderCache whether to use the finder cache
 	 * @return the ordered range of matching microblogs entries
 	 */
 	@Override
 	public List<MicroblogsEntry> findByC_CCNI_CCPK(
 		long companyId, long creatorClassNameId, long creatorClassPK, int start,
 		int end, OrderByComparator<MicroblogsEntry> orderByComparator,
-		boolean retrieveFromCache) {
+		boolean useFinderCache) {
 
-		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
 			(orderByComparator == null)) {
 
-			pagination = false;
-			finderPath = _finderPathWithoutPaginationFindByC_CCNI_CCPK;
-			finderArgs = new Object[] {
-				companyId, creatorClassNameId, creatorClassPK
-			};
+			if (useFinderCache) {
+				finderPath = _finderPathWithoutPaginationFindByC_CCNI_CCPK;
+				finderArgs = new Object[] {
+					companyId, creatorClassNameId, creatorClassPK
+				};
+			}
 		}
-		else {
+		else if (useFinderCache) {
 			finderPath = _finderPathWithPaginationFindByC_CCNI_CCPK;
 			finderArgs = new Object[] {
 				companyId, creatorClassNameId, creatorClassPK, start, end,
@@ -3750,7 +3715,7 @@ public class MicroblogsEntryPersistenceImpl
 
 		List<MicroblogsEntry> list = null;
 
-		if (retrieveFromCache) {
+		if (useFinderCache) {
 			list = (List<MicroblogsEntry>)finderCache.getResult(
 				finderPath, finderArgs, this);
 
@@ -3793,7 +3758,7 @@ public class MicroblogsEntryPersistenceImpl
 				appendOrderByComparator(
 					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
 			}
-			else if (pagination) {
+			else {
 				query.append(MicroblogsEntryModelImpl.ORDER_BY_JPQL);
 			}
 
@@ -3814,25 +3779,19 @@ public class MicroblogsEntryPersistenceImpl
 
 				qPos.add(creatorClassPK);
 
-				if (!pagination) {
-					list = (List<MicroblogsEntry>)QueryUtil.list(
-						q, getDialect(), start, end, false);
-
-					Collections.sort(list);
-
-					list = Collections.unmodifiableList(list);
-				}
-				else {
-					list = (List<MicroblogsEntry>)QueryUtil.list(
-						q, getDialect(), start, end);
-				}
+				list = (List<MicroblogsEntry>)QueryUtil.list(
+					q, getDialect(), start, end);
 
 				cacheResult(list);
 
-				finderCache.putResult(finderPath, finderArgs, list);
+				if (useFinderCache) {
+					finderCache.putResult(finderPath, finderArgs, list);
+				}
 			}
 			catch (Exception e) {
-				finderCache.removeResult(finderPath, finderArgs);
+				if (useFinderCache) {
+					finderCache.removeResult(finderPath, finderArgs);
+				}
 
 				throw processException(e);
 			}
@@ -4153,7 +4112,7 @@ public class MicroblogsEntryPersistenceImpl
 	 * Returns all the microblogs entries where companyId = &#63; and creatorClassNameId = &#63; and creatorClassPK = any &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>MicroblogsEntryModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>MicroblogsEntryModelImpl</code>.
 	 * </p>
 	 *
 	 * @param companyId the company ID
@@ -4174,7 +4133,7 @@ public class MicroblogsEntryPersistenceImpl
 	 * Returns a range of all the microblogs entries where companyId = &#63; and creatorClassNameId = &#63; and creatorClassPK = any &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>MicroblogsEntryModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>MicroblogsEntryModelImpl</code>.
 	 * </p>
 	 *
 	 * @param companyId the company ID
@@ -4197,7 +4156,7 @@ public class MicroblogsEntryPersistenceImpl
 	 * Returns an ordered range of all the microblogs entries where companyId = &#63; and creatorClassNameId = &#63; and creatorClassPK = any &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>MicroblogsEntryModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>MicroblogsEntryModelImpl</code>.
 	 * </p>
 	 *
 	 * @param companyId the company ID
@@ -4223,7 +4182,7 @@ public class MicroblogsEntryPersistenceImpl
 	 * Returns an ordered range of all the microblogs entries where companyId = &#63; and creatorClassNameId = &#63; and creatorClassPK = &#63;, optionally using the finder cache.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>MicroblogsEntryModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>MicroblogsEntryModelImpl</code>.
 	 * </p>
 	 *
 	 * @param companyId the company ID
@@ -4232,7 +4191,7 @@ public class MicroblogsEntryPersistenceImpl
 	 * @param start the lower bound of the range of microblogs entries
 	 * @param end the upper bound of the range of microblogs entries (not inclusive)
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
-	 * @param retrieveFromCache whether to retrieve from the finder cache
+	 * @param useFinderCache whether to use the finder cache
 	 * @return the ordered range of matching microblogs entries
 	 */
 	@Override
@@ -4240,7 +4199,7 @@ public class MicroblogsEntryPersistenceImpl
 		long companyId, long creatorClassNameId, long[] creatorClassPKs,
 		int start, int end,
 		OrderByComparator<MicroblogsEntry> orderByComparator,
-		boolean retrieveFromCache) {
+		boolean useFinderCache) {
 
 		if (creatorClassPKs == null) {
 			creatorClassPKs = new long[0];
@@ -4255,18 +4214,19 @@ public class MicroblogsEntryPersistenceImpl
 				orderByComparator);
 		}
 
-		boolean pagination = true;
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
 			(orderByComparator == null)) {
 
-			pagination = false;
-			finderArgs = new Object[] {
-				companyId, creatorClassNameId, StringUtil.merge(creatorClassPKs)
-			};
+			if (useFinderCache) {
+				finderArgs = new Object[] {
+					companyId, creatorClassNameId,
+					StringUtil.merge(creatorClassPKs)
+				};
+			}
 		}
-		else {
+		else if (useFinderCache) {
 			finderArgs = new Object[] {
 				companyId, creatorClassNameId,
 				StringUtil.merge(creatorClassPKs), start, end, orderByComparator
@@ -4275,7 +4235,7 @@ public class MicroblogsEntryPersistenceImpl
 
 		List<MicroblogsEntry> list = null;
 
-		if (retrieveFromCache) {
+		if (useFinderCache) {
 			list = (List<MicroblogsEntry>)finderCache.getResult(
 				_finderPathWithPaginationFindByC_CCNI_CCPK, finderArgs, this);
 
@@ -4325,7 +4285,7 @@ public class MicroblogsEntryPersistenceImpl
 				appendOrderByComparator(
 					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
 			}
-			else if (pagination) {
+			else {
 				query.append(MicroblogsEntryModelImpl.ORDER_BY_JPQL);
 			}
 
@@ -4344,28 +4304,22 @@ public class MicroblogsEntryPersistenceImpl
 
 				qPos.add(creatorClassNameId);
 
-				if (!pagination) {
-					list = (List<MicroblogsEntry>)QueryUtil.list(
-						q, getDialect(), start, end, false);
-
-					Collections.sort(list);
-
-					list = Collections.unmodifiableList(list);
-				}
-				else {
-					list = (List<MicroblogsEntry>)QueryUtil.list(
-						q, getDialect(), start, end);
-				}
+				list = (List<MicroblogsEntry>)QueryUtil.list(
+					q, getDialect(), start, end);
 
 				cacheResult(list);
 
-				finderCache.putResult(
-					_finderPathWithPaginationFindByC_CCNI_CCPK, finderArgs,
-					list);
+				if (useFinderCache) {
+					finderCache.putResult(
+						_finderPathWithPaginationFindByC_CCNI_CCPK, finderArgs,
+						list);
+				}
 			}
 			catch (Exception e) {
-				finderCache.removeResult(
-					_finderPathWithPaginationFindByC_CCNI_CCPK, finderArgs);
+				if (useFinderCache) {
+					finderCache.removeResult(
+						_finderPathWithPaginationFindByC_CCNI_CCPK, finderArgs);
+				}
 
 				throw processException(e);
 			}
@@ -4586,7 +4540,7 @@ public class MicroblogsEntryPersistenceImpl
 	 * Returns a range of all the microblogs entries where companyId = &#63; and creatorClassNameId = &#63; and type = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>MicroblogsEntryModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>MicroblogsEntryModelImpl</code>.
 	 * </p>
 	 *
 	 * @param companyId the company ID
@@ -4608,7 +4562,7 @@ public class MicroblogsEntryPersistenceImpl
 	 * Returns an ordered range of all the microblogs entries where companyId = &#63; and creatorClassNameId = &#63; and type = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>MicroblogsEntryModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>MicroblogsEntryModelImpl</code>.
 	 * </p>
 	 *
 	 * @param companyId the company ID
@@ -4633,7 +4587,7 @@ public class MicroblogsEntryPersistenceImpl
 	 * Returns an ordered range of all the microblogs entries where companyId = &#63; and creatorClassNameId = &#63; and type = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>MicroblogsEntryModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>MicroblogsEntryModelImpl</code>.
 	 * </p>
 	 *
 	 * @param companyId the company ID
@@ -4642,27 +4596,27 @@ public class MicroblogsEntryPersistenceImpl
 	 * @param start the lower bound of the range of microblogs entries
 	 * @param end the upper bound of the range of microblogs entries (not inclusive)
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
-	 * @param retrieveFromCache whether to retrieve from the finder cache
+	 * @param useFinderCache whether to use the finder cache
 	 * @return the ordered range of matching microblogs entries
 	 */
 	@Override
 	public List<MicroblogsEntry> findByC_CCNI_T(
 		long companyId, long creatorClassNameId, int type, int start, int end,
 		OrderByComparator<MicroblogsEntry> orderByComparator,
-		boolean retrieveFromCache) {
+		boolean useFinderCache) {
 
-		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
 			(orderByComparator == null)) {
 
-			pagination = false;
-			finderPath = _finderPathWithoutPaginationFindByC_CCNI_T;
-			finderArgs = new Object[] {companyId, creatorClassNameId, type};
+			if (useFinderCache) {
+				finderPath = _finderPathWithoutPaginationFindByC_CCNI_T;
+				finderArgs = new Object[] {companyId, creatorClassNameId, type};
+			}
 		}
-		else {
+		else if (useFinderCache) {
 			finderPath = _finderPathWithPaginationFindByC_CCNI_T;
 			finderArgs = new Object[] {
 				companyId, creatorClassNameId, type, start, end,
@@ -4672,7 +4626,7 @@ public class MicroblogsEntryPersistenceImpl
 
 		List<MicroblogsEntry> list = null;
 
-		if (retrieveFromCache) {
+		if (useFinderCache) {
 			list = (List<MicroblogsEntry>)finderCache.getResult(
 				finderPath, finderArgs, this);
 
@@ -4714,7 +4668,7 @@ public class MicroblogsEntryPersistenceImpl
 				appendOrderByComparator(
 					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
 			}
-			else if (pagination) {
+			else {
 				query.append(MicroblogsEntryModelImpl.ORDER_BY_JPQL);
 			}
 
@@ -4735,25 +4689,19 @@ public class MicroblogsEntryPersistenceImpl
 
 				qPos.add(type);
 
-				if (!pagination) {
-					list = (List<MicroblogsEntry>)QueryUtil.list(
-						q, getDialect(), start, end, false);
-
-					Collections.sort(list);
-
-					list = Collections.unmodifiableList(list);
-				}
-				else {
-					list = (List<MicroblogsEntry>)QueryUtil.list(
-						q, getDialect(), start, end);
-				}
+				list = (List<MicroblogsEntry>)QueryUtil.list(
+					q, getDialect(), start, end);
 
 				cacheResult(list);
 
-				finderCache.putResult(finderPath, finderArgs, list);
+				if (useFinderCache) {
+					finderCache.putResult(finderPath, finderArgs, list);
+				}
 			}
 			catch (Exception e) {
-				finderCache.removeResult(finderPath, finderArgs);
+				if (useFinderCache) {
+					finderCache.removeResult(finderPath, finderArgs);
+				}
 
 				throw processException(e);
 			}
@@ -5187,7 +5135,7 @@ public class MicroblogsEntryPersistenceImpl
 	 * Returns a range of all the microblogs entries where creatorClassNameId = &#63; and creatorClassPK = &#63; and type = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>MicroblogsEntryModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>MicroblogsEntryModelImpl</code>.
 	 * </p>
 	 *
 	 * @param creatorClassNameId the creator class name ID
@@ -5210,7 +5158,7 @@ public class MicroblogsEntryPersistenceImpl
 	 * Returns an ordered range of all the microblogs entries where creatorClassNameId = &#63; and creatorClassPK = &#63; and type = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>MicroblogsEntryModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>MicroblogsEntryModelImpl</code>.
 	 * </p>
 	 *
 	 * @param creatorClassNameId the creator class name ID
@@ -5235,7 +5183,7 @@ public class MicroblogsEntryPersistenceImpl
 	 * Returns an ordered range of all the microblogs entries where creatorClassNameId = &#63; and creatorClassPK = &#63; and type = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>MicroblogsEntryModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>MicroblogsEntryModelImpl</code>.
 	 * </p>
 	 *
 	 * @param creatorClassNameId the creator class name ID
@@ -5244,29 +5192,29 @@ public class MicroblogsEntryPersistenceImpl
 	 * @param start the lower bound of the range of microblogs entries
 	 * @param end the upper bound of the range of microblogs entries (not inclusive)
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
-	 * @param retrieveFromCache whether to retrieve from the finder cache
+	 * @param useFinderCache whether to use the finder cache
 	 * @return the ordered range of matching microblogs entries
 	 */
 	@Override
 	public List<MicroblogsEntry> findByCCNI_CCPK_T(
 		long creatorClassNameId, long creatorClassPK, int type, int start,
 		int end, OrderByComparator<MicroblogsEntry> orderByComparator,
-		boolean retrieveFromCache) {
+		boolean useFinderCache) {
 
-		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
 			(orderByComparator == null)) {
 
-			pagination = false;
-			finderPath = _finderPathWithoutPaginationFindByCCNI_CCPK_T;
-			finderArgs = new Object[] {
-				creatorClassNameId, creatorClassPK, type
-			};
+			if (useFinderCache) {
+				finderPath = _finderPathWithoutPaginationFindByCCNI_CCPK_T;
+				finderArgs = new Object[] {
+					creatorClassNameId, creatorClassPK, type
+				};
+			}
 		}
-		else {
+		else if (useFinderCache) {
 			finderPath = _finderPathWithPaginationFindByCCNI_CCPK_T;
 			finderArgs = new Object[] {
 				creatorClassNameId, creatorClassPK, type, start, end,
@@ -5276,7 +5224,7 @@ public class MicroblogsEntryPersistenceImpl
 
 		List<MicroblogsEntry> list = null;
 
-		if (retrieveFromCache) {
+		if (useFinderCache) {
 			list = (List<MicroblogsEntry>)finderCache.getResult(
 				finderPath, finderArgs, this);
 
@@ -5319,7 +5267,7 @@ public class MicroblogsEntryPersistenceImpl
 				appendOrderByComparator(
 					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
 			}
-			else if (pagination) {
+			else {
 				query.append(MicroblogsEntryModelImpl.ORDER_BY_JPQL);
 			}
 
@@ -5340,25 +5288,19 @@ public class MicroblogsEntryPersistenceImpl
 
 				qPos.add(type);
 
-				if (!pagination) {
-					list = (List<MicroblogsEntry>)QueryUtil.list(
-						q, getDialect(), start, end, false);
-
-					Collections.sort(list);
-
-					list = Collections.unmodifiableList(list);
-				}
-				else {
-					list = (List<MicroblogsEntry>)QueryUtil.list(
-						q, getDialect(), start, end);
-				}
+				list = (List<MicroblogsEntry>)QueryUtil.list(
+					q, getDialect(), start, end);
 
 				cacheResult(list);
 
-				finderCache.putResult(finderPath, finderArgs, list);
+				if (useFinderCache) {
+					finderCache.putResult(finderPath, finderArgs, list);
+				}
 			}
 			catch (Exception e) {
-				finderCache.removeResult(finderPath, finderArgs);
+				if (useFinderCache) {
+					finderCache.removeResult(finderPath, finderArgs);
+				}
 
 				throw processException(e);
 			}
@@ -5678,7 +5620,7 @@ public class MicroblogsEntryPersistenceImpl
 	 * Returns all the microblogs entries where creatorClassNameId = &#63; and creatorClassPK = any &#63; and type = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>MicroblogsEntryModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>MicroblogsEntryModelImpl</code>.
 	 * </p>
 	 *
 	 * @param creatorClassNameId the creator class name ID
@@ -5699,7 +5641,7 @@ public class MicroblogsEntryPersistenceImpl
 	 * Returns a range of all the microblogs entries where creatorClassNameId = &#63; and creatorClassPK = any &#63; and type = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>MicroblogsEntryModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>MicroblogsEntryModelImpl</code>.
 	 * </p>
 	 *
 	 * @param creatorClassNameId the creator class name ID
@@ -5722,7 +5664,7 @@ public class MicroblogsEntryPersistenceImpl
 	 * Returns an ordered range of all the microblogs entries where creatorClassNameId = &#63; and creatorClassPK = any &#63; and type = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>MicroblogsEntryModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>MicroblogsEntryModelImpl</code>.
 	 * </p>
 	 *
 	 * @param creatorClassNameId the creator class name ID
@@ -5747,7 +5689,7 @@ public class MicroblogsEntryPersistenceImpl
 	 * Returns an ordered range of all the microblogs entries where creatorClassNameId = &#63; and creatorClassPK = &#63; and type = &#63;, optionally using the finder cache.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>MicroblogsEntryModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>MicroblogsEntryModelImpl</code>.
 	 * </p>
 	 *
 	 * @param creatorClassNameId the creator class name ID
@@ -5756,14 +5698,14 @@ public class MicroblogsEntryPersistenceImpl
 	 * @param start the lower bound of the range of microblogs entries
 	 * @param end the upper bound of the range of microblogs entries (not inclusive)
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
-	 * @param retrieveFromCache whether to retrieve from the finder cache
+	 * @param useFinderCache whether to use the finder cache
 	 * @return the ordered range of matching microblogs entries
 	 */
 	@Override
 	public List<MicroblogsEntry> findByCCNI_CCPK_T(
 		long creatorClassNameId, long[] creatorClassPKs, int type, int start,
 		int end, OrderByComparator<MicroblogsEntry> orderByComparator,
-		boolean retrieveFromCache) {
+		boolean useFinderCache) {
 
 		if (creatorClassPKs == null) {
 			creatorClassPKs = new long[0];
@@ -5778,18 +5720,18 @@ public class MicroblogsEntryPersistenceImpl
 				orderByComparator);
 		}
 
-		boolean pagination = true;
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
 			(orderByComparator == null)) {
 
-			pagination = false;
-			finderArgs = new Object[] {
-				creatorClassNameId, StringUtil.merge(creatorClassPKs), type
-			};
+			if (useFinderCache) {
+				finderArgs = new Object[] {
+					creatorClassNameId, StringUtil.merge(creatorClassPKs), type
+				};
+			}
 		}
-		else {
+		else if (useFinderCache) {
 			finderArgs = new Object[] {
 				creatorClassNameId, StringUtil.merge(creatorClassPKs), type,
 				start, end, orderByComparator
@@ -5798,7 +5740,7 @@ public class MicroblogsEntryPersistenceImpl
 
 		List<MicroblogsEntry> list = null;
 
-		if (retrieveFromCache) {
+		if (useFinderCache) {
 			list = (List<MicroblogsEntry>)finderCache.getResult(
 				_finderPathWithPaginationFindByCCNI_CCPK_T, finderArgs, this);
 
@@ -5850,7 +5792,7 @@ public class MicroblogsEntryPersistenceImpl
 				appendOrderByComparator(
 					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
 			}
-			else if (pagination) {
+			else {
 				query.append(MicroblogsEntryModelImpl.ORDER_BY_JPQL);
 			}
 
@@ -5869,28 +5811,22 @@ public class MicroblogsEntryPersistenceImpl
 
 				qPos.add(type);
 
-				if (!pagination) {
-					list = (List<MicroblogsEntry>)QueryUtil.list(
-						q, getDialect(), start, end, false);
-
-					Collections.sort(list);
-
-					list = Collections.unmodifiableList(list);
-				}
-				else {
-					list = (List<MicroblogsEntry>)QueryUtil.list(
-						q, getDialect(), start, end);
-				}
+				list = (List<MicroblogsEntry>)QueryUtil.list(
+					q, getDialect(), start, end);
 
 				cacheResult(list);
 
-				finderCache.putResult(
-					_finderPathWithPaginationFindByCCNI_CCPK_T, finderArgs,
-					list);
+				if (useFinderCache) {
+					finderCache.putResult(
+						_finderPathWithPaginationFindByCCNI_CCPK_T, finderArgs,
+						list);
+				}
 			}
 			catch (Exception e) {
-				finderCache.removeResult(
-					_finderPathWithPaginationFindByCCNI_CCPK_T, finderArgs);
+				if (useFinderCache) {
+					finderCache.removeResult(
+						_finderPathWithPaginationFindByCCNI_CCPK_T, finderArgs);
+				}
 
 				throw processException(e);
 			}
@@ -6116,7 +6052,7 @@ public class MicroblogsEntryPersistenceImpl
 	 * Returns a range of all the microblogs entries where companyId = &#63; and creatorClassNameId = &#63; and creatorClassPK = &#63; and type = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>MicroblogsEntryModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>MicroblogsEntryModelImpl</code>.
 	 * </p>
 	 *
 	 * @param companyId the company ID
@@ -6141,7 +6077,7 @@ public class MicroblogsEntryPersistenceImpl
 	 * Returns an ordered range of all the microblogs entries where companyId = &#63; and creatorClassNameId = &#63; and creatorClassPK = &#63; and type = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>MicroblogsEntryModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>MicroblogsEntryModelImpl</code>.
 	 * </p>
 	 *
 	 * @param companyId the company ID
@@ -6168,7 +6104,7 @@ public class MicroblogsEntryPersistenceImpl
 	 * Returns an ordered range of all the microblogs entries where companyId = &#63; and creatorClassNameId = &#63; and creatorClassPK = &#63; and type = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>MicroblogsEntryModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>MicroblogsEntryModelImpl</code>.
 	 * </p>
 	 *
 	 * @param companyId the company ID
@@ -6178,7 +6114,7 @@ public class MicroblogsEntryPersistenceImpl
 	 * @param start the lower bound of the range of microblogs entries
 	 * @param end the upper bound of the range of microblogs entries (not inclusive)
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
-	 * @param retrieveFromCache whether to retrieve from the finder cache
+	 * @param useFinderCache whether to use the finder cache
 	 * @return the ordered range of matching microblogs entries
 	 */
 	@Override
@@ -6186,22 +6122,22 @@ public class MicroblogsEntryPersistenceImpl
 		long companyId, long creatorClassNameId, long creatorClassPK, int type,
 		int start, int end,
 		OrderByComparator<MicroblogsEntry> orderByComparator,
-		boolean retrieveFromCache) {
+		boolean useFinderCache) {
 
-		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
 			(orderByComparator == null)) {
 
-			pagination = false;
-			finderPath = _finderPathWithoutPaginationFindByC_CCNI_CCPK_T;
-			finderArgs = new Object[] {
-				companyId, creatorClassNameId, creatorClassPK, type
-			};
+			if (useFinderCache) {
+				finderPath = _finderPathWithoutPaginationFindByC_CCNI_CCPK_T;
+				finderArgs = new Object[] {
+					companyId, creatorClassNameId, creatorClassPK, type
+				};
+			}
 		}
-		else {
+		else if (useFinderCache) {
 			finderPath = _finderPathWithPaginationFindByC_CCNI_CCPK_T;
 			finderArgs = new Object[] {
 				companyId, creatorClassNameId, creatorClassPK, type, start, end,
@@ -6211,7 +6147,7 @@ public class MicroblogsEntryPersistenceImpl
 
 		List<MicroblogsEntry> list = null;
 
-		if (retrieveFromCache) {
+		if (useFinderCache) {
 			list = (List<MicroblogsEntry>)finderCache.getResult(
 				finderPath, finderArgs, this);
 
@@ -6257,7 +6193,7 @@ public class MicroblogsEntryPersistenceImpl
 				appendOrderByComparator(
 					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
 			}
-			else if (pagination) {
+			else {
 				query.append(MicroblogsEntryModelImpl.ORDER_BY_JPQL);
 			}
 
@@ -6280,25 +6216,19 @@ public class MicroblogsEntryPersistenceImpl
 
 				qPos.add(type);
 
-				if (!pagination) {
-					list = (List<MicroblogsEntry>)QueryUtil.list(
-						q, getDialect(), start, end, false);
-
-					Collections.sort(list);
-
-					list = Collections.unmodifiableList(list);
-				}
-				else {
-					list = (List<MicroblogsEntry>)QueryUtil.list(
-						q, getDialect(), start, end);
-				}
+				list = (List<MicroblogsEntry>)QueryUtil.list(
+					q, getDialect(), start, end);
 
 				cacheResult(list);
 
-				finderCache.putResult(finderPath, finderArgs, list);
+				if (useFinderCache) {
+					finderCache.putResult(finderPath, finderArgs, list);
+				}
 			}
 			catch (Exception e) {
-				finderCache.removeResult(finderPath, finderArgs);
+				if (useFinderCache) {
+					finderCache.removeResult(finderPath, finderArgs);
+				}
 
 				throw processException(e);
 			}
@@ -6636,7 +6566,7 @@ public class MicroblogsEntryPersistenceImpl
 	 * Returns all the microblogs entries where companyId = &#63; and creatorClassNameId = &#63; and creatorClassPK = any &#63; and type = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>MicroblogsEntryModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>MicroblogsEntryModelImpl</code>.
 	 * </p>
 	 *
 	 * @param companyId the company ID
@@ -6659,7 +6589,7 @@ public class MicroblogsEntryPersistenceImpl
 	 * Returns a range of all the microblogs entries where companyId = &#63; and creatorClassNameId = &#63; and creatorClassPK = any &#63; and type = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>MicroblogsEntryModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>MicroblogsEntryModelImpl</code>.
 	 * </p>
 	 *
 	 * @param companyId the company ID
@@ -6684,7 +6614,7 @@ public class MicroblogsEntryPersistenceImpl
 	 * Returns an ordered range of all the microblogs entries where companyId = &#63; and creatorClassNameId = &#63; and creatorClassPK = any &#63; and type = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>MicroblogsEntryModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>MicroblogsEntryModelImpl</code>.
 	 * </p>
 	 *
 	 * @param companyId the company ID
@@ -6711,7 +6641,7 @@ public class MicroblogsEntryPersistenceImpl
 	 * Returns an ordered range of all the microblogs entries where companyId = &#63; and creatorClassNameId = &#63; and creatorClassPK = &#63; and type = &#63;, optionally using the finder cache.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>MicroblogsEntryModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>MicroblogsEntryModelImpl</code>.
 	 * </p>
 	 *
 	 * @param companyId the company ID
@@ -6721,7 +6651,7 @@ public class MicroblogsEntryPersistenceImpl
 	 * @param start the lower bound of the range of microblogs entries
 	 * @param end the upper bound of the range of microblogs entries (not inclusive)
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
-	 * @param retrieveFromCache whether to retrieve from the finder cache
+	 * @param useFinderCache whether to use the finder cache
 	 * @return the ordered range of matching microblogs entries
 	 */
 	@Override
@@ -6729,7 +6659,7 @@ public class MicroblogsEntryPersistenceImpl
 		long companyId, long creatorClassNameId, long[] creatorClassPKs,
 		int type, int start, int end,
 		OrderByComparator<MicroblogsEntry> orderByComparator,
-		boolean retrieveFromCache) {
+		boolean useFinderCache) {
 
 		if (creatorClassPKs == null) {
 			creatorClassPKs = new long[0];
@@ -6744,19 +6674,19 @@ public class MicroblogsEntryPersistenceImpl
 				end, orderByComparator);
 		}
 
-		boolean pagination = true;
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
 			(orderByComparator == null)) {
 
-			pagination = false;
-			finderArgs = new Object[] {
-				companyId, creatorClassNameId,
-				StringUtil.merge(creatorClassPKs), type
-			};
+			if (useFinderCache) {
+				finderArgs = new Object[] {
+					companyId, creatorClassNameId,
+					StringUtil.merge(creatorClassPKs), type
+				};
+			}
 		}
-		else {
+		else if (useFinderCache) {
 			finderArgs = new Object[] {
 				companyId, creatorClassNameId,
 				StringUtil.merge(creatorClassPKs), type, start, end,
@@ -6766,7 +6696,7 @@ public class MicroblogsEntryPersistenceImpl
 
 		List<MicroblogsEntry> list = null;
 
-		if (retrieveFromCache) {
+		if (useFinderCache) {
 			list = (List<MicroblogsEntry>)finderCache.getResult(
 				_finderPathWithPaginationFindByC_CCNI_CCPK_T, finderArgs, this);
 
@@ -6821,7 +6751,7 @@ public class MicroblogsEntryPersistenceImpl
 				appendOrderByComparator(
 					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
 			}
-			else if (pagination) {
+			else {
 				query.append(MicroblogsEntryModelImpl.ORDER_BY_JPQL);
 			}
 
@@ -6842,28 +6772,23 @@ public class MicroblogsEntryPersistenceImpl
 
 				qPos.add(type);
 
-				if (!pagination) {
-					list = (List<MicroblogsEntry>)QueryUtil.list(
-						q, getDialect(), start, end, false);
-
-					Collections.sort(list);
-
-					list = Collections.unmodifiableList(list);
-				}
-				else {
-					list = (List<MicroblogsEntry>)QueryUtil.list(
-						q, getDialect(), start, end);
-				}
+				list = (List<MicroblogsEntry>)QueryUtil.list(
+					q, getDialect(), start, end);
 
 				cacheResult(list);
 
-				finderCache.putResult(
-					_finderPathWithPaginationFindByC_CCNI_CCPK_T, finderArgs,
-					list);
+				if (useFinderCache) {
+					finderCache.putResult(
+						_finderPathWithPaginationFindByC_CCNI_CCPK_T,
+						finderArgs, list);
+				}
 			}
 			catch (Exception e) {
-				finderCache.removeResult(
-					_finderPathWithPaginationFindByC_CCNI_CCPK_T, finderArgs);
+				if (useFinderCache) {
+					finderCache.removeResult(
+						_finderPathWithPaginationFindByC_CCNI_CCPK_T,
+						finderArgs);
+				}
 
 				throw processException(e);
 			}
@@ -7105,7 +7030,7 @@ public class MicroblogsEntryPersistenceImpl
 	 * Returns a range of all the microblogs entries where userId = &#63; and createDate = &#63; and type = &#63; and socialRelationType = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>MicroblogsEntryModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>MicroblogsEntryModelImpl</code>.
 	 * </p>
 	 *
 	 * @param userId the user ID
@@ -7129,7 +7054,7 @@ public class MicroblogsEntryPersistenceImpl
 	 * Returns an ordered range of all the microblogs entries where userId = &#63; and createDate = &#63; and type = &#63; and socialRelationType = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>MicroblogsEntryModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>MicroblogsEntryModelImpl</code>.
 	 * </p>
 	 *
 	 * @param userId the user ID
@@ -7156,7 +7081,7 @@ public class MicroblogsEntryPersistenceImpl
 	 * Returns an ordered range of all the microblogs entries where userId = &#63; and createDate = &#63; and type = &#63; and socialRelationType = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>MicroblogsEntryModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>MicroblogsEntryModelImpl</code>.
 	 * </p>
 	 *
 	 * @param userId the user ID
@@ -7166,7 +7091,7 @@ public class MicroblogsEntryPersistenceImpl
 	 * @param start the lower bound of the range of microblogs entries
 	 * @param end the upper bound of the range of microblogs entries (not inclusive)
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
-	 * @param retrieveFromCache whether to retrieve from the finder cache
+	 * @param useFinderCache whether to use the finder cache
 	 * @return the ordered range of matching microblogs entries
 	 */
 	@Override
@@ -7174,22 +7099,22 @@ public class MicroblogsEntryPersistenceImpl
 		long userId, Date createDate, int type, int socialRelationType,
 		int start, int end,
 		OrderByComparator<MicroblogsEntry> orderByComparator,
-		boolean retrieveFromCache) {
+		boolean useFinderCache) {
 
-		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
 			(orderByComparator == null)) {
 
-			pagination = false;
-			finderPath = _finderPathWithoutPaginationFindByU_C_T_S;
-			finderArgs = new Object[] {
-				userId, _getTime(createDate), type, socialRelationType
-			};
+			if (useFinderCache) {
+				finderPath = _finderPathWithoutPaginationFindByU_C_T_S;
+				finderArgs = new Object[] {
+					userId, _getTime(createDate), type, socialRelationType
+				};
+			}
 		}
-		else {
+		else if (useFinderCache) {
 			finderPath = _finderPathWithPaginationFindByU_C_T_S;
 			finderArgs = new Object[] {
 				userId, _getTime(createDate), type, socialRelationType, start,
@@ -7199,7 +7124,7 @@ public class MicroblogsEntryPersistenceImpl
 
 		List<MicroblogsEntry> list = null;
 
-		if (retrieveFromCache) {
+		if (useFinderCache) {
 			list = (List<MicroblogsEntry>)finderCache.getResult(
 				finderPath, finderArgs, this);
 
@@ -7254,7 +7179,7 @@ public class MicroblogsEntryPersistenceImpl
 				appendOrderByComparator(
 					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
 			}
-			else if (pagination) {
+			else {
 				query.append(MicroblogsEntryModelImpl.ORDER_BY_JPQL);
 			}
 
@@ -7279,25 +7204,19 @@ public class MicroblogsEntryPersistenceImpl
 
 				qPos.add(socialRelationType);
 
-				if (!pagination) {
-					list = (List<MicroblogsEntry>)QueryUtil.list(
-						q, getDialect(), start, end, false);
-
-					Collections.sort(list);
-
-					list = Collections.unmodifiableList(list);
-				}
-				else {
-					list = (List<MicroblogsEntry>)QueryUtil.list(
-						q, getDialect(), start, end);
-				}
+				list = (List<MicroblogsEntry>)QueryUtil.list(
+					q, getDialect(), start, end);
 
 				cacheResult(list);
 
-				finderCache.putResult(finderPath, finderArgs, list);
+				if (useFinderCache) {
+					finderCache.putResult(finderPath, finderArgs, list);
+				}
 			}
 			catch (Exception e) {
-				finderCache.removeResult(finderPath, finderArgs);
+				if (useFinderCache) {
+					finderCache.removeResult(finderPath, finderArgs);
+				}
 
 				throw processException(e);
 			}
@@ -7762,7 +7681,6 @@ public class MicroblogsEntryPersistenceImpl
 
 		setModelImplClass(MicroblogsEntryImpl.class);
 		setModelPKClass(long.class);
-		setEntityCacheEnabled(MicroblogsEntryModelImpl.ENTITY_CACHE_ENABLED);
 
 		Map<String, String> dbColumnNames = new HashMap<String, String>();
 
@@ -7779,9 +7697,8 @@ public class MicroblogsEntryPersistenceImpl
 	@Override
 	public void cacheResult(MicroblogsEntry microblogsEntry) {
 		entityCache.putResult(
-			MicroblogsEntryModelImpl.ENTITY_CACHE_ENABLED,
-			MicroblogsEntryImpl.class, microblogsEntry.getPrimaryKey(),
-			microblogsEntry);
+			entityCacheEnabled, MicroblogsEntryImpl.class,
+			microblogsEntry.getPrimaryKey(), microblogsEntry);
 
 		microblogsEntry.resetOriginalValues();
 	}
@@ -7795,8 +7712,7 @@ public class MicroblogsEntryPersistenceImpl
 	public void cacheResult(List<MicroblogsEntry> microblogsEntries) {
 		for (MicroblogsEntry microblogsEntry : microblogsEntries) {
 			if (entityCache.getResult(
-					MicroblogsEntryModelImpl.ENTITY_CACHE_ENABLED,
-					MicroblogsEntryImpl.class,
+					entityCacheEnabled, MicroblogsEntryImpl.class,
 					microblogsEntry.getPrimaryKey()) == null) {
 
 				cacheResult(microblogsEntry);
@@ -7833,8 +7749,8 @@ public class MicroblogsEntryPersistenceImpl
 	@Override
 	public void clearCache(MicroblogsEntry microblogsEntry) {
 		entityCache.removeResult(
-			MicroblogsEntryModelImpl.ENTITY_CACHE_ENABLED,
-			MicroblogsEntryImpl.class, microblogsEntry.getPrimaryKey());
+			entityCacheEnabled, MicroblogsEntryImpl.class,
+			microblogsEntry.getPrimaryKey());
 
 		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
 		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
@@ -7847,8 +7763,8 @@ public class MicroblogsEntryPersistenceImpl
 
 		for (MicroblogsEntry microblogsEntry : microblogsEntries) {
 			entityCache.removeResult(
-				MicroblogsEntryModelImpl.ENTITY_CACHE_ENABLED,
-				MicroblogsEntryImpl.class, microblogsEntry.getPrimaryKey());
+				entityCacheEnabled, MicroblogsEntryImpl.class,
+				microblogsEntry.getPrimaryKey());
 		}
 	}
 
@@ -7865,7 +7781,7 @@ public class MicroblogsEntryPersistenceImpl
 		microblogsEntry.setNew(true);
 		microblogsEntry.setPrimaryKey(microblogsEntryId);
 
-		microblogsEntry.setCompanyId(companyProvider.getCompanyId());
+		microblogsEntry.setCompanyId(CompanyThreadLocal.getCompanyId());
 
 		return microblogsEntry;
 	}
@@ -8029,7 +7945,7 @@ public class MicroblogsEntryPersistenceImpl
 
 		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
 
-		if (!MicroblogsEntryModelImpl.COLUMN_BITMASK_ENABLED) {
+		if (!_columnBitmaskEnabled) {
 			finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
 		}
 		else if (isNew) {
@@ -8402,9 +8318,8 @@ public class MicroblogsEntryPersistenceImpl
 		}
 
 		entityCache.putResult(
-			MicroblogsEntryModelImpl.ENTITY_CACHE_ENABLED,
-			MicroblogsEntryImpl.class, microblogsEntry.getPrimaryKey(),
-			microblogsEntry, false);
+			entityCacheEnabled, MicroblogsEntryImpl.class,
+			microblogsEntry.getPrimaryKey(), microblogsEntry, false);
 
 		microblogsEntry.resetOriginalValues();
 
@@ -8475,7 +8390,7 @@ public class MicroblogsEntryPersistenceImpl
 	 * Returns a range of all the microblogs entries.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>MicroblogsEntryModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>MicroblogsEntryModelImpl</code>.
 	 * </p>
 	 *
 	 * @param start the lower bound of the range of microblogs entries
@@ -8491,7 +8406,7 @@ public class MicroblogsEntryPersistenceImpl
 	 * Returns an ordered range of all the microblogs entries.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>MicroblogsEntryModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>MicroblogsEntryModelImpl</code>.
 	 * </p>
 	 *
 	 * @param start the lower bound of the range of microblogs entries
@@ -8511,40 +8426,40 @@ public class MicroblogsEntryPersistenceImpl
 	 * Returns an ordered range of all the microblogs entries.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>MicroblogsEntryModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>MicroblogsEntryModelImpl</code>.
 	 * </p>
 	 *
 	 * @param start the lower bound of the range of microblogs entries
 	 * @param end the upper bound of the range of microblogs entries (not inclusive)
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
-	 * @param retrieveFromCache whether to retrieve from the finder cache
+	 * @param useFinderCache whether to use the finder cache
 	 * @return the ordered range of microblogs entries
 	 */
 	@Override
 	public List<MicroblogsEntry> findAll(
 		int start, int end,
 		OrderByComparator<MicroblogsEntry> orderByComparator,
-		boolean retrieveFromCache) {
+		boolean useFinderCache) {
 
-		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
 			(orderByComparator == null)) {
 
-			pagination = false;
-			finderPath = _finderPathWithoutPaginationFindAll;
-			finderArgs = FINDER_ARGS_EMPTY;
+			if (useFinderCache) {
+				finderPath = _finderPathWithoutPaginationFindAll;
+				finderArgs = FINDER_ARGS_EMPTY;
+			}
 		}
-		else {
+		else if (useFinderCache) {
 			finderPath = _finderPathWithPaginationFindAll;
 			finderArgs = new Object[] {start, end, orderByComparator};
 		}
 
 		List<MicroblogsEntry> list = null;
 
-		if (retrieveFromCache) {
+		if (useFinderCache) {
 			list = (List<MicroblogsEntry>)finderCache.getResult(
 				finderPath, finderArgs, this);
 		}
@@ -8567,9 +8482,7 @@ public class MicroblogsEntryPersistenceImpl
 			else {
 				sql = _SQL_SELECT_MICROBLOGSENTRY;
 
-				if (pagination) {
-					sql = sql.concat(MicroblogsEntryModelImpl.ORDER_BY_JPQL);
-				}
+				sql = sql.concat(MicroblogsEntryModelImpl.ORDER_BY_JPQL);
 			}
 
 			Session session = null;
@@ -8579,25 +8492,19 @@ public class MicroblogsEntryPersistenceImpl
 
 				Query q = session.createQuery(sql);
 
-				if (!pagination) {
-					list = (List<MicroblogsEntry>)QueryUtil.list(
-						q, getDialect(), start, end, false);
-
-					Collections.sort(list);
-
-					list = Collections.unmodifiableList(list);
-				}
-				else {
-					list = (List<MicroblogsEntry>)QueryUtil.list(
-						q, getDialect(), start, end);
-				}
+				list = (List<MicroblogsEntry>)QueryUtil.list(
+					q, getDialect(), start, end);
 
 				cacheResult(list);
 
-				finderCache.putResult(finderPath, finderArgs, list);
+				if (useFinderCache) {
+					finderCache.putResult(finderPath, finderArgs, list);
+				}
 			}
 			catch (Exception e) {
-				finderCache.removeResult(finderPath, finderArgs);
+				if (useFinderCache) {
+					finderCache.removeResult(finderPath, finderArgs);
+				}
 
 				throw processException(e);
 			}
@@ -8685,81 +8592,68 @@ public class MicroblogsEntryPersistenceImpl
 	/**
 	 * Initializes the microblogs entry persistence.
 	 */
-	public void afterPropertiesSet() {
+	@Activate
+	public void activate() {
+		MicroblogsEntryModelImpl.setEntityCacheEnabled(entityCacheEnabled);
+		MicroblogsEntryModelImpl.setFinderCacheEnabled(finderCacheEnabled);
+
 		_finderPathWithPaginationFindAll = new FinderPath(
-			MicroblogsEntryModelImpl.ENTITY_CACHE_ENABLED,
-			MicroblogsEntryModelImpl.FINDER_CACHE_ENABLED,
-			MicroblogsEntryImpl.class, FINDER_CLASS_NAME_LIST_WITH_PAGINATION,
-			"findAll", new String[0]);
+			entityCacheEnabled, finderCacheEnabled, MicroblogsEntryImpl.class,
+			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findAll", new String[0]);
 
 		_finderPathWithoutPaginationFindAll = new FinderPath(
-			MicroblogsEntryModelImpl.ENTITY_CACHE_ENABLED,
-			MicroblogsEntryModelImpl.FINDER_CACHE_ENABLED,
-			MicroblogsEntryImpl.class,
+			entityCacheEnabled, finderCacheEnabled, MicroblogsEntryImpl.class,
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findAll",
 			new String[0]);
 
 		_finderPathCountAll = new FinderPath(
-			MicroblogsEntryModelImpl.ENTITY_CACHE_ENABLED,
-			MicroblogsEntryModelImpl.FINDER_CACHE_ENABLED, Long.class,
+			entityCacheEnabled, finderCacheEnabled, Long.class,
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countAll",
 			new String[0]);
 
 		_finderPathWithPaginationFindByCompanyId = new FinderPath(
-			MicroblogsEntryModelImpl.ENTITY_CACHE_ENABLED,
-			MicroblogsEntryModelImpl.FINDER_CACHE_ENABLED,
-			MicroblogsEntryImpl.class, FINDER_CLASS_NAME_LIST_WITH_PAGINATION,
-			"findByCompanyId",
+			entityCacheEnabled, finderCacheEnabled, MicroblogsEntryImpl.class,
+			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByCompanyId",
 			new String[] {
 				Long.class.getName(), Integer.class.getName(),
 				Integer.class.getName(), OrderByComparator.class.getName()
 			});
 
 		_finderPathWithoutPaginationFindByCompanyId = new FinderPath(
-			MicroblogsEntryModelImpl.ENTITY_CACHE_ENABLED,
-			MicroblogsEntryModelImpl.FINDER_CACHE_ENABLED,
-			MicroblogsEntryImpl.class,
+			entityCacheEnabled, finderCacheEnabled, MicroblogsEntryImpl.class,
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByCompanyId",
 			new String[] {Long.class.getName()},
 			MicroblogsEntryModelImpl.COMPANYID_COLUMN_BITMASK |
 			MicroblogsEntryModelImpl.CREATEDATE_COLUMN_BITMASK);
 
 		_finderPathCountByCompanyId = new FinderPath(
-			MicroblogsEntryModelImpl.ENTITY_CACHE_ENABLED,
-			MicroblogsEntryModelImpl.FINDER_CACHE_ENABLED, Long.class,
+			entityCacheEnabled, finderCacheEnabled, Long.class,
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByCompanyId",
 			new String[] {Long.class.getName()});
 
 		_finderPathWithPaginationFindByUserId = new FinderPath(
-			MicroblogsEntryModelImpl.ENTITY_CACHE_ENABLED,
-			MicroblogsEntryModelImpl.FINDER_CACHE_ENABLED,
-			MicroblogsEntryImpl.class, FINDER_CLASS_NAME_LIST_WITH_PAGINATION,
-			"findByUserId",
+			entityCacheEnabled, finderCacheEnabled, MicroblogsEntryImpl.class,
+			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByUserId",
 			new String[] {
 				Long.class.getName(), Integer.class.getName(),
 				Integer.class.getName(), OrderByComparator.class.getName()
 			});
 
 		_finderPathWithoutPaginationFindByUserId = new FinderPath(
-			MicroblogsEntryModelImpl.ENTITY_CACHE_ENABLED,
-			MicroblogsEntryModelImpl.FINDER_CACHE_ENABLED,
-			MicroblogsEntryImpl.class,
+			entityCacheEnabled, finderCacheEnabled, MicroblogsEntryImpl.class,
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByUserId",
 			new String[] {Long.class.getName()},
 			MicroblogsEntryModelImpl.USERID_COLUMN_BITMASK |
 			MicroblogsEntryModelImpl.CREATEDATE_COLUMN_BITMASK);
 
 		_finderPathCountByUserId = new FinderPath(
-			MicroblogsEntryModelImpl.ENTITY_CACHE_ENABLED,
-			MicroblogsEntryModelImpl.FINDER_CACHE_ENABLED, Long.class,
+			entityCacheEnabled, finderCacheEnabled, Long.class,
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByUserId",
 			new String[] {Long.class.getName()});
 
 		_finderPathWithPaginationFindByU_T = new FinderPath(
-			MicroblogsEntryModelImpl.ENTITY_CACHE_ENABLED,
-			MicroblogsEntryModelImpl.FINDER_CACHE_ENABLED,
-			MicroblogsEntryImpl.class, FINDER_CLASS_NAME_LIST_WITH_PAGINATION,
-			"findByU_T",
+			entityCacheEnabled, finderCacheEnabled, MicroblogsEntryImpl.class,
+			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByU_T",
 			new String[] {
 				Long.class.getName(), Integer.class.getName(),
 				Integer.class.getName(), Integer.class.getName(),
@@ -8767,9 +8661,7 @@ public class MicroblogsEntryPersistenceImpl
 			});
 
 		_finderPathWithoutPaginationFindByU_T = new FinderPath(
-			MicroblogsEntryModelImpl.ENTITY_CACHE_ENABLED,
-			MicroblogsEntryModelImpl.FINDER_CACHE_ENABLED,
-			MicroblogsEntryImpl.class,
+			entityCacheEnabled, finderCacheEnabled, MicroblogsEntryImpl.class,
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByU_T",
 			new String[] {Long.class.getName(), Integer.class.getName()},
 			MicroblogsEntryModelImpl.USERID_COLUMN_BITMASK |
@@ -8777,16 +8669,13 @@ public class MicroblogsEntryPersistenceImpl
 			MicroblogsEntryModelImpl.CREATEDATE_COLUMN_BITMASK);
 
 		_finderPathCountByU_T = new FinderPath(
-			MicroblogsEntryModelImpl.ENTITY_CACHE_ENABLED,
-			MicroblogsEntryModelImpl.FINDER_CACHE_ENABLED, Long.class,
+			entityCacheEnabled, finderCacheEnabled, Long.class,
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByU_T",
 			new String[] {Long.class.getName(), Integer.class.getName()});
 
 		_finderPathWithPaginationFindByCCNI_CCPK = new FinderPath(
-			MicroblogsEntryModelImpl.ENTITY_CACHE_ENABLED,
-			MicroblogsEntryModelImpl.FINDER_CACHE_ENABLED,
-			MicroblogsEntryImpl.class, FINDER_CLASS_NAME_LIST_WITH_PAGINATION,
-			"findByCCNI_CCPK",
+			entityCacheEnabled, finderCacheEnabled, MicroblogsEntryImpl.class,
+			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByCCNI_CCPK",
 			new String[] {
 				Long.class.getName(), Long.class.getName(),
 				Integer.class.getName(), Integer.class.getName(),
@@ -8794,9 +8683,7 @@ public class MicroblogsEntryPersistenceImpl
 			});
 
 		_finderPathWithoutPaginationFindByCCNI_CCPK = new FinderPath(
-			MicroblogsEntryModelImpl.ENTITY_CACHE_ENABLED,
-			MicroblogsEntryModelImpl.FINDER_CACHE_ENABLED,
-			MicroblogsEntryImpl.class,
+			entityCacheEnabled, finderCacheEnabled, MicroblogsEntryImpl.class,
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByCCNI_CCPK",
 			new String[] {Long.class.getName(), Long.class.getName()},
 			MicroblogsEntryModelImpl.CREATORCLASSNAMEID_COLUMN_BITMASK |
@@ -8804,22 +8691,18 @@ public class MicroblogsEntryPersistenceImpl
 			MicroblogsEntryModelImpl.CREATEDATE_COLUMN_BITMASK);
 
 		_finderPathCountByCCNI_CCPK = new FinderPath(
-			MicroblogsEntryModelImpl.ENTITY_CACHE_ENABLED,
-			MicroblogsEntryModelImpl.FINDER_CACHE_ENABLED, Long.class,
+			entityCacheEnabled, finderCacheEnabled, Long.class,
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByCCNI_CCPK",
 			new String[] {Long.class.getName(), Long.class.getName()});
 
 		_finderPathWithPaginationCountByCCNI_CCPK = new FinderPath(
-			MicroblogsEntryModelImpl.ENTITY_CACHE_ENABLED,
-			MicroblogsEntryModelImpl.FINDER_CACHE_ENABLED, Long.class,
+			entityCacheEnabled, finderCacheEnabled, Long.class,
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "countByCCNI_CCPK",
 			new String[] {Long.class.getName(), Long.class.getName()});
 
 		_finderPathWithPaginationFindByCCNI_T = new FinderPath(
-			MicroblogsEntryModelImpl.ENTITY_CACHE_ENABLED,
-			MicroblogsEntryModelImpl.FINDER_CACHE_ENABLED,
-			MicroblogsEntryImpl.class, FINDER_CLASS_NAME_LIST_WITH_PAGINATION,
-			"findByCCNI_T",
+			entityCacheEnabled, finderCacheEnabled, MicroblogsEntryImpl.class,
+			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByCCNI_T",
 			new String[] {
 				Long.class.getName(), Integer.class.getName(),
 				Integer.class.getName(), Integer.class.getName(),
@@ -8827,9 +8710,7 @@ public class MicroblogsEntryPersistenceImpl
 			});
 
 		_finderPathWithoutPaginationFindByCCNI_T = new FinderPath(
-			MicroblogsEntryModelImpl.ENTITY_CACHE_ENABLED,
-			MicroblogsEntryModelImpl.FINDER_CACHE_ENABLED,
-			MicroblogsEntryImpl.class,
+			entityCacheEnabled, finderCacheEnabled, MicroblogsEntryImpl.class,
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByCCNI_T",
 			new String[] {Long.class.getName(), Integer.class.getName()},
 			MicroblogsEntryModelImpl.CREATORCLASSNAMEID_COLUMN_BITMASK |
@@ -8837,16 +8718,13 @@ public class MicroblogsEntryPersistenceImpl
 			MicroblogsEntryModelImpl.CREATEDATE_COLUMN_BITMASK);
 
 		_finderPathCountByCCNI_T = new FinderPath(
-			MicroblogsEntryModelImpl.ENTITY_CACHE_ENABLED,
-			MicroblogsEntryModelImpl.FINDER_CACHE_ENABLED, Long.class,
+			entityCacheEnabled, finderCacheEnabled, Long.class,
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByCCNI_T",
 			new String[] {Long.class.getName(), Integer.class.getName()});
 
 		_finderPathWithPaginationFindByT_P = new FinderPath(
-			MicroblogsEntryModelImpl.ENTITY_CACHE_ENABLED,
-			MicroblogsEntryModelImpl.FINDER_CACHE_ENABLED,
-			MicroblogsEntryImpl.class, FINDER_CLASS_NAME_LIST_WITH_PAGINATION,
-			"findByT_P",
+			entityCacheEnabled, finderCacheEnabled, MicroblogsEntryImpl.class,
+			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByT_P",
 			new String[] {
 				Integer.class.getName(), Long.class.getName(),
 				Integer.class.getName(), Integer.class.getName(),
@@ -8854,9 +8732,7 @@ public class MicroblogsEntryPersistenceImpl
 			});
 
 		_finderPathWithoutPaginationFindByT_P = new FinderPath(
-			MicroblogsEntryModelImpl.ENTITY_CACHE_ENABLED,
-			MicroblogsEntryModelImpl.FINDER_CACHE_ENABLED,
-			MicroblogsEntryImpl.class,
+			entityCacheEnabled, finderCacheEnabled, MicroblogsEntryImpl.class,
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByT_P",
 			new String[] {Integer.class.getName(), Long.class.getName()},
 			MicroblogsEntryModelImpl.TYPE_COLUMN_BITMASK |
@@ -8864,16 +8740,13 @@ public class MicroblogsEntryPersistenceImpl
 			MicroblogsEntryModelImpl.CREATEDATE_COLUMN_BITMASK);
 
 		_finderPathCountByT_P = new FinderPath(
-			MicroblogsEntryModelImpl.ENTITY_CACHE_ENABLED,
-			MicroblogsEntryModelImpl.FINDER_CACHE_ENABLED, Long.class,
+			entityCacheEnabled, finderCacheEnabled, Long.class,
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByT_P",
 			new String[] {Integer.class.getName(), Long.class.getName()});
 
 		_finderPathWithPaginationFindByC_CCNI_CCPK = new FinderPath(
-			MicroblogsEntryModelImpl.ENTITY_CACHE_ENABLED,
-			MicroblogsEntryModelImpl.FINDER_CACHE_ENABLED,
-			MicroblogsEntryImpl.class, FINDER_CLASS_NAME_LIST_WITH_PAGINATION,
-			"findByC_CCNI_CCPK",
+			entityCacheEnabled, finderCacheEnabled, MicroblogsEntryImpl.class,
+			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByC_CCNI_CCPK",
 			new String[] {
 				Long.class.getName(), Long.class.getName(),
 				Long.class.getName(), Integer.class.getName(),
@@ -8881,9 +8754,7 @@ public class MicroblogsEntryPersistenceImpl
 			});
 
 		_finderPathWithoutPaginationFindByC_CCNI_CCPK = new FinderPath(
-			MicroblogsEntryModelImpl.ENTITY_CACHE_ENABLED,
-			MicroblogsEntryModelImpl.FINDER_CACHE_ENABLED,
-			MicroblogsEntryImpl.class,
+			entityCacheEnabled, finderCacheEnabled, MicroblogsEntryImpl.class,
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByC_CCNI_CCPK",
 			new String[] {
 				Long.class.getName(), Long.class.getName(), Long.class.getName()
@@ -8894,26 +8765,22 @@ public class MicroblogsEntryPersistenceImpl
 			MicroblogsEntryModelImpl.CREATEDATE_COLUMN_BITMASK);
 
 		_finderPathCountByC_CCNI_CCPK = new FinderPath(
-			MicroblogsEntryModelImpl.ENTITY_CACHE_ENABLED,
-			MicroblogsEntryModelImpl.FINDER_CACHE_ENABLED, Long.class,
+			entityCacheEnabled, finderCacheEnabled, Long.class,
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByC_CCNI_CCPK",
 			new String[] {
 				Long.class.getName(), Long.class.getName(), Long.class.getName()
 			});
 
 		_finderPathWithPaginationCountByC_CCNI_CCPK = new FinderPath(
-			MicroblogsEntryModelImpl.ENTITY_CACHE_ENABLED,
-			MicroblogsEntryModelImpl.FINDER_CACHE_ENABLED, Long.class,
+			entityCacheEnabled, finderCacheEnabled, Long.class,
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "countByC_CCNI_CCPK",
 			new String[] {
 				Long.class.getName(), Long.class.getName(), Long.class.getName()
 			});
 
 		_finderPathWithPaginationFindByC_CCNI_T = new FinderPath(
-			MicroblogsEntryModelImpl.ENTITY_CACHE_ENABLED,
-			MicroblogsEntryModelImpl.FINDER_CACHE_ENABLED,
-			MicroblogsEntryImpl.class, FINDER_CLASS_NAME_LIST_WITH_PAGINATION,
-			"findByC_CCNI_T",
+			entityCacheEnabled, finderCacheEnabled, MicroblogsEntryImpl.class,
+			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByC_CCNI_T",
 			new String[] {
 				Long.class.getName(), Long.class.getName(),
 				Integer.class.getName(), Integer.class.getName(),
@@ -8921,9 +8788,7 @@ public class MicroblogsEntryPersistenceImpl
 			});
 
 		_finderPathWithoutPaginationFindByC_CCNI_T = new FinderPath(
-			MicroblogsEntryModelImpl.ENTITY_CACHE_ENABLED,
-			MicroblogsEntryModelImpl.FINDER_CACHE_ENABLED,
-			MicroblogsEntryImpl.class,
+			entityCacheEnabled, finderCacheEnabled, MicroblogsEntryImpl.class,
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByC_CCNI_T",
 			new String[] {
 				Long.class.getName(), Long.class.getName(),
@@ -8935,8 +8800,7 @@ public class MicroblogsEntryPersistenceImpl
 			MicroblogsEntryModelImpl.CREATEDATE_COLUMN_BITMASK);
 
 		_finderPathCountByC_CCNI_T = new FinderPath(
-			MicroblogsEntryModelImpl.ENTITY_CACHE_ENABLED,
-			MicroblogsEntryModelImpl.FINDER_CACHE_ENABLED, Long.class,
+			entityCacheEnabled, finderCacheEnabled, Long.class,
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByC_CCNI_T",
 			new String[] {
 				Long.class.getName(), Long.class.getName(),
@@ -8944,10 +8808,8 @@ public class MicroblogsEntryPersistenceImpl
 			});
 
 		_finderPathWithPaginationFindByCCNI_CCPK_T = new FinderPath(
-			MicroblogsEntryModelImpl.ENTITY_CACHE_ENABLED,
-			MicroblogsEntryModelImpl.FINDER_CACHE_ENABLED,
-			MicroblogsEntryImpl.class, FINDER_CLASS_NAME_LIST_WITH_PAGINATION,
-			"findByCCNI_CCPK_T",
+			entityCacheEnabled, finderCacheEnabled, MicroblogsEntryImpl.class,
+			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByCCNI_CCPK_T",
 			new String[] {
 				Long.class.getName(), Long.class.getName(),
 				Integer.class.getName(), Integer.class.getName(),
@@ -8955,9 +8817,7 @@ public class MicroblogsEntryPersistenceImpl
 			});
 
 		_finderPathWithoutPaginationFindByCCNI_CCPK_T = new FinderPath(
-			MicroblogsEntryModelImpl.ENTITY_CACHE_ENABLED,
-			MicroblogsEntryModelImpl.FINDER_CACHE_ENABLED,
-			MicroblogsEntryImpl.class,
+			entityCacheEnabled, finderCacheEnabled, MicroblogsEntryImpl.class,
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByCCNI_CCPK_T",
 			new String[] {
 				Long.class.getName(), Long.class.getName(),
@@ -8969,8 +8829,7 @@ public class MicroblogsEntryPersistenceImpl
 			MicroblogsEntryModelImpl.CREATEDATE_COLUMN_BITMASK);
 
 		_finderPathCountByCCNI_CCPK_T = new FinderPath(
-			MicroblogsEntryModelImpl.ENTITY_CACHE_ENABLED,
-			MicroblogsEntryModelImpl.FINDER_CACHE_ENABLED, Long.class,
+			entityCacheEnabled, finderCacheEnabled, Long.class,
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByCCNI_CCPK_T",
 			new String[] {
 				Long.class.getName(), Long.class.getName(),
@@ -8978,8 +8837,7 @@ public class MicroblogsEntryPersistenceImpl
 			});
 
 		_finderPathWithPaginationCountByCCNI_CCPK_T = new FinderPath(
-			MicroblogsEntryModelImpl.ENTITY_CACHE_ENABLED,
-			MicroblogsEntryModelImpl.FINDER_CACHE_ENABLED, Long.class,
+			entityCacheEnabled, finderCacheEnabled, Long.class,
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "countByCCNI_CCPK_T",
 			new String[] {
 				Long.class.getName(), Long.class.getName(),
@@ -8987,10 +8845,8 @@ public class MicroblogsEntryPersistenceImpl
 			});
 
 		_finderPathWithPaginationFindByC_CCNI_CCPK_T = new FinderPath(
-			MicroblogsEntryModelImpl.ENTITY_CACHE_ENABLED,
-			MicroblogsEntryModelImpl.FINDER_CACHE_ENABLED,
-			MicroblogsEntryImpl.class, FINDER_CLASS_NAME_LIST_WITH_PAGINATION,
-			"findByC_CCNI_CCPK_T",
+			entityCacheEnabled, finderCacheEnabled, MicroblogsEntryImpl.class,
+			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByC_CCNI_CCPK_T",
 			new String[] {
 				Long.class.getName(), Long.class.getName(),
 				Long.class.getName(), Integer.class.getName(),
@@ -8999,9 +8855,7 @@ public class MicroblogsEntryPersistenceImpl
 			});
 
 		_finderPathWithoutPaginationFindByC_CCNI_CCPK_T = new FinderPath(
-			MicroblogsEntryModelImpl.ENTITY_CACHE_ENABLED,
-			MicroblogsEntryModelImpl.FINDER_CACHE_ENABLED,
-			MicroblogsEntryImpl.class,
+			entityCacheEnabled, finderCacheEnabled, MicroblogsEntryImpl.class,
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByC_CCNI_CCPK_T",
 			new String[] {
 				Long.class.getName(), Long.class.getName(),
@@ -9014,8 +8868,7 @@ public class MicroblogsEntryPersistenceImpl
 			MicroblogsEntryModelImpl.CREATEDATE_COLUMN_BITMASK);
 
 		_finderPathCountByC_CCNI_CCPK_T = new FinderPath(
-			MicroblogsEntryModelImpl.ENTITY_CACHE_ENABLED,
-			MicroblogsEntryModelImpl.FINDER_CACHE_ENABLED, Long.class,
+			entityCacheEnabled, finderCacheEnabled, Long.class,
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByC_CCNI_CCPK_T",
 			new String[] {
 				Long.class.getName(), Long.class.getName(),
@@ -9023,8 +8876,7 @@ public class MicroblogsEntryPersistenceImpl
 			});
 
 		_finderPathWithPaginationCountByC_CCNI_CCPK_T = new FinderPath(
-			MicroblogsEntryModelImpl.ENTITY_CACHE_ENABLED,
-			MicroblogsEntryModelImpl.FINDER_CACHE_ENABLED, Long.class,
+			entityCacheEnabled, finderCacheEnabled, Long.class,
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "countByC_CCNI_CCPK_T",
 			new String[] {
 				Long.class.getName(), Long.class.getName(),
@@ -9032,10 +8884,8 @@ public class MicroblogsEntryPersistenceImpl
 			});
 
 		_finderPathWithPaginationFindByU_C_T_S = new FinderPath(
-			MicroblogsEntryModelImpl.ENTITY_CACHE_ENABLED,
-			MicroblogsEntryModelImpl.FINDER_CACHE_ENABLED,
-			MicroblogsEntryImpl.class, FINDER_CLASS_NAME_LIST_WITH_PAGINATION,
-			"findByU_C_T_S",
+			entityCacheEnabled, finderCacheEnabled, MicroblogsEntryImpl.class,
+			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByU_C_T_S",
 			new String[] {
 				Long.class.getName(), Date.class.getName(),
 				Integer.class.getName(), Integer.class.getName(),
@@ -9044,9 +8894,7 @@ public class MicroblogsEntryPersistenceImpl
 			});
 
 		_finderPathWithoutPaginationFindByU_C_T_S = new FinderPath(
-			MicroblogsEntryModelImpl.ENTITY_CACHE_ENABLED,
-			MicroblogsEntryModelImpl.FINDER_CACHE_ENABLED,
-			MicroblogsEntryImpl.class,
+			entityCacheEnabled, finderCacheEnabled, MicroblogsEntryImpl.class,
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByU_C_T_S",
 			new String[] {
 				Long.class.getName(), Date.class.getName(),
@@ -9058,8 +8906,7 @@ public class MicroblogsEntryPersistenceImpl
 			MicroblogsEntryModelImpl.SOCIALRELATIONTYPE_COLUMN_BITMASK);
 
 		_finderPathCountByU_C_T_S = new FinderPath(
-			MicroblogsEntryModelImpl.ENTITY_CACHE_ENABLED,
-			MicroblogsEntryModelImpl.FINDER_CACHE_ENABLED, Long.class,
+			entityCacheEnabled, finderCacheEnabled, Long.class,
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByU_C_T_S",
 			new String[] {
 				Long.class.getName(), Date.class.getName(),
@@ -9067,20 +8914,52 @@ public class MicroblogsEntryPersistenceImpl
 			});
 	}
 
-	public void destroy() {
+	@Deactivate
+	public void deactivate() {
 		entityCache.removeCache(MicroblogsEntryImpl.class.getName());
 		finderCache.removeCache(FINDER_CLASS_NAME_ENTITY);
 		finderCache.removeCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
 		finderCache.removeCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
 	}
 
-	@ServiceReference(type = CompanyProviderWrapper.class)
-	protected CompanyProvider companyProvider;
+	@Override
+	@Reference(
+		target = MicroblogsPersistenceConstants.SERVICE_CONFIGURATION_FILTER,
+		unbind = "-"
+	)
+	public void setConfiguration(Configuration configuration) {
+		super.setConfiguration(configuration);
 
-	@ServiceReference(type = EntityCache.class)
+		_columnBitmaskEnabled = GetterUtil.getBoolean(
+			configuration.get(
+				"value.object.column.bitmask.enabled.com.liferay.microblogs.model.MicroblogsEntry"),
+			true);
+	}
+
+	@Override
+	@Reference(
+		target = MicroblogsPersistenceConstants.ORIGIN_BUNDLE_SYMBOLIC_NAME_FILTER,
+		unbind = "-"
+	)
+	public void setDataSource(DataSource dataSource) {
+		super.setDataSource(dataSource);
+	}
+
+	@Override
+	@Reference(
+		target = MicroblogsPersistenceConstants.ORIGIN_BUNDLE_SYMBOLIC_NAME_FILTER,
+		unbind = "-"
+	)
+	public void setSessionFactory(SessionFactory sessionFactory) {
+		super.setSessionFactory(sessionFactory);
+	}
+
+	private boolean _columnBitmaskEnabled;
+
+	@Reference
 	protected EntityCache entityCache;
 
-	@ServiceReference(type = FinderCache.class)
+	@Reference
 	protected FinderCache finderCache;
 
 	private Long _getTime(Date date) {
@@ -9116,5 +8995,14 @@ public class MicroblogsEntryPersistenceImpl
 
 	private static final Set<String> _badColumnNames = SetUtil.fromArray(
 		new String[] {"type"});
+
+	static {
+		try {
+			Class.forName(MicroblogsPersistenceConstants.class.getName());
+		}
+		catch (ClassNotFoundException cnfe) {
+			throw new ExceptionInInitializerError(cnfe);
+		}
+	}
 
 }

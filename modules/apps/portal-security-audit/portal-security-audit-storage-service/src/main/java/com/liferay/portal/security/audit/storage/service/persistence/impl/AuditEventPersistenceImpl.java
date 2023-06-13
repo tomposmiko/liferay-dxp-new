@@ -15,6 +15,7 @@
 package com.liferay.portal.security.audit.storage.service.persistence.impl;
 
 import com.liferay.petra.string.StringBundler;
+import com.liferay.portal.kernel.configuration.Configuration;
 import com.liferay.portal.kernel.dao.orm.EntityCache;
 import com.liferay.portal.kernel.dao.orm.FinderCache;
 import com.liferay.portal.kernel.dao.orm.FinderPath;
@@ -22,11 +23,12 @@ import com.liferay.portal.kernel.dao.orm.Query;
 import com.liferay.portal.kernel.dao.orm.QueryPos;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.dao.orm.Session;
+import com.liferay.portal.kernel.dao.orm.SessionFactory;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.service.persistence.CompanyProvider;
-import com.liferay.portal.kernel.service.persistence.CompanyProviderWrapper;
+import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
 import com.liferay.portal.kernel.service.persistence.impl.BasePersistenceImpl;
+import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.security.audit.storage.exception.NoSuchEventException;
@@ -34,17 +36,21 @@ import com.liferay.portal.security.audit.storage.model.AuditEvent;
 import com.liferay.portal.security.audit.storage.model.impl.AuditEventImpl;
 import com.liferay.portal.security.audit.storage.model.impl.AuditEventModelImpl;
 import com.liferay.portal.security.audit.storage.service.persistence.AuditEventPersistence;
-import com.liferay.portal.spring.extender.service.ServiceReference;
+import com.liferay.portal.security.audit.storage.service.persistence.impl.constants.AuditPersistenceConstants;
 
 import java.io.Serializable;
 
 import java.lang.reflect.InvocationHandler;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import org.osgi.annotation.versioning.ProviderType;
+import javax.sql.DataSource;
+
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
+import org.osgi.service.component.annotations.Reference;
 
 /**
  * The persistence implementation for the audit event service.
@@ -56,11 +62,11 @@ import org.osgi.annotation.versioning.ProviderType;
  * @author Brian Wing Shun Chan
  * @generated
  */
-@ProviderType
+@Component(service = AuditEventPersistence.class)
 public class AuditEventPersistenceImpl
 	extends BasePersistenceImpl<AuditEvent> implements AuditEventPersistence {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this class directly. Always use <code>AuditEventUtil</code> to access the audit event persistence. Modify <code>service.xml</code> and rerun ServiceBuilder to regenerate this class.
@@ -97,7 +103,7 @@ public class AuditEventPersistenceImpl
 	 * Returns a range of all the audit events where companyId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>AuditEventModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>AuditEventModelImpl</code>.
 	 * </p>
 	 *
 	 * @param companyId the company ID
@@ -116,7 +122,7 @@ public class AuditEventPersistenceImpl
 	 * Returns an ordered range of all the audit events where companyId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>AuditEventModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>AuditEventModelImpl</code>.
 	 * </p>
 	 *
 	 * @param companyId the company ID
@@ -137,34 +143,34 @@ public class AuditEventPersistenceImpl
 	 * Returns an ordered range of all the audit events where companyId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>AuditEventModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>AuditEventModelImpl</code>.
 	 * </p>
 	 *
 	 * @param companyId the company ID
 	 * @param start the lower bound of the range of audit events
 	 * @param end the upper bound of the range of audit events (not inclusive)
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
-	 * @param retrieveFromCache whether to retrieve from the finder cache
+	 * @param useFinderCache whether to use the finder cache
 	 * @return the ordered range of matching audit events
 	 */
 	@Override
 	public List<AuditEvent> findByCompanyId(
 		long companyId, int start, int end,
 		OrderByComparator<AuditEvent> orderByComparator,
-		boolean retrieveFromCache) {
+		boolean useFinderCache) {
 
-		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
 			(orderByComparator == null)) {
 
-			pagination = false;
-			finderPath = _finderPathWithoutPaginationFindByCompanyId;
-			finderArgs = new Object[] {companyId};
+			if (useFinderCache) {
+				finderPath = _finderPathWithoutPaginationFindByCompanyId;
+				finderArgs = new Object[] {companyId};
+			}
 		}
-		else {
+		else if (useFinderCache) {
 			finderPath = _finderPathWithPaginationFindByCompanyId;
 			finderArgs = new Object[] {
 				companyId, start, end, orderByComparator
@@ -173,13 +179,13 @@ public class AuditEventPersistenceImpl
 
 		List<AuditEvent> list = null;
 
-		if (retrieveFromCache) {
+		if (useFinderCache) {
 			list = (List<AuditEvent>)finderCache.getResult(
 				finderPath, finderArgs, this);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (AuditEvent auditEvent : list) {
-					if ((companyId != auditEvent.getCompanyId())) {
+					if (companyId != auditEvent.getCompanyId()) {
 						list = null;
 
 						break;
@@ -207,7 +213,7 @@ public class AuditEventPersistenceImpl
 				appendOrderByComparator(
 					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
 			}
-			else if (pagination) {
+			else {
 				query.append(AuditEventModelImpl.ORDER_BY_JPQL);
 			}
 
@@ -224,25 +230,19 @@ public class AuditEventPersistenceImpl
 
 				qPos.add(companyId);
 
-				if (!pagination) {
-					list = (List<AuditEvent>)QueryUtil.list(
-						q, getDialect(), start, end, false);
-
-					Collections.sort(list);
-
-					list = Collections.unmodifiableList(list);
-				}
-				else {
-					list = (List<AuditEvent>)QueryUtil.list(
-						q, getDialect(), start, end);
-				}
+				list = (List<AuditEvent>)QueryUtil.list(
+					q, getDialect(), start, end);
 
 				cacheResult(list);
 
-				finderCache.putResult(finderPath, finderArgs, list);
+				if (useFinderCache) {
+					finderCache.putResult(finderPath, finderArgs, list);
+				}
 			}
 			catch (Exception e) {
-				finderCache.removeResult(finderPath, finderArgs);
+				if (useFinderCache) {
+					finderCache.removeResult(finderPath, finderArgs);
+				}
 
 				throw processException(e);
 			}
@@ -590,7 +590,6 @@ public class AuditEventPersistenceImpl
 
 		setModelImplClass(AuditEventImpl.class);
 		setModelPKClass(long.class);
-		setEntityCacheEnabled(AuditEventModelImpl.ENTITY_CACHE_ENABLED);
 	}
 
 	/**
@@ -601,7 +600,7 @@ public class AuditEventPersistenceImpl
 	@Override
 	public void cacheResult(AuditEvent auditEvent) {
 		entityCache.putResult(
-			AuditEventModelImpl.ENTITY_CACHE_ENABLED, AuditEventImpl.class,
+			entityCacheEnabled, AuditEventImpl.class,
 			auditEvent.getPrimaryKey(), auditEvent);
 
 		auditEvent.resetOriginalValues();
@@ -616,8 +615,8 @@ public class AuditEventPersistenceImpl
 	public void cacheResult(List<AuditEvent> auditEvents) {
 		for (AuditEvent auditEvent : auditEvents) {
 			if (entityCache.getResult(
-					AuditEventModelImpl.ENTITY_CACHE_ENABLED,
-					AuditEventImpl.class, auditEvent.getPrimaryKey()) == null) {
+					entityCacheEnabled, AuditEventImpl.class,
+					auditEvent.getPrimaryKey()) == null) {
 
 				cacheResult(auditEvent);
 			}
@@ -653,7 +652,7 @@ public class AuditEventPersistenceImpl
 	@Override
 	public void clearCache(AuditEvent auditEvent) {
 		entityCache.removeResult(
-			AuditEventModelImpl.ENTITY_CACHE_ENABLED, AuditEventImpl.class,
+			entityCacheEnabled, AuditEventImpl.class,
 			auditEvent.getPrimaryKey());
 
 		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
@@ -667,7 +666,7 @@ public class AuditEventPersistenceImpl
 
 		for (AuditEvent auditEvent : auditEvents) {
 			entityCache.removeResult(
-				AuditEventModelImpl.ENTITY_CACHE_ENABLED, AuditEventImpl.class,
+				entityCacheEnabled, AuditEventImpl.class,
 				auditEvent.getPrimaryKey());
 		}
 	}
@@ -685,7 +684,7 @@ public class AuditEventPersistenceImpl
 		auditEvent.setNew(true);
 		auditEvent.setPrimaryKey(auditEventId);
 
-		auditEvent.setCompanyId(companyProvider.getCompanyId());
+		auditEvent.setCompanyId(CompanyThreadLocal.getCompanyId());
 
 		return auditEvent;
 	}
@@ -819,7 +818,7 @@ public class AuditEventPersistenceImpl
 
 		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
 
-		if (!AuditEventModelImpl.COLUMN_BITMASK_ENABLED) {
+		if (!_columnBitmaskEnabled) {
 			finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
 		}
 		else if (isNew) {
@@ -855,7 +854,7 @@ public class AuditEventPersistenceImpl
 		}
 
 		entityCache.putResult(
-			AuditEventModelImpl.ENTITY_CACHE_ENABLED, AuditEventImpl.class,
+			entityCacheEnabled, AuditEventImpl.class,
 			auditEvent.getPrimaryKey(), auditEvent, false);
 
 		auditEvent.resetOriginalValues();
@@ -927,7 +926,7 @@ public class AuditEventPersistenceImpl
 	 * Returns a range of all the audit events.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>AuditEventModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>AuditEventModelImpl</code>.
 	 * </p>
 	 *
 	 * @param start the lower bound of the range of audit events
@@ -943,7 +942,7 @@ public class AuditEventPersistenceImpl
 	 * Returns an ordered range of all the audit events.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>AuditEventModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>AuditEventModelImpl</code>.
 	 * </p>
 	 *
 	 * @param start the lower bound of the range of audit events
@@ -962,39 +961,39 @@ public class AuditEventPersistenceImpl
 	 * Returns an ordered range of all the audit events.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>AuditEventModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>AuditEventModelImpl</code>.
 	 * </p>
 	 *
 	 * @param start the lower bound of the range of audit events
 	 * @param end the upper bound of the range of audit events (not inclusive)
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
-	 * @param retrieveFromCache whether to retrieve from the finder cache
+	 * @param useFinderCache whether to use the finder cache
 	 * @return the ordered range of audit events
 	 */
 	@Override
 	public List<AuditEvent> findAll(
 		int start, int end, OrderByComparator<AuditEvent> orderByComparator,
-		boolean retrieveFromCache) {
+		boolean useFinderCache) {
 
-		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
 			(orderByComparator == null)) {
 
-			pagination = false;
-			finderPath = _finderPathWithoutPaginationFindAll;
-			finderArgs = FINDER_ARGS_EMPTY;
+			if (useFinderCache) {
+				finderPath = _finderPathWithoutPaginationFindAll;
+				finderArgs = FINDER_ARGS_EMPTY;
+			}
 		}
-		else {
+		else if (useFinderCache) {
 			finderPath = _finderPathWithPaginationFindAll;
 			finderArgs = new Object[] {start, end, orderByComparator};
 		}
 
 		List<AuditEvent> list = null;
 
-		if (retrieveFromCache) {
+		if (useFinderCache) {
 			list = (List<AuditEvent>)finderCache.getResult(
 				finderPath, finderArgs, this);
 		}
@@ -1017,9 +1016,7 @@ public class AuditEventPersistenceImpl
 			else {
 				sql = _SQL_SELECT_AUDITEVENT;
 
-				if (pagination) {
-					sql = sql.concat(AuditEventModelImpl.ORDER_BY_JPQL);
-				}
+				sql = sql.concat(AuditEventModelImpl.ORDER_BY_JPQL);
 			}
 
 			Session session = null;
@@ -1029,25 +1026,19 @@ public class AuditEventPersistenceImpl
 
 				Query q = session.createQuery(sql);
 
-				if (!pagination) {
-					list = (List<AuditEvent>)QueryUtil.list(
-						q, getDialect(), start, end, false);
-
-					Collections.sort(list);
-
-					list = Collections.unmodifiableList(list);
-				}
-				else {
-					list = (List<AuditEvent>)QueryUtil.list(
-						q, getDialect(), start, end);
-				}
+				list = (List<AuditEvent>)QueryUtil.list(
+					q, getDialect(), start, end);
 
 				cacheResult(list);
 
-				finderCache.putResult(finderPath, finderArgs, list);
+				if (useFinderCache) {
+					finderCache.putResult(finderPath, finderArgs, list);
+				}
 			}
 			catch (Exception e) {
-				finderCache.removeResult(finderPath, finderArgs);
+				if (useFinderCache) {
+					finderCache.removeResult(finderPath, finderArgs);
+				}
 
 				throw processException(e);
 			}
@@ -1130,27 +1121,27 @@ public class AuditEventPersistenceImpl
 	/**
 	 * Initializes the audit event persistence.
 	 */
-	public void afterPropertiesSet() {
+	@Activate
+	public void activate() {
+		AuditEventModelImpl.setEntityCacheEnabled(entityCacheEnabled);
+		AuditEventModelImpl.setFinderCacheEnabled(finderCacheEnabled);
+
 		_finderPathWithPaginationFindAll = new FinderPath(
-			AuditEventModelImpl.ENTITY_CACHE_ENABLED,
-			AuditEventModelImpl.FINDER_CACHE_ENABLED, AuditEventImpl.class,
+			entityCacheEnabled, finderCacheEnabled, AuditEventImpl.class,
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findAll", new String[0]);
 
 		_finderPathWithoutPaginationFindAll = new FinderPath(
-			AuditEventModelImpl.ENTITY_CACHE_ENABLED,
-			AuditEventModelImpl.FINDER_CACHE_ENABLED, AuditEventImpl.class,
+			entityCacheEnabled, finderCacheEnabled, AuditEventImpl.class,
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findAll",
 			new String[0]);
 
 		_finderPathCountAll = new FinderPath(
-			AuditEventModelImpl.ENTITY_CACHE_ENABLED,
-			AuditEventModelImpl.FINDER_CACHE_ENABLED, Long.class,
+			entityCacheEnabled, finderCacheEnabled, Long.class,
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countAll",
 			new String[0]);
 
 		_finderPathWithPaginationFindByCompanyId = new FinderPath(
-			AuditEventModelImpl.ENTITY_CACHE_ENABLED,
-			AuditEventModelImpl.FINDER_CACHE_ENABLED, AuditEventImpl.class,
+			entityCacheEnabled, finderCacheEnabled, AuditEventImpl.class,
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByCompanyId",
 			new String[] {
 				Long.class.getName(), Integer.class.getName(),
@@ -1158,34 +1149,64 @@ public class AuditEventPersistenceImpl
 			});
 
 		_finderPathWithoutPaginationFindByCompanyId = new FinderPath(
-			AuditEventModelImpl.ENTITY_CACHE_ENABLED,
-			AuditEventModelImpl.FINDER_CACHE_ENABLED, AuditEventImpl.class,
+			entityCacheEnabled, finderCacheEnabled, AuditEventImpl.class,
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByCompanyId",
 			new String[] {Long.class.getName()},
 			AuditEventModelImpl.COMPANYID_COLUMN_BITMASK |
 			AuditEventModelImpl.CREATEDATE_COLUMN_BITMASK);
 
 		_finderPathCountByCompanyId = new FinderPath(
-			AuditEventModelImpl.ENTITY_CACHE_ENABLED,
-			AuditEventModelImpl.FINDER_CACHE_ENABLED, Long.class,
+			entityCacheEnabled, finderCacheEnabled, Long.class,
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByCompanyId",
 			new String[] {Long.class.getName()});
 	}
 
-	public void destroy() {
+	@Deactivate
+	public void deactivate() {
 		entityCache.removeCache(AuditEventImpl.class.getName());
 		finderCache.removeCache(FINDER_CLASS_NAME_ENTITY);
 		finderCache.removeCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
 		finderCache.removeCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
 	}
 
-	@ServiceReference(type = CompanyProviderWrapper.class)
-	protected CompanyProvider companyProvider;
+	@Override
+	@Reference(
+		target = AuditPersistenceConstants.SERVICE_CONFIGURATION_FILTER,
+		unbind = "-"
+	)
+	public void setConfiguration(Configuration configuration) {
+		super.setConfiguration(configuration);
 
-	@ServiceReference(type = EntityCache.class)
+		_columnBitmaskEnabled = GetterUtil.getBoolean(
+			configuration.get(
+				"value.object.column.bitmask.enabled.com.liferay.portal.security.audit.storage.model.AuditEvent"),
+			true);
+	}
+
+	@Override
+	@Reference(
+		target = AuditPersistenceConstants.ORIGIN_BUNDLE_SYMBOLIC_NAME_FILTER,
+		unbind = "-"
+	)
+	public void setDataSource(DataSource dataSource) {
+		super.setDataSource(dataSource);
+	}
+
+	@Override
+	@Reference(
+		target = AuditPersistenceConstants.ORIGIN_BUNDLE_SYMBOLIC_NAME_FILTER,
+		unbind = "-"
+	)
+	public void setSessionFactory(SessionFactory sessionFactory) {
+		super.setSessionFactory(sessionFactory);
+	}
+
+	private boolean _columnBitmaskEnabled;
+
+	@Reference
 	protected EntityCache entityCache;
 
-	@ServiceReference(type = FinderCache.class)
+	@Reference
 	protected FinderCache finderCache;
 
 	private static final String _SQL_SELECT_AUDITEVENT =
@@ -1210,5 +1231,14 @@ public class AuditEventPersistenceImpl
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		AuditEventPersistenceImpl.class);
+
+	static {
+		try {
+			Class.forName(AuditPersistenceConstants.class.getName());
+		}
+		catch (ClassNotFoundException cnfe) {
+			throw new ExceptionInInitializerError(cnfe);
+		}
+	}
 
 }

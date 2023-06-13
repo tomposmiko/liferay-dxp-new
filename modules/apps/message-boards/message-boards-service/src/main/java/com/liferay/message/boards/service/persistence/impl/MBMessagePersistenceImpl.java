@@ -19,7 +19,9 @@ import com.liferay.message.boards.model.MBMessage;
 import com.liferay.message.boards.model.impl.MBMessageImpl;
 import com.liferay.message.boards.model.impl.MBMessageModelImpl;
 import com.liferay.message.boards.service.persistence.MBMessagePersistence;
+import com.liferay.message.boards.service.persistence.impl.constants.MBPersistenceConstants;
 import com.liferay.petra.string.StringBundler;
+import com.liferay.portal.kernel.configuration.Configuration;
 import com.liferay.portal.kernel.dao.orm.EntityCache;
 import com.liferay.portal.kernel.dao.orm.FinderCache;
 import com.liferay.portal.kernel.dao.orm.FinderPath;
@@ -28,18 +30,18 @@ import com.liferay.portal.kernel.dao.orm.QueryPos;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.dao.orm.SQLQuery;
 import com.liferay.portal.kernel.dao.orm.Session;
+import com.liferay.portal.kernel.dao.orm.SessionFactory;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.sanitizer.Sanitizer;
 import com.liferay.portal.kernel.sanitizer.SanitizerException;
 import com.liferay.portal.kernel.sanitizer.SanitizerUtil;
+import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
 import com.liferay.portal.kernel.security.auth.PrincipalThreadLocal;
 import com.liferay.portal.kernel.security.permission.InlineSQLHelperUtil;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
-import com.liferay.portal.kernel.service.persistence.CompanyProvider;
-import com.liferay.portal.kernel.service.persistence.CompanyProviderWrapper;
 import com.liferay.portal.kernel.service.persistence.impl.BasePersistenceImpl;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.ContentTypes;
@@ -50,13 +52,11 @@ import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.uuid.PortalUUIDUtil;
-import com.liferay.portal.spring.extender.service.ServiceReference;
 
 import java.io.Serializable;
 
 import java.lang.reflect.InvocationHandler;
 
-import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -64,7 +64,12 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
-import org.osgi.annotation.versioning.ProviderType;
+import javax.sql.DataSource;
+
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
+import org.osgi.service.component.annotations.Reference;
 
 /**
  * The persistence implementation for the message-boards message service.
@@ -76,11 +81,11 @@ import org.osgi.annotation.versioning.ProviderType;
  * @author Brian Wing Shun Chan
  * @generated
  */
-@ProviderType
+@Component(service = MBMessagePersistence.class)
 public class MBMessagePersistenceImpl
 	extends BasePersistenceImpl<MBMessage> implements MBMessagePersistence {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this class directly. Always use <code>MBMessageUtil</code> to access the message-boards message persistence. Modify <code>service.xml</code> and rerun ServiceBuilder to regenerate this class.
@@ -116,7 +121,7 @@ public class MBMessagePersistenceImpl
 	 * Returns a range of all the message-boards messages where uuid = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>MBMessageModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>MBMessageModelImpl</code>.
 	 * </p>
 	 *
 	 * @param uuid the uuid
@@ -133,7 +138,7 @@ public class MBMessagePersistenceImpl
 	 * Returns an ordered range of all the message-boards messages where uuid = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>MBMessageModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>MBMessageModelImpl</code>.
 	 * </p>
 	 *
 	 * @param uuid the uuid
@@ -154,43 +159,43 @@ public class MBMessagePersistenceImpl
 	 * Returns an ordered range of all the message-boards messages where uuid = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>MBMessageModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>MBMessageModelImpl</code>.
 	 * </p>
 	 *
 	 * @param uuid the uuid
 	 * @param start the lower bound of the range of message-boards messages
 	 * @param end the upper bound of the range of message-boards messages (not inclusive)
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
-	 * @param retrieveFromCache whether to retrieve from the finder cache
+	 * @param useFinderCache whether to use the finder cache
 	 * @return the ordered range of matching message-boards messages
 	 */
 	@Override
 	public List<MBMessage> findByUuid(
 		String uuid, int start, int end,
 		OrderByComparator<MBMessage> orderByComparator,
-		boolean retrieveFromCache) {
+		boolean useFinderCache) {
 
 		uuid = Objects.toString(uuid, "");
 
-		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
 			(orderByComparator == null)) {
 
-			pagination = false;
-			finderPath = _finderPathWithoutPaginationFindByUuid;
-			finderArgs = new Object[] {uuid};
+			if (useFinderCache) {
+				finderPath = _finderPathWithoutPaginationFindByUuid;
+				finderArgs = new Object[] {uuid};
+			}
 		}
-		else {
+		else if (useFinderCache) {
 			finderPath = _finderPathWithPaginationFindByUuid;
 			finderArgs = new Object[] {uuid, start, end, orderByComparator};
 		}
 
 		List<MBMessage> list = null;
 
-		if (retrieveFromCache) {
+		if (useFinderCache) {
 			list = (List<MBMessage>)finderCache.getResult(
 				finderPath, finderArgs, this);
 
@@ -233,7 +238,7 @@ public class MBMessagePersistenceImpl
 				appendOrderByComparator(
 					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
 			}
-			else if (pagination) {
+			else {
 				query.append(MBMessageModelImpl.ORDER_BY_JPQL);
 			}
 
@@ -252,25 +257,19 @@ public class MBMessagePersistenceImpl
 					qPos.add(uuid);
 				}
 
-				if (!pagination) {
-					list = (List<MBMessage>)QueryUtil.list(
-						q, getDialect(), start, end, false);
-
-					Collections.sort(list);
-
-					list = Collections.unmodifiableList(list);
-				}
-				else {
-					list = (List<MBMessage>)QueryUtil.list(
-						q, getDialect(), start, end);
-				}
+				list = (List<MBMessage>)QueryUtil.list(
+					q, getDialect(), start, end);
 
 				cacheResult(list);
 
-				finderCache.putResult(finderPath, finderArgs, list);
+				if (useFinderCache) {
+					finderCache.putResult(finderPath, finderArgs, list);
+				}
 			}
 			catch (Exception e) {
-				finderCache.removeResult(finderPath, finderArgs);
+				if (useFinderCache) {
+					finderCache.removeResult(finderPath, finderArgs);
+				}
 
 				throw processException(e);
 			}
@@ -695,20 +694,24 @@ public class MBMessagePersistenceImpl
 	 *
 	 * @param uuid the uuid
 	 * @param groupId the group ID
-	 * @param retrieveFromCache whether to retrieve from the finder cache
+	 * @param useFinderCache whether to use the finder cache
 	 * @return the matching message-boards message, or <code>null</code> if a matching message-boards message could not be found
 	 */
 	@Override
 	public MBMessage fetchByUUID_G(
-		String uuid, long groupId, boolean retrieveFromCache) {
+		String uuid, long groupId, boolean useFinderCache) {
 
 		uuid = Objects.toString(uuid, "");
 
-		Object[] finderArgs = new Object[] {uuid, groupId};
+		Object[] finderArgs = null;
+
+		if (useFinderCache) {
+			finderArgs = new Object[] {uuid, groupId};
+		}
 
 		Object result = null;
 
-		if (retrieveFromCache) {
+		if (useFinderCache) {
 			result = finderCache.getResult(
 				_finderPathFetchByUUID_G, finderArgs, this);
 		}
@@ -761,8 +764,10 @@ public class MBMessagePersistenceImpl
 				List<MBMessage> list = q.list();
 
 				if (list.isEmpty()) {
-					finderCache.putResult(
-						_finderPathFetchByUUID_G, finderArgs, list);
+					if (useFinderCache) {
+						finderCache.putResult(
+							_finderPathFetchByUUID_G, finderArgs, list);
+					}
 				}
 				else {
 					MBMessage mbMessage = list.get(0);
@@ -773,7 +778,10 @@ public class MBMessagePersistenceImpl
 				}
 			}
 			catch (Exception e) {
-				finderCache.removeResult(_finderPathFetchByUUID_G, finderArgs);
+				if (useFinderCache) {
+					finderCache.removeResult(
+						_finderPathFetchByUUID_G, finderArgs);
+				}
 
 				throw processException(e);
 			}
@@ -905,7 +913,7 @@ public class MBMessagePersistenceImpl
 	 * Returns a range of all the message-boards messages where uuid = &#63; and companyId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>MBMessageModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>MBMessageModelImpl</code>.
 	 * </p>
 	 *
 	 * @param uuid the uuid
@@ -925,7 +933,7 @@ public class MBMessagePersistenceImpl
 	 * Returns an ordered range of all the message-boards messages where uuid = &#63; and companyId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>MBMessageModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>MBMessageModelImpl</code>.
 	 * </p>
 	 *
 	 * @param uuid the uuid
@@ -948,7 +956,7 @@ public class MBMessagePersistenceImpl
 	 * Returns an ordered range of all the message-boards messages where uuid = &#63; and companyId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>MBMessageModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>MBMessageModelImpl</code>.
 	 * </p>
 	 *
 	 * @param uuid the uuid
@@ -956,29 +964,29 @@ public class MBMessagePersistenceImpl
 	 * @param start the lower bound of the range of message-boards messages
 	 * @param end the upper bound of the range of message-boards messages (not inclusive)
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
-	 * @param retrieveFromCache whether to retrieve from the finder cache
+	 * @param useFinderCache whether to use the finder cache
 	 * @return the ordered range of matching message-boards messages
 	 */
 	@Override
 	public List<MBMessage> findByUuid_C(
 		String uuid, long companyId, int start, int end,
 		OrderByComparator<MBMessage> orderByComparator,
-		boolean retrieveFromCache) {
+		boolean useFinderCache) {
 
 		uuid = Objects.toString(uuid, "");
 
-		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
 			(orderByComparator == null)) {
 
-			pagination = false;
-			finderPath = _finderPathWithoutPaginationFindByUuid_C;
-			finderArgs = new Object[] {uuid, companyId};
+			if (useFinderCache) {
+				finderPath = _finderPathWithoutPaginationFindByUuid_C;
+				finderArgs = new Object[] {uuid, companyId};
+			}
 		}
-		else {
+		else if (useFinderCache) {
 			finderPath = _finderPathWithPaginationFindByUuid_C;
 			finderArgs = new Object[] {
 				uuid, companyId, start, end, orderByComparator
@@ -987,7 +995,7 @@ public class MBMessagePersistenceImpl
 
 		List<MBMessage> list = null;
 
-		if (retrieveFromCache) {
+		if (useFinderCache) {
 			list = (List<MBMessage>)finderCache.getResult(
 				finderPath, finderArgs, this);
 
@@ -1034,7 +1042,7 @@ public class MBMessagePersistenceImpl
 				appendOrderByComparator(
 					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
 			}
-			else if (pagination) {
+			else {
 				query.append(MBMessageModelImpl.ORDER_BY_JPQL);
 			}
 
@@ -1055,25 +1063,19 @@ public class MBMessagePersistenceImpl
 
 				qPos.add(companyId);
 
-				if (!pagination) {
-					list = (List<MBMessage>)QueryUtil.list(
-						q, getDialect(), start, end, false);
-
-					Collections.sort(list);
-
-					list = Collections.unmodifiableList(list);
-				}
-				else {
-					list = (List<MBMessage>)QueryUtil.list(
-						q, getDialect(), start, end);
-				}
+				list = (List<MBMessage>)QueryUtil.list(
+					q, getDialect(), start, end);
 
 				cacheResult(list);
 
-				finderCache.putResult(finderPath, finderArgs, list);
+				if (useFinderCache) {
+					finderCache.putResult(finderPath, finderArgs, list);
+				}
 			}
 			catch (Exception e) {
-				finderCache.removeResult(finderPath, finderArgs);
+				if (useFinderCache) {
+					finderCache.removeResult(finderPath, finderArgs);
+				}
 
 				throw processException(e);
 			}
@@ -1494,7 +1496,7 @@ public class MBMessagePersistenceImpl
 	 * Returns a range of all the message-boards messages where groupId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>MBMessageModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>MBMessageModelImpl</code>.
 	 * </p>
 	 *
 	 * @param groupId the group ID
@@ -1511,7 +1513,7 @@ public class MBMessagePersistenceImpl
 	 * Returns an ordered range of all the message-boards messages where groupId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>MBMessageModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>MBMessageModelImpl</code>.
 	 * </p>
 	 *
 	 * @param groupId the group ID
@@ -1532,47 +1534,47 @@ public class MBMessagePersistenceImpl
 	 * Returns an ordered range of all the message-boards messages where groupId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>MBMessageModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>MBMessageModelImpl</code>.
 	 * </p>
 	 *
 	 * @param groupId the group ID
 	 * @param start the lower bound of the range of message-boards messages
 	 * @param end the upper bound of the range of message-boards messages (not inclusive)
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
-	 * @param retrieveFromCache whether to retrieve from the finder cache
+	 * @param useFinderCache whether to use the finder cache
 	 * @return the ordered range of matching message-boards messages
 	 */
 	@Override
 	public List<MBMessage> findByGroupId(
 		long groupId, int start, int end,
 		OrderByComparator<MBMessage> orderByComparator,
-		boolean retrieveFromCache) {
+		boolean useFinderCache) {
 
-		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
 			(orderByComparator == null)) {
 
-			pagination = false;
-			finderPath = _finderPathWithoutPaginationFindByGroupId;
-			finderArgs = new Object[] {groupId};
+			if (useFinderCache) {
+				finderPath = _finderPathWithoutPaginationFindByGroupId;
+				finderArgs = new Object[] {groupId};
+			}
 		}
-		else {
+		else if (useFinderCache) {
 			finderPath = _finderPathWithPaginationFindByGroupId;
 			finderArgs = new Object[] {groupId, start, end, orderByComparator};
 		}
 
 		List<MBMessage> list = null;
 
-		if (retrieveFromCache) {
+		if (useFinderCache) {
 			list = (List<MBMessage>)finderCache.getResult(
 				finderPath, finderArgs, this);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (MBMessage mbMessage : list) {
-					if ((groupId != mbMessage.getGroupId())) {
+					if (groupId != mbMessage.getGroupId()) {
 						list = null;
 
 						break;
@@ -1600,7 +1602,7 @@ public class MBMessagePersistenceImpl
 				appendOrderByComparator(
 					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
 			}
-			else if (pagination) {
+			else {
 				query.append(MBMessageModelImpl.ORDER_BY_JPQL);
 			}
 
@@ -1617,25 +1619,19 @@ public class MBMessagePersistenceImpl
 
 				qPos.add(groupId);
 
-				if (!pagination) {
-					list = (List<MBMessage>)QueryUtil.list(
-						q, getDialect(), start, end, false);
-
-					Collections.sort(list);
-
-					list = Collections.unmodifiableList(list);
-				}
-				else {
-					list = (List<MBMessage>)QueryUtil.list(
-						q, getDialect(), start, end);
-				}
+				list = (List<MBMessage>)QueryUtil.list(
+					q, getDialect(), start, end);
 
 				cacheResult(list);
 
-				finderCache.putResult(finderPath, finderArgs, list);
+				if (useFinderCache) {
+					finderCache.putResult(finderPath, finderArgs, list);
+				}
 			}
 			catch (Exception e) {
-				finderCache.removeResult(finderPath, finderArgs);
+				if (useFinderCache) {
+					finderCache.removeResult(finderPath, finderArgs);
+				}
 
 				throw processException(e);
 			}
@@ -1922,7 +1918,7 @@ public class MBMessagePersistenceImpl
 	 * Returns a range of all the message-boards messages that the user has permission to view where groupId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>MBMessageModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>MBMessageModelImpl</code>.
 	 * </p>
 	 *
 	 * @param groupId the group ID
@@ -1941,7 +1937,7 @@ public class MBMessagePersistenceImpl
 	 * Returns an ordered range of all the message-boards messages that the user has permissions to view where groupId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>MBMessageModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>MBMessageModelImpl</code>.
 	 * </p>
 	 *
 	 * @param groupId the group ID
@@ -2370,7 +2366,7 @@ public class MBMessagePersistenceImpl
 	 * Returns a range of all the message-boards messages where companyId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>MBMessageModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>MBMessageModelImpl</code>.
 	 * </p>
 	 *
 	 * @param companyId the company ID
@@ -2387,7 +2383,7 @@ public class MBMessagePersistenceImpl
 	 * Returns an ordered range of all the message-boards messages where companyId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>MBMessageModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>MBMessageModelImpl</code>.
 	 * </p>
 	 *
 	 * @param companyId the company ID
@@ -2408,34 +2404,34 @@ public class MBMessagePersistenceImpl
 	 * Returns an ordered range of all the message-boards messages where companyId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>MBMessageModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>MBMessageModelImpl</code>.
 	 * </p>
 	 *
 	 * @param companyId the company ID
 	 * @param start the lower bound of the range of message-boards messages
 	 * @param end the upper bound of the range of message-boards messages (not inclusive)
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
-	 * @param retrieveFromCache whether to retrieve from the finder cache
+	 * @param useFinderCache whether to use the finder cache
 	 * @return the ordered range of matching message-boards messages
 	 */
 	@Override
 	public List<MBMessage> findByCompanyId(
 		long companyId, int start, int end,
 		OrderByComparator<MBMessage> orderByComparator,
-		boolean retrieveFromCache) {
+		boolean useFinderCache) {
 
-		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
 			(orderByComparator == null)) {
 
-			pagination = false;
-			finderPath = _finderPathWithoutPaginationFindByCompanyId;
-			finderArgs = new Object[] {companyId};
+			if (useFinderCache) {
+				finderPath = _finderPathWithoutPaginationFindByCompanyId;
+				finderArgs = new Object[] {companyId};
+			}
 		}
-		else {
+		else if (useFinderCache) {
 			finderPath = _finderPathWithPaginationFindByCompanyId;
 			finderArgs = new Object[] {
 				companyId, start, end, orderByComparator
@@ -2444,13 +2440,13 @@ public class MBMessagePersistenceImpl
 
 		List<MBMessage> list = null;
 
-		if (retrieveFromCache) {
+		if (useFinderCache) {
 			list = (List<MBMessage>)finderCache.getResult(
 				finderPath, finderArgs, this);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (MBMessage mbMessage : list) {
-					if ((companyId != mbMessage.getCompanyId())) {
+					if (companyId != mbMessage.getCompanyId()) {
 						list = null;
 
 						break;
@@ -2478,7 +2474,7 @@ public class MBMessagePersistenceImpl
 				appendOrderByComparator(
 					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
 			}
-			else if (pagination) {
+			else {
 				query.append(MBMessageModelImpl.ORDER_BY_JPQL);
 			}
 
@@ -2495,25 +2491,19 @@ public class MBMessagePersistenceImpl
 
 				qPos.add(companyId);
 
-				if (!pagination) {
-					list = (List<MBMessage>)QueryUtil.list(
-						q, getDialect(), start, end, false);
-
-					Collections.sort(list);
-
-					list = Collections.unmodifiableList(list);
-				}
-				else {
-					list = (List<MBMessage>)QueryUtil.list(
-						q, getDialect(), start, end);
-				}
+				list = (List<MBMessage>)QueryUtil.list(
+					q, getDialect(), start, end);
 
 				cacheResult(list);
 
-				finderCache.putResult(finderPath, finderArgs, list);
+				if (useFinderCache) {
+					finderCache.putResult(finderPath, finderArgs, list);
+				}
 			}
 			catch (Exception e) {
-				finderCache.removeResult(finderPath, finderArgs);
+				if (useFinderCache) {
+					finderCache.removeResult(finderPath, finderArgs);
+				}
 
 				throw processException(e);
 			}
@@ -2875,7 +2865,7 @@ public class MBMessagePersistenceImpl
 	 * Returns a range of all the message-boards messages where userId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>MBMessageModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>MBMessageModelImpl</code>.
 	 * </p>
 	 *
 	 * @param userId the user ID
@@ -2892,7 +2882,7 @@ public class MBMessagePersistenceImpl
 	 * Returns an ordered range of all the message-boards messages where userId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>MBMessageModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>MBMessageModelImpl</code>.
 	 * </p>
 	 *
 	 * @param userId the user ID
@@ -2913,47 +2903,47 @@ public class MBMessagePersistenceImpl
 	 * Returns an ordered range of all the message-boards messages where userId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>MBMessageModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>MBMessageModelImpl</code>.
 	 * </p>
 	 *
 	 * @param userId the user ID
 	 * @param start the lower bound of the range of message-boards messages
 	 * @param end the upper bound of the range of message-boards messages (not inclusive)
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
-	 * @param retrieveFromCache whether to retrieve from the finder cache
+	 * @param useFinderCache whether to use the finder cache
 	 * @return the ordered range of matching message-boards messages
 	 */
 	@Override
 	public List<MBMessage> findByUserId(
 		long userId, int start, int end,
 		OrderByComparator<MBMessage> orderByComparator,
-		boolean retrieveFromCache) {
+		boolean useFinderCache) {
 
-		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
 			(orderByComparator == null)) {
 
-			pagination = false;
-			finderPath = _finderPathWithoutPaginationFindByUserId;
-			finderArgs = new Object[] {userId};
+			if (useFinderCache) {
+				finderPath = _finderPathWithoutPaginationFindByUserId;
+				finderArgs = new Object[] {userId};
+			}
 		}
-		else {
+		else if (useFinderCache) {
 			finderPath = _finderPathWithPaginationFindByUserId;
 			finderArgs = new Object[] {userId, start, end, orderByComparator};
 		}
 
 		List<MBMessage> list = null;
 
-		if (retrieveFromCache) {
+		if (useFinderCache) {
 			list = (List<MBMessage>)finderCache.getResult(
 				finderPath, finderArgs, this);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (MBMessage mbMessage : list) {
-					if ((userId != mbMessage.getUserId())) {
+					if (userId != mbMessage.getUserId()) {
 						list = null;
 
 						break;
@@ -2981,7 +2971,7 @@ public class MBMessagePersistenceImpl
 				appendOrderByComparator(
 					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
 			}
-			else if (pagination) {
+			else {
 				query.append(MBMessageModelImpl.ORDER_BY_JPQL);
 			}
 
@@ -2998,25 +2988,19 @@ public class MBMessagePersistenceImpl
 
 				qPos.add(userId);
 
-				if (!pagination) {
-					list = (List<MBMessage>)QueryUtil.list(
-						q, getDialect(), start, end, false);
-
-					Collections.sort(list);
-
-					list = Collections.unmodifiableList(list);
-				}
-				else {
-					list = (List<MBMessage>)QueryUtil.list(
-						q, getDialect(), start, end);
-				}
+				list = (List<MBMessage>)QueryUtil.list(
+					q, getDialect(), start, end);
 
 				cacheResult(list);
 
-				finderCache.putResult(finderPath, finderArgs, list);
+				if (useFinderCache) {
+					finderCache.putResult(finderPath, finderArgs, list);
+				}
 			}
 			catch (Exception e) {
-				finderCache.removeResult(finderPath, finderArgs);
+				if (useFinderCache) {
+					finderCache.removeResult(finderPath, finderArgs);
+				}
 
 				throw processException(e);
 			}
@@ -3376,7 +3360,7 @@ public class MBMessagePersistenceImpl
 	 * Returns a range of all the message-boards messages where threadId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>MBMessageModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>MBMessageModelImpl</code>.
 	 * </p>
 	 *
 	 * @param threadId the thread ID
@@ -3393,7 +3377,7 @@ public class MBMessagePersistenceImpl
 	 * Returns an ordered range of all the message-boards messages where threadId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>MBMessageModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>MBMessageModelImpl</code>.
 	 * </p>
 	 *
 	 * @param threadId the thread ID
@@ -3414,47 +3398,47 @@ public class MBMessagePersistenceImpl
 	 * Returns an ordered range of all the message-boards messages where threadId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>MBMessageModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>MBMessageModelImpl</code>.
 	 * </p>
 	 *
 	 * @param threadId the thread ID
 	 * @param start the lower bound of the range of message-boards messages
 	 * @param end the upper bound of the range of message-boards messages (not inclusive)
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
-	 * @param retrieveFromCache whether to retrieve from the finder cache
+	 * @param useFinderCache whether to use the finder cache
 	 * @return the ordered range of matching message-boards messages
 	 */
 	@Override
 	public List<MBMessage> findByThreadId(
 		long threadId, int start, int end,
 		OrderByComparator<MBMessage> orderByComparator,
-		boolean retrieveFromCache) {
+		boolean useFinderCache) {
 
-		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
 			(orderByComparator == null)) {
 
-			pagination = false;
-			finderPath = _finderPathWithoutPaginationFindByThreadId;
-			finderArgs = new Object[] {threadId};
+			if (useFinderCache) {
+				finderPath = _finderPathWithoutPaginationFindByThreadId;
+				finderArgs = new Object[] {threadId};
+			}
 		}
-		else {
+		else if (useFinderCache) {
 			finderPath = _finderPathWithPaginationFindByThreadId;
 			finderArgs = new Object[] {threadId, start, end, orderByComparator};
 		}
 
 		List<MBMessage> list = null;
 
-		if (retrieveFromCache) {
+		if (useFinderCache) {
 			list = (List<MBMessage>)finderCache.getResult(
 				finderPath, finderArgs, this);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (MBMessage mbMessage : list) {
-					if ((threadId != mbMessage.getThreadId())) {
+					if (threadId != mbMessage.getThreadId()) {
 						list = null;
 
 						break;
@@ -3482,7 +3466,7 @@ public class MBMessagePersistenceImpl
 				appendOrderByComparator(
 					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
 			}
-			else if (pagination) {
+			else {
 				query.append(MBMessageModelImpl.ORDER_BY_JPQL);
 			}
 
@@ -3499,25 +3483,19 @@ public class MBMessagePersistenceImpl
 
 				qPos.add(threadId);
 
-				if (!pagination) {
-					list = (List<MBMessage>)QueryUtil.list(
-						q, getDialect(), start, end, false);
-
-					Collections.sort(list);
-
-					list = Collections.unmodifiableList(list);
-				}
-				else {
-					list = (List<MBMessage>)QueryUtil.list(
-						q, getDialect(), start, end);
-				}
+				list = (List<MBMessage>)QueryUtil.list(
+					q, getDialect(), start, end);
 
 				cacheResult(list);
 
-				finderCache.putResult(finderPath, finderArgs, list);
+				if (useFinderCache) {
+					finderCache.putResult(finderPath, finderArgs, list);
+				}
 			}
 			catch (Exception e) {
-				finderCache.removeResult(finderPath, finderArgs);
+				if (useFinderCache) {
+					finderCache.removeResult(finderPath, finderArgs);
+				}
 
 				throw processException(e);
 			}
@@ -3879,7 +3857,7 @@ public class MBMessagePersistenceImpl
 	 * Returns a range of all the message-boards messages where threadId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>MBMessageModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>MBMessageModelImpl</code>.
 	 * </p>
 	 *
 	 * @param threadId the thread ID
@@ -3898,7 +3876,7 @@ public class MBMessagePersistenceImpl
 	 * Returns an ordered range of all the message-boards messages where threadId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>MBMessageModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>MBMessageModelImpl</code>.
 	 * </p>
 	 *
 	 * @param threadId the thread ID
@@ -3920,47 +3898,47 @@ public class MBMessagePersistenceImpl
 	 * Returns an ordered range of all the message-boards messages where threadId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>MBMessageModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>MBMessageModelImpl</code>.
 	 * </p>
 	 *
 	 * @param threadId the thread ID
 	 * @param start the lower bound of the range of message-boards messages
 	 * @param end the upper bound of the range of message-boards messages (not inclusive)
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
-	 * @param retrieveFromCache whether to retrieve from the finder cache
+	 * @param useFinderCache whether to use the finder cache
 	 * @return the ordered range of matching message-boards messages
 	 */
 	@Override
 	public List<MBMessage> findByThreadReplies(
 		long threadId, int start, int end,
 		OrderByComparator<MBMessage> orderByComparator,
-		boolean retrieveFromCache) {
+		boolean useFinderCache) {
 
-		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
 			(orderByComparator == null)) {
 
-			pagination = false;
-			finderPath = _finderPathWithoutPaginationFindByThreadReplies;
-			finderArgs = new Object[] {threadId};
+			if (useFinderCache) {
+				finderPath = _finderPathWithoutPaginationFindByThreadReplies;
+				finderArgs = new Object[] {threadId};
+			}
 		}
-		else {
+		else if (useFinderCache) {
 			finderPath = _finderPathWithPaginationFindByThreadReplies;
 			finderArgs = new Object[] {threadId, start, end, orderByComparator};
 		}
 
 		List<MBMessage> list = null;
 
-		if (retrieveFromCache) {
+		if (useFinderCache) {
 			list = (List<MBMessage>)finderCache.getResult(
 				finderPath, finderArgs, this);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (MBMessage mbMessage : list) {
-					if ((threadId != mbMessage.getThreadId())) {
+					if (threadId != mbMessage.getThreadId()) {
 						list = null;
 
 						break;
@@ -3988,7 +3966,7 @@ public class MBMessagePersistenceImpl
 				appendOrderByComparator(
 					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
 			}
-			else if (pagination) {
+			else {
 				query.append(MBMessageModelImpl.ORDER_BY_JPQL);
 			}
 
@@ -4005,25 +3983,19 @@ public class MBMessagePersistenceImpl
 
 				qPos.add(threadId);
 
-				if (!pagination) {
-					list = (List<MBMessage>)QueryUtil.list(
-						q, getDialect(), start, end, false);
-
-					Collections.sort(list);
-
-					list = Collections.unmodifiableList(list);
-				}
-				else {
-					list = (List<MBMessage>)QueryUtil.list(
-						q, getDialect(), start, end);
-				}
+				list = (List<MBMessage>)QueryUtil.list(
+					q, getDialect(), start, end);
 
 				cacheResult(list);
 
-				finderCache.putResult(finderPath, finderArgs, list);
+				if (useFinderCache) {
+					finderCache.putResult(finderPath, finderArgs, list);
+				}
 			}
 			catch (Exception e) {
-				finderCache.removeResult(finderPath, finderArgs);
+				if (useFinderCache) {
+					finderCache.removeResult(finderPath, finderArgs);
+				}
 
 				throw processException(e);
 			}
@@ -4366,6 +4338,513 @@ public class MBMessagePersistenceImpl
 	private static final String _FINDER_COLUMN_THREADREPLIES_THREADID_2 =
 		"mbMessage.threadId = ? AND mbMessage.parentMessageId != 0";
 
+	private FinderPath _finderPathWithPaginationFindByParentMessageId;
+	private FinderPath _finderPathWithoutPaginationFindByParentMessageId;
+	private FinderPath _finderPathCountByParentMessageId;
+
+	/**
+	 * Returns all the message-boards messages where parentMessageId = &#63;.
+	 *
+	 * @param parentMessageId the parent message ID
+	 * @return the matching message-boards messages
+	 */
+	@Override
+	public List<MBMessage> findByParentMessageId(long parentMessageId) {
+		return findByParentMessageId(
+			parentMessageId, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
+	}
+
+	/**
+	 * Returns a range of all the message-boards messages where parentMessageId = &#63;.
+	 *
+	 * <p>
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>MBMessageModelImpl</code>.
+	 * </p>
+	 *
+	 * @param parentMessageId the parent message ID
+	 * @param start the lower bound of the range of message-boards messages
+	 * @param end the upper bound of the range of message-boards messages (not inclusive)
+	 * @return the range of matching message-boards messages
+	 */
+	@Override
+	public List<MBMessage> findByParentMessageId(
+		long parentMessageId, int start, int end) {
+
+		return findByParentMessageId(parentMessageId, start, end, null);
+	}
+
+	/**
+	 * Returns an ordered range of all the message-boards messages where parentMessageId = &#63;.
+	 *
+	 * <p>
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>MBMessageModelImpl</code>.
+	 * </p>
+	 *
+	 * @param parentMessageId the parent message ID
+	 * @param start the lower bound of the range of message-boards messages
+	 * @param end the upper bound of the range of message-boards messages (not inclusive)
+	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
+	 * @return the ordered range of matching message-boards messages
+	 */
+	@Override
+	public List<MBMessage> findByParentMessageId(
+		long parentMessageId, int start, int end,
+		OrderByComparator<MBMessage> orderByComparator) {
+
+		return findByParentMessageId(
+			parentMessageId, start, end, orderByComparator, true);
+	}
+
+	/**
+	 * Returns an ordered range of all the message-boards messages where parentMessageId = &#63;.
+	 *
+	 * <p>
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>MBMessageModelImpl</code>.
+	 * </p>
+	 *
+	 * @param parentMessageId the parent message ID
+	 * @param start the lower bound of the range of message-boards messages
+	 * @param end the upper bound of the range of message-boards messages (not inclusive)
+	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
+	 * @param useFinderCache whether to use the finder cache
+	 * @return the ordered range of matching message-boards messages
+	 */
+	@Override
+	public List<MBMessage> findByParentMessageId(
+		long parentMessageId, int start, int end,
+		OrderByComparator<MBMessage> orderByComparator,
+		boolean useFinderCache) {
+
+		FinderPath finderPath = null;
+		Object[] finderArgs = null;
+
+		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
+			(orderByComparator == null)) {
+
+			if (useFinderCache) {
+				finderPath = _finderPathWithoutPaginationFindByParentMessageId;
+				finderArgs = new Object[] {parentMessageId};
+			}
+		}
+		else if (useFinderCache) {
+			finderPath = _finderPathWithPaginationFindByParentMessageId;
+			finderArgs = new Object[] {
+				parentMessageId, start, end, orderByComparator
+			};
+		}
+
+		List<MBMessage> list = null;
+
+		if (useFinderCache) {
+			list = (List<MBMessage>)finderCache.getResult(
+				finderPath, finderArgs, this);
+
+			if ((list != null) && !list.isEmpty()) {
+				for (MBMessage mbMessage : list) {
+					if (parentMessageId != mbMessage.getParentMessageId()) {
+						list = null;
+
+						break;
+					}
+				}
+			}
+		}
+
+		if (list == null) {
+			StringBundler query = null;
+
+			if (orderByComparator != null) {
+				query = new StringBundler(
+					3 + (orderByComparator.getOrderByFields().length * 2));
+			}
+			else {
+				query = new StringBundler(3);
+			}
+
+			query.append(_SQL_SELECT_MBMESSAGE_WHERE);
+
+			query.append(_FINDER_COLUMN_PARENTMESSAGEID_PARENTMESSAGEID_2);
+
+			if (orderByComparator != null) {
+				appendOrderByComparator(
+					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
+			}
+			else {
+				query.append(MBMessageModelImpl.ORDER_BY_JPQL);
+			}
+
+			String sql = query.toString();
+
+			Session session = null;
+
+			try {
+				session = openSession();
+
+				Query q = session.createQuery(sql);
+
+				QueryPos qPos = QueryPos.getInstance(q);
+
+				qPos.add(parentMessageId);
+
+				list = (List<MBMessage>)QueryUtil.list(
+					q, getDialect(), start, end);
+
+				cacheResult(list);
+
+				if (useFinderCache) {
+					finderCache.putResult(finderPath, finderArgs, list);
+				}
+			}
+			catch (Exception e) {
+				if (useFinderCache) {
+					finderCache.removeResult(finderPath, finderArgs);
+				}
+
+				throw processException(e);
+			}
+			finally {
+				closeSession(session);
+			}
+		}
+
+		return list;
+	}
+
+	/**
+	 * Returns the first message-boards message in the ordered set where parentMessageId = &#63;.
+	 *
+	 * @param parentMessageId the parent message ID
+	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	 * @return the first matching message-boards message
+	 * @throws NoSuchMessageException if a matching message-boards message could not be found
+	 */
+	@Override
+	public MBMessage findByParentMessageId_First(
+			long parentMessageId,
+			OrderByComparator<MBMessage> orderByComparator)
+		throws NoSuchMessageException {
+
+		MBMessage mbMessage = fetchByParentMessageId_First(
+			parentMessageId, orderByComparator);
+
+		if (mbMessage != null) {
+			return mbMessage;
+		}
+
+		StringBundler msg = new StringBundler(4);
+
+		msg.append(_NO_SUCH_ENTITY_WITH_KEY);
+
+		msg.append("parentMessageId=");
+		msg.append(parentMessageId);
+
+		msg.append("}");
+
+		throw new NoSuchMessageException(msg.toString());
+	}
+
+	/**
+	 * Returns the first message-boards message in the ordered set where parentMessageId = &#63;.
+	 *
+	 * @param parentMessageId the parent message ID
+	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	 * @return the first matching message-boards message, or <code>null</code> if a matching message-boards message could not be found
+	 */
+	@Override
+	public MBMessage fetchByParentMessageId_First(
+		long parentMessageId, OrderByComparator<MBMessage> orderByComparator) {
+
+		List<MBMessage> list = findByParentMessageId(
+			parentMessageId, 0, 1, orderByComparator);
+
+		if (!list.isEmpty()) {
+			return list.get(0);
+		}
+
+		return null;
+	}
+
+	/**
+	 * Returns the last message-boards message in the ordered set where parentMessageId = &#63;.
+	 *
+	 * @param parentMessageId the parent message ID
+	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	 * @return the last matching message-boards message
+	 * @throws NoSuchMessageException if a matching message-boards message could not be found
+	 */
+	@Override
+	public MBMessage findByParentMessageId_Last(
+			long parentMessageId,
+			OrderByComparator<MBMessage> orderByComparator)
+		throws NoSuchMessageException {
+
+		MBMessage mbMessage = fetchByParentMessageId_Last(
+			parentMessageId, orderByComparator);
+
+		if (mbMessage != null) {
+			return mbMessage;
+		}
+
+		StringBundler msg = new StringBundler(4);
+
+		msg.append(_NO_SUCH_ENTITY_WITH_KEY);
+
+		msg.append("parentMessageId=");
+		msg.append(parentMessageId);
+
+		msg.append("}");
+
+		throw new NoSuchMessageException(msg.toString());
+	}
+
+	/**
+	 * Returns the last message-boards message in the ordered set where parentMessageId = &#63;.
+	 *
+	 * @param parentMessageId the parent message ID
+	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	 * @return the last matching message-boards message, or <code>null</code> if a matching message-boards message could not be found
+	 */
+	@Override
+	public MBMessage fetchByParentMessageId_Last(
+		long parentMessageId, OrderByComparator<MBMessage> orderByComparator) {
+
+		int count = countByParentMessageId(parentMessageId);
+
+		if (count == 0) {
+			return null;
+		}
+
+		List<MBMessage> list = findByParentMessageId(
+			parentMessageId, count - 1, count, orderByComparator);
+
+		if (!list.isEmpty()) {
+			return list.get(0);
+		}
+
+		return null;
+	}
+
+	/**
+	 * Returns the message-boards messages before and after the current message-boards message in the ordered set where parentMessageId = &#63;.
+	 *
+	 * @param messageId the primary key of the current message-boards message
+	 * @param parentMessageId the parent message ID
+	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	 * @return the previous, current, and next message-boards message
+	 * @throws NoSuchMessageException if a message-boards message with the primary key could not be found
+	 */
+	@Override
+	public MBMessage[] findByParentMessageId_PrevAndNext(
+			long messageId, long parentMessageId,
+			OrderByComparator<MBMessage> orderByComparator)
+		throws NoSuchMessageException {
+
+		MBMessage mbMessage = findByPrimaryKey(messageId);
+
+		Session session = null;
+
+		try {
+			session = openSession();
+
+			MBMessage[] array = new MBMessageImpl[3];
+
+			array[0] = getByParentMessageId_PrevAndNext(
+				session, mbMessage, parentMessageId, orderByComparator, true);
+
+			array[1] = mbMessage;
+
+			array[2] = getByParentMessageId_PrevAndNext(
+				session, mbMessage, parentMessageId, orderByComparator, false);
+
+			return array;
+		}
+		catch (Exception e) {
+			throw processException(e);
+		}
+		finally {
+			closeSession(session);
+		}
+	}
+
+	protected MBMessage getByParentMessageId_PrevAndNext(
+		Session session, MBMessage mbMessage, long parentMessageId,
+		OrderByComparator<MBMessage> orderByComparator, boolean previous) {
+
+		StringBundler query = null;
+
+		if (orderByComparator != null) {
+			query = new StringBundler(
+				4 + (orderByComparator.getOrderByConditionFields().length * 3) +
+					(orderByComparator.getOrderByFields().length * 3));
+		}
+		else {
+			query = new StringBundler(3);
+		}
+
+		query.append(_SQL_SELECT_MBMESSAGE_WHERE);
+
+		query.append(_FINDER_COLUMN_PARENTMESSAGEID_PARENTMESSAGEID_2);
+
+		if (orderByComparator != null) {
+			String[] orderByConditionFields =
+				orderByComparator.getOrderByConditionFields();
+
+			if (orderByConditionFields.length > 0) {
+				query.append(WHERE_AND);
+			}
+
+			for (int i = 0; i < orderByConditionFields.length; i++) {
+				query.append(_ORDER_BY_ENTITY_ALIAS);
+				query.append(orderByConditionFields[i]);
+
+				if ((i + 1) < orderByConditionFields.length) {
+					if (orderByComparator.isAscending() ^ previous) {
+						query.append(WHERE_GREATER_THAN_HAS_NEXT);
+					}
+					else {
+						query.append(WHERE_LESSER_THAN_HAS_NEXT);
+					}
+				}
+				else {
+					if (orderByComparator.isAscending() ^ previous) {
+						query.append(WHERE_GREATER_THAN);
+					}
+					else {
+						query.append(WHERE_LESSER_THAN);
+					}
+				}
+			}
+
+			query.append(ORDER_BY_CLAUSE);
+
+			String[] orderByFields = orderByComparator.getOrderByFields();
+
+			for (int i = 0; i < orderByFields.length; i++) {
+				query.append(_ORDER_BY_ENTITY_ALIAS);
+				query.append(orderByFields[i]);
+
+				if ((i + 1) < orderByFields.length) {
+					if (orderByComparator.isAscending() ^ previous) {
+						query.append(ORDER_BY_ASC_HAS_NEXT);
+					}
+					else {
+						query.append(ORDER_BY_DESC_HAS_NEXT);
+					}
+				}
+				else {
+					if (orderByComparator.isAscending() ^ previous) {
+						query.append(ORDER_BY_ASC);
+					}
+					else {
+						query.append(ORDER_BY_DESC);
+					}
+				}
+			}
+		}
+		else {
+			query.append(MBMessageModelImpl.ORDER_BY_JPQL);
+		}
+
+		String sql = query.toString();
+
+		Query q = session.createQuery(sql);
+
+		q.setFirstResult(0);
+		q.setMaxResults(2);
+
+		QueryPos qPos = QueryPos.getInstance(q);
+
+		qPos.add(parentMessageId);
+
+		if (orderByComparator != null) {
+			for (Object orderByConditionValue :
+					orderByComparator.getOrderByConditionValues(mbMessage)) {
+
+				qPos.add(orderByConditionValue);
+			}
+		}
+
+		List<MBMessage> list = q.list();
+
+		if (list.size() == 2) {
+			return list.get(1);
+		}
+		else {
+			return null;
+		}
+	}
+
+	/**
+	 * Removes all the message-boards messages where parentMessageId = &#63; from the database.
+	 *
+	 * @param parentMessageId the parent message ID
+	 */
+	@Override
+	public void removeByParentMessageId(long parentMessageId) {
+		for (MBMessage mbMessage :
+				findByParentMessageId(
+					parentMessageId, QueryUtil.ALL_POS, QueryUtil.ALL_POS,
+					null)) {
+
+			remove(mbMessage);
+		}
+	}
+
+	/**
+	 * Returns the number of message-boards messages where parentMessageId = &#63;.
+	 *
+	 * @param parentMessageId the parent message ID
+	 * @return the number of matching message-boards messages
+	 */
+	@Override
+	public int countByParentMessageId(long parentMessageId) {
+		FinderPath finderPath = _finderPathCountByParentMessageId;
+
+		Object[] finderArgs = new Object[] {parentMessageId};
+
+		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+
+		if (count == null) {
+			StringBundler query = new StringBundler(2);
+
+			query.append(_SQL_COUNT_MBMESSAGE_WHERE);
+
+			query.append(_FINDER_COLUMN_PARENTMESSAGEID_PARENTMESSAGEID_2);
+
+			String sql = query.toString();
+
+			Session session = null;
+
+			try {
+				session = openSession();
+
+				Query q = session.createQuery(sql);
+
+				QueryPos qPos = QueryPos.getInstance(q);
+
+				qPos.add(parentMessageId);
+
+				count = (Long)q.uniqueResult();
+
+				finderCache.putResult(finderPath, finderArgs, count);
+			}
+			catch (Exception e) {
+				finderCache.removeResult(finderPath, finderArgs);
+
+				throw processException(e);
+			}
+			finally {
+				closeSession(session);
+			}
+		}
+
+		return count.intValue();
+	}
+
+	private static final String
+		_FINDER_COLUMN_PARENTMESSAGEID_PARENTMESSAGEID_2 =
+			"mbMessage.parentMessageId = ?";
+
 	private FinderPath _finderPathWithPaginationFindByG_U;
 	private FinderPath _finderPathWithoutPaginationFindByG_U;
 	private FinderPath _finderPathCountByG_U;
@@ -4387,7 +4866,7 @@ public class MBMessagePersistenceImpl
 	 * Returns a range of all the message-boards messages where groupId = &#63; and userId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>MBMessageModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>MBMessageModelImpl</code>.
 	 * </p>
 	 *
 	 * @param groupId the group ID
@@ -4407,7 +4886,7 @@ public class MBMessagePersistenceImpl
 	 * Returns an ordered range of all the message-boards messages where groupId = &#63; and userId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>MBMessageModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>MBMessageModelImpl</code>.
 	 * </p>
 	 *
 	 * @param groupId the group ID
@@ -4429,7 +4908,7 @@ public class MBMessagePersistenceImpl
 	 * Returns an ordered range of all the message-boards messages where groupId = &#63; and userId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>MBMessageModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>MBMessageModelImpl</code>.
 	 * </p>
 	 *
 	 * @param groupId the group ID
@@ -4437,27 +4916,27 @@ public class MBMessagePersistenceImpl
 	 * @param start the lower bound of the range of message-boards messages
 	 * @param end the upper bound of the range of message-boards messages (not inclusive)
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
-	 * @param retrieveFromCache whether to retrieve from the finder cache
+	 * @param useFinderCache whether to use the finder cache
 	 * @return the ordered range of matching message-boards messages
 	 */
 	@Override
 	public List<MBMessage> findByG_U(
 		long groupId, long userId, int start, int end,
 		OrderByComparator<MBMessage> orderByComparator,
-		boolean retrieveFromCache) {
+		boolean useFinderCache) {
 
-		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
 			(orderByComparator == null)) {
 
-			pagination = false;
-			finderPath = _finderPathWithoutPaginationFindByG_U;
-			finderArgs = new Object[] {groupId, userId};
+			if (useFinderCache) {
+				finderPath = _finderPathWithoutPaginationFindByG_U;
+				finderArgs = new Object[] {groupId, userId};
+			}
 		}
-		else {
+		else if (useFinderCache) {
 			finderPath = _finderPathWithPaginationFindByG_U;
 			finderArgs = new Object[] {
 				groupId, userId, start, end, orderByComparator
@@ -4466,7 +4945,7 @@ public class MBMessagePersistenceImpl
 
 		List<MBMessage> list = null;
 
-		if (retrieveFromCache) {
+		if (useFinderCache) {
 			list = (List<MBMessage>)finderCache.getResult(
 				finderPath, finderArgs, this);
 
@@ -4504,7 +4983,7 @@ public class MBMessagePersistenceImpl
 				appendOrderByComparator(
 					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
 			}
-			else if (pagination) {
+			else {
 				query.append(MBMessageModelImpl.ORDER_BY_JPQL);
 			}
 
@@ -4523,25 +5002,19 @@ public class MBMessagePersistenceImpl
 
 				qPos.add(userId);
 
-				if (!pagination) {
-					list = (List<MBMessage>)QueryUtil.list(
-						q, getDialect(), start, end, false);
-
-					Collections.sort(list);
-
-					list = Collections.unmodifiableList(list);
-				}
-				else {
-					list = (List<MBMessage>)QueryUtil.list(
-						q, getDialect(), start, end);
-				}
+				list = (List<MBMessage>)QueryUtil.list(
+					q, getDialect(), start, end);
 
 				cacheResult(list);
 
-				finderCache.putResult(finderPath, finderArgs, list);
+				if (useFinderCache) {
+					finderCache.putResult(finderPath, finderArgs, list);
+				}
 			}
 			catch (Exception e) {
-				finderCache.removeResult(finderPath, finderArgs);
+				if (useFinderCache) {
+					finderCache.removeResult(finderPath, finderArgs);
+				}
 
 				throw processException(e);
 			}
@@ -4851,7 +5324,7 @@ public class MBMessagePersistenceImpl
 	 * Returns a range of all the message-boards messages that the user has permission to view where groupId = &#63; and userId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>MBMessageModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>MBMessageModelImpl</code>.
 	 * </p>
 	 *
 	 * @param groupId the group ID
@@ -4871,7 +5344,7 @@ public class MBMessagePersistenceImpl
 	 * Returns an ordered range of all the message-boards messages that the user has permissions to view where groupId = &#63; and userId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>MBMessageModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>MBMessageModelImpl</code>.
 	 * </p>
 	 *
 	 * @param groupId the group ID
@@ -5326,7 +5799,7 @@ public class MBMessagePersistenceImpl
 	 * Returns a range of all the message-boards messages where groupId = &#63; and categoryId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>MBMessageModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>MBMessageModelImpl</code>.
 	 * </p>
 	 *
 	 * @param groupId the group ID
@@ -5346,7 +5819,7 @@ public class MBMessagePersistenceImpl
 	 * Returns an ordered range of all the message-boards messages where groupId = &#63; and categoryId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>MBMessageModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>MBMessageModelImpl</code>.
 	 * </p>
 	 *
 	 * @param groupId the group ID
@@ -5369,7 +5842,7 @@ public class MBMessagePersistenceImpl
 	 * Returns an ordered range of all the message-boards messages where groupId = &#63; and categoryId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>MBMessageModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>MBMessageModelImpl</code>.
 	 * </p>
 	 *
 	 * @param groupId the group ID
@@ -5377,27 +5850,27 @@ public class MBMessagePersistenceImpl
 	 * @param start the lower bound of the range of message-boards messages
 	 * @param end the upper bound of the range of message-boards messages (not inclusive)
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
-	 * @param retrieveFromCache whether to retrieve from the finder cache
+	 * @param useFinderCache whether to use the finder cache
 	 * @return the ordered range of matching message-boards messages
 	 */
 	@Override
 	public List<MBMessage> findByG_C(
 		long groupId, long categoryId, int start, int end,
 		OrderByComparator<MBMessage> orderByComparator,
-		boolean retrieveFromCache) {
+		boolean useFinderCache) {
 
-		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
 			(orderByComparator == null)) {
 
-			pagination = false;
-			finderPath = _finderPathWithoutPaginationFindByG_C;
-			finderArgs = new Object[] {groupId, categoryId};
+			if (useFinderCache) {
+				finderPath = _finderPathWithoutPaginationFindByG_C;
+				finderArgs = new Object[] {groupId, categoryId};
+			}
 		}
-		else {
+		else if (useFinderCache) {
 			finderPath = _finderPathWithPaginationFindByG_C;
 			finderArgs = new Object[] {
 				groupId, categoryId, start, end, orderByComparator
@@ -5406,7 +5879,7 @@ public class MBMessagePersistenceImpl
 
 		List<MBMessage> list = null;
 
-		if (retrieveFromCache) {
+		if (useFinderCache) {
 			list = (List<MBMessage>)finderCache.getResult(
 				finderPath, finderArgs, this);
 
@@ -5444,7 +5917,7 @@ public class MBMessagePersistenceImpl
 				appendOrderByComparator(
 					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
 			}
-			else if (pagination) {
+			else {
 				query.append(MBMessageModelImpl.ORDER_BY_JPQL);
 			}
 
@@ -5463,25 +5936,19 @@ public class MBMessagePersistenceImpl
 
 				qPos.add(categoryId);
 
-				if (!pagination) {
-					list = (List<MBMessage>)QueryUtil.list(
-						q, getDialect(), start, end, false);
-
-					Collections.sort(list);
-
-					list = Collections.unmodifiableList(list);
-				}
-				else {
-					list = (List<MBMessage>)QueryUtil.list(
-						q, getDialect(), start, end);
-				}
+				list = (List<MBMessage>)QueryUtil.list(
+					q, getDialect(), start, end);
 
 				cacheResult(list);
 
-				finderCache.putResult(finderPath, finderArgs, list);
+				if (useFinderCache) {
+					finderCache.putResult(finderPath, finderArgs, list);
+				}
 			}
 			catch (Exception e) {
-				finderCache.removeResult(finderPath, finderArgs);
+				if (useFinderCache) {
+					finderCache.removeResult(finderPath, finderArgs);
+				}
 
 				throw processException(e);
 			}
@@ -5793,7 +6260,7 @@ public class MBMessagePersistenceImpl
 	 * Returns a range of all the message-boards messages that the user has permission to view where groupId = &#63; and categoryId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>MBMessageModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>MBMessageModelImpl</code>.
 	 * </p>
 	 *
 	 * @param groupId the group ID
@@ -5813,7 +6280,7 @@ public class MBMessagePersistenceImpl
 	 * Returns an ordered range of all the message-boards messages that the user has permissions to view where groupId = &#63; and categoryId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>MBMessageModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>MBMessageModelImpl</code>.
 	 * </p>
 	 *
 	 * @param groupId the group ID
@@ -6271,7 +6738,7 @@ public class MBMessagePersistenceImpl
 	 * Returns a range of all the message-boards messages where groupId = &#63; and status = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>MBMessageModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>MBMessageModelImpl</code>.
 	 * </p>
 	 *
 	 * @param groupId the group ID
@@ -6291,7 +6758,7 @@ public class MBMessagePersistenceImpl
 	 * Returns an ordered range of all the message-boards messages where groupId = &#63; and status = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>MBMessageModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>MBMessageModelImpl</code>.
 	 * </p>
 	 *
 	 * @param groupId the group ID
@@ -6313,7 +6780,7 @@ public class MBMessagePersistenceImpl
 	 * Returns an ordered range of all the message-boards messages where groupId = &#63; and status = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>MBMessageModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>MBMessageModelImpl</code>.
 	 * </p>
 	 *
 	 * @param groupId the group ID
@@ -6321,27 +6788,27 @@ public class MBMessagePersistenceImpl
 	 * @param start the lower bound of the range of message-boards messages
 	 * @param end the upper bound of the range of message-boards messages (not inclusive)
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
-	 * @param retrieveFromCache whether to retrieve from the finder cache
+	 * @param useFinderCache whether to use the finder cache
 	 * @return the ordered range of matching message-boards messages
 	 */
 	@Override
 	public List<MBMessage> findByG_S(
 		long groupId, int status, int start, int end,
 		OrderByComparator<MBMessage> orderByComparator,
-		boolean retrieveFromCache) {
+		boolean useFinderCache) {
 
-		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
 			(orderByComparator == null)) {
 
-			pagination = false;
-			finderPath = _finderPathWithoutPaginationFindByG_S;
-			finderArgs = new Object[] {groupId, status};
+			if (useFinderCache) {
+				finderPath = _finderPathWithoutPaginationFindByG_S;
+				finderArgs = new Object[] {groupId, status};
+			}
 		}
-		else {
+		else if (useFinderCache) {
 			finderPath = _finderPathWithPaginationFindByG_S;
 			finderArgs = new Object[] {
 				groupId, status, start, end, orderByComparator
@@ -6350,7 +6817,7 @@ public class MBMessagePersistenceImpl
 
 		List<MBMessage> list = null;
 
-		if (retrieveFromCache) {
+		if (useFinderCache) {
 			list = (List<MBMessage>)finderCache.getResult(
 				finderPath, finderArgs, this);
 
@@ -6388,7 +6855,7 @@ public class MBMessagePersistenceImpl
 				appendOrderByComparator(
 					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
 			}
-			else if (pagination) {
+			else {
 				query.append(MBMessageModelImpl.ORDER_BY_JPQL);
 			}
 
@@ -6407,25 +6874,19 @@ public class MBMessagePersistenceImpl
 
 				qPos.add(status);
 
-				if (!pagination) {
-					list = (List<MBMessage>)QueryUtil.list(
-						q, getDialect(), start, end, false);
-
-					Collections.sort(list);
-
-					list = Collections.unmodifiableList(list);
-				}
-				else {
-					list = (List<MBMessage>)QueryUtil.list(
-						q, getDialect(), start, end);
-				}
+				list = (List<MBMessage>)QueryUtil.list(
+					q, getDialect(), start, end);
 
 				cacheResult(list);
 
-				finderCache.putResult(finderPath, finderArgs, list);
+				if (useFinderCache) {
+					finderCache.putResult(finderPath, finderArgs, list);
+				}
 			}
 			catch (Exception e) {
-				finderCache.removeResult(finderPath, finderArgs);
+				if (useFinderCache) {
+					finderCache.removeResult(finderPath, finderArgs);
+				}
 
 				throw processException(e);
 			}
@@ -6735,7 +7196,7 @@ public class MBMessagePersistenceImpl
 	 * Returns a range of all the message-boards messages that the user has permission to view where groupId = &#63; and status = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>MBMessageModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>MBMessageModelImpl</code>.
 	 * </p>
 	 *
 	 * @param groupId the group ID
@@ -6755,7 +7216,7 @@ public class MBMessagePersistenceImpl
 	 * Returns an ordered range of all the message-boards messages that the user has permissions to view where groupId = &#63; and status = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>MBMessageModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>MBMessageModelImpl</code>.
 	 * </p>
 	 *
 	 * @param groupId the group ID
@@ -7210,7 +7671,7 @@ public class MBMessagePersistenceImpl
 	 * Returns a range of all the message-boards messages where companyId = &#63; and status = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>MBMessageModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>MBMessageModelImpl</code>.
 	 * </p>
 	 *
 	 * @param companyId the company ID
@@ -7230,7 +7691,7 @@ public class MBMessagePersistenceImpl
 	 * Returns an ordered range of all the message-boards messages where companyId = &#63; and status = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>MBMessageModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>MBMessageModelImpl</code>.
 	 * </p>
 	 *
 	 * @param companyId the company ID
@@ -7253,7 +7714,7 @@ public class MBMessagePersistenceImpl
 	 * Returns an ordered range of all the message-boards messages where companyId = &#63; and status = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>MBMessageModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>MBMessageModelImpl</code>.
 	 * </p>
 	 *
 	 * @param companyId the company ID
@@ -7261,27 +7722,27 @@ public class MBMessagePersistenceImpl
 	 * @param start the lower bound of the range of message-boards messages
 	 * @param end the upper bound of the range of message-boards messages (not inclusive)
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
-	 * @param retrieveFromCache whether to retrieve from the finder cache
+	 * @param useFinderCache whether to use the finder cache
 	 * @return the ordered range of matching message-boards messages
 	 */
 	@Override
 	public List<MBMessage> findByC_S(
 		long companyId, int status, int start, int end,
 		OrderByComparator<MBMessage> orderByComparator,
-		boolean retrieveFromCache) {
+		boolean useFinderCache) {
 
-		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
 			(orderByComparator == null)) {
 
-			pagination = false;
-			finderPath = _finderPathWithoutPaginationFindByC_S;
-			finderArgs = new Object[] {companyId, status};
+			if (useFinderCache) {
+				finderPath = _finderPathWithoutPaginationFindByC_S;
+				finderArgs = new Object[] {companyId, status};
+			}
 		}
-		else {
+		else if (useFinderCache) {
 			finderPath = _finderPathWithPaginationFindByC_S;
 			finderArgs = new Object[] {
 				companyId, status, start, end, orderByComparator
@@ -7290,7 +7751,7 @@ public class MBMessagePersistenceImpl
 
 		List<MBMessage> list = null;
 
-		if (retrieveFromCache) {
+		if (useFinderCache) {
 			list = (List<MBMessage>)finderCache.getResult(
 				finderPath, finderArgs, this);
 
@@ -7328,7 +7789,7 @@ public class MBMessagePersistenceImpl
 				appendOrderByComparator(
 					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
 			}
-			else if (pagination) {
+			else {
 				query.append(MBMessageModelImpl.ORDER_BY_JPQL);
 			}
 
@@ -7347,25 +7808,19 @@ public class MBMessagePersistenceImpl
 
 				qPos.add(status);
 
-				if (!pagination) {
-					list = (List<MBMessage>)QueryUtil.list(
-						q, getDialect(), start, end, false);
-
-					Collections.sort(list);
-
-					list = Collections.unmodifiableList(list);
-				}
-				else {
-					list = (List<MBMessage>)QueryUtil.list(
-						q, getDialect(), start, end);
-				}
+				list = (List<MBMessage>)QueryUtil.list(
+					q, getDialect(), start, end);
 
 				cacheResult(list);
 
-				finderCache.putResult(finderPath, finderArgs, list);
+				if (useFinderCache) {
+					finderCache.putResult(finderPath, finderArgs, list);
+				}
 			}
 			catch (Exception e) {
-				finderCache.removeResult(finderPath, finderArgs);
+				if (useFinderCache) {
+					finderCache.removeResult(finderPath, finderArgs);
+				}
 
 				throw processException(e);
 			}
@@ -7760,7 +8215,7 @@ public class MBMessagePersistenceImpl
 	 * Returns a range of all the message-boards messages where userId = &#63; and classNameId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>MBMessageModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>MBMessageModelImpl</code>.
 	 * </p>
 	 *
 	 * @param userId the user ID
@@ -7780,7 +8235,7 @@ public class MBMessagePersistenceImpl
 	 * Returns an ordered range of all the message-boards messages where userId = &#63; and classNameId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>MBMessageModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>MBMessageModelImpl</code>.
 	 * </p>
 	 *
 	 * @param userId the user ID
@@ -7803,7 +8258,7 @@ public class MBMessagePersistenceImpl
 	 * Returns an ordered range of all the message-boards messages where userId = &#63; and classNameId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>MBMessageModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>MBMessageModelImpl</code>.
 	 * </p>
 	 *
 	 * @param userId the user ID
@@ -7811,27 +8266,27 @@ public class MBMessagePersistenceImpl
 	 * @param start the lower bound of the range of message-boards messages
 	 * @param end the upper bound of the range of message-boards messages (not inclusive)
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
-	 * @param retrieveFromCache whether to retrieve from the finder cache
+	 * @param useFinderCache whether to use the finder cache
 	 * @return the ordered range of matching message-boards messages
 	 */
 	@Override
 	public List<MBMessage> findByU_C(
 		long userId, long classNameId, int start, int end,
 		OrderByComparator<MBMessage> orderByComparator,
-		boolean retrieveFromCache) {
+		boolean useFinderCache) {
 
-		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
 			(orderByComparator == null)) {
 
-			pagination = false;
-			finderPath = _finderPathWithoutPaginationFindByU_C;
-			finderArgs = new Object[] {userId, classNameId};
+			if (useFinderCache) {
+				finderPath = _finderPathWithoutPaginationFindByU_C;
+				finderArgs = new Object[] {userId, classNameId};
+			}
 		}
-		else {
+		else if (useFinderCache) {
 			finderPath = _finderPathWithPaginationFindByU_C;
 			finderArgs = new Object[] {
 				userId, classNameId, start, end, orderByComparator
@@ -7840,7 +8295,7 @@ public class MBMessagePersistenceImpl
 
 		List<MBMessage> list = null;
 
-		if (retrieveFromCache) {
+		if (useFinderCache) {
 			list = (List<MBMessage>)finderCache.getResult(
 				finderPath, finderArgs, this);
 
@@ -7878,7 +8333,7 @@ public class MBMessagePersistenceImpl
 				appendOrderByComparator(
 					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
 			}
-			else if (pagination) {
+			else {
 				query.append(MBMessageModelImpl.ORDER_BY_JPQL);
 			}
 
@@ -7897,25 +8352,19 @@ public class MBMessagePersistenceImpl
 
 				qPos.add(classNameId);
 
-				if (!pagination) {
-					list = (List<MBMessage>)QueryUtil.list(
-						q, getDialect(), start, end, false);
-
-					Collections.sort(list);
-
-					list = Collections.unmodifiableList(list);
-				}
-				else {
-					list = (List<MBMessage>)QueryUtil.list(
-						q, getDialect(), start, end);
-				}
+				list = (List<MBMessage>)QueryUtil.list(
+					q, getDialect(), start, end);
 
 				cacheResult(list);
 
-				finderCache.putResult(finderPath, finderArgs, list);
+				if (useFinderCache) {
+					finderCache.putResult(finderPath, finderArgs, list);
+				}
 			}
 			catch (Exception e) {
-				finderCache.removeResult(finderPath, finderArgs);
+				if (useFinderCache) {
+					finderCache.removeResult(finderPath, finderArgs);
+				}
 
 				throw processException(e);
 			}
@@ -8214,7 +8663,7 @@ public class MBMessagePersistenceImpl
 	 * Returns all the message-boards messages where userId = &#63; and classNameId = any &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>MBMessageModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>MBMessageModelImpl</code>.
 	 * </p>
 	 *
 	 * @param userId the user ID
@@ -8231,7 +8680,7 @@ public class MBMessagePersistenceImpl
 	 * Returns a range of all the message-boards messages where userId = &#63; and classNameId = any &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>MBMessageModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>MBMessageModelImpl</code>.
 	 * </p>
 	 *
 	 * @param userId the user ID
@@ -8251,7 +8700,7 @@ public class MBMessagePersistenceImpl
 	 * Returns an ordered range of all the message-boards messages where userId = &#63; and classNameId = any &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>MBMessageModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>MBMessageModelImpl</code>.
 	 * </p>
 	 *
 	 * @param userId the user ID
@@ -8274,7 +8723,7 @@ public class MBMessagePersistenceImpl
 	 * Returns an ordered range of all the message-boards messages where userId = &#63; and classNameId = &#63;, optionally using the finder cache.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>MBMessageModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>MBMessageModelImpl</code>.
 	 * </p>
 	 *
 	 * @param userId the user ID
@@ -8282,14 +8731,14 @@ public class MBMessagePersistenceImpl
 	 * @param start the lower bound of the range of message-boards messages
 	 * @param end the upper bound of the range of message-boards messages (not inclusive)
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
-	 * @param retrieveFromCache whether to retrieve from the finder cache
+	 * @param useFinderCache whether to use the finder cache
 	 * @return the ordered range of matching message-boards messages
 	 */
 	@Override
 	public List<MBMessage> findByU_C(
 		long userId, long[] classNameIds, int start, int end,
 		OrderByComparator<MBMessage> orderByComparator,
-		boolean retrieveFromCache) {
+		boolean useFinderCache) {
 
 		if (classNameIds == null) {
 			classNameIds = new long[0];
@@ -8303,16 +8752,18 @@ public class MBMessagePersistenceImpl
 				userId, classNameIds[0], start, end, orderByComparator);
 		}
 
-		boolean pagination = true;
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
 			(orderByComparator == null)) {
 
-			pagination = false;
-			finderArgs = new Object[] {userId, StringUtil.merge(classNameIds)};
+			if (useFinderCache) {
+				finderArgs = new Object[] {
+					userId, StringUtil.merge(classNameIds)
+				};
+			}
 		}
-		else {
+		else if (useFinderCache) {
 			finderArgs = new Object[] {
 				userId, StringUtil.merge(classNameIds), start, end,
 				orderByComparator
@@ -8321,7 +8772,7 @@ public class MBMessagePersistenceImpl
 
 		List<MBMessage> list = null;
 
-		if (retrieveFromCache) {
+		if (useFinderCache) {
 			list = (List<MBMessage>)finderCache.getResult(
 				_finderPathWithPaginationFindByU_C, finderArgs, this);
 
@@ -8366,7 +8817,7 @@ public class MBMessagePersistenceImpl
 				appendOrderByComparator(
 					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
 			}
-			else if (pagination) {
+			else {
 				query.append(MBMessageModelImpl.ORDER_BY_JPQL);
 			}
 
@@ -8383,27 +8834,21 @@ public class MBMessagePersistenceImpl
 
 				qPos.add(userId);
 
-				if (!pagination) {
-					list = (List<MBMessage>)QueryUtil.list(
-						q, getDialect(), start, end, false);
-
-					Collections.sort(list);
-
-					list = Collections.unmodifiableList(list);
-				}
-				else {
-					list = (List<MBMessage>)QueryUtil.list(
-						q, getDialect(), start, end);
-				}
+				list = (List<MBMessage>)QueryUtil.list(
+					q, getDialect(), start, end);
 
 				cacheResult(list);
 
-				finderCache.putResult(
-					_finderPathWithPaginationFindByU_C, finderArgs, list);
+				if (useFinderCache) {
+					finderCache.putResult(
+						_finderPathWithPaginationFindByU_C, finderArgs, list);
+				}
 			}
 			catch (Exception e) {
-				finderCache.removeResult(
-					_finderPathWithPaginationFindByU_C, finderArgs);
+				if (useFinderCache) {
+					finderCache.removeResult(
+						_finderPathWithPaginationFindByU_C, finderArgs);
+				}
 
 				throw processException(e);
 			}
@@ -8596,7 +9041,7 @@ public class MBMessagePersistenceImpl
 	 * Returns a range of all the message-boards messages where classNameId = &#63; and classPK = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>MBMessageModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>MBMessageModelImpl</code>.
 	 * </p>
 	 *
 	 * @param classNameId the class name ID
@@ -8616,7 +9061,7 @@ public class MBMessagePersistenceImpl
 	 * Returns an ordered range of all the message-boards messages where classNameId = &#63; and classPK = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>MBMessageModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>MBMessageModelImpl</code>.
 	 * </p>
 	 *
 	 * @param classNameId the class name ID
@@ -8639,7 +9084,7 @@ public class MBMessagePersistenceImpl
 	 * Returns an ordered range of all the message-boards messages where classNameId = &#63; and classPK = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>MBMessageModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>MBMessageModelImpl</code>.
 	 * </p>
 	 *
 	 * @param classNameId the class name ID
@@ -8647,27 +9092,27 @@ public class MBMessagePersistenceImpl
 	 * @param start the lower bound of the range of message-boards messages
 	 * @param end the upper bound of the range of message-boards messages (not inclusive)
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
-	 * @param retrieveFromCache whether to retrieve from the finder cache
+	 * @param useFinderCache whether to use the finder cache
 	 * @return the ordered range of matching message-boards messages
 	 */
 	@Override
 	public List<MBMessage> findByC_C(
 		long classNameId, long classPK, int start, int end,
 		OrderByComparator<MBMessage> orderByComparator,
-		boolean retrieveFromCache) {
+		boolean useFinderCache) {
 
-		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
 			(orderByComparator == null)) {
 
-			pagination = false;
-			finderPath = _finderPathWithoutPaginationFindByC_C;
-			finderArgs = new Object[] {classNameId, classPK};
+			if (useFinderCache) {
+				finderPath = _finderPathWithoutPaginationFindByC_C;
+				finderArgs = new Object[] {classNameId, classPK};
+			}
 		}
-		else {
+		else if (useFinderCache) {
 			finderPath = _finderPathWithPaginationFindByC_C;
 			finderArgs = new Object[] {
 				classNameId, classPK, start, end, orderByComparator
@@ -8676,7 +9121,7 @@ public class MBMessagePersistenceImpl
 
 		List<MBMessage> list = null;
 
-		if (retrieveFromCache) {
+		if (useFinderCache) {
 			list = (List<MBMessage>)finderCache.getResult(
 				finderPath, finderArgs, this);
 
@@ -8714,7 +9159,7 @@ public class MBMessagePersistenceImpl
 				appendOrderByComparator(
 					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
 			}
-			else if (pagination) {
+			else {
 				query.append(MBMessageModelImpl.ORDER_BY_JPQL);
 			}
 
@@ -8733,25 +9178,19 @@ public class MBMessagePersistenceImpl
 
 				qPos.add(classPK);
 
-				if (!pagination) {
-					list = (List<MBMessage>)QueryUtil.list(
-						q, getDialect(), start, end, false);
-
-					Collections.sort(list);
-
-					list = Collections.unmodifiableList(list);
-				}
-				else {
-					list = (List<MBMessage>)QueryUtil.list(
-						q, getDialect(), start, end);
-				}
+				list = (List<MBMessage>)QueryUtil.list(
+					q, getDialect(), start, end);
 
 				cacheResult(list);
 
-				finderCache.putResult(finderPath, finderArgs, list);
+				if (useFinderCache) {
+					finderCache.putResult(finderPath, finderArgs, list);
+				}
 			}
 			catch (Exception e) {
-				finderCache.removeResult(finderPath, finderArgs);
+				if (useFinderCache) {
+					finderCache.removeResult(finderPath, finderArgs);
+				}
 
 				throw processException(e);
 			}
@@ -9147,7 +9586,7 @@ public class MBMessagePersistenceImpl
 	 * Returns a range of all the message-boards messages where threadId = &#63; and parentMessageId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>MBMessageModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>MBMessageModelImpl</code>.
 	 * </p>
 	 *
 	 * @param threadId the thread ID
@@ -9167,7 +9606,7 @@ public class MBMessagePersistenceImpl
 	 * Returns an ordered range of all the message-boards messages where threadId = &#63; and parentMessageId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>MBMessageModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>MBMessageModelImpl</code>.
 	 * </p>
 	 *
 	 * @param threadId the thread ID
@@ -9190,7 +9629,7 @@ public class MBMessagePersistenceImpl
 	 * Returns an ordered range of all the message-boards messages where threadId = &#63; and parentMessageId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>MBMessageModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>MBMessageModelImpl</code>.
 	 * </p>
 	 *
 	 * @param threadId the thread ID
@@ -9198,27 +9637,27 @@ public class MBMessagePersistenceImpl
 	 * @param start the lower bound of the range of message-boards messages
 	 * @param end the upper bound of the range of message-boards messages (not inclusive)
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
-	 * @param retrieveFromCache whether to retrieve from the finder cache
+	 * @param useFinderCache whether to use the finder cache
 	 * @return the ordered range of matching message-boards messages
 	 */
 	@Override
 	public List<MBMessage> findByT_P(
 		long threadId, long parentMessageId, int start, int end,
 		OrderByComparator<MBMessage> orderByComparator,
-		boolean retrieveFromCache) {
+		boolean useFinderCache) {
 
-		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
 			(orderByComparator == null)) {
 
-			pagination = false;
-			finderPath = _finderPathWithoutPaginationFindByT_P;
-			finderArgs = new Object[] {threadId, parentMessageId};
+			if (useFinderCache) {
+				finderPath = _finderPathWithoutPaginationFindByT_P;
+				finderArgs = new Object[] {threadId, parentMessageId};
+			}
 		}
-		else {
+		else if (useFinderCache) {
 			finderPath = _finderPathWithPaginationFindByT_P;
 			finderArgs = new Object[] {
 				threadId, parentMessageId, start, end, orderByComparator
@@ -9227,7 +9666,7 @@ public class MBMessagePersistenceImpl
 
 		List<MBMessage> list = null;
 
-		if (retrieveFromCache) {
+		if (useFinderCache) {
 			list = (List<MBMessage>)finderCache.getResult(
 				finderPath, finderArgs, this);
 
@@ -9265,7 +9704,7 @@ public class MBMessagePersistenceImpl
 				appendOrderByComparator(
 					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
 			}
-			else if (pagination) {
+			else {
 				query.append(MBMessageModelImpl.ORDER_BY_JPQL);
 			}
 
@@ -9284,25 +9723,19 @@ public class MBMessagePersistenceImpl
 
 				qPos.add(parentMessageId);
 
-				if (!pagination) {
-					list = (List<MBMessage>)QueryUtil.list(
-						q, getDialect(), start, end, false);
-
-					Collections.sort(list);
-
-					list = Collections.unmodifiableList(list);
-				}
-				else {
-					list = (List<MBMessage>)QueryUtil.list(
-						q, getDialect(), start, end);
-				}
+				list = (List<MBMessage>)QueryUtil.list(
+					q, getDialect(), start, end);
 
 				cacheResult(list);
 
-				finderCache.putResult(finderPath, finderArgs, list);
+				if (useFinderCache) {
+					finderCache.putResult(finderPath, finderArgs, list);
+				}
 			}
 			catch (Exception e) {
-				finderCache.removeResult(finderPath, finderArgs);
+				if (useFinderCache) {
+					finderCache.removeResult(finderPath, finderArgs);
+				}
 
 				throw processException(e);
 			}
@@ -9698,7 +10131,7 @@ public class MBMessagePersistenceImpl
 	 * Returns a range of all the message-boards messages where threadId = &#63; and answer = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>MBMessageModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>MBMessageModelImpl</code>.
 	 * </p>
 	 *
 	 * @param threadId the thread ID
@@ -9718,7 +10151,7 @@ public class MBMessagePersistenceImpl
 	 * Returns an ordered range of all the message-boards messages where threadId = &#63; and answer = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>MBMessageModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>MBMessageModelImpl</code>.
 	 * </p>
 	 *
 	 * @param threadId the thread ID
@@ -9740,7 +10173,7 @@ public class MBMessagePersistenceImpl
 	 * Returns an ordered range of all the message-boards messages where threadId = &#63; and answer = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>MBMessageModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>MBMessageModelImpl</code>.
 	 * </p>
 	 *
 	 * @param threadId the thread ID
@@ -9748,27 +10181,27 @@ public class MBMessagePersistenceImpl
 	 * @param start the lower bound of the range of message-boards messages
 	 * @param end the upper bound of the range of message-boards messages (not inclusive)
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
-	 * @param retrieveFromCache whether to retrieve from the finder cache
+	 * @param useFinderCache whether to use the finder cache
 	 * @return the ordered range of matching message-boards messages
 	 */
 	@Override
 	public List<MBMessage> findByT_A(
 		long threadId, boolean answer, int start, int end,
 		OrderByComparator<MBMessage> orderByComparator,
-		boolean retrieveFromCache) {
+		boolean useFinderCache) {
 
-		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
 			(orderByComparator == null)) {
 
-			pagination = false;
-			finderPath = _finderPathWithoutPaginationFindByT_A;
-			finderArgs = new Object[] {threadId, answer};
+			if (useFinderCache) {
+				finderPath = _finderPathWithoutPaginationFindByT_A;
+				finderArgs = new Object[] {threadId, answer};
+			}
 		}
-		else {
+		else if (useFinderCache) {
 			finderPath = _finderPathWithPaginationFindByT_A;
 			finderArgs = new Object[] {
 				threadId, answer, start, end, orderByComparator
@@ -9777,7 +10210,7 @@ public class MBMessagePersistenceImpl
 
 		List<MBMessage> list = null;
 
-		if (retrieveFromCache) {
+		if (useFinderCache) {
 			list = (List<MBMessage>)finderCache.getResult(
 				finderPath, finderArgs, this);
 
@@ -9815,7 +10248,7 @@ public class MBMessagePersistenceImpl
 				appendOrderByComparator(
 					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
 			}
-			else if (pagination) {
+			else {
 				query.append(MBMessageModelImpl.ORDER_BY_JPQL);
 			}
 
@@ -9834,25 +10267,19 @@ public class MBMessagePersistenceImpl
 
 				qPos.add(answer);
 
-				if (!pagination) {
-					list = (List<MBMessage>)QueryUtil.list(
-						q, getDialect(), start, end, false);
-
-					Collections.sort(list);
-
-					list = Collections.unmodifiableList(list);
-				}
-				else {
-					list = (List<MBMessage>)QueryUtil.list(
-						q, getDialect(), start, end);
-				}
+				list = (List<MBMessage>)QueryUtil.list(
+					q, getDialect(), start, end);
 
 				cacheResult(list);
 
-				finderCache.putResult(finderPath, finderArgs, list);
+				if (useFinderCache) {
+					finderCache.putResult(finderPath, finderArgs, list);
+				}
 			}
 			catch (Exception e) {
-				finderCache.removeResult(finderPath, finderArgs);
+				if (useFinderCache) {
+					finderCache.removeResult(finderPath, finderArgs);
+				}
 
 				throw processException(e);
 			}
@@ -10245,7 +10672,7 @@ public class MBMessagePersistenceImpl
 	 * Returns a range of all the message-boards messages where threadId = &#63; and status = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>MBMessageModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>MBMessageModelImpl</code>.
 	 * </p>
 	 *
 	 * @param threadId the thread ID
@@ -10265,7 +10692,7 @@ public class MBMessagePersistenceImpl
 	 * Returns an ordered range of all the message-boards messages where threadId = &#63; and status = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>MBMessageModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>MBMessageModelImpl</code>.
 	 * </p>
 	 *
 	 * @param threadId the thread ID
@@ -10287,7 +10714,7 @@ public class MBMessagePersistenceImpl
 	 * Returns an ordered range of all the message-boards messages where threadId = &#63; and status = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>MBMessageModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>MBMessageModelImpl</code>.
 	 * </p>
 	 *
 	 * @param threadId the thread ID
@@ -10295,27 +10722,27 @@ public class MBMessagePersistenceImpl
 	 * @param start the lower bound of the range of message-boards messages
 	 * @param end the upper bound of the range of message-boards messages (not inclusive)
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
-	 * @param retrieveFromCache whether to retrieve from the finder cache
+	 * @param useFinderCache whether to use the finder cache
 	 * @return the ordered range of matching message-boards messages
 	 */
 	@Override
 	public List<MBMessage> findByT_S(
 		long threadId, int status, int start, int end,
 		OrderByComparator<MBMessage> orderByComparator,
-		boolean retrieveFromCache) {
+		boolean useFinderCache) {
 
-		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
 			(orderByComparator == null)) {
 
-			pagination = false;
-			finderPath = _finderPathWithoutPaginationFindByT_S;
-			finderArgs = new Object[] {threadId, status};
+			if (useFinderCache) {
+				finderPath = _finderPathWithoutPaginationFindByT_S;
+				finderArgs = new Object[] {threadId, status};
+			}
 		}
-		else {
+		else if (useFinderCache) {
 			finderPath = _finderPathWithPaginationFindByT_S;
 			finderArgs = new Object[] {
 				threadId, status, start, end, orderByComparator
@@ -10324,7 +10751,7 @@ public class MBMessagePersistenceImpl
 
 		List<MBMessage> list = null;
 
-		if (retrieveFromCache) {
+		if (useFinderCache) {
 			list = (List<MBMessage>)finderCache.getResult(
 				finderPath, finderArgs, this);
 
@@ -10362,7 +10789,7 @@ public class MBMessagePersistenceImpl
 				appendOrderByComparator(
 					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
 			}
-			else if (pagination) {
+			else {
 				query.append(MBMessageModelImpl.ORDER_BY_JPQL);
 			}
 
@@ -10381,25 +10808,19 @@ public class MBMessagePersistenceImpl
 
 				qPos.add(status);
 
-				if (!pagination) {
-					list = (List<MBMessage>)QueryUtil.list(
-						q, getDialect(), start, end, false);
-
-					Collections.sort(list);
-
-					list = Collections.unmodifiableList(list);
-				}
-				else {
-					list = (List<MBMessage>)QueryUtil.list(
-						q, getDialect(), start, end);
-				}
+				list = (List<MBMessage>)QueryUtil.list(
+					q, getDialect(), start, end);
 
 				cacheResult(list);
 
-				finderCache.putResult(finderPath, finderArgs, list);
+				if (useFinderCache) {
+					finderCache.putResult(finderPath, finderArgs, list);
+				}
 			}
 			catch (Exception e) {
-				finderCache.removeResult(finderPath, finderArgs);
+				if (useFinderCache) {
+					finderCache.removeResult(finderPath, finderArgs);
+				}
 
 				throw processException(e);
 			}
@@ -10791,7 +11212,7 @@ public class MBMessagePersistenceImpl
 	 * Returns a range of all the message-boards messages where threadId = &#63; and status &ne; &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>MBMessageModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>MBMessageModelImpl</code>.
 	 * </p>
 	 *
 	 * @param threadId the thread ID
@@ -10811,7 +11232,7 @@ public class MBMessagePersistenceImpl
 	 * Returns an ordered range of all the message-boards messages where threadId = &#63; and status &ne; &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>MBMessageModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>MBMessageModelImpl</code>.
 	 * </p>
 	 *
 	 * @param threadId the thread ID
@@ -10834,7 +11255,7 @@ public class MBMessagePersistenceImpl
 	 * Returns an ordered range of all the message-boards messages where threadId = &#63; and status &ne; &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>MBMessageModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>MBMessageModelImpl</code>.
 	 * </p>
 	 *
 	 * @param threadId the thread ID
@@ -10842,16 +11263,15 @@ public class MBMessagePersistenceImpl
 	 * @param start the lower bound of the range of message-boards messages
 	 * @param end the upper bound of the range of message-boards messages (not inclusive)
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
-	 * @param retrieveFromCache whether to retrieve from the finder cache
+	 * @param useFinderCache whether to use the finder cache
 	 * @return the ordered range of matching message-boards messages
 	 */
 	@Override
 	public List<MBMessage> findByT_notS(
 		long threadId, int status, int start, int end,
 		OrderByComparator<MBMessage> orderByComparator,
-		boolean retrieveFromCache) {
+		boolean useFinderCache) {
 
-		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
@@ -10862,7 +11282,7 @@ public class MBMessagePersistenceImpl
 
 		List<MBMessage> list = null;
 
-		if (retrieveFromCache) {
+		if (useFinderCache) {
 			list = (List<MBMessage>)finderCache.getResult(
 				finderPath, finderArgs, this);
 
@@ -10900,7 +11320,7 @@ public class MBMessagePersistenceImpl
 				appendOrderByComparator(
 					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
 			}
-			else if (pagination) {
+			else {
 				query.append(MBMessageModelImpl.ORDER_BY_JPQL);
 			}
 
@@ -10919,25 +11339,19 @@ public class MBMessagePersistenceImpl
 
 				qPos.add(status);
 
-				if (!pagination) {
-					list = (List<MBMessage>)QueryUtil.list(
-						q, getDialect(), start, end, false);
-
-					Collections.sort(list);
-
-					list = Collections.unmodifiableList(list);
-				}
-				else {
-					list = (List<MBMessage>)QueryUtil.list(
-						q, getDialect(), start, end);
-				}
+				list = (List<MBMessage>)QueryUtil.list(
+					q, getDialect(), start, end);
 
 				cacheResult(list);
 
-				finderCache.putResult(finderPath, finderArgs, list);
+				if (useFinderCache) {
+					finderCache.putResult(finderPath, finderArgs, list);
+				}
 			}
 			catch (Exception e) {
-				finderCache.removeResult(finderPath, finderArgs);
+				if (useFinderCache) {
+					finderCache.removeResult(finderPath, finderArgs);
+				}
 
 				throw processException(e);
 			}
@@ -10978,7 +11392,7 @@ public class MBMessagePersistenceImpl
 		msg.append("threadId=");
 		msg.append(threadId);
 
-		msg.append(", status=");
+		msg.append(", status!=");
 		msg.append(status);
 
 		msg.append("}");
@@ -11038,7 +11452,7 @@ public class MBMessagePersistenceImpl
 		msg.append("threadId=");
 		msg.append(threadId);
 
-		msg.append(", status=");
+		msg.append(", status!=");
 		msg.append(status);
 
 		msg.append("}");
@@ -11330,7 +11744,7 @@ public class MBMessagePersistenceImpl
 	 * Returns a range of all the message-boards messages where threadId = &#63; and status = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>MBMessageModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>MBMessageModelImpl</code>.
 	 * </p>
 	 *
 	 * @param threadId the thread ID
@@ -11350,7 +11764,7 @@ public class MBMessagePersistenceImpl
 	 * Returns an ordered range of all the message-boards messages where threadId = &#63; and status = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>MBMessageModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>MBMessageModelImpl</code>.
 	 * </p>
 	 *
 	 * @param threadId the thread ID
@@ -11373,7 +11787,7 @@ public class MBMessagePersistenceImpl
 	 * Returns an ordered range of all the message-boards messages where threadId = &#63; and status = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>MBMessageModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>MBMessageModelImpl</code>.
 	 * </p>
 	 *
 	 * @param threadId the thread ID
@@ -11381,27 +11795,27 @@ public class MBMessagePersistenceImpl
 	 * @param start the lower bound of the range of message-boards messages
 	 * @param end the upper bound of the range of message-boards messages (not inclusive)
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
-	 * @param retrieveFromCache whether to retrieve from the finder cache
+	 * @param useFinderCache whether to use the finder cache
 	 * @return the ordered range of matching message-boards messages
 	 */
 	@Override
 	public List<MBMessage> findByTR_S(
 		long threadId, int status, int start, int end,
 		OrderByComparator<MBMessage> orderByComparator,
-		boolean retrieveFromCache) {
+		boolean useFinderCache) {
 
-		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
 			(orderByComparator == null)) {
 
-			pagination = false;
-			finderPath = _finderPathWithoutPaginationFindByTR_S;
-			finderArgs = new Object[] {threadId, status};
+			if (useFinderCache) {
+				finderPath = _finderPathWithoutPaginationFindByTR_S;
+				finderArgs = new Object[] {threadId, status};
+			}
 		}
-		else {
+		else if (useFinderCache) {
 			finderPath = _finderPathWithPaginationFindByTR_S;
 			finderArgs = new Object[] {
 				threadId, status, start, end, orderByComparator
@@ -11410,7 +11824,7 @@ public class MBMessagePersistenceImpl
 
 		List<MBMessage> list = null;
 
-		if (retrieveFromCache) {
+		if (useFinderCache) {
 			list = (List<MBMessage>)finderCache.getResult(
 				finderPath, finderArgs, this);
 
@@ -11448,7 +11862,7 @@ public class MBMessagePersistenceImpl
 				appendOrderByComparator(
 					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
 			}
-			else if (pagination) {
+			else {
 				query.append(MBMessageModelImpl.ORDER_BY_JPQL);
 			}
 
@@ -11467,25 +11881,19 @@ public class MBMessagePersistenceImpl
 
 				qPos.add(status);
 
-				if (!pagination) {
-					list = (List<MBMessage>)QueryUtil.list(
-						q, getDialect(), start, end, false);
-
-					Collections.sort(list);
-
-					list = Collections.unmodifiableList(list);
-				}
-				else {
-					list = (List<MBMessage>)QueryUtil.list(
-						q, getDialect(), start, end);
-				}
+				list = (List<MBMessage>)QueryUtil.list(
+					q, getDialect(), start, end);
 
 				cacheResult(list);
 
-				finderCache.putResult(finderPath, finderArgs, list);
+				if (useFinderCache) {
+					finderCache.putResult(finderPath, finderArgs, list);
+				}
 			}
 			catch (Exception e) {
-				finderCache.removeResult(finderPath, finderArgs);
+				if (useFinderCache) {
+					finderCache.removeResult(finderPath, finderArgs);
+				}
 
 				throw processException(e);
 			}
@@ -11879,7 +12287,7 @@ public class MBMessagePersistenceImpl
 	 * Returns a range of all the message-boards messages where parentMessageId = &#63; and status = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>MBMessageModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>MBMessageModelImpl</code>.
 	 * </p>
 	 *
 	 * @param parentMessageId the parent message ID
@@ -11899,7 +12307,7 @@ public class MBMessagePersistenceImpl
 	 * Returns an ordered range of all the message-boards messages where parentMessageId = &#63; and status = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>MBMessageModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>MBMessageModelImpl</code>.
 	 * </p>
 	 *
 	 * @param parentMessageId the parent message ID
@@ -11922,7 +12330,7 @@ public class MBMessagePersistenceImpl
 	 * Returns an ordered range of all the message-boards messages where parentMessageId = &#63; and status = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>MBMessageModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>MBMessageModelImpl</code>.
 	 * </p>
 	 *
 	 * @param parentMessageId the parent message ID
@@ -11930,27 +12338,27 @@ public class MBMessagePersistenceImpl
 	 * @param start the lower bound of the range of message-boards messages
 	 * @param end the upper bound of the range of message-boards messages (not inclusive)
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
-	 * @param retrieveFromCache whether to retrieve from the finder cache
+	 * @param useFinderCache whether to use the finder cache
 	 * @return the ordered range of matching message-boards messages
 	 */
 	@Override
 	public List<MBMessage> findByP_S(
 		long parentMessageId, int status, int start, int end,
 		OrderByComparator<MBMessage> orderByComparator,
-		boolean retrieveFromCache) {
+		boolean useFinderCache) {
 
-		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
 			(orderByComparator == null)) {
 
-			pagination = false;
-			finderPath = _finderPathWithoutPaginationFindByP_S;
-			finderArgs = new Object[] {parentMessageId, status};
+			if (useFinderCache) {
+				finderPath = _finderPathWithoutPaginationFindByP_S;
+				finderArgs = new Object[] {parentMessageId, status};
+			}
 		}
-		else {
+		else if (useFinderCache) {
 			finderPath = _finderPathWithPaginationFindByP_S;
 			finderArgs = new Object[] {
 				parentMessageId, status, start, end, orderByComparator
@@ -11959,7 +12367,7 @@ public class MBMessagePersistenceImpl
 
 		List<MBMessage> list = null;
 
-		if (retrieveFromCache) {
+		if (useFinderCache) {
 			list = (List<MBMessage>)finderCache.getResult(
 				finderPath, finderArgs, this);
 
@@ -11997,7 +12405,7 @@ public class MBMessagePersistenceImpl
 				appendOrderByComparator(
 					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
 			}
-			else if (pagination) {
+			else {
 				query.append(MBMessageModelImpl.ORDER_BY_JPQL);
 			}
 
@@ -12016,25 +12424,19 @@ public class MBMessagePersistenceImpl
 
 				qPos.add(status);
 
-				if (!pagination) {
-					list = (List<MBMessage>)QueryUtil.list(
-						q, getDialect(), start, end, false);
-
-					Collections.sort(list);
-
-					list = Collections.unmodifiableList(list);
-				}
-				else {
-					list = (List<MBMessage>)QueryUtil.list(
-						q, getDialect(), start, end);
-				}
+				list = (List<MBMessage>)QueryUtil.list(
+					q, getDialect(), start, end);
 
 				cacheResult(list);
 
-				finderCache.putResult(finderPath, finderArgs, list);
+				if (useFinderCache) {
+					finderCache.putResult(finderPath, finderArgs, list);
+				}
 			}
 			catch (Exception e) {
-				finderCache.removeResult(finderPath, finderArgs);
+				if (useFinderCache) {
+					finderCache.removeResult(finderPath, finderArgs);
+				}
 
 				throw processException(e);
 			}
@@ -12431,7 +12833,7 @@ public class MBMessagePersistenceImpl
 	 * Returns a range of all the message-boards messages where groupId = &#63; and userId = &#63; and status = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>MBMessageModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>MBMessageModelImpl</code>.
 	 * </p>
 	 *
 	 * @param groupId the group ID
@@ -12452,7 +12854,7 @@ public class MBMessagePersistenceImpl
 	 * Returns an ordered range of all the message-boards messages where groupId = &#63; and userId = &#63; and status = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>MBMessageModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>MBMessageModelImpl</code>.
 	 * </p>
 	 *
 	 * @param groupId the group ID
@@ -12476,7 +12878,7 @@ public class MBMessagePersistenceImpl
 	 * Returns an ordered range of all the message-boards messages where groupId = &#63; and userId = &#63; and status = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>MBMessageModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>MBMessageModelImpl</code>.
 	 * </p>
 	 *
 	 * @param groupId the group ID
@@ -12485,27 +12887,27 @@ public class MBMessagePersistenceImpl
 	 * @param start the lower bound of the range of message-boards messages
 	 * @param end the upper bound of the range of message-boards messages (not inclusive)
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
-	 * @param retrieveFromCache whether to retrieve from the finder cache
+	 * @param useFinderCache whether to use the finder cache
 	 * @return the ordered range of matching message-boards messages
 	 */
 	@Override
 	public List<MBMessage> findByG_U_S(
 		long groupId, long userId, int status, int start, int end,
 		OrderByComparator<MBMessage> orderByComparator,
-		boolean retrieveFromCache) {
+		boolean useFinderCache) {
 
-		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
 			(orderByComparator == null)) {
 
-			pagination = false;
-			finderPath = _finderPathWithoutPaginationFindByG_U_S;
-			finderArgs = new Object[] {groupId, userId, status};
+			if (useFinderCache) {
+				finderPath = _finderPathWithoutPaginationFindByG_U_S;
+				finderArgs = new Object[] {groupId, userId, status};
+			}
 		}
-		else {
+		else if (useFinderCache) {
 			finderPath = _finderPathWithPaginationFindByG_U_S;
 			finderArgs = new Object[] {
 				groupId, userId, status, start, end, orderByComparator
@@ -12514,7 +12916,7 @@ public class MBMessagePersistenceImpl
 
 		List<MBMessage> list = null;
 
-		if (retrieveFromCache) {
+		if (useFinderCache) {
 			list = (List<MBMessage>)finderCache.getResult(
 				finderPath, finderArgs, this);
 
@@ -12555,7 +12957,7 @@ public class MBMessagePersistenceImpl
 				appendOrderByComparator(
 					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
 			}
-			else if (pagination) {
+			else {
 				query.append(MBMessageModelImpl.ORDER_BY_JPQL);
 			}
 
@@ -12576,25 +12978,19 @@ public class MBMessagePersistenceImpl
 
 				qPos.add(status);
 
-				if (!pagination) {
-					list = (List<MBMessage>)QueryUtil.list(
-						q, getDialect(), start, end, false);
-
-					Collections.sort(list);
-
-					list = Collections.unmodifiableList(list);
-				}
-				else {
-					list = (List<MBMessage>)QueryUtil.list(
-						q, getDialect(), start, end);
-				}
+				list = (List<MBMessage>)QueryUtil.list(
+					q, getDialect(), start, end);
 
 				cacheResult(list);
 
-				finderCache.putResult(finderPath, finderArgs, list);
+				if (useFinderCache) {
+					finderCache.putResult(finderPath, finderArgs, list);
+				}
 			}
 			catch (Exception e) {
-				finderCache.removeResult(finderPath, finderArgs);
+				if (useFinderCache) {
+					finderCache.removeResult(finderPath, finderArgs);
+				}
 
 				throw processException(e);
 			}
@@ -12926,7 +13322,7 @@ public class MBMessagePersistenceImpl
 	 * Returns a range of all the message-boards messages that the user has permission to view where groupId = &#63; and userId = &#63; and status = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>MBMessageModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>MBMessageModelImpl</code>.
 	 * </p>
 	 *
 	 * @param groupId the group ID
@@ -12947,7 +13343,7 @@ public class MBMessagePersistenceImpl
 	 * Returns an ordered range of all the message-boards messages that the user has permissions to view where groupId = &#63; and userId = &#63; and status = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>MBMessageModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>MBMessageModelImpl</code>.
 	 * </p>
 	 *
 	 * @param groupId the group ID
@@ -13434,7 +13830,7 @@ public class MBMessagePersistenceImpl
 	 * Returns a range of all the message-boards messages where groupId = &#63; and categoryId = &#63; and threadId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>MBMessageModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>MBMessageModelImpl</code>.
 	 * </p>
 	 *
 	 * @param groupId the group ID
@@ -13455,7 +13851,7 @@ public class MBMessagePersistenceImpl
 	 * Returns an ordered range of all the message-boards messages where groupId = &#63; and categoryId = &#63; and threadId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>MBMessageModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>MBMessageModelImpl</code>.
 	 * </p>
 	 *
 	 * @param groupId the group ID
@@ -13479,7 +13875,7 @@ public class MBMessagePersistenceImpl
 	 * Returns an ordered range of all the message-boards messages where groupId = &#63; and categoryId = &#63; and threadId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>MBMessageModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>MBMessageModelImpl</code>.
 	 * </p>
 	 *
 	 * @param groupId the group ID
@@ -13488,27 +13884,27 @@ public class MBMessagePersistenceImpl
 	 * @param start the lower bound of the range of message-boards messages
 	 * @param end the upper bound of the range of message-boards messages (not inclusive)
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
-	 * @param retrieveFromCache whether to retrieve from the finder cache
+	 * @param useFinderCache whether to use the finder cache
 	 * @return the ordered range of matching message-boards messages
 	 */
 	@Override
 	public List<MBMessage> findByG_C_T(
 		long groupId, long categoryId, long threadId, int start, int end,
 		OrderByComparator<MBMessage> orderByComparator,
-		boolean retrieveFromCache) {
+		boolean useFinderCache) {
 
-		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
 			(orderByComparator == null)) {
 
-			pagination = false;
-			finderPath = _finderPathWithoutPaginationFindByG_C_T;
-			finderArgs = new Object[] {groupId, categoryId, threadId};
+			if (useFinderCache) {
+				finderPath = _finderPathWithoutPaginationFindByG_C_T;
+				finderArgs = new Object[] {groupId, categoryId, threadId};
+			}
 		}
-		else {
+		else if (useFinderCache) {
 			finderPath = _finderPathWithPaginationFindByG_C_T;
 			finderArgs = new Object[] {
 				groupId, categoryId, threadId, start, end, orderByComparator
@@ -13517,7 +13913,7 @@ public class MBMessagePersistenceImpl
 
 		List<MBMessage> list = null;
 
-		if (retrieveFromCache) {
+		if (useFinderCache) {
 			list = (List<MBMessage>)finderCache.getResult(
 				finderPath, finderArgs, this);
 
@@ -13558,7 +13954,7 @@ public class MBMessagePersistenceImpl
 				appendOrderByComparator(
 					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
 			}
-			else if (pagination) {
+			else {
 				query.append(MBMessageModelImpl.ORDER_BY_JPQL);
 			}
 
@@ -13579,25 +13975,19 @@ public class MBMessagePersistenceImpl
 
 				qPos.add(threadId);
 
-				if (!pagination) {
-					list = (List<MBMessage>)QueryUtil.list(
-						q, getDialect(), start, end, false);
-
-					Collections.sort(list);
-
-					list = Collections.unmodifiableList(list);
-				}
-				else {
-					list = (List<MBMessage>)QueryUtil.list(
-						q, getDialect(), start, end);
-				}
+				list = (List<MBMessage>)QueryUtil.list(
+					q, getDialect(), start, end);
 
 				cacheResult(list);
 
-				finderCache.putResult(finderPath, finderArgs, list);
+				if (useFinderCache) {
+					finderCache.putResult(finderPath, finderArgs, list);
+				}
 			}
 			catch (Exception e) {
-				finderCache.removeResult(finderPath, finderArgs);
+				if (useFinderCache) {
+					finderCache.removeResult(finderPath, finderArgs);
+				}
 
 				throw processException(e);
 			}
@@ -13929,7 +14319,7 @@ public class MBMessagePersistenceImpl
 	 * Returns a range of all the message-boards messages that the user has permission to view where groupId = &#63; and categoryId = &#63; and threadId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>MBMessageModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>MBMessageModelImpl</code>.
 	 * </p>
 	 *
 	 * @param groupId the group ID
@@ -13951,7 +14341,7 @@ public class MBMessagePersistenceImpl
 	 * Returns an ordered range of all the message-boards messages that the user has permissions to view where groupId = &#63; and categoryId = &#63; and threadId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>MBMessageModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>MBMessageModelImpl</code>.
 	 * </p>
 	 *
 	 * @param groupId the group ID
@@ -14440,7 +14830,7 @@ public class MBMessagePersistenceImpl
 	 * Returns a range of all the message-boards messages where groupId = &#63; and categoryId = &#63; and status = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>MBMessageModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>MBMessageModelImpl</code>.
 	 * </p>
 	 *
 	 * @param groupId the group ID
@@ -14461,7 +14851,7 @@ public class MBMessagePersistenceImpl
 	 * Returns an ordered range of all the message-boards messages where groupId = &#63; and categoryId = &#63; and status = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>MBMessageModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>MBMessageModelImpl</code>.
 	 * </p>
 	 *
 	 * @param groupId the group ID
@@ -14485,7 +14875,7 @@ public class MBMessagePersistenceImpl
 	 * Returns an ordered range of all the message-boards messages where groupId = &#63; and categoryId = &#63; and status = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>MBMessageModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>MBMessageModelImpl</code>.
 	 * </p>
 	 *
 	 * @param groupId the group ID
@@ -14494,27 +14884,27 @@ public class MBMessagePersistenceImpl
 	 * @param start the lower bound of the range of message-boards messages
 	 * @param end the upper bound of the range of message-boards messages (not inclusive)
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
-	 * @param retrieveFromCache whether to retrieve from the finder cache
+	 * @param useFinderCache whether to use the finder cache
 	 * @return the ordered range of matching message-boards messages
 	 */
 	@Override
 	public List<MBMessage> findByG_C_S(
 		long groupId, long categoryId, int status, int start, int end,
 		OrderByComparator<MBMessage> orderByComparator,
-		boolean retrieveFromCache) {
+		boolean useFinderCache) {
 
-		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
 			(orderByComparator == null)) {
 
-			pagination = false;
-			finderPath = _finderPathWithoutPaginationFindByG_C_S;
-			finderArgs = new Object[] {groupId, categoryId, status};
+			if (useFinderCache) {
+				finderPath = _finderPathWithoutPaginationFindByG_C_S;
+				finderArgs = new Object[] {groupId, categoryId, status};
+			}
 		}
-		else {
+		else if (useFinderCache) {
 			finderPath = _finderPathWithPaginationFindByG_C_S;
 			finderArgs = new Object[] {
 				groupId, categoryId, status, start, end, orderByComparator
@@ -14523,7 +14913,7 @@ public class MBMessagePersistenceImpl
 
 		List<MBMessage> list = null;
 
-		if (retrieveFromCache) {
+		if (useFinderCache) {
 			list = (List<MBMessage>)finderCache.getResult(
 				finderPath, finderArgs, this);
 
@@ -14564,7 +14954,7 @@ public class MBMessagePersistenceImpl
 				appendOrderByComparator(
 					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
 			}
-			else if (pagination) {
+			else {
 				query.append(MBMessageModelImpl.ORDER_BY_JPQL);
 			}
 
@@ -14585,25 +14975,19 @@ public class MBMessagePersistenceImpl
 
 				qPos.add(status);
 
-				if (!pagination) {
-					list = (List<MBMessage>)QueryUtil.list(
-						q, getDialect(), start, end, false);
-
-					Collections.sort(list);
-
-					list = Collections.unmodifiableList(list);
-				}
-				else {
-					list = (List<MBMessage>)QueryUtil.list(
-						q, getDialect(), start, end);
-				}
+				list = (List<MBMessage>)QueryUtil.list(
+					q, getDialect(), start, end);
 
 				cacheResult(list);
 
-				finderCache.putResult(finderPath, finderArgs, list);
+				if (useFinderCache) {
+					finderCache.putResult(finderPath, finderArgs, list);
+				}
 			}
 			catch (Exception e) {
-				finderCache.removeResult(finderPath, finderArgs);
+				if (useFinderCache) {
+					finderCache.removeResult(finderPath, finderArgs);
+				}
 
 				throw processException(e);
 			}
@@ -14935,7 +15319,7 @@ public class MBMessagePersistenceImpl
 	 * Returns a range of all the message-boards messages that the user has permission to view where groupId = &#63; and categoryId = &#63; and status = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>MBMessageModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>MBMessageModelImpl</code>.
 	 * </p>
 	 *
 	 * @param groupId the group ID
@@ -14956,7 +15340,7 @@ public class MBMessagePersistenceImpl
 	 * Returns an ordered range of all the message-boards messages that the user has permissions to view where groupId = &#63; and categoryId = &#63; and status = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>MBMessageModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>MBMessageModelImpl</code>.
 	 * </p>
 	 *
 	 * @param groupId the group ID
@@ -15443,7 +15827,7 @@ public class MBMessagePersistenceImpl
 	 * Returns a range of all the message-boards messages where userId = &#63; and classNameId = &#63; and classPK = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>MBMessageModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>MBMessageModelImpl</code>.
 	 * </p>
 	 *
 	 * @param userId the user ID
@@ -15464,7 +15848,7 @@ public class MBMessagePersistenceImpl
 	 * Returns an ordered range of all the message-boards messages where userId = &#63; and classNameId = &#63; and classPK = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>MBMessageModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>MBMessageModelImpl</code>.
 	 * </p>
 	 *
 	 * @param userId the user ID
@@ -15488,7 +15872,7 @@ public class MBMessagePersistenceImpl
 	 * Returns an ordered range of all the message-boards messages where userId = &#63; and classNameId = &#63; and classPK = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>MBMessageModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>MBMessageModelImpl</code>.
 	 * </p>
 	 *
 	 * @param userId the user ID
@@ -15497,27 +15881,27 @@ public class MBMessagePersistenceImpl
 	 * @param start the lower bound of the range of message-boards messages
 	 * @param end the upper bound of the range of message-boards messages (not inclusive)
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
-	 * @param retrieveFromCache whether to retrieve from the finder cache
+	 * @param useFinderCache whether to use the finder cache
 	 * @return the ordered range of matching message-boards messages
 	 */
 	@Override
 	public List<MBMessage> findByU_C_C(
 		long userId, long classNameId, long classPK, int start, int end,
 		OrderByComparator<MBMessage> orderByComparator,
-		boolean retrieveFromCache) {
+		boolean useFinderCache) {
 
-		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
 			(orderByComparator == null)) {
 
-			pagination = false;
-			finderPath = _finderPathWithoutPaginationFindByU_C_C;
-			finderArgs = new Object[] {userId, classNameId, classPK};
+			if (useFinderCache) {
+				finderPath = _finderPathWithoutPaginationFindByU_C_C;
+				finderArgs = new Object[] {userId, classNameId, classPK};
+			}
 		}
-		else {
+		else if (useFinderCache) {
 			finderPath = _finderPathWithPaginationFindByU_C_C;
 			finderArgs = new Object[] {
 				userId, classNameId, classPK, start, end, orderByComparator
@@ -15526,7 +15910,7 @@ public class MBMessagePersistenceImpl
 
 		List<MBMessage> list = null;
 
-		if (retrieveFromCache) {
+		if (useFinderCache) {
 			list = (List<MBMessage>)finderCache.getResult(
 				finderPath, finderArgs, this);
 
@@ -15567,7 +15951,7 @@ public class MBMessagePersistenceImpl
 				appendOrderByComparator(
 					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
 			}
-			else if (pagination) {
+			else {
 				query.append(MBMessageModelImpl.ORDER_BY_JPQL);
 			}
 
@@ -15588,25 +15972,19 @@ public class MBMessagePersistenceImpl
 
 				qPos.add(classPK);
 
-				if (!pagination) {
-					list = (List<MBMessage>)QueryUtil.list(
-						q, getDialect(), start, end, false);
-
-					Collections.sort(list);
-
-					list = Collections.unmodifiableList(list);
-				}
-				else {
-					list = (List<MBMessage>)QueryUtil.list(
-						q, getDialect(), start, end);
-				}
+				list = (List<MBMessage>)QueryUtil.list(
+					q, getDialect(), start, end);
 
 				cacheResult(list);
 
-				finderCache.putResult(finderPath, finderArgs, list);
+				if (useFinderCache) {
+					finderCache.putResult(finderPath, finderArgs, list);
+				}
 			}
 			catch (Exception e) {
-				finderCache.removeResult(finderPath, finderArgs);
+				if (useFinderCache) {
+					finderCache.removeResult(finderPath, finderArgs);
+				}
 
 				throw processException(e);
 			}
@@ -16031,7 +16409,7 @@ public class MBMessagePersistenceImpl
 	 * Returns a range of all the message-boards messages where userId = &#63; and classNameId = &#63; and status = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>MBMessageModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>MBMessageModelImpl</code>.
 	 * </p>
 	 *
 	 * @param userId the user ID
@@ -16052,7 +16430,7 @@ public class MBMessagePersistenceImpl
 	 * Returns an ordered range of all the message-boards messages where userId = &#63; and classNameId = &#63; and status = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>MBMessageModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>MBMessageModelImpl</code>.
 	 * </p>
 	 *
 	 * @param userId the user ID
@@ -16076,7 +16454,7 @@ public class MBMessagePersistenceImpl
 	 * Returns an ordered range of all the message-boards messages where userId = &#63; and classNameId = &#63; and status = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>MBMessageModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>MBMessageModelImpl</code>.
 	 * </p>
 	 *
 	 * @param userId the user ID
@@ -16085,27 +16463,27 @@ public class MBMessagePersistenceImpl
 	 * @param start the lower bound of the range of message-boards messages
 	 * @param end the upper bound of the range of message-boards messages (not inclusive)
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
-	 * @param retrieveFromCache whether to retrieve from the finder cache
+	 * @param useFinderCache whether to use the finder cache
 	 * @return the ordered range of matching message-boards messages
 	 */
 	@Override
 	public List<MBMessage> findByU_C_S(
 		long userId, long classNameId, int status, int start, int end,
 		OrderByComparator<MBMessage> orderByComparator,
-		boolean retrieveFromCache) {
+		boolean useFinderCache) {
 
-		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
 			(orderByComparator == null)) {
 
-			pagination = false;
-			finderPath = _finderPathWithoutPaginationFindByU_C_S;
-			finderArgs = new Object[] {userId, classNameId, status};
+			if (useFinderCache) {
+				finderPath = _finderPathWithoutPaginationFindByU_C_S;
+				finderArgs = new Object[] {userId, classNameId, status};
+			}
 		}
-		else {
+		else if (useFinderCache) {
 			finderPath = _finderPathWithPaginationFindByU_C_S;
 			finderArgs = new Object[] {
 				userId, classNameId, status, start, end, orderByComparator
@@ -16114,7 +16492,7 @@ public class MBMessagePersistenceImpl
 
 		List<MBMessage> list = null;
 
-		if (retrieveFromCache) {
+		if (useFinderCache) {
 			list = (List<MBMessage>)finderCache.getResult(
 				finderPath, finderArgs, this);
 
@@ -16155,7 +16533,7 @@ public class MBMessagePersistenceImpl
 				appendOrderByComparator(
 					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
 			}
-			else if (pagination) {
+			else {
 				query.append(MBMessageModelImpl.ORDER_BY_JPQL);
 			}
 
@@ -16176,25 +16554,19 @@ public class MBMessagePersistenceImpl
 
 				qPos.add(status);
 
-				if (!pagination) {
-					list = (List<MBMessage>)QueryUtil.list(
-						q, getDialect(), start, end, false);
-
-					Collections.sort(list);
-
-					list = Collections.unmodifiableList(list);
-				}
-				else {
-					list = (List<MBMessage>)QueryUtil.list(
-						q, getDialect(), start, end);
-				}
+				list = (List<MBMessage>)QueryUtil.list(
+					q, getDialect(), start, end);
 
 				cacheResult(list);
 
-				finderCache.putResult(finderPath, finderArgs, list);
+				if (useFinderCache) {
+					finderCache.putResult(finderPath, finderArgs, list);
+				}
 			}
 			catch (Exception e) {
-				finderCache.removeResult(finderPath, finderArgs);
+				if (useFinderCache) {
+					finderCache.removeResult(finderPath, finderArgs);
+				}
 
 				throw processException(e);
 			}
@@ -16509,7 +16881,7 @@ public class MBMessagePersistenceImpl
 	 * Returns all the message-boards messages where userId = &#63; and classNameId = any &#63; and status = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>MBMessageModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>MBMessageModelImpl</code>.
 	 * </p>
 	 *
 	 * @param userId the user ID
@@ -16530,7 +16902,7 @@ public class MBMessagePersistenceImpl
 	 * Returns a range of all the message-boards messages where userId = &#63; and classNameId = any &#63; and status = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>MBMessageModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>MBMessageModelImpl</code>.
 	 * </p>
 	 *
 	 * @param userId the user ID
@@ -16551,7 +16923,7 @@ public class MBMessagePersistenceImpl
 	 * Returns an ordered range of all the message-boards messages where userId = &#63; and classNameId = any &#63; and status = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>MBMessageModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>MBMessageModelImpl</code>.
 	 * </p>
 	 *
 	 * @param userId the user ID
@@ -16575,7 +16947,7 @@ public class MBMessagePersistenceImpl
 	 * Returns an ordered range of all the message-boards messages where userId = &#63; and classNameId = &#63; and status = &#63;, optionally using the finder cache.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>MBMessageModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>MBMessageModelImpl</code>.
 	 * </p>
 	 *
 	 * @param userId the user ID
@@ -16584,14 +16956,14 @@ public class MBMessagePersistenceImpl
 	 * @param start the lower bound of the range of message-boards messages
 	 * @param end the upper bound of the range of message-boards messages (not inclusive)
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
-	 * @param retrieveFromCache whether to retrieve from the finder cache
+	 * @param useFinderCache whether to use the finder cache
 	 * @return the ordered range of matching message-boards messages
 	 */
 	@Override
 	public List<MBMessage> findByU_C_S(
 		long userId, long[] classNameIds, int status, int start, int end,
 		OrderByComparator<MBMessage> orderByComparator,
-		boolean retrieveFromCache) {
+		boolean useFinderCache) {
 
 		if (classNameIds == null) {
 			classNameIds = new long[0];
@@ -16605,18 +16977,18 @@ public class MBMessagePersistenceImpl
 				userId, classNameIds[0], status, start, end, orderByComparator);
 		}
 
-		boolean pagination = true;
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
 			(orderByComparator == null)) {
 
-			pagination = false;
-			finderArgs = new Object[] {
-				userId, StringUtil.merge(classNameIds), status
-			};
+			if (useFinderCache) {
+				finderArgs = new Object[] {
+					userId, StringUtil.merge(classNameIds), status
+				};
+			}
 		}
-		else {
+		else if (useFinderCache) {
 			finderArgs = new Object[] {
 				userId, StringUtil.merge(classNameIds), status, start, end,
 				orderByComparator
@@ -16625,7 +16997,7 @@ public class MBMessagePersistenceImpl
 
 		List<MBMessage> list = null;
 
-		if (retrieveFromCache) {
+		if (useFinderCache) {
 			list = (List<MBMessage>)finderCache.getResult(
 				_finderPathWithPaginationFindByU_C_S, finderArgs, this);
 
@@ -16675,7 +17047,7 @@ public class MBMessagePersistenceImpl
 				appendOrderByComparator(
 					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
 			}
-			else if (pagination) {
+			else {
 				query.append(MBMessageModelImpl.ORDER_BY_JPQL);
 			}
 
@@ -16694,27 +17066,21 @@ public class MBMessagePersistenceImpl
 
 				qPos.add(status);
 
-				if (!pagination) {
-					list = (List<MBMessage>)QueryUtil.list(
-						q, getDialect(), start, end, false);
-
-					Collections.sort(list);
-
-					list = Collections.unmodifiableList(list);
-				}
-				else {
-					list = (List<MBMessage>)QueryUtil.list(
-						q, getDialect(), start, end);
-				}
+				list = (List<MBMessage>)QueryUtil.list(
+					q, getDialect(), start, end);
 
 				cacheResult(list);
 
-				finderCache.putResult(
-					_finderPathWithPaginationFindByU_C_S, finderArgs, list);
+				if (useFinderCache) {
+					finderCache.putResult(
+						_finderPathWithPaginationFindByU_C_S, finderArgs, list);
+				}
 			}
 			catch (Exception e) {
-				finderCache.removeResult(
-					_finderPathWithPaginationFindByU_C_S, finderArgs);
+				if (useFinderCache) {
+					finderCache.removeResult(
+						_finderPathWithPaginationFindByU_C_S, finderArgs);
+				}
 
 				throw processException(e);
 			}
@@ -16927,7 +17293,7 @@ public class MBMessagePersistenceImpl
 	 * Returns a range of all the message-boards messages where classNameId = &#63; and classPK = &#63; and status = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>MBMessageModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>MBMessageModelImpl</code>.
 	 * </p>
 	 *
 	 * @param classNameId the class name ID
@@ -16948,7 +17314,7 @@ public class MBMessagePersistenceImpl
 	 * Returns an ordered range of all the message-boards messages where classNameId = &#63; and classPK = &#63; and status = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>MBMessageModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>MBMessageModelImpl</code>.
 	 * </p>
 	 *
 	 * @param classNameId the class name ID
@@ -16972,7 +17338,7 @@ public class MBMessagePersistenceImpl
 	 * Returns an ordered range of all the message-boards messages where classNameId = &#63; and classPK = &#63; and status = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>MBMessageModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>MBMessageModelImpl</code>.
 	 * </p>
 	 *
 	 * @param classNameId the class name ID
@@ -16981,27 +17347,27 @@ public class MBMessagePersistenceImpl
 	 * @param start the lower bound of the range of message-boards messages
 	 * @param end the upper bound of the range of message-boards messages (not inclusive)
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
-	 * @param retrieveFromCache whether to retrieve from the finder cache
+	 * @param useFinderCache whether to use the finder cache
 	 * @return the ordered range of matching message-boards messages
 	 */
 	@Override
 	public List<MBMessage> findByC_C_S(
 		long classNameId, long classPK, int status, int start, int end,
 		OrderByComparator<MBMessage> orderByComparator,
-		boolean retrieveFromCache) {
+		boolean useFinderCache) {
 
-		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
 			(orderByComparator == null)) {
 
-			pagination = false;
-			finderPath = _finderPathWithoutPaginationFindByC_C_S;
-			finderArgs = new Object[] {classNameId, classPK, status};
+			if (useFinderCache) {
+				finderPath = _finderPathWithoutPaginationFindByC_C_S;
+				finderArgs = new Object[] {classNameId, classPK, status};
+			}
 		}
-		else {
+		else if (useFinderCache) {
 			finderPath = _finderPathWithPaginationFindByC_C_S;
 			finderArgs = new Object[] {
 				classNameId, classPK, status, start, end, orderByComparator
@@ -17010,7 +17376,7 @@ public class MBMessagePersistenceImpl
 
 		List<MBMessage> list = null;
 
-		if (retrieveFromCache) {
+		if (useFinderCache) {
 			list = (List<MBMessage>)finderCache.getResult(
 				finderPath, finderArgs, this);
 
@@ -17051,7 +17417,7 @@ public class MBMessagePersistenceImpl
 				appendOrderByComparator(
 					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
 			}
-			else if (pagination) {
+			else {
 				query.append(MBMessageModelImpl.ORDER_BY_JPQL);
 			}
 
@@ -17072,25 +17438,19 @@ public class MBMessagePersistenceImpl
 
 				qPos.add(status);
 
-				if (!pagination) {
-					list = (List<MBMessage>)QueryUtil.list(
-						q, getDialect(), start, end, false);
-
-					Collections.sort(list);
-
-					list = Collections.unmodifiableList(list);
-				}
-				else {
-					list = (List<MBMessage>)QueryUtil.list(
-						q, getDialect(), start, end);
-				}
+				list = (List<MBMessage>)QueryUtil.list(
+					q, getDialect(), start, end);
 
 				cacheResult(list);
 
-				finderCache.putResult(finderPath, finderArgs, list);
+				if (useFinderCache) {
+					finderCache.putResult(finderPath, finderArgs, list);
+				}
 			}
 			catch (Exception e) {
-				finderCache.removeResult(finderPath, finderArgs);
+				if (useFinderCache) {
+					finderCache.removeResult(finderPath, finderArgs);
+				}
 
 				throw processException(e);
 			}
@@ -17515,7 +17875,7 @@ public class MBMessagePersistenceImpl
 	 * Returns a range of all the message-boards messages where groupId = &#63; and categoryId = &#63; and threadId = &#63; and answer = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>MBMessageModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>MBMessageModelImpl</code>.
 	 * </p>
 	 *
 	 * @param groupId the group ID
@@ -17539,7 +17899,7 @@ public class MBMessagePersistenceImpl
 	 * Returns an ordered range of all the message-boards messages where groupId = &#63; and categoryId = &#63; and threadId = &#63; and answer = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>MBMessageModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>MBMessageModelImpl</code>.
 	 * </p>
 	 *
 	 * @param groupId the group ID
@@ -17565,7 +17925,7 @@ public class MBMessagePersistenceImpl
 	 * Returns an ordered range of all the message-boards messages where groupId = &#63; and categoryId = &#63; and threadId = &#63; and answer = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>MBMessageModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>MBMessageModelImpl</code>.
 	 * </p>
 	 *
 	 * @param groupId the group ID
@@ -17575,27 +17935,29 @@ public class MBMessagePersistenceImpl
 	 * @param start the lower bound of the range of message-boards messages
 	 * @param end the upper bound of the range of message-boards messages (not inclusive)
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
-	 * @param retrieveFromCache whether to retrieve from the finder cache
+	 * @param useFinderCache whether to use the finder cache
 	 * @return the ordered range of matching message-boards messages
 	 */
 	@Override
 	public List<MBMessage> findByG_C_T_A(
 		long groupId, long categoryId, long threadId, boolean answer, int start,
 		int end, OrderByComparator<MBMessage> orderByComparator,
-		boolean retrieveFromCache) {
+		boolean useFinderCache) {
 
-		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
 			(orderByComparator == null)) {
 
-			pagination = false;
-			finderPath = _finderPathWithoutPaginationFindByG_C_T_A;
-			finderArgs = new Object[] {groupId, categoryId, threadId, answer};
+			if (useFinderCache) {
+				finderPath = _finderPathWithoutPaginationFindByG_C_T_A;
+				finderArgs = new Object[] {
+					groupId, categoryId, threadId, answer
+				};
+			}
 		}
-		else {
+		else if (useFinderCache) {
 			finderPath = _finderPathWithPaginationFindByG_C_T_A;
 			finderArgs = new Object[] {
 				groupId, categoryId, threadId, answer, start, end,
@@ -17605,7 +17967,7 @@ public class MBMessagePersistenceImpl
 
 		List<MBMessage> list = null;
 
-		if (retrieveFromCache) {
+		if (useFinderCache) {
 			list = (List<MBMessage>)finderCache.getResult(
 				finderPath, finderArgs, this);
 
@@ -17649,7 +18011,7 @@ public class MBMessagePersistenceImpl
 				appendOrderByComparator(
 					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
 			}
-			else if (pagination) {
+			else {
 				query.append(MBMessageModelImpl.ORDER_BY_JPQL);
 			}
 
@@ -17672,25 +18034,19 @@ public class MBMessagePersistenceImpl
 
 				qPos.add(answer);
 
-				if (!pagination) {
-					list = (List<MBMessage>)QueryUtil.list(
-						q, getDialect(), start, end, false);
-
-					Collections.sort(list);
-
-					list = Collections.unmodifiableList(list);
-				}
-				else {
-					list = (List<MBMessage>)QueryUtil.list(
-						q, getDialect(), start, end);
-				}
+				list = (List<MBMessage>)QueryUtil.list(
+					q, getDialect(), start, end);
 
 				cacheResult(list);
 
-				finderCache.putResult(finderPath, finderArgs, list);
+				if (useFinderCache) {
+					finderCache.putResult(finderPath, finderArgs, list);
+				}
 			}
 			catch (Exception e) {
-				finderCache.removeResult(finderPath, finderArgs);
+				if (useFinderCache) {
+					finderCache.removeResult(finderPath, finderArgs);
+				}
 
 				throw processException(e);
 			}
@@ -18039,7 +18395,7 @@ public class MBMessagePersistenceImpl
 	 * Returns a range of all the message-boards messages that the user has permission to view where groupId = &#63; and categoryId = &#63; and threadId = &#63; and answer = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>MBMessageModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>MBMessageModelImpl</code>.
 	 * </p>
 	 *
 	 * @param groupId the group ID
@@ -18063,7 +18419,7 @@ public class MBMessagePersistenceImpl
 	 * Returns an ordered range of all the message-boards messages that the user has permissions to view where groupId = &#63; and categoryId = &#63; and threadId = &#63; and answer = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>MBMessageModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>MBMessageModelImpl</code>.
 	 * </p>
 	 *
 	 * @param groupId the group ID
@@ -18585,7 +18941,7 @@ public class MBMessagePersistenceImpl
 	 * Returns a range of all the message-boards messages where groupId = &#63; and categoryId = &#63; and threadId = &#63; and status = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>MBMessageModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>MBMessageModelImpl</code>.
 	 * </p>
 	 *
 	 * @param groupId the group ID
@@ -18609,7 +18965,7 @@ public class MBMessagePersistenceImpl
 	 * Returns an ordered range of all the message-boards messages where groupId = &#63; and categoryId = &#63; and threadId = &#63; and status = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>MBMessageModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>MBMessageModelImpl</code>.
 	 * </p>
 	 *
 	 * @param groupId the group ID
@@ -18635,7 +18991,7 @@ public class MBMessagePersistenceImpl
 	 * Returns an ordered range of all the message-boards messages where groupId = &#63; and categoryId = &#63; and threadId = &#63; and status = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>MBMessageModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>MBMessageModelImpl</code>.
 	 * </p>
 	 *
 	 * @param groupId the group ID
@@ -18645,27 +19001,29 @@ public class MBMessagePersistenceImpl
 	 * @param start the lower bound of the range of message-boards messages
 	 * @param end the upper bound of the range of message-boards messages (not inclusive)
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
-	 * @param retrieveFromCache whether to retrieve from the finder cache
+	 * @param useFinderCache whether to use the finder cache
 	 * @return the ordered range of matching message-boards messages
 	 */
 	@Override
 	public List<MBMessage> findByG_C_T_S(
 		long groupId, long categoryId, long threadId, int status, int start,
 		int end, OrderByComparator<MBMessage> orderByComparator,
-		boolean retrieveFromCache) {
+		boolean useFinderCache) {
 
-		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
 			(orderByComparator == null)) {
 
-			pagination = false;
-			finderPath = _finderPathWithoutPaginationFindByG_C_T_S;
-			finderArgs = new Object[] {groupId, categoryId, threadId, status};
+			if (useFinderCache) {
+				finderPath = _finderPathWithoutPaginationFindByG_C_T_S;
+				finderArgs = new Object[] {
+					groupId, categoryId, threadId, status
+				};
+			}
 		}
-		else {
+		else if (useFinderCache) {
 			finderPath = _finderPathWithPaginationFindByG_C_T_S;
 			finderArgs = new Object[] {
 				groupId, categoryId, threadId, status, start, end,
@@ -18675,7 +19033,7 @@ public class MBMessagePersistenceImpl
 
 		List<MBMessage> list = null;
 
-		if (retrieveFromCache) {
+		if (useFinderCache) {
 			list = (List<MBMessage>)finderCache.getResult(
 				finderPath, finderArgs, this);
 
@@ -18719,7 +19077,7 @@ public class MBMessagePersistenceImpl
 				appendOrderByComparator(
 					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
 			}
-			else if (pagination) {
+			else {
 				query.append(MBMessageModelImpl.ORDER_BY_JPQL);
 			}
 
@@ -18742,25 +19100,19 @@ public class MBMessagePersistenceImpl
 
 				qPos.add(status);
 
-				if (!pagination) {
-					list = (List<MBMessage>)QueryUtil.list(
-						q, getDialect(), start, end, false);
-
-					Collections.sort(list);
-
-					list = Collections.unmodifiableList(list);
-				}
-				else {
-					list = (List<MBMessage>)QueryUtil.list(
-						q, getDialect(), start, end);
-				}
+				list = (List<MBMessage>)QueryUtil.list(
+					q, getDialect(), start, end);
 
 				cacheResult(list);
 
-				finderCache.putResult(finderPath, finderArgs, list);
+				if (useFinderCache) {
+					finderCache.putResult(finderPath, finderArgs, list);
+				}
 			}
 			catch (Exception e) {
-				finderCache.removeResult(finderPath, finderArgs);
+				if (useFinderCache) {
+					finderCache.removeResult(finderPath, finderArgs);
+				}
 
 				throw processException(e);
 			}
@@ -19109,7 +19461,7 @@ public class MBMessagePersistenceImpl
 	 * Returns a range of all the message-boards messages that the user has permission to view where groupId = &#63; and categoryId = &#63; and threadId = &#63; and status = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>MBMessageModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>MBMessageModelImpl</code>.
 	 * </p>
 	 *
 	 * @param groupId the group ID
@@ -19133,7 +19485,7 @@ public class MBMessagePersistenceImpl
 	 * Returns an ordered range of all the message-boards messages that the user has permissions to view where groupId = &#63; and categoryId = &#63; and threadId = &#63; and status = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>MBMessageModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>MBMessageModelImpl</code>.
 	 * </p>
 	 *
 	 * @param groupId the group ID
@@ -19655,7 +20007,7 @@ public class MBMessagePersistenceImpl
 	 * Returns a range of all the message-boards messages where userId = &#63; and classNameId = &#63; and classPK = &#63; and status = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>MBMessageModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>MBMessageModelImpl</code>.
 	 * </p>
 	 *
 	 * @param userId the user ID
@@ -19679,7 +20031,7 @@ public class MBMessagePersistenceImpl
 	 * Returns an ordered range of all the message-boards messages where userId = &#63; and classNameId = &#63; and classPK = &#63; and status = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>MBMessageModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>MBMessageModelImpl</code>.
 	 * </p>
 	 *
 	 * @param userId the user ID
@@ -19705,7 +20057,7 @@ public class MBMessagePersistenceImpl
 	 * Returns an ordered range of all the message-boards messages where userId = &#63; and classNameId = &#63; and classPK = &#63; and status = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>MBMessageModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>MBMessageModelImpl</code>.
 	 * </p>
 	 *
 	 * @param userId the user ID
@@ -19715,27 +20067,29 @@ public class MBMessagePersistenceImpl
 	 * @param start the lower bound of the range of message-boards messages
 	 * @param end the upper bound of the range of message-boards messages (not inclusive)
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
-	 * @param retrieveFromCache whether to retrieve from the finder cache
+	 * @param useFinderCache whether to use the finder cache
 	 * @return the ordered range of matching message-boards messages
 	 */
 	@Override
 	public List<MBMessage> findByU_C_C_S(
 		long userId, long classNameId, long classPK, int status, int start,
 		int end, OrderByComparator<MBMessage> orderByComparator,
-		boolean retrieveFromCache) {
+		boolean useFinderCache) {
 
-		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
 			(orderByComparator == null)) {
 
-			pagination = false;
-			finderPath = _finderPathWithoutPaginationFindByU_C_C_S;
-			finderArgs = new Object[] {userId, classNameId, classPK, status};
+			if (useFinderCache) {
+				finderPath = _finderPathWithoutPaginationFindByU_C_C_S;
+				finderArgs = new Object[] {
+					userId, classNameId, classPK, status
+				};
+			}
 		}
-		else {
+		else if (useFinderCache) {
 			finderPath = _finderPathWithPaginationFindByU_C_C_S;
 			finderArgs = new Object[] {
 				userId, classNameId, classPK, status, start, end,
@@ -19745,7 +20099,7 @@ public class MBMessagePersistenceImpl
 
 		List<MBMessage> list = null;
 
-		if (retrieveFromCache) {
+		if (useFinderCache) {
 			list = (List<MBMessage>)finderCache.getResult(
 				finderPath, finderArgs, this);
 
@@ -19789,7 +20143,7 @@ public class MBMessagePersistenceImpl
 				appendOrderByComparator(
 					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
 			}
-			else if (pagination) {
+			else {
 				query.append(MBMessageModelImpl.ORDER_BY_JPQL);
 			}
 
@@ -19812,25 +20166,19 @@ public class MBMessagePersistenceImpl
 
 				qPos.add(status);
 
-				if (!pagination) {
-					list = (List<MBMessage>)QueryUtil.list(
-						q, getDialect(), start, end, false);
-
-					Collections.sort(list);
-
-					list = Collections.unmodifiableList(list);
-				}
-				else {
-					list = (List<MBMessage>)QueryUtil.list(
-						q, getDialect(), start, end);
-				}
+				list = (List<MBMessage>)QueryUtil.list(
+					q, getDialect(), start, end);
 
 				cacheResult(list);
 
-				finderCache.putResult(finderPath, finderArgs, list);
+				if (useFinderCache) {
+					finderCache.putResult(finderPath, finderArgs, list);
+				}
 			}
 			catch (Exception e) {
-				finderCache.removeResult(finderPath, finderArgs);
+				if (useFinderCache) {
+					finderCache.removeResult(finderPath, finderArgs);
+				}
 
 				throw processException(e);
 			}
@@ -20265,7 +20613,6 @@ public class MBMessagePersistenceImpl
 
 		setModelImplClass(MBMessageImpl.class);
 		setModelPKClass(long.class);
-		setEntityCacheEnabled(MBMessageModelImpl.ENTITY_CACHE_ENABLED);
 
 		Map<String, String> dbColumnNames = new HashMap<String, String>();
 
@@ -20282,8 +20629,8 @@ public class MBMessagePersistenceImpl
 	@Override
 	public void cacheResult(MBMessage mbMessage) {
 		entityCache.putResult(
-			MBMessageModelImpl.ENTITY_CACHE_ENABLED, MBMessageImpl.class,
-			mbMessage.getPrimaryKey(), mbMessage);
+			entityCacheEnabled, MBMessageImpl.class, mbMessage.getPrimaryKey(),
+			mbMessage);
 
 		finderCache.putResult(
 			_finderPathFetchByUUID_G,
@@ -20302,8 +20649,8 @@ public class MBMessagePersistenceImpl
 	public void cacheResult(List<MBMessage> mbMessages) {
 		for (MBMessage mbMessage : mbMessages) {
 			if (entityCache.getResult(
-					MBMessageModelImpl.ENTITY_CACHE_ENABLED,
-					MBMessageImpl.class, mbMessage.getPrimaryKey()) == null) {
+					entityCacheEnabled, MBMessageImpl.class,
+					mbMessage.getPrimaryKey()) == null) {
 
 				cacheResult(mbMessage);
 			}
@@ -20339,8 +20686,7 @@ public class MBMessagePersistenceImpl
 	@Override
 	public void clearCache(MBMessage mbMessage) {
 		entityCache.removeResult(
-			MBMessageModelImpl.ENTITY_CACHE_ENABLED, MBMessageImpl.class,
-			mbMessage.getPrimaryKey());
+			entityCacheEnabled, MBMessageImpl.class, mbMessage.getPrimaryKey());
 
 		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
 		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
@@ -20355,7 +20701,7 @@ public class MBMessagePersistenceImpl
 
 		for (MBMessage mbMessage : mbMessages) {
 			entityCache.removeResult(
-				MBMessageModelImpl.ENTITY_CACHE_ENABLED, MBMessageImpl.class,
+				entityCacheEnabled, MBMessageImpl.class,
 				mbMessage.getPrimaryKey());
 
 			clearUniqueFindersCache((MBMessageModelImpl)mbMessage, true);
@@ -20417,7 +20763,7 @@ public class MBMessagePersistenceImpl
 
 		mbMessage.setUuid(uuid);
 
-		mbMessage.setCompanyId(companyProvider.getCompanyId());
+		mbMessage.setCompanyId(CompanyThreadLocal.getCompanyId());
 
 		return mbMessage;
 	}
@@ -20604,7 +20950,7 @@ public class MBMessagePersistenceImpl
 
 		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
 
-		if (!MBMessageModelImpl.COLUMN_BITMASK_ENABLED) {
+		if (!_columnBitmaskEnabled) {
 			finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
 		}
 		else if (isNew) {
@@ -20651,6 +20997,12 @@ public class MBMessagePersistenceImpl
 			finderCache.removeResult(_finderPathCountByThreadReplies, args);
 			finderCache.removeResult(
 				_finderPathWithoutPaginationFindByThreadReplies, args);
+
+			args = new Object[] {mbMessageModelImpl.getParentMessageId()};
+
+			finderCache.removeResult(_finderPathCountByParentMessageId, args);
+			finderCache.removeResult(
+				_finderPathWithoutPaginationFindByParentMessageId, args);
 
 			args = new Object[] {
 				mbMessageModelImpl.getGroupId(), mbMessageModelImpl.getUserId()
@@ -20974,6 +21326,27 @@ public class MBMessagePersistenceImpl
 				finderCache.removeResult(_finderPathCountByThreadReplies, args);
 				finderCache.removeResult(
 					_finderPathWithoutPaginationFindByThreadReplies, args);
+			}
+
+			if ((mbMessageModelImpl.getColumnBitmask() &
+				 _finderPathWithoutPaginationFindByParentMessageId.
+					 getColumnBitmask()) != 0) {
+
+				Object[] args = new Object[] {
+					mbMessageModelImpl.getOriginalParentMessageId()
+				};
+
+				finderCache.removeResult(
+					_finderPathCountByParentMessageId, args);
+				finderCache.removeResult(
+					_finderPathWithoutPaginationFindByParentMessageId, args);
+
+				args = new Object[] {mbMessageModelImpl.getParentMessageId()};
+
+				finderCache.removeResult(
+					_finderPathCountByParentMessageId, args);
+				finderCache.removeResult(
+					_finderPathWithoutPaginationFindByParentMessageId, args);
 			}
 
 			if ((mbMessageModelImpl.getColumnBitmask() &
@@ -21462,8 +21835,8 @@ public class MBMessagePersistenceImpl
 		}
 
 		entityCache.putResult(
-			MBMessageModelImpl.ENTITY_CACHE_ENABLED, MBMessageImpl.class,
-			mbMessage.getPrimaryKey(), mbMessage, false);
+			entityCacheEnabled, MBMessageImpl.class, mbMessage.getPrimaryKey(),
+			mbMessage, false);
 
 		clearUniqueFindersCache(mbMessageModelImpl, false);
 		cacheUniqueFindersCache(mbMessageModelImpl);
@@ -21537,7 +21910,7 @@ public class MBMessagePersistenceImpl
 	 * Returns a range of all the message-boards messages.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>MBMessageModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>MBMessageModelImpl</code>.
 	 * </p>
 	 *
 	 * @param start the lower bound of the range of message-boards messages
@@ -21553,7 +21926,7 @@ public class MBMessagePersistenceImpl
 	 * Returns an ordered range of all the message-boards messages.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>MBMessageModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>MBMessageModelImpl</code>.
 	 * </p>
 	 *
 	 * @param start the lower bound of the range of message-boards messages
@@ -21572,39 +21945,39 @@ public class MBMessagePersistenceImpl
 	 * Returns an ordered range of all the message-boards messages.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>MBMessageModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>MBMessageModelImpl</code>.
 	 * </p>
 	 *
 	 * @param start the lower bound of the range of message-boards messages
 	 * @param end the upper bound of the range of message-boards messages (not inclusive)
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
-	 * @param retrieveFromCache whether to retrieve from the finder cache
+	 * @param useFinderCache whether to use the finder cache
 	 * @return the ordered range of message-boards messages
 	 */
 	@Override
 	public List<MBMessage> findAll(
 		int start, int end, OrderByComparator<MBMessage> orderByComparator,
-		boolean retrieveFromCache) {
+		boolean useFinderCache) {
 
-		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
 			(orderByComparator == null)) {
 
-			pagination = false;
-			finderPath = _finderPathWithoutPaginationFindAll;
-			finderArgs = FINDER_ARGS_EMPTY;
+			if (useFinderCache) {
+				finderPath = _finderPathWithoutPaginationFindAll;
+				finderArgs = FINDER_ARGS_EMPTY;
+			}
 		}
-		else {
+		else if (useFinderCache) {
 			finderPath = _finderPathWithPaginationFindAll;
 			finderArgs = new Object[] {start, end, orderByComparator};
 		}
 
 		List<MBMessage> list = null;
 
-		if (retrieveFromCache) {
+		if (useFinderCache) {
 			list = (List<MBMessage>)finderCache.getResult(
 				finderPath, finderArgs, this);
 		}
@@ -21627,9 +22000,7 @@ public class MBMessagePersistenceImpl
 			else {
 				sql = _SQL_SELECT_MBMESSAGE;
 
-				if (pagination) {
-					sql = sql.concat(MBMessageModelImpl.ORDER_BY_JPQL);
-				}
+				sql = sql.concat(MBMessageModelImpl.ORDER_BY_JPQL);
 			}
 
 			Session session = null;
@@ -21639,25 +22010,19 @@ public class MBMessagePersistenceImpl
 
 				Query q = session.createQuery(sql);
 
-				if (!pagination) {
-					list = (List<MBMessage>)QueryUtil.list(
-						q, getDialect(), start, end, false);
-
-					Collections.sort(list);
-
-					list = Collections.unmodifiableList(list);
-				}
-				else {
-					list = (List<MBMessage>)QueryUtil.list(
-						q, getDialect(), start, end);
-				}
+				list = (List<MBMessage>)QueryUtil.list(
+					q, getDialect(), start, end);
 
 				cacheResult(list);
 
-				finderCache.putResult(finderPath, finderArgs, list);
+				if (useFinderCache) {
+					finderCache.putResult(finderPath, finderArgs, list);
+				}
 			}
 			catch (Exception e) {
-				finderCache.removeResult(finderPath, finderArgs);
+				if (useFinderCache) {
+					finderCache.removeResult(finderPath, finderArgs);
+				}
 
 				throw processException(e);
 			}
@@ -21745,27 +22110,27 @@ public class MBMessagePersistenceImpl
 	/**
 	 * Initializes the message-boards message persistence.
 	 */
-	public void afterPropertiesSet() {
+	@Activate
+	public void activate() {
+		MBMessageModelImpl.setEntityCacheEnabled(entityCacheEnabled);
+		MBMessageModelImpl.setFinderCacheEnabled(finderCacheEnabled);
+
 		_finderPathWithPaginationFindAll = new FinderPath(
-			MBMessageModelImpl.ENTITY_CACHE_ENABLED,
-			MBMessageModelImpl.FINDER_CACHE_ENABLED, MBMessageImpl.class,
+			entityCacheEnabled, finderCacheEnabled, MBMessageImpl.class,
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findAll", new String[0]);
 
 		_finderPathWithoutPaginationFindAll = new FinderPath(
-			MBMessageModelImpl.ENTITY_CACHE_ENABLED,
-			MBMessageModelImpl.FINDER_CACHE_ENABLED, MBMessageImpl.class,
+			entityCacheEnabled, finderCacheEnabled, MBMessageImpl.class,
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findAll",
 			new String[0]);
 
 		_finderPathCountAll = new FinderPath(
-			MBMessageModelImpl.ENTITY_CACHE_ENABLED,
-			MBMessageModelImpl.FINDER_CACHE_ENABLED, Long.class,
+			entityCacheEnabled, finderCacheEnabled, Long.class,
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countAll",
 			new String[0]);
 
 		_finderPathWithPaginationFindByUuid = new FinderPath(
-			MBMessageModelImpl.ENTITY_CACHE_ENABLED,
-			MBMessageModelImpl.FINDER_CACHE_ENABLED, MBMessageImpl.class,
+			entityCacheEnabled, finderCacheEnabled, MBMessageImpl.class,
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByUuid",
 			new String[] {
 				String.class.getName(), Integer.class.getName(),
@@ -21773,36 +22138,31 @@ public class MBMessagePersistenceImpl
 			});
 
 		_finderPathWithoutPaginationFindByUuid = new FinderPath(
-			MBMessageModelImpl.ENTITY_CACHE_ENABLED,
-			MBMessageModelImpl.FINDER_CACHE_ENABLED, MBMessageImpl.class,
+			entityCacheEnabled, finderCacheEnabled, MBMessageImpl.class,
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByUuid",
 			new String[] {String.class.getName()},
 			MBMessageModelImpl.UUID_COLUMN_BITMASK |
 			MBMessageModelImpl.CREATEDATE_COLUMN_BITMASK);
 
 		_finderPathCountByUuid = new FinderPath(
-			MBMessageModelImpl.ENTITY_CACHE_ENABLED,
-			MBMessageModelImpl.FINDER_CACHE_ENABLED, Long.class,
+			entityCacheEnabled, finderCacheEnabled, Long.class,
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByUuid",
 			new String[] {String.class.getName()});
 
 		_finderPathFetchByUUID_G = new FinderPath(
-			MBMessageModelImpl.ENTITY_CACHE_ENABLED,
-			MBMessageModelImpl.FINDER_CACHE_ENABLED, MBMessageImpl.class,
+			entityCacheEnabled, finderCacheEnabled, MBMessageImpl.class,
 			FINDER_CLASS_NAME_ENTITY, "fetchByUUID_G",
 			new String[] {String.class.getName(), Long.class.getName()},
 			MBMessageModelImpl.UUID_COLUMN_BITMASK |
 			MBMessageModelImpl.GROUPID_COLUMN_BITMASK);
 
 		_finderPathCountByUUID_G = new FinderPath(
-			MBMessageModelImpl.ENTITY_CACHE_ENABLED,
-			MBMessageModelImpl.FINDER_CACHE_ENABLED, Long.class,
+			entityCacheEnabled, finderCacheEnabled, Long.class,
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByUUID_G",
 			new String[] {String.class.getName(), Long.class.getName()});
 
 		_finderPathWithPaginationFindByUuid_C = new FinderPath(
-			MBMessageModelImpl.ENTITY_CACHE_ENABLED,
-			MBMessageModelImpl.FINDER_CACHE_ENABLED, MBMessageImpl.class,
+			entityCacheEnabled, finderCacheEnabled, MBMessageImpl.class,
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByUuid_C",
 			new String[] {
 				String.class.getName(), Long.class.getName(),
@@ -21811,8 +22171,7 @@ public class MBMessagePersistenceImpl
 			});
 
 		_finderPathWithoutPaginationFindByUuid_C = new FinderPath(
-			MBMessageModelImpl.ENTITY_CACHE_ENABLED,
-			MBMessageModelImpl.FINDER_CACHE_ENABLED, MBMessageImpl.class,
+			entityCacheEnabled, finderCacheEnabled, MBMessageImpl.class,
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByUuid_C",
 			new String[] {String.class.getName(), Long.class.getName()},
 			MBMessageModelImpl.UUID_COLUMN_BITMASK |
@@ -21820,14 +22179,12 @@ public class MBMessagePersistenceImpl
 			MBMessageModelImpl.CREATEDATE_COLUMN_BITMASK);
 
 		_finderPathCountByUuid_C = new FinderPath(
-			MBMessageModelImpl.ENTITY_CACHE_ENABLED,
-			MBMessageModelImpl.FINDER_CACHE_ENABLED, Long.class,
+			entityCacheEnabled, finderCacheEnabled, Long.class,
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByUuid_C",
 			new String[] {String.class.getName(), Long.class.getName()});
 
 		_finderPathWithPaginationFindByGroupId = new FinderPath(
-			MBMessageModelImpl.ENTITY_CACHE_ENABLED,
-			MBMessageModelImpl.FINDER_CACHE_ENABLED, MBMessageImpl.class,
+			entityCacheEnabled, finderCacheEnabled, MBMessageImpl.class,
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByGroupId",
 			new String[] {
 				Long.class.getName(), Integer.class.getName(),
@@ -21835,22 +22192,19 @@ public class MBMessagePersistenceImpl
 			});
 
 		_finderPathWithoutPaginationFindByGroupId = new FinderPath(
-			MBMessageModelImpl.ENTITY_CACHE_ENABLED,
-			MBMessageModelImpl.FINDER_CACHE_ENABLED, MBMessageImpl.class,
+			entityCacheEnabled, finderCacheEnabled, MBMessageImpl.class,
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByGroupId",
 			new String[] {Long.class.getName()},
 			MBMessageModelImpl.GROUPID_COLUMN_BITMASK |
 			MBMessageModelImpl.CREATEDATE_COLUMN_BITMASK);
 
 		_finderPathCountByGroupId = new FinderPath(
-			MBMessageModelImpl.ENTITY_CACHE_ENABLED,
-			MBMessageModelImpl.FINDER_CACHE_ENABLED, Long.class,
+			entityCacheEnabled, finderCacheEnabled, Long.class,
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByGroupId",
 			new String[] {Long.class.getName()});
 
 		_finderPathWithPaginationFindByCompanyId = new FinderPath(
-			MBMessageModelImpl.ENTITY_CACHE_ENABLED,
-			MBMessageModelImpl.FINDER_CACHE_ENABLED, MBMessageImpl.class,
+			entityCacheEnabled, finderCacheEnabled, MBMessageImpl.class,
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByCompanyId",
 			new String[] {
 				Long.class.getName(), Integer.class.getName(),
@@ -21858,22 +22212,19 @@ public class MBMessagePersistenceImpl
 			});
 
 		_finderPathWithoutPaginationFindByCompanyId = new FinderPath(
-			MBMessageModelImpl.ENTITY_CACHE_ENABLED,
-			MBMessageModelImpl.FINDER_CACHE_ENABLED, MBMessageImpl.class,
+			entityCacheEnabled, finderCacheEnabled, MBMessageImpl.class,
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByCompanyId",
 			new String[] {Long.class.getName()},
 			MBMessageModelImpl.COMPANYID_COLUMN_BITMASK |
 			MBMessageModelImpl.CREATEDATE_COLUMN_BITMASK);
 
 		_finderPathCountByCompanyId = new FinderPath(
-			MBMessageModelImpl.ENTITY_CACHE_ENABLED,
-			MBMessageModelImpl.FINDER_CACHE_ENABLED, Long.class,
+			entityCacheEnabled, finderCacheEnabled, Long.class,
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByCompanyId",
 			new String[] {Long.class.getName()});
 
 		_finderPathWithPaginationFindByUserId = new FinderPath(
-			MBMessageModelImpl.ENTITY_CACHE_ENABLED,
-			MBMessageModelImpl.FINDER_CACHE_ENABLED, MBMessageImpl.class,
+			entityCacheEnabled, finderCacheEnabled, MBMessageImpl.class,
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByUserId",
 			new String[] {
 				Long.class.getName(), Integer.class.getName(),
@@ -21881,22 +22232,19 @@ public class MBMessagePersistenceImpl
 			});
 
 		_finderPathWithoutPaginationFindByUserId = new FinderPath(
-			MBMessageModelImpl.ENTITY_CACHE_ENABLED,
-			MBMessageModelImpl.FINDER_CACHE_ENABLED, MBMessageImpl.class,
+			entityCacheEnabled, finderCacheEnabled, MBMessageImpl.class,
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByUserId",
 			new String[] {Long.class.getName()},
 			MBMessageModelImpl.USERID_COLUMN_BITMASK |
 			MBMessageModelImpl.CREATEDATE_COLUMN_BITMASK);
 
 		_finderPathCountByUserId = new FinderPath(
-			MBMessageModelImpl.ENTITY_CACHE_ENABLED,
-			MBMessageModelImpl.FINDER_CACHE_ENABLED, Long.class,
+			entityCacheEnabled, finderCacheEnabled, Long.class,
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByUserId",
 			new String[] {Long.class.getName()});
 
 		_finderPathWithPaginationFindByThreadId = new FinderPath(
-			MBMessageModelImpl.ENTITY_CACHE_ENABLED,
-			MBMessageModelImpl.FINDER_CACHE_ENABLED, MBMessageImpl.class,
+			entityCacheEnabled, finderCacheEnabled, MBMessageImpl.class,
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByThreadId",
 			new String[] {
 				Long.class.getName(), Integer.class.getName(),
@@ -21904,22 +22252,19 @@ public class MBMessagePersistenceImpl
 			});
 
 		_finderPathWithoutPaginationFindByThreadId = new FinderPath(
-			MBMessageModelImpl.ENTITY_CACHE_ENABLED,
-			MBMessageModelImpl.FINDER_CACHE_ENABLED, MBMessageImpl.class,
+			entityCacheEnabled, finderCacheEnabled, MBMessageImpl.class,
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByThreadId",
 			new String[] {Long.class.getName()},
 			MBMessageModelImpl.THREADID_COLUMN_BITMASK |
 			MBMessageModelImpl.CREATEDATE_COLUMN_BITMASK);
 
 		_finderPathCountByThreadId = new FinderPath(
-			MBMessageModelImpl.ENTITY_CACHE_ENABLED,
-			MBMessageModelImpl.FINDER_CACHE_ENABLED, Long.class,
+			entityCacheEnabled, finderCacheEnabled, Long.class,
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByThreadId",
 			new String[] {Long.class.getName()});
 
 		_finderPathWithPaginationFindByThreadReplies = new FinderPath(
-			MBMessageModelImpl.ENTITY_CACHE_ENABLED,
-			MBMessageModelImpl.FINDER_CACHE_ENABLED, MBMessageImpl.class,
+			entityCacheEnabled, finderCacheEnabled, MBMessageImpl.class,
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByThreadReplies",
 			new String[] {
 				Long.class.getName(), Integer.class.getName(),
@@ -21927,22 +22272,39 @@ public class MBMessagePersistenceImpl
 			});
 
 		_finderPathWithoutPaginationFindByThreadReplies = new FinderPath(
-			MBMessageModelImpl.ENTITY_CACHE_ENABLED,
-			MBMessageModelImpl.FINDER_CACHE_ENABLED, MBMessageImpl.class,
+			entityCacheEnabled, finderCacheEnabled, MBMessageImpl.class,
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByThreadReplies",
 			new String[] {Long.class.getName()},
 			MBMessageModelImpl.THREADID_COLUMN_BITMASK |
 			MBMessageModelImpl.CREATEDATE_COLUMN_BITMASK);
 
 		_finderPathCountByThreadReplies = new FinderPath(
-			MBMessageModelImpl.ENTITY_CACHE_ENABLED,
-			MBMessageModelImpl.FINDER_CACHE_ENABLED, Long.class,
+			entityCacheEnabled, finderCacheEnabled, Long.class,
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByThreadReplies",
 			new String[] {Long.class.getName()});
 
+		_finderPathWithPaginationFindByParentMessageId = new FinderPath(
+			entityCacheEnabled, finderCacheEnabled, MBMessageImpl.class,
+			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByParentMessageId",
+			new String[] {
+				Long.class.getName(), Integer.class.getName(),
+				Integer.class.getName(), OrderByComparator.class.getName()
+			});
+
+		_finderPathWithoutPaginationFindByParentMessageId = new FinderPath(
+			entityCacheEnabled, finderCacheEnabled, MBMessageImpl.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByParentMessageId",
+			new String[] {Long.class.getName()},
+			MBMessageModelImpl.PARENTMESSAGEID_COLUMN_BITMASK |
+			MBMessageModelImpl.CREATEDATE_COLUMN_BITMASK);
+
+		_finderPathCountByParentMessageId = new FinderPath(
+			entityCacheEnabled, finderCacheEnabled, Long.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByParentMessageId",
+			new String[] {Long.class.getName()});
+
 		_finderPathWithPaginationFindByG_U = new FinderPath(
-			MBMessageModelImpl.ENTITY_CACHE_ENABLED,
-			MBMessageModelImpl.FINDER_CACHE_ENABLED, MBMessageImpl.class,
+			entityCacheEnabled, finderCacheEnabled, MBMessageImpl.class,
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByG_U",
 			new String[] {
 				Long.class.getName(), Long.class.getName(),
@@ -21951,8 +22313,7 @@ public class MBMessagePersistenceImpl
 			});
 
 		_finderPathWithoutPaginationFindByG_U = new FinderPath(
-			MBMessageModelImpl.ENTITY_CACHE_ENABLED,
-			MBMessageModelImpl.FINDER_CACHE_ENABLED, MBMessageImpl.class,
+			entityCacheEnabled, finderCacheEnabled, MBMessageImpl.class,
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByG_U",
 			new String[] {Long.class.getName(), Long.class.getName()},
 			MBMessageModelImpl.GROUPID_COLUMN_BITMASK |
@@ -21960,14 +22321,12 @@ public class MBMessagePersistenceImpl
 			MBMessageModelImpl.CREATEDATE_COLUMN_BITMASK);
 
 		_finderPathCountByG_U = new FinderPath(
-			MBMessageModelImpl.ENTITY_CACHE_ENABLED,
-			MBMessageModelImpl.FINDER_CACHE_ENABLED, Long.class,
+			entityCacheEnabled, finderCacheEnabled, Long.class,
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByG_U",
 			new String[] {Long.class.getName(), Long.class.getName()});
 
 		_finderPathWithPaginationFindByG_C = new FinderPath(
-			MBMessageModelImpl.ENTITY_CACHE_ENABLED,
-			MBMessageModelImpl.FINDER_CACHE_ENABLED, MBMessageImpl.class,
+			entityCacheEnabled, finderCacheEnabled, MBMessageImpl.class,
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByG_C",
 			new String[] {
 				Long.class.getName(), Long.class.getName(),
@@ -21976,8 +22335,7 @@ public class MBMessagePersistenceImpl
 			});
 
 		_finderPathWithoutPaginationFindByG_C = new FinderPath(
-			MBMessageModelImpl.ENTITY_CACHE_ENABLED,
-			MBMessageModelImpl.FINDER_CACHE_ENABLED, MBMessageImpl.class,
+			entityCacheEnabled, finderCacheEnabled, MBMessageImpl.class,
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByG_C",
 			new String[] {Long.class.getName(), Long.class.getName()},
 			MBMessageModelImpl.GROUPID_COLUMN_BITMASK |
@@ -21985,14 +22343,12 @@ public class MBMessagePersistenceImpl
 			MBMessageModelImpl.CREATEDATE_COLUMN_BITMASK);
 
 		_finderPathCountByG_C = new FinderPath(
-			MBMessageModelImpl.ENTITY_CACHE_ENABLED,
-			MBMessageModelImpl.FINDER_CACHE_ENABLED, Long.class,
+			entityCacheEnabled, finderCacheEnabled, Long.class,
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByG_C",
 			new String[] {Long.class.getName(), Long.class.getName()});
 
 		_finderPathWithPaginationFindByG_S = new FinderPath(
-			MBMessageModelImpl.ENTITY_CACHE_ENABLED,
-			MBMessageModelImpl.FINDER_CACHE_ENABLED, MBMessageImpl.class,
+			entityCacheEnabled, finderCacheEnabled, MBMessageImpl.class,
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByG_S",
 			new String[] {
 				Long.class.getName(), Integer.class.getName(),
@@ -22001,8 +22357,7 @@ public class MBMessagePersistenceImpl
 			});
 
 		_finderPathWithoutPaginationFindByG_S = new FinderPath(
-			MBMessageModelImpl.ENTITY_CACHE_ENABLED,
-			MBMessageModelImpl.FINDER_CACHE_ENABLED, MBMessageImpl.class,
+			entityCacheEnabled, finderCacheEnabled, MBMessageImpl.class,
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByG_S",
 			new String[] {Long.class.getName(), Integer.class.getName()},
 			MBMessageModelImpl.GROUPID_COLUMN_BITMASK |
@@ -22010,14 +22365,12 @@ public class MBMessagePersistenceImpl
 			MBMessageModelImpl.CREATEDATE_COLUMN_BITMASK);
 
 		_finderPathCountByG_S = new FinderPath(
-			MBMessageModelImpl.ENTITY_CACHE_ENABLED,
-			MBMessageModelImpl.FINDER_CACHE_ENABLED, Long.class,
+			entityCacheEnabled, finderCacheEnabled, Long.class,
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByG_S",
 			new String[] {Long.class.getName(), Integer.class.getName()});
 
 		_finderPathWithPaginationFindByC_S = new FinderPath(
-			MBMessageModelImpl.ENTITY_CACHE_ENABLED,
-			MBMessageModelImpl.FINDER_CACHE_ENABLED, MBMessageImpl.class,
+			entityCacheEnabled, finderCacheEnabled, MBMessageImpl.class,
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByC_S",
 			new String[] {
 				Long.class.getName(), Integer.class.getName(),
@@ -22026,8 +22379,7 @@ public class MBMessagePersistenceImpl
 			});
 
 		_finderPathWithoutPaginationFindByC_S = new FinderPath(
-			MBMessageModelImpl.ENTITY_CACHE_ENABLED,
-			MBMessageModelImpl.FINDER_CACHE_ENABLED, MBMessageImpl.class,
+			entityCacheEnabled, finderCacheEnabled, MBMessageImpl.class,
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByC_S",
 			new String[] {Long.class.getName(), Integer.class.getName()},
 			MBMessageModelImpl.COMPANYID_COLUMN_BITMASK |
@@ -22035,14 +22387,12 @@ public class MBMessagePersistenceImpl
 			MBMessageModelImpl.CREATEDATE_COLUMN_BITMASK);
 
 		_finderPathCountByC_S = new FinderPath(
-			MBMessageModelImpl.ENTITY_CACHE_ENABLED,
-			MBMessageModelImpl.FINDER_CACHE_ENABLED, Long.class,
+			entityCacheEnabled, finderCacheEnabled, Long.class,
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByC_S",
 			new String[] {Long.class.getName(), Integer.class.getName()});
 
 		_finderPathWithPaginationFindByU_C = new FinderPath(
-			MBMessageModelImpl.ENTITY_CACHE_ENABLED,
-			MBMessageModelImpl.FINDER_CACHE_ENABLED, MBMessageImpl.class,
+			entityCacheEnabled, finderCacheEnabled, MBMessageImpl.class,
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByU_C",
 			new String[] {
 				Long.class.getName(), Long.class.getName(),
@@ -22051,8 +22401,7 @@ public class MBMessagePersistenceImpl
 			});
 
 		_finderPathWithoutPaginationFindByU_C = new FinderPath(
-			MBMessageModelImpl.ENTITY_CACHE_ENABLED,
-			MBMessageModelImpl.FINDER_CACHE_ENABLED, MBMessageImpl.class,
+			entityCacheEnabled, finderCacheEnabled, MBMessageImpl.class,
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByU_C",
 			new String[] {Long.class.getName(), Long.class.getName()},
 			MBMessageModelImpl.USERID_COLUMN_BITMASK |
@@ -22060,20 +22409,17 @@ public class MBMessagePersistenceImpl
 			MBMessageModelImpl.CREATEDATE_COLUMN_BITMASK);
 
 		_finderPathCountByU_C = new FinderPath(
-			MBMessageModelImpl.ENTITY_CACHE_ENABLED,
-			MBMessageModelImpl.FINDER_CACHE_ENABLED, Long.class,
+			entityCacheEnabled, finderCacheEnabled, Long.class,
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByU_C",
 			new String[] {Long.class.getName(), Long.class.getName()});
 
 		_finderPathWithPaginationCountByU_C = new FinderPath(
-			MBMessageModelImpl.ENTITY_CACHE_ENABLED,
-			MBMessageModelImpl.FINDER_CACHE_ENABLED, Long.class,
+			entityCacheEnabled, finderCacheEnabled, Long.class,
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "countByU_C",
 			new String[] {Long.class.getName(), Long.class.getName()});
 
 		_finderPathWithPaginationFindByC_C = new FinderPath(
-			MBMessageModelImpl.ENTITY_CACHE_ENABLED,
-			MBMessageModelImpl.FINDER_CACHE_ENABLED, MBMessageImpl.class,
+			entityCacheEnabled, finderCacheEnabled, MBMessageImpl.class,
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByC_C",
 			new String[] {
 				Long.class.getName(), Long.class.getName(),
@@ -22082,8 +22428,7 @@ public class MBMessagePersistenceImpl
 			});
 
 		_finderPathWithoutPaginationFindByC_C = new FinderPath(
-			MBMessageModelImpl.ENTITY_CACHE_ENABLED,
-			MBMessageModelImpl.FINDER_CACHE_ENABLED, MBMessageImpl.class,
+			entityCacheEnabled, finderCacheEnabled, MBMessageImpl.class,
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByC_C",
 			new String[] {Long.class.getName(), Long.class.getName()},
 			MBMessageModelImpl.CLASSNAMEID_COLUMN_BITMASK |
@@ -22091,14 +22436,12 @@ public class MBMessagePersistenceImpl
 			MBMessageModelImpl.CREATEDATE_COLUMN_BITMASK);
 
 		_finderPathCountByC_C = new FinderPath(
-			MBMessageModelImpl.ENTITY_CACHE_ENABLED,
-			MBMessageModelImpl.FINDER_CACHE_ENABLED, Long.class,
+			entityCacheEnabled, finderCacheEnabled, Long.class,
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByC_C",
 			new String[] {Long.class.getName(), Long.class.getName()});
 
 		_finderPathWithPaginationFindByT_P = new FinderPath(
-			MBMessageModelImpl.ENTITY_CACHE_ENABLED,
-			MBMessageModelImpl.FINDER_CACHE_ENABLED, MBMessageImpl.class,
+			entityCacheEnabled, finderCacheEnabled, MBMessageImpl.class,
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByT_P",
 			new String[] {
 				Long.class.getName(), Long.class.getName(),
@@ -22107,8 +22450,7 @@ public class MBMessagePersistenceImpl
 			});
 
 		_finderPathWithoutPaginationFindByT_P = new FinderPath(
-			MBMessageModelImpl.ENTITY_CACHE_ENABLED,
-			MBMessageModelImpl.FINDER_CACHE_ENABLED, MBMessageImpl.class,
+			entityCacheEnabled, finderCacheEnabled, MBMessageImpl.class,
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByT_P",
 			new String[] {Long.class.getName(), Long.class.getName()},
 			MBMessageModelImpl.THREADID_COLUMN_BITMASK |
@@ -22116,14 +22458,12 @@ public class MBMessagePersistenceImpl
 			MBMessageModelImpl.CREATEDATE_COLUMN_BITMASK);
 
 		_finderPathCountByT_P = new FinderPath(
-			MBMessageModelImpl.ENTITY_CACHE_ENABLED,
-			MBMessageModelImpl.FINDER_CACHE_ENABLED, Long.class,
+			entityCacheEnabled, finderCacheEnabled, Long.class,
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByT_P",
 			new String[] {Long.class.getName(), Long.class.getName()});
 
 		_finderPathWithPaginationFindByT_A = new FinderPath(
-			MBMessageModelImpl.ENTITY_CACHE_ENABLED,
-			MBMessageModelImpl.FINDER_CACHE_ENABLED, MBMessageImpl.class,
+			entityCacheEnabled, finderCacheEnabled, MBMessageImpl.class,
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByT_A",
 			new String[] {
 				Long.class.getName(), Boolean.class.getName(),
@@ -22132,8 +22472,7 @@ public class MBMessagePersistenceImpl
 			});
 
 		_finderPathWithoutPaginationFindByT_A = new FinderPath(
-			MBMessageModelImpl.ENTITY_CACHE_ENABLED,
-			MBMessageModelImpl.FINDER_CACHE_ENABLED, MBMessageImpl.class,
+			entityCacheEnabled, finderCacheEnabled, MBMessageImpl.class,
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByT_A",
 			new String[] {Long.class.getName(), Boolean.class.getName()},
 			MBMessageModelImpl.THREADID_COLUMN_BITMASK |
@@ -22141,14 +22480,12 @@ public class MBMessagePersistenceImpl
 			MBMessageModelImpl.CREATEDATE_COLUMN_BITMASK);
 
 		_finderPathCountByT_A = new FinderPath(
-			MBMessageModelImpl.ENTITY_CACHE_ENABLED,
-			MBMessageModelImpl.FINDER_CACHE_ENABLED, Long.class,
+			entityCacheEnabled, finderCacheEnabled, Long.class,
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByT_A",
 			new String[] {Long.class.getName(), Boolean.class.getName()});
 
 		_finderPathWithPaginationFindByT_S = new FinderPath(
-			MBMessageModelImpl.ENTITY_CACHE_ENABLED,
-			MBMessageModelImpl.FINDER_CACHE_ENABLED, MBMessageImpl.class,
+			entityCacheEnabled, finderCacheEnabled, MBMessageImpl.class,
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByT_S",
 			new String[] {
 				Long.class.getName(), Integer.class.getName(),
@@ -22157,8 +22494,7 @@ public class MBMessagePersistenceImpl
 			});
 
 		_finderPathWithoutPaginationFindByT_S = new FinderPath(
-			MBMessageModelImpl.ENTITY_CACHE_ENABLED,
-			MBMessageModelImpl.FINDER_CACHE_ENABLED, MBMessageImpl.class,
+			entityCacheEnabled, finderCacheEnabled, MBMessageImpl.class,
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByT_S",
 			new String[] {Long.class.getName(), Integer.class.getName()},
 			MBMessageModelImpl.THREADID_COLUMN_BITMASK |
@@ -22166,14 +22502,12 @@ public class MBMessagePersistenceImpl
 			MBMessageModelImpl.CREATEDATE_COLUMN_BITMASK);
 
 		_finderPathCountByT_S = new FinderPath(
-			MBMessageModelImpl.ENTITY_CACHE_ENABLED,
-			MBMessageModelImpl.FINDER_CACHE_ENABLED, Long.class,
+			entityCacheEnabled, finderCacheEnabled, Long.class,
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByT_S",
 			new String[] {Long.class.getName(), Integer.class.getName()});
 
 		_finderPathWithPaginationFindByT_notS = new FinderPath(
-			MBMessageModelImpl.ENTITY_CACHE_ENABLED,
-			MBMessageModelImpl.FINDER_CACHE_ENABLED, MBMessageImpl.class,
+			entityCacheEnabled, finderCacheEnabled, MBMessageImpl.class,
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByT_notS",
 			new String[] {
 				Long.class.getName(), Integer.class.getName(),
@@ -22182,14 +22516,12 @@ public class MBMessagePersistenceImpl
 			});
 
 		_finderPathWithPaginationCountByT_notS = new FinderPath(
-			MBMessageModelImpl.ENTITY_CACHE_ENABLED,
-			MBMessageModelImpl.FINDER_CACHE_ENABLED, Long.class,
+			entityCacheEnabled, finderCacheEnabled, Long.class,
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "countByT_notS",
 			new String[] {Long.class.getName(), Integer.class.getName()});
 
 		_finderPathWithPaginationFindByTR_S = new FinderPath(
-			MBMessageModelImpl.ENTITY_CACHE_ENABLED,
-			MBMessageModelImpl.FINDER_CACHE_ENABLED, MBMessageImpl.class,
+			entityCacheEnabled, finderCacheEnabled, MBMessageImpl.class,
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByTR_S",
 			new String[] {
 				Long.class.getName(), Integer.class.getName(),
@@ -22198,8 +22530,7 @@ public class MBMessagePersistenceImpl
 			});
 
 		_finderPathWithoutPaginationFindByTR_S = new FinderPath(
-			MBMessageModelImpl.ENTITY_CACHE_ENABLED,
-			MBMessageModelImpl.FINDER_CACHE_ENABLED, MBMessageImpl.class,
+			entityCacheEnabled, finderCacheEnabled, MBMessageImpl.class,
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByTR_S",
 			new String[] {Long.class.getName(), Integer.class.getName()},
 			MBMessageModelImpl.THREADID_COLUMN_BITMASK |
@@ -22207,14 +22538,12 @@ public class MBMessagePersistenceImpl
 			MBMessageModelImpl.CREATEDATE_COLUMN_BITMASK);
 
 		_finderPathCountByTR_S = new FinderPath(
-			MBMessageModelImpl.ENTITY_CACHE_ENABLED,
-			MBMessageModelImpl.FINDER_CACHE_ENABLED, Long.class,
+			entityCacheEnabled, finderCacheEnabled, Long.class,
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByTR_S",
 			new String[] {Long.class.getName(), Integer.class.getName()});
 
 		_finderPathWithPaginationFindByP_S = new FinderPath(
-			MBMessageModelImpl.ENTITY_CACHE_ENABLED,
-			MBMessageModelImpl.FINDER_CACHE_ENABLED, MBMessageImpl.class,
+			entityCacheEnabled, finderCacheEnabled, MBMessageImpl.class,
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByP_S",
 			new String[] {
 				Long.class.getName(), Integer.class.getName(),
@@ -22223,8 +22552,7 @@ public class MBMessagePersistenceImpl
 			});
 
 		_finderPathWithoutPaginationFindByP_S = new FinderPath(
-			MBMessageModelImpl.ENTITY_CACHE_ENABLED,
-			MBMessageModelImpl.FINDER_CACHE_ENABLED, MBMessageImpl.class,
+			entityCacheEnabled, finderCacheEnabled, MBMessageImpl.class,
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByP_S",
 			new String[] {Long.class.getName(), Integer.class.getName()},
 			MBMessageModelImpl.PARENTMESSAGEID_COLUMN_BITMASK |
@@ -22232,14 +22560,12 @@ public class MBMessagePersistenceImpl
 			MBMessageModelImpl.CREATEDATE_COLUMN_BITMASK);
 
 		_finderPathCountByP_S = new FinderPath(
-			MBMessageModelImpl.ENTITY_CACHE_ENABLED,
-			MBMessageModelImpl.FINDER_CACHE_ENABLED, Long.class,
+			entityCacheEnabled, finderCacheEnabled, Long.class,
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByP_S",
 			new String[] {Long.class.getName(), Integer.class.getName()});
 
 		_finderPathWithPaginationFindByG_U_S = new FinderPath(
-			MBMessageModelImpl.ENTITY_CACHE_ENABLED,
-			MBMessageModelImpl.FINDER_CACHE_ENABLED, MBMessageImpl.class,
+			entityCacheEnabled, finderCacheEnabled, MBMessageImpl.class,
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByG_U_S",
 			new String[] {
 				Long.class.getName(), Long.class.getName(),
@@ -22248,8 +22574,7 @@ public class MBMessagePersistenceImpl
 			});
 
 		_finderPathWithoutPaginationFindByG_U_S = new FinderPath(
-			MBMessageModelImpl.ENTITY_CACHE_ENABLED,
-			MBMessageModelImpl.FINDER_CACHE_ENABLED, MBMessageImpl.class,
+			entityCacheEnabled, finderCacheEnabled, MBMessageImpl.class,
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByG_U_S",
 			new String[] {
 				Long.class.getName(), Long.class.getName(),
@@ -22261,8 +22586,7 @@ public class MBMessagePersistenceImpl
 			MBMessageModelImpl.CREATEDATE_COLUMN_BITMASK);
 
 		_finderPathCountByG_U_S = new FinderPath(
-			MBMessageModelImpl.ENTITY_CACHE_ENABLED,
-			MBMessageModelImpl.FINDER_CACHE_ENABLED, Long.class,
+			entityCacheEnabled, finderCacheEnabled, Long.class,
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByG_U_S",
 			new String[] {
 				Long.class.getName(), Long.class.getName(),
@@ -22270,8 +22594,7 @@ public class MBMessagePersistenceImpl
 			});
 
 		_finderPathWithPaginationFindByG_C_T = new FinderPath(
-			MBMessageModelImpl.ENTITY_CACHE_ENABLED,
-			MBMessageModelImpl.FINDER_CACHE_ENABLED, MBMessageImpl.class,
+			entityCacheEnabled, finderCacheEnabled, MBMessageImpl.class,
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByG_C_T",
 			new String[] {
 				Long.class.getName(), Long.class.getName(),
@@ -22280,8 +22603,7 @@ public class MBMessagePersistenceImpl
 			});
 
 		_finderPathWithoutPaginationFindByG_C_T = new FinderPath(
-			MBMessageModelImpl.ENTITY_CACHE_ENABLED,
-			MBMessageModelImpl.FINDER_CACHE_ENABLED, MBMessageImpl.class,
+			entityCacheEnabled, finderCacheEnabled, MBMessageImpl.class,
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByG_C_T",
 			new String[] {
 				Long.class.getName(), Long.class.getName(), Long.class.getName()
@@ -22292,16 +22614,14 @@ public class MBMessagePersistenceImpl
 			MBMessageModelImpl.CREATEDATE_COLUMN_BITMASK);
 
 		_finderPathCountByG_C_T = new FinderPath(
-			MBMessageModelImpl.ENTITY_CACHE_ENABLED,
-			MBMessageModelImpl.FINDER_CACHE_ENABLED, Long.class,
+			entityCacheEnabled, finderCacheEnabled, Long.class,
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByG_C_T",
 			new String[] {
 				Long.class.getName(), Long.class.getName(), Long.class.getName()
 			});
 
 		_finderPathWithPaginationFindByG_C_S = new FinderPath(
-			MBMessageModelImpl.ENTITY_CACHE_ENABLED,
-			MBMessageModelImpl.FINDER_CACHE_ENABLED, MBMessageImpl.class,
+			entityCacheEnabled, finderCacheEnabled, MBMessageImpl.class,
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByG_C_S",
 			new String[] {
 				Long.class.getName(), Long.class.getName(),
@@ -22310,8 +22630,7 @@ public class MBMessagePersistenceImpl
 			});
 
 		_finderPathWithoutPaginationFindByG_C_S = new FinderPath(
-			MBMessageModelImpl.ENTITY_CACHE_ENABLED,
-			MBMessageModelImpl.FINDER_CACHE_ENABLED, MBMessageImpl.class,
+			entityCacheEnabled, finderCacheEnabled, MBMessageImpl.class,
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByG_C_S",
 			new String[] {
 				Long.class.getName(), Long.class.getName(),
@@ -22323,8 +22642,7 @@ public class MBMessagePersistenceImpl
 			MBMessageModelImpl.CREATEDATE_COLUMN_BITMASK);
 
 		_finderPathCountByG_C_S = new FinderPath(
-			MBMessageModelImpl.ENTITY_CACHE_ENABLED,
-			MBMessageModelImpl.FINDER_CACHE_ENABLED, Long.class,
+			entityCacheEnabled, finderCacheEnabled, Long.class,
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByG_C_S",
 			new String[] {
 				Long.class.getName(), Long.class.getName(),
@@ -22332,8 +22650,7 @@ public class MBMessagePersistenceImpl
 			});
 
 		_finderPathWithPaginationFindByU_C_C = new FinderPath(
-			MBMessageModelImpl.ENTITY_CACHE_ENABLED,
-			MBMessageModelImpl.FINDER_CACHE_ENABLED, MBMessageImpl.class,
+			entityCacheEnabled, finderCacheEnabled, MBMessageImpl.class,
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByU_C_C",
 			new String[] {
 				Long.class.getName(), Long.class.getName(),
@@ -22342,8 +22659,7 @@ public class MBMessagePersistenceImpl
 			});
 
 		_finderPathWithoutPaginationFindByU_C_C = new FinderPath(
-			MBMessageModelImpl.ENTITY_CACHE_ENABLED,
-			MBMessageModelImpl.FINDER_CACHE_ENABLED, MBMessageImpl.class,
+			entityCacheEnabled, finderCacheEnabled, MBMessageImpl.class,
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByU_C_C",
 			new String[] {
 				Long.class.getName(), Long.class.getName(), Long.class.getName()
@@ -22354,16 +22670,14 @@ public class MBMessagePersistenceImpl
 			MBMessageModelImpl.CREATEDATE_COLUMN_BITMASK);
 
 		_finderPathCountByU_C_C = new FinderPath(
-			MBMessageModelImpl.ENTITY_CACHE_ENABLED,
-			MBMessageModelImpl.FINDER_CACHE_ENABLED, Long.class,
+			entityCacheEnabled, finderCacheEnabled, Long.class,
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByU_C_C",
 			new String[] {
 				Long.class.getName(), Long.class.getName(), Long.class.getName()
 			});
 
 		_finderPathWithPaginationFindByU_C_S = new FinderPath(
-			MBMessageModelImpl.ENTITY_CACHE_ENABLED,
-			MBMessageModelImpl.FINDER_CACHE_ENABLED, MBMessageImpl.class,
+			entityCacheEnabled, finderCacheEnabled, MBMessageImpl.class,
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByU_C_S",
 			new String[] {
 				Long.class.getName(), Long.class.getName(),
@@ -22372,8 +22686,7 @@ public class MBMessagePersistenceImpl
 			});
 
 		_finderPathWithoutPaginationFindByU_C_S = new FinderPath(
-			MBMessageModelImpl.ENTITY_CACHE_ENABLED,
-			MBMessageModelImpl.FINDER_CACHE_ENABLED, MBMessageImpl.class,
+			entityCacheEnabled, finderCacheEnabled, MBMessageImpl.class,
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByU_C_S",
 			new String[] {
 				Long.class.getName(), Long.class.getName(),
@@ -22385,8 +22698,7 @@ public class MBMessagePersistenceImpl
 			MBMessageModelImpl.CREATEDATE_COLUMN_BITMASK);
 
 		_finderPathCountByU_C_S = new FinderPath(
-			MBMessageModelImpl.ENTITY_CACHE_ENABLED,
-			MBMessageModelImpl.FINDER_CACHE_ENABLED, Long.class,
+			entityCacheEnabled, finderCacheEnabled, Long.class,
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByU_C_S",
 			new String[] {
 				Long.class.getName(), Long.class.getName(),
@@ -22394,8 +22706,7 @@ public class MBMessagePersistenceImpl
 			});
 
 		_finderPathWithPaginationCountByU_C_S = new FinderPath(
-			MBMessageModelImpl.ENTITY_CACHE_ENABLED,
-			MBMessageModelImpl.FINDER_CACHE_ENABLED, Long.class,
+			entityCacheEnabled, finderCacheEnabled, Long.class,
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "countByU_C_S",
 			new String[] {
 				Long.class.getName(), Long.class.getName(),
@@ -22403,8 +22714,7 @@ public class MBMessagePersistenceImpl
 			});
 
 		_finderPathWithPaginationFindByC_C_S = new FinderPath(
-			MBMessageModelImpl.ENTITY_CACHE_ENABLED,
-			MBMessageModelImpl.FINDER_CACHE_ENABLED, MBMessageImpl.class,
+			entityCacheEnabled, finderCacheEnabled, MBMessageImpl.class,
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByC_C_S",
 			new String[] {
 				Long.class.getName(), Long.class.getName(),
@@ -22413,8 +22723,7 @@ public class MBMessagePersistenceImpl
 			});
 
 		_finderPathWithoutPaginationFindByC_C_S = new FinderPath(
-			MBMessageModelImpl.ENTITY_CACHE_ENABLED,
-			MBMessageModelImpl.FINDER_CACHE_ENABLED, MBMessageImpl.class,
+			entityCacheEnabled, finderCacheEnabled, MBMessageImpl.class,
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByC_C_S",
 			new String[] {
 				Long.class.getName(), Long.class.getName(),
@@ -22426,8 +22735,7 @@ public class MBMessagePersistenceImpl
 			MBMessageModelImpl.CREATEDATE_COLUMN_BITMASK);
 
 		_finderPathCountByC_C_S = new FinderPath(
-			MBMessageModelImpl.ENTITY_CACHE_ENABLED,
-			MBMessageModelImpl.FINDER_CACHE_ENABLED, Long.class,
+			entityCacheEnabled, finderCacheEnabled, Long.class,
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByC_C_S",
 			new String[] {
 				Long.class.getName(), Long.class.getName(),
@@ -22435,8 +22743,7 @@ public class MBMessagePersistenceImpl
 			});
 
 		_finderPathWithPaginationFindByG_C_T_A = new FinderPath(
-			MBMessageModelImpl.ENTITY_CACHE_ENABLED,
-			MBMessageModelImpl.FINDER_CACHE_ENABLED, MBMessageImpl.class,
+			entityCacheEnabled, finderCacheEnabled, MBMessageImpl.class,
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByG_C_T_A",
 			new String[] {
 				Long.class.getName(), Long.class.getName(),
@@ -22446,8 +22753,7 @@ public class MBMessagePersistenceImpl
 			});
 
 		_finderPathWithoutPaginationFindByG_C_T_A = new FinderPath(
-			MBMessageModelImpl.ENTITY_CACHE_ENABLED,
-			MBMessageModelImpl.FINDER_CACHE_ENABLED, MBMessageImpl.class,
+			entityCacheEnabled, finderCacheEnabled, MBMessageImpl.class,
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByG_C_T_A",
 			new String[] {
 				Long.class.getName(), Long.class.getName(),
@@ -22460,8 +22766,7 @@ public class MBMessagePersistenceImpl
 			MBMessageModelImpl.CREATEDATE_COLUMN_BITMASK);
 
 		_finderPathCountByG_C_T_A = new FinderPath(
-			MBMessageModelImpl.ENTITY_CACHE_ENABLED,
-			MBMessageModelImpl.FINDER_CACHE_ENABLED, Long.class,
+			entityCacheEnabled, finderCacheEnabled, Long.class,
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByG_C_T_A",
 			new String[] {
 				Long.class.getName(), Long.class.getName(),
@@ -22469,8 +22774,7 @@ public class MBMessagePersistenceImpl
 			});
 
 		_finderPathWithPaginationFindByG_C_T_S = new FinderPath(
-			MBMessageModelImpl.ENTITY_CACHE_ENABLED,
-			MBMessageModelImpl.FINDER_CACHE_ENABLED, MBMessageImpl.class,
+			entityCacheEnabled, finderCacheEnabled, MBMessageImpl.class,
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByG_C_T_S",
 			new String[] {
 				Long.class.getName(), Long.class.getName(),
@@ -22480,8 +22784,7 @@ public class MBMessagePersistenceImpl
 			});
 
 		_finderPathWithoutPaginationFindByG_C_T_S = new FinderPath(
-			MBMessageModelImpl.ENTITY_CACHE_ENABLED,
-			MBMessageModelImpl.FINDER_CACHE_ENABLED, MBMessageImpl.class,
+			entityCacheEnabled, finderCacheEnabled, MBMessageImpl.class,
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByG_C_T_S",
 			new String[] {
 				Long.class.getName(), Long.class.getName(),
@@ -22494,8 +22797,7 @@ public class MBMessagePersistenceImpl
 			MBMessageModelImpl.CREATEDATE_COLUMN_BITMASK);
 
 		_finderPathCountByG_C_T_S = new FinderPath(
-			MBMessageModelImpl.ENTITY_CACHE_ENABLED,
-			MBMessageModelImpl.FINDER_CACHE_ENABLED, Long.class,
+			entityCacheEnabled, finderCacheEnabled, Long.class,
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByG_C_T_S",
 			new String[] {
 				Long.class.getName(), Long.class.getName(),
@@ -22503,8 +22805,7 @@ public class MBMessagePersistenceImpl
 			});
 
 		_finderPathWithPaginationFindByU_C_C_S = new FinderPath(
-			MBMessageModelImpl.ENTITY_CACHE_ENABLED,
-			MBMessageModelImpl.FINDER_CACHE_ENABLED, MBMessageImpl.class,
+			entityCacheEnabled, finderCacheEnabled, MBMessageImpl.class,
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByU_C_C_S",
 			new String[] {
 				Long.class.getName(), Long.class.getName(),
@@ -22514,8 +22815,7 @@ public class MBMessagePersistenceImpl
 			});
 
 		_finderPathWithoutPaginationFindByU_C_C_S = new FinderPath(
-			MBMessageModelImpl.ENTITY_CACHE_ENABLED,
-			MBMessageModelImpl.FINDER_CACHE_ENABLED, MBMessageImpl.class,
+			entityCacheEnabled, finderCacheEnabled, MBMessageImpl.class,
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByU_C_C_S",
 			new String[] {
 				Long.class.getName(), Long.class.getName(),
@@ -22528,8 +22828,7 @@ public class MBMessagePersistenceImpl
 			MBMessageModelImpl.CREATEDATE_COLUMN_BITMASK);
 
 		_finderPathCountByU_C_C_S = new FinderPath(
-			MBMessageModelImpl.ENTITY_CACHE_ENABLED,
-			MBMessageModelImpl.FINDER_CACHE_ENABLED, Long.class,
+			entityCacheEnabled, finderCacheEnabled, Long.class,
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByU_C_C_S",
 			new String[] {
 				Long.class.getName(), Long.class.getName(),
@@ -22537,20 +22836,52 @@ public class MBMessagePersistenceImpl
 			});
 	}
 
-	public void destroy() {
+	@Deactivate
+	public void deactivate() {
 		entityCache.removeCache(MBMessageImpl.class.getName());
 		finderCache.removeCache(FINDER_CLASS_NAME_ENTITY);
 		finderCache.removeCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
 		finderCache.removeCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
 	}
 
-	@ServiceReference(type = CompanyProviderWrapper.class)
-	protected CompanyProvider companyProvider;
+	@Override
+	@Reference(
+		target = MBPersistenceConstants.SERVICE_CONFIGURATION_FILTER,
+		unbind = "-"
+	)
+	public void setConfiguration(Configuration configuration) {
+		super.setConfiguration(configuration);
 
-	@ServiceReference(type = EntityCache.class)
+		_columnBitmaskEnabled = GetterUtil.getBoolean(
+			configuration.get(
+				"value.object.column.bitmask.enabled.com.liferay.message.boards.model.MBMessage"),
+			true);
+	}
+
+	@Override
+	@Reference(
+		target = MBPersistenceConstants.ORIGIN_BUNDLE_SYMBOLIC_NAME_FILTER,
+		unbind = "-"
+	)
+	public void setDataSource(DataSource dataSource) {
+		super.setDataSource(dataSource);
+	}
+
+	@Override
+	@Reference(
+		target = MBPersistenceConstants.ORIGIN_BUNDLE_SYMBOLIC_NAME_FILTER,
+		unbind = "-"
+	)
+	public void setSessionFactory(SessionFactory sessionFactory) {
+		super.setSessionFactory(sessionFactory);
+	}
+
+	private boolean _columnBitmaskEnabled;
+
+	@Reference
 	protected EntityCache entityCache;
 
-	@ServiceReference(type = FinderCache.class)
+	@Reference
 	protected FinderCache finderCache;
 
 	private static final String _SQL_SELECT_MBMESSAGE =
@@ -22601,5 +22932,14 @@ public class MBMessagePersistenceImpl
 
 	private static final Set<String> _badColumnNames = SetUtil.fromArray(
 		new String[] {"uuid"});
+
+	static {
+		try {
+			Class.forName(MBPersistenceConstants.class.getName());
+		}
+		catch (ClassNotFoundException cnfe) {
+			throw new ExceptionInInitializerError(cnfe);
+		}
+	}
 
 }

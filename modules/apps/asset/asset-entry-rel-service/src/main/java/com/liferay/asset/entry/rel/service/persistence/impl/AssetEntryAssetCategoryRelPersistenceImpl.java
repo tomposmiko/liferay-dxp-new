@@ -48,7 +48,6 @@ import java.util.Map;
 
 import javax.sql.DataSource;
 
-import org.osgi.annotation.versioning.ProviderType;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
@@ -65,12 +64,11 @@ import org.osgi.service.component.annotations.Reference;
  * @generated
  */
 @Component(service = AssetEntryAssetCategoryRelPersistence.class)
-@ProviderType
 public class AssetEntryAssetCategoryRelPersistenceImpl
 	extends BasePersistenceImpl<AssetEntryAssetCategoryRel>
 	implements AssetEntryAssetCategoryRelPersistence {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this class directly. Always use <code>AssetEntryAssetCategoryRelUtil</code> to access the asset entry asset category rel persistence. Modify <code>service.xml</code> and rerun ServiceBuilder to regenerate this class.
@@ -109,7 +107,7 @@ public class AssetEntryAssetCategoryRelPersistenceImpl
 	 * Returns a range of all the asset entry asset category rels where assetEntryId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>AssetEntryAssetCategoryRelModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>AssetEntryAssetCategoryRelModelImpl</code>.
 	 * </p>
 	 *
 	 * @param assetEntryId the asset entry ID
@@ -128,7 +126,7 @@ public class AssetEntryAssetCategoryRelPersistenceImpl
 	 * Returns an ordered range of all the asset entry asset category rels where assetEntryId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>AssetEntryAssetCategoryRelModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>AssetEntryAssetCategoryRelModelImpl</code>.
 	 * </p>
 	 *
 	 * @param assetEntryId the asset entry ID
@@ -150,34 +148,34 @@ public class AssetEntryAssetCategoryRelPersistenceImpl
 	 * Returns an ordered range of all the asset entry asset category rels where assetEntryId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>AssetEntryAssetCategoryRelModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>AssetEntryAssetCategoryRelModelImpl</code>.
 	 * </p>
 	 *
 	 * @param assetEntryId the asset entry ID
 	 * @param start the lower bound of the range of asset entry asset category rels
 	 * @param end the upper bound of the range of asset entry asset category rels (not inclusive)
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
-	 * @param retrieveFromCache whether to retrieve from the finder cache
+	 * @param useFinderCache whether to use the finder cache
 	 * @return the ordered range of matching asset entry asset category rels
 	 */
 	@Override
 	public List<AssetEntryAssetCategoryRel> findByAssetEntryId(
 		long assetEntryId, int start, int end,
 		OrderByComparator<AssetEntryAssetCategoryRel> orderByComparator,
-		boolean retrieveFromCache) {
+		boolean useFinderCache) {
 
-		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
 			(orderByComparator == null)) {
 
-			pagination = false;
-			finderPath = _finderPathWithoutPaginationFindByAssetEntryId;
-			finderArgs = new Object[] {assetEntryId};
+			if (useFinderCache) {
+				finderPath = _finderPathWithoutPaginationFindByAssetEntryId;
+				finderArgs = new Object[] {assetEntryId};
+			}
 		}
-		else {
+		else if (useFinderCache) {
 			finderPath = _finderPathWithPaginationFindByAssetEntryId;
 			finderArgs = new Object[] {
 				assetEntryId, start, end, orderByComparator
@@ -186,7 +184,7 @@ public class AssetEntryAssetCategoryRelPersistenceImpl
 
 		List<AssetEntryAssetCategoryRel> list = null;
 
-		if (retrieveFromCache) {
+		if (useFinderCache) {
 			list = (List<AssetEntryAssetCategoryRel>)finderCache.getResult(
 				finderPath, finderArgs, this);
 
@@ -194,8 +192,8 @@ public class AssetEntryAssetCategoryRelPersistenceImpl
 				for (AssetEntryAssetCategoryRel assetEntryAssetCategoryRel :
 						list) {
 
-					if ((assetEntryId !=
-							assetEntryAssetCategoryRel.getAssetEntryId())) {
+					if (assetEntryId !=
+							assetEntryAssetCategoryRel.getAssetEntryId()) {
 
 						list = null;
 
@@ -224,7 +222,7 @@ public class AssetEntryAssetCategoryRelPersistenceImpl
 				appendOrderByComparator(
 					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
 			}
-			else if (pagination) {
+			else {
 				query.append(AssetEntryAssetCategoryRelModelImpl.ORDER_BY_JPQL);
 			}
 
@@ -241,25 +239,19 @@ public class AssetEntryAssetCategoryRelPersistenceImpl
 
 				qPos.add(assetEntryId);
 
-				if (!pagination) {
-					list = (List<AssetEntryAssetCategoryRel>)QueryUtil.list(
-						q, getDialect(), start, end, false);
-
-					Collections.sort(list);
-
-					list = Collections.unmodifiableList(list);
-				}
-				else {
-					list = (List<AssetEntryAssetCategoryRel>)QueryUtil.list(
-						q, getDialect(), start, end);
-				}
+				list = (List<AssetEntryAssetCategoryRel>)QueryUtil.list(
+					q, getDialect(), start, end);
 
 				cacheResult(list);
 
-				finderCache.putResult(finderPath, finderArgs, list);
+				if (useFinderCache) {
+					finderCache.putResult(finderPath, finderArgs, list);
+				}
 			}
 			catch (Exception e) {
-				finderCache.removeResult(finderPath, finderArgs);
+				if (useFinderCache) {
+					finderCache.removeResult(finderPath, finderArgs);
+				}
 
 				throw processException(e);
 			}
@@ -635,7 +627,7 @@ public class AssetEntryAssetCategoryRelPersistenceImpl
 	 * Returns a range of all the asset entry asset category rels where assetCategoryId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>AssetEntryAssetCategoryRelModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>AssetEntryAssetCategoryRelModelImpl</code>.
 	 * </p>
 	 *
 	 * @param assetCategoryId the asset category ID
@@ -654,7 +646,7 @@ public class AssetEntryAssetCategoryRelPersistenceImpl
 	 * Returns an ordered range of all the asset entry asset category rels where assetCategoryId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>AssetEntryAssetCategoryRelModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>AssetEntryAssetCategoryRelModelImpl</code>.
 	 * </p>
 	 *
 	 * @param assetCategoryId the asset category ID
@@ -676,34 +668,34 @@ public class AssetEntryAssetCategoryRelPersistenceImpl
 	 * Returns an ordered range of all the asset entry asset category rels where assetCategoryId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>AssetEntryAssetCategoryRelModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>AssetEntryAssetCategoryRelModelImpl</code>.
 	 * </p>
 	 *
 	 * @param assetCategoryId the asset category ID
 	 * @param start the lower bound of the range of asset entry asset category rels
 	 * @param end the upper bound of the range of asset entry asset category rels (not inclusive)
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
-	 * @param retrieveFromCache whether to retrieve from the finder cache
+	 * @param useFinderCache whether to use the finder cache
 	 * @return the ordered range of matching asset entry asset category rels
 	 */
 	@Override
 	public List<AssetEntryAssetCategoryRel> findByAssetCategoryId(
 		long assetCategoryId, int start, int end,
 		OrderByComparator<AssetEntryAssetCategoryRel> orderByComparator,
-		boolean retrieveFromCache) {
+		boolean useFinderCache) {
 
-		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
 			(orderByComparator == null)) {
 
-			pagination = false;
-			finderPath = _finderPathWithoutPaginationFindByAssetCategoryId;
-			finderArgs = new Object[] {assetCategoryId};
+			if (useFinderCache) {
+				finderPath = _finderPathWithoutPaginationFindByAssetCategoryId;
+				finderArgs = new Object[] {assetCategoryId};
+			}
 		}
-		else {
+		else if (useFinderCache) {
 			finderPath = _finderPathWithPaginationFindByAssetCategoryId;
 			finderArgs = new Object[] {
 				assetCategoryId, start, end, orderByComparator
@@ -712,7 +704,7 @@ public class AssetEntryAssetCategoryRelPersistenceImpl
 
 		List<AssetEntryAssetCategoryRel> list = null;
 
-		if (retrieveFromCache) {
+		if (useFinderCache) {
 			list = (List<AssetEntryAssetCategoryRel>)finderCache.getResult(
 				finderPath, finderArgs, this);
 
@@ -720,8 +712,8 @@ public class AssetEntryAssetCategoryRelPersistenceImpl
 				for (AssetEntryAssetCategoryRel assetEntryAssetCategoryRel :
 						list) {
 
-					if ((assetCategoryId !=
-							assetEntryAssetCategoryRel.getAssetCategoryId())) {
+					if (assetCategoryId !=
+							assetEntryAssetCategoryRel.getAssetCategoryId()) {
 
 						list = null;
 
@@ -750,7 +742,7 @@ public class AssetEntryAssetCategoryRelPersistenceImpl
 				appendOrderByComparator(
 					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
 			}
-			else if (pagination) {
+			else {
 				query.append(AssetEntryAssetCategoryRelModelImpl.ORDER_BY_JPQL);
 			}
 
@@ -767,25 +759,19 @@ public class AssetEntryAssetCategoryRelPersistenceImpl
 
 				qPos.add(assetCategoryId);
 
-				if (!pagination) {
-					list = (List<AssetEntryAssetCategoryRel>)QueryUtil.list(
-						q, getDialect(), start, end, false);
-
-					Collections.sort(list);
-
-					list = Collections.unmodifiableList(list);
-				}
-				else {
-					list = (List<AssetEntryAssetCategoryRel>)QueryUtil.list(
-						q, getDialect(), start, end);
-				}
+				list = (List<AssetEntryAssetCategoryRel>)QueryUtil.list(
+					q, getDialect(), start, end);
 
 				cacheResult(list);
 
-				finderCache.putResult(finderPath, finderArgs, list);
+				if (useFinderCache) {
+					finderCache.putResult(finderPath, finderArgs, list);
+				}
 			}
 			catch (Exception e) {
-				finderCache.removeResult(finderPath, finderArgs);
+				if (useFinderCache) {
+					finderCache.removeResult(finderPath, finderArgs);
+				}
 
 				throw processException(e);
 			}
@@ -1202,18 +1188,22 @@ public class AssetEntryAssetCategoryRelPersistenceImpl
 	 *
 	 * @param assetEntryId the asset entry ID
 	 * @param assetCategoryId the asset category ID
-	 * @param retrieveFromCache whether to retrieve from the finder cache
+	 * @param useFinderCache whether to use the finder cache
 	 * @return the matching asset entry asset category rel, or <code>null</code> if a matching asset entry asset category rel could not be found
 	 */
 	@Override
 	public AssetEntryAssetCategoryRel fetchByA_A(
-		long assetEntryId, long assetCategoryId, boolean retrieveFromCache) {
+		long assetEntryId, long assetCategoryId, boolean useFinderCache) {
 
-		Object[] finderArgs = new Object[] {assetEntryId, assetCategoryId};
+		Object[] finderArgs = null;
+
+		if (useFinderCache) {
+			finderArgs = new Object[] {assetEntryId, assetCategoryId};
+		}
 
 		Object result = null;
 
-		if (retrieveFromCache) {
+		if (useFinderCache) {
 			result = finderCache.getResult(
 				_finderPathFetchByA_A, finderArgs, this);
 		}
@@ -1258,14 +1248,22 @@ public class AssetEntryAssetCategoryRelPersistenceImpl
 				List<AssetEntryAssetCategoryRel> list = q.list();
 
 				if (list.isEmpty()) {
-					finderCache.putResult(
-						_finderPathFetchByA_A, finderArgs, list);
+					if (useFinderCache) {
+						finderCache.putResult(
+							_finderPathFetchByA_A, finderArgs, list);
+					}
 				}
 				else {
 					if (list.size() > 1) {
 						Collections.sort(list, Collections.reverseOrder());
 
 						if (_log.isWarnEnabled()) {
+							if (!useFinderCache) {
+								finderArgs = new Object[] {
+									assetEntryId, assetCategoryId
+								};
+							}
+
 							_log.warn(
 								"AssetEntryAssetCategoryRelPersistenceImpl.fetchByA_A(long, long, boolean) with parameters (" +
 									StringUtil.merge(finderArgs) +
@@ -1282,7 +1280,9 @@ public class AssetEntryAssetCategoryRelPersistenceImpl
 				}
 			}
 			catch (Exception e) {
-				finderCache.removeResult(_finderPathFetchByA_A, finderArgs);
+				if (useFinderCache) {
+					finderCache.removeResult(_finderPathFetchByA_A, finderArgs);
+				}
 
 				throw processException(e);
 			}
@@ -1853,7 +1853,7 @@ public class AssetEntryAssetCategoryRelPersistenceImpl
 	 * Returns a range of all the asset entry asset category rels.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>AssetEntryAssetCategoryRelModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>AssetEntryAssetCategoryRelModelImpl</code>.
 	 * </p>
 	 *
 	 * @param start the lower bound of the range of asset entry asset category rels
@@ -1869,7 +1869,7 @@ public class AssetEntryAssetCategoryRelPersistenceImpl
 	 * Returns an ordered range of all the asset entry asset category rels.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>AssetEntryAssetCategoryRelModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>AssetEntryAssetCategoryRelModelImpl</code>.
 	 * </p>
 	 *
 	 * @param start the lower bound of the range of asset entry asset category rels
@@ -1889,40 +1889,40 @@ public class AssetEntryAssetCategoryRelPersistenceImpl
 	 * Returns an ordered range of all the asset entry asset category rels.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>AssetEntryAssetCategoryRelModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>AssetEntryAssetCategoryRelModelImpl</code>.
 	 * </p>
 	 *
 	 * @param start the lower bound of the range of asset entry asset category rels
 	 * @param end the upper bound of the range of asset entry asset category rels (not inclusive)
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
-	 * @param retrieveFromCache whether to retrieve from the finder cache
+	 * @param useFinderCache whether to use the finder cache
 	 * @return the ordered range of asset entry asset category rels
 	 */
 	@Override
 	public List<AssetEntryAssetCategoryRel> findAll(
 		int start, int end,
 		OrderByComparator<AssetEntryAssetCategoryRel> orderByComparator,
-		boolean retrieveFromCache) {
+		boolean useFinderCache) {
 
-		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
 			(orderByComparator == null)) {
 
-			pagination = false;
-			finderPath = _finderPathWithoutPaginationFindAll;
-			finderArgs = FINDER_ARGS_EMPTY;
+			if (useFinderCache) {
+				finderPath = _finderPathWithoutPaginationFindAll;
+				finderArgs = FINDER_ARGS_EMPTY;
+			}
 		}
-		else {
+		else if (useFinderCache) {
 			finderPath = _finderPathWithPaginationFindAll;
 			finderArgs = new Object[] {start, end, orderByComparator};
 		}
 
 		List<AssetEntryAssetCategoryRel> list = null;
 
-		if (retrieveFromCache) {
+		if (useFinderCache) {
 			list = (List<AssetEntryAssetCategoryRel>)finderCache.getResult(
 				finderPath, finderArgs, this);
 		}
@@ -1945,10 +1945,8 @@ public class AssetEntryAssetCategoryRelPersistenceImpl
 			else {
 				sql = _SQL_SELECT_ASSETENTRYASSETCATEGORYREL;
 
-				if (pagination) {
-					sql = sql.concat(
-						AssetEntryAssetCategoryRelModelImpl.ORDER_BY_JPQL);
-				}
+				sql = sql.concat(
+					AssetEntryAssetCategoryRelModelImpl.ORDER_BY_JPQL);
 			}
 
 			Session session = null;
@@ -1958,25 +1956,19 @@ public class AssetEntryAssetCategoryRelPersistenceImpl
 
 				Query q = session.createQuery(sql);
 
-				if (!pagination) {
-					list = (List<AssetEntryAssetCategoryRel>)QueryUtil.list(
-						q, getDialect(), start, end, false);
-
-					Collections.sort(list);
-
-					list = Collections.unmodifiableList(list);
-				}
-				else {
-					list = (List<AssetEntryAssetCategoryRel>)QueryUtil.list(
-						q, getDialect(), start, end);
-				}
+				list = (List<AssetEntryAssetCategoryRel>)QueryUtil.list(
+					q, getDialect(), start, end);
 
 				cacheResult(list);
 
-				finderCache.putResult(finderPath, finderArgs, list);
+				if (useFinderCache) {
+					finderCache.putResult(finderPath, finderArgs, list);
+				}
 			}
 			catch (Exception e) {
-				finderCache.removeResult(finderPath, finderArgs);
+				if (useFinderCache) {
+					finderCache.removeResult(finderPath, finderArgs);
+				}
 
 				throw processException(e);
 			}
@@ -2151,7 +2143,7 @@ public class AssetEntryAssetCategoryRelPersistenceImpl
 
 	@Override
 	@Reference(
-		target = AssetPersistenceConstants.ORIGIN_BUNDLE_SYMBOLIC_NAME_FILTER,
+		target = AssetPersistenceConstants.SERVICE_CONFIGURATION_FILTER,
 		unbind = "-"
 	)
 	public void setConfiguration(Configuration configuration) {
@@ -2212,5 +2204,14 @@ public class AssetEntryAssetCategoryRelPersistenceImpl
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		AssetEntryAssetCategoryRelPersistenceImpl.class);
+
+	static {
+		try {
+			Class.forName(AssetPersistenceConstants.class.getName());
+		}
+		catch (ClassNotFoundException cnfe) {
+			throw new ExceptionInInitializerError(cnfe);
+		}
+	}
 
 }

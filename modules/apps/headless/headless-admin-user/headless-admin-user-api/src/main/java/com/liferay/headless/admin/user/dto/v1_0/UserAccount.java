@@ -20,9 +20,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import com.liferay.petra.function.UnsafeSupplier;
 import com.liferay.petra.string.StringBundler;
-
-import graphql.annotations.annotationTypes.GraphQLField;
-import graphql.annotations.annotationTypes.GraphQLName;
+import com.liferay.portal.vulcan.graphql.annotation.GraphQLField;
+import com.liferay.portal.vulcan.graphql.annotation.GraphQLName;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 
@@ -36,6 +35,8 @@ import java.util.Objects;
 import java.util.Set;
 
 import javax.annotation.Generated;
+
+import javax.validation.Valid;
 
 import javax.xml.bind.annotation.XmlRootElement;
 
@@ -134,6 +135,7 @@ public class UserAccount {
 	protected Date birthDate;
 
 	@Schema(description = "The user's contact information.")
+	@Valid
 	public ContactInformation getContactInformation() {
 		return contactInformation;
 	}
@@ -163,6 +165,7 @@ public class UserAccount {
 	protected ContactInformation contactInformation;
 
 	@Schema
+	@Valid
 	public CustomField[] getCustomFields() {
 		return customFields;
 	}
@@ -553,6 +556,7 @@ public class UserAccount {
 	protected String name;
 
 	@Schema(description = "A list of the user's organizations.")
+	@Valid
 	public OrganizationBrief[] getOrganizationBriefs() {
 		return organizationBriefs;
 	}
@@ -610,6 +614,7 @@ public class UserAccount {
 	protected String profileURL;
 
 	@Schema(description = "A list of the user's roles.")
+	@Valid
 	public RoleBrief[] getRoleBriefs() {
 		return roleBriefs;
 	}
@@ -638,6 +643,7 @@ public class UserAccount {
 	protected RoleBrief[] roleBriefs;
 
 	@Schema(description = "A list of the user's sites.")
+	@Valid
 	public SiteBrief[] getSiteBriefs() {
 		return siteBriefs;
 	}
@@ -1033,6 +1039,12 @@ public class UserAccount {
 
 		return sb.toString();
 	}
+
+	@Schema(
+		defaultValue = "com.liferay.headless.admin.user.dto.v1_0.UserAccount",
+		name = "x-class-name"
+	)
+	public String xClassName;
 
 	private static String _escape(Object object) {
 		String string = String.valueOf(object);

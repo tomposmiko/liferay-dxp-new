@@ -14,7 +14,7 @@
 
 package com.liferay.amazon.rankings.web.internal.portlet;
 
-import com.liferay.amazon.rankings.web.configuration.AmazonRankingsConfiguration;
+import com.liferay.amazon.rankings.web.internal.configuration.AmazonRankingsConfiguration;
 import com.liferay.amazon.rankings.web.internal.constants.AmazonRankingsPortletKeys;
 import com.liferay.portal.configuration.metatype.bnd.util.ConfigurableUtil;
 import com.liferay.portal.kernel.model.Release;
@@ -40,7 +40,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Peter Fellwock
  */
 @Component(
-	configurationPid = "com.liferay.amazon.rankings.web.configuration.AmazonRankingsConfiguration",
+	configurationPid = "com.liferay.amazon.rankings.web.internal.configuration.AmazonRankingsConfiguration",
 	configurationPolicy = ConfigurationPolicy.OPTIONAL, immediate = true,
 	property = {
 		"com.liferay.portlet.css-class-wrapper=portlet-amazon-rankings",
@@ -84,7 +84,7 @@ public class AmazonRankingsPortlet extends MVCPortlet {
 	private volatile AmazonRankingsConfiguration _amazonRankingsConfiguration;
 
 	@Reference(
-		target = "(&(release.bundle.symbolic.name=com.liferay.amazon.rankings.web)(&(release.schema.version>=1.0.0)(!(release.schema.version>=1.1.0))))"
+		target = "(&(release.bundle.symbolic.name=com.liferay.amazon.rankings.web)(&(release.schema.version>=1.0.0)(!(release.schema.version>=2.0.0))))"
 	)
 	private Release _release;
 

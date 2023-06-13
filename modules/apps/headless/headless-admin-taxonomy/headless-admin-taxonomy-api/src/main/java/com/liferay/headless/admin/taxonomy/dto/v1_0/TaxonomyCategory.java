@@ -22,9 +22,8 @@ import com.fasterxml.jackson.annotation.JsonValue;
 
 import com.liferay.petra.function.UnsafeSupplier;
 import com.liferay.petra.string.StringBundler;
-
-import graphql.annotations.annotationTypes.GraphQLField;
-import graphql.annotations.annotationTypes.GraphQLName;
+import com.liferay.portal.vulcan.graphql.annotation.GraphQLField;
+import com.liferay.portal.vulcan.graphql.annotation.GraphQLName;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 
@@ -39,6 +38,7 @@ import java.util.Set;
 
 import javax.annotation.Generated;
 
+import javax.validation.Valid;
 import javax.validation.constraints.NotEmpty;
 
 import javax.xml.bind.annotation.XmlRootElement;
@@ -54,6 +54,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement(name = "TaxonomyCategory")
 public class TaxonomyCategory {
 
+	@GraphQLName("ViewableBy")
 	public static enum ViewableBy {
 
 		ANYONE("Anyone"), MEMBERS("Members"), OWNER("Owner");
@@ -118,6 +119,7 @@ public class TaxonomyCategory {
 	protected String[] availableLanguages;
 
 	@Schema(description = "The category's creator.")
+	@Valid
 	public Creator getCreator() {
 		return creator;
 	}
@@ -317,6 +319,7 @@ public class TaxonomyCategory {
 	protected Integer numberOfTaxonomyCategories;
 
 	@Schema(description = "The category's parent category, if it exists.")
+	@Valid
 	public ParentTaxonomyCategory getParentTaxonomyCategory() {
 		return parentTaxonomyCategory;
 	}
@@ -350,6 +353,7 @@ public class TaxonomyCategory {
 	@Schema(
 		description = "The parent category's `TaxonomyVocabulary`, if such a parent category exists."
 	)
+	@Valid
 	public ParentTaxonomyVocabulary getParentTaxonomyVocabulary() {
 		return parentTaxonomyVocabulary;
 	}
@@ -384,6 +388,7 @@ public class TaxonomyCategory {
 	@Schema(
 		description = "A write-only property that specifies the category's default permissions."
 	)
+	@Valid
 	public ViewableBy getViewableBy() {
 		return viewableBy;
 	}
@@ -598,6 +603,12 @@ public class TaxonomyCategory {
 
 		return sb.toString();
 	}
+
+	@Schema(
+		defaultValue = "com.liferay.headless.admin.taxonomy.dto.v1_0.TaxonomyCategory",
+		name = "x-class-name"
+	)
+	public String xClassName;
 
 	private static String _escape(Object object) {
 		String string = String.valueOf(object);

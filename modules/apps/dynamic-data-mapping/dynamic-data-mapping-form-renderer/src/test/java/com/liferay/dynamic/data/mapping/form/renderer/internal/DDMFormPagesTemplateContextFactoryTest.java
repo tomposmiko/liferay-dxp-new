@@ -14,7 +14,7 @@
 
 package com.liferay.dynamic.data.mapping.form.renderer.internal;
 
-import com.liferay.dynamic.data.mapping.expression.DDMExpressionFunction;
+import com.liferay.dynamic.data.mapping.expression.DDMExpressionFunctionFactory;
 import com.liferay.dynamic.data.mapping.expression.DDMExpressionFunctionTracker;
 import com.liferay.dynamic.data.mapping.expression.internal.DDMExpressionFactoryImpl;
 import com.liferay.dynamic.data.mapping.form.evaluator.DDMFormEvaluator;
@@ -917,7 +917,7 @@ public class DDMFormPagesTemplateContextFactoryTest extends PowerMockito {
 	}
 
 	protected DDMFormEvaluator getDDMFormEvaluator() throws Exception {
-		DDMExpressionFactoryImpl ddmExpressionFactory =
+		DDMExpressionFactoryImpl ddmExpressionFactoryImpl =
 			new DDMExpressionFactoryImpl();
 
 		DDMFormEvaluator ddmFormEvaluator = new DDMFormEvaluatorImpl();
@@ -925,7 +925,7 @@ public class DDMFormPagesTemplateContextFactoryTest extends PowerMockito {
 		field(
 			DDMFormEvaluatorImpl.class, "ddmExpressionFactory"
 		).set(
-			ddmFormEvaluator, ddmExpressionFactory
+			ddmFormEvaluator, ddmExpressionFactoryImpl
 		);
 
 		field(
@@ -934,25 +934,26 @@ public class DDMFormPagesTemplateContextFactoryTest extends PowerMockito {
 			ddmFormEvaluator, _ddmFormFieldTypeServicesTracker
 		);
 
-		Map<String, DDMExpressionFunction> ddmExpressionFunctionMap =
-			new HashMap<>();
+		Map<String, DDMExpressionFunctionFactory>
+			ddmExpressionFunctionFactoryMap = new HashMap<>();
 
-		ddmExpressionFunctionMap.put("jumpPage", new JumpPageFunction());
+		ddmExpressionFunctionFactoryMap.put(
+			"jumpPage", () -> new JumpPageFunction());
 
 		DDMExpressionFunctionTracker ddmExpressionFunctionTracker = mock(
 			DDMExpressionFunctionTracker.class);
 
 		when(
-			ddmExpressionFunctionTracker.getDDMExpressionFunctions(
+			ddmExpressionFunctionTracker.getDDMExpressionFunctionFactories(
 				Matchers.any())
 		).thenReturn(
-			ddmExpressionFunctionMap
+			ddmExpressionFunctionFactoryMap
 		);
 
 		field(
 			DDMExpressionFactoryImpl.class, "ddmExpressionFunctionTracker"
 		).set(
-			ddmExpressionFactory, ddmExpressionFunctionTracker
+			ddmExpressionFactoryImpl, ddmExpressionFunctionTracker
 		);
 
 		return ddmFormEvaluator;

@@ -1,0 +1,13 @@
+#
+# Liferay App Version 1.0.0
+#
+
+app.artifacts-1.0.0=\
+	com.liferay.portal.security.sso.openid.api-3.0.5.jar,\
+	com.liferay.portal.security.sso.openid.impl-2.0.4.jar,\
+	com.liferay.portal.security.sso.openid.login.authentication.web-1.0.4.jar,\
+	com.liferay.portal.security.sso.openid.settings.authentication.web-1.0.3.jar
+
+app.change.log-1.0.0=LPS-77699 LPS-84119 LPS-88906 LPS-91851 LPS-93427 LPS-94555 LPS-95413 LPS-95555
+
+app.git.id-1.0.0=890bc44855629add2b7cf8021c897ae49552e041

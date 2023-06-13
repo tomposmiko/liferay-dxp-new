@@ -60,7 +60,7 @@ import org.osgi.annotation.versioning.ProviderType;
 public interface FragmentEntryLocalService
 	extends BaseLocalService, PersistedModelLocalService {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this interface directly. Always use {@link FragmentEntryLocalServiceUtil} to access the fragment entry local service. Add custom service methods to <code>com.liferay.fragment.service.impl.FragmentEntryLocalServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
@@ -75,33 +75,69 @@ public interface FragmentEntryLocalService
 	@Indexable(type = IndexableType.REINDEX)
 	public FragmentEntry addFragmentEntry(FragmentEntry fragmentEntry);
 
+	/**
+	 * @deprecated As of Mueller (7.2.x), replaced by {@link
+	 #addFragmentEntry(long, long, long, String, String, String,
+	 String, int, int, ServiceContext)}
+	 */
+	@Deprecated
 	public FragmentEntry addFragmentEntry(
 			long userId, long groupId, long fragmentCollectionId, String name,
 			int type, int status, ServiceContext serviceContext)
 		throws PortalException;
 
+	/**
+	 * @deprecated As of Mueller (7.2.x), replaced by {@link
+	 #addFragmentEntry(long, long, long, String, String, String,
+	 String, int, int, ServiceContext)}
+	 */
+	@Deprecated
 	public FragmentEntry addFragmentEntry(
 			long userId, long groupId, long fragmentCollectionId, String name,
 			int status, ServiceContext serviceContext)
 		throws PortalException;
 
+	/**
+	 * @deprecated As of Mueller (7.2.x), replaced by {@link
+	 #addFragmentEntry(long, long, long, String, String, String,
+	 String, int, int, ServiceContext)}
+	 */
+	@Deprecated
 	public FragmentEntry addFragmentEntry(
 			long userId, long groupId, long fragmentCollectionId, String name,
 			long previewFileEntryId, int type, int status,
 			ServiceContext serviceContext)
 		throws PortalException;
 
+	/**
+	 * @deprecated As of Mueller (7.2.x), replaced by {@link
+	 #addFragmentEntry(long, long, long, String, String, String,
+	 String, int, int, ServiceContext)}
+	 */
+	@Deprecated
 	public FragmentEntry addFragmentEntry(
 			long userId, long groupId, long fragmentCollectionId, String name,
 			long previewFileEntryId, int status, ServiceContext serviceContext)
 		throws PortalException;
 
+	/**
+	 * @deprecated As of Mueller (7.2.x), replaced by {@link
+	 #addFragmentEntry(long, long, long, String, String, String,
+	 String, int, int, ServiceContext)}
+	 */
+	@Deprecated
 	public FragmentEntry addFragmentEntry(
 			long userId, long groupId, long fragmentCollectionId,
 			String fragmentEntryKey, String name, int type, int status,
 			ServiceContext serviceContext)
 		throws PortalException;
 
+	/**
+	 * @deprecated As of Mueller (7.2.x), replaced by {@link
+	 #addFragmentEntry(long, long, long, String, String, String,
+	 String, int, int, ServiceContext)}
+	 */
+	@Deprecated
 	public FragmentEntry addFragmentEntry(
 			long userId, long groupId, long fragmentCollectionId,
 			String fragmentEntryKey, String name, int status,
@@ -114,48 +150,96 @@ public interface FragmentEntryLocalService
 			int type, int status, ServiceContext serviceContext)
 		throws PortalException;
 
+	/**
+	 * @deprecated As of Mueller (7.2.x), replaced by {@link
+	 #addFragmentEntry(long, long, long, String, String, String,
+	 String, int, int, ServiceContext)}
+	 */
+	@Deprecated
 	public FragmentEntry addFragmentEntry(
 			long userId, long groupId, long fragmentCollectionId,
 			String fragmentEntryKey, String name, long previewFileEntryId,
 			int status, ServiceContext serviceContext)
 		throws PortalException;
 
+	/**
+	 * @deprecated As of Mueller (7.2.x), replaced by {@link
+	 #addFragmentEntry(long, long, long, String, String, String,
+	 String, String, String, long, int, int, ServiceContext)}
+	 */
+	@Deprecated
 	public FragmentEntry addFragmentEntry(
 			long userId, long groupId, long fragmentCollectionId, String name,
 			String css, String html, String js, int type, int status,
 			ServiceContext serviceContext)
 		throws PortalException;
 
+	/**
+	 * @deprecated As of Mueller (7.2.x), replaced by {@link
+	 #addFragmentEntry(long, long, long, String, String, String,
+	 String, String, String, long, int, int, ServiceContext)}
+	 */
+	@Deprecated
 	public FragmentEntry addFragmentEntry(
 			long userId, long groupId, long fragmentCollectionId, String name,
 			String css, String html, String js, int status,
 			ServiceContext serviceContext)
 		throws PortalException;
 
+	/**
+	 * @deprecated As of Mueller (7.2.x), replaced by {@link
+	 #addFragmentEntry(long, long, long, String, String, String,
+	 String, String, String, long, int, int, ServiceContext)}
+	 */
+	@Deprecated
 	public FragmentEntry addFragmentEntry(
 			long userId, long groupId, long fragmentCollectionId, String name,
 			String css, String html, String js, long previewFileEntryId,
 			int type, int status, ServiceContext serviceContext)
 		throws PortalException;
 
+	/**
+	 * @deprecated As of Mueller (7.2.x), replaced by {@link
+	 #addFragmentEntry(long, long, long, String, String, String,
+	 String, String, String, long, int, int, ServiceContext)}
+	 */
+	@Deprecated
 	public FragmentEntry addFragmentEntry(
 			long userId, long groupId, long fragmentCollectionId, String name,
 			String css, String html, String js, long previewFileEntryId,
 			int status, ServiceContext serviceContext)
 		throws PortalException;
 
+	/**
+	 * @deprecated As of Mueller (7.2.x), replaced by {@link
+	 #addFragmentEntry(long, long, long, String, String, String,
+	 String, String, String, long, int, int, ServiceContext)}
+	 */
+	@Deprecated
 	public FragmentEntry addFragmentEntry(
 			long userId, long groupId, long fragmentCollectionId,
 			String fragmentEntryKey, String name, String css, String html,
 			String js, int type, int status, ServiceContext serviceContext)
 		throws PortalException;
 
+	/**
+	 * @deprecated As of Mueller (7.2.x), replaced by {@link
+	 #addFragmentEntry(long, long, long, String, String, String,
+	 String, String, String, long, int, int, ServiceContext)}
+	 */
+	@Deprecated
 	public FragmentEntry addFragmentEntry(
 			long userId, long groupId, long fragmentCollectionId,
 			String fragmentEntryKey, String name, String css, String html,
 			String js, int status, ServiceContext serviceContext)
 		throws PortalException;
 
+	/**
+	 * @deprecated As of Mueller (7.2.x), replaced by {@link
+	 #addFragmentEntry(long, long, long, String, String, String,
+	 String, String, String, long, int, int, ServiceContext)}
+	 */
+	@Deprecated
 	public FragmentEntry addFragmentEntry(
 			long userId, long groupId, long fragmentCollectionId,
 			String fragmentEntryKey, String name, String css, String html,
@@ -163,11 +247,24 @@ public interface FragmentEntryLocalService
 			ServiceContext serviceContext)
 		throws PortalException;
 
+	/**
+	 * @deprecated As of Mueller (7.2.x), replaced by {@link
+	 #addFragmentEntry(long, long, long, String, String, String,
+	 String, String, String, long, int, int, ServiceContext)}
+	 */
+	@Deprecated
 	public FragmentEntry addFragmentEntry(
 			long userId, long groupId, long fragmentCollectionId,
 			String fragmentEntryKey, String name, String css, String html,
 			String js, long previewFileEntryId, int status,
 			ServiceContext serviceContext)
+		throws PortalException;
+
+	public FragmentEntry addFragmentEntry(
+			long userId, long groupId, long fragmentCollectionId,
+			String fragmentEntryKey, String name, String css, String html,
+			String js, String configuration, long previewFileEntryId, int type,
+			int status, ServiceContext serviceContext)
 		throws PortalException;
 
 	public FragmentEntry copyFragmentEntry(
@@ -230,7 +327,7 @@ public interface FragmentEntryLocalService
 	 * Performs a dynamic query on the database and returns a range of the matching rows.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>com.liferay.fragment.model.impl.FragmentEntryModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>com.liferay.fragment.model.impl.FragmentEntryModelImpl</code>.
 	 * </p>
 	 *
 	 * @param dynamicQuery the dynamic query
@@ -246,7 +343,7 @@ public interface FragmentEntryLocalService
 	 * Performs a dynamic query on the database and returns an ordered range of the matching rows.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>com.liferay.fragment.model.impl.FragmentEntryModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>com.liferay.fragment.model.impl.FragmentEntryModelImpl</code>.
 	 * </p>
 	 *
 	 * @param dynamicQuery the dynamic query
@@ -311,7 +408,7 @@ public interface FragmentEntryLocalService
 	 * Returns a range of all the fragment entries.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>com.liferay.fragment.model.impl.FragmentEntryModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>com.liferay.fragment.model.impl.FragmentEntryModelImpl</code>.
 	 * </p>
 	 *
 	 * @param start the lower bound of the range of fragment entries
@@ -440,14 +537,37 @@ public interface FragmentEntryLocalService
 			long fragmentEntryId, long previewFileEntryId)
 		throws PortalException;
 
+	/**
+	 * @deprecated As of Mueller (7.2.x), replaced by {@link
+	 #updateFragmentEntry(long, long, String, String, String,
+	 String, String, int)}
+	 */
+	@Deprecated
 	public FragmentEntry updateFragmentEntry(
 			long userId, long fragmentEntryId, String name, String css,
 			String html, String js, int status)
 		throws PortalException;
 
+	/**
+	 * @deprecated As of Mueller (7.2.x), replaced by {@link
+	 #updateFragmentEntry(long, long, String, String, String,
+	 String, String, long, int)}
+	 */
+	@Deprecated
 	public FragmentEntry updateFragmentEntry(
 			long userId, long fragmentEntryId, String name, String css,
 			String html, String js, long previewFileEntryId, int status)
+		throws PortalException;
+
+	public FragmentEntry updateFragmentEntry(
+			long userId, long fragmentEntryId, String name, String css,
+			String html, String js, String configuration, int status)
+		throws PortalException;
+
+	public FragmentEntry updateFragmentEntry(
+			long userId, long fragmentEntryId, String name, String css,
+			String html, String js, String configuration,
+			long previewFileEntryId, int status)
 		throws PortalException;
 
 	public FragmentEntry updateFragmentEntry(long fragmentEntryId, String name)

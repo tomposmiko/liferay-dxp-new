@@ -1,7 +1,8 @@
 components:
     schemas:
         Creator:
-            description: https://www.schema.org/Creator
+            description:
+                https://www.schema.org/Creator
             properties:
                 additionalName:
                     type: string
@@ -22,7 +23,8 @@ components:
                     type: string
             type: object
         Form:
-            description: https://www.schema.org/Form
+            description:
+                https://www.schema.org/Form
             properties:
                 availableLanguages:
                     items:
@@ -72,21 +74,25 @@ components:
                     writeOnly: true
             type: object
         FormContext:
-            description: https://www.schema.org/FormContext
+            description:
+                https://www.schema.org/FormContext
             properties:
                 formFieldValues:
-                    description: https://www.schema.org/FormFieldValue
+                    description:
+                        https://www.schema.org/FormFieldValue
                     items:
                         $ref: "#/components/schemas/FormFieldValue"
                     type: array
                 formPageContexts:
-                    description: https://www.schema.org/FormPageContext
+                    description:
+                        https://www.schema.org/FormPageContext
                     items:
                         properties:
                             enabled:
                                 type: boolean
                             formFieldContexts:
-                                description: https://www.schema.org/FormFieldContext
+                                description:
+                                    https://www.schema.org/FormFieldContext
                                 items:
                                     properties:
                                         evaluable:
@@ -122,7 +128,8 @@ components:
                 showSubmitButton:
                     type: boolean
         FormDocument:
-            description: https://www.schema.org/FormDocument
+            description:
+                https://www.schema.org/FormDocument
             properties:
                 contentUrl:
                     format: uri
@@ -154,7 +161,8 @@ components:
                     type: string
             type: object
         FormField:
-            description: https://www.schema.org/FormField
+            description:
+                https://www.schema.org/FormField
             items:
                 properties:
                     autocomplete:
@@ -223,7 +231,8 @@ components:
                     tooltip:
                         type: string
                     validation:
-                        description: https://www.schema.org/FormFieldValidation
+                        description:
+                            https://www.schema.org/FormFieldValidation
                         properties:
                             errorMessage:
                                 type: string
@@ -236,7 +245,8 @@ components:
                 type: object
             type: array
         FormFieldOption:
-            description: https://www.schema.org/FormFieldOption
+            description:
+                https://www.schema.org/FormFieldOption
             items:
                 properties:
                     id:
@@ -249,7 +259,8 @@ components:
                 type: object
             type: array
         FormFieldValue:
-            description: https://www.schema.org/FormFieldValue
+            description:
+                https://www.schema.org/FormFieldValue
             items:
                 properties:
                     formDocument:
@@ -271,7 +282,8 @@ components:
                 type: object
             type: array
         FormRecord:
-            description: https://www.schema.org/FormRecord
+            description:
+                https://www.schema.org/FormRecord
             properties:
                 creator:
                     $ref: "#/components/schemas/Creator"
@@ -289,10 +301,6 @@ components:
                     type: string
                 draft:
                     type: boolean
-                form:
-                    allOf:
-                        - $ref: "#/components/schemas/Form"
-                    readOnly: true
                 formFieldValues:
                     items:
                         $ref: "#/components/schemas/FormFieldValue"
@@ -307,7 +315,8 @@ components:
                     type: integer
             type: object
         FormStructure:
-            description: https://www.schema.org/FormStructure
+            description:
+                https://www.schema.org/FormStructure
             properties:
                 availableLanguages:
                     items:
@@ -324,7 +333,8 @@ components:
                 description:
                     type: string
                 formPages:
-                    description: https://www.schema.org/FormPage
+                    description:
+                        https://www.schema.org/FormPage
                     items:
                         properties:
                             formFields:
@@ -341,7 +351,8 @@ components:
                         type: object
                     type: array
                 formSuccessPage:
-                    description: https://www.schema.org/FormSuccessPage
+                    description:
+                        https://www.schema.org/FormSuccessPage
                     properties:
                         description:
                             type: string
@@ -361,7 +372,11 @@ components:
                     type: integer
             type: object
 info:
-    description: ""
+    description:
+        ""
+    license:
+        name: "Apache 2.0"
+        url: "http://www.apache.org/licenses/LICENSE-2.0.html"
     title: "Headless Form"
     version: v1.0
 openapi: 3.0.1
@@ -380,7 +395,8 @@ paths:
                 204:
                     content:
                         application/json: {}
-                    description: ""
+                    description:
+                        ""
             tags: ["FormDocument"]
         get:
             operationId: getFormDocument
@@ -400,7 +416,8 @@ paths:
                         application/xml:
                             schema:
                                 $ref: "#/components/schemas/FormDocument"
-                    description: ""
+                    description:
+                        ""
             tags: ["FormDocument"]
     "/form-records/{formRecordId}":
         get:
@@ -421,21 +438,22 @@ paths:
                         application/xml:
                             schema:
                                 $ref: "#/components/schemas/FormRecord"
-                    description: ""
+                    description:
+                        ""
             tags: ["FormRecord"]
         put:
             operationId: putFormRecord
             parameters:
-                - in: header
-                  name: Accept-Language
-                  schema:
-                      type: string
                 - in: path
                   name: formRecordId
                   required: true
                   schema:
                       format: int64
                       type: integer
+                - in: header
+                  name: Accept-Language
+                  schema:
+                      type: string
             requestBody:
                 content:
                     application/json:
@@ -453,7 +471,8 @@ paths:
                         application/xml:
                             schema:
                                 $ref: "#/components/schemas/FormRecord"
-                    description: ""
+                    description:
+                        ""
             tags: ["FormRecord"]
     "/form-structures/{formStructureId}":
         get:
@@ -474,7 +493,8 @@ paths:
                         application/xml:
                             schema:
                                 $ref: "#/components/schemas/FormStructure"
-                    description: ""
+                    description:
+                        ""
             tags: ["FormStructure"]
     "/forms/{formId}":
         get:
@@ -495,22 +515,23 @@ paths:
                         application/xml:
                             schema:
                                 $ref: "#/components/schemas/Form"
-                    description: ""
+                    description:
+                        ""
             tags: ["Form"]
     "/forms/{formId}/evaluate-context":
         post:
             operationId: postFormEvaluateContext
             parameters:
-                - in: header
-                  name: Accept-Language
-                  schema:
-                      type: string
                 - in: path
                   name: formId
                   required: true
                   schema:
                       format: int64
                       type: integer
+                - in: header
+                  name: Accept-Language
+                  schema:
+                      type: string
             requestBody:
                 content:
                     application/json:
@@ -528,7 +549,8 @@ paths:
                         application/xml:
                             schema:
                                 $ref: "#/components/schemas/FormContext"
-                    description: ""
+                    description:
+                        ""
             tags: ["Form"]
     "/forms/{formId}/form-document":
         post:
@@ -560,7 +582,8 @@ paths:
                         application/xml:
                             schema:
                                 $ref: "#/components/schemas/FormDocument"
-                    description: ""
+                    description:
+                        ""
             tags: ["Form"]
     "/forms/{formId}/form-records":
         get:
@@ -593,21 +616,22 @@ paths:
                                 items:
                                     $ref: "#/components/schemas/FormRecord"
                                 type: array
-                    description: ""
+                    description:
+                        ""
             tags: ["FormRecord"]
         post:
             operationId: postFormFormRecord
             parameters:
-                - in: header
-                  name: Accept-Language
-                  schema:
-                      type: string
                 - in: path
                   name: formId
                   required: true
                   schema:
                       format: int64
                       type: integer
+                - in: header
+                  name: Accept-Language
+                  schema:
+                      type: string
             requestBody:
                 content:
                     application/json:
@@ -625,7 +649,8 @@ paths:
                         application/xml:
                             schema:
                                 $ref: "#/components/schemas/FormRecord"
-                    description: ""
+                    description:
+                        ""
             tags: ["FormRecord"]
     "/forms/{formId}/form-records/by-latest-draft":
         get:
@@ -646,7 +671,8 @@ paths:
                         application/xml:
                             schema:
                                 $ref: "#/components/schemas/FormRecord"
-                    description: ""
+                    description:
+                        ""
             tags: ["FormRecord"]
     "/sites/{siteId}/form-structures":
         get:
@@ -679,7 +705,8 @@ paths:
                                 items:
                                     $ref: "#/components/schemas/FormStructure"
                                 type: array
-                    description: ""
+                    description:
+                        ""
             tags: ["FormStructure"]
     "/sites/{siteId}/forms":
         get:
@@ -712,5 +739,6 @@ paths:
                                 items:
                                     $ref: "#/components/schemas/Form"
                                 type: array
-                    description: ""
+                    description:
+                        ""
             tags: ["Form"]

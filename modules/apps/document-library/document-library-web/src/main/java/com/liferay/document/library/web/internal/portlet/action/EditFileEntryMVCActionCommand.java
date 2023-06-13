@@ -52,7 +52,10 @@ import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.lock.DuplicateLockException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.model.Group;
+import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.model.TrashedModel;
+import com.liferay.portal.kernel.model.role.RoleConstants;
 import com.liferay.portal.kernel.portlet.JSONPortletResponseUtil;
 import com.liferay.portal.kernel.portlet.LiferayPortletURL;
 import com.liferay.portal.kernel.portlet.PortletURLFactoryUtil;
@@ -63,6 +66,8 @@ import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.security.auth.PrincipalException;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextFactory;
+import com.liferay.portal.kernel.service.permission.ModelPermissions;
+import com.liferay.portal.kernel.service.permission.ModelPermissionsFactory;
 import com.liferay.portal.kernel.servlet.MultiSessionMessages;
 import com.liferay.portal.kernel.servlet.SessionErrors;
 import com.liferay.portal.kernel.servlet.SessionMessages;
@@ -87,6 +92,7 @@ import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.trash.service.TrashEntryService;
 import com.liferay.upload.UploadResponseHandler;
 
+import java.io.IOException;
 import java.io.InputStream;
 
 import java.util.ArrayList;
@@ -100,8 +106,10 @@ import java.util.Set;
 import javax.portlet.ActionRequest;
 import javax.portlet.ActionResponse;
 import javax.portlet.PortletConfig;
+import javax.portlet.PortletException;
 import javax.portlet.PortletRequest;
-import javax.portlet.PortletResponse;
+
+import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.fileupload.FileUploadBase;
 
@@ -139,309 +147,6 @@ public class EditFileEntryMVCActionCommand extends BaseMVCActionCommand {
 	protected void activate(Map<String, Object> properties) {
 		_dlConfiguration = ConfigurableUtil.createConfigurable(
 			DLConfiguration.class, properties);
-	}
-
-	protected void addMultipleFileEntries(
-			PortletConfig portletConfig, ActionRequest actionRequest,
-			ActionResponse actionResponse)
-		throws Exception {
-
-		List<KeyValuePair> validFileNameKVPs = new ArrayList<>();
-		List<KeyValuePair> invalidFileNameKVPs = new ArrayList<>();
-
-		String[] selectedFileNames = ParamUtil.getParameterValues(
-			actionRequest, "selectedFileName", new String[0], false);
-
-		for (String selectedFileName : selectedFileNames) {
-			addMultipleFileEntries(
-				portletConfig, actionRequest, actionResponse, selectedFileName,
-				validFileNameKVPs, invalidFileNameKVPs);
-		}
-
-		JSONArray jsonArray = JSONFactoryUtil.createJSONArray();
-
-		for (KeyValuePair validFileNameKVP : validFileNameKVPs) {
-			String fileName = validFileNameKVP.getKey();
-			String originalFileName = validFileNameKVP.getValue();
-
-			JSONObject jsonObject = JSONUtil.put(
-				"added", Boolean.TRUE
-			).put(
-				"fileName", fileName
-			).put(
-				"originalFileName", originalFileName
-			);
-
-			jsonArray.put(jsonObject);
-		}
-
-		for (KeyValuePair invalidFileNameKVP : invalidFileNameKVPs) {
-			String fileName = invalidFileNameKVP.getKey();
-			String errorMessage = invalidFileNameKVP.getValue();
-
-			JSONObject jsonObject = JSONUtil.put(
-				"added", Boolean.FALSE
-			).put(
-				"errorMessage", errorMessage
-			).put(
-				"fileName", fileName
-			).put(
-				"originalFileName", fileName
-			);
-
-			jsonArray.put(jsonObject);
-		}
-
-		JSONPortletResponseUtil.writeJSON(
-			actionRequest, actionResponse, jsonArray);
-	}
-
-	protected void addMultipleFileEntries(
-			PortletConfig portletConfig, ActionRequest actionRequest,
-			ActionResponse actionResponse, String selectedFileName,
-			List<KeyValuePair> validFileNameKVPs,
-			List<KeyValuePair> invalidFileNameKVPs)
-		throws Exception {
-
-		ThemeDisplay themeDisplay = (ThemeDisplay)actionRequest.getAttribute(
-			WebKeys.THEME_DISPLAY);
-
-		long repositoryId = ParamUtil.getLong(actionRequest, "repositoryId");
-		long folderId = ParamUtil.getLong(actionRequest, "folderId");
-		String description = ParamUtil.getString(actionRequest, "description");
-		String changeLog = ParamUtil.getString(actionRequest, "changeLog");
-
-		FileEntry tempFileEntry = null;
-
-		try {
-			tempFileEntry = TempFileEntryUtil.getTempFileEntry(
-				themeDisplay.getScopeGroupId(), themeDisplay.getUserId(),
-				TEMP_FOLDER_NAME, selectedFileName);
-
-			String originalSelectedFileName =
-				TempFileEntryUtil.getOriginalTempFileName(
-					tempFileEntry.getFileName());
-
-			String uniqueFileName = DLUtil.getUniqueFileName(
-				tempFileEntry.getGroupId(), folderId, originalSelectedFileName);
-
-			String mimeType = tempFileEntry.getMimeType();
-			InputStream inputStream = tempFileEntry.getContentStream();
-			long size = tempFileEntry.getSize();
-
-			ServiceContext serviceContext = ServiceContextFactory.getInstance(
-				DLFileEntry.class.getName(), actionRequest);
-
-			FileEntry fileEntry = _dlAppService.addFileEntry(
-				repositoryId, folderId, uniqueFileName, mimeType,
-				uniqueFileName, description, changeLog, inputStream, size,
-				serviceContext);
-
-			_assetDisplayPageEntryFormProcessor.process(
-				DLFileEntry.class.getName(), fileEntry.getFileEntryId(),
-				actionRequest);
-
-			validFileNameKVPs.add(
-				new KeyValuePair(uniqueFileName, selectedFileName));
-
-			return;
-		}
-		catch (Exception e) {
-			String errorMessage = getAddMultipleFileEntriesErrorMessage(
-				portletConfig, actionRequest, actionResponse, e);
-
-			invalidFileNameKVPs.add(
-				new KeyValuePair(selectedFileName, errorMessage));
-		}
-		finally {
-			if (tempFileEntry != null) {
-				TempFileEntryUtil.deleteTempFileEntry(
-					tempFileEntry.getFileEntryId());
-			}
-		}
-	}
-
-	protected void addTempFileEntry(
-			ActionRequest actionRequest, ActionResponse actionResponse)
-		throws Exception {
-
-		UploadPortletRequest uploadPortletRequest =
-			_portal.getUploadPortletRequest(actionRequest);
-
-		ThemeDisplay themeDisplay = (ThemeDisplay)actionRequest.getAttribute(
-			WebKeys.THEME_DISPLAY);
-
-		long folderId = ParamUtil.getLong(uploadPortletRequest, "folderId");
-		String sourceFileName = uploadPortletRequest.getFileName("file");
-
-		try (InputStream inputStream = uploadPortletRequest.getFileAsStream(
-				"file")) {
-
-			String tempFileName = TempFileEntryUtil.getTempFileName(
-				sourceFileName);
-
-			String mimeType = uploadPortletRequest.getContentType("file");
-
-			FileEntry fileEntry = _dlAppService.addTempFileEntry(
-				themeDisplay.getScopeGroupId(), folderId, TEMP_FOLDER_NAME,
-				tempFileName, inputStream, mimeType);
-
-			JSONObject jsonObject = _multipleUploadResponseHandler.onSuccess(
-				uploadPortletRequest, fileEntry);
-
-			JSONPortletResponseUtil.writeJSON(
-				actionRequest, actionResponse, jsonObject);
-		}
-	}
-
-	protected void cancelFileEntriesCheckOut(ActionRequest actionRequest)
-		throws Exception {
-
-		long fileEntryId = ParamUtil.getLong(actionRequest, "fileEntryId");
-
-		if (fileEntryId > 0) {
-			_dlAppService.cancelCheckOut(fileEntryId);
-		}
-		else {
-			long[] fileEntryIds = ParamUtil.getLongValues(
-				actionRequest, "rowIdsFileEntry");
-
-			for (long curFileEntryId : fileEntryIds) {
-				_dlAppService.cancelCheckOut(curFileEntryId);
-			}
-		}
-	}
-
-	protected void checkInFileEntries(ActionRequest actionRequest)
-		throws Exception {
-
-		long fileEntryId = ParamUtil.getLong(actionRequest, "fileEntryId");
-
-		DLVersionNumberIncrease dlVersionNumberIncrease =
-			DLVersionNumberIncrease.valueOf(
-				ParamUtil.getString(actionRequest, "versionIncrease"),
-				DLVersionNumberIncrease.AUTOMATIC);
-
-		String changeLog = ParamUtil.getString(actionRequest, "changeLog");
-
-		ServiceContext serviceContext = ServiceContextFactory.getInstance(
-			actionRequest);
-
-		if (fileEntryId > 0) {
-			_dlAppService.checkInFileEntry(
-				fileEntryId, dlVersionNumberIncrease, changeLog,
-				serviceContext);
-		}
-		else {
-			long[] fileEntryIds = ParamUtil.getLongValues(
-				actionRequest, "rowIdsFileEntry");
-
-			for (long curFileEntryId : fileEntryIds) {
-				_dlAppService.checkInFileEntry(
-					curFileEntryId, dlVersionNumberIncrease, changeLog,
-					serviceContext);
-			}
-		}
-	}
-
-	protected void checkOutFileEntries(ActionRequest actionRequest)
-		throws Exception {
-
-		long fileEntryId = ParamUtil.getLong(actionRequest, "fileEntryId");
-
-		ServiceContext serviceContext = ServiceContextFactory.getInstance(
-			actionRequest);
-
-		if (fileEntryId > 0) {
-			_dlAppService.checkOutFileEntry(fileEntryId, serviceContext);
-		}
-		else {
-			long[] fileEntryIds = ParamUtil.getLongValues(
-				actionRequest, "rowIdsFileEntry");
-
-			for (long curFileEntryId : fileEntryIds) {
-				_dlAppService.checkOutFileEntry(curFileEntryId, serviceContext);
-			}
-		}
-	}
-
-	protected void deleteFileEntry(
-			ActionRequest actionRequest, boolean moveToTrash)
-		throws Exception {
-
-		long fileEntryId = ParamUtil.getLong(actionRequest, "fileEntryId");
-
-		if (fileEntryId == 0) {
-			return;
-		}
-
-		String version = ParamUtil.getString(actionRequest, "version");
-
-		if (Validator.isNotNull(version)) {
-			_dlAppService.deleteFileVersion(fileEntryId, version);
-
-			return;
-		}
-
-		if (!moveToTrash) {
-			_dlAppService.deleteFileEntry(fileEntryId);
-
-			return;
-		}
-
-		FileEntry fileEntry = _dlAppService.getFileEntry(fileEntryId);
-
-		if (!fileEntry.isRepositoryCapabilityProvided(TrashCapability.class)) {
-			hideDefaultSuccessMessage(actionRequest);
-
-			return;
-		}
-
-		fileEntry = _dlTrashService.moveFileEntryToTrash(fileEntryId);
-
-		List<TrashedModel> trashedModels = new ArrayList<>();
-
-		trashedModels.add((TrashedModel)fileEntry.getModel());
-
-		Map<String, Object> data = new HashMap<>();
-
-		data.put("trashedModels", trashedModels);
-
-		addDeleteSuccessData(actionRequest, data);
-	}
-
-	protected void deleteTempFileEntry(
-			ActionRequest actionRequest, ActionResponse actionResponse)
-		throws Exception {
-
-		ThemeDisplay themeDisplay = (ThemeDisplay)actionRequest.getAttribute(
-			WebKeys.THEME_DISPLAY);
-
-		long folderId = ParamUtil.getLong(actionRequest, "folderId");
-		String fileName = ParamUtil.getString(actionRequest, "fileName");
-
-		JSONObject jsonObject = JSONFactoryUtil.createJSONObject();
-
-		try {
-			_dlAppService.deleteTempFileEntry(
-				themeDisplay.getScopeGroupId(), folderId, TEMP_FOLDER_NAME,
-				fileName);
-
-			jsonObject.put("deleted", Boolean.TRUE);
-		}
-		catch (Exception e) {
-			String errorMessage = themeDisplay.translate(
-				"an-unexpected-error-occurred-while-deleting-the-file");
-
-			jsonObject.put(
-				"deleted", Boolean.FALSE
-			).put(
-				"errorMessage", errorMessage
-			);
-		}
-
-		JSONPortletResponseUtil.writeJSON(
-			actionRequest, actionResponse, jsonObject);
 	}
 
 	@Override
@@ -498,11 +203,11 @@ public class EditFileEntryMVCActionCommand extends BaseMVCActionCommand {
 					"file");
 
 				try {
-					fileEntry = updateFileEntry(
+					fileEntry = _updateFileEntry(
 						portletConfig, actionRequest, actionResponse,
 						uploadPortletRequest);
 				}
-				catch (Exception e) {
+				catch (PortalException pe) {
 					if (!cmd.equals(Constants.ADD_DYNAMIC) &&
 						Validator.isNotNull(sourceFileName)) {
 
@@ -510,39 +215,39 @@ public class EditFileEntryMVCActionCommand extends BaseMVCActionCommand {
 							actionRequest, RequiredFileException.class);
 					}
 
-					throw e;
+					throw pe;
 				}
 			}
 			else if (cmd.equals(Constants.ADD_MULTIPLE)) {
-				addMultipleFileEntries(
+				_addMultipleFileEntries(
 					portletConfig, actionRequest, actionResponse);
 			}
 			else if (cmd.equals(Constants.ADD_TEMP)) {
-				addTempFileEntry(actionRequest, actionResponse);
+				_addTempFileEntry(actionRequest, actionResponse);
 			}
 			else if (cmd.equals(Constants.DELETE)) {
-				deleteFileEntry(actionRequest, false);
+				_deleteFileEntry(actionRequest, false);
 			}
 			else if (cmd.equals(Constants.DELETE_TEMP)) {
-				deleteTempFileEntry(actionRequest, actionResponse);
+				_deleteTempFileEntry(actionRequest, actionResponse);
 			}
 			else if (cmd.equals(Constants.CANCEL_CHECKOUT)) {
-				cancelFileEntriesCheckOut(actionRequest);
+				_cancelFileEntriesCheckOut(actionRequest);
 			}
 			else if (cmd.equals(Constants.CHECKIN)) {
-				checkInFileEntries(actionRequest);
+				_checkInFileEntries(actionRequest);
 			}
 			else if (cmd.equals(Constants.CHECKOUT)) {
-				checkOutFileEntries(actionRequest);
+				_checkOutFileEntries(actionRequest);
 			}
 			else if (cmd.equals(Constants.MOVE_TO_TRASH)) {
-				deleteFileEntry(actionRequest, true);
+				_deleteFileEntry(actionRequest, true);
 			}
 			else if (cmd.equals(Constants.RESTORE)) {
-				restoreTrashEntries(actionRequest);
+				_restoreTrashEntries(actionRequest);
 			}
 			else if (cmd.equals(Constants.REVERT)) {
-				revertFileEntry(actionRequest);
+				_revertFileEntry(actionRequest);
 			}
 
 			if (cmd.equals(Constants.ADD_TEMP) ||
@@ -572,7 +277,7 @@ public class EditFileEntryMVCActionCommand extends BaseMVCActionCommand {
 				if ((fileEntry != null) &&
 					(workflowAction == WorkflowConstants.ACTION_SAVE_DRAFT)) {
 
-					redirect = getSaveAndContinueRedirect(
+					redirect = _getSaveAndContinueRedirect(
 						portletConfig, actionRequest, fileEntry, redirect);
 
 					sendRedirect(actionRequest, actionResponse, redirect);
@@ -605,15 +310,354 @@ public class EditFileEntryMVCActionCommand extends BaseMVCActionCommand {
 			}
 		}
 		catch (Exception e) {
-			handleUploadException(
-				portletConfig, actionRequest, actionResponse, cmd, e);
+			_handleUploadException(actionRequest, actionResponse, cmd, e);
 		}
 	}
 
-	protected String getAddMultipleFileEntriesErrorMessage(
+	private void _addMultipleFileEntries(
 			PortletConfig portletConfig, ActionRequest actionRequest,
-			ActionResponse actionResponse, Exception e)
-		throws Exception {
+			ActionResponse actionResponse)
+		throws IOException, PortalException {
+
+		List<KeyValuePair> validFileNameKVPs = new ArrayList<>();
+		List<KeyValuePair> invalidFileNameKVPs = new ArrayList<>();
+
+		String[] selectedFileNames = ParamUtil.getParameterValues(
+			actionRequest, "selectedFileName", new String[0], false);
+
+		for (String selectedFileName : selectedFileNames) {
+			_addMultipleFileEntries(
+				portletConfig, actionRequest, selectedFileName,
+				validFileNameKVPs, invalidFileNameKVPs);
+		}
+
+		JSONArray jsonArray = JSONFactoryUtil.createJSONArray();
+
+		for (KeyValuePair validFileNameKVP : validFileNameKVPs) {
+			String fileName = validFileNameKVP.getKey();
+			String originalFileName = validFileNameKVP.getValue();
+
+			JSONObject jsonObject = JSONUtil.put(
+				"added", Boolean.TRUE
+			).put(
+				"fileName", fileName
+			).put(
+				"originalFileName", originalFileName
+			);
+
+			jsonArray.put(jsonObject);
+		}
+
+		for (KeyValuePair invalidFileNameKVP : invalidFileNameKVPs) {
+			String fileName = invalidFileNameKVP.getKey();
+			String errorMessage = invalidFileNameKVP.getValue();
+
+			JSONObject jsonObject = JSONUtil.put(
+				"added", Boolean.FALSE
+			).put(
+				"errorMessage", errorMessage
+			).put(
+				"fileName", fileName
+			).put(
+				"originalFileName", fileName
+			);
+
+			jsonArray.put(jsonObject);
+		}
+
+		JSONPortletResponseUtil.writeJSON(
+			actionRequest, actionResponse, jsonArray);
+	}
+
+	private void _addMultipleFileEntries(
+			PortletConfig portletConfig, ActionRequest actionRequest,
+			String selectedFileName, List<KeyValuePair> validFileNameKVPs,
+			List<KeyValuePair> invalidFileNameKVPs)
+		throws PortalException {
+
+		ThemeDisplay themeDisplay = (ThemeDisplay)actionRequest.getAttribute(
+			WebKeys.THEME_DISPLAY);
+
+		long repositoryId = ParamUtil.getLong(actionRequest, "repositoryId");
+		long folderId = ParamUtil.getLong(actionRequest, "folderId");
+		String description = ParamUtil.getString(actionRequest, "description");
+		String changeLog = ParamUtil.getString(actionRequest, "changeLog");
+
+		FileEntry tempFileEntry = null;
+
+		try {
+			tempFileEntry = TempFileEntryUtil.getTempFileEntry(
+				themeDisplay.getScopeGroupId(), themeDisplay.getUserId(),
+				TEMP_FOLDER_NAME, selectedFileName);
+
+			String originalSelectedFileName =
+				TempFileEntryUtil.getOriginalTempFileName(
+					tempFileEntry.getFileName());
+
+			String uniqueFileName = DLUtil.getUniqueFileName(
+				tempFileEntry.getGroupId(), folderId, originalSelectedFileName);
+
+			String mimeType = tempFileEntry.getMimeType();
+			InputStream inputStream = tempFileEntry.getContentStream();
+			long size = tempFileEntry.getSize();
+
+			ServiceContext serviceContext = ServiceContextFactory.getInstance(
+				DLFileEntry.class.getName(), actionRequest);
+
+			FileEntry fileEntry = _dlAppService.addFileEntry(
+				repositoryId, folderId, uniqueFileName, mimeType,
+				uniqueFileName, description, changeLog, inputStream, size,
+				serviceContext);
+
+			_assetDisplayPageEntryFormProcessor.process(
+				DLFileEntry.class.getName(), fileEntry.getFileEntryId(),
+				actionRequest);
+
+			validFileNameKVPs.add(
+				new KeyValuePair(uniqueFileName, selectedFileName));
+		}
+		catch (Exception e) {
+			String errorMessage = _getAddMultipleFileEntriesErrorMessage(
+				portletConfig, actionRequest, e);
+
+			invalidFileNameKVPs.add(
+				new KeyValuePair(selectedFileName, errorMessage));
+		}
+		finally {
+			if (tempFileEntry != null) {
+				TempFileEntryUtil.deleteTempFileEntry(
+					tempFileEntry.getFileEntryId());
+			}
+		}
+	}
+
+	private void _addTempFileEntry(
+			ActionRequest actionRequest, ActionResponse actionResponse)
+		throws IOException, PortalException {
+
+		UploadPortletRequest uploadPortletRequest =
+			_portal.getUploadPortletRequest(actionRequest);
+
+		ThemeDisplay themeDisplay = (ThemeDisplay)actionRequest.getAttribute(
+			WebKeys.THEME_DISPLAY);
+
+		long folderId = ParamUtil.getLong(uploadPortletRequest, "folderId");
+		String sourceFileName = uploadPortletRequest.getFileName("file");
+
+		try (InputStream inputStream = uploadPortletRequest.getFileAsStream(
+				"file")) {
+
+			String tempFileName = TempFileEntryUtil.getTempFileName(
+				sourceFileName);
+
+			String mimeType = uploadPortletRequest.getContentType("file");
+
+			FileEntry fileEntry = _dlAppService.addTempFileEntry(
+				themeDisplay.getScopeGroupId(), folderId, TEMP_FOLDER_NAME,
+				tempFileName, inputStream, mimeType);
+
+			JSONObject jsonObject = _multipleUploadResponseHandler.onSuccess(
+				uploadPortletRequest, fileEntry);
+
+			JSONPortletResponseUtil.writeJSON(
+				actionRequest, actionResponse, jsonObject);
+		}
+	}
+
+	private void _cancelFileEntriesCheckOut(ActionRequest actionRequest)
+		throws PortalException {
+
+		long fileEntryId = ParamUtil.getLong(actionRequest, "fileEntryId");
+
+		if (fileEntryId > 0) {
+			_dlAppService.cancelCheckOut(fileEntryId);
+		}
+		else {
+			long[] fileEntryIds = ParamUtil.getLongValues(
+				actionRequest, "rowIdsFileEntry");
+
+			for (long curFileEntryId : fileEntryIds) {
+				_dlAppService.cancelCheckOut(curFileEntryId);
+			}
+		}
+	}
+
+	private void _checkInFileEntries(ActionRequest actionRequest)
+		throws PortalException {
+
+		long fileEntryId = ParamUtil.getLong(actionRequest, "fileEntryId");
+
+		DLVersionNumberIncrease dlVersionNumberIncrease =
+			DLVersionNumberIncrease.valueOf(
+				actionRequest.getParameter("versionIncrease"),
+				DLVersionNumberIncrease.AUTOMATIC);
+
+		String changeLog = ParamUtil.getString(actionRequest, "changeLog");
+
+		ServiceContext serviceContext = ServiceContextFactory.getInstance(
+			actionRequest);
+
+		if (fileEntryId > 0) {
+			_dlAppService.checkInFileEntry(
+				fileEntryId, dlVersionNumberIncrease, changeLog,
+				serviceContext);
+		}
+		else {
+			long[] fileEntryIds = ParamUtil.getLongValues(
+				actionRequest, "rowIdsFileEntry");
+
+			for (long curFileEntryId : fileEntryIds) {
+				_dlAppService.checkInFileEntry(
+					curFileEntryId, dlVersionNumberIncrease, changeLog,
+					serviceContext);
+			}
+		}
+	}
+
+	private void _checkOutFileEntries(ActionRequest actionRequest)
+		throws PortalException {
+
+		long fileEntryId = ParamUtil.getLong(actionRequest, "fileEntryId");
+
+		ServiceContext serviceContext = ServiceContextFactory.getInstance(
+			actionRequest);
+
+		if (fileEntryId > 0) {
+			_dlAppService.checkOutFileEntry(fileEntryId, serviceContext);
+		}
+		else {
+			long[] fileEntryIds = ParamUtil.getLongValues(
+				actionRequest, "rowIdsFileEntry");
+
+			for (long curFileEntryId : fileEntryIds) {
+				_dlAppService.checkOutFileEntry(curFileEntryId, serviceContext);
+			}
+		}
+	}
+
+	private ServiceContext _createServiceContext(
+			HttpServletRequest httpServletRequest)
+		throws PortalException {
+
+		String cmd = ParamUtil.getString(httpServletRequest, Constants.CMD);
+
+		if (!cmd.equals(Constants.ADD_DYNAMIC)) {
+			return ServiceContextFactory.getInstance(
+				DLFileEntry.class.getName(), httpServletRequest);
+		}
+
+		ThemeDisplay themeDisplay =
+			(ThemeDisplay)httpServletRequest.getAttribute(
+				WebKeys.THEME_DISPLAY);
+
+		Layout layout = themeDisplay.getLayout();
+		Group group = themeDisplay.getScopeGroup();
+
+		if (layout.isPublicLayout() ||
+			(layout.isTypeControlPanel() && !group.hasPrivateLayouts())) {
+
+			return ServiceContextFactory.getInstance(
+				DLFileEntry.class.getName(), httpServletRequest);
+		}
+
+		ServiceContext serviceContext = ServiceContextFactory.getInstance(
+			DLFileEntry.class.getName(), httpServletRequest);
+
+		ModelPermissions modelPermissions =
+			serviceContext.getModelPermissions();
+
+		serviceContext.setModelPermissions(
+			ModelPermissionsFactory.create(
+				modelPermissions.getActionIds(
+					RoleConstants.PLACEHOLDER_DEFAULT_GROUP_ROLE),
+				_RESTRICTED_GUEST_PERMISSIONS, DLFileEntry.class.getName()));
+
+		return serviceContext;
+	}
+
+	private void _deleteFileEntry(
+			ActionRequest actionRequest, boolean moveToTrash)
+		throws PortalException {
+
+		long fileEntryId = ParamUtil.getLong(actionRequest, "fileEntryId");
+
+		if (fileEntryId == 0) {
+			return;
+		}
+
+		String version = ParamUtil.getString(actionRequest, "version");
+
+		if (Validator.isNotNull(version)) {
+			_dlAppService.deleteFileVersion(fileEntryId, version);
+
+			return;
+		}
+
+		if (!moveToTrash) {
+			_dlAppService.deleteFileEntry(fileEntryId);
+
+			return;
+		}
+
+		FileEntry fileEntry = _dlAppService.getFileEntry(fileEntryId);
+
+		if (!fileEntry.isRepositoryCapabilityProvided(TrashCapability.class)) {
+			hideDefaultSuccessMessage(actionRequest);
+
+			return;
+		}
+
+		fileEntry = _dlTrashService.moveFileEntryToTrash(fileEntryId);
+
+		List<TrashedModel> trashedModels = new ArrayList<>();
+
+		trashedModels.add((TrashedModel)fileEntry.getModel());
+
+		Map<String, Object> data = new HashMap<>();
+
+		data.put("trashedModels", trashedModels);
+
+		addDeleteSuccessData(actionRequest, data);
+	}
+
+	private void _deleteTempFileEntry(
+			ActionRequest actionRequest, ActionResponse actionResponse)
+		throws IOException {
+
+		ThemeDisplay themeDisplay = (ThemeDisplay)actionRequest.getAttribute(
+			WebKeys.THEME_DISPLAY);
+
+		long folderId = ParamUtil.getLong(actionRequest, "folderId");
+		String fileName = ParamUtil.getString(actionRequest, "fileName");
+
+		JSONObject jsonObject = JSONFactoryUtil.createJSONObject();
+
+		try {
+			_dlAppService.deleteTempFileEntry(
+				themeDisplay.getScopeGroupId(), folderId, TEMP_FOLDER_NAME,
+				fileName);
+
+			jsonObject.put("deleted", Boolean.TRUE);
+		}
+		catch (Exception e) {
+			String errorMessage = themeDisplay.translate(
+				"an-unexpected-error-occurred-while-deleting-the-file");
+
+			jsonObject.put(
+				"deleted", Boolean.FALSE
+			).put(
+				"errorMessage", errorMessage
+			);
+		}
+
+		JSONPortletResponseUtil.writeJSON(
+			actionRequest, actionResponse, jsonObject);
+	}
+
+	private String _getAddMultipleFileEntriesErrorMessage(
+			PortletConfig portletConfig, ActionRequest actionRequest,
+			Exception e)
+		throws PortalException {
 
 		String errorMessage = null;
 
@@ -659,8 +703,7 @@ public class EditFileEntryMVCActionCommand extends BaseMVCActionCommand {
 			errorMessage = themeDisplay.translate(
 				"please-enter-a-file-with-a-valid-extension-x",
 				StringUtil.merge(
-					getAllowedFileExtensions(
-						portletConfig, actionRequest, actionResponse)));
+					_getAllowedFileExtensions(portletConfig, actionRequest)));
 		}
 		else if (e instanceof FileNameException) {
 			errorMessage = themeDisplay.translate(
@@ -685,9 +728,8 @@ public class EditFileEntryMVCActionCommand extends BaseMVCActionCommand {
 		return errorMessage;
 	}
 
-	protected String[] getAllowedFileExtensions(
-			PortletConfig portletConfig, PortletRequest portletRequest,
-			PortletResponse portletResponse)
+	private String[] _getAllowedFileExtensions(
+			PortletConfig portletConfig, PortletRequest portletRequest)
 		throws PortalException {
 
 		String portletName = portletConfig.getPortletName();
@@ -716,10 +758,10 @@ public class EditFileEntryMVCActionCommand extends BaseMVCActionCommand {
 		return extensions.toArray(new String[0]);
 	}
 
-	protected String getSaveAndContinueRedirect(
+	private String _getSaveAndContinueRedirect(
 			PortletConfig portletConfig, ActionRequest actionRequest,
 			FileEntry fileEntry, String redirect)
-		throws Exception {
+		throws PortletException {
 
 		LiferayPortletURL portletURL = PortletURLFactoryUtil.create(
 			actionRequest, portletConfig.getPortletName(),
@@ -740,9 +782,9 @@ public class EditFileEntryMVCActionCommand extends BaseMVCActionCommand {
 		return portletURL.toString();
 	}
 
-	protected void handleUploadException(
-			PortletConfig portletConfig, ActionRequest actionRequest,
-			ActionResponse actionResponse, String cmd, Exception e)
+	private void _handleUploadException(
+			ActionRequest actionRequest, ActionResponse actionResponse,
+			String cmd, Exception e)
 		throws Exception {
 
 		if (e instanceof AssetCategoryException ||
@@ -833,7 +875,7 @@ public class EditFileEntryMVCActionCommand extends BaseMVCActionCommand {
 		}
 	}
 
-	protected void restoreTrashEntries(ActionRequest actionRequest)
+	private void _restoreTrashEntries(ActionRequest actionRequest)
 		throws Exception {
 
 		long[] restoreTrashEntryIds = StringUtil.split(
@@ -844,7 +886,7 @@ public class EditFileEntryMVCActionCommand extends BaseMVCActionCommand {
 		}
 	}
 
-	protected void revertFileEntry(ActionRequest actionRequest)
+	private void _revertFileEntry(ActionRequest actionRequest)
 		throws Exception {
 
 		long fileEntryId = ParamUtil.getLong(actionRequest, "fileEntryId");
@@ -856,26 +898,11 @@ public class EditFileEntryMVCActionCommand extends BaseMVCActionCommand {
 		_dlAppService.revertFileEntry(fileEntryId, version, serviceContext);
 	}
 
-	@Reference(unbind = "-")
-	protected void setDLAppService(DLAppService dlAppService) {
-		_dlAppService = dlAppService;
-	}
-
-	@Reference(unbind = "-")
-	protected void setDLTrashService(DLTrashService dlTrashService) {
-		_dlTrashService = dlTrashService;
-	}
-
-	@Reference(unbind = "-")
-	protected void setTrashEntryService(TrashEntryService trashEntryService) {
-		_trashEntryService = trashEntryService;
-	}
-
-	protected FileEntry updateFileEntry(
+	private FileEntry _updateFileEntry(
 			PortletConfig portletConfig, ActionRequest actionRequest,
 			ActionResponse actionResponse,
 			UploadPortletRequest uploadPortletRequest)
-		throws Exception {
+		throws IOException, PortalException {
 
 		ThemeDisplay themeDisplay = (ThemeDisplay)actionRequest.getAttribute(
 			WebKeys.THEME_DISPLAY);
@@ -897,7 +924,7 @@ public class EditFileEntryMVCActionCommand extends BaseMVCActionCommand {
 
 		DLVersionNumberIncrease dlVersionNumberIncrease =
 			DLVersionNumberIncrease.valueOf(
-				ParamUtil.getString(uploadPortletRequest, "versionIncrease"),
+				uploadPortletRequest.getParameter("versionIncrease"),
 				DLVersionNumberIncrease.AUTOMATIC);
 
 		boolean updateVersionDetails = ParamUtil.getBoolean(
@@ -937,17 +964,17 @@ public class EditFileEntryMVCActionCommand extends BaseMVCActionCommand {
 						DLPortletInstanceSettings.getInstance(
 							themeDisplay.getLayout(), portletDisplay.getId());
 
-					String[] mimeTypes =
-						dlPortletInstanceSettings.getMimeTypes();
+					int count = Arrays.binarySearch(
+						dlPortletInstanceSettings.getMimeTypes(), contentType);
 
-					if (Arrays.binarySearch(mimeTypes, contentType) < 0) {
+					if (count < 0) {
 						throw new FileMimeTypeException(contentType);
 					}
 				}
 			}
 
-			ServiceContext serviceContext = ServiceContextFactory.getInstance(
-				DLFileEntry.class.getName(), uploadPortletRequest);
+			ServiceContext serviceContext = _createServiceContext(
+				uploadPortletRequest);
 
 			FileEntry fileEntry = null;
 
@@ -1003,6 +1030,8 @@ public class EditFileEntryMVCActionCommand extends BaseMVCActionCommand {
 		}
 	}
 
+	private static final String[] _RESTRICTED_GUEST_PERMISSIONS = {};
+
 	private static final Log _log = LogFactoryUtil.getLog(
 		EditFileEntryMVCActionCommand.class);
 
@@ -1010,8 +1039,12 @@ public class EditFileEntryMVCActionCommand extends BaseMVCActionCommand {
 	private AssetDisplayPageEntryFormProcessor
 		_assetDisplayPageEntryFormProcessor;
 
+	@Reference
 	private DLAppService _dlAppService;
+
 	private volatile DLConfiguration _dlConfiguration;
+
+	@Reference
 	private DLTrashService _dlTrashService;
 
 	@Reference
@@ -1026,6 +1059,7 @@ public class EditFileEntryMVCActionCommand extends BaseMVCActionCommand {
 	@Reference
 	private Portal _portal;
 
+	@Reference
 	private TrashEntryService _trashEntryService;
 
 }

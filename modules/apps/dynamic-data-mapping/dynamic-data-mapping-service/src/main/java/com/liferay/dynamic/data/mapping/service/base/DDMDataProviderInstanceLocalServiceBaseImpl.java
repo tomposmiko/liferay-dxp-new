@@ -24,7 +24,7 @@ import com.liferay.exportimport.kernel.lar.ManifestSummary;
 import com.liferay.exportimport.kernel.lar.PortletDataContext;
 import com.liferay.exportimport.kernel.lar.StagedModelDataHandlerUtil;
 import com.liferay.exportimport.kernel.lar.StagedModelType;
-import com.liferay.portal.kernel.bean.BeanReference;
+import com.liferay.portal.aop.AopService;
 import com.liferay.portal.kernel.dao.db.DB;
 import com.liferay.portal.kernel.dao.db.DBManagerUtil;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdate;
@@ -43,12 +43,10 @@ import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiServic
 import com.liferay.portal.kernel.search.Indexable;
 import com.liferay.portal.kernel.search.IndexableType;
 import com.liferay.portal.kernel.service.BaseLocalServiceImpl;
-import com.liferay.portal.kernel.service.PersistedModelLocalServiceRegistry;
-import com.liferay.portal.kernel.service.persistence.UserPersistence;
+import com.liferay.portal.kernel.service.PersistedModelLocalService;
 import com.liferay.portal.kernel.transaction.Transactional;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.PortalUtil;
-import com.liferay.portal.spring.extender.service.ServiceReference;
 
 import java.io.Serializable;
 
@@ -56,7 +54,7 @@ import java.util.List;
 
 import javax.sql.DataSource;
 
-import org.osgi.annotation.versioning.ProviderType;
+import org.osgi.service.component.annotations.Reference;
 
 /**
  * Provides the base implementation for the ddm data provider instance local service.
@@ -69,12 +67,12 @@ import org.osgi.annotation.versioning.ProviderType;
  * @see com.liferay.dynamic.data.mapping.service.impl.DDMDataProviderInstanceLocalServiceImpl
  * @generated
  */
-@ProviderType
 public abstract class DDMDataProviderInstanceLocalServiceBaseImpl
 	extends BaseLocalServiceImpl
-	implements DDMDataProviderInstanceLocalService, IdentifiableOSGiService {
+	implements AopService, DDMDataProviderInstanceLocalService,
+			   IdentifiableOSGiService {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this class directly. Use <code>DDMDataProviderInstanceLocalService</code> via injection or a <code>org.osgi.util.tracker.ServiceTracker</code> or use <code>com.liferay.dynamic.data.mapping.service.DDMDataProviderInstanceLocalServiceUtil</code>.
@@ -168,7 +166,7 @@ public abstract class DDMDataProviderInstanceLocalServiceBaseImpl
 	 * Performs a dynamic query on the database and returns a range of the matching rows.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>com.liferay.dynamic.data.mapping.model.impl.DDMDataProviderInstanceModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>com.liferay.dynamic.data.mapping.model.impl.DDMDataProviderInstanceModelImpl</code>.
 	 * </p>
 	 *
 	 * @param dynamicQuery the dynamic query
@@ -188,7 +186,7 @@ public abstract class DDMDataProviderInstanceLocalServiceBaseImpl
 	 * Performs a dynamic query on the database and returns an ordered range of the matching rows.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>com.liferay.dynamic.data.mapping.model.impl.DDMDataProviderInstanceModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>com.liferay.dynamic.data.mapping.model.impl.DDMDataProviderInstanceModelImpl</code>.
 	 * </p>
 	 *
 	 * @param dynamicQuery the dynamic query
@@ -462,7 +460,7 @@ public abstract class DDMDataProviderInstanceLocalServiceBaseImpl
 	 * Returns a range of all the ddm data provider instances.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>com.liferay.dynamic.data.mapping.model.impl.DDMDataProviderInstanceModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>com.liferay.dynamic.data.mapping.model.impl.DDMDataProviderInstanceModelImpl</code>.
 	 * </p>
 	 *
 	 * @param start the lower bound of the range of ddm data provider instances
@@ -501,218 +499,18 @@ public abstract class DDMDataProviderInstanceLocalServiceBaseImpl
 			ddmDataProviderInstance);
 	}
 
-	/**
-	 * Returns the ddm data provider instance local service.
-	 *
-	 * @return the ddm data provider instance local service
-	 */
-	public DDMDataProviderInstanceLocalService
-		getDDMDataProviderInstanceLocalService() {
-
-		return ddmDataProviderInstanceLocalService;
+	@Override
+	public Class<?>[] getAopInterfaces() {
+		return new Class<?>[] {
+			DDMDataProviderInstanceLocalService.class,
+			IdentifiableOSGiService.class, PersistedModelLocalService.class
+		};
 	}
 
-	/**
-	 * Sets the ddm data provider instance local service.
-	 *
-	 * @param ddmDataProviderInstanceLocalService the ddm data provider instance local service
-	 */
-	public void setDDMDataProviderInstanceLocalService(
-		DDMDataProviderInstanceLocalService
-			ddmDataProviderInstanceLocalService) {
-
-		this.ddmDataProviderInstanceLocalService =
-			ddmDataProviderInstanceLocalService;
-	}
-
-	/**
-	 * Returns the ddm data provider instance persistence.
-	 *
-	 * @return the ddm data provider instance persistence
-	 */
-	public DDMDataProviderInstancePersistence
-		getDDMDataProviderInstancePersistence() {
-
-		return ddmDataProviderInstancePersistence;
-	}
-
-	/**
-	 * Sets the ddm data provider instance persistence.
-	 *
-	 * @param ddmDataProviderInstancePersistence the ddm data provider instance persistence
-	 */
-	public void setDDMDataProviderInstancePersistence(
-		DDMDataProviderInstancePersistence ddmDataProviderInstancePersistence) {
-
-		this.ddmDataProviderInstancePersistence =
-			ddmDataProviderInstancePersistence;
-	}
-
-	/**
-	 * Returns the ddm data provider instance finder.
-	 *
-	 * @return the ddm data provider instance finder
-	 */
-	public DDMDataProviderInstanceFinder getDDMDataProviderInstanceFinder() {
-		return ddmDataProviderInstanceFinder;
-	}
-
-	/**
-	 * Sets the ddm data provider instance finder.
-	 *
-	 * @param ddmDataProviderInstanceFinder the ddm data provider instance finder
-	 */
-	public void setDDMDataProviderInstanceFinder(
-		DDMDataProviderInstanceFinder ddmDataProviderInstanceFinder) {
-
-		this.ddmDataProviderInstanceFinder = ddmDataProviderInstanceFinder;
-	}
-
-	/**
-	 * Returns the counter local service.
-	 *
-	 * @return the counter local service
-	 */
-	public com.liferay.counter.kernel.service.CounterLocalService
-		getCounterLocalService() {
-
-		return counterLocalService;
-	}
-
-	/**
-	 * Sets the counter local service.
-	 *
-	 * @param counterLocalService the counter local service
-	 */
-	public void setCounterLocalService(
-		com.liferay.counter.kernel.service.CounterLocalService
-			counterLocalService) {
-
-		this.counterLocalService = counterLocalService;
-	}
-
-	/**
-	 * Returns the resource local service.
-	 *
-	 * @return the resource local service
-	 */
-	public com.liferay.portal.kernel.service.ResourceLocalService
-		getResourceLocalService() {
-
-		return resourceLocalService;
-	}
-
-	/**
-	 * Sets the resource local service.
-	 *
-	 * @param resourceLocalService the resource local service
-	 */
-	public void setResourceLocalService(
-		com.liferay.portal.kernel.service.ResourceLocalService
-			resourceLocalService) {
-
-		this.resourceLocalService = resourceLocalService;
-	}
-
-	/**
-	 * Returns the user local service.
-	 *
-	 * @return the user local service
-	 */
-	public com.liferay.portal.kernel.service.UserLocalService
-		getUserLocalService() {
-
-		return userLocalService;
-	}
-
-	/**
-	 * Sets the user local service.
-	 *
-	 * @param userLocalService the user local service
-	 */
-	public void setUserLocalService(
-		com.liferay.portal.kernel.service.UserLocalService userLocalService) {
-
-		this.userLocalService = userLocalService;
-	}
-
-	/**
-	 * Returns the user persistence.
-	 *
-	 * @return the user persistence
-	 */
-	public UserPersistence getUserPersistence() {
-		return userPersistence;
-	}
-
-	/**
-	 * Sets the user persistence.
-	 *
-	 * @param userPersistence the user persistence
-	 */
-	public void setUserPersistence(UserPersistence userPersistence) {
-		this.userPersistence = userPersistence;
-	}
-
-	/**
-	 * Returns the ddm data provider instance link local service.
-	 *
-	 * @return the ddm data provider instance link local service
-	 */
-	public com.liferay.dynamic.data.mapping.service.
-		DDMDataProviderInstanceLinkLocalService
-			getDDMDataProviderInstanceLinkLocalService() {
-
-		return ddmDataProviderInstanceLinkLocalService;
-	}
-
-	/**
-	 * Sets the ddm data provider instance link local service.
-	 *
-	 * @param ddmDataProviderInstanceLinkLocalService the ddm data provider instance link local service
-	 */
-	public void setDDMDataProviderInstanceLinkLocalService(
-		com.liferay.dynamic.data.mapping.service.
-			DDMDataProviderInstanceLinkLocalService
-				ddmDataProviderInstanceLinkLocalService) {
-
-		this.ddmDataProviderInstanceLinkLocalService =
-			ddmDataProviderInstanceLinkLocalService;
-	}
-
-	/**
-	 * Returns the ddm data provider instance link persistence.
-	 *
-	 * @return the ddm data provider instance link persistence
-	 */
-	public DDMDataProviderInstanceLinkPersistence
-		getDDMDataProviderInstanceLinkPersistence() {
-
-		return ddmDataProviderInstanceLinkPersistence;
-	}
-
-	/**
-	 * Sets the ddm data provider instance link persistence.
-	 *
-	 * @param ddmDataProviderInstanceLinkPersistence the ddm data provider instance link persistence
-	 */
-	public void setDDMDataProviderInstanceLinkPersistence(
-		DDMDataProviderInstanceLinkPersistence
-			ddmDataProviderInstanceLinkPersistence) {
-
-		this.ddmDataProviderInstanceLinkPersistence =
-			ddmDataProviderInstanceLinkPersistence;
-	}
-
-	public void afterPropertiesSet() {
-		persistedModelLocalServiceRegistry.register(
-			"com.liferay.dynamic.data.mapping.model.DDMDataProviderInstance",
-			ddmDataProviderInstanceLocalService);
-	}
-
-	public void destroy() {
-		persistedModelLocalServiceRegistry.unregister(
-			"com.liferay.dynamic.data.mapping.model.DDMDataProviderInstance");
+	@Override
+	public void setAopProxy(Object aopProxy) {
+		ddmDataProviderInstanceLocalService =
+			(DDMDataProviderInstanceLocalService)aopProxy;
 	}
 
 	/**
@@ -758,51 +556,30 @@ public abstract class DDMDataProviderInstanceLocalServiceBaseImpl
 		}
 	}
 
-	@BeanReference(type = DDMDataProviderInstanceLocalService.class)
 	protected DDMDataProviderInstanceLocalService
 		ddmDataProviderInstanceLocalService;
 
-	@BeanReference(type = DDMDataProviderInstancePersistence.class)
+	@Reference
 	protected DDMDataProviderInstancePersistence
 		ddmDataProviderInstancePersistence;
 
-	@BeanReference(type = DDMDataProviderInstanceFinder.class)
+	@Reference
 	protected DDMDataProviderInstanceFinder ddmDataProviderInstanceFinder;
 
-	@ServiceReference(
-		type = com.liferay.counter.kernel.service.CounterLocalService.class
-	)
+	@Reference
 	protected com.liferay.counter.kernel.service.CounterLocalService
 		counterLocalService;
 
-	@ServiceReference(
-		type = com.liferay.portal.kernel.service.ResourceLocalService.class
-	)
+	@Reference
 	protected com.liferay.portal.kernel.service.ResourceLocalService
 		resourceLocalService;
 
-	@ServiceReference(
-		type = com.liferay.portal.kernel.service.UserLocalService.class
-	)
+	@Reference
 	protected com.liferay.portal.kernel.service.UserLocalService
 		userLocalService;
 
-	@ServiceReference(type = UserPersistence.class)
-	protected UserPersistence userPersistence;
-
-	@BeanReference(
-		type = com.liferay.dynamic.data.mapping.service.DDMDataProviderInstanceLinkLocalService.class
-	)
-	protected com.liferay.dynamic.data.mapping.service.
-		DDMDataProviderInstanceLinkLocalService
-			ddmDataProviderInstanceLinkLocalService;
-
-	@BeanReference(type = DDMDataProviderInstanceLinkPersistence.class)
+	@Reference
 	protected DDMDataProviderInstanceLinkPersistence
 		ddmDataProviderInstanceLinkPersistence;
-
-	@ServiceReference(type = PersistedModelLocalServiceRegistry.class)
-	protected PersistedModelLocalServiceRegistry
-		persistedModelLocalServiceRegistry;
 
 }

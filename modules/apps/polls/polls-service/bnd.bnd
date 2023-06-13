@@ -1,9 +1,10 @@
 Bundle-Name: Liferay Polls Service
 Bundle-SymbolicName: com.liferay.polls.service
-Bundle-Version: 5.0.6
+Bundle-Version: 5.0.17
 Import-Package:\
 	com.liferay.polls.util.comparator,\
 	\
 	*
-Liferay-Require-SchemaVersion: 2.0.0
+Liferay-Require-SchemaVersion: 2.1.0
 Liferay-Service: true
+-dsannotations-options: inherit

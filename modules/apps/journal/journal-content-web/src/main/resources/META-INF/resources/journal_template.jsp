@@ -72,7 +72,7 @@ AssetRendererFactory<JournalArticle> assetRendererFactory = AssetRendererFactory
 AssetRenderer<JournalArticle> assetRenderer = assetRendererFactory.getAssetRenderer(article, 0);
 %>
 
-<aui:script use="aui-io-request,aui-parse-content,liferay-alert">
+<aui:script use="aui-parse-content,liferay-alert">
 	var templatePreview = A.one('.template-preview-content');
 	var form = A.one('#<%= refererPortletName %>fm');
 	var templateKeyInput = A.one('#<%= refererPortletName + "ddmTemplateKey" %>');
@@ -103,8 +103,10 @@ AssetRenderer<JournalArticle> assetRenderer = assetRendererFactory.getAssetRende
 						destroyOnHide: true,
 						modal: true
 					},
-					eventName: '<%= PortalUtil.getPortletNamespace(portletId) + "selectDDMTemplate" %>',
-					id: '<%= PortalUtil.getPortletNamespace(portletId) + "selectDDMTemplate" %>',
+					eventName:
+						'<%= PortalUtil.getPortletNamespace(portletId) + "selectDDMTemplate" %>',
+					id:
+						'<%= PortalUtil.getPortletNamespace(portletId) + "selectDDMTemplate" %>',
 					title: '<liferay-ui:message key="templates" />',
 					uri: '<%= selectDDMTemplateURL %>'
 				},
@@ -113,48 +115,50 @@ AssetRenderer<JournalArticle> assetRenderer = assetRendererFactory.getAssetRende
 
 					templatePreview.html('<div class="loading-animation"></div>');
 
-					var data = Liferay.Util.ns(
-						'<%= PortalUtil.getPortletNamespace(JournalContentPortletKeys.JOURNAL_CONTENT) %>',
-						{
-							ddmTemplateKey: event.ddmtemplatekey
-						}
+					var data = new URLSearchParams(
+						Liferay.Util.ns(
+							'<%= PortalUtil.getPortletNamespace(JournalContentPortletKeys.JOURNAL_CONTENT) %>',
+							{
+								ddmTemplateKey: event.ddmtemplatekey
+							}
+						)
 					);
 
-					A.io.request(
+					Liferay.Util.fetch(
 						'<liferay-portlet:resourceURL portletName="<%= JournalContentPortletKeys.JOURNAL_CONTENT %>" windowState="<%= LiferayWindowState.EXCLUSIVE.toString() %>"><portlet:param name="mvcPath" value="/journal_template_resources.jsp" /><portlet:param name="articleResourcePrimKey" value="<%= String.valueOf(assetRenderer.getClassPK()) %>" /></liferay-portlet:resourceURL>',
 						{
-							data: data,
-							on: {
-								failure: function() {
-									templatePreview.html('<div class="alert alert-danger hidden"><liferay-ui:message key="an-unexpected-error-occurred" /></div>');
-								},
-								success: function(event, id, obj) {
-									var responseData = this.get('responseData');
-
-									templatePreview.plug(A.Plugin.ParseContent);
-
-									templatePreview.setContent(responseData);
-								}
-							}
+							body: data,
+							method: 'POST'
 						}
-					);
+					)
+						.then(function(response) {
+							return response.text();
+						})
+						.then(function(response) {
+							templatePreview.plug(A.Plugin.ParseContent);
 
-					new Liferay.Alert(
-						{
-							closeable: true,
-							delay: {
-								hide: 0,
-								show: 0
-							},
-							duration: 500,
-							icon: 'info-circle',
-							message: '<%= HtmlUtil.escapeJS(LanguageUtil.get(resourceBundle, "changing-the-template-will-not-affect-the-original-web-content-defautl-template.-the-change-only-applies-to-this-web-content-display")) %>',
-							namespace: '<portlet:namespace />',
-							title: '',
-							type: 'info'
-						}
-					).render(form);
+							templatePreview.setContent(response);
+						})
+						.catch(function() {
+							templatePreview.html(
+								'<div class="alert alert-danger hidden"><liferay-ui:message key="an-unexpected-error-occurred" /></div>'
+							);
+						});
 
+					new Liferay.Alert({
+						closeable: true,
+						delay: {
+							hide: 0,
+							show: 0
+						},
+						duration: 500,
+						icon: 'info-circle',
+						message:
+							'<%= HtmlUtil.escapeJS(LanguageUtil.get(resourceBundle, "changing-the-template-will-not-affect-the-original-web-content-defautl-template.-the-change-only-applies-to-this-web-content-display")) %>',
+						namespace: '<portlet:namespace />',
+						title: '',
+						type: 'info'
+					}).render(form);
 				}
 			);
 		}
@@ -172,10 +176,20 @@ AssetRenderer<JournalArticle> assetRenderer = assetRendererFactory.getAssetRende
 		function(event) {
 			templateKeyInput.setAttribute('value', '');
 
-			templatePreview.html('<p class="text-default"><liferay-ui:message key="no-template" /></p>');
+			templatePreview.html(
+				'<p class="text-default"><liferay-ui:message key="no-template" /></p>'
+			);
 		}
 	);
 
-	Liferay.Util.toggleRadio('<%= refererPortletName + "ddmTemplateTypeCustom" %>', '<%= refererPortletName + "customDDMTemplateContainer" %>', '');
-	Liferay.Util.toggleRadio('<%= refererPortletName + "ddmTemplateTypeDefault" %>', '', '<%= refererPortletName + "customDDMTemplateContainer" %>');
+	Liferay.Util.toggleRadio(
+		'<%= refererPortletName + "ddmTemplateTypeCustom" %>',
+		'<%= refererPortletName + "customDDMTemplateContainer" %>',
+		''
+	);
+	Liferay.Util.toggleRadio(
+		'<%= refererPortletName + "ddmTemplateTypeDefault" %>',
+		'',
+		'<%= refererPortletName + "customDDMTemplateContainer" %>'
+	);
 </aui:script>

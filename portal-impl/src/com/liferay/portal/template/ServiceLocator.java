@@ -24,16 +24,13 @@ import com.liferay.registry.RegistryUtil;
 
 import java.util.function.Function;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 /**
  * @author Brian Wing Shun Chan
  */
-@ProviderType
 public class ServiceLocator {
 
 	public static ServiceLocator getInstance() {
-		return _instance;
+		return _serviceLocator;
 	}
 
 	public Object findService(String serviceName) {
@@ -83,6 +80,6 @@ public class ServiceLocator {
 
 	private static final Log _log = LogFactoryUtil.getLog(ServiceLocator.class);
 
-	private static final ServiceLocator _instance = new ServiceLocator();
+	private static final ServiceLocator _serviceLocator = new ServiceLocator();
 
 }

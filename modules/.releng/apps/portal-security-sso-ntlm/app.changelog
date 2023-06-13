@@ -1,0 +1,12 @@
+#
+# Liferay App Version 1.0.0
+#
+
+app.artifacts-1.0.0=\
+	com.liferay.portal.security.sso.ntlm.api-3.0.4.jar,\
+	com.liferay.portal.security.sso.ntlm.impl-2.0.2.jar,\
+	com.liferay.portal.security.sso.ntlm.settings.authentication.web-1.0.3.jar
+
+app.change.log-1.0.0=LPS-77699 LPS-84119 LPS-88856 LPS-90255 LPS-93427 LPS-94555 LPS-95413 LPS-95555
+
+app.git.id-1.0.0=92226e8e7a3a58028b5e721fa7b8ca4cbe348a93

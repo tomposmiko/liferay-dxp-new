@@ -20,9 +20,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import com.liferay.petra.function.UnsafeSupplier;
 import com.liferay.petra.string.StringBundler;
-
-import graphql.annotations.annotationTypes.GraphQLField;
-import graphql.annotations.annotationTypes.GraphQLName;
+import com.liferay.portal.vulcan.graphql.annotation.GraphQLField;
+import com.liferay.portal.vulcan.graphql.annotation.GraphQLName;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 
@@ -75,6 +74,34 @@ public class AggregateRating {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Double bestRating;
 
+	@Schema(description = "The average rating.")
+	public Double getRatingAverage() {
+		return ratingAverage;
+	}
+
+	public void setRatingAverage(Double ratingAverage) {
+		this.ratingAverage = ratingAverage;
+	}
+
+	@JsonIgnore
+	public void setRatingAverage(
+		UnsafeSupplier<Double, Exception> ratingAverageUnsafeSupplier) {
+
+		try {
+			ratingAverage = ratingAverageUnsafeSupplier.get();
+		}
+		catch (RuntimeException re) {
+			throw re;
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	@GraphQLField
+	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
+	protected Double ratingAverage;
+
 	@Schema(description = "The number of ratings.")
 	public Integer getRatingCount() {
 		return ratingCount;
@@ -103,7 +130,7 @@ public class AggregateRating {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Integer ratingCount;
 
-	@Schema(description = "The average rating.")
+	@Schema(description = "The rating value.")
 	public Double getRatingValue() {
 		return ratingValue;
 	}
@@ -198,6 +225,16 @@ public class AggregateRating {
 			sb.append(bestRating);
 		}
 
+		if (ratingAverage != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"ratingAverage\": ");
+
+			sb.append(ratingAverage);
+		}
+
 		if (ratingCount != null) {
 			if (sb.length() > 1) {
 				sb.append(", ");
@@ -232,6 +269,12 @@ public class AggregateRating {
 
 		return sb.toString();
 	}
+
+	@Schema(
+		defaultValue = "com.liferay.headless.delivery.dto.v1_0.AggregateRating",
+		name = "x-class-name"
+	)
+	public String xClassName;
 
 	private static String _escape(Object object) {
 		String string = String.valueOf(object);

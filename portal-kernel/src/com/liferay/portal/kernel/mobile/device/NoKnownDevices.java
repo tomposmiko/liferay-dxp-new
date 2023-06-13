@@ -18,19 +18,16 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 /**
  * Class represents unknown device
  *
  * @author Milen Dyankov
  * @author Michael C. Han
  */
-@ProviderType
 public class NoKnownDevices implements KnownDevices {
 
 	public static NoKnownDevices getInstance() {
-		return _instance;
+		return _noKnownDevices;
 	}
 
 	@Override
@@ -69,7 +66,7 @@ public class NoKnownDevices implements KnownDevices {
 	private NoKnownDevices() {
 	}
 
-	private static final NoKnownDevices _instance = new NoKnownDevices();
+	private static final NoKnownDevices _noKnownDevices = new NoKnownDevices();
 
 	private final Set<String> _pointingMethods = Collections.singleton(
 		VersionableName.UNKNOWN.getName());

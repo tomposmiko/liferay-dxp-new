@@ -26,12 +26,9 @@ import com.liferay.portal.security.service.access.policy.constants.SAPConstants;
 import java.util.List;
 import java.util.Objects;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 /**
  * @author Brian Wing Shun Chan
  */
-@ProviderType
 public class SAPEntryImpl extends SAPEntryBaseImpl {
 
 	@Override
@@ -39,7 +36,7 @@ public class SAPEntryImpl extends SAPEntryBaseImpl {
 		String[] allowedServiceSignatures = StringUtil.split(
 			getAllowedServiceSignatures(), StringPool.NEW_LINE);
 
-		return ListUtil.toList(allowedServiceSignatures);
+		return ListUtil.fromArray(allowedServiceSignatures);
 	}
 
 	@Override

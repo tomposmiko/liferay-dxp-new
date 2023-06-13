@@ -248,6 +248,10 @@ definition {
 				value1 = "Select");
 		}
 
+		while (IsElementNotPresent(locator1 = "DocumentsAndMediaSelectDocument#SELECT_DOCUMENT_IFRAME")) {
+			Pause(locator1 = "1000");
+		}
+
 		SelectFrame(locator1 = "DocumentsAndMediaSelectDocument#SELECT_DOCUMENT_IFRAME");
 
 		if ("${userRole}" == "Guest") {
@@ -256,26 +260,17 @@ definition {
 				value1 = "Sign In");
 		}
 		else {
-			var browserType = PropsUtil.get("browser.type");
+			UploadCommonFile.uploadCommonFileHiddenNoMouseOver(
+				locator1 = "TextInput#FILE",
+				value1 = "${document}");
 
-			if ("${browserType}" == "chrome") {
-				UploadCommonFile.uploadCommonFileHiddenNoMouseOver(
-					locator1 = "DocumentsAndMediaSelectDocument#SELECT_FILE_BUTTON",
-					value1 = "${document}");
-			}
-			else {
-				UploadCommonFile.uploadCommonFileHidden(
-					locator1 = "DocumentsAndMediaSelectDocument#SELECT_FILE_BUTTON",
-					value1 = "${document}");
-			}
-
-			Pause(locator1 = "1000");
-
-			SelectFrameTop(value1 = "relative=top");
+			SelectFrame(locator1 = "ItemSelector#ITEM_SELECTOR_MODAL_FOOTER");
 
 			AssertClick(
-				locator1 = "Button#ADD",
+				locator1 = "ItemSelector#ADD_BUTTON",
 				value1 = "Add");
+
+			SelectFrameTop(value1 = "relative=top");
 		}
 	}
 
@@ -383,7 +378,7 @@ definition {
 		var i = "1";
 
 		while (IsElementPresent(locator1 = "xpath=(//div[@data-fieldname='${key_fieldName}']/a[contains(@class,'ddm-repeatable-add-button')])[${i}]")) {
-			var i = MathUtil.sum("${i}", "1");
+			var i = ${i} + 1;
 
 			if (IsElementPresent(locator1 = "xpath=(//div[@data-fieldname='${key_fieldName}']/a[contains(@class,'ddm-repeatable-add-button')])[${i}]")) {
 				Type(
@@ -454,7 +449,7 @@ definition {
 		var i = "1";
 
 		while (IsElementPresent(locator1 = "xpath=(//div[@data-fieldname='Text']//input)[${i}]")) {
-			var i = MathUtil.sum("${i}", "1");
+			var i = ${i} + 1;
 
 			if (IsElementPresent(locator1 = "xpath=(//div[@data-fieldname='Text']//input)[${i}]")) {
 				Type(
@@ -589,7 +584,7 @@ definition {
 	macro viewFieldPredefinedValue {
 		var key_fieldName = "${fieldName}";
 
-		if (!("${fieldShowLabel}" == "No")) {
+		if ("${fieldShowLabel}" != "No") {
 			AssertTextEquals(
 				locator1 = "DDLEditRecord#FIELD_LABEL",
 				value1 = "${fieldFieldLabel}");
@@ -779,7 +774,7 @@ definition {
 
 		AssertElementPresent(locator1 = "DDLEditRecord#LINK_TO_PAGE_BREADCRUMB");
 
-		var count = MathUtil.sum("${count}", "1");
+		var count = ${count} + 1;
 		var key_number = "${count}";
 
 		AssertElementNotPresent(locator1 = "DDLEditRecord#LINK_TO_PAGE_BREADCRUMB");

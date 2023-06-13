@@ -20,6 +20,8 @@ import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.RequiredUserException;
 import com.liferay.portal.kernel.exception.UserEmailAddressException;
 import com.liferay.portal.kernel.exception.UserFieldException;
+import com.liferay.portal.kernel.jsonwebservice.JSONWebService;
+import com.liferay.portal.kernel.jsonwebservice.JSONWebServiceMode;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Address;
@@ -32,13 +34,14 @@ import com.liferay.portal.kernel.model.GroupConstants;
 import com.liferay.portal.kernel.model.Organization;
 import com.liferay.portal.kernel.model.Phone;
 import com.liferay.portal.kernel.model.Role;
-import com.liferay.portal.kernel.model.RoleConstants;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.model.UserGroup;
 import com.liferay.portal.kernel.model.UserGroupRole;
 import com.liferay.portal.kernel.model.Website;
+import com.liferay.portal.kernel.model.role.RoleConstants;
 import com.liferay.portal.kernel.search.Indexer;
 import com.liferay.portal.kernel.search.IndexerRegistryUtil;
+import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
 import com.liferay.portal.kernel.security.auth.PrincipalException;
 import com.liferay.portal.kernel.security.membershippolicy.OrganizationMembershipPolicyUtil;
 import com.liferay.portal.kernel.security.membershippolicy.RoleMembershipPolicyUtil;
@@ -679,8 +682,11 @@ public class UserServiceImpl extends UserServiceBaseImpl {
 
 		PermissionChecker permissionChecker = getPermissionChecker();
 
-		if (!permissionChecker.isCompanyAdmin(companyId)) {
-			throw new PrincipalException.MustBeCompanyAdmin(permissionChecker);
+		if (!permissionChecker.hasPermission(
+				null, User.class.getName(), companyId, ActionKeys.VIEW)) {
+
+			throw new PrincipalException.MustHavePermission(
+				permissionChecker, User.class.getName(), 0, ActionKeys.VIEW);
 		}
 
 		return userPersistence.findByCompanyId(companyId, start, end);
@@ -690,8 +696,11 @@ public class UserServiceImpl extends UserServiceBaseImpl {
 	public int getCompanyUsersCount(long companyId) throws PortalException {
 		PermissionChecker permissionChecker = getPermissionChecker();
 
-		if (!permissionChecker.isCompanyAdmin(companyId)) {
-			throw new PrincipalException.MustBeCompanyAdmin(permissionChecker);
+		if (!permissionChecker.hasPermission(
+				null, User.class.getName(), companyId, ActionKeys.VIEW)) {
+
+			throw new PrincipalException.MustHavePermission(
+				permissionChecker, User.class.getName(), 0, ActionKeys.VIEW);
 		}
 
 		return userPersistence.countByCompanyId(companyId);
@@ -794,8 +803,11 @@ public class UserServiceImpl extends UserServiceBaseImpl {
 
 		PermissionChecker permissionChecker = getPermissionChecker();
 
-		if (!permissionChecker.isCompanyAdmin(companyId)) {
-			throw new PrincipalException.MustBeCompanyAdmin(permissionChecker);
+		if (!permissionChecker.hasPermission(
+				null, User.class.getName(), companyId, ActionKeys.VIEW)) {
+
+			throw new PrincipalException.MustHavePermission(
+				permissionChecker, User.class.getName(), 0, ActionKeys.VIEW);
 		}
 
 		return userPersistence.findByU_C(
@@ -812,8 +824,13 @@ public class UserServiceImpl extends UserServiceBaseImpl {
 
 		PermissionChecker permissionChecker = getPermissionChecker();
 
-		if (!permissionChecker.isCompanyAdmin(organization.getCompanyId())) {
-			throw new PrincipalException.MustBeCompanyAdmin(permissionChecker);
+		if (!permissionChecker.hasPermission(
+				null, Organization.class.getName(), organization.getCompanyId(),
+				ActionKeys.VIEW_MEMBERS)) {
+
+			throw new PrincipalException.MustHavePermission(
+				permissionChecker, Organization.class.getName(), 0,
+				ActionKeys.VIEW_MEMBERS);
 		}
 
 		return userFinder.findByUsersOrgsGtUserId(
@@ -830,8 +847,13 @@ public class UserServiceImpl extends UserServiceBaseImpl {
 
 		PermissionChecker permissionChecker = getPermissionChecker();
 
-		if (!permissionChecker.isCompanyAdmin(userGroup.getCompanyId())) {
-			throw new PrincipalException.MustBeCompanyAdmin(permissionChecker);
+		if (!permissionChecker.hasPermission(
+				null, UserGroup.class.getName(), userGroup.getCompanyId(),
+				ActionKeys.VIEW_MEMBERS)) {
+
+			throw new PrincipalException.MustHavePermission(
+				permissionChecker, UserGroup.class.getName(), 0,
+				ActionKeys.VIEW_MEMBERS);
 		}
 
 		return userFinder.findByUsersUserGroupsGtUserId(
@@ -845,8 +867,22 @@ public class UserServiceImpl extends UserServiceBaseImpl {
 
 		PermissionChecker permissionChecker = getPermissionChecker();
 
-		if (!permissionChecker.isOmniadmin()) {
-			throw new PrincipalException.MustBeCompanyAdmin(permissionChecker);
+		if (!permissionChecker.hasPermission(
+				null, Organization.class.getName(),
+				CompanyThreadLocal.getCompanyId(), ActionKeys.VIEW_MEMBERS)) {
+
+			throw new PrincipalException.MustHavePermission(
+				permissionChecker, Organization.class.getName(), 0,
+				ActionKeys.VIEW_MEMBERS);
+		}
+
+		if (!permissionChecker.hasPermission(
+				null, UserGroup.class.getName(),
+				CompanyThreadLocal.getCompanyId(), ActionKeys.VIEW_MEMBERS)) {
+
+			throw new PrincipalException.MustHavePermission(
+				permissionChecker, UserGroup.class.getName(), 0,
+				ActionKeys.VIEW_MEMBERS);
 		}
 
 		return userLocalService.getOrganizationsAndUserGroupsUsersCount(
@@ -1171,6 +1207,7 @@ public class UserServiceImpl extends UserServiceBaseImpl {
 	 *         password; <code>false</code> if the notification email only
 	 *         contains a reset link
 	 */
+	@JSONWebService(mode = JSONWebServiceMode.IGNORE)
 	@Override
 	public boolean sendPasswordByEmailAddress(
 			long companyId, String emailAddress)
@@ -1199,6 +1236,7 @@ public class UserServiceImpl extends UserServiceBaseImpl {
 	 *         password; <code>false</code> if the notification email only
 	 *         contains a reset link
 	 */
+	@JSONWebService(mode = JSONWebServiceMode.IGNORE)
 	@Override
 	public boolean sendPasswordByScreenName(long companyId, String screenName)
 		throws PortalException {
@@ -1224,6 +1262,7 @@ public class UserServiceImpl extends UserServiceBaseImpl {
 	 *         password; <code>false</code> if the notification email only
 	 *         contains a reset link
 	 */
+	@JSONWebService(mode = JSONWebServiceMode.IGNORE)
 	@Override
 	public boolean sendPasswordByUserId(long userId) throws PortalException {
 		return userLocalService.sendPasswordByUserId(userId);
@@ -1813,7 +1852,7 @@ public class UserServiceImpl extends UserServiceBaseImpl {
 	 * @param  emailAddress the user's new email address
 	 * @param  facebookId the user's new Facebook ID
 	 * @param  openId the user's new OpenID
-	 * @param  portrait whether to update the user's portrait image
+	 * @param  hasPortrait if the user has a custom portrait image
 	 * @param  portraitBytes the new portrait image data
 	 * @param  languageId the user's new language ID
 	 * @param  timeZoneId the user's new time zone ID
@@ -1857,7 +1896,7 @@ public class UserServiceImpl extends UserServiceBaseImpl {
 			String newPassword2, boolean passwordReset,
 			String reminderQueryQuestion, String reminderQueryAnswer,
 			String screenName, String emailAddress, long facebookId,
-			String openId, boolean portrait, byte[] portraitBytes,
+			String openId, boolean hasPortrait, byte[] portraitBytes,
 			String languageId, String timeZoneId, String greeting,
 			String comments, String firstName, String middleName,
 			String lastName, long prefixId, long suffixId, boolean male,
@@ -1928,7 +1967,7 @@ public class UserServiceImpl extends UserServiceBaseImpl {
 		if (groupIds != null) {
 			long[] oldGroupIds = user.getGroupIds();
 
-			removeGroupIds = ListUtil.toList(oldGroupIds);
+			removeGroupIds = ListUtil.fromArray(oldGroupIds);
 
 			groupIds = checkGroups(userId, groupIds);
 
@@ -1956,7 +1995,7 @@ public class UserServiceImpl extends UserServiceBaseImpl {
 		if (organizationIds != null) {
 			long[] oldOrganizationIds = user.getOrganizationIds();
 
-			removeOrganizationIds = ListUtil.toList(oldOrganizationIds);
+			removeOrganizationIds = ListUtil.fromArray(oldOrganizationIds);
 
 			organizationIds = checkOrganizations(userId, organizationIds);
 
@@ -1987,7 +2026,7 @@ public class UserServiceImpl extends UserServiceBaseImpl {
 		if (roleIds != null) {
 			long[] oldRoleIds = user.getRoleIds();
 
-			removeRoleIds = ListUtil.toList(oldRoleIds);
+			removeRoleIds = ListUtil.fromArray(oldRoleIds);
 
 			roleIds = checkRoles(userId, roleIds);
 
@@ -2082,7 +2121,7 @@ public class UserServiceImpl extends UserServiceBaseImpl {
 		if (userGroupIds != null) {
 			long[] oldUserGroupIds = user.getUserGroupIds();
 
-			removeUserGroupIds = ListUtil.toList(oldUserGroupIds);
+			removeUserGroupIds = ListUtil.fromArray(oldUserGroupIds);
 
 			userGroupIds = checkUserGroupIds(userId, userGroupIds);
 
@@ -2105,7 +2144,7 @@ public class UserServiceImpl extends UserServiceBaseImpl {
 		user = userLocalService.updateUser(
 			userId, oldPassword, newPassword1, newPassword2, passwordReset,
 			reminderQueryQuestion, reminderQueryAnswer, screenName,
-			emailAddress, facebookId, openId, portrait, portraitBytes,
+			emailAddress, facebookId, openId, hasPortrait, portraitBytes,
 			languageId, timeZoneId, greeting, comments, firstName, middleName,
 			lastName, prefixId, suffixId, male, birthdayMonth, birthdayDay,
 			birthdayYear, smsSn, facebookSn, jabberSn, skypeSn, twitterSn,
@@ -2280,13 +2319,12 @@ public class UserServiceImpl extends UserServiceBaseImpl {
 			}
 		}
 
-		if ((creatorUserId == 0) || (creatorUserId == defaultUserId)) {
-			if (!company.isStrangersWithMx() &&
-				company.hasCompanyMx(emailAddress)) {
+		if (((creatorUserId == 0) || (creatorUserId == defaultUserId)) &&
+			!company.isStrangersWithMx() &&
+			company.hasCompanyMx(emailAddress)) {
 
-				throw new UserEmailAddressException.MustNotUseCompanyMx(
-					emailAddress);
-			}
+			throw new UserEmailAddressException.MustNotUseCompanyMx(
+				emailAddress);
 		}
 	}
 

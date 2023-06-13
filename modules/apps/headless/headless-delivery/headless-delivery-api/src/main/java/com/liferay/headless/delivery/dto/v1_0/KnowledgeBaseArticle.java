@@ -22,9 +22,8 @@ import com.fasterxml.jackson.annotation.JsonValue;
 
 import com.liferay.petra.function.UnsafeSupplier;
 import com.liferay.petra.string.StringBundler;
-
-import graphql.annotations.annotationTypes.GraphQLField;
-import graphql.annotations.annotationTypes.GraphQLName;
+import com.liferay.portal.vulcan.graphql.annotation.GraphQLField;
+import com.liferay.portal.vulcan.graphql.annotation.GraphQLName;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 
@@ -39,6 +38,7 @@ import java.util.Set;
 
 import javax.annotation.Generated;
 
+import javax.validation.Valid;
 import javax.validation.constraints.NotEmpty;
 
 import javax.xml.bind.annotation.XmlRootElement;
@@ -54,6 +54,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement(name = "KnowledgeBaseArticle")
 public class KnowledgeBaseArticle {
 
+	@GraphQLName("ViewableBy")
 	public static enum ViewableBy {
 
 		ANYONE("Anyone"), MEMBERS("Members"), OWNER("Owner");
@@ -88,6 +89,7 @@ public class KnowledgeBaseArticle {
 	}
 
 	@Schema(description = "The article's average rating.")
+	@Valid
 	public AggregateRating getAggregateRating() {
 		return aggregateRating;
 	}
@@ -146,6 +148,7 @@ public class KnowledgeBaseArticle {
 	protected String articleBody;
 
 	@Schema(description = "The article's author.")
+	@Valid
 	public Creator getCreator() {
 		return creator;
 	}
@@ -174,6 +177,7 @@ public class KnowledgeBaseArticle {
 	protected Creator creator;
 
 	@Schema
+	@Valid
 	public CustomField[] getCustomFields() {
 		return customFields;
 	}
@@ -460,6 +464,7 @@ public class KnowledgeBaseArticle {
 	protected Integer numberOfKnowledgeBaseArticles;
 
 	@Schema(description = "The article's parent folder, if it exists.")
+	@Valid
 	public ParentKnowledgeBaseFolder getParentKnowledgeBaseFolder() {
 		return parentKnowledgeBaseFolder;
 	}
@@ -526,6 +531,7 @@ public class KnowledgeBaseArticle {
 	protected Long parentKnowledgeBaseFolderId;
 
 	@Schema
+	@Valid
 	public RelatedContent[] getRelatedContents() {
 		return relatedContents;
 	}
@@ -582,7 +588,36 @@ public class KnowledgeBaseArticle {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Long siteId;
 
+	@Schema
+	public Boolean getSubscribed() {
+		return subscribed;
+	}
+
+	public void setSubscribed(Boolean subscribed) {
+		this.subscribed = subscribed;
+	}
+
+	@JsonIgnore
+	public void setSubscribed(
+		UnsafeSupplier<Boolean, Exception> subscribedUnsafeSupplier) {
+
+		try {
+			subscribed = subscribedUnsafeSupplier.get();
+		}
+		catch (RuntimeException re) {
+			throw re;
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	@GraphQLField
+	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
+	protected Boolean subscribed;
+
 	@Schema(description = "The categories associated with this article.")
+	@Valid
 	public TaxonomyCategory[] getTaxonomyCategories() {
 		return taxonomyCategories;
 	}
@@ -673,6 +708,7 @@ public class KnowledgeBaseArticle {
 	@Schema(
 		description = "A write-only property that specifies the article's default permissions."
 	)
+	@Valid
 	public ViewableBy getViewableBy() {
 		return viewableBy;
 	}
@@ -968,6 +1004,16 @@ public class KnowledgeBaseArticle {
 			sb.append(siteId);
 		}
 
+		if (subscribed != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"subscribed\": ");
+
+			sb.append(subscribed);
+		}
+
 		if (taxonomyCategories != null) {
 			if (sb.length() > 1) {
 				sb.append(", ");
@@ -1040,6 +1086,12 @@ public class KnowledgeBaseArticle {
 
 		return sb.toString();
 	}
+
+	@Schema(
+		defaultValue = "com.liferay.headless.delivery.dto.v1_0.KnowledgeBaseArticle",
+		name = "x-class-name"
+	)
+	public String xClassName;
 
 	private static String _escape(Object object) {
 		String string = String.valueOf(object);

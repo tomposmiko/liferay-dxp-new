@@ -40,8 +40,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 /**
  * @author Brian Wing Shun Chan
  * @author Joel Kozikowski
@@ -52,11 +50,10 @@ import org.osgi.annotation.versioning.ProviderType;
  * @author Zsigmond Rab
  * @author Douglas Wong
  */
-@ProviderType
 public class PermissionExporter {
 
 	public static PermissionExporter getInstance() {
-		return _instance;
+		return _permissionExporter;
 	}
 
 	public void exportPortletDataPermissions(
@@ -190,7 +187,7 @@ public class PermissionExporter {
 	private static final Log _log = LogFactoryUtil.getLog(
 		PermissionExporter.class);
 
-	private static final PermissionExporter _instance =
+	private static final PermissionExporter _permissionExporter =
 		new PermissionExporter();
 
 }

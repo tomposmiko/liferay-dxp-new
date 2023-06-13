@@ -40,13 +40,14 @@ public class DuplicateKeywordExceptionMapper
 	implements ExceptionMapper<DuplicateTagException> {
 
 	@Override
-	public Response toResponse(DuplicateTagException dte) {
+	public Response toResponse(DuplicateTagException duplicateTagException) {
 		return Response.status(
 			409
+		).entity(
+			StringUtil.replace(
+				duplicateTagException.getMessage(), "tag", "keyword")
 		).type(
 			MediaType.TEXT_PLAIN
-		).entity(
-			StringUtil.replace(dte.getMessage(), "tag", "keyword")
 		).build();
 	}
 

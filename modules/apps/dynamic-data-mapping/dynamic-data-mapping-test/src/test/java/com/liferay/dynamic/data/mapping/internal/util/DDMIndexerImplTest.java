@@ -15,10 +15,10 @@
 package com.liferay.dynamic.data.mapping.internal.util;
 
 import com.liferay.dynamic.data.mapping.form.field.type.DDMFormFieldTypeServicesTracker;
+import com.liferay.dynamic.data.mapping.internal.io.DDMFormJSONSerializer;
 import com.liferay.dynamic.data.mapping.internal.test.util.DDMFixture;
 import com.liferay.dynamic.data.mapping.io.DDMFormSerializerSerializeRequest;
 import com.liferay.dynamic.data.mapping.io.DDMFormSerializerSerializeResponse;
-import com.liferay.dynamic.data.mapping.io.internal.DDMFormJSONSerializer;
 import com.liferay.dynamic.data.mapping.model.DDMForm;
 import com.liferay.dynamic.data.mapping.model.DDMFormField;
 import com.liferay.dynamic.data.mapping.model.DDMStructure;
@@ -213,8 +213,8 @@ public class DDMIndexerImplTest {
 		Map<String, String> map = _withSortableValues(
 			new HashMap<String, String>() {
 				{
-					put("ddm__text__NNNNN__text1_ja_JP", fieldValueJP);
 					put("ddm__text__NNNNN__text1_en_US", fieldValueUS);
+					put("ddm__text__NNNNN__text1_ja_JP", fieldValueJP);
 				}
 			});
 
@@ -228,7 +228,7 @@ public class DDMIndexerImplTest {
 		String fieldName, String indexType) {
 
 		DDMFormField ddmFormField = DDMFormTestUtil.createTextDDMFormField(
-			fieldName, false, false, true);
+			fieldName, true, false, true);
 
 		ddmFormField.setIndexType(indexType);
 

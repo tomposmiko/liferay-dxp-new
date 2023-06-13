@@ -1,9 +1,10 @@
 Bundle-Name: Liferay Portal Vulcan API
 Bundle-SymbolicName: com.liferay.portal.vulcan.api
-Bundle-Version: 3.2.2
+Bundle-Version: 3.9.2
 Export-Package:\
 	com.liferay.portal.vulcan.accept.language,\
 	com.liferay.portal.vulcan.fields,\
+	com.liferay.portal.vulcan.graphql.annotation,\
 	com.liferay.portal.vulcan.graphql.servlet,\
 	com.liferay.portal.vulcan.multipart,\
 	com.liferay.portal.vulcan.pagination,\
@@ -16,10 +17,11 @@ Export-Package:\
 	\
 	graphql.annotations.annotationTypes;version="5.4"
 Import-Package:\
+	!graphql.annotations.directives.*,\
 	!graphql.annotations.processor.typeFunctions.*,\
 	!graphql.annotations.typeResolvers.*,\
 	\
 	!graphql.schema.*,\
 	\
 	*
--includeresource: @graphql-java-annotations-[0-9]*.jar!/graphql/annotations/annotationTypes/*
+-includeresource: @graphql-java-annotations-[0-9.]*.jar!/graphql/annotations/annotationTypes/*

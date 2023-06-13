@@ -154,7 +154,6 @@ import com.liferay.portal.kernel.model.ResourceConstants;
 import com.liferay.portal.kernel.model.ResourcePermission;
 import com.liferay.portal.kernel.model.ResourcePermissionModel;
 import com.liferay.portal.kernel.model.Role;
-import com.liferay.portal.kernel.model.RoleConstants;
 import com.liferay.portal.kernel.model.RoleModel;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.model.UserModel;
@@ -162,6 +161,7 @@ import com.liferay.portal.kernel.model.UserNotificationDeliveryConstants;
 import com.liferay.portal.kernel.model.UserNotificationDeliveryModel;
 import com.liferay.portal.kernel.model.UserPersonalSite;
 import com.liferay.portal.kernel.model.VirtualHostModel;
+import com.liferay.portal.kernel.model.role.RoleConstants;
 import com.liferay.portal.kernel.portlet.PortletIdCodec;
 import com.liferay.portal.kernel.portlet.PortletPreferencesFactory;
 import com.liferay.portal.kernel.security.auth.FullNameGenerator;
@@ -352,7 +352,7 @@ public class DataFactory {
 		String defaultAssetPublisherPreference = StringUtil.read(
 			getResourceInputStream("default_asset_publisher_preference.xml"));
 
-		_defaultAssetPublisherPortletPreference =
+		_defaultAssetPublisherPortletPreferencesImpl =
 			(PortletPreferencesImpl)_portletPreferencesFactory.fromDefaultXML(
 				defaultAssetPublisherPreference);
 
@@ -2525,7 +2525,8 @@ public class DataFactory {
 			groupId, objectValuePair.getValue());
 
 		PortletPreferences jxPortletPreferences =
-			(PortletPreferences)_defaultAssetPublisherPortletPreference.clone();
+			(PortletPreferences)
+				_defaultAssetPublisherPortletPreferencesImpl.clone();
 
 		jxPortletPreferences.setValue("queryAndOperator0", "false");
 		jxPortletPreferences.setValue("queryContains0", "true");
@@ -3309,6 +3310,8 @@ public class DataFactory {
 		ddmStructureLayoutModel.setUserName(_SAMPLE_USER_NAME);
 		ddmStructureLayoutModel.setCreateDate(nextFutureDate());
 		ddmStructureLayoutModel.setModifiedDate(nextFutureDate());
+		ddmStructureLayoutModel.setStructureLayoutKey(
+			String.valueOf(_counter.get()));
 		ddmStructureLayoutModel.setStructureVersionId(structureVersionId);
 		ddmStructureLayoutModel.setDefinition(definition);
 
@@ -3634,17 +3637,17 @@ public class DataFactory {
 			String servletContextName, String schemaVersion)
 		throws IOException {
 
-		ReleaseModelImpl releaseModel = new ReleaseModelImpl();
+		ReleaseModelImpl releaseModelImpl = new ReleaseModelImpl();
 
-		releaseModel.setReleaseId(_counter.get());
-		releaseModel.setCreateDate(new Date());
-		releaseModel.setModifiedDate(new Date());
-		releaseModel.setServletContextName(servletContextName);
-		releaseModel.setSchemaVersion(schemaVersion);
-		releaseModel.setBuildDate(new Date());
-		releaseModel.setVerified(true);
+		releaseModelImpl.setReleaseId(_counter.get());
+		releaseModelImpl.setCreateDate(new Date());
+		releaseModelImpl.setModifiedDate(new Date());
+		releaseModelImpl.setServletContextName(servletContextName);
+		releaseModelImpl.setSchemaVersion(schemaVersion);
+		releaseModelImpl.setBuildDate(new Date());
+		releaseModelImpl.setVerified(true);
 
-		return releaseModel;
+		return releaseModelImpl;
 	}
 
 	protected ResourcePermissionModel newResourcePermissionModel(
@@ -3977,7 +3980,7 @@ public class DataFactory {
 	private final SimpleCounter _counter;
 	private final Map<String, Writer> _csvWriters = new HashMap<>();
 	private final PortletPreferencesImpl
-		_defaultAssetPublisherPortletPreference;
+		_defaultAssetPublisherPortletPreferencesImpl;
 	private AssetVocabularyModel _defaultAssetVocabularyModel;
 	private DDMStructureLayoutModel _defaultDLDDMStructureLayoutModel;
 	private DDMStructureModel _defaultDLDDMStructureModel;

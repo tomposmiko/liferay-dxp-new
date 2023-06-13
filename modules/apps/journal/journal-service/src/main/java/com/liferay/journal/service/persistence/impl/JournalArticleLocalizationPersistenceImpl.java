@@ -32,8 +32,7 @@ import com.liferay.portal.kernel.dao.orm.Session;
 import com.liferay.portal.kernel.dao.orm.SessionFactory;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.service.persistence.CompanyProvider;
-import com.liferay.portal.kernel.service.persistence.CompanyProviderWrapper;
+import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
 import com.liferay.portal.kernel.service.persistence.impl.BasePersistenceImpl;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
@@ -43,14 +42,12 @@ import java.io.Serializable;
 
 import java.lang.reflect.InvocationHandler;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
 import javax.sql.DataSource;
 
-import org.osgi.annotation.versioning.ProviderType;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
@@ -67,12 +64,11 @@ import org.osgi.service.component.annotations.Reference;
  * @generated
  */
 @Component(service = JournalArticleLocalizationPersistence.class)
-@ProviderType
 public class JournalArticleLocalizationPersistenceImpl
 	extends BasePersistenceImpl<JournalArticleLocalization>
 	implements JournalArticleLocalizationPersistence {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this class directly. Always use <code>JournalArticleLocalizationUtil</code> to access the journal article localization persistence. Modify <code>service.xml</code> and rerun ServiceBuilder to regenerate this class.
@@ -109,7 +105,7 @@ public class JournalArticleLocalizationPersistenceImpl
 	 * Returns a range of all the journal article localizations where articlePK = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>JournalArticleLocalizationModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>JournalArticleLocalizationModelImpl</code>.
 	 * </p>
 	 *
 	 * @param articlePK the article pk
@@ -128,7 +124,7 @@ public class JournalArticleLocalizationPersistenceImpl
 	 * Returns an ordered range of all the journal article localizations where articlePK = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>JournalArticleLocalizationModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>JournalArticleLocalizationModelImpl</code>.
 	 * </p>
 	 *
 	 * @param articlePK the article pk
@@ -149,34 +145,34 @@ public class JournalArticleLocalizationPersistenceImpl
 	 * Returns an ordered range of all the journal article localizations where articlePK = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>JournalArticleLocalizationModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>JournalArticleLocalizationModelImpl</code>.
 	 * </p>
 	 *
 	 * @param articlePK the article pk
 	 * @param start the lower bound of the range of journal article localizations
 	 * @param end the upper bound of the range of journal article localizations (not inclusive)
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
-	 * @param retrieveFromCache whether to retrieve from the finder cache
+	 * @param useFinderCache whether to use the finder cache
 	 * @return the ordered range of matching journal article localizations
 	 */
 	@Override
 	public List<JournalArticleLocalization> findByArticlePK(
 		long articlePK, int start, int end,
 		OrderByComparator<JournalArticleLocalization> orderByComparator,
-		boolean retrieveFromCache) {
+		boolean useFinderCache) {
 
-		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
 			(orderByComparator == null)) {
 
-			pagination = false;
-			finderPath = _finderPathWithoutPaginationFindByArticlePK;
-			finderArgs = new Object[] {articlePK};
+			if (useFinderCache) {
+				finderPath = _finderPathWithoutPaginationFindByArticlePK;
+				finderArgs = new Object[] {articlePK};
+			}
 		}
-		else {
+		else if (useFinderCache) {
 			finderPath = _finderPathWithPaginationFindByArticlePK;
 			finderArgs = new Object[] {
 				articlePK, start, end, orderByComparator
@@ -185,7 +181,7 @@ public class JournalArticleLocalizationPersistenceImpl
 
 		List<JournalArticleLocalization> list = null;
 
-		if (retrieveFromCache) {
+		if (useFinderCache) {
 			list = (List<JournalArticleLocalization>)finderCache.getResult(
 				finderPath, finderArgs, this);
 
@@ -193,8 +189,8 @@ public class JournalArticleLocalizationPersistenceImpl
 				for (JournalArticleLocalization journalArticleLocalization :
 						list) {
 
-					if ((articlePK !=
-							journalArticleLocalization.getArticlePK())) {
+					if (articlePK !=
+							journalArticleLocalization.getArticlePK()) {
 
 						list = null;
 
@@ -223,7 +219,7 @@ public class JournalArticleLocalizationPersistenceImpl
 				appendOrderByComparator(
 					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
 			}
-			else if (pagination) {
+			else {
 				query.append(JournalArticleLocalizationModelImpl.ORDER_BY_JPQL);
 			}
 
@@ -240,25 +236,19 @@ public class JournalArticleLocalizationPersistenceImpl
 
 				qPos.add(articlePK);
 
-				if (!pagination) {
-					list = (List<JournalArticleLocalization>)QueryUtil.list(
-						q, getDialect(), start, end, false);
-
-					Collections.sort(list);
-
-					list = Collections.unmodifiableList(list);
-				}
-				else {
-					list = (List<JournalArticleLocalization>)QueryUtil.list(
-						q, getDialect(), start, end);
-				}
+				list = (List<JournalArticleLocalization>)QueryUtil.list(
+					q, getDialect(), start, end);
 
 				cacheResult(list);
 
-				finderCache.putResult(finderPath, finderArgs, list);
+				if (useFinderCache) {
+					finderCache.putResult(finderPath, finderArgs, list);
+				}
 			}
 			catch (Exception e) {
-				finderCache.removeResult(finderPath, finderArgs);
+				if (useFinderCache) {
+					finderCache.removeResult(finderPath, finderArgs);
+				}
 
 				throw processException(e);
 			}
@@ -673,20 +663,24 @@ public class JournalArticleLocalizationPersistenceImpl
 	 *
 	 * @param articlePK the article pk
 	 * @param languageId the language ID
-	 * @param retrieveFromCache whether to retrieve from the finder cache
+	 * @param useFinderCache whether to use the finder cache
 	 * @return the matching journal article localization, or <code>null</code> if a matching journal article localization could not be found
 	 */
 	@Override
 	public JournalArticleLocalization fetchByA_L(
-		long articlePK, String languageId, boolean retrieveFromCache) {
+		long articlePK, String languageId, boolean useFinderCache) {
 
 		languageId = Objects.toString(languageId, "");
 
-		Object[] finderArgs = new Object[] {articlePK, languageId};
+		Object[] finderArgs = null;
+
+		if (useFinderCache) {
+			finderArgs = new Object[] {articlePK, languageId};
+		}
 
 		Object result = null;
 
-		if (retrieveFromCache) {
+		if (useFinderCache) {
 			result = finderCache.getResult(
 				_finderPathFetchByA_L, finderArgs, this);
 		}
@@ -741,8 +735,10 @@ public class JournalArticleLocalizationPersistenceImpl
 				List<JournalArticleLocalization> list = q.list();
 
 				if (list.isEmpty()) {
-					finderCache.putResult(
-						_finderPathFetchByA_L, finderArgs, list);
+					if (useFinderCache) {
+						finderCache.putResult(
+							_finderPathFetchByA_L, finderArgs, list);
+					}
 				}
 				else {
 					JournalArticleLocalization journalArticleLocalization =
@@ -754,7 +750,9 @@ public class JournalArticleLocalizationPersistenceImpl
 				}
 			}
 			catch (Exception e) {
-				finderCache.removeResult(_finderPathFetchByA_L, finderArgs);
+				if (useFinderCache) {
+					finderCache.removeResult(_finderPathFetchByA_L, finderArgs);
+				}
 
 				throw processException(e);
 			}
@@ -1039,7 +1037,8 @@ public class JournalArticleLocalizationPersistenceImpl
 		journalArticleLocalization.setNew(true);
 		journalArticleLocalization.setPrimaryKey(articleLocalizationId);
 
-		journalArticleLocalization.setCompanyId(companyProvider.getCompanyId());
+		journalArticleLocalization.setCompanyId(
+			CompanyThreadLocal.getCompanyId());
 
 		return journalArticleLocalization;
 	}
@@ -1308,7 +1307,7 @@ public class JournalArticleLocalizationPersistenceImpl
 	 * Returns a range of all the journal article localizations.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>JournalArticleLocalizationModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>JournalArticleLocalizationModelImpl</code>.
 	 * </p>
 	 *
 	 * @param start the lower bound of the range of journal article localizations
@@ -1324,7 +1323,7 @@ public class JournalArticleLocalizationPersistenceImpl
 	 * Returns an ordered range of all the journal article localizations.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>JournalArticleLocalizationModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>JournalArticleLocalizationModelImpl</code>.
 	 * </p>
 	 *
 	 * @param start the lower bound of the range of journal article localizations
@@ -1344,40 +1343,40 @@ public class JournalArticleLocalizationPersistenceImpl
 	 * Returns an ordered range of all the journal article localizations.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>JournalArticleLocalizationModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>JournalArticleLocalizationModelImpl</code>.
 	 * </p>
 	 *
 	 * @param start the lower bound of the range of journal article localizations
 	 * @param end the upper bound of the range of journal article localizations (not inclusive)
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
-	 * @param retrieveFromCache whether to retrieve from the finder cache
+	 * @param useFinderCache whether to use the finder cache
 	 * @return the ordered range of journal article localizations
 	 */
 	@Override
 	public List<JournalArticleLocalization> findAll(
 		int start, int end,
 		OrderByComparator<JournalArticleLocalization> orderByComparator,
-		boolean retrieveFromCache) {
+		boolean useFinderCache) {
 
-		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
 			(orderByComparator == null)) {
 
-			pagination = false;
-			finderPath = _finderPathWithoutPaginationFindAll;
-			finderArgs = FINDER_ARGS_EMPTY;
+			if (useFinderCache) {
+				finderPath = _finderPathWithoutPaginationFindAll;
+				finderArgs = FINDER_ARGS_EMPTY;
+			}
 		}
-		else {
+		else if (useFinderCache) {
 			finderPath = _finderPathWithPaginationFindAll;
 			finderArgs = new Object[] {start, end, orderByComparator};
 		}
 
 		List<JournalArticleLocalization> list = null;
 
-		if (retrieveFromCache) {
+		if (useFinderCache) {
 			list = (List<JournalArticleLocalization>)finderCache.getResult(
 				finderPath, finderArgs, this);
 		}
@@ -1400,10 +1399,8 @@ public class JournalArticleLocalizationPersistenceImpl
 			else {
 				sql = _SQL_SELECT_JOURNALARTICLELOCALIZATION;
 
-				if (pagination) {
-					sql = sql.concat(
-						JournalArticleLocalizationModelImpl.ORDER_BY_JPQL);
-				}
+				sql = sql.concat(
+					JournalArticleLocalizationModelImpl.ORDER_BY_JPQL);
 			}
 
 			Session session = null;
@@ -1413,25 +1410,19 @@ public class JournalArticleLocalizationPersistenceImpl
 
 				Query q = session.createQuery(sql);
 
-				if (!pagination) {
-					list = (List<JournalArticleLocalization>)QueryUtil.list(
-						q, getDialect(), start, end, false);
-
-					Collections.sort(list);
-
-					list = Collections.unmodifiableList(list);
-				}
-				else {
-					list = (List<JournalArticleLocalization>)QueryUtil.list(
-						q, getDialect(), start, end);
-				}
+				list = (List<JournalArticleLocalization>)QueryUtil.list(
+					q, getDialect(), start, end);
 
 				cacheResult(list);
 
-				finderCache.putResult(finderPath, finderArgs, list);
+				if (useFinderCache) {
+					finderCache.putResult(finderPath, finderArgs, list);
+				}
 			}
 			catch (Exception e) {
-				finderCache.removeResult(finderPath, finderArgs);
+				if (useFinderCache) {
+					finderCache.removeResult(finderPath, finderArgs);
+				}
 
 				throw processException(e);
 			}
@@ -1585,7 +1576,7 @@ public class JournalArticleLocalizationPersistenceImpl
 
 	@Override
 	@Reference(
-		target = JournalPersistenceConstants.ORIGIN_BUNDLE_SYMBOLIC_NAME_FILTER,
+		target = JournalPersistenceConstants.SERVICE_CONFIGURATION_FILTER,
 		unbind = "-"
 	)
 	public void setConfiguration(Configuration configuration) {
@@ -1617,9 +1608,6 @@ public class JournalArticleLocalizationPersistenceImpl
 
 	private boolean _columnBitmaskEnabled;
 
-	@Reference(service = CompanyProviderWrapper.class)
-	protected CompanyProvider companyProvider;
-
 	@Reference
 	protected EntityCache entityCache;
 
@@ -1649,5 +1637,14 @@ public class JournalArticleLocalizationPersistenceImpl
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		JournalArticleLocalizationPersistenceImpl.class);
+
+	static {
+		try {
+			Class.forName(JournalPersistenceConstants.class.getName());
+		}
+		catch (ClassNotFoundException cnfe) {
+			throw new ExceptionInInitializerError(cnfe);
+		}
+	}
 
 }

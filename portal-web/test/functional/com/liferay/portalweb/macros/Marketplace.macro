@@ -3,7 +3,7 @@ definition {
 	macro smoke {
 		var siteName = TestCase.getSiteName(siteName = "${siteName}");
 
-		ProductMenu.gotoSite(site = "${siteName}");
+		Navigator.openSiteURL(siteName = "${siteName}");
 
 		ProductMenu.gotoPortlet(
 			category = "Site Builder",
@@ -44,14 +44,11 @@ definition {
 			siteName = "${siteName}",
 			siteURL = "${siteURL}");
 
-		BlogsEntryComment.add(
-			entryComment = "Blogs Entry 1 Comment",
-			siteName = "${siteName}",
-			siteURL = "${siteURL}");
+		Comments.addPG(entryComment = "Blogs Entry 1 Comment");
 
 		Navigator.gotoPage(pageName = "Blogs Test Page");
 
-		ProductMenu.gotoSite(site = "${siteName}");
+		Navigator.openSiteURL(siteName = "${siteName}");
 
 		ProductMenu.gotoPortlet(
 			category = "Site Builder",
@@ -138,7 +135,7 @@ definition {
 
 		Navigator.gotoPage(pageName = "Wiki Test Page");
 
-		ProductMenu.gotoSite(site = "${siteName}");
+		Navigator.openSiteURL(siteName = "${siteName}");
 
 		ProductMenu.gotoPortlet(
 			category = "Site Builder",
@@ -176,7 +173,7 @@ definition {
 
 		Navigator.gotoPage(pageName = "Calendar Test Page");
 
-		ProductMenu.gotoSite(site = "${siteName}");
+		Navigator.openSiteURL(siteName = "${siteName}");
 
 		ProductMenu.gotoPortlet(
 			category = "Site Builder",

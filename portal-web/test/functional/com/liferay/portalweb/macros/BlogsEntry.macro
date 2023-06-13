@@ -225,7 +225,7 @@ definition {
 		var displayDateDay = selenium.getElementValue("TextInput#DISPLAY_DATE_DAY");
 		var displayDateMonth = selenium.getElementValue("TextInput#DISPLAY_DATE_MONTH");
 		var displayDateYear = DateUtil.getCurrentYear();
-		var displayDateYear = MathUtil.sum("${displayDateYear}", "1");
+		var displayDateYear = ${displayDateYear} + 1;
 		var displayDate = "${displayDateMonth}/${displayDateDay}/${displayDateYear}";
 
 		Type(
@@ -315,6 +315,8 @@ definition {
 	macro flagPG {
 		var key_entryTitle = "${entryTitle}";
 
+		AssertElementPresent(locator1 = "BlogsEntry#FLAG_LINK");
+
 		Click(locator1 = "BlogsEntry#FLAG_LINK");
 
 		AssertElementPresent.assertVisible(locator1 = "BlogsEntry#FLAG_MODAL");
@@ -357,8 +359,6 @@ definition {
 			key_menuItem = "Move to Recycle Bin",
 			locator1 = "MenuItem#DROPDOWN_MENU_ITEM");
 
-		AssertConfirm(value1 = "Are you sure you want to move this to the Recycle Bin?");
-
 		Alert.viewSuccessMessage();
 	}
 
@@ -378,8 +378,6 @@ definition {
 		ClickNoError(
 			key_menuItem = "Move to Recycle Bin",
 			locator1 = "MenuItem#DROPDOWN_MENU_ITEM");
-
-		AssertConfirm(value1 = "Are you sure you want to move this to the Recycle Bin?");
 
 		Alert.viewSuccessMessage();
 	}
@@ -430,7 +428,7 @@ definition {
 
 		AssertTextEquals.assertPartialText(
 			locator1 = "BlogsEntry#TITLE_FIELD_HELPER",
-			value1 = "This field is required to publish the entry.");
+			value1 = "This field is required.");
 
 		AssertElementNotPresent(locator1 = "Message#SUCCESS");
 	}
@@ -503,7 +501,7 @@ definition {
 	macro scheduleBlogEntry {
 		var displayDateDay = selenium.getElementValue("TextInput#DISPLAY_DATE_DAY");
 		var displayDateMonth = selenium.getElementValue("TextInput#DISPLAY_DATE_MONTH");
-		var displayDateMonth = MathUtil.sum("${displayDateMonth}", "1");
+		var displayDateMonth = ${displayDateMonth} + 1;
 		var displayDateYear = selenium.getElementValue("TextInput#DISPLAY_DATE_YEAR");
 		var displayDate = "${displayDateMonth}/${displayDateDay}/${displayDateYear}";
 
@@ -519,7 +517,7 @@ definition {
 		}
 
 		var displayDateMinute = selenium.getElementValue("TextInput#DISPLAY_DATE_MINUTE");
-		var displayDateMinuteFuture = MathUtil.sum("${displayDateMinute}", "3");
+		var displayDateMinuteFuture = ${displayDateMinute} + 3;
 		var displayDateMinuteFutureLength = StringUtil.length("${displayDateMinuteFuture}");
 
 		if ("${displayDateMinuteFutureLength}" == "1") {
@@ -635,6 +633,17 @@ definition {
 			key_relatedAssetTitle = "${relatedAssetTitle}",
 			locator1 = "AssetRelatedAssets#ASSET_TITLE",
 			value1 = "${relatedAssetTitle}");
+	}
+
+	macro viewAutoTag {
+		var key_entryTitle = "${entryTitle}";
+		var tagName = StringUtil.lowerCase("${tagName}");
+
+		var key_tagName = "${tagName}";
+
+		AssertTextEquals(
+			locator1 = "BlogsEntry#TAG",
+			value1 = "${tagName}");
 	}
 
 	macro viewContent {
@@ -833,14 +842,16 @@ definition {
 		if (isSet(tagNameList)) {
 			for (var tagName : list "${tagNameList}") {
 				AssertElementNotPresent(
-					key_tagName = StringUtil.lowerCase("${tagName}"),
-					locator1 = "BlogsEntry#TAG");
+					key_tagName = "${tagName}",
+					locator1 = "BlogsEntry#TAG",
+					tagName = StringUtil.lowerCase("${tagName}"));
 			}
 		}
 		else {
 			AssertElementNotPresent(
-				key_tagName = StringUtil.lowerCase("${tagName}"),
-				locator1 = "BlogsEntry#TAG");
+				key_tagName = "${tagName}",
+				locator1 = "BlogsEntry#TAG",
+				tagName = StringUtil.lowerCase("${tagName}"));
 		}
 	}
 
@@ -911,8 +922,6 @@ definition {
 			locator1 = "AP#ASSET_ABSTRACT_TITLE",
 			value1 = "${entryTitle}");
 
-		AssertVisible(locator1 = "Icon#SHARE");
-
 		AssertTextEquals.assertPartialText(
 			locator1 = "APAsset#ASSET_TITLE_HEADER",
 			value1 = "${entryTitle}");
@@ -971,6 +980,34 @@ definition {
 		AssertTextEquals(
 			locator1 = "RSS#ENTRY_CONTENT",
 			value1 = "${entryContent}");
+	}
+
+	macro viewSharedAsset {
+		AssertTextEquals(
+			locator1 = "Portlet#HEADER",
+			value1 = "Shared Content");
+
+		if ("${contentSharingPermission}" == "View") {
+			AssertElementNotPresent(locator1 = "Button#EDIT");
+		}
+
+		else if ("${contentSharingPermission}" == "Comment") {
+			AssertElementNotPresent(locator1 = "Button#EDIT");
+		}
+
+		else {
+			AssertElementPresent(locator1 = "Comments#COMMENT_FIELD");
+		}
+
+		var key_entryTitle = "${entryTitle}";
+
+		AssertTextEquals(
+			locator1 = "Sharing#BLOGS_CONTENT",
+			value1 = "${entryContent}");
+
+		AssertTextEquals(
+			locator1 = "Sharing#BLOGS_TITLE",
+			value1 = "${entryTitle}");
 	}
 
 	macro viewStatus {
@@ -1109,7 +1146,7 @@ definition {
 			locator1 = "BlogsEntry#TITLE_LINK",
 			value1 = "${entryTitle}");
 
-		var entryViewCount = MathUtil.sum("${entryViewCount}", "1");
+		var entryViewCount = ${entryViewCount} + 1;
 
 		AssertTextEquals.assertPartialText(
 			locator1 = "BlogsEntry#ENTRY_VIEW_COUNT",

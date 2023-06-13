@@ -21,6 +21,7 @@ import com.google.ical.values.RDateList;
 import com.google.ical.values.RRule;
 import com.google.ical.values.WeekdayNum;
 
+import com.liferay.petra.string.CharPool;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
@@ -51,7 +52,7 @@ public class RecurrenceSerializer {
 		try {
 			Recurrence recurrence = new Recurrence();
 
-			int index = data.indexOf(StringPool.NEW_LINE);
+			int index = data.indexOf(CharPool.NEW_LINE);
 
 			if (index != -1) {
 				String exceptionDates = data.substring(index + 1);
@@ -97,7 +98,7 @@ public class RecurrenceSerializer {
 
 			recurrence.setPositionalWeekdays(positionalWeekdays);
 
-			recurrence.setMonths(ListUtil.toList(rRule.getByMonth()));
+			recurrence.setMonths(ListUtil.fromArray(rRule.getByMonth()));
 
 			return recurrence;
 		}
@@ -223,13 +224,13 @@ public class RecurrenceSerializer {
 	private static final Map<Weekday, com.google.ical.values.Weekday>
 		_weekdaysMap = new HashMap<Weekday, com.google.ical.values.Weekday>() {
 			{
-				put(Weekday.SUNDAY, com.google.ical.values.Weekday.SU);
+				put(Weekday.FRIDAY, com.google.ical.values.Weekday.FR);
 				put(Weekday.MONDAY, com.google.ical.values.Weekday.MO);
+				put(Weekday.SATURDAY, com.google.ical.values.Weekday.SA);
+				put(Weekday.SUNDAY, com.google.ical.values.Weekday.SU);
+				put(Weekday.THURSDAY, com.google.ical.values.Weekday.TH);
 				put(Weekday.TUESDAY, com.google.ical.values.Weekday.TU);
 				put(Weekday.WEDNESDAY, com.google.ical.values.Weekday.WE);
-				put(Weekday.THURSDAY, com.google.ical.values.Weekday.TH);
-				put(Weekday.FRIDAY, com.google.ical.values.Weekday.FR);
-				put(Weekday.SATURDAY, com.google.ical.values.Weekday.SA);
 			}
 		};
 

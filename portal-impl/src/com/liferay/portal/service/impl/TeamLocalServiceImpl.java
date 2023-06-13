@@ -22,10 +22,9 @@ import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.TeamNameException;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.ResourceConstants;
-import com.liferay.portal.kernel.model.Role;
-import com.liferay.portal.kernel.model.RoleConstants;
 import com.liferay.portal.kernel.model.Team;
 import com.liferay.portal.kernel.model.User;
+import com.liferay.portal.kernel.model.role.RoleConstants;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
@@ -112,7 +111,7 @@ public class TeamLocalServiceImpl extends TeamLocalServiceBaseImpl {
 			UnicodeProperties typeSettingsProperties =
 				group.getTypeSettingsProperties();
 
-			List<Long> defaultTeamIds = ListUtil.toList(
+			List<Long> defaultTeamIds = ListUtil.fromArray(
 				StringUtil.split(
 					typeSettingsProperties.getProperty("defaultTeamIds"), 0L));
 
@@ -130,9 +129,7 @@ public class TeamLocalServiceImpl extends TeamLocalServiceBaseImpl {
 
 		// Role
 
-		Role role = team.getRole();
-
-		roleLocalService.deleteRole(role);
+		roleLocalService.deleteRole(team.getRole());
 
 		return team;
 	}

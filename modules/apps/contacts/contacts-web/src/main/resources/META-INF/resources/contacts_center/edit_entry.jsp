@@ -49,8 +49,10 @@ if (entryId > 0) {
 	</aui:button-row>
 </aui:form>
 
-<aui:script use="aui-io-request-deprecated,datatype-number">
-	Liferay.Util.focusFormField(document.<portlet:namespace />addEntry.<portlet:namespace />fullName);
+<aui:script use="datatype-number">
+	Liferay.Util.focusFormField(
+		document.<portlet:namespace />addEntry.<portlet:namespace />fullName
+	);
 
 	var form = A.one('#<portlet:namespace />addEntry');
 
@@ -60,65 +62,67 @@ if (entryId > 0) {
 		if (errorMessage) {
 			errorMessage.addClass('alert alert-danger');
 
-			errorMessage.html('<liferay-ui:message key="an-error-occurred-while-retrieving-the-users-information" unicode="<%= true %>" />');
+			errorMessage.html(
+				'<liferay-ui:message key="an-error-occurred-while-retrieving-the-users-information" unicode="<%= true %>" />'
+			);
 		}
 	};
 
-	form.on(
-		'submit',
-		function(event) {
-			var end = <%= ContactsConstants.MAX_RESULT_COUNT %>;
+	form.on('submit', function(event) {
+		var end = <%= ContactsConstants.MAX_RESULT_COUNT %>;
 
-			var lastNameAnchor = '';
+		var lastNameAnchor = '';
 
-			var node = A.one('.more-results a');
+		var node = A.one('.more-results a');
 
-			if (node) {
-				end = A.DataType.Number.parse(node.getAttribute('data-end'));
+		if (node) {
+			end = A.DataType.Number.parse(node.getAttribute('data-end'));
 
-				lastNameAnchor = node.getAttribute('data-lastNameAnchor');
-			}
-
-			var contactFilterSelect = A.one('#<portlet:namespace />filterBy');
-
-			var searchInput = A.one('.contacts-portlet #<portlet:namespace />name');
-
-			A.io.request(
-				form.attr('action'),
-				{
-					after: {
-						failure: failureCallback,
-						success: function(event, id, obj) {
-							var responseData = this.get('responseData');
-
-							if (!responseData.success) {
-								var message = A.one('#<portlet:namespace />errorMessage');
-
-								if (message) {
-									message.addClass('alert alert-danger');
-
-									message.html(responseData.message);
-								}
-							}
-							else {
-								Liferay.component('contactsCenter').renderEntry(responseData);
-
-								Liferay.component('contactsCenter').closePopup();
-							}
-						}
-					},
-					data: {
-						<portlet:namespace />end: end,
-						<portlet:namespace />filterBy: contactFilterSelect.get('value') || '<%= ContactsConstants.FILTER_BY_DEFAULT %>',
-						<portlet:namespace />keywords: searchInput.get('value'),
-						<portlet:namespace />start: 0
-					},
-					dataType: 'JSON',
-					form: {
-						id: form
-					}
-				}
-			);
+			lastNameAnchor = node.getAttribute('data-lastNameAnchor');
 		}
-	);
+
+		var contactFilterSelect = A.one('#<portlet:namespace />filterBy');
+
+		var searchInput = A.one('.contacts-portlet #<portlet:namespace />name');
+
+		var url = new URL(form.attr('action'));
+
+		url.searchParams.set('<portlet:namespace />end', end);
+		url.searchParams.set(
+			'<portlet:namespace />filterBy',
+			contactFilterSelect.get('value') ||
+				'<%= ContactsConstants.FILTER_BY_DEFAULT %>'
+		);
+		url.searchParams.set(
+			'<portlet:namespace />keywords',
+			searchInput.get('value')
+		);
+		url.searchParams.set('<portlet:namespace />start', 0);
+
+		Liferay.Util.fetch(url, {
+			body: new FormData(form.getDOM()),
+			method: 'POST'
+		})
+			.then(function(response) {
+				return response.json();
+			})
+			.then(function(data) {
+				if (!data.success) {
+					var message = A.one('#<portlet:namespace />errorMessage');
+
+					if (message) {
+						message.addClass('alert alert-danger');
+
+						message.html(data.message);
+					}
+				} else {
+					Liferay.component('contactsCenter').renderEntry(data);
+
+					Liferay.component('contactsCenter').closePopup();
+				}
+			})
+			.catch(function() {
+				failureCallback();
+			});
+	});
 </aui:script>

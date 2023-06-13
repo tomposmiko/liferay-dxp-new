@@ -36,10 +36,6 @@ portletDisplay.setURLBack(redirect);
 renderResponse.setTitle((structure == null) ? LanguageUtil.get(request, "new-element-set") : LanguageUtil.get(request, "edit-element-set"));
 %>
 
-<liferay-util:html-top>
-	<link href="<%= PortalUtil.getStaticResourceURL(request, "/o/dynamic-data-mapping-form-builder/css/main.css") %>" rel="stylesheet" type="text/css" />
-</liferay-util:html-top>
-
 <portlet:actionURL name="saveStructure" var="saveStructureURL">
 	<portlet:param name="mvcRenderCommandName" value="/admin/edit_element_set" />
 </portlet:actionURL>
@@ -120,6 +116,10 @@ renderResponse.setTitle((structure == null) ? LanguageUtil.get(request, "new-ele
 	</aui:form>
 </div>
 
+<div class="hide">
+	<%= ddmFormAdminDisplayContext.serializeSettingsForm() %>
+</div>
+
 <aui:script>
 	Liferay.namespace('DDM').FormSettings = {
 		portletNamespace: '<portlet:namespace />',
@@ -157,10 +157,14 @@ renderResponse.setTitle((structure == null) ? LanguageUtil.get(request, "new-ele
 					Liferay.Forms.instance = new packageName.Form(
 						{
 							context: context,
-							dataProviderInstanceParameterSettingsURL: '<%= dataProviderInstanceParameterSettingsURL %>',
-							dataProviderInstancesURL: '<%= dataProviderInstancesURL %>',
-							defaultLanguageId: '<%= ddmFormAdminDisplayContext.getDefaultLanguageId() %>',
-							fieldSetDefinitionURL: '<%= ddmFormAdminDisplayContext.getFieldSetDefinitionURL() %>',
+							dataProviderInstanceParameterSettingsURL:
+								'<%= dataProviderInstanceParameterSettingsURL %>',
+							dataProviderInstancesURL:
+								'<%= dataProviderInstancesURL %>',
+							defaultLanguageId:
+								'<%= ddmFormAdminDisplayContext.getDefaultLanguageId() %>',
+							fieldSetDefinitionURL:
+								'<%= ddmFormAdminDisplayContext.getFieldSetDefinitionURL() %>',
 							fieldSets: <%= ddmFormAdminDisplayContext.getFieldSetsJSONArray() %>,
 							fieldTypes: <%= ddmFormAdminDisplayContext.getDDMFormFieldTypesJSONArray() %>,
 							groupId: <%= groupId %>,
@@ -186,19 +190,19 @@ renderResponse.setTitle((structure == null) ? LanguageUtil.get(request, "new-ele
 		if (event.portletId === '<%= portletDisplay.getRootPortletId() %>') {
 			Liferay.Forms.App.dispose();
 
-			var translationManager = Liferay.component('<portlet:namespace />translationManager');
-
-			Liferay.destroyComponents(
-				function(component) {
-					var destroy = false;
-
-					if (component === translationManager) {
-						destroy = true;
-					}
-
-					return destroy;
-				}
+			var translationManager = Liferay.component(
+				'<portlet:namespace />translationManager'
 			);
+
+			Liferay.destroyComponents(function(component) {
+				var destroy = false;
+
+				if (component === translationManager) {
+					destroy = true;
+				}
+
+				return destroy;
+			});
 
 			Liferay.detach('destroyPortlet', clearPortletHandlers);
 		}
@@ -208,13 +212,9 @@ renderResponse.setTitle((structure == null) ? LanguageUtil.get(request, "new-ele
 
 	if (Liferay.DMMFieldTypesReady) {
 		Liferay.Forms.App.start();
-	}
-	else {
-		Liferay.onceAfter(
-			'DMMFieldTypesReady',
-			function() {
-				Liferay.Forms.App.start();
-			}
-		);
+	} else {
+		Liferay.onceAfter('DMMFieldTypesReady', function() {
+			Liferay.Forms.App.start();
+		});
 	}
 </aui:script>

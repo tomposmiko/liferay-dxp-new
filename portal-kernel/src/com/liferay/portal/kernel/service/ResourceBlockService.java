@@ -36,8 +36,8 @@ import org.osgi.annotation.versioning.ProviderType;
  * @deprecated
  * @generated
  */
-@Deprecated
 @AccessControlled
+@Deprecated
 @JSONWebService
 @ProviderType
 @Transactional(
@@ -46,7 +46,7 @@ import org.osgi.annotation.versioning.ProviderType;
 )
 public interface ResourceBlockService extends BaseService {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this interface directly. Always use {@link ResourceBlockServiceUtil} to access the resource block remote service. Add custom service methods to <code>com.liferay.portal.service.impl.ResourceBlockServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.

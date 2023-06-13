@@ -16,8 +16,6 @@ package com.liferay.portal.model.impl;
 
 import com.liferay.portal.kernel.model.LayoutSetVersion;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 /**
  * The extended model base implementation for the LayoutSetVersion service. Represents a row in the &quot;LayoutSetVersion&quot; database table, with each column mapped to a property of this class.
  *
@@ -30,11 +28,10 @@ import org.osgi.annotation.versioning.ProviderType;
  * @see LayoutSetVersion
  * @generated
  */
-@ProviderType
 public abstract class LayoutSetVersionBaseImpl
 	extends LayoutSetVersionModelImpl implements LayoutSetVersion {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this class directly. All methods that expect a layout set version model instance should use the <code>LayoutSetVersion</code> interface instead.

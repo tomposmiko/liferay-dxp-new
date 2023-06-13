@@ -15,7 +15,6 @@
 package com.liferay.portlet.ratings.service.persistence.impl;
 
 import com.liferay.petra.string.StringBundler;
-import com.liferay.portal.kernel.bean.BeanReference;
 import com.liferay.portal.kernel.dao.orm.EntityCache;
 import com.liferay.portal.kernel.dao.orm.EntityCacheUtil;
 import com.liferay.portal.kernel.dao.orm.FinderCacheUtil;
@@ -26,8 +25,7 @@ import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.dao.orm.Session;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.service.persistence.CompanyProvider;
-import com.liferay.portal.kernel.service.persistence.CompanyProviderWrapper;
+import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
 import com.liferay.portal.kernel.service.persistence.impl.BasePersistenceImpl;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
@@ -48,8 +46,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 /**
  * The persistence implementation for the ratings stats service.
  *
@@ -60,12 +56,11 @@ import org.osgi.annotation.versioning.ProviderType;
  * @author Brian Wing Shun Chan
  * @generated
  */
-@ProviderType
 public class RatingsStatsPersistenceImpl
 	extends BasePersistenceImpl<RatingsStats>
 	implements RatingsStatsPersistence {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this class directly. Always use <code>RatingsStatsUtil</code> to access the ratings stats persistence. Modify <code>service.xml</code> and rerun ServiceBuilder to regenerate this class.
@@ -92,7 +87,7 @@ public class RatingsStatsPersistenceImpl
 	 * Returns all the ratings statses where classNameId = &#63; and classPK = any &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>RatingsStatsModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>RatingsStatsModelImpl</code>.
 	 * </p>
 	 *
 	 * @param classNameId the class name ID
@@ -109,7 +104,7 @@ public class RatingsStatsPersistenceImpl
 	 * Returns a range of all the ratings statses where classNameId = &#63; and classPK = any &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>RatingsStatsModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>RatingsStatsModelImpl</code>.
 	 * </p>
 	 *
 	 * @param classNameId the class name ID
@@ -129,7 +124,7 @@ public class RatingsStatsPersistenceImpl
 	 * Returns an ordered range of all the ratings statses where classNameId = &#63; and classPK = any &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>RatingsStatsModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>RatingsStatsModelImpl</code>.
 	 * </p>
 	 *
 	 * @param classNameId the class name ID
@@ -152,7 +147,7 @@ public class RatingsStatsPersistenceImpl
 	 * Returns an ordered range of all the ratings statses where classNameId = &#63; and classPK = &#63;, optionally using the finder cache.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>RatingsStatsModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>RatingsStatsModelImpl</code>.
 	 * </p>
 	 *
 	 * @param classNameId the class name ID
@@ -160,14 +155,14 @@ public class RatingsStatsPersistenceImpl
 	 * @param start the lower bound of the range of ratings statses
 	 * @param end the upper bound of the range of ratings statses (not inclusive)
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
-	 * @param retrieveFromCache whether to retrieve from the finder cache
+	 * @param useFinderCache whether to use the finder cache
 	 * @return the ordered range of matching ratings statses
 	 */
 	@Override
 	public List<RatingsStats> findByC_C(
 		long classNameId, long[] classPKs, int start, int end,
 		OrderByComparator<RatingsStats> orderByComparator,
-		boolean retrieveFromCache) {
+		boolean useFinderCache) {
 
 		if (classPKs == null) {
 			classPKs = new long[0];
@@ -187,16 +182,18 @@ public class RatingsStatsPersistenceImpl
 			}
 		}
 
-		boolean pagination = true;
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
 			(orderByComparator == null)) {
 
-			pagination = false;
-			finderArgs = new Object[] {classNameId, StringUtil.merge(classPKs)};
+			if (useFinderCache) {
+				finderArgs = new Object[] {
+					classNameId, StringUtil.merge(classPKs)
+				};
+			}
 		}
-		else {
+		else if (useFinderCache) {
 			finderArgs = new Object[] {
 				classNameId, StringUtil.merge(classPKs), start, end,
 				orderByComparator
@@ -205,7 +202,7 @@ public class RatingsStatsPersistenceImpl
 
 		List<RatingsStats> list = null;
 
-		if (retrieveFromCache) {
+		if (useFinderCache) {
 			list = (List<RatingsStats>)FinderCacheUtil.getResult(
 				_finderPathWithPaginationFindByC_C, finderArgs, this);
 
@@ -239,7 +236,7 @@ public class RatingsStatsPersistenceImpl
 						list.addAll(
 							_findByC_C(
 								classNameId, classPKsPage, start, end,
-								orderByComparator, pagination));
+								orderByComparator));
 					}
 
 					Collections.sort(list, orderByComparator);
@@ -248,18 +245,21 @@ public class RatingsStatsPersistenceImpl
 				}
 				else {
 					list = _findByC_C(
-						classNameId, classPKs, start, end, orderByComparator,
-						pagination);
+						classNameId, classPKs, start, end, orderByComparator);
 				}
 
 				cacheResult(list);
 
-				FinderCacheUtil.putResult(
-					_finderPathWithPaginationFindByC_C, finderArgs, list);
+				if (useFinderCache) {
+					FinderCacheUtil.putResult(
+						_finderPathWithPaginationFindByC_C, finderArgs, list);
+				}
 			}
 			catch (Exception e) {
-				FinderCacheUtil.removeResult(
-					_finderPathWithPaginationFindByC_C, finderArgs);
+				if (useFinderCache) {
+					FinderCacheUtil.removeResult(
+						_finderPathWithPaginationFindByC_C, finderArgs);
+				}
 
 				throw processException(e);
 			}
@@ -270,7 +270,7 @@ public class RatingsStatsPersistenceImpl
 
 	private List<RatingsStats> _findByC_C(
 		long classNameId, long[] classPKs, int start, int end,
-		OrderByComparator<RatingsStats> orderByComparator, boolean pagination) {
+		OrderByComparator<RatingsStats> orderByComparator) {
 
 		List<RatingsStats> list = null;
 
@@ -300,7 +300,7 @@ public class RatingsStatsPersistenceImpl
 			appendOrderByComparator(
 				query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
 		}
-		else if (pagination) {
+		else {
 			query.append(RatingsStatsModelImpl.ORDER_BY_JPQL);
 		}
 
@@ -317,18 +317,8 @@ public class RatingsStatsPersistenceImpl
 
 			qPos.add(classNameId);
 
-			if (!pagination) {
-				list = (List<RatingsStats>)QueryUtil.list(
-					q, getDialect(), start, end, false);
-
-				Collections.sort(list);
-
-				list = Collections.unmodifiableList(list);
-			}
-			else {
-				list = (List<RatingsStats>)QueryUtil.list(
-					q, getDialect(), start, end);
-			}
+			list = (List<RatingsStats>)QueryUtil.list(
+				q, getDialect(), start, end);
 		}
 		catch (Exception e) {
 			throw processException(e);
@@ -394,18 +384,22 @@ public class RatingsStatsPersistenceImpl
 	 *
 	 * @param classNameId the class name ID
 	 * @param classPK the class pk
-	 * @param retrieveFromCache whether to retrieve from the finder cache
+	 * @param useFinderCache whether to use the finder cache
 	 * @return the matching ratings stats, or <code>null</code> if a matching ratings stats could not be found
 	 */
 	@Override
 	public RatingsStats fetchByC_C(
-		long classNameId, long classPK, boolean retrieveFromCache) {
+		long classNameId, long classPK, boolean useFinderCache) {
 
-		Object[] finderArgs = new Object[] {classNameId, classPK};
+		Object[] finderArgs = null;
+
+		if (useFinderCache) {
+			finderArgs = new Object[] {classNameId, classPK};
+		}
 
 		Object result = null;
 
-		if (retrieveFromCache) {
+		if (useFinderCache) {
 			result = FinderCacheUtil.getResult(
 				_finderPathFetchByC_C, finderArgs, this);
 		}
@@ -447,8 +441,10 @@ public class RatingsStatsPersistenceImpl
 				List<RatingsStats> list = q.list();
 
 				if (list.isEmpty()) {
-					FinderCacheUtil.putResult(
-						_finderPathFetchByC_C, finderArgs, list);
+					if (useFinderCache) {
+						FinderCacheUtil.putResult(
+							_finderPathFetchByC_C, finderArgs, list);
+					}
 				}
 				else {
 					RatingsStats ratingsStats = list.get(0);
@@ -459,7 +455,10 @@ public class RatingsStatsPersistenceImpl
 				}
 			}
 			catch (Exception e) {
-				FinderCacheUtil.removeResult(_finderPathFetchByC_C, finderArgs);
+				if (useFinderCache) {
+					FinderCacheUtil.removeResult(
+						_finderPathFetchByC_C, finderArgs);
+				}
 
 				throw processException(e);
 			}
@@ -816,7 +815,7 @@ public class RatingsStatsPersistenceImpl
 		ratingsStats.setNew(true);
 		ratingsStats.setPrimaryKey(statsId);
 
-		ratingsStats.setCompanyId(companyProvider.getCompanyId());
+		ratingsStats.setCompanyId(CompanyThreadLocal.getCompanyId());
 
 		return ratingsStats;
 	}
@@ -1071,7 +1070,7 @@ public class RatingsStatsPersistenceImpl
 	 * Returns a range of all the ratings statses.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>RatingsStatsModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>RatingsStatsModelImpl</code>.
 	 * </p>
 	 *
 	 * @param start the lower bound of the range of ratings statses
@@ -1087,7 +1086,7 @@ public class RatingsStatsPersistenceImpl
 	 * Returns an ordered range of all the ratings statses.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>RatingsStatsModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>RatingsStatsModelImpl</code>.
 	 * </p>
 	 *
 	 * @param start the lower bound of the range of ratings statses
@@ -1106,39 +1105,39 @@ public class RatingsStatsPersistenceImpl
 	 * Returns an ordered range of all the ratings statses.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>RatingsStatsModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>RatingsStatsModelImpl</code>.
 	 * </p>
 	 *
 	 * @param start the lower bound of the range of ratings statses
 	 * @param end the upper bound of the range of ratings statses (not inclusive)
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
-	 * @param retrieveFromCache whether to retrieve from the finder cache
+	 * @param useFinderCache whether to use the finder cache
 	 * @return the ordered range of ratings statses
 	 */
 	@Override
 	public List<RatingsStats> findAll(
 		int start, int end, OrderByComparator<RatingsStats> orderByComparator,
-		boolean retrieveFromCache) {
+		boolean useFinderCache) {
 
-		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
 			(orderByComparator == null)) {
 
-			pagination = false;
-			finderPath = _finderPathWithoutPaginationFindAll;
-			finderArgs = FINDER_ARGS_EMPTY;
+			if (useFinderCache) {
+				finderPath = _finderPathWithoutPaginationFindAll;
+				finderArgs = FINDER_ARGS_EMPTY;
+			}
 		}
-		else {
+		else if (useFinderCache) {
 			finderPath = _finderPathWithPaginationFindAll;
 			finderArgs = new Object[] {start, end, orderByComparator};
 		}
 
 		List<RatingsStats> list = null;
 
-		if (retrieveFromCache) {
+		if (useFinderCache) {
 			list = (List<RatingsStats>)FinderCacheUtil.getResult(
 				finderPath, finderArgs, this);
 		}
@@ -1161,9 +1160,7 @@ public class RatingsStatsPersistenceImpl
 			else {
 				sql = _SQL_SELECT_RATINGSSTATS;
 
-				if (pagination) {
-					sql = sql.concat(RatingsStatsModelImpl.ORDER_BY_JPQL);
-				}
+				sql = sql.concat(RatingsStatsModelImpl.ORDER_BY_JPQL);
 			}
 
 			Session session = null;
@@ -1173,25 +1170,19 @@ public class RatingsStatsPersistenceImpl
 
 				Query q = session.createQuery(sql);
 
-				if (!pagination) {
-					list = (List<RatingsStats>)QueryUtil.list(
-						q, getDialect(), start, end, false);
-
-					Collections.sort(list);
-
-					list = Collections.unmodifiableList(list);
-				}
-				else {
-					list = (List<RatingsStats>)QueryUtil.list(
-						q, getDialect(), start, end);
-				}
+				list = (List<RatingsStats>)QueryUtil.list(
+					q, getDialect(), start, end);
 
 				cacheResult(list);
 
-				FinderCacheUtil.putResult(finderPath, finderArgs, list);
+				if (useFinderCache) {
+					FinderCacheUtil.putResult(finderPath, finderArgs, list);
+				}
 			}
 			catch (Exception e) {
-				FinderCacheUtil.removeResult(finderPath, finderArgs);
+				if (useFinderCache) {
+					FinderCacheUtil.removeResult(finderPath, finderArgs);
+				}
 
 				throw processException(e);
 			}
@@ -1337,9 +1328,6 @@ public class RatingsStatsPersistenceImpl
 		FinderCacheUtil.removeCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
 		FinderCacheUtil.removeCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
 	}
-
-	@BeanReference(type = CompanyProviderWrapper.class)
-	protected CompanyProvider companyProvider;
 
 	private static final String _SQL_SELECT_RATINGSSTATS =
 		"SELECT ratingsStats FROM RatingsStats ratingsStats";

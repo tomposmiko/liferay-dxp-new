@@ -32,7 +32,6 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
-import java.util.ResourceBundle;
 
 import javax.portlet.PortletURL;
 
@@ -71,9 +70,8 @@ public class OrganizationItemSelectorView
 
 	@Override
 	public String getTitle(Locale locale) {
-		ResourceBundle resourceBundle = _portal.getResourceBundle(locale);
-
-		return LanguageUtil.get(resourceBundle, "organizations");
+		return LanguageUtil.get(
+			_portal.getResourceBundle(locale), "organizations");
 	}
 
 	@Override
@@ -83,12 +81,13 @@ public class OrganizationItemSelectorView
 
 	@Override
 	public void renderHTML(
-			ServletRequest request, ServletResponse response,
+			ServletRequest servletRequest, ServletResponse servletResponse,
 			OrganizationItemSelectorCriterion organizationItemSelectorCriterion,
 			PortletURL portletURL, String itemSelectedEventName, boolean search)
 		throws IOException, ServletException {
 
-		HttpServletRequest httpServletRequest = (HttpServletRequest)request;
+		HttpServletRequest httpServletRequest =
+			(HttpServletRequest)servletRequest;
 
 		OrganizationItemSelectorViewDisplayContext
 			organizationItemSelectorViewDisplayContext =
@@ -96,7 +95,7 @@ public class OrganizationItemSelectorView
 					_organizationLocalService, _usersAdmin, httpServletRequest,
 					portletURL, itemSelectedEventName);
 
-		request.setAttribute(
+		servletRequest.setAttribute(
 			OrganizationItemSelectorViewConstants.
 				ORGANIZATION_ITEM_SELECTOR_VIEW_DISPLAY_CONTEXT,
 			organizationItemSelectorViewDisplayContext);
@@ -107,7 +106,7 @@ public class OrganizationItemSelectorView
 			servletContext.getRequestDispatcher(
 				"/organization_item_selector.jsp");
 
-		requestDispatcher.include(request, response);
+		requestDispatcher.include(servletRequest, servletResponse);
 	}
 
 	private static final List<ItemSelectorReturnType>

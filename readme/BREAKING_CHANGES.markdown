@@ -20,7 +20,7 @@ Here are some of the types of changes documented in this file:
   replaces an old API, in spite of the old API being kept in Liferay Portal for
   backwards compatibility.
 
-*This document has been reviewed through commit `2a13ff2d257a`.*
+*This document has been reviewed through commit `77cef15df6f0`.*
 
 ## Breaking Changes Contribution Guidelines
 
@@ -514,6 +514,54 @@ implementation for authentication.
 
 ---------------------------------------
 
+### Updated AlloyEditor v2.0 Includes New Major Version of React
+- **Date:** 2019-Feb-04
+- **JIRA Ticket:** [LPS-90079](https://issues.liferay.com/browse/LPS-90079)
+
+#### What changed?
+
+AlloyEditor was upgraded to version 2.0.0, which includes a major upgrade from
+React v15 to v16.
+
+The `React.createClass` was
+[deprecated in React v15.5.0](https://reactjs.org/blog/2017/04/07/react-v15.5.0.html)
+(April 2017) and
+[removed in React v16.0.0](https://reactjs.org/blog/2017/09/26/react-v16.0.html)
+(September 2017). All the buttons bundled with AlloyEditor have been
+updated to use the ES6 class syntax instead of `React.createClass`.
+
+#### Who is affected?
+
+This affects anyone who built their own buttons using `React.createClass`. The
+`createClass` function is no longer available and attempts to access it at
+runtime will trigger an error.
+
+#### How should I update my code?
+
+You should update your code in one of two ways:
+
+1. Port custom buttons from the `React.createClass` API to use the ES6 `class`
+   API as described in
+   [the React documentation](https://reactjs.org/docs/react-component.html). For
+   example, see the changes made in moving to an
+   [ES6 class-based button](https://github.com/liferay/alloy-editor/blob/b082c312179ae6626cb2ddcc04ad3ebc5b355e1b/src/components/buttons/button-ol.jsx),
+   from
+   [the previous `createClass`-based implementation](https://github.com/liferay/alloy-editor/blob/2826ab9ceabe17c6ba0d38985baf8a787c23db43/src/ui/react/src/components/buttons/button-ol.jsx).
+
+2. Provide a compatibility adapter. The
+   [create-react-class package](https://www.npmjs.com/package/create-react-class)
+   (described [here](https://reactjs.org/docs/react-without-es6.html)) can be
+   injected into the page to restore the `createClass` API.
+
+#### Why was this change made?
+
+Moving to a newer major version of React
+
+- brings performance and compatibility improvements
+- reduces the bundle size due to the removal of deprecated APIs
+
+---------------------------------------
+
 ### Deprecated dl.tabs.visible property
 - **Date:** 2019-Apr-10
 - **JIRA Ticket:** [LPS-93948](https://issues.liferay.com/browse/LPS-93948)
@@ -537,6 +585,36 @@ No code changes are necessary.
 
 Documents & Media has been reviewed from a UX perspective, and removing the
 navigation tabs in widget pages was part of a UI clean up process.
+
+---------------------------------------
+
+### Move the User Menu out of the Product Menu
+- **Date:** 2019-Apr-19
+- **JIRA Ticket:** [LPS-87868](https://issues.liferay.com/browse/LPS-87868)
+
+#### What changed?
+
+The User Menu was removed from the Product Menu, and the user menu entries were
+moved to the new Personal Menu, a dropdown menu triggered by the user avatar.
+
+#### Who is affected?
+
+This affects anyone who has customized the User Menu section of the Product
+Menu.
+
+#### How should I update my code?
+
+If you would like to keep your custom user menu entries and have them available
+in the Personal Menu, you need to implement the `PersonalMenuEntry` interface.
+All panel apps registered with the `PanelCategoryKeys.USER`,
+`PanelCategoryKeys.USER_MY_ACCOUNT`, and `PanelCategoryKeys.USER_SIGN_OUT` panel
+category keys should be converted to `PersonalMenuEntry`.
+
+#### Why was this change made?
+
+Product navigation has been reviewed from a UX perspective, and removing the
+User Menu from the Product Menu and splitting the menu to its own provides a
+better user experience.
 
 ---------------------------------------
 
@@ -565,3 +643,85 @@ References to Hong Kong and Macau should be done with their corresponding
 
 After the handover of Hong Kong in 1997 and of Macau in 1999, Hong Kong and
 Macau are now the special administrative regions of China.
+
+---------------------------------------
+
+### Upgraded JGroups from 3.6.16 to 4.1.1
+- **Date:** 2019-Aug-15
+- **JIRA Ticket:** [LPS-97897](https://issues.liferay.com/browse/LPS-97897)
+
+#### What changed?
+
+JGroups was upgraded from version 3.6.16 to 4.1.1.
+
+#### Who is affected?
+
+This affects anyone who is using Cluster Link.
+
+#### How should I update my code?
+
+The `cluster.link.channel.properties.*` property in `portal.properties` no
+longer accepts a connection string as a value; it now requires a file path to a
+configuration XML file. Some of the protocol properties from 3.6.16 are removed
+and no longer parsed by 4.1.1; you should update the protocol properties
+accordingly.
+
+#### Why was this change made?
+
+This upgrade is needed to fix a security issue.
+
+---------------------------------------
+
+### Auto Tagging Needs To Be Reconfigured Manually
+- **Date: 2019-Oct-2**
+- **JIRA Ticket: LPS-97123**
+
+#### What changed?
+
+Auto Tagging configurations were renamed and reorganized. There's no
+automatic upgrade process, things need to be reconfigured manually again.
+
+#### Who is affected?
+
+This affects any installation of DXP 7.2 upgrading to SP1 that has Auto
+Tagging configured and enabled.
+
+#### How should I update my code?
+
+Changes need to be made in System Settings (please consult the official
+documentation for the details). Any code referencing the old configuration
+interfaces must be updated to use the new ones.
+
+#### Why was this change made?
+
+The old configuration UI was very confusing, split between different
+configuration interfaces. This change unifies the configuration interfaces.
+
+---------------------------------------
+
+### Blogs Image Properties Moved To System Settings
+- **Date: 2019-Oct-2**
+- **JIRA Ticket: LPS-95298**
+
+#### What changed?
+
+Configuration of Blogs images was moved from portal.properties to System
+Settings. There's no automatic upgrade process, so if there was a custom
+property, it needs to be reconfigured manually again.
+
+#### Who is affected?
+
+This affects any installation of DXP 7.2 upgrading to SP1 that has custom
+values for the blogs.image.max.size and blogs.image.extensions properties.
+
+#### How should I update my code?
+
+Changes need to be made in System Settings, in the configuration section
+Blogs > File Uploads. Any code referencing the old properties must be updated
+to use the new configuration interfaces.
+
+#### Why was this change made?
+
+The ability to change these configuration options dynamically (i.e. without a restart) was considered as a valuable feature.
+
+---------------------------------------

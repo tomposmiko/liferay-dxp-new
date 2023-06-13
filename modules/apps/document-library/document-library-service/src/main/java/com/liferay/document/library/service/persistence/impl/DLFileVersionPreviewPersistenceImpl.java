@@ -41,13 +41,11 @@ import java.io.Serializable;
 
 import java.lang.reflect.InvocationHandler;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
 import javax.sql.DataSource;
 
-import org.osgi.annotation.versioning.ProviderType;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
@@ -64,12 +62,11 @@ import org.osgi.service.component.annotations.Reference;
  * @generated
  */
 @Component(service = DLFileVersionPreviewPersistence.class)
-@ProviderType
 public class DLFileVersionPreviewPersistenceImpl
 	extends BasePersistenceImpl<DLFileVersionPreview>
 	implements DLFileVersionPreviewPersistence {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this class directly. Always use <code>DLFileVersionPreviewUtil</code> to access the dl file version preview persistence. Modify <code>service.xml</code> and rerun ServiceBuilder to regenerate this class.
@@ -106,7 +103,7 @@ public class DLFileVersionPreviewPersistenceImpl
 	 * Returns a range of all the dl file version previews where fileEntryId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>DLFileVersionPreviewModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>DLFileVersionPreviewModelImpl</code>.
 	 * </p>
 	 *
 	 * @param fileEntryId the file entry ID
@@ -125,7 +122,7 @@ public class DLFileVersionPreviewPersistenceImpl
 	 * Returns an ordered range of all the dl file version previews where fileEntryId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>DLFileVersionPreviewModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>DLFileVersionPreviewModelImpl</code>.
 	 * </p>
 	 *
 	 * @param fileEntryId the file entry ID
@@ -147,34 +144,34 @@ public class DLFileVersionPreviewPersistenceImpl
 	 * Returns an ordered range of all the dl file version previews where fileEntryId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>DLFileVersionPreviewModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>DLFileVersionPreviewModelImpl</code>.
 	 * </p>
 	 *
 	 * @param fileEntryId the file entry ID
 	 * @param start the lower bound of the range of dl file version previews
 	 * @param end the upper bound of the range of dl file version previews (not inclusive)
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
-	 * @param retrieveFromCache whether to retrieve from the finder cache
+	 * @param useFinderCache whether to use the finder cache
 	 * @return the ordered range of matching dl file version previews
 	 */
 	@Override
 	public List<DLFileVersionPreview> findByFileEntryId(
 		long fileEntryId, int start, int end,
 		OrderByComparator<DLFileVersionPreview> orderByComparator,
-		boolean retrieveFromCache) {
+		boolean useFinderCache) {
 
-		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
 			(orderByComparator == null)) {
 
-			pagination = false;
-			finderPath = _finderPathWithoutPaginationFindByFileEntryId;
-			finderArgs = new Object[] {fileEntryId};
+			if (useFinderCache) {
+				finderPath = _finderPathWithoutPaginationFindByFileEntryId;
+				finderArgs = new Object[] {fileEntryId};
+			}
 		}
-		else {
+		else if (useFinderCache) {
 			finderPath = _finderPathWithPaginationFindByFileEntryId;
 			finderArgs = new Object[] {
 				fileEntryId, start, end, orderByComparator
@@ -183,15 +180,13 @@ public class DLFileVersionPreviewPersistenceImpl
 
 		List<DLFileVersionPreview> list = null;
 
-		if (retrieveFromCache) {
+		if (useFinderCache) {
 			list = (List<DLFileVersionPreview>)finderCache.getResult(
 				finderPath, finderArgs, this);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (DLFileVersionPreview dlFileVersionPreview : list) {
-					if ((fileEntryId !=
-							dlFileVersionPreview.getFileEntryId())) {
-
+					if (fileEntryId != dlFileVersionPreview.getFileEntryId()) {
 						list = null;
 
 						break;
@@ -219,7 +214,7 @@ public class DLFileVersionPreviewPersistenceImpl
 				appendOrderByComparator(
 					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
 			}
-			else if (pagination) {
+			else {
 				query.append(DLFileVersionPreviewModelImpl.ORDER_BY_JPQL);
 			}
 
@@ -236,25 +231,19 @@ public class DLFileVersionPreviewPersistenceImpl
 
 				qPos.add(fileEntryId);
 
-				if (!pagination) {
-					list = (List<DLFileVersionPreview>)QueryUtil.list(
-						q, getDialect(), start, end, false);
-
-					Collections.sort(list);
-
-					list = Collections.unmodifiableList(list);
-				}
-				else {
-					list = (List<DLFileVersionPreview>)QueryUtil.list(
-						q, getDialect(), start, end);
-				}
+				list = (List<DLFileVersionPreview>)QueryUtil.list(
+					q, getDialect(), start, end);
 
 				cacheResult(list);
 
-				finderCache.putResult(finderPath, finderArgs, list);
+				if (useFinderCache) {
+					finderCache.putResult(finderPath, finderArgs, list);
+				}
 			}
 			catch (Exception e) {
-				finderCache.removeResult(finderPath, finderArgs);
+				if (useFinderCache) {
+					finderCache.removeResult(finderPath, finderArgs);
+				}
 
 				throw processException(e);
 			}
@@ -627,7 +616,7 @@ public class DLFileVersionPreviewPersistenceImpl
 	 * Returns a range of all the dl file version previews where fileVersionId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>DLFileVersionPreviewModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>DLFileVersionPreviewModelImpl</code>.
 	 * </p>
 	 *
 	 * @param fileVersionId the file version ID
@@ -646,7 +635,7 @@ public class DLFileVersionPreviewPersistenceImpl
 	 * Returns an ordered range of all the dl file version previews where fileVersionId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>DLFileVersionPreviewModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>DLFileVersionPreviewModelImpl</code>.
 	 * </p>
 	 *
 	 * @param fileVersionId the file version ID
@@ -668,34 +657,34 @@ public class DLFileVersionPreviewPersistenceImpl
 	 * Returns an ordered range of all the dl file version previews where fileVersionId = &#63;.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>DLFileVersionPreviewModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>DLFileVersionPreviewModelImpl</code>.
 	 * </p>
 	 *
 	 * @param fileVersionId the file version ID
 	 * @param start the lower bound of the range of dl file version previews
 	 * @param end the upper bound of the range of dl file version previews (not inclusive)
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
-	 * @param retrieveFromCache whether to retrieve from the finder cache
+	 * @param useFinderCache whether to use the finder cache
 	 * @return the ordered range of matching dl file version previews
 	 */
 	@Override
 	public List<DLFileVersionPreview> findByFileVersionId(
 		long fileVersionId, int start, int end,
 		OrderByComparator<DLFileVersionPreview> orderByComparator,
-		boolean retrieveFromCache) {
+		boolean useFinderCache) {
 
-		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
 			(orderByComparator == null)) {
 
-			pagination = false;
-			finderPath = _finderPathWithoutPaginationFindByFileVersionId;
-			finderArgs = new Object[] {fileVersionId};
+			if (useFinderCache) {
+				finderPath = _finderPathWithoutPaginationFindByFileVersionId;
+				finderArgs = new Object[] {fileVersionId};
+			}
 		}
-		else {
+		else if (useFinderCache) {
 			finderPath = _finderPathWithPaginationFindByFileVersionId;
 			finderArgs = new Object[] {
 				fileVersionId, start, end, orderByComparator
@@ -704,14 +693,14 @@ public class DLFileVersionPreviewPersistenceImpl
 
 		List<DLFileVersionPreview> list = null;
 
-		if (retrieveFromCache) {
+		if (useFinderCache) {
 			list = (List<DLFileVersionPreview>)finderCache.getResult(
 				finderPath, finderArgs, this);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (DLFileVersionPreview dlFileVersionPreview : list) {
-					if ((fileVersionId !=
-							dlFileVersionPreview.getFileVersionId())) {
+					if (fileVersionId !=
+							dlFileVersionPreview.getFileVersionId()) {
 
 						list = null;
 
@@ -740,7 +729,7 @@ public class DLFileVersionPreviewPersistenceImpl
 				appendOrderByComparator(
 					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
 			}
-			else if (pagination) {
+			else {
 				query.append(DLFileVersionPreviewModelImpl.ORDER_BY_JPQL);
 			}
 
@@ -757,25 +746,19 @@ public class DLFileVersionPreviewPersistenceImpl
 
 				qPos.add(fileVersionId);
 
-				if (!pagination) {
-					list = (List<DLFileVersionPreview>)QueryUtil.list(
-						q, getDialect(), start, end, false);
-
-					Collections.sort(list);
-
-					list = Collections.unmodifiableList(list);
-				}
-				else {
-					list = (List<DLFileVersionPreview>)QueryUtil.list(
-						q, getDialect(), start, end);
-				}
+				list = (List<DLFileVersionPreview>)QueryUtil.list(
+					q, getDialect(), start, end);
 
 				cacheResult(list);
 
-				finderCache.putResult(finderPath, finderArgs, list);
+				if (useFinderCache) {
+					finderCache.putResult(finderPath, finderArgs, list);
+				}
 			}
 			catch (Exception e) {
-				finderCache.removeResult(finderPath, finderArgs);
+				if (useFinderCache) {
+					finderCache.removeResult(finderPath, finderArgs);
+				}
 
 				throw processException(e);
 			}
@@ -1189,18 +1172,22 @@ public class DLFileVersionPreviewPersistenceImpl
 	 *
 	 * @param fileEntryId the file entry ID
 	 * @param fileVersionId the file version ID
-	 * @param retrieveFromCache whether to retrieve from the finder cache
+	 * @param useFinderCache whether to use the finder cache
 	 * @return the matching dl file version preview, or <code>null</code> if a matching dl file version preview could not be found
 	 */
 	@Override
 	public DLFileVersionPreview fetchByF_F(
-		long fileEntryId, long fileVersionId, boolean retrieveFromCache) {
+		long fileEntryId, long fileVersionId, boolean useFinderCache) {
 
-		Object[] finderArgs = new Object[] {fileEntryId, fileVersionId};
+		Object[] finderArgs = null;
+
+		if (useFinderCache) {
+			finderArgs = new Object[] {fileEntryId, fileVersionId};
+		}
 
 		Object result = null;
 
-		if (retrieveFromCache) {
+		if (useFinderCache) {
 			result = finderCache.getResult(
 				_finderPathFetchByF_F, finderArgs, this);
 		}
@@ -1243,8 +1230,10 @@ public class DLFileVersionPreviewPersistenceImpl
 				List<DLFileVersionPreview> list = q.list();
 
 				if (list.isEmpty()) {
-					finderCache.putResult(
-						_finderPathFetchByF_F, finderArgs, list);
+					if (useFinderCache) {
+						finderCache.putResult(
+							_finderPathFetchByF_F, finderArgs, list);
+					}
 				}
 				else {
 					DLFileVersionPreview dlFileVersionPreview = list.get(0);
@@ -1255,7 +1244,9 @@ public class DLFileVersionPreviewPersistenceImpl
 				}
 			}
 			catch (Exception e) {
-				finderCache.removeResult(_finderPathFetchByF_F, finderArgs);
+				if (useFinderCache) {
+					finderCache.removeResult(_finderPathFetchByF_F, finderArgs);
+				}
 
 				throw processException(e);
 			}
@@ -1419,21 +1410,25 @@ public class DLFileVersionPreviewPersistenceImpl
 	 * @param fileEntryId the file entry ID
 	 * @param fileVersionId the file version ID
 	 * @param previewStatus the preview status
-	 * @param retrieveFromCache whether to retrieve from the finder cache
+	 * @param useFinderCache whether to use the finder cache
 	 * @return the matching dl file version preview, or <code>null</code> if a matching dl file version preview could not be found
 	 */
 	@Override
 	public DLFileVersionPreview fetchByF_F_P(
 		long fileEntryId, long fileVersionId, int previewStatus,
-		boolean retrieveFromCache) {
+		boolean useFinderCache) {
 
-		Object[] finderArgs = new Object[] {
-			fileEntryId, fileVersionId, previewStatus
-		};
+		Object[] finderArgs = null;
+
+		if (useFinderCache) {
+			finderArgs = new Object[] {
+				fileEntryId, fileVersionId, previewStatus
+			};
+		}
 
 		Object result = null;
 
-		if (retrieveFromCache) {
+		if (useFinderCache) {
 			result = finderCache.getResult(
 				_finderPathFetchByF_F_P, finderArgs, this);
 		}
@@ -1481,8 +1476,10 @@ public class DLFileVersionPreviewPersistenceImpl
 				List<DLFileVersionPreview> list = q.list();
 
 				if (list.isEmpty()) {
-					finderCache.putResult(
-						_finderPathFetchByF_F_P, finderArgs, list);
+					if (useFinderCache) {
+						finderCache.putResult(
+							_finderPathFetchByF_F_P, finderArgs, list);
+					}
 				}
 				else {
 					DLFileVersionPreview dlFileVersionPreview = list.get(0);
@@ -1493,7 +1490,10 @@ public class DLFileVersionPreviewPersistenceImpl
 				}
 			}
 			catch (Exception e) {
-				finderCache.removeResult(_finderPathFetchByF_F_P, finderArgs);
+				if (useFinderCache) {
+					finderCache.removeResult(
+						_finderPathFetchByF_F_P, finderArgs);
+				}
 
 				throw processException(e);
 			}
@@ -2094,7 +2094,7 @@ public class DLFileVersionPreviewPersistenceImpl
 	 * Returns a range of all the dl file version previews.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>DLFileVersionPreviewModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>DLFileVersionPreviewModelImpl</code>.
 	 * </p>
 	 *
 	 * @param start the lower bound of the range of dl file version previews
@@ -2110,7 +2110,7 @@ public class DLFileVersionPreviewPersistenceImpl
 	 * Returns an ordered range of all the dl file version previews.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>DLFileVersionPreviewModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>DLFileVersionPreviewModelImpl</code>.
 	 * </p>
 	 *
 	 * @param start the lower bound of the range of dl file version previews
@@ -2130,40 +2130,40 @@ public class DLFileVersionPreviewPersistenceImpl
 	 * Returns an ordered range of all the dl file version previews.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>DLFileVersionPreviewModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>DLFileVersionPreviewModelImpl</code>.
 	 * </p>
 	 *
 	 * @param start the lower bound of the range of dl file version previews
 	 * @param end the upper bound of the range of dl file version previews (not inclusive)
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
-	 * @param retrieveFromCache whether to retrieve from the finder cache
+	 * @param useFinderCache whether to use the finder cache
 	 * @return the ordered range of dl file version previews
 	 */
 	@Override
 	public List<DLFileVersionPreview> findAll(
 		int start, int end,
 		OrderByComparator<DLFileVersionPreview> orderByComparator,
-		boolean retrieveFromCache) {
+		boolean useFinderCache) {
 
-		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
 			(orderByComparator == null)) {
 
-			pagination = false;
-			finderPath = _finderPathWithoutPaginationFindAll;
-			finderArgs = FINDER_ARGS_EMPTY;
+			if (useFinderCache) {
+				finderPath = _finderPathWithoutPaginationFindAll;
+				finderArgs = FINDER_ARGS_EMPTY;
+			}
 		}
-		else {
+		else if (useFinderCache) {
 			finderPath = _finderPathWithPaginationFindAll;
 			finderArgs = new Object[] {start, end, orderByComparator};
 		}
 
 		List<DLFileVersionPreview> list = null;
 
-		if (retrieveFromCache) {
+		if (useFinderCache) {
 			list = (List<DLFileVersionPreview>)finderCache.getResult(
 				finderPath, finderArgs, this);
 		}
@@ -2186,10 +2186,7 @@ public class DLFileVersionPreviewPersistenceImpl
 			else {
 				sql = _SQL_SELECT_DLFILEVERSIONPREVIEW;
 
-				if (pagination) {
-					sql = sql.concat(
-						DLFileVersionPreviewModelImpl.ORDER_BY_JPQL);
-				}
+				sql = sql.concat(DLFileVersionPreviewModelImpl.ORDER_BY_JPQL);
 			}
 
 			Session session = null;
@@ -2199,25 +2196,19 @@ public class DLFileVersionPreviewPersistenceImpl
 
 				Query q = session.createQuery(sql);
 
-				if (!pagination) {
-					list = (List<DLFileVersionPreview>)QueryUtil.list(
-						q, getDialect(), start, end, false);
-
-					Collections.sort(list);
-
-					list = Collections.unmodifiableList(list);
-				}
-				else {
-					list = (List<DLFileVersionPreview>)QueryUtil.list(
-						q, getDialect(), start, end);
-				}
+				list = (List<DLFileVersionPreview>)QueryUtil.list(
+					q, getDialect(), start, end);
 
 				cacheResult(list);
 
-				finderCache.putResult(finderPath, finderArgs, list);
+				if (useFinderCache) {
+					finderCache.putResult(finderPath, finderArgs, list);
+				}
 			}
 			catch (Exception e) {
-				finderCache.removeResult(finderPath, finderArgs);
+				if (useFinderCache) {
+					finderCache.removeResult(finderPath, finderArgs);
+				}
 
 				throw processException(e);
 			}
@@ -2407,7 +2398,7 @@ public class DLFileVersionPreviewPersistenceImpl
 
 	@Override
 	@Reference(
-		target = DLPersistenceConstants.ORIGIN_BUNDLE_SYMBOLIC_NAME_FILTER,
+		target = DLPersistenceConstants.SERVICE_CONFIGURATION_FILTER,
 		unbind = "-"
 	)
 	public void setConfiguration(Configuration configuration) {
@@ -2468,5 +2459,14 @@ public class DLFileVersionPreviewPersistenceImpl
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		DLFileVersionPreviewPersistenceImpl.class);
+
+	static {
+		try {
+			Class.forName(DLPersistenceConstants.class.getName());
+		}
+		catch (ClassNotFoundException cnfe) {
+			throw new ExceptionInInitializerError(cnfe);
+		}
+	}
 
 }

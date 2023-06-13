@@ -41,7 +41,7 @@ import com.liferay.portal.kernel.model.ResourceBlockPermissionsContainer;
 import com.liferay.portal.kernel.model.ResourceConstants;
 import com.liferay.portal.kernel.model.ResourceTypePermission;
 import com.liferay.portal.kernel.model.Role;
-import com.liferay.portal.kernel.model.RoleConstants;
+import com.liferay.portal.kernel.model.role.RoleConstants;
 import com.liferay.portal.kernel.security.auth.PrincipalException;
 import com.liferay.portal.kernel.security.permission.PermissionThreadLocal;
 import com.liferay.portal.kernel.security.permission.ResourceActionsUtil;
@@ -69,8 +69,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Callable;
-
-import javax.sql.DataSource;
 
 /**
  * Provides the local service for accessing, adding, deleting, and updating
@@ -859,11 +857,9 @@ public class ResourceBlockLocalServiceImpl
 
 		resourceBlockPermissionsContainer.setPermissions(roleId, actionIdsLong);
 
-		String permissionsHash =
-			resourceBlockPermissionsContainer.getPermissionsHash();
-
 		resourceBlockLocalService.updateResourceBlockId(
-			companyId, groupId, name, permissionedModel, permissionsHash,
+			companyId, groupId, name, permissionedModel,
+			resourceBlockPermissionsContainer.getPermissionsHash(),
 			resourceBlockPermissionsContainer);
 	}
 
@@ -912,11 +908,9 @@ public class ResourceBlockLocalServiceImpl
 					DB db = DBManagerUtil.getDB();
 
 					if (!db.isSupportsQueryingAfterException()) {
-						DataSource dataSource =
-							resourceBlockPersistence.getDataSource();
-
 						Connection connection =
-							CurrentConnectionUtil.getConnection(dataSource);
+							CurrentConnectionUtil.getConnection(
+								resourceBlockPersistence.getDataSource());
 
 						try {
 							connection.rollback();

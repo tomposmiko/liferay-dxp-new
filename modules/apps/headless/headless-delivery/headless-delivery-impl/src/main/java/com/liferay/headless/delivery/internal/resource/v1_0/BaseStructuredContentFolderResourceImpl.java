@@ -18,6 +18,7 @@ import com.liferay.headless.delivery.dto.v1_0.StructuredContentFolder;
 import com.liferay.headless.delivery.resource.v1_0.StructuredContentFolderResource;
 import com.liferay.petra.function.UnsafeFunction;
 import com.liferay.portal.kernel.model.Company;
+import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.search.Sort;
 import com.liferay.portal.kernel.search.filter.Filter;
 import com.liferay.portal.vulcan.accept.language.AcceptLanguage;
@@ -32,11 +33,13 @@ import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.tags.Tags;
 
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
 import javax.annotation.Generated;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import javax.validation.constraints.NotNull;
 
@@ -62,6 +65,11 @@ import javax.ws.rs.core.UriInfo;
 public abstract class BaseStructuredContentFolderResourceImpl
 	implements StructuredContentFolderResource {
 
+	/**
+	 * Invoke this method with the command line:
+	 *
+	 * curl -X 'GET' 'http://localhost:8080/o/headless-delivery/v1.0/sites/{siteId}/structured-content-folders'  -u 'test@liferay.com:test'
+	 */
 	@Override
 	@GET
 	@Operation(
@@ -92,6 +100,11 @@ public abstract class BaseStructuredContentFolderResourceImpl
 		return Page.of(Collections.emptyList());
 	}
 
+	/**
+	 * Invoke this method with the command line:
+	 *
+	 * curl -X 'POST' 'http://localhost:8080/o/headless-delivery/v1.0/sites/{siteId}/structured-content-folders' -d $'{"customFields": ___, "description": ___, "name": ___, "viewableBy": ___}' --header 'Content-Type: application/json' -u 'test@liferay.com:test'
+	 */
 	@Override
 	@Consumes({"application/json", "application/xml"})
 	@Operation(description = "Creates a new structured content folder.")
@@ -108,6 +121,11 @@ public abstract class BaseStructuredContentFolderResourceImpl
 		return new StructuredContentFolder();
 	}
 
+	/**
+	 * Invoke this method with the command line:
+	 *
+	 * curl -X 'GET' 'http://localhost:8080/o/headless-delivery/v1.0/structured-content-folders/{parentStructuredContentFolderId}/structured-content-folders'  -u 'test@liferay.com:test'
+	 */
 	@Override
 	@GET
 	@Operation(
@@ -143,6 +161,11 @@ public abstract class BaseStructuredContentFolderResourceImpl
 		return Page.of(Collections.emptyList());
 	}
 
+	/**
+	 * Invoke this method with the command line:
+	 *
+	 * curl -X 'POST' 'http://localhost:8080/o/headless-delivery/v1.0/structured-content-folders/{parentStructuredContentFolderId}/structured-content-folders' -d $'{"customFields": ___, "description": ___, "name": ___, "viewableBy": ___}' --header 'Content-Type: application/json' -u 'test@liferay.com:test'
+	 */
 	@Override
 	@Consumes({"application/json", "application/xml"})
 	@Operation(
@@ -172,6 +195,11 @@ public abstract class BaseStructuredContentFolderResourceImpl
 		return new StructuredContentFolder();
 	}
 
+	/**
+	 * Invoke this method with the command line:
+	 *
+	 * curl -X 'DELETE' 'http://localhost:8080/o/headless-delivery/v1.0/structured-content-folders/{structuredContentFolderId}'  -u 'test@liferay.com:test'
+	 */
 	@Override
 	@DELETE
 	@Operation(
@@ -194,6 +222,11 @@ public abstract class BaseStructuredContentFolderResourceImpl
 		throws Exception {
 	}
 
+	/**
+	 * Invoke this method with the command line:
+	 *
+	 * curl -X 'GET' 'http://localhost:8080/o/headless-delivery/v1.0/structured-content-folders/{structuredContentFolderId}'  -u 'test@liferay.com:test'
+	 */
 	@Override
 	@GET
 	@Operation(description = "Retrieves the structured content folder.")
@@ -216,6 +249,11 @@ public abstract class BaseStructuredContentFolderResourceImpl
 		return new StructuredContentFolder();
 	}
 
+	/**
+	 * Invoke this method with the command line:
+	 *
+	 * curl -X 'PATCH' 'http://localhost:8080/o/headless-delivery/v1.0/structured-content-folders/{structuredContentFolderId}' -d $'{"customFields": ___, "description": ___, "name": ___, "viewableBy": ___}' --header 'Content-Type: application/json' -u 'test@liferay.com:test'
+	 */
 	@Override
 	@Consumes({"application/json", "application/xml"})
 	@Operation(
@@ -279,6 +317,11 @@ public abstract class BaseStructuredContentFolderResourceImpl
 				structuredContentFolder.getSiteId());
 		}
 
+		if (structuredContentFolder.getSubscribed() != null) {
+			existingStructuredContentFolder.setSubscribed(
+				structuredContentFolder.getSubscribed());
+		}
+
 		if (structuredContentFolder.getViewableBy() != null) {
 			existingStructuredContentFolder.setViewableBy(
 				structuredContentFolder.getViewableBy());
@@ -290,6 +333,11 @@ public abstract class BaseStructuredContentFolderResourceImpl
 			structuredContentFolderId, existingStructuredContentFolder);
 	}
 
+	/**
+	 * Invoke this method with the command line:
+	 *
+	 * curl -X 'PUT' 'http://localhost:8080/o/headless-delivery/v1.0/structured-content-folders/{structuredContentFolderId}' -d $'{"customFields": ___, "description": ___, "name": ___, "viewableBy": ___}' --header 'Content-Type: application/json' -u 'test@liferay.com:test'
+	 */
 	@Override
 	@Consumes({"application/json", "application/xml"})
 	@Operation(
@@ -316,8 +364,80 @@ public abstract class BaseStructuredContentFolderResourceImpl
 		return new StructuredContentFolder();
 	}
 
+	/**
+	 * Invoke this method with the command line:
+	 *
+	 * curl -X 'PUT' 'http://localhost:8080/o/headless-delivery/v1.0/structured-content-folders/{structuredContentFolderId}/subscribe'  -u 'test@liferay.com:test'
+	 */
+	@Override
+	@PUT
+	@Parameters(
+		value = {
+			@Parameter(
+				in = ParameterIn.PATH, name = "structuredContentFolderId"
+			)
+		}
+	)
+	@Path("/structured-content-folders/{structuredContentFolderId}/subscribe")
+	@Produces("application/json")
+	@Tags(value = {@Tag(name = "StructuredContentFolder")})
+	public void putStructuredContentFolderSubscribe(
+			@NotNull @Parameter(hidden = true)
+			@PathParam("structuredContentFolderId") Long
+				structuredContentFolderId)
+		throws Exception {
+	}
+
+	/**
+	 * Invoke this method with the command line:
+	 *
+	 * curl -X 'PUT' 'http://localhost:8080/o/headless-delivery/v1.0/structured-content-folders/{structuredContentFolderId}/unsubscribe'  -u 'test@liferay.com:test'
+	 */
+	@Override
+	@PUT
+	@Parameters(
+		value = {
+			@Parameter(
+				in = ParameterIn.PATH, name = "structuredContentFolderId"
+			)
+		}
+	)
+	@Path("/structured-content-folders/{structuredContentFolderId}/unsubscribe")
+	@Produces("application/json")
+	@Tags(value = {@Tag(name = "StructuredContentFolder")})
+	public void putStructuredContentFolderUnsubscribe(
+			@NotNull @Parameter(hidden = true)
+			@PathParam("structuredContentFolderId") Long
+				structuredContentFolderId)
+		throws Exception {
+	}
+
+	public void setContextAcceptLanguage(AcceptLanguage contextAcceptLanguage) {
+		this.contextAcceptLanguage = contextAcceptLanguage;
+	}
+
 	public void setContextCompany(Company contextCompany) {
 		this.contextCompany = contextCompany;
+	}
+
+	public void setContextHttpServletRequest(
+		HttpServletRequest contextHttpServletRequest) {
+
+		this.contextHttpServletRequest = contextHttpServletRequest;
+	}
+
+	public void setContextHttpServletResponse(
+		HttpServletResponse contextHttpServletResponse) {
+
+		this.contextHttpServletResponse = contextHttpServletResponse;
+	}
+
+	public void setContextUriInfo(UriInfo contextUriInfo) {
+		this.contextUriInfo = contextUriInfo;
+	}
+
+	public void setContextUser(User contextUser) {
+		this.contextUser = contextUser;
 	}
 
 	protected void preparePatch(
@@ -326,7 +446,7 @@ public abstract class BaseStructuredContentFolderResourceImpl
 	}
 
 	protected <T, R> List<R> transform(
-		Collection<T> collection,
+		java.util.Collection<T> collection,
 		UnsafeFunction<T, R, Exception> unsafeFunction) {
 
 		return TransformUtil.transform(collection, unsafeFunction);
@@ -340,7 +460,7 @@ public abstract class BaseStructuredContentFolderResourceImpl
 	}
 
 	protected <T, R> R[] transformToArray(
-		Collection<T> collection,
+		java.util.Collection<T> collection,
 		UnsafeFunction<T, R, Exception> unsafeFunction, Class<?> clazz) {
 
 		return TransformUtil.transformToArray(
@@ -353,13 +473,11 @@ public abstract class BaseStructuredContentFolderResourceImpl
 		return TransformUtil.transformToList(array, unsafeFunction);
 	}
 
-	@Context
 	protected AcceptLanguage contextAcceptLanguage;
-
-	@Context
 	protected Company contextCompany;
-
-	@Context
+	protected HttpServletRequest contextHttpServletRequest;
+	protected HttpServletResponse contextHttpServletResponse;
 	protected UriInfo contextUriInfo;
+	protected User contextUser;
 
 }

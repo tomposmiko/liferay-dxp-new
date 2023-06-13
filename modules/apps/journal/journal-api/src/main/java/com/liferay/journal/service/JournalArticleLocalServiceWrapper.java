@@ -16,8 +16,6 @@ package com.liferay.journal.service;
 
 import com.liferay.portal.kernel.service.ServiceWrapper;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 /**
  * Provides a wrapper for {@link JournalArticleLocalService}.
  *
@@ -25,7 +23,6 @@ import org.osgi.annotation.versioning.ProviderType;
  * @see JournalArticleLocalService
  * @generated
  */
-@ProviderType
 public class JournalArticleLocalServiceWrapper
 	implements JournalArticleLocalService,
 			   ServiceWrapper<JournalArticleLocalService> {
@@ -339,6 +336,23 @@ public class JournalArticleLocalServiceWrapper
 			ddmStructureKey, ddmTemplateKey, serviceContext);
 	}
 
+	@Override
+	public com.liferay.journal.model.JournalArticle addArticleDefaultValues(
+			long userId, long groupId, long classNameId, long classPK,
+			java.util.Map<java.util.Locale, String> titleMap,
+			java.util.Map<java.util.Locale, String> descriptionMap,
+			String content, String ddmStructureKey, String ddmTemplateKey,
+			String layoutUuid, boolean indexable, boolean smallImage,
+			String smallImageURL, java.io.File smallImageFile,
+			com.liferay.portal.kernel.service.ServiceContext serviceContext)
+		throws com.liferay.portal.kernel.exception.PortalException {
+
+		return _journalArticleLocalService.addArticleDefaultValues(
+			userId, groupId, classNameId, classPK, titleMap, descriptionMap,
+			content, ddmStructureKey, ddmTemplateKey, layoutUuid, indexable,
+			smallImage, smallImageURL, smallImageFile, serviceContext);
+	}
+
 	/**
 	 * Adds the resources to the web content article.
 	 *
@@ -640,6 +654,15 @@ public class JournalArticleLocalServiceWrapper
 			groupId, articleId, serviceContext);
 	}
 
+	@Override
+	public void deleteArticleDefaultValues(
+			long groupId, String articleId, String ddmStructureKey)
+		throws com.liferay.portal.kernel.exception.PortalException {
+
+		_journalArticleLocalService.deleteArticleDefaultValues(
+			groupId, articleId, ddmStructureKey);
+	}
+
 	/**
 	 * Deletes all the group's web content articles and resources.
 	 *
@@ -785,7 +808,7 @@ public class JournalArticleLocalServiceWrapper
 	 * Performs a dynamic query on the database and returns a range of the matching rows.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>com.liferay.journal.model.impl.JournalArticleModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>com.liferay.journal.model.impl.JournalArticleModelImpl</code>.
 	 * </p>
 	 *
 	 * @param dynamicQuery the dynamic query
@@ -806,7 +829,7 @@ public class JournalArticleLocalServiceWrapper
 	 * Performs a dynamic query on the database and returns an ordered range of the matching rows.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>com.liferay.journal.model.impl.JournalArticleModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>com.liferay.journal.model.impl.JournalArticleModelImpl</code>.
 	 * </p>
 	 *
 	 * @param dynamicQuery the dynamic query
@@ -2286,7 +2309,7 @@ public class JournalArticleLocalServiceWrapper
 	 * Returns a range of all the journal articles.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>com.liferay.journal.model.impl.JournalArticleModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>com.liferay.journal.model.impl.JournalArticleModelImpl</code>.
 	 * </p>
 	 *
 	 * @param start the lower bound of the range of journal articles
@@ -4425,6 +4448,23 @@ public class JournalArticleLocalServiceWrapper
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _journalArticleLocalService.updateArticle(id, urlTitle);
+	}
+
+	@Override
+	public com.liferay.journal.model.JournalArticle updateArticleDefaultValues(
+			long userId, long groupId, String articleId,
+			java.util.Map<java.util.Locale, String> titleMap,
+			java.util.Map<java.util.Locale, String> descriptionMap,
+			String content, String ddmStructureKey, String ddmTemplateKey,
+			String layoutUuid, boolean indexable, boolean smallImage,
+			String smallImageURL, java.io.File smallImageFile,
+			com.liferay.portal.kernel.service.ServiceContext serviceContext)
+		throws com.liferay.portal.kernel.exception.PortalException {
+
+		return _journalArticleLocalService.updateArticleDefaultValues(
+			userId, groupId, articleId, titleMap, descriptionMap, content,
+			ddmStructureKey, ddmTemplateKey, layoutUuid, indexable, smallImage,
+			smallImageURL, smallImageFile, serviceContext);
 	}
 
 	/**

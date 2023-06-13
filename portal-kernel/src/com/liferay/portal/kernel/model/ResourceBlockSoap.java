@@ -19,8 +19,6 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 /**
  * This class is used by SOAP remote services, specifically {@link com.liferay.portal.service.http.ResourceBlockServiceSoap}.
  *
@@ -29,7 +27,6 @@ import org.osgi.annotation.versioning.ProviderType;
  * @generated
  */
 @Deprecated
-@ProviderType
 public class ResourceBlockSoap implements Serializable {
 
 	public static ResourceBlockSoap toSoapModel(ResourceBlock model) {

@@ -141,6 +141,8 @@ definition {
 
 		DMRepository.gotoCP(dmRepositoryName = "Sharepoint Repository Name");
 
+		Pause(locator1 = "5000");
+
 		var key_dmDocumentTitle = "Document_3.txt";
 
 		AssertElementNotPresent(locator1 = "DocumentsAndMedia#ICON_DOCUMENT_ICON_NOT_LOCKED");
@@ -287,6 +289,67 @@ definition {
 		DMDocument.cannotViewDocumentMetadataCP(
 			metadataData = "ISO-8859-1",
 			metadataLabel = "Content Encoding");
+	}
+
+	@priority = "4"
+	test EditRepository {
+		property test.name.skip.portal.instance = "CPSharepoint#EditRepository";
+
+		Navigator.openURL();
+
+		ProductMenu.gotoPortlet(
+			category = "Content &amp; Data",
+			panel = "Site Administration",
+			portlet = "Documents and Media");
+
+		DMRepository.gotoCP(dmRepositoryName = "Sharepoint Repository Name");
+
+		DMRepository.viewBreadcrumb(dmRepositoryName = "Sharepoint Repository Name");
+
+		DMDocument.expandInfo();
+
+		Click(locator1 = "Icon#BODY_VERTICAL_ELLIPSIS");
+
+		AssertElementNotPresent(
+			key_menuItem = "Download",
+			locator1 = "DocumentsAndMedia#SIDEBAR_MENU_ITEM");
+		AssertElementNotPresent(
+			key_menuItem = "Move",
+			locator1 = "DocumentsAndMedia#SIDEBAR_MENU_ITEM");
+		AssertElementPresent(
+			key_menuItem = "Add Folder",
+			locator1 = "DocumentsAndMedia#SIDEBAR_MENU_ITEM");
+		AssertElementPresent(
+			key_menuItem = "Delete",
+			locator1 = "DocumentsAndMedia#SIDEBAR_MENU_ITEM");
+		AssertElementPresent(
+			key_menuItem = "Edit",
+			locator1 = "DocumentsAndMedia#SIDEBAR_MENU_ITEM");
+
+		DMRepository.gotoCP(dmRepositoryName = "Sharepoint Repository Name");
+
+		Click(locator1 = "Icon#HEADER_VERTICAL_ELLIPSIS");
+
+		MenuItem.viewNotPresent(menuItem = "Download");
+		MenuItem.viewNotPresent(menuItem = "Move");
+		MenuItem.viewPresent(menuItem = "Delete");
+		MenuItem.viewPresent(menuItem = "Edit");
+
+		MenuItem.click(menuItem = "Edit");
+
+		DMRepository.edit(dmRepositoryName = "Sharepoint Repository Name Edit");
+
+		PortletEntry.save();
+
+		ProductMenu.gotoPortlet(
+			category = "Content &amp; Data",
+			panel = "Site Administration",
+			portlet = "Documents and Media");
+
+		AssertTextEquals(
+			key_dmRepositoryName = "Sharepoint Repository Name Edit",
+			locator1 = "DocumentsAndMedia#REPOSITORY_FOLDER_NAME_DESCRIPTIVE_VIEW",
+			value1 = "Sharepoint Repository Name Edit");
 	}
 
 	@priority = "4"
@@ -552,22 +615,6 @@ definition {
 		DMNavigator.gotoDocumentCP(dmDocumentTitle = "Document_3.docx");
 
 		DMDocument.viewCP(dmDocumentTitle = "Document_3.docx");
-	}
-
-	@priority = "4"
-	test ViewRepository {
-		property test.name.skip.portal.instance = "CPSharepoint#ViewRepository";
-
-		Navigator.openURL();
-
-		ProductMenu.gotoPortlet(
-			category = "Content &amp; Data",
-			panel = "Site Administration",
-			portlet = "Documents and Media");
-
-		DMRepository.gotoCP(dmRepositoryName = "Sharepoint Repository Name");
-
-		DMRepository.viewBreadcrumb(dmRepositoryName = "Sharepoint Repository Name");
 	}
 
 }

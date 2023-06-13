@@ -35,7 +35,6 @@ import com.liferay.headless.delivery.internal.dto.v1_0.util.RatingUtil;
 import com.liferay.headless.delivery.internal.odata.entity.v1_0.DocumentEntityModel;
 import com.liferay.headless.delivery.resource.v1_0.DocumentResource;
 import com.liferay.petra.function.UnsafeConsumer;
-import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.repository.model.Folder;
 import com.liferay.portal.kernel.search.BooleanClauseOccur;
@@ -64,7 +63,6 @@ import java.util.Map;
 import java.util.Optional;
 
 import javax.ws.rs.BadRequestException;
-import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MultivaluedMap;
 
 import org.osgi.service.component.annotations.Component;
@@ -95,15 +93,13 @@ public class DocumentResourceImpl
 
 	@Override
 	public Document getDocument(Long documentId) throws Exception {
-		FileEntry fileEntry = _dlAppService.getFileEntry(documentId);
-
-		return _toDocument(fileEntry);
+		return _toDocument(_dlAppService.getFileEntry(documentId));
 	}
 
 	@Override
 	public Page<Document> getDocumentFolderDocumentsPage(
-			Long documentFolderId, String search, Filter filter,
-			Pagination pagination, Sort[] sorts)
+			Long documentFolderId, Boolean flatten, String search,
+			Filter filter, Pagination pagination, Sort[] sorts)
 		throws Exception {
 
 		return _getDocumentsPage(
@@ -112,9 +108,14 @@ public class DocumentResourceImpl
 					BooleanFilter booleanFilter =
 						booleanQuery.getPreBooleanFilter();
 
+					String field = Field.FOLDER_ID;
+
+					if (GetterUtil.getBoolean(flatten)) {
+						field = "treePath";
+					}
+
 					booleanFilter.add(
-						new TermFilter(
-							Field.FOLDER_ID, String.valueOf(documentFolderId)),
+						new TermFilter(field, String.valueOf(documentFolderId)),
 						BooleanClauseOccur.MUST);
 				}
 			},
@@ -420,12 +421,13 @@ public class DocumentResourceImpl
 			DLFileEntry.class.getName(), _ratingsEntryLocalService,
 			ratingsEntry -> RatingUtil.toRating(
 				_portal, ratingsEntry, _userLocalService),
-			_user);
+			contextUser);
 	}
 
 	private Document _toDocument(FileEntry fileEntry) throws Exception {
 		return _documentDTOConverter.toDTO(
-			new DefaultDTOConverterContext(null, fileEntry.getFileEntryId()));
+			new DefaultDTOConverterContext(
+				null, fileEntry.getFileEntryId(), contextUriInfo, contextUser));
 	}
 
 	@Reference
@@ -451,9 +453,6 @@ public class DocumentResourceImpl
 
 	@Reference
 	private RatingsEntryLocalService _ratingsEntryLocalService;
-
-	@Context
-	private User _user;
 
 	@Reference
 	private UserLocalService _userLocalService;

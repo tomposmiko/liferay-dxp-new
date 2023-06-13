@@ -14,6 +14,12 @@
  */
 --%>
 
+<%@ taglib uri="http://java.sun.com/portlet_2_0" prefix="portlet" %>
+
+<%@ taglib uri="http://liferay.com/tld/aui" prefix="aui" %><%@
+taglib uri="http://liferay.com/tld/frontend" prefix="liferay-frontend" %><%@
+taglib uri="http://liferay.com/tld/portlet" prefix="liferay-portlet" %>
+
 <%@ page import="com.liferay.portal.kernel.json.JSONArray" %><%@
 page import="com.liferay.portal.kernel.json.JSONObject" %><%@
 page import="com.liferay.portal.kernel.util.Constants" %><%@
@@ -21,12 +27,6 @@ page import="com.liferay.portal.kernel.util.StringUtil" %><%@
 page import="com.liferay.portal.search.web.internal.sort.portlet.SortPortletPreferences" %><%@
 page import="com.liferay.portal.search.web.internal.sort.portlet.SortPortletPreferencesImpl" %><%@
 page import="com.liferay.portal.search.web.internal.util.PortletPreferencesJspUtil" %>
-
-<%@ taglib uri="http://java.sun.com/portlet_2_0" prefix="portlet" %>
-
-<%@ taglib uri="http://liferay.com/tld/aui" prefix="aui" %><%@
-taglib uri="http://liferay.com/tld/frontend" prefix="liferay-frontend" %><%@
-taglib uri="http://liferay.com/tld/portlet" prefix="liferay-portlet" %>
 
 <portlet:defineObjects />
 
@@ -75,7 +75,7 @@ JSONArray fieldsJSONArray = sortPortletPreferences.getFieldsJSONArray();
 
 				<aui:input cssClass="fields-input" name="<%= PortletPreferencesJspUtil.getInputName(SortPortletPreferences.PREFERENCE_KEY_FIELDS) %>" type="hidden" value="<%= sortPortletPreferences.getFieldsString() %>" />
 
-				<aui:input name='<%= "fieldsIndexes" %>' type="hidden" value="<%= StringUtil.merge(fieldsIndexes) %>" />
+				<aui:input name="fieldsIndexes" type="hidden" value="<%= StringUtil.merge(fieldsIndexes) %>" />
 			</aui:fieldset>
 		</liferay-frontend:fieldset-group>
 	</liferay-frontend:edit-form-body>
@@ -88,13 +88,11 @@ JSONArray fieldsJSONArray = sortPortletPreferences.getFieldsJSONArray();
 </liferay-frontend:edit-form>
 
 <aui:script use="liferay-auto-fields">
-	var autoFields = new Liferay.AutoFields(
-		{
-			contentBox: 'fieldset#<portlet:namespace />fieldsId',
-			fieldIndexes: '<portlet:namespace />fieldsIndexes',
-			namespace: '<portlet:namespace />'
-		}
-	).render();
+	var autoFields = new Liferay.AutoFields({
+		contentBox: 'fieldset#<portlet:namespace />fieldsId',
+		fieldIndexes: '<portlet:namespace />fieldsIndexes',
+		namespace: '<portlet:namespace />'
+	}).render();
 </aui:script>
 
 <aui:script use="liferay-search-sort-configuration">

@@ -20,9 +20,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import com.liferay.petra.function.UnsafeSupplier;
 import com.liferay.petra.string.StringBundler;
-
-import graphql.annotations.annotationTypes.GraphQLField;
-import graphql.annotations.annotationTypes.GraphQLName;
+import com.liferay.portal.vulcan.graphql.annotation.GraphQLField;
+import com.liferay.portal.vulcan.graphql.annotation.GraphQLName;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 
@@ -32,6 +31,8 @@ import java.util.Objects;
 import java.util.Set;
 
 import javax.annotation.Generated;
+
+import javax.validation.Valid;
 
 import javax.xml.bind.annotation.XmlRootElement;
 
@@ -162,20 +163,22 @@ public class ContentField {
 	@Schema(
 		description = "A list of child content fields that depend on this resource."
 	)
-	public ContentField[] getNestedFields() {
-		return nestedFields;
+	@Valid
+	public ContentField[] getNestedContentFields() {
+		return nestedContentFields;
 	}
 
-	public void setNestedFields(ContentField[] nestedFields) {
-		this.nestedFields = nestedFields;
+	public void setNestedContentFields(ContentField[] nestedContentFields) {
+		this.nestedContentFields = nestedContentFields;
 	}
 
 	@JsonIgnore
-	public void setNestedFields(
-		UnsafeSupplier<ContentField[], Exception> nestedFieldsUnsafeSupplier) {
+	public void setNestedContentFields(
+		UnsafeSupplier<ContentField[], Exception>
+			nestedContentFieldsUnsafeSupplier) {
 
 		try {
-			nestedFields = nestedFieldsUnsafeSupplier.get();
+			nestedContentFields = nestedContentFieldsUnsafeSupplier.get();
 		}
 		catch (RuntimeException re) {
 			throw re;
@@ -187,7 +190,7 @@ public class ContentField {
 
 	@GraphQLField
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
-	protected ContentField[] nestedFields;
+	protected ContentField[] nestedContentFields;
 
 	@Schema(
 		description = "A flag that indicates whether this field can be rendered multiple times."
@@ -220,6 +223,7 @@ public class ContentField {
 	protected Boolean repeatable;
 
 	@Schema
+	@Valid
 	public Value getValue() {
 		return value;
 	}
@@ -328,19 +332,19 @@ public class ContentField {
 			sb.append("\"");
 		}
 
-		if (nestedFields != null) {
+		if (nestedContentFields != null) {
 			if (sb.length() > 1) {
 				sb.append(", ");
 			}
 
-			sb.append("\"nestedFields\": ");
+			sb.append("\"nestedContentFields\": ");
 
 			sb.append("[");
 
-			for (int i = 0; i < nestedFields.length; i++) {
-				sb.append(String.valueOf(nestedFields[i]));
+			for (int i = 0; i < nestedContentFields.length; i++) {
+				sb.append(String.valueOf(nestedContentFields[i]));
 
-				if ((i + 1) < nestedFields.length) {
+				if ((i + 1) < nestedContentFields.length) {
 					sb.append(", ");
 				}
 			}
@@ -372,6 +376,12 @@ public class ContentField {
 
 		return sb.toString();
 	}
+
+	@Schema(
+		defaultValue = "com.liferay.headless.delivery.dto.v1_0.ContentField",
+		name = "x-class-name"
+	)
+	public String xClassName;
 
 	private static String _escape(Object object) {
 		String string = String.valueOf(object);

@@ -40,6 +40,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -199,13 +200,13 @@ public abstract class BaseGroupByTestCase extends BaseIndexingTestCase {
 
 		Set<Map.Entry<String, Integer>> entries = map1.entrySet();
 
-		Map<String, String> map2 = entries.stream(
-		).collect(
+		Stream<Map.Entry<String, Integer>> stream = entries.stream();
+
+		Map<String, String> map2 = stream.collect(
 			Collectors.toMap(
 				Map.Entry::getKey,
 				entry -> getCountPairString(
-					entry.getValue(), entry.getValue() - 1))
-		);
+					entry.getValue(), entry.getValue() - 1)));
 
 		assertSearch(
 			indexingTestHelper -> {
@@ -229,17 +230,17 @@ public abstract class BaseGroupByTestCase extends BaseIndexingTestCase {
 	public void testGroupByTermsSizeDefault() throws Exception {
 		Map<String, Integer> map1 = new HashMap<String, Integer>() {
 			{
-				put("one", 1);
-				put("two", 2);
-				put("three", 2);
-				put("four", 2);
-				put("five", 2);
-				put("six", 2);
-				put("seven", 2);
 				put("eight", 2);
-				put("nine", 2);
-				put("ten", 2);
 				put("eleven", 2);
+				put("five", 2);
+				put("four", 2);
+				put("nine", 2);
+				put("one", 1);
+				put("seven", 2);
+				put("six", 2);
+				put("ten", 2);
+				put("three", 2);
+				put("two", 2);
 			}
 		};
 
@@ -249,12 +250,13 @@ public abstract class BaseGroupByTestCase extends BaseIndexingTestCase {
 
 		Set<Map.Entry<String, Integer>> entries = map1.entrySet();
 
-		Map<String, String> map2 = entries.stream(
-		).collect(
+		Stream<Map.Entry<String, Integer>> stream = entries.stream();
+
+		Map<String, String> map2 = stream.collect(
 			Collectors.toMap(
 				Map.Entry::getKey,
-				entry -> getCountPairString(entry.getValue(), entry.getValue()))
-		);
+				entry -> getCountPairString(
+					entry.getValue(), entry.getValue())));
 
 		assertSearch(
 			indexingTestHelper -> {
@@ -317,17 +319,17 @@ public abstract class BaseGroupByTestCase extends BaseIndexingTestCase {
 	public void testGroupByTermsSizeMoreThanDefault() throws Exception {
 		Map<String, Integer> map1 = new HashMap<String, Integer>() {
 			{
-				put("one", 1);
-				put("two", 2);
-				put("three", 2);
-				put("four", 2);
-				put("five", 2);
-				put("six", 2);
-				put("seven", 2);
 				put("eight", 2);
-				put("nine", 2);
-				put("ten", 2);
 				put("eleven", 2);
+				put("five", 2);
+				put("four", 2);
+				put("nine", 2);
+				put("one", 1);
+				put("seven", 2);
+				put("six", 2);
+				put("ten", 2);
+				put("three", 2);
+				put("two", 2);
 			}
 		};
 
@@ -335,12 +337,13 @@ public abstract class BaseGroupByTestCase extends BaseIndexingTestCase {
 
 		Set<Map.Entry<String, Integer>> entries = map1.entrySet();
 
-		Map<String, String> map2 = entries.stream(
-		).collect(
+		Stream<Map.Entry<String, Integer>> stream = entries.stream();
+
+		Map<String, String> map2 = stream.collect(
 			Collectors.toMap(
 				Map.Entry::getKey,
-				entry -> getCountPairString(entry.getValue(), entry.getValue()))
-		);
+				entry -> getCountPairString(
+					entry.getValue(), entry.getValue())));
 
 		assertSearch(
 			indexingTestHelper -> {
@@ -425,14 +428,15 @@ public abstract class BaseGroupByTestCase extends BaseIndexingTestCase {
 						searchContext.setGroupBy(groupBy);
 					});
 
-				BooleanQueryImpl booleanQuery = new BooleanQueryImpl();
+				BooleanQueryImpl booleanQueryImpl = new BooleanQueryImpl();
 
-				booleanQuery.addExactTerm(SORT_FIELD, "3");
-				booleanQuery.addExactTerm(SORT_FIELD, "2");
+				booleanQueryImpl.addExactTerm(SORT_FIELD, "3");
+				booleanQueryImpl.addExactTerm(SORT_FIELD, "2");
 
-				booleanQuery.add(getDefaultQuery(), BooleanClauseOccur.MUST);
+				booleanQueryImpl.add(
+					getDefaultQuery(), BooleanClauseOccur.MUST);
 
-				indexingTestHelper.setQuery(booleanQuery);
+				indexingTestHelper.setQuery(booleanQueryImpl);
 
 				indexingTestHelper.search();
 
@@ -492,12 +496,12 @@ public abstract class BaseGroupByTestCase extends BaseIndexingTestCase {
 
 		Collection<Map.Entry<String, Hits>> entries = hitsMap.entrySet();
 
-		Map<String, String> actualCountsMap = entries.stream(
-		).collect(
+		Stream<Map.Entry<String, Hits>> stream = entries.stream();
+
+		Map<String, String> actualCountsMap = stream.collect(
 			Collectors.toMap(
 				Map.Entry::getKey,
-				entry -> getCountPairString(entry.getValue()))
-		);
+				entry -> getCountPairString(entry.getValue())));
 
 		AssertUtils.assertEquals(
 			indexingTestHelper.getRequestString(), expectedCountsMap,

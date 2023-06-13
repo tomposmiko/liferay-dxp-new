@@ -20,8 +20,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 /**
  * <p>
  * This class is a wrapper for {@link LayoutSetVersion}.
@@ -31,7 +29,6 @@ import org.osgi.annotation.versioning.ProviderType;
  * @see LayoutSetVersion
  * @generated
  */
-@ProviderType
 public class LayoutSetVersionWrapper
 	extends BaseModelWrapper<LayoutSetVersion>
 	implements LayoutSetVersion, ModelWrapper<LayoutSetVersion> {

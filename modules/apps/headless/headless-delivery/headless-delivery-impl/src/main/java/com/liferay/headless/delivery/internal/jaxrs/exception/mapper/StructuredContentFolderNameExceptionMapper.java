@@ -39,13 +39,14 @@ public class StructuredContentFolderNameExceptionMapper
 	implements ExceptionMapper<FolderNameException> {
 
 	@Override
-	public Response toResponse(FolderNameException fne) {
+	public Response toResponse(FolderNameException folderNameException) {
 		return Response.status(
 			400
+		).entity(
+			"Invalid structured content folder name " +
+				folderNameException.getMessage()
 		).type(
 			MediaType.TEXT_PLAIN
-		).entity(
-			"Invalid structured content folder name " + fne.getMessage()
 		).build();
 	}
 

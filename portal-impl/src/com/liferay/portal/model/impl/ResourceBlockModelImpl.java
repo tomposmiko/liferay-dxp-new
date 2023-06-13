@@ -45,8 +45,6 @@ import java.util.Map;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 /**
  * The base model implementation for the ResourceBlock service. Represents a row in the &quot;ResourceBlock&quot; database table, with each column mapped to a property of this class.
  *
@@ -61,11 +59,10 @@ import org.osgi.annotation.versioning.ProviderType;
  */
 @Deprecated
 @JSON(strict = true)
-@ProviderType
 public class ResourceBlockModelImpl
 	extends BaseModelImpl<ResourceBlock> implements ResourceBlockModel {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this class directly. All methods that expect a resource block model instance should use the <code>ResourceBlock</code> interface instead.
@@ -498,7 +495,12 @@ public class ResourceBlockModelImpl
 	@Override
 	public ResourceBlock toEscapedModel() {
 		if (_escapedModel == null) {
-			_escapedModel = _escapedModelProxyProviderFunction.apply(
+			Function<InvocationHandler, ResourceBlock>
+				escapedModelProxyProviderFunction =
+					EscapedModelProxyProviderFunctionHolder.
+						_escapedModelProxyProviderFunction;
+
+			_escapedModel = escapedModelProxyProviderFunction.apply(
 				new AutoEscapeBeanHandler(this));
 		}
 
@@ -693,8 +695,12 @@ public class ResourceBlockModelImpl
 		return sb.toString();
 	}
 
-	private static final Function<InvocationHandler, ResourceBlock>
-		_escapedModelProxyProviderFunction = _getProxyProviderFunction();
+	private static class EscapedModelProxyProviderFunctionHolder {
+
+		private static final Function<InvocationHandler, ResourceBlock>
+			_escapedModelProxyProviderFunction = _getProxyProviderFunction();
+
+	}
 
 	private long _mvccVersion;
 	private long _resourceBlockId;

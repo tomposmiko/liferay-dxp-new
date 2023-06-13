@@ -15,13 +15,11 @@
 package com.liferay.portal.deploy;
 
 import com.liferay.petra.string.CharPool;
-import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
-import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.ServerDetector;
 import com.liferay.portal.kernel.util.StreamUtil;
@@ -46,7 +44,6 @@ import java.nio.file.Paths;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -146,7 +143,7 @@ public class DeployUtil {
 	public static String getResourcePath(Set<Path> tempPaths, String resource)
 		throws Exception {
 
-		return _instance._getResourcePath(tempPaths, resource);
+		return _deployUtil._getResourcePath(tempPaths, resource);
 	}
 
 	/**
@@ -155,31 +152,7 @@ public class DeployUtil {
 	 */
 	@Deprecated
 	public static String getResourcePath(String resource) throws Exception {
-		return _instance._getResourcePath(new HashSet<>(), resource);
-	}
-
-	public static void redeployJetty(String context) throws Exception {
-		String contextsDirName = _getJettyHome() + "/contexts";
-
-		if (_isPortalContext(context)) {
-			throw new UnsupportedOperationException(
-				"This method is meant for redeploying plugins, not the portal");
-		}
-
-		File contextXml = new File(contextsDirName, context + ".xml");
-
-		if (contextXml.exists()) {
-			FileUtils.touch(contextXml);
-		}
-		else {
-			Map<String, String> filterMap = new HashMap<>();
-
-			filterMap.put("context", context);
-
-			copyDependencyXml(
-				"jetty-context-configure.xml", contextXml.getParent(),
-				contextXml.getName(), filterMap, true);
-		}
+		return _deployUtil._getResourcePath(new HashSet<>(), resource);
 	}
 
 	public static void redeployTomcat(String context) throws Exception {
@@ -204,9 +177,7 @@ public class DeployUtil {
 			return;
 		}
 
-		if (!appServerType.equals(ServerDetector.GLASSFISH_ID) &&
-			!appServerType.equals(ServerDetector.JBOSS_ID) &&
-			!appServerType.equals(ServerDetector.JETTY_ID) &&
+		if (!appServerType.equals(ServerDetector.JBOSS_ID) &&
 			!appServerType.equals(ServerDetector.TOMCAT_ID) &&
 			!appServerType.equals(ServerDetector.WEBLOGIC_ID) &&
 			!appServerType.equals(ServerDetector.WILDFLY_ID)) {
@@ -251,13 +222,6 @@ public class DeployUtil {
 			DeleteTask.deleteDirectory(deployDir);
 		}
 
-		if (appServerType.equals(ServerDetector.JETTY_ID)) {
-			FileUtil.delete(
-				StringBundler.concat(
-					_getJettyHome(), "/contexts/", deployDir.getName(),
-					".xml"));
-		}
-
 		if (appServerType.equals(ServerDetector.JBOSS_ID) ||
 			appServerType.equals(ServerDetector.WILDFLY_ID)) {
 
@@ -279,16 +243,6 @@ public class DeployUtil {
 		if (undeployInterval > 0) {
 			Thread.sleep(undeployInterval);
 		}
-	}
-
-	private static String _getJettyHome() {
-		String jettyHome = System.getProperty("jetty.home");
-
-		if (jettyHome == null) {
-			jettyHome = PortalUtil.getGlobalLibDir() + "../../..";
-		}
-
-		return jettyHome;
 	}
 
 	private static boolean _isPortalContext(String context) {
@@ -343,6 +297,6 @@ public class DeployUtil {
 
 	private static final Log _log = LogFactoryUtil.getLog(DeployUtil.class);
 
-	private static final DeployUtil _instance = new DeployUtil();
+	private static final DeployUtil _deployUtil = new DeployUtil();
 
 }

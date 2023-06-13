@@ -24,8 +24,8 @@ import com.liferay.portal.kernel.model.Portlet;
 import com.liferay.portal.kernel.model.ResourceAction;
 import com.liferay.portal.kernel.model.ResourceConstants;
 import com.liferay.portal.kernel.model.Role;
-import com.liferay.portal.kernel.model.RoleConstants;
 import com.liferay.portal.kernel.model.User;
+import com.liferay.portal.kernel.model.role.RoleConstants;
 import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.security.permission.PermissionChecker;
@@ -47,6 +47,7 @@ import com.liferay.portal.kernel.test.util.RoleTestUtil;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.kernel.test.util.UserTestUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
+import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 
@@ -82,7 +83,7 @@ public class PermissionCheckerTest {
 
 		_resourceActions.read(
 			null, PermissionCheckerTest.class.getClassLoader(),
-			packageName.replace('.', '/') +
+			StringUtil.replace(packageName, '.', '/') +
 				"/dependencies/resource-actions.xml");
 
 		_resourceActions.check(_PORTLET_RESOURCE_NAME);

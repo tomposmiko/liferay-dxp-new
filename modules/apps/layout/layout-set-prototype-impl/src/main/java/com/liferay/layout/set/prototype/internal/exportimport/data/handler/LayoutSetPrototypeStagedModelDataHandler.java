@@ -92,7 +92,7 @@ public class LayoutSetPrototypeStagedModelDataHandler
 	public List<LayoutSetPrototype> fetchStagedModelsByUuidAndCompanyId(
 		String uuid, long companyId) {
 
-		return ListUtil.toList(
+		return ListUtil.fromArray(
 			_layoutSetPrototypeLocalService.
 				fetchLayoutSetPrototypeByUuidAndCompanyId(uuid, companyId));
 	}
@@ -225,12 +225,11 @@ public class LayoutSetPrototypeStagedModelDataHandler
 			"layout_set_prototypes", "page-templates");
 
 		for (Layout layout : layouts) {
-			String layoutPrototypeUuid = layout.getLayoutPrototypeUuid();
-
 			LayoutPrototype layoutPrototype =
 				_layoutPrototypeLocalService.
 					getLayoutPrototypeByUuidAndCompanyId(
-						layoutPrototypeUuid, portletDataContext.getCompanyId());
+						layout.getLayoutPrototypeUuid(),
+						portletDataContext.getCompanyId());
 
 			portletDataContext.addReferenceElement(
 				layout, layoutSetPrototypeElement, layoutPrototype,

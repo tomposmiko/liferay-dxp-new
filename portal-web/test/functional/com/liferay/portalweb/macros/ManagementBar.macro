@@ -31,7 +31,14 @@ definition {
 	}
 
 	macro clickInfo {
-		Click.clickNoMouseOver(locator1 = "Icon#INFO");
+		var browserType = PropsUtil.get("browser.type");
+
+		if ("${browserType}" == "internetexplorer") {
+			Click.clickNoMouseOver(locator1 = "Icon#INFO_IE");
+		}
+		else {
+			Click.clickNoMouseOver(locator1 = "Icon#INFO");
+		}
 	}
 
 	macro clickSelectAllCheckbox {
@@ -48,7 +55,7 @@ definition {
 			var menuItem = "${orderBy}";
 		}
 
-		Click(locator1 = "ManagementBar#FILTER_AND_ORDER");
+		Click.pauseClickAt(locator1 = "ManagementBar#FILTER_AND_ORDER");
 
 		MenuItem.click(menuItem = "${menuItem}");
 	}
@@ -56,6 +63,8 @@ definition {
 	macro toggleViewOrder {
 		if (IsElementNotPresent(locator1 = "ManagementBar#ORDER_ICON_SPECIFIC", key_order = "${order}")) {
 			Click(locator1 = "ManagementBar#ORDER_ICON_GENERIC");
+
+			MouseOver(locator1 = "ManagementBar#FILTER_AND_ORDER");
 		}
 
 		AssertElementPresent(

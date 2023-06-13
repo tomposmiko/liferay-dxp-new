@@ -64,7 +64,7 @@ import org.osgi.annotation.versioning.ProviderType;
 public interface UserLocalService
 	extends BaseLocalService, PersistedModelLocalService {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this interface directly. Always use {@link UserLocalServiceUtil} to access the user local service. Add custom service methods to <code>com.liferay.portal.service.impl.UserLocalServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
@@ -689,7 +689,7 @@ public interface UserLocalService
 	 * Performs a dynamic query on the database and returns a range of the matching rows.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>com.liferay.portal.model.impl.UserModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>com.liferay.portal.model.impl.UserModelImpl</code>.
 	 * </p>
 	 *
 	 * @param dynamicQuery the dynamic query
@@ -705,7 +705,7 @@ public interface UserLocalService
 	 * Performs a dynamic query on the database and returns an ordered range of the matching rows.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>com.liferay.portal.model.impl.UserModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>com.liferay.portal.model.impl.UserModelImpl</code>.
 	 * </p>
 	 *
 	 * @param dynamicQuery the dynamic query
@@ -1470,7 +1470,7 @@ public interface UserLocalService
 	 * Returns a range of all the users.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>com.liferay.portal.model.impl.UserModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>com.liferay.portal.model.impl.UserModelImpl</code>.
 	 * </p>
 	 *
 	 * @param start the lower bound of the range of users
@@ -2097,6 +2097,7 @@ public interface UserLocalService
 	 * @param emailAddress2 the user's new email address confirmation
 	 * @return the user
 	 */
+	@Indexable(type = IndexableType.REINDEX)
 	public User updateEmailAddress(
 			long userId, String password, String emailAddress1,
 			String emailAddress2)
@@ -2114,6 +2115,7 @@ public interface UserLocalService
 	 remote host, and agent for the user.
 	 * @return the user
 	 */
+	@Indexable(type = IndexableType.REINDEX)
 	public User updateEmailAddress(
 			long userId, String password, String emailAddress1,
 			String emailAddress2, ServiceContext serviceContext)
@@ -2217,6 +2219,7 @@ public interface UserLocalService
 	 * @param jobTitle the user's job title
 	 * @return the user
 	 */
+	@Indexable(type = IndexableType.REINDEX)
 	public User updateJobTitle(long userId, String jobTitle)
 		throws PortalException;
 
@@ -2281,6 +2284,7 @@ public interface UserLocalService
 	 * @param modifiedDate the new modified date
 	 * @return the user
 	 */
+	@Indexable(type = IndexableType.REINDEX)
 	public User updateModifiedDate(long userId, Date modifiedDate)
 		throws PortalException;
 
@@ -2397,6 +2401,7 @@ public interface UserLocalService
 	 * @param screenName the user's new screen name
 	 * @return the user
 	 */
+	@Indexable(type = IndexableType.REINDEX)
 	public User updateScreenName(long userId, String screenName)
 		throws PortalException;
 
@@ -2431,7 +2436,7 @@ public interface UserLocalService
 	 * @param emailAddress the user's new email address
 	 * @param facebookId the user's new Facebook ID
 	 * @param openId the user's new OpenID
-	 * @param portrait whether to update the user's portrait image
+	 * @param hasPortrait if the user has a custom portrait image
 	 * @param portraitBytes the new portrait image data
 	 * @param languageId the user's new language ID
 	 * @param timeZoneId the user's new time zone ID
@@ -2469,7 +2474,7 @@ public interface UserLocalService
 			String newPassword2, boolean passwordReset,
 			String reminderQueryQuestion, String reminderQueryAnswer,
 			String screenName, String emailAddress, long facebookId,
-			String openId, boolean portrait, byte[] portraitBytes,
+			String openId, boolean hasPortrait, byte[] portraitBytes,
 			String languageId, String timeZoneId, String greeting,
 			String comments, String firstName, String middleName,
 			String lastName, long prefixId, long suffixId, boolean male,

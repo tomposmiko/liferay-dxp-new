@@ -126,7 +126,10 @@ else {
 										</ul>
 
 										<aui:script>
-											Liferay.Util.toggleBoxes('<portlet:namespace /><%= PortletDataHandlerKeys.PORTLET_CONFIGURATION + StringPool.UNDERLINE + selPortlet.getRootPortletId() %>', '<portlet:namespace />showChangeConfiguration<%= StringPool.UNDERLINE + selPortlet.getRootPortletId() %>');
+											Liferay.Util.toggleBoxes(
+												'<portlet:namespace /><%= PortletDataHandlerKeys.PORTLET_CONFIGURATION + StringPool.UNDERLINE + selPortlet.getRootPortletId() %>',
+												'<portlet:namespace />showChangeConfiguration<%= StringPool.UNDERLINE + selPortlet.getRootPortletId() %>'
+											);
 										</aui:script>
 									</li>
 								</ul>
@@ -226,15 +229,15 @@ else {
 												/>
 
 												<liferay-ui:input-time
-													amPmParam='<%= "startDateAmPm" %>'
+													amPmParam="startDateAmPm"
 													amPmValue="<%= startCalendar.get(Calendar.AM_PM) %>"
 													cssClass="form-group form-group-inline"
 													dateParam="startDateTime"
 													dateValue="<%= startCalendar.getTime() %>"
 													disabled="<%= false %>"
-													hourParam='<%= "startDateHour" %>'
+													hourParam="startDateHour"
 													hourValue="<%= startCalendar.get(Calendar.HOUR) %>"
-													minuteParam='<%= "startDateMinute" %>'
+													minuteParam="startDateMinute"
 													minuteValue="<%= startCalendar.get(Calendar.MINUTE) %>"
 													name="startTime"
 												/>
@@ -256,15 +259,15 @@ else {
 												/>
 
 												<liferay-ui:input-time
-													amPmParam='<%= "endDateAmPm" %>'
+													amPmParam="endDateAmPm"
 													amPmValue="<%= endCalendar.get(Calendar.AM_PM) %>"
 													cssClass="form-group form-group-inline"
 													dateParam="startDateTime"
 													dateValue="<%= endCalendar.getTime() %>"
 													disabled="<%= false %>"
-													hourParam='<%= "endDateHour" %>'
+													hourParam="endDateHour"
 													hourValue="<%= endCalendar.get(Calendar.HOUR) %>"
-													minuteParam='<%= "endDateMinute" %>'
+													minuteParam="endDateMinute"
 													minuteValue="<%= endCalendar.get(Calendar.MINUTE) %>"
 													name="endTime"
 												/>
@@ -379,7 +382,10 @@ else {
 												</ul>
 
 												<aui:script>
-													Liferay.Util.toggleBoxes('<portlet:namespace /><%= PortletDataHandlerKeys.PORTLET_DATA + StringPool.UNDERLINE + selPortlet.getRootPortletId() %>', '<portlet:namespace />showChangeContent<%= StringPool.UNDERLINE + selPortlet.getRootPortletId() %>');
+													Liferay.Util.toggleBoxes(
+														'<portlet:namespace /><%= PortletDataHandlerKeys.PORTLET_DATA + StringPool.UNDERLINE + selPortlet.getRootPortletId() %>',
+														'<portlet:namespace />showChangeContent<%= StringPool.UNDERLINE + selPortlet.getRootPortletId() %>'
+													);
 												</aui:script>
 
 											<%

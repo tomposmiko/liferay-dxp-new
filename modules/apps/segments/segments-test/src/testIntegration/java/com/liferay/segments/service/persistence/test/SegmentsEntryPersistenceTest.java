@@ -124,6 +124,8 @@ public class SegmentsEntryPersistenceTest {
 
 		SegmentsEntry newSegmentsEntry = _persistence.create(pk);
 
+		newSegmentsEntry.setMvccVersion(RandomTestUtil.nextLong());
+
 		newSegmentsEntry.setUuid(RandomTestUtil.randomString());
 
 		newSegmentsEntry.setGroupId(RandomTestUtil.nextLong());
@@ -159,6 +161,9 @@ public class SegmentsEntryPersistenceTest {
 		SegmentsEntry existingSegmentsEntry = _persistence.findByPrimaryKey(
 			newSegmentsEntry.getPrimaryKey());
 
+		Assert.assertEquals(
+			existingSegmentsEntry.getMvccVersion(),
+			newSegmentsEntry.getMvccVersion());
 		Assert.assertEquals(
 			existingSegmentsEntry.getUuid(), newSegmentsEntry.getUuid());
 		Assert.assertEquals(
@@ -311,6 +316,26 @@ public class SegmentsEntryPersistenceTest {
 	}
 
 	@Test
+	public void testCountByG_A_S_T() throws Exception {
+		_persistence.countByG_A_S_T(
+			RandomTestUtil.nextLong(), RandomTestUtil.randomBoolean(), "", "");
+
+		_persistence.countByG_A_S_T(
+			0L, RandomTestUtil.randomBoolean(), "null", "null");
+
+		_persistence.countByG_A_S_T(
+			0L, RandomTestUtil.randomBoolean(), (String)null, (String)null);
+	}
+
+	@Test
+	public void testCountByG_A_S_TArrayable() throws Exception {
+		_persistence.countByG_A_S_T(
+			new long[] {RandomTestUtil.nextLong(), 0L},
+			RandomTestUtil.randomBoolean(), RandomTestUtil.randomString(),
+			RandomTestUtil.randomString());
+	}
+
+	@Test
 	public void testFindByPrimaryKeyExisting() throws Exception {
 		SegmentsEntry newSegmentsEntry = addSegmentsEntry();
 
@@ -341,11 +366,12 @@ public class SegmentsEntryPersistenceTest {
 
 	protected OrderByComparator<SegmentsEntry> getOrderByComparator() {
 		return OrderByComparatorFactoryUtil.create(
-			"SegmentsEntry", "uuid", true, "segmentsEntryId", true, "groupId",
-			true, "companyId", true, "userId", true, "userName", true,
-			"createDate", true, "modifiedDate", true, "segmentsEntryKey", true,
-			"name", true, "description", true, "active", true, "source", true,
-			"type", true, "lastPublishDate", true);
+			"SegmentsEntry", "mvccVersion", true, "uuid", true,
+			"segmentsEntryId", true, "groupId", true, "companyId", true,
+			"userId", true, "userName", true, "createDate", true,
+			"modifiedDate", true, "segmentsEntryKey", true, "name", true,
+			"description", true, "active", true, "source", true, "type", true,
+			"lastPublishDate", true);
 	}
 
 	@Test
@@ -597,6 +623,8 @@ public class SegmentsEntryPersistenceTest {
 		long pk = RandomTestUtil.nextLong();
 
 		SegmentsEntry segmentsEntry = _persistence.create(pk);
+
+		segmentsEntry.setMvccVersion(RandomTestUtil.nextLong());
 
 		segmentsEntry.setUuid(RandomTestUtil.randomString());
 

@@ -50,8 +50,11 @@ public class ATag extends BaseATag {
 
 		if (Validator.isNotNull(getHref())) {
 			if (AUIUtil.isOpensNewWindow(getTarget())) {
-				ThemeDisplay themeDisplay = (ThemeDisplay)request.getAttribute(
-					WebKeys.THEME_DISPLAY);
+				HttpServletRequest httpServletRequest = getRequest();
+
+				ThemeDisplay themeDisplay =
+					(ThemeDisplay)httpServletRequest.getAttribute(
+						WebKeys.THEME_DISPLAY);
 
 				ResourceBundle resourceBundle =
 					TagResourceBundleUtil.getResourceBundle(pageContext);
@@ -172,13 +175,11 @@ public class ATag extends BaseATag {
 		jspWriter.write(">");
 
 		if (Validator.isNotNull(label)) {
-			Boolean localizeLabel = getLocalizeLabel();
-
-			if (localizeLabel) {
-				ResourceBundle resourceBundle =
-					TagResourceBundleUtil.getResourceBundle(pageContext);
-
-				jspWriter.write(LanguageUtil.get(resourceBundle, label));
+			if (getLocalizeLabel()) {
+				jspWriter.write(
+					LanguageUtil.get(
+						TagResourceBundleUtil.getResourceBundle(pageContext),
+						label));
 			}
 			else {
 				jspWriter.write(label);

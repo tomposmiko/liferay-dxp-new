@@ -1,8 +1,29 @@
-import {disableSavingChangesStatusAction, enableSavingChangesStatusAction, updateLastSaveDateAction} from './saveChanges.es';
+/**
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
+ *
+ * This library is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU Lesser General Public License as published by the Free
+ * Software Foundation; either version 2.1 of the License, or (at your option)
+ * any later version.
+ *
+ * This library is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
+ * details.
+ */
+
+import {updatePageEditorLayoutData} from '../utils/FragmentsEditorFetchUtils.es';
 import {getRowIndex} from '../utils/FragmentsEditorGetUtils.es';
 import {setIn} from '../utils/FragmentsEditorUpdateUtils.es';
-import {UPDATE_ROW_COLUMNS_ERROR, UPDATE_ROW_COLUMNS_LOADING, UPDATE_ROW_COLUMNS_SUCCESS} from './actions.es';
-import {updatePageEditorLayoutData} from '../utils/FragmentsEditorFetchUtils.es';
+import {
+	UPDATE_ROW_COLUMNS_ERROR,
+	UPDATE_ROW_COLUMNS_LOADING
+} from './actions.es';
+import {
+	disableSavingChangesStatusAction,
+	enableSavingChangesStatusAction,
+	updateLastSaveDateAction
+} from './saveChanges.es';
 
 /**
  * @param {Array} columns
@@ -14,10 +35,7 @@ function updateRowColumnsAction(columns, rowId) {
 	return function(dispatch, getState) {
 		const state = getState();
 
-		const rowIndex = getRowIndex(
-			state.layoutData.structure,
-			rowId
-		);
+		const rowIndex = getRowIndex(state.layoutData.structure, rowId);
 
 		const previousData = state.layoutData;
 
@@ -26,11 +44,7 @@ function updateRowColumnsAction(columns, rowId) {
 		if (rowIndex !== -1) {
 			nextData = setIn(
 				previousData,
-				[
-					'structure',
-					rowIndex.toString(),
-					'columns'
-				],
+				['structure', rowIndex.toString(), 'columns'],
 				columns
 			);
 		}
@@ -38,21 +52,15 @@ function updateRowColumnsAction(columns, rowId) {
 		dispatch(updateRowColumnsLoadingAction(nextData));
 		dispatch(enableSavingChangesStatusAction());
 
-		updatePageEditorLayoutData(
-			nextData,
-			state.segmentsExperienceId
-		).then(
-			() => {
-				dispatch(updateRowColumnsSuccessAction());
+		updatePageEditorLayoutData(nextData, state.segmentsExperienceId)
+			.then(() => {
 				dispatch(disableSavingChangesStatusAction());
 				dispatch(updateLastSaveDateAction());
-			}
-		).catch(
-			() => {
+			})
+			.catch(() => {
 				dispatch(updateRowColumnsErrorAction(previousData));
 				dispatch(disableSavingChangesStatusAction());
-			}
-		);
+			});
 	};
 }
 
@@ -63,8 +71,8 @@ function updateRowColumnsAction(columns, rowId) {
  */
 function updateRowColumnsErrorAction(layoutData) {
 	return {
-		layoutData,
-		type: UPDATE_ROW_COLUMNS_ERROR
+		type: UPDATE_ROW_COLUMNS_ERROR,
+		value: layoutData
 	};
 }
 
@@ -75,21 +83,9 @@ function updateRowColumnsErrorAction(layoutData) {
  */
 function updateRowColumnsLoadingAction(layoutData) {
 	return {
-		layoutData,
-		type: UPDATE_ROW_COLUMNS_LOADING
+		type: UPDATE_ROW_COLUMNS_LOADING,
+		value: layoutData
 	};
 }
 
-/**
- * @return {object}
- * @review
- */
-function updateRowColumnsSuccessAction() {
-	return {
-		type: UPDATE_ROW_COLUMNS_SUCCESS
-	};
-}
-
-export {
-	updateRowColumnsAction
-};
+export {updateRowColumnsAction};

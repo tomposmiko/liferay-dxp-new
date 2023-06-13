@@ -137,14 +137,6 @@ JournalArticle article = journalDisplayContext.getArticle();
 								value="<%= HtmlUtil.escape(articleVersion.getTitle(locale)) %>"
 							/>
 
-							<c:if test="<%= journalDisplayContext.isChangeListColumnVisible() %>">
-								<liferay-ui:search-container-column-text
-									cssClass="change-list-title table-cell-content"
-									name="change-list"
-									value="<%= HtmlUtil.escape(journalDisplayContext.getChangeListName(articleVersion)) %>"
-								/>
-							</c:if>
-
 							<liferay-ui:search-container-column-text
 								cssClass="table-cell-expand-smallest table-cell-minw-100"
 								name="version"
@@ -196,7 +188,6 @@ JournalArticle article = journalDisplayContext.getArticle();
 
 		<liferay-frontend:component
 			componentId="<%= JournalWebConstants.JOURNAL_ELEMENTS_DEFAULT_EVENT_HANDLER %>"
-			context="<%= journalDisplayContext.getComponentContext() %>"
 			module="js/ElementsDefaultEventHandler.es"
 		/>
 

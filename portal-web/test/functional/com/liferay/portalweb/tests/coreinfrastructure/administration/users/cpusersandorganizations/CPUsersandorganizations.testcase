@@ -30,7 +30,7 @@ definition {
 
 	@priority = "5"
 	test AddMember {
-		property portal.acceptance = "quarantine";
+		property portal.acceptance = "true";
 		property testray.component.names = "Training";
 
 		ProductMenu.gotoPortlet(
@@ -294,7 +294,7 @@ definition {
 
 		Organization.addSiteCP(orgName = "Organization Name");
 
-		ProductMenu.gotoSite(site = "Organization Name");
+		SitePages.openPagesAdmin(siteURLKey = "Organization Name");
 
 		ProductMenu.gotoPortlet(
 			category = "Site Builder",
@@ -334,7 +334,7 @@ definition {
 
 		Organization.addSiteCP(orgName = "Organization Name");
 
-		ProductMenu.gotoSite(site = "Organization Name");
+		SitePages.openPagesAdmin(siteURLKey = "Organization Name");
 
 		ProductMenu.gotoPortlet(
 			category = "Site Builder",
@@ -354,7 +354,7 @@ definition {
 
 	@priority = "5"
 	test AddOrganizationTeam {
-		property portal.acceptance = "quarantine";
+		property portal.acceptance = "true";
 		property test.name.skip.portal.instance = "CPUsersandorganizations#AddOrganizationTeam";
 		property testray.component.names = "Training";
 
@@ -408,7 +408,7 @@ definition {
 			userName = "Test Test",
 			userScreenName = "test");
 
-		ProductMenu.gotoSite(site = "Organization Name");
+		SitePages.openPagesAdmin(siteURLKey = "Organization Name");
 
 		ProductMenu.gotoPortlet(
 			category = "Site Builder",
@@ -417,7 +417,7 @@ definition {
 
 		SitePages.addPublicPage(pageName = "Organization Public Page");
 
-		ProductMenu.gotoSite(site = "Organization Name");
+		SitePages.openPagesAdmin(siteURLKey = "Organization Name");
 
 		ProductMenu.gotoPortlet(
 			category = "People",
@@ -432,7 +432,7 @@ definition {
 
 	@priority = "5"
 	test AddSuborganization {
-		property portal.acceptance = "quarantine";
+		property portal.acceptance = "true";
 		property testray.component.names = "Training";
 
 		ProductMenu.gotoPortlet(
@@ -565,6 +565,112 @@ definition {
 		User.editUserDisplaySettingsCP(
 			displaySettingsGreeting = "Welcome Selenium01!",
 			userScreenName = "usersn");
+	}
+
+	@description = "This is a use case for LPS-102425."
+	@priority = "4"
+	test AddUserEmailAddressApostrophe {
+		JSONUser.addUser(
+			userEmailAddress = "user1@liferay.com",
+			userFirstName = "user1",
+			userLastName = "user1",
+			userScreenName = "user1");
+
+		ProductMenu.gotoPortlet(
+			category = "Users",
+			panel = "Control Panel",
+			portlet = "Users and Organizations");
+
+		User.editPasswordCP(
+			userEmailAddress = "user1@liferay.com",
+			userScreenName = "user1");
+
+		JSONRole.assignRoleToUser(
+			roleTitle = "Administrator",
+			userEmailAddress = "user1@liferay.com");
+
+		User.logoutAndLoginPG(
+			userLoginEmailAddress = "user1@liferay.com",
+			userLoginFullName = "user1 user1");
+
+		JSONLayout.addPublicLayout(
+			groupName = "Guest",
+			layoutName = "Message Boards Page");
+
+		JSONLayout.addWidgetToPublicLayout(
+			column = "1",
+			groupName = "Guest",
+			layoutName = "Message Boards Page",
+			widgetName = "Message Boards");
+
+		PermissionsInline.gotoMessageBoardsPG(pageName = "Message Boards Page");
+
+		Role.definePermissionPG(
+			permissionDefinitionKey = "INLINE_PERMISSIONS_ADD_MESSAGE_CHECKBOX",
+			roleTitle = "User");
+
+		Navigator.openURL();
+
+		JSONUser.addUser(
+			userEmailAddress = "user%27ea@liferay.com",
+			userFirstName = "userfn",
+			userLastName = "userln",
+			userScreenName = "usersn");
+
+		ProductMenu.gotoPortlet(
+			category = "Users",
+			panel = "Control Panel",
+			portlet = "Users and Organizations");
+
+		User.editPasswordCP(
+			userEmailAddress = "user'ea@liferay.com",
+			userScreenName = "usersn");
+
+		User.logoutAndLoginPG(
+			userLoginEmailAddress = "user'ea@liferay.com",
+			userLoginFullName = "userfn userln");
+
+		Navigator.openURL();
+
+		Navigator.gotoAccountSettings();
+
+		MyAccount.view();
+
+		Navigator.openURL();
+
+		Navigator.gotoPage(pageName = "Message Boards Page");
+
+		MessageboardsThread.addPG(
+			threadBody = "MB Thread Message Body as User",
+			threadSubject = "MB Thread Message Subject as User");
+
+		User.logoutAndLoginPG(
+			userLoginEmailAddress = "user1@liferay.com",
+			userLoginFullName = "user1 user1");
+
+		JSONRole.assignRoleToUser(
+			roleTitle = "Administrator",
+			userEmailAddress = "user%27ea@liferay.com");
+
+		User.logoutAndLoginPG(
+			userLoginEmailAddress = "user'ea@liferay.com",
+			userLoginFullName = "userfn userln");
+
+		Navigator.gotoPage(pageName = "Message Boards Page");
+
+		MessageboardsThread.addPG(
+			threadBody = "MB Thread Message Body as Admin",
+			threadSubject = "MB Thread Message Subject as Admin");
+
+		BlogsNavigator.openBlogsAdmin(siteURLKey = "guest");
+
+		Blogs.addEntry(
+			entryContent = "Blogs Entry Content as Admin",
+			entryTitle = "Blogs Entry Title as Admin");
+
+		User.logoutAndLoginPG(
+			userLoginEmailAddress = "test@liferay.com",
+			userLoginFullName = "test test");
 	}
 
 	@priority = "4"
@@ -903,7 +1009,7 @@ definition {
 	test AddUsers {
 		var count = "1";
 
-		while (!("${count}" == "4")) {
+		while ("${count}" != "4") {
 			ProductMenu.gotoPortlet(
 				category = "Users",
 				panel = "Control Panel",
@@ -915,12 +1021,12 @@ definition {
 				userLastName = "userln${count}",
 				userScreenName = "usersn${count}");
 
-			var count = MathUtil.sum("${count}", "1");
+			var count = ${count} + 1;
 		}
 
 		var count = "1";
 
-		while (!("${count}" == "4")) {
+		while ("${count}" != "4") {
 			ProductMenu.gotoPortlet(
 				category = "Users",
 				panel = "Control Panel",
@@ -932,7 +1038,7 @@ definition {
 				userLastName = "userln${count}",
 				userScreenName = "usersn${count}");
 
-			var count = MathUtil.sum("${count}", "1");
+			var count = ${count} + 1;
 		}
 	}
 
@@ -1057,7 +1163,7 @@ definition {
 
 	@priority = "5"
 	test DeleteOrganization {
-		property portal.acceptance = "quarantine";
+		property portal.acceptance = "true";
 
 		ProductMenu.gotoPortlet(
 			category = "Users",
@@ -1181,7 +1287,7 @@ definition {
 
 	@priority = "5"
 	test EditOrganizationSite {
-		property portal.acceptance = "quarantine";
+		property portal.acceptance = "true";
 		property testray.component.names = "Training";
 
 		ProductMenu.gotoPortlet(
@@ -1295,7 +1401,7 @@ definition {
 			userName = "userfn userln",
 			userScreenName = "usersn");
 
-		ProductMenu.gotoSite(site = "Organization Name");
+		SitePages.openPagesAdmin(siteURLKey = "Organization Name");
 
 		ProductMenu.gotoPortlet(
 			category = "Site Builder",
@@ -1304,7 +1410,7 @@ definition {
 
 		SitePages.addPublicPage(pageName = "Public Page");
 
-		Navigator.openSiteURL(siteName = "Organization Name");
+		SitePages.openPagesAdmin(siteURLKey = "Organization Name");
 
 		ProductMenu.gotoPortlet(
 			category = "People",
@@ -1330,7 +1436,7 @@ definition {
 
 	@priority = "5"
 	test EditUserSite {
-		property app.server.types = "jboss,resin,tcserver,tomcat,weblogic,websphere,wildfly";
+		property app.server.types = "jboss,tcserver,tomcat,weblogic,websphere,wildfly";
 		property database.types = "db2,hypersonic,mariadb,mysql,oracle,postgresql,sqlserver,sybase";
 		property environment.acceptance = "true";
 		property portal.acceptance = "true";
@@ -1875,7 +1981,7 @@ definition {
 
 		Organization.addSiteCP(orgName = "Organization Name 1");
 
-		ProductMenu.gotoSite(site = "Organization Name 1");
+		SitePages.openPagesAdmin(siteURLKey = "Organization Name 1");
 
 		ProductMenu.gotoPortlet(
 			category = "Site Builder",
@@ -1974,6 +2080,7 @@ definition {
 			userId = "${userId}",
 			userLastName = "test1",
 			userPrefixId = "0",
+			userRoleTitles = "Administrator,Power User",
 			userScreenName = "test1",
 			userSuffixId = "0");
 

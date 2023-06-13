@@ -46,7 +46,6 @@ import com.liferay.message.boards.settings.MBGroupServiceSettings;
 import com.liferay.petra.function.UnsafeConsumer;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
-import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.search.BooleanClauseOccur;
 import com.liferay.portal.kernel.search.BooleanQuery;
 import com.liferay.portal.kernel.search.Field;
@@ -55,7 +54,6 @@ import com.liferay.portal.kernel.search.filter.BooleanFilter;
 import com.liferay.portal.kernel.search.filter.Filter;
 import com.liferay.portal.kernel.search.filter.TermFilter;
 import com.liferay.portal.kernel.service.UserLocalService;
-import com.liferay.portal.kernel.service.UserService;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.Portal;
@@ -68,6 +66,7 @@ import com.liferay.portal.vulcan.resource.EntityModelResource;
 import com.liferay.portal.vulcan.util.SearchUtil;
 import com.liferay.ratings.kernel.service.RatingsEntryLocalService;
 import com.liferay.ratings.kernel.service.RatingsStatsLocalService;
+import com.liferay.subscription.service.SubscriptionLocalService;
 
 import java.io.Serializable;
 
@@ -78,7 +77,6 @@ import java.util.Map;
 import java.util.Optional;
 
 import javax.ws.rs.BadRequestException;
-import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MultivaluedMap;
 
 import org.osgi.service.component.annotations.Component;
@@ -275,6 +273,26 @@ public class MessageBoardThreadResourceImpl
 			rating.getRatingValue(), mbThread.getRootMessageId());
 	}
 
+	@Override
+	public void putMessageBoardThreadSubscribe(Long messageBoardThreadId)
+		throws Exception {
+
+		MBThread mbThread = _mbThreadLocalService.getThread(
+			messageBoardThreadId);
+
+		_mbMessageService.subscribeMessage(mbThread.getRootMessageId());
+	}
+
+	@Override
+	public void putMessageBoardThreadUnsubscribe(Long messageBoardThreadId)
+		throws Exception {
+
+		MBThread mbThread = _mbThreadLocalService.getThread(
+			messageBoardThreadId);
+
+		_mbMessageService.unsubscribeMessage(mbThread.getRootMessageId());
+	}
+
 	private MessageBoardThread _addMessageBoardThread(
 			Long siteId, Long messageBoardSectionId,
 			MessageBoardThread messageBoardThread)
@@ -330,7 +348,7 @@ public class MessageBoardThreadResourceImpl
 			MBMessage.class.getName(), _ratingsEntryLocalService,
 			ratingsEntry -> RatingUtil.toRating(
 				_portal, ratingsEntry, _userLocalService),
-			_user);
+			contextUser);
 	}
 
 	private MessageBoardThread _toMessageBoardThread(MBMessage mbMessage)
@@ -352,7 +370,8 @@ public class MessageBoardThreadResourceImpl
 						MBMessage.class.getName(), mbMessage.getMessageId()));
 				articleBody = mbMessage.getBody();
 				creator = CreatorUtil.toCreator(
-					_portal, _userService.getUserById(mbThread.getUserId()));
+					_portal,
+					_userLocalService.getUserById(mbThread.getUserId()));
 				customFields = CustomFieldsUtil.toCustomFields(
 					MBMessage.class.getName(), mbMessage.getMessageId(),
 					mbThread.getCompanyId(),
@@ -378,8 +397,12 @@ public class MessageBoardThreadResourceImpl
 					contextAcceptLanguage.getPreferredLocale());
 				showAsQuestion = mbThread.isQuestion();
 				siteId = mbThread.getGroupId();
+				subscribed = _subscriptionLocalService.isSubscribed(
+					mbMessage.getCompanyId(), contextUser.getUserId(),
+					MBThread.class.getName(), mbMessage.getThreadId());
 				threadType = _toThreadType(
 					mbThread.getGroupId(), mbThread.getPriority());
+				viewCount = mbThread.getViewCount();
 			}
 		};
 	}
@@ -495,13 +518,10 @@ public class MessageBoardThreadResourceImpl
 	@Reference
 	private RatingsStatsLocalService _ratingsStatsLocalService;
 
-	@Context
-	private User _user;
+	@Reference
+	private SubscriptionLocalService _subscriptionLocalService;
 
 	@Reference
 	private UserLocalService _userLocalService;
-
-	@Reference
-	private UserService _userService;
 
 }

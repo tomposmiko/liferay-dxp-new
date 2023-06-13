@@ -20,7 +20,7 @@
 
 <liferay-ui:success key="layoutPublished" message="the-page-was-published-succesfully" />
 
-<liferay-ui:error embed="<%= false %>" exception="<%= GroupInheritContentException.class %>" message="this-page-cannot-be-deleted-and-cannot-have-child-pages-because-it-is-associated-to-a-site-template" />
+<liferay-ui:error embed="<%= false %>" exception="<%= GroupInheritContentException.class %>" message="this-page-cannot-be-deleted-and-cannot-have-child-pages-because-it-is-associated-with-a-site-template" />
 
 <clay:navigation-bar
 	inverted="<%= true %>"
@@ -41,6 +41,8 @@
 		<liferay-ui:message arguments='<%= "layout.types." + lte.getLayoutType() %>' key="the-first-page-cannot-be-of-type-x" />
 	</c:if>
 </liferay-ui:error>
+
+<liferay-ui:error exception="<%= RequiredSegmentsExperienceException.MustNotDeleteSegmentsExperienceReferencedBySegmentsExperiments.class %>" message="this-page-cannot-be-deleted-because-it-has-ab-tests-in-progress" />
 
 <portlet:actionURL name="/layout/delete_layout" var="deleteLayoutURL">
 	<portlet:param name="redirect" value="<%= currentURL %>" />
@@ -80,7 +82,7 @@
 			<liferay-frontend:empty-result-message
 				actionDropdownItems="<%= layoutsAdminDisplayContext.isShowAddRootLayoutButton() ? layoutsAdminDisplayContext.getAddLayoutDropdownItems() : null %>"
 				description='<%= LanguageUtil.get(request, "fortunately-it-is-very-easy-to-add-new-ones") %>'
-				elementType="pages"
+				elementType='<%= LanguageUtil.get(request, "pages") %>'
 			/>
 		</c:otherwise>
 	</c:choose>
@@ -88,27 +90,28 @@
 
 <aui:script sandbox="<%= true %>">
 	var deleteSelectedPages = function() {
-		if (confirm('<liferay-ui:message key="are-you-sure-you-want-to-delete-this" />')) {
+		if (
+			confirm(
+				'<liferay-ui:message key="are-you-sure-you-want-to-delete-this" />'
+			)
+		) {
 			submitForm(document.<portlet:namespace />fm);
 		}
 	};
 
 	var ACTIONS = {
-		'deleteSelectedPages': deleteSelectedPages
+		deleteSelectedPages: deleteSelectedPages
 	};
 
-	Liferay.componentReady('pagesManagementToolbar').then(
-		function(managementToolbar) {
-			managementToolbar.on(
-				'actionItemClicked',
-				function(event) {
-					var itemData = event.data.item.data;
+	Liferay.componentReady('pagesManagementToolbar').then(function(
+		managementToolbar
+	) {
+		managementToolbar.on('actionItemClicked', function(event) {
+			var itemData = event.data.item.data;
 
-					if (itemData && itemData.action && ACTIONS[itemData.action]) {
-						ACTIONS[itemData.action]();
-					}
-				}
-			);
-		}
-	);
+			if (itemData && itemData.action && ACTIONS[itemData.action]) {
+				ACTIONS[itemData.action]();
+			}
+		});
+	});
 </aui:script>

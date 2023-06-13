@@ -29,6 +29,7 @@ import java.net.URL;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Dictionary;
 import java.util.Enumeration;
 import java.util.EventListener;
 import java.util.HashMap;
@@ -70,13 +71,16 @@ import org.apache.jasper.runtime.JspFactoryImpl;
 import org.apache.jasper.runtime.TagHandlerPool;
 
 import org.osgi.framework.Bundle;
+import org.osgi.framework.BundleEvent;
 import org.osgi.framework.BundleReference;
+import org.osgi.framework.Constants;
 import org.osgi.framework.FrameworkUtil;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.framework.wiring.BundleCapability;
 import org.osgi.framework.wiring.BundleRevision;
 import org.osgi.framework.wiring.BundleWire;
 import org.osgi.framework.wiring.BundleWiring;
+import org.osgi.util.tracker.BundleTracker;
 
 /**
  * @author Raymond Augé
@@ -195,8 +199,14 @@ public class JspServlet extends HttpServlet {
 				"JspCompiler");
 		defaults.put("compilerSourceVM", "1.8");
 		defaults.put("compilerTargetVM", "1.8");
-		defaults.put("development", "false");
+		defaults.put(
+			"development",
+			String.valueOf(PropsValues.WORK_DIR_OVERRIDE_ENABLED));
 		defaults.put("httpMethods", "GET,POST,HEAD");
+		defaults.put(
+			"jspCompilerClassName",
+			"com.liferay.portal.osgi.web.servlet.jsp.compiler.internal." +
+				"CompilerWrapper");
 		defaults.put("keepgenerated", "false");
 		defaults.put("logVerbosityLevel", "NONE");
 		defaults.put("saveBytecode", "true");
@@ -209,6 +219,46 @@ public class JspServlet extends HttpServlet {
 		sb.append(_bundle.getVersion());
 
 		defaults.put(_INIT_PARAMETER_NAME_SCRATCH_DIR, sb.toString());
+
+		String symbolicName = _bundle.getSymbolicName();
+
+		BundleTracker<Bundle> bundleTracker = new BundleTracker(
+			_bundle.getBundleContext(), ~Bundle.UNINSTALLED, null) {
+
+			@Override
+			public Bundle addingBundle(Bundle bundle, BundleEvent bundleEvent) {
+				Dictionary<String, String> dictionary = bundle.getHeaders(
+					StringPool.BLANK);
+
+				String fragmentHost = dictionary.get(Constants.FRAGMENT_HOST);
+
+				if (fragmentHost != null) {
+					int index = fragmentHost.indexOf(StringPool.SEMICOLON);
+
+					if (index != -1) {
+						fragmentHost = fragmentHost.substring(0, index);
+					}
+
+					if (fragmentHost.equals(symbolicName)) {
+						Enumeration<URL> enumeration = bundle.findEntries(
+							"META-INF/resources", "*.jsp", true);
+
+						if (enumeration != null) {
+							defaults.put("hasFragment", "true");
+
+							close();
+						}
+					}
+				}
+
+				return bundle;
+			}
+
+		};
+
+		bundleTracker.open();
+
+		bundleTracker.close();
 
 		defaults.put(
 			TagHandlerPool.OPTION_TAGPOOL, JspTagHandlerPool.class.getName());
@@ -324,10 +374,13 @@ public class JspServlet extends HttpServlet {
 	}
 
 	@Override
-	public void service(ServletRequest request, ServletResponse response)
+	public void service(
+			ServletRequest servletRequest, ServletResponse servletResponse)
 		throws IOException, ServletException {
 
-		service((HttpServletRequest)request, (HttpServletResponse)response);
+		service(
+			(HttpServletRequest)servletRequest,
+			(HttpServletResponse)servletResponse);
 	}
 
 	@Override

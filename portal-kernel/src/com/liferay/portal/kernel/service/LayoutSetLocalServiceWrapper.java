@@ -14,8 +14,6 @@
 
 package com.liferay.portal.kernel.service;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 /**
  * Provides a wrapper for {@link LayoutSetLocalService}.
  *
@@ -23,7 +21,6 @@ import org.osgi.annotation.versioning.ProviderType;
  * @see LayoutSetLocalService
  * @generated
  */
-@ProviderType
 public class LayoutSetLocalServiceWrapper
 	implements LayoutSetLocalService, ServiceWrapper<LayoutSetLocalService> {
 
@@ -167,7 +164,7 @@ public class LayoutSetLocalServiceWrapper
 	 * Performs a dynamic query on the database and returns a range of the matching rows.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>com.liferay.portal.model.impl.LayoutSetModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>com.liferay.portal.model.impl.LayoutSetModelImpl</code>.
 	 * </p>
 	 *
 	 * @param dynamicQuery the dynamic query
@@ -187,7 +184,7 @@ public class LayoutSetLocalServiceWrapper
 	 * Performs a dynamic query on the database and returns an ordered range of the matching rows.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>com.liferay.portal.model.impl.LayoutSetModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>com.liferay.portal.model.impl.LayoutSetModelImpl</code>.
 	 * </p>
 	 *
 	 * @param dynamicQuery the dynamic query
@@ -272,7 +269,7 @@ public class LayoutSetLocalServiceWrapper
 
 	@Override
 	public com.liferay.portal.kernel.model.LayoutSet fetchLayoutSet(
-		String virtualHostname) {
+		java.lang.String virtualHostname) {
 
 		return _layoutSetLocalService.fetchLayoutSet(virtualHostname);
 	}
@@ -354,7 +351,7 @@ public class LayoutSetLocalServiceWrapper
 
 	@Override
 	public com.liferay.portal.kernel.model.LayoutSet getLayoutSet(
-			String virtualHostname)
+			java.lang.String virtualHostname)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _layoutSetLocalService.getLayoutSet(virtualHostname);
@@ -364,7 +361,7 @@ public class LayoutSetLocalServiceWrapper
 	 * Returns a range of all the layout sets.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>com.liferay.portal.model.impl.LayoutSetModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>com.liferay.portal.model.impl.LayoutSetModelImpl</code>.
 	 * </p>
 	 *
 	 * @param start the lower bound of the range of layout sets
@@ -380,7 +377,8 @@ public class LayoutSetLocalServiceWrapper
 
 	@Override
 	public java.util.List<com.liferay.portal.kernel.model.LayoutSet>
-		getLayoutSetsByLayoutSetPrototypeUuid(String layoutSetPrototypeUuid) {
+		getLayoutSetsByLayoutSetPrototypeUuid(
+			java.lang.String layoutSetPrototypeUuid) {
 
 		return _layoutSetLocalService.getLayoutSetsByLayoutSetPrototypeUuid(
 			layoutSetPrototypeUuid);
@@ -402,7 +400,7 @@ public class LayoutSetLocalServiceWrapper
 	 * @return the OSGi service identifier
 	 */
 	@Override
-	public String getOSGiServiceIdentifier() {
+	public java.lang.String getOSGiServiceIdentifier() {
 		return _layoutSetLocalService.getOSGiServiceIdentifier();
 	}
 
@@ -494,7 +492,7 @@ public class LayoutSetLocalServiceWrapper
 	public void updateLayoutSetPrototypeLinkEnabled(
 			long groupId, boolean privateLayout,
 			boolean layoutSetPrototypeLinkEnabled,
-			String layoutSetPrototypeUuid)
+			java.lang.String layoutSetPrototypeUuid)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		_layoutSetLocalService.updateLayoutSetPrototypeLinkEnabled(
@@ -504,47 +502,47 @@ public class LayoutSetLocalServiceWrapper
 
 	@Override
 	public com.liferay.portal.kernel.model.LayoutSet updateLogo(
-			long groupId, boolean privateLayout, boolean logo, byte[] bytes)
+			long groupId, boolean privateLayout, boolean hasLogo, byte[] bytes)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _layoutSetLocalService.updateLogo(
-			groupId, privateLayout, logo, bytes);
+			groupId, privateLayout, hasLogo, bytes);
 	}
 
 	@Override
 	public com.liferay.portal.kernel.model.LayoutSet updateLogo(
-			long groupId, boolean privateLayout, boolean logo,
+			long groupId, boolean privateLayout, boolean hasLogo,
 			java.io.File file)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _layoutSetLocalService.updateLogo(
-			groupId, privateLayout, logo, file);
+			groupId, privateLayout, hasLogo, file);
 	}
 
 	@Override
 	public com.liferay.portal.kernel.model.LayoutSet updateLogo(
-			long groupId, boolean privateLayout, boolean logo,
+			long groupId, boolean privateLayout, boolean hasLogo,
 			java.io.InputStream is)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _layoutSetLocalService.updateLogo(
-			groupId, privateLayout, logo, is);
+			groupId, privateLayout, hasLogo, is);
 	}
 
 	@Override
 	public com.liferay.portal.kernel.model.LayoutSet updateLogo(
-			long groupId, boolean privateLayout, boolean logo,
+			long groupId, boolean privateLayout, boolean hasLogo,
 			java.io.InputStream is, boolean cleanUpStream)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _layoutSetLocalService.updateLogo(
-			groupId, privateLayout, logo, is, cleanUpStream);
+			groupId, privateLayout, hasLogo, is, cleanUpStream);
 	}
 
 	@Override
 	public com.liferay.portal.kernel.model.LayoutSet updateLookAndFeel(
-			long groupId, boolean privateLayout, String themeId,
-			String colorSchemeId, String css)
+			long groupId, boolean privateLayout, java.lang.String themeId,
+			java.lang.String colorSchemeId, java.lang.String css)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _layoutSetLocalService.updateLookAndFeel(
@@ -553,7 +551,8 @@ public class LayoutSetLocalServiceWrapper
 
 	@Override
 	public void updateLookAndFeel(
-			long groupId, String themeId, String colorSchemeId, String css)
+			long groupId, java.lang.String themeId,
+			java.lang.String colorSchemeId, java.lang.String css)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		_layoutSetLocalService.updateLookAndFeel(
@@ -570,7 +569,7 @@ public class LayoutSetLocalServiceWrapper
 
 	@Override
 	public com.liferay.portal.kernel.model.LayoutSet updateSettings(
-			long groupId, boolean privateLayout, String settings)
+			long groupId, boolean privateLayout, java.lang.String settings)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _layoutSetLocalService.updateSettings(
@@ -579,7 +578,8 @@ public class LayoutSetLocalServiceWrapper
 
 	@Override
 	public com.liferay.portal.kernel.model.LayoutSet updateVirtualHost(
-			long groupId, boolean privateLayout, String virtualHostname)
+			long groupId, boolean privateLayout,
+			java.lang.String virtualHostname)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _layoutSetLocalService.updateVirtualHost(

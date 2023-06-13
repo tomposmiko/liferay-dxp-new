@@ -138,14 +138,12 @@ public class JournalConverterImpl implements JournalConverter {
 
 		Element rootElement = document.addElement("root");
 
-		String availableLocales = getAvailableLocales(ddmFields);
-
-		rootElement.addAttribute("available-locales", availableLocales);
-
-		Locale defaultLocale = ddmFields.getDefaultLocale();
+		rootElement.addAttribute(
+			"available-locales", getAvailableLocales(ddmFields));
 
 		rootElement.addAttribute(
-			"default-locale", LocaleUtil.toLanguageId(defaultLocale));
+			"default-locale",
+			LocaleUtil.toLanguageId(ddmFields.getDefaultLocale()));
 
 		DDMFieldsCounter ddmFieldsCounter = new DDMFieldsCounter();
 
@@ -166,7 +164,9 @@ public class JournalConverterImpl implements JournalConverter {
 		}
 
 		try {
-			return XMLUtil.formatXML(document.asXML());
+			String content = XMLUtil.stripInvalidChars(document.asXML());
+
+			return XMLUtil.formatXML(content);
 		}
 		catch (Exception e) {
 			throw new ArticleContentException(
@@ -501,7 +501,11 @@ public class JournalConverterImpl implements JournalConverter {
 				"language-id");
 
 			if (Validator.isNotNull(languageId)) {
-				locale = LocaleUtil.fromLanguageId(languageId);
+				locale = LocaleUtil.fromLanguageId(languageId, true, false);
+
+				if (locale == null) {
+					continue;
+				}
 
 				missingLanguageIds.remove(languageId);
 			}
@@ -560,7 +564,7 @@ public class JournalConverterImpl implements JournalConverter {
 						uuid, groupId);
 				}
 
-				serializable = jsonObject.toString();
+				serializable = dynamicContentElement.getText();
 			}
 			catch (Exception e) {
 				return StringPool.BLANK;
@@ -787,6 +791,11 @@ public class JournalConverterImpl implements JournalConverter {
 					"language-id", LocaleUtil.toLanguageId(locale));
 
 				Serializable fieldValue = ddmField.getValue(locale, count);
+
+				if (fieldValue == null) {
+					fieldValue = ddmField.getValue(
+						ddmField.getDefaultLocale(), count);
+				}
 
 				String valueString = String.valueOf(fieldValue);
 

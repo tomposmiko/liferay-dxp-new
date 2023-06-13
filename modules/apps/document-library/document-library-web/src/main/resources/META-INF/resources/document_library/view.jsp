@@ -77,7 +77,7 @@ String navigation = ParamUtil.getString(request, "navigation");
 
 		<soy:component-renderer
 			context="<%= context %>"
-			module="document_library/bulk/BulkStatus.es"
+			module="document_library/js/bulk/BulkStatus.es"
 			templateNamespace="com.liferay.document.library.web.BulkStatus.render"
 		/>
 
@@ -120,14 +120,18 @@ String navigation = ParamUtil.getString(request, "navigation");
 						<aui:input name="redirect" type="hidden" value="<%= currentURL %>" />
 						<aui:input name="repositoryId" type="hidden" value="<%= repositoryId %>" />
 						<aui:input name="newFolderId" type="hidden" />
-						<aui:input name="selectAll" type="hidden" value="<%= false %>" />
 						<aui:input name="folderId" type="hidden" value="<%= folderId %>" />
 						<aui:input name="changeLog" type="hidden" />
 						<aui:input name="versionIncrease" type="hidden" />
+						<aui:input name="selectAll" type="hidden" value="<%= false %>" />
+
+						<liferay-util:dynamic-include key="com.liferay.document.library.web#/document_library/view.jsp#errors" />
 
 						<liferay-ui:error exception="<%= AuthenticationRepositoryException.class %>" message="you-cannot-access-the-repository-because-you-are-not-allowed-to-or-it-is-unavailable" />
 						<liferay-ui:error exception="<%= DuplicateFileEntryException.class %>" message="the-folder-you-selected-already-has-an-entry-with-this-name.-please-select-a-different-folder" />
+						<liferay-ui:error exception="<%= FileEntryLockException.MustBeUnlocked.class %>" message="you-cannot-perform-this-operation-on-checked-out-documents-.please-check-it-in-or-cancel-the-checkout-first" />
 						<liferay-ui:error exception="<%= FileEntryLockException.MustOwnLock.class %>" message="you-can-only-checkin-documents-you-have-checked-out-yourself" />
+						<liferay-ui:error key="externalServiceFailed" message="you-cannot-access-external-service-because-you-are-not-allowed-to-or-it-is-unavailable" />
 
 						<div class="document-container">
 							<c:choose>
@@ -150,7 +154,6 @@ String navigation = ParamUtil.getString(request, "navigation");
 
 		<%
 		if (!defaultFolderView && (folder != null) && (portletName.equals(DLPortletKeys.DOCUMENT_LIBRARY) || portletName.equals(DLPortletKeys.DOCUMENT_LIBRARY_ADMIN))) {
-			PortalUtil.setPageSubtitle(folder.getName(), request);
 			PortalUtil.setPageDescription(folder.getDescription(), request);
 		}
 
@@ -185,11 +188,19 @@ String navigation = ParamUtil.getString(request, "navigation");
 		%>
 
 		<aui:script>
-			function <portlet:namespace />move(itemsSelected, parameterName, parameterValue) {
+			function <portlet:namespace />move(
+				itemsSelected,
+				parameterName,
+				parameterValue
+			) {
 				var dlComponent = Liferay.component('<portlet:namespace />DocumentLibrary');
 
 				if (dlComponent) {
-					dlComponent.showFolderDialog(itemsSelected, parameterName, parameterValue);
+					dlComponent.showFolderDialog(
+						itemsSelected,
+						parameterName,
+						parameterValue
+					);
 				}
 			}
 		</aui:script>
@@ -214,67 +225,51 @@ String navigation = ParamUtil.getString(request, "navigation");
 
 			Liferay.component(
 				'<portlet:namespace />DocumentLibrary',
-				new Liferay.Portlet.DocumentLibrary(
-					{
-						columnNames: ['<%= StringUtil.merge(escapedEntryColumns, "','") %>'],
+				new Liferay.Portlet.DocumentLibrary({
+					columnNames: ['<%= StringUtil.merge(escapedEntryColumns, "','") %>'],
 
-						<%
-						DecimalFormatSymbols decimalFormatSymbols = DecimalFormatSymbols.getInstance(locale);
-						%>
+					<%
+					DecimalFormatSymbols decimalFormatSymbols = DecimalFormatSymbols.getInstance(locale);
+					%>
 
-						decimalSeparator: '<%= decimalFormatSymbols.getDecimalSeparator() %>',
-						displayStyle: '<%= HtmlUtil.escapeJS(displayStyle) %>',
-						editEntryUrl: '<portlet:actionURL name="/document_library/edit_entry" />',
-						downloadEntryUrl: '<portlet:resourceURL id="/document_library/download_entry"><portlet:param name="folderId" value="<%= String.valueOf(folderId) %>" /></portlet:resourceURL>',
-						folders: {
-							defaultParentFolderId: '<%= folderId %>',
-							dimensions: {
-								height: '<%= PrefsPropsUtil.getLong(PropsKeys.DL_FILE_ENTRY_THUMBNAIL_MAX_HEIGHT) %>',
-								width: '<%= PrefsPropsUtil.getLong(PropsKeys.DL_FILE_ENTRY_THUMBNAIL_MAX_WIDTH) %>'
-							}
-						},
-						form: {
-							method: 'POST',
-							node: A.one(document.<portlet:namespace />fm2)
-						},
-						maxFileSize: <%= dlConfiguration.fileMaxSize() %>,
-						namespace: '<portlet:namespace />',
-						openViewMoreFileEntryTypesURL: '<portlet:renderURL windowState="<%= LiferayWindowState.POP_UP.toString() %>"><portlet:param name="mvcPath" value="/document_library/view_more_menu_items.jsp" /><portlet:param name="folderId" value="<%= String.valueOf(folderId) %>" /><portlet:param name="eventName" value='<%= liferayPortletResponse.getNamespace() + "selectAddMenuItem" %>' /></portlet:renderURL>',
-						portletId: '<%= HtmlUtil.escapeJS(portletId) %>',
-						redirect: encodeURIComponent('<%= currentURL %>'),
-						repositories: [
-							{
-								id: '<%= scopeGroupId %>',
-								name: '<liferay-ui:message key="local" />'
-							}
-
-							<%
-							List<Folder> mountFolders = DLAppServiceUtil.getMountFolders(repositoryId, DLFolderConstants.DEFAULT_PARENT_FOLDER_ID, QueryUtil.ALL_POS, QueryUtil.ALL_POS);
-
-							for (Folder mountFolder : mountFolders) {
-							%>
-
-								, {
-									id: '<%= mountFolder.getRepositoryId() %>',
-									name: '<%= HtmlUtil.escapeJS(mountFolder.getName()) %>'
-								}
-
-							<%
-							}
-							%>
-
-						],
-						selectFileEntryTypeURL: '<portlet:renderURL windowState="<%= LiferayWindowState.POP_UP.toString() %>"><portlet:param name="mvcPath" value="/document_library/select_file_entry_type.jsp" /><portlet:param name="fileEntryTypeId" value="<%= String.valueOf(fileEntryTypeId) %>" /></portlet:renderURL>',
-						selectFolderURL: '<portlet:renderURL windowState="<%= LiferayWindowState.POP_UP.toString() %>"><portlet:param name="mvcRenderCommandName" value="/document_library/select_folder" /><portlet:param name="folderId" value="<%= String.valueOf(folderId) %>" /></portlet:renderURL>',
-						scopeGroupId: <%= scopeGroupId %>,
-						searchContainerId: 'entries',
-						trashEnabled: <%= (scopeGroupId == repositoryId) && dlTrashUtil.isTrashEnabled(scopeGroupId, repositoryId) %>,
-						uploadable: <%= uploadable %>,
-						uploadURL: '<%= uploadURL %>',
-						viewFileEntryURL: '<portlet:renderURL><portlet:param name="mvcRenderCommandName" value="/document_library/view_file_entry" /><portlet:param name="redirect" value="<%= currentURL %>" /></portlet:renderURL>',
-						viewFileEntryTypeURL: '<%= viewFileEntryTypeURL %>'
-					}
-				),
+					decimalSeparator: '<%= decimalFormatSymbols.getDecimalSeparator() %>',
+					displayStyle: '<%= HtmlUtil.escapeJS(displayStyle) %>',
+					editEntryUrl:
+						'<portlet:actionURL name="/document_library/edit_entry" />',
+					downloadEntryUrl:
+						'<portlet:resourceURL id="/document_library/download_entry"><portlet:param name="folderId" value="<%= String.valueOf(folderId) %>" /></portlet:resourceURL>',
+					folders: {
+						defaultParentFolderId: '<%= folderId %>',
+						dimensions: {
+							height:
+								'<%= PrefsPropsUtil.getLong(PropsKeys.DL_FILE_ENTRY_THUMBNAIL_MAX_HEIGHT) %>',
+							width:
+								'<%= PrefsPropsUtil.getLong(PropsKeys.DL_FILE_ENTRY_THUMBNAIL_MAX_WIDTH) %>'
+						}
+					},
+					form: {
+						method: 'POST',
+						node: A.one(document.<portlet:namespace />fm2)
+					},
+					maxFileSize: <%= dlConfiguration.fileMaxSize() %>,
+					namespace: '<portlet:namespace />',
+					openViewMoreFileEntryTypesURL:
+						'<portlet:renderURL windowState="<%= LiferayWindowState.POP_UP.toString() %>"><portlet:param name="mvcPath" value="/document_library/view_more_menu_items.jsp" /><portlet:param name="folderId" value="<%= String.valueOf(folderId) %>" /><portlet:param name="eventName" value='<%= liferayPortletResponse.getNamespace() + "selectAddMenuItem" %>' /></portlet:renderURL>',
+					portletId: '<%= HtmlUtil.escapeJS(portletId) %>',
+					redirect: encodeURIComponent('<%= currentURL %>'),
+					selectFileEntryTypeURL:
+						'<portlet:renderURL windowState="<%= LiferayWindowState.POP_UP.toString() %>"><portlet:param name="mvcPath" value="/document_library/select_file_entry_type.jsp" /><portlet:param name="fileEntryTypeId" value="<%= String.valueOf(fileEntryTypeId) %>" /></portlet:renderURL>',
+					selectFolderURL:
+						'<portlet:renderURL windowState="<%= LiferayWindowState.POP_UP.toString() %>"><portlet:param name="mvcRenderCommandName" value="/document_library/select_folder" /><portlet:param name="folderId" value="<%= String.valueOf(folderId) %>" /></portlet:renderURL>',
+					scopeGroupId: <%= scopeGroupId %>,
+					searchContainerId: 'entries',
+					trashEnabled: <%= (scopeGroupId == repositoryId) && dlTrashUtil.isTrashEnabled(scopeGroupId, repositoryId) %>,
+					uploadable: <%= uploadable %>,
+					uploadURL: '<%= uploadURL %>',
+					viewFileEntryURL:
+						'<portlet:renderURL><portlet:param name="mvcRenderCommandName" value="/document_library/view_file_entry" /><portlet:param name="redirect" value="<%= currentURL %>" /></portlet:renderURL>',
+					viewFileEntryTypeURL: '<%= viewFileEntryTypeURL %>'
+				}),
 				{
 					destroyOnNavigate: true,
 					portletId: '<%= HtmlUtil.escapeJS(portletId) %>'
@@ -299,12 +294,15 @@ String navigation = ParamUtil.getString(request, "navigation");
 			</portlet:renderURL>
 
 			var editFileEntryHandler = function(event) {
-				var uri = '<%= addFileEntryURL %>'
+				var uri = '<%= addFileEntryURL %>';
 
-				location.href = Liferay.Util.addParams('<portlet:namespace />fileEntryTypeId' + '=' + event.fileEntryTypeId, uri);
+				location.href = Liferay.Util.addParams(
+					'<portlet:namespace />fileEntryTypeId' + '=' + event.fileEntryTypeId,
+					uri
+				);
 			};
 
-			Liferay.on( '<portlet:namespace />selectAddMenuItem', editFileEntryHandler);
+			Liferay.on('<portlet:namespace />selectAddMenuItem', editFileEntryHandler);
 		</aui:script>
 
 		<%
@@ -330,14 +328,14 @@ String navigation = ParamUtil.getString(request, "navigation");
 			componentId='<%= liferayPortletResponse.getNamespace() + "EditTagsComponent" %>'
 			containerId='<%= "#" + liferayPortletResponse.getNamespace() + "documentLibraryModal" %>'
 			context="<%= tagsContext %>"
-			module="document_library/categorization/EditTags.es"
+			module="document_library/js/categorization/EditTags.es"
 		/>
 
 		<liferay-frontend:component
 			componentId='<%= liferayPortletResponse.getNamespace() + "EditCategoriesComponent" %>'
 			containerId='<%= "#" + liferayPortletResponse.getNamespace() + "documentLibraryModal" %>'
 			context="<%= categoriesContext %>"
-			module="document_library/categorization/EditCategories.es"
+			module="document_library/js/categorization/EditCategories.es"
 		/>
 
 		<liferay-util:dynamic-include key="com.liferay.document.library.web#/document_library/view.jsp#post" />

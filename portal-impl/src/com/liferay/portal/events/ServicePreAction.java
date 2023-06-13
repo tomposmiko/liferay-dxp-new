@@ -44,10 +44,10 @@ import com.liferay.portal.kernel.model.LayoutTemplate;
 import com.liferay.portal.kernel.model.LayoutTypeAccessPolicy;
 import com.liferay.portal.kernel.model.LayoutTypePortlet;
 import com.liferay.portal.kernel.model.LayoutTypePortletConstants;
-import com.liferay.portal.kernel.model.RoleConstants;
 import com.liferay.portal.kernel.model.Theme;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.model.impl.VirtualLayout;
+import com.liferay.portal.kernel.model.role.RoleConstants;
 import com.liferay.portal.kernel.portlet.LiferayWindowState;
 import com.liferay.portal.kernel.portlet.PortalPreferences;
 import com.liferay.portal.kernel.portlet.PortletPreferencesFactoryUtil;
@@ -147,7 +147,7 @@ public class ServicePreAction extends Action {
 		stopWatch.start();
 
 		try {
-			_servicePre(httpServletRequest, httpServletResponse);
+			servicePre(httpServletRequest, httpServletResponse, true);
 		}
 		catch (Exception e) {
 			throw new ActionException(e);
@@ -155,6 +155,53 @@ public class ServicePreAction extends Action {
 
 		if (_log.isDebugEnabled()) {
 			_log.debug("Running takes " + stopWatch.getTime() + " ms");
+		}
+	}
+
+	public void servicePre(
+			HttpServletRequest httpServletRequest,
+			HttpServletResponse httpServletResponse,
+			boolean initPermissionChecker)
+		throws Exception {
+
+		// Service context
+
+		ServiceContext serviceContext = ServiceContextFactory.getInstance(
+			httpServletRequest);
+
+		ServiceContextThreadLocal.pushServiceContext(serviceContext);
+
+		// Theme display
+
+		ThemeDisplay themeDisplay = _initThemeDisplay(
+			httpServletRequest, httpServletResponse, initPermissionChecker);
+
+		if (themeDisplay == null) {
+			return;
+		}
+
+		httpServletRequest.setAttribute(WebKeys.THEME_DISPLAY, themeDisplay);
+
+		// Ajaxable render
+
+		if (PropsValues.LAYOUT_AJAX_RENDER_ENABLE) {
+			boolean portletAjaxRender = ParamUtil.getBoolean(
+				httpServletRequest, "p_p_ajax", true);
+
+			httpServletRequest.setAttribute(
+				WebKeys.PORTLET_AJAX_RENDER, portletAjaxRender);
+		}
+
+		// Parallel render
+
+		if (PropsValues.LAYOUT_PARALLEL_RENDER_ENABLE &&
+			ServerDetector.isTomcat()) {
+
+			boolean portletParallelRender = ParamUtil.getBoolean(
+				httpServletRequest, "p_p_parallel", true);
+
+			httpServletRequest.setAttribute(
+				WebKeys.PORTLET_PARALLEL_RENDER, portletParallelRender);
 		}
 	}
 
@@ -757,7 +804,8 @@ public class ServicePreAction extends Action {
 
 	private ThemeDisplay _initThemeDisplay(
 			HttpServletRequest httpServletRequest,
-			HttpServletResponse httpServletResponse)
+			HttpServletResponse httpServletResponse,
+			boolean initPermissionChecker)
 		throws Exception {
 
 		HttpSession session = httpServletRequest.getSession();
@@ -892,11 +940,10 @@ public class ServicePreAction extends Action {
 
 		Long realUserId = (Long)session.getAttribute(WebKeys.USER_ID);
 
-		if (realUserId != null) {
-			if (user.getUserId() != realUserId.longValue()) {
-				realUser = UserLocalServiceUtil.getUserById(
-					realUserId.longValue());
-			}
+		if ((realUserId != null) &&
+			(user.getUserId() != realUserId.longValue())) {
+
+			realUser = UserLocalServiceUtil.getUserById(realUserId.longValue());
 		}
 
 		String doAsUserId = ParamUtil.getString(
@@ -921,7 +968,7 @@ public class ServicePreAction extends Action {
 		PermissionChecker permissionChecker =
 			PermissionThreadLocal.getPermissionChecker();
 
-		if ((permissionChecker == null) ||
+		if ((initPermissionChecker && (permissionChecker == null)) ||
 			(permissionChecker.getUserId() != user.getUserId())) {
 
 			permissionChecker = PermissionCheckerFactoryUtil.create(user);
@@ -1190,6 +1237,10 @@ public class ServicePreAction extends Action {
 
 					if (siblingLayoutSet.isLogo()) {
 						logoId = siblingLayoutSet.getLogoId();
+
+						if (logoId == 0) {
+							logoId = siblingLayoutSet.getLiveLogoId();
+						}
 					}
 				}
 
@@ -1365,12 +1416,11 @@ public class ServicePreAction extends Action {
 
 		boolean themeJsBarebone = PropsValues.JAVASCRIPT_BAREBONE_ENABLED;
 
-		if (themeJsBarebone) {
-			if (signedIn ||
-				PropsValues.JAVASCRIPT_SINGLE_PAGE_APPLICATION_ENABLED) {
+		if (themeJsBarebone &&
+			(signedIn ||
+			 PropsValues.JAVASCRIPT_SINGLE_PAGE_APPLICATION_ENABLED)) {
 
-				themeJsBarebone = false;
-			}
+			themeJsBarebone = false;
 		}
 
 		boolean themeJsFastLoad = SessionParamUtil.getBoolean(
@@ -1582,9 +1632,8 @@ public class ServicePreAction extends Action {
 
 		themeDisplay.setURLControlPanel(urlControlPanel);
 
-		String currentURL = PortalUtil.getCurrentURL(httpServletRequest);
-
-		themeDisplay.setURLCurrent(currentURL);
+		themeDisplay.setURLCurrent(
+			PortalUtil.getCurrentURL(httpServletRequest));
 
 		String urlHome = PortalUtil.getHomeURL(httpServletRequest);
 
@@ -1897,50 +1946,6 @@ public class ServicePreAction extends Action {
 			_log.debug("Current group id " + currentGroupId);
 			_log.debug("Recent group id " + recentGroupId);
 			_log.debug("Previous group id " + previousGroupId);
-		}
-	}
-
-	private void _servicePre(
-			HttpServletRequest httpServletRequest,
-			HttpServletResponse httpServletResponse)
-		throws Exception {
-
-		ThemeDisplay themeDisplay = _initThemeDisplay(
-			httpServletRequest, httpServletResponse);
-
-		if (themeDisplay == null) {
-			return;
-		}
-
-		httpServletRequest.setAttribute(WebKeys.THEME_DISPLAY, themeDisplay);
-
-		// Service context
-
-		ServiceContext serviceContext = ServiceContextFactory.getInstance(
-			httpServletRequest);
-
-		ServiceContextThreadLocal.pushServiceContext(serviceContext);
-
-		// Ajaxable render
-
-		if (PropsValues.LAYOUT_AJAX_RENDER_ENABLE) {
-			boolean portletAjaxRender = ParamUtil.getBoolean(
-				httpServletRequest, "p_p_ajax", true);
-
-			httpServletRequest.setAttribute(
-				WebKeys.PORTLET_AJAX_RENDER, portletAjaxRender);
-		}
-
-		// Parallel render
-
-		if (PropsValues.LAYOUT_PARALLEL_RENDER_ENABLE &&
-			ServerDetector.isTomcat()) {
-
-			boolean portletParallelRender = ParamUtil.getBoolean(
-				httpServletRequest, "p_p_parallel", true);
-
-			httpServletRequest.setAttribute(
-				WebKeys.PORTLET_PARALLEL_RENDER, portletParallelRender);
 		}
 	}
 

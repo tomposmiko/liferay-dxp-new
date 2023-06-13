@@ -56,15 +56,14 @@ if (Validator.isNotNull(assetPublisherViewContentDisplayContext.getReturnToFullP
 	</c:otherwise>
 </c:choose>
 
-<aui:script use="aui-base">
-	Liferay.once(
-		'allPortletsReady',
-		function() {
-			if (!Liferay.Browser.isIe()) {
-				A.one('#p_p_id_<%= portletDisplay.getId() %>_').scrollIntoView();
-			}
+<aui:script>
+	Liferay.once('allPortletsReady', function() {
+		if (!Liferay.Browser.isIe()) {
+			document
+				.getElementById('p_p_id_<%= portletDisplay.getId() %>_')
+				.scrollIntoView();
 		}
-	);
+	});
 </aui:script>
 
 <liferay-util:dynamic-include key="com.liferay.asset.publisher.web#/view_content.jsp#post" />

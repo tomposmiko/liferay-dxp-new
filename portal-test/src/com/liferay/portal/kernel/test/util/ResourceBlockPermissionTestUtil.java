@@ -18,7 +18,7 @@ import com.liferay.counter.kernel.service.CounterLocalServiceUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.model.ResourceBlockPermission;
 import com.liferay.portal.kernel.model.Role;
-import com.liferay.portal.kernel.model.RoleConstants;
+import com.liferay.portal.kernel.model.role.RoleConstants;
 import com.liferay.portal.kernel.security.permission.ResourceActionsUtil;
 import com.liferay.portal.kernel.service.ResourceBlockLocalServiceUtil;
 import com.liferay.portal.kernel.service.ResourceBlockPermissionLocalServiceUtil;
@@ -62,16 +62,15 @@ public class ResourceBlockPermissionTestUtil {
 			List<String> actionIds)
 		throws PortalException {
 
-		List<String> resourceActionsIds =
-			ResourceActionsUtil.getResourceActions(
-				portletResource, resourceName);
+		List<String> resourceActions = ResourceActionsUtil.getResourceActions(
+			portletResource, resourceName);
 
 		Map<Long, String[]> roleIdsToActionIds = new HashMap<>();
 
 		for (String roleName : roleNames) {
 			Role role = RoleLocalServiceUtil.getRole(companyId, roleName);
 
-			List<String> roleActionIds = ListUtil.copy(resourceActionsIds);
+			List<String> roleActionIds = ListUtil.copy(resourceActions);
 
 			if (roleName.equals(RoleConstants.GUEST)) {
 				List<String> unsupportedActionIds =

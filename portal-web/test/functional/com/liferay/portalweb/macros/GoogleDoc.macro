@@ -1,5 +1,33 @@
 definition {
 
+	macro addContent {
+		SelectFrame.selectFrameNoLoading(locator1 = "IFrame#GOOGLE_DOC");
+
+		if (isSet(insertLink)) {
+			Click(locator1 = "GoogleDoc#INSERT_LINK_BUTTON");
+
+			Click(locator1 = "GoogleDoc#INSERT_LINK_LINK");
+
+			Type(
+				locator1 = "GoogleDoc#INSERT_LINK_LINK",
+				value1 = "${linkAddress}");
+
+			Click(locator1 = "GoogleDoc#INSERT_LINK_TEXT");
+
+			Type(
+				locator1 = "GoogleDoc#INSERT_LINK_TEXT",
+				value1 = "${linkText}");
+
+			Click(locator1 = "GoogleDoc#INSERT_LINK_APPLY_BUTTON");
+
+			var key_googleDocContent = "${googleDocContent}";
+
+			AssertElementPresent(locator1 = "GoogleDoc#INSERT_LINK_DOCUMENT_CONTENT");
+		}
+
+		SelectFrameTop();
+	}
+
 	macro discardChanges {
 		var key_text = "Discard Changes";
 
@@ -19,6 +47,10 @@ definition {
 			locator1 = "GoogleDoc#TITLE",
 			value1 = "${dmDocumentTitle}");
 
+		KeyPress(
+			locator1 = "GoogleDoc#TITLE",
+			value1 = "\RETURN");
+
 		SelectFrameTop();
 	}
 
@@ -27,21 +59,25 @@ definition {
 
 		Click(locator1 = "DocumentsAndMedia#DESCRIPTIVE_LIST_DOCUMENT_VERTICAL_ELLIPSIS");
 
-		MenuItem.click(menuItem = "Edit in ${dmGoogleApp}");
+		MenuItem.click(menuItem = "Edit in ${dmDocumentTypeName}");
+
+		var siteName = TestCase.getSiteName(siteName = "${siteName}");
 
 		AssertElementPresent(
-			key_text = "Save and Return to Liferay",
+			key_text = "Save and Return to ${siteName}",
 			locator1 = "Button#ANY");
 	}
 
 	macro saveAndExit {
-		var key_text = "Save and Return to Liferay";
+		var siteName = TestCase.getSiteName(siteName = "${siteName}");
+
+		var key_text = "Save and Return to ${siteName}";
 
 		AssertElementPresent(locator1 = "Button#ANY");
 
 		AssertClick(
 			locator1 = "Button#ANY",
-			value1 = "Save and Return to Liferay");
+			value1 = "Save and Return to ${siteName}");
 
 		Navigator.openURL();
 	}

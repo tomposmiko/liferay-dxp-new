@@ -20,9 +20,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import com.liferay.petra.function.UnsafeSupplier;
 import com.liferay.petra.string.StringBundler;
-
-import graphql.annotations.annotationTypes.GraphQLField;
-import graphql.annotations.annotationTypes.GraphQLName;
+import com.liferay.portal.vulcan.graphql.annotation.GraphQLField;
+import com.liferay.portal.vulcan.graphql.annotation.GraphQLName;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 
@@ -36,6 +35,8 @@ import java.util.Objects;
 import java.util.Set;
 
 import javax.annotation.Generated;
+
+import javax.validation.Valid;
 
 import javax.xml.bind.annotation.XmlRootElement;
 
@@ -52,6 +53,7 @@ public class WorkflowLog {
 	@Schema(
 		description = "The user account of the person auditing the workflow."
 	)
+	@Valid
 	public Creator getAuditPerson() {
 		return auditPerson;
 	}
@@ -162,6 +164,7 @@ public class WorkflowLog {
 	protected Long id;
 
 	@Schema(description = "The person assigned to the workflow.")
+	@Valid
 	public Creator getPerson() {
 		return person;
 	}
@@ -190,6 +193,7 @@ public class WorkflowLog {
 	protected Creator person;
 
 	@Schema(description = "The previous person assigned to the workflow.")
+	@Valid
 	public Creator getPreviousPerson() {
 		return previousPerson;
 	}
@@ -481,6 +485,12 @@ public class WorkflowLog {
 
 		return sb.toString();
 	}
+
+	@Schema(
+		defaultValue = "com.liferay.headless.admin.workflow.dto.v1_0.WorkflowLog",
+		name = "x-class-name"
+	)
+	public String xClassName;
 
 	private static String _escape(Object object) {
 		String string = String.valueOf(object);

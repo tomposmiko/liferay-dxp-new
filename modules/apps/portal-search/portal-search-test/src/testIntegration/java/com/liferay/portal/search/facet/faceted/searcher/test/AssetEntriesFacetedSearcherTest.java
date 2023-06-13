@@ -17,6 +17,7 @@ package com.liferay.portal.search.facet.faceted.searcher.test;
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
 import com.liferay.document.library.kernel.model.DLFileEntry;
 import com.liferay.document.library.kernel.service.DLAppLocalService;
+import com.liferay.document.library.test.util.DLAppTestUtil;
 import com.liferay.journal.model.JournalArticle;
 import com.liferay.journal.test.util.search.JournalArticleBlueprint;
 import com.liferay.journal.test.util.search.JournalArticleContent;
@@ -38,9 +39,9 @@ import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.search.facet.Facet;
 import com.liferay.portal.search.facet.type.AssetEntriesFacetFactory;
 import com.liferay.portal.search.test.util.DocumentsAssert;
+import com.liferay.portal.search.test.util.FacetsAssert;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
-import com.liferay.portlet.documentlibrary.util.test.DLAppTestUtil;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -49,6 +50,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.junit.After;
 import org.junit.ClassRule;
@@ -92,8 +94,32 @@ public class AssetEntriesFacetedSearcherTest
 
 		assertEntryClassNames(_entryClassNames, hits, facet, searchContext);
 
-		assertFrequencies(
-			facet.getFieldName(), searchContext, toMap(_entryClassNames));
+		FacetsAssert.assertFrequencies(
+			facet.getFieldName(), searchContext, hits, toMap(_entryClassNames));
+	}
+
+	@Test
+	public void testAvoidResidualDataFromDDMStructureLocalServiceTest()
+		throws Exception {
+
+		// See LPS-58543
+
+		String keyword = "To Do";
+
+		index(keyword);
+
+		SearchContext searchContext = getSearchContext(keyword);
+
+		Facet facet = createFacet(searchContext);
+
+		searchContext.addFacet(facet);
+
+		Hits hits = search(searchContext);
+
+		assertEntryClassNames(_entryClassNames, hits, facet, searchContext);
+
+		FacetsAssert.assertFrequencies(
+			facet.getFieldName(), searchContext, hits, toMap(_entryClassNames));
 	}
 
 	@Test
@@ -116,8 +142,8 @@ public class AssetEntriesFacetedSearcherTest
 			Arrays.asList(JournalArticle.class.getName()), hits, facet,
 			searchContext);
 
-		assertFrequencies(
-			facet.getFieldName(), searchContext, toMap(_entryClassNames));
+		FacetsAssert.assertFrequencies(
+			facet.getFieldName(), searchContext, hits, toMap(_entryClassNames));
 	}
 
 	protected static Map<String, Integer> toMap(String key, Integer value) {
@@ -200,10 +226,9 @@ public class AssetEntriesFacetedSearcherTest
 	}
 
 	protected Map<String, Integer> toMap(Collection<String> strings) {
-		return strings.stream(
-		).collect(
-			Collectors.toMap(s -> s, s -> 1)
-		);
+		Stream<String> stream = strings.stream();
+
+		return stream.collect(Collectors.toMap(s -> s, s -> 1));
 	}
 
 	@Inject

@@ -19,8 +19,6 @@ import com.liferay.portal.kernel.model.wrapper.BaseModelWrapper;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 /**
  * <p>
  * This class is a wrapper for {@link ResourceBlock}.
@@ -32,10 +30,9 @@ import org.osgi.annotation.versioning.ProviderType;
  * @generated
  */
 @Deprecated
-@ProviderType
 public class ResourceBlockWrapper
 	extends BaseModelWrapper<ResourceBlock>
-	implements ResourceBlock, ModelWrapper<ResourceBlock> {
+	implements ModelWrapper<ResourceBlock>, ResourceBlock {
 
 	public ResourceBlockWrapper(ResourceBlock resourceBlock) {
 		super(resourceBlock);
@@ -181,6 +178,11 @@ public class ResourceBlockWrapper
 		return model.getResourceBlockId();
 	}
 
+	/**
+	 * NOTE FOR DEVELOPERS:
+	 *
+	 * Never modify or reference this class directly. All methods that expect a resource block model instance should use the <code>ResourceBlock</code> interface instead.
+	 */
 	@Override
 	public void persist() {
 		model.persist();

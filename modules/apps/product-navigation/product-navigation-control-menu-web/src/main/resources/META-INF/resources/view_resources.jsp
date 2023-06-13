@@ -37,7 +37,11 @@ if (Validator.isNotNull(keywords)) {
 	<span class="dropdown" id="<portlet:namespace />numItemsContainer">
 		<a aria-expanded="true" class="dropdown-toggle" data-toggle="dropdown" href="javascript:;">
 			<span class="item-title"><%= delta %></span>
-			<span class="icon-sort"></span>
+
+			<liferay-ui:icon
+				icon="caret-double"
+				markupView="lexicon"
+			/>
 		</a>
 
 		<ul class="dropdown-menu">
@@ -252,12 +256,9 @@ if (Validator.isNotNull(keywords)) {
 		function(event) {
 			var delta = event.currentTarget.attr('data-delta');
 
-			Liferay.fire(
-				'AddContent:refreshContentList',
-				{
-					delta: delta
-				}
-			);
+			Liferay.fire('AddContent:refreshContentList', {
+				delta: delta
+			});
 		},
 		'.num-item'
 	);
@@ -267,12 +268,9 @@ if (Validator.isNotNull(keywords)) {
 		function(event) {
 			var displayStyle = event.currentTarget.attr('data-displaystyle');
 
-			Liferay.fire(
-				'AddContent:refreshContentList',
-				{
-					displayStyle: displayStyle
-				}
-			);
+			Liferay.fire('AddContent:refreshContentList', {
+				displayStyle: displayStyle
+			});
 		},
 		'.display-style'
 	);

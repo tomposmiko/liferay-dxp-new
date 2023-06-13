@@ -14,8 +14,6 @@
 
 package com.liferay.portal.kernel.service;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 /**
  * Provides a wrapper for {@link PasswordPolicyLocalService}.
  *
@@ -23,7 +21,6 @@ import org.osgi.annotation.versioning.ProviderType;
  * @see PasswordPolicyLocalService
  * @generated
  */
-@ProviderType
 public class PasswordPolicyLocalServiceWrapper
 	implements PasswordPolicyLocalService,
 			   ServiceWrapper<PasswordPolicyLocalService> {
@@ -34,17 +31,23 @@ public class PasswordPolicyLocalServiceWrapper
 		_passwordPolicyLocalService = passwordPolicyLocalService;
 	}
 
+	/**
+	 * NOTE FOR DEVELOPERS:
+	 *
+	 * Never modify or reference this interface directly. Always use {@link PasswordPolicyLocalServiceUtil} to access the password policy local service. Add custom service methods to <code>com.liferay.portal.service.impl.PasswordPolicyLocalServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
+	 */
 	@Override
 	public com.liferay.portal.kernel.model.PasswordPolicy addPasswordPolicy(
-			long userId, boolean defaultPolicy, String name, String description,
-			boolean changeable, boolean changeRequired, long minAge,
-			boolean checkSyntax, boolean allowDictionaryWords,
-			int minAlphanumeric, int minLength, int minLowerCase,
-			int minNumbers, int minSymbols, int minUpperCase, String regex,
-			boolean history, int historyCount, boolean expireable, long maxAge,
-			long warningTime, int graceLimit, boolean lockout, int maxFailure,
-			long lockoutDuration, long resetFailureCount,
-			long resetTicketMaxAge, ServiceContext serviceContext)
+			long userId, boolean defaultPolicy, java.lang.String name,
+			java.lang.String description, boolean changeable,
+			boolean changeRequired, long minAge, boolean checkSyntax,
+			boolean allowDictionaryWords, int minAlphanumeric, int minLength,
+			int minLowerCase, int minNumbers, int minSymbols, int minUpperCase,
+			java.lang.String regex, boolean history, int historyCount,
+			boolean expireable, long maxAge, long warningTime, int graceLimit,
+			boolean lockout, int maxFailure, long lockoutDuration,
+			long resetFailureCount, long resetTicketMaxAge,
+			ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _passwordPolicyLocalService.addPasswordPolicy(
@@ -161,7 +164,7 @@ public class PasswordPolicyLocalServiceWrapper
 	 * Performs a dynamic query on the database and returns a range of the matching rows.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>com.liferay.portal.model.impl.PasswordPolicyModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>com.liferay.portal.model.impl.PasswordPolicyModelImpl</code>.
 	 * </p>
 	 *
 	 * @param dynamicQuery the dynamic query
@@ -182,7 +185,7 @@ public class PasswordPolicyLocalServiceWrapper
 	 * Performs a dynamic query on the database and returns an ordered range of the matching rows.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>com.liferay.portal.model.impl.PasswordPolicyModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>com.liferay.portal.model.impl.PasswordPolicyModelImpl</code>.
 	 * </p>
 	 *
 	 * @param dynamicQuery the dynamic query
@@ -240,7 +243,7 @@ public class PasswordPolicyLocalServiceWrapper
 
 	@Override
 	public com.liferay.portal.kernel.model.PasswordPolicy fetchPasswordPolicy(
-		long companyId, String name) {
+		long companyId, java.lang.String name) {
 
 		return _passwordPolicyLocalService.fetchPasswordPolicy(companyId, name);
 	}
@@ -254,7 +257,8 @@ public class PasswordPolicyLocalServiceWrapper
 	 */
 	@Override
 	public com.liferay.portal.kernel.model.PasswordPolicy
-		fetchPasswordPolicyByUuidAndCompanyId(String uuid, long companyId) {
+		fetchPasswordPolicyByUuidAndCompanyId(
+			java.lang.String uuid, long companyId) {
 
 		return _passwordPolicyLocalService.
 			fetchPasswordPolicyByUuidAndCompanyId(uuid, companyId);
@@ -298,7 +302,7 @@ public class PasswordPolicyLocalServiceWrapper
 	 * @return the OSGi service identifier
 	 */
 	@Override
-	public String getOSGiServiceIdentifier() {
+	public java.lang.String getOSGiServiceIdentifier() {
 		return _passwordPolicyLocalService.getOSGiServiceIdentifier();
 	}
 
@@ -306,7 +310,7 @@ public class PasswordPolicyLocalServiceWrapper
 	 * Returns a range of all the password policies.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>com.liferay.portal.model.impl.PasswordPolicyModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>com.liferay.portal.model.impl.PasswordPolicyModelImpl</code>.
 	 * </p>
 	 *
 	 * @param start the lower bound of the range of password policies
@@ -389,7 +393,8 @@ public class PasswordPolicyLocalServiceWrapper
 	 */
 	@Override
 	public com.liferay.portal.kernel.model.PasswordPolicy
-			getPasswordPolicyByUuidAndCompanyId(String uuid, long companyId)
+			getPasswordPolicyByUuidAndCompanyId(
+				java.lang.String uuid, long companyId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _passwordPolicyLocalService.getPasswordPolicyByUuidAndCompanyId(
@@ -407,7 +412,7 @@ public class PasswordPolicyLocalServiceWrapper
 	@Override
 	public java.util.List<com.liferay.portal.kernel.model.PasswordPolicy>
 		search(
-			long companyId, String name, int start, int end,
+			long companyId, java.lang.String name, int start, int end,
 			com.liferay.portal.kernel.util.OrderByComparator
 				<com.liferay.portal.kernel.model.PasswordPolicy> obc) {
 
@@ -416,21 +421,22 @@ public class PasswordPolicyLocalServiceWrapper
 	}
 
 	@Override
-	public int searchCount(long companyId, String name) {
+	public int searchCount(long companyId, java.lang.String name) {
 		return _passwordPolicyLocalService.searchCount(companyId, name);
 	}
 
 	@Override
 	public com.liferay.portal.kernel.model.PasswordPolicy updatePasswordPolicy(
-			long passwordPolicyId, String name, String description,
-			boolean changeable, boolean changeRequired, long minAge,
-			boolean checkSyntax, boolean allowDictionaryWords,
-			int minAlphanumeric, int minLength, int minLowerCase,
-			int minNumbers, int minSymbols, int minUpperCase, String regex,
-			boolean history, int historyCount, boolean expireable, long maxAge,
-			long warningTime, int graceLimit, boolean lockout, int maxFailure,
-			long lockoutDuration, long resetFailureCount,
-			long resetTicketMaxAge, ServiceContext serviceContext)
+			long passwordPolicyId, java.lang.String name,
+			java.lang.String description, boolean changeable,
+			boolean changeRequired, long minAge, boolean checkSyntax,
+			boolean allowDictionaryWords, int minAlphanumeric, int minLength,
+			int minLowerCase, int minNumbers, int minSymbols, int minUpperCase,
+			java.lang.String regex, boolean history, int historyCount,
+			boolean expireable, long maxAge, long warningTime, int graceLimit,
+			boolean lockout, int maxFailure, long lockoutDuration,
+			long resetFailureCount, long resetTicketMaxAge,
+			ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _passwordPolicyLocalService.updatePasswordPolicy(

@@ -23,7 +23,7 @@ PortletURL portletURL = currentURLObj;
 %>
 
 <clay:navigation-bar
-	navigationItems="<%=
+	navigationItems='<%=
 		new JSPNavigationItemList(pageContext) {
 			{
 				add(
@@ -41,7 +41,7 @@ PortletURL portletURL = currentURLObj;
 					});
 			}
 		}
-	%>"
+	%>'
 />
 
 <aui:input id="groupId" name="TypeSettingsProperties--groupId--" type="hidden" value="<%= scopeGroupId %>" />
@@ -66,27 +66,24 @@ PortletURL portletURL = currentURLObj;
 	var layoutUuid = document.getElementById('<portlet:namespace />layoutUuid');
 
 	if (layoutUuid) {
-		Liferay.componentReady('<portlet:namespace />selectLayout').then(
-			function(selectLayout) {
-				selectLayout.on(
-					'<portlet:namespace />selectLayout',
-					function(event) {
-						var selectedItems = event.data;
+		Liferay.componentReady('<portlet:namespace />selectLayout').then(function(
+			selectLayout
+		) {
+			selectLayout.on('<portlet:namespace />selectLayout', function(event) {
+				var selectedItems = event.data;
 
-						if (selectedItems) {
-							var layoutUuids = selectedItems.reduce(
-								function(previousValue, currentValue) {
-									return previousValue.concat([currentValue.id]);
-								},
-								[]
-							);
+				if (selectedItems) {
+					var layoutUuids = selectedItems.reduce(function(
+						previousValue,
+						currentValue
+					) {
+						return previousValue.concat([currentValue.id]);
+					},
+					[]);
 
-							layoutUuid.value = layoutUuids.join();
-
-						}
-					}
-				);
-			}
-		);
+					layoutUuid.value = layoutUuids.join();
+				}
+			});
+		});
 	}
 </aui:script>

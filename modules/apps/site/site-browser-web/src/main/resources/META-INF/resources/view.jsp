@@ -118,17 +118,18 @@
 	</liferay-ui:search-container>
 </aui:form>
 
-<aui:script use="aui-base">
-	var Util = Liferay.Util;
+<aui:script>
+	const Util = Liferay.Util;
 
-	var openingLiferay = Util.getOpener().Liferay;
+	const openingLiferay = Util.getOpener().Liferay;
 
-	openingLiferay.fire(
-		'<portlet:namespace />enableRemovedSites',
-		{
-			selectors: A.all('.selector-button:disabled')
-		}
+	openingLiferay.fire('<portlet:namespace />enableRemovedSites', {
+		selectors: document.querySelectorAll('.selector-button:disabled')
+	});
+
+	Util.selectEntityHandler(
+		'#<portlet:namespace />selectGroupFm',
+		'<%= HtmlUtil.escapeJS(siteBrowserDisplayContext.getEventName()) %>',
+		<%= siteBrowserDisplayContext.getSelUser() != null %>
 	);
-
-	Util.selectEntityHandler('#<portlet:namespace />selectGroupFm', '<%= HtmlUtil.escapeJS(siteBrowserDisplayContext.getEventName()) %>', <%= siteBrowserDisplayContext.getSelUser() != null %>);
 </aui:script>

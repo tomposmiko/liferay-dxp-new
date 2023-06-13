@@ -24,6 +24,10 @@ import com.liferay.portal.kernel.util.ServiceProxyFactory;
  */
 public class MessageBusUtil {
 
+	/**
+	 * @deprecated As of Athanasius (7.3.x), with no direct replacement
+	 */
+	@Deprecated
 	public static void addDestination(Destination destination) {
 		_messageBus.addDestination(destination);
 	}
@@ -74,6 +78,10 @@ public class MessageBusUtil {
 		_messageBus.registerMessageListener(destinationName, messageListener);
 	}
 
+	/**
+	 * @deprecated As of Athanasius (7.3.x), with no direct replacement
+	 */
+	@Deprecated
 	public static void removeDestination(String destinationName) {
 		_messageBus.removeDestination(destinationName);
 	}

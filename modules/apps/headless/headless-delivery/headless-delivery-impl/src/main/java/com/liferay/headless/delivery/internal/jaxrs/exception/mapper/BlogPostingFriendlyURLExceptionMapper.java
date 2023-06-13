@@ -40,13 +40,15 @@ public class BlogPostingFriendlyURLExceptionMapper
 	implements ExceptionMapper<EntryUrlTitleException> {
 
 	@Override
-	public Response toResponse(EntryUrlTitleException eute) {
+	public Response toResponse(EntryUrlTitleException entryUrlTitleException) {
 		return Response.status(
 			400
+		).entity(
+			StringUtil.replace(
+				entryUrlTitleException.getMessage(), "URL title",
+				"Friendly URL")
 		).type(
 			MediaType.TEXT_PLAIN
-		).entity(
-			StringUtil.replace(eute.getMessage(), "URL title", "Friendly URL")
 		).build();
 	}
 

@@ -22,7 +22,7 @@ import com.liferay.portal.kernel.servlet.SessionErrors;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.webcache.WebCacheException;
-import com.liferay.translator.web.configuration.TranslatorConfiguration;
+import com.liferay.translator.web.internal.configuration.TranslatorConfiguration;
 import com.liferay.translator.web.internal.constants.TranslatorPortletKeys;
 import com.liferay.translator.web.internal.model.Translation;
 import com.liferay.translator.web.internal.util.TranslatorUtil;
@@ -49,7 +49,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Peter Fellwock
  */
 @Component(
-	configurationPid = "com.liferay.translator.web.configuration.TranslatorConfiguration",
+	configurationPid = "com.liferay.translator.web.internal.configuration.TranslatorConfiguration",
 	configurationPolicy = ConfigurationPolicy.OPTIONAL, immediate = true,
 	property = {
 		"com.liferay.portlet.css-class-wrapper=portlet-translator",
@@ -130,7 +130,7 @@ public class TranslatorPortlet extends MVCPortlet {
 	}
 
 	@Reference(
-		target = "(&(release.bundle.symbolic.name=com.liferay.translator.web)(&(release.schema.version>=1.0.0)(!(release.schema.version>=1.1.0))))",
+		target = "(&(release.bundle.symbolic.name=com.liferay.translator.web)(&(release.schema.version>=1.0.0)(!(release.schema.version>=2.0.0))))",
 		unbind = "-"
 	)
 	protected void setRelease(Release release) {

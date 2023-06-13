@@ -80,6 +80,7 @@ public class AssignScopesDisplayContext
 			dlURLHelper);
 
 		_applicationDescriptorLocator = applicationDescriptorLocator;
+		_companyId = themeDisplay.getCompanyId();
 		_locale = themeDisplay.getLocale();
 
 		OAuth2Application oAuth2Application = getOAuth2Application();
@@ -203,7 +204,8 @@ public class AssignScopesDisplayContext
 		String delimiter) {
 
 		Set<String> applicationScopeDescription =
-			assignableScopes.getApplicationScopeDescription(applicationName);
+			assignableScopes.getApplicationScopeDescription(
+				_companyId, applicationName);
 
 		Stream<String> stream = applicationScopeDescription.stream();
 
@@ -480,7 +482,7 @@ public class AssignScopesDisplayContext
 	}
 
 	private static <K, V> Map<V, K> _invertMap(Map<K, V> map) {
-		Map<V, K> ret = new HashMap<>(map.size());
+		Map<V, K> ret = new HashMap<>();
 
 		for (Map.Entry<K, V> entry : map.entrySet()) {
 			ret.put(entry.getValue(), entry.getKey());
@@ -594,6 +596,7 @@ public class AssignScopesDisplayContext
 	private final ApplicationDescriptorLocator _applicationDescriptorLocator;
 	private Map<AssignableScopes, Relations> _assignableScopesRelations =
 		new HashMap<>();
+	private final long _companyId;
 	private Map<String, Set<AssignableScopes>>
 		_globalAssignableScopesByApplicationName = new HashMap<>();
 	private Map<String, Set<AssignableScopes>>

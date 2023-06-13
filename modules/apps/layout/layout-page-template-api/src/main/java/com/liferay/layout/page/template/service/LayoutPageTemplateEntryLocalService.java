@@ -59,7 +59,7 @@ import org.osgi.annotation.versioning.ProviderType;
 public interface LayoutPageTemplateEntryLocalService
 	extends BaseLocalService, PersistedModelLocalService {
 
-	/*
+	/**
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this interface directly. Always use {@link LayoutPageTemplateEntryLocalServiceUtil} to access the layout page template entry local service. Add custom service methods to <code>com.liferay.layout.page.template.service.impl.LayoutPageTemplateEntryLocalServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
@@ -82,6 +82,13 @@ public interface LayoutPageTemplateEntryLocalService
 			LayoutPrototype layoutPrototype)
 		throws PortalException;
 
+	/**
+	 * @deprecated As of Mueller (7.2.x), replaced by {@link
+	 #addLayoutPageTemplateEntry(long, long, long, long, long,
+	 String, int, boolean, long, long, long, int,
+	 ServiceContext)}}
+	 */
+	@Deprecated
 	public LayoutPageTemplateEntry addLayoutPageTemplateEntry(
 			long userId, long groupId, long layoutPageTemplateCollectionId,
 			long classNameId, long classTypeId, String name, int type,
@@ -99,26 +106,56 @@ public interface LayoutPageTemplateEntryLocalService
 
 	public LayoutPageTemplateEntry addLayoutPageTemplateEntry(
 			long userId, long groupId, long layoutPageTemplateCollectionId,
+			long classNameId, long classTypeId, String name, int type,
+			int status, ServiceContext serviceContext)
+		throws PortalException;
+
+	public LayoutPageTemplateEntry addLayoutPageTemplateEntry(
+			long userId, long groupId, long layoutPageTemplateCollectionId,
 			String name, int type, int status, ServiceContext serviceContext)
 		throws PortalException;
 
+	/**
+	 * @deprecated As of Mueller (7.2.x), replaced by {@link
+	 #addLayoutPageTemplateEntry(long, long, long, long, long,
+	 String, int, boolean, long, long, long, int, ServiceContext)}
+	 */
+	@Deprecated
 	public LayoutPageTemplateEntry addLayoutPageTemplateEntry(
 			long userId, long groupId, long layoutPageTemplateCollectionId,
 			String name, int type, long layoutPrototypeId, int status,
 			ServiceContext serviceContext)
 		throws PortalException;
 
+	/**
+	 * @deprecated As of Mueller (7.2.x), replaced by {@link
+	 #addLayoutPageTemplateEntry(long, long, long, long, long,
+	 String, int, boolean, long, long, long, int, ServiceContext)}
+	 */
+	@Deprecated
 	public LayoutPageTemplateEntry addLayoutPageTemplateEntry(
 			long userId, long groupId, long layoutPageTemplateCollectionId,
 			String name, int type, long layoutPrototypeId,
 			long previewFileEntryId, int status, ServiceContext serviceContext)
 		throws PortalException;
 
+	/**
+	 * @deprecated As of Mueller (7.2.x), replaced by {@link
+	 #addLayoutPageTemplateEntry(long, long, long, long, long,
+	 String, int, boolean, long, long, long, int, ServiceContext)}
+	 */
+	@Deprecated
 	public LayoutPageTemplateEntry addLayoutPageTemplateEntry(
 			long userId, long groupId, long layoutPageTemplateCollectionId,
 			String name, int type, ServiceContext serviceContext)
 		throws PortalException;
 
+	/**
+	 * @deprecated As of Mueller (7.2.x), replaced by {@link
+	 #addLayoutPageTemplateEntry(long, long, long, long, long,
+	 String, int, boolean, long, long, long, int, ServiceContext)}
+	 */
+	@Deprecated
 	public LayoutPageTemplateEntry addLayoutPageTemplateEntry(
 			long userId, long groupId, long layoutPageTemplateCollectionId,
 			String name, ServiceContext serviceContext)
@@ -181,7 +218,7 @@ public interface LayoutPageTemplateEntryLocalService
 	 * Performs a dynamic query on the database and returns a range of the matching rows.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>com.liferay.layout.page.template.model.impl.LayoutPageTemplateEntryModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>com.liferay.layout.page.template.model.impl.LayoutPageTemplateEntryModelImpl</code>.
 	 * </p>
 	 *
 	 * @param dynamicQuery the dynamic query
@@ -197,7 +234,7 @@ public interface LayoutPageTemplateEntryLocalService
 	 * Performs a dynamic query on the database and returns an ordered range of the matching rows.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>com.liferay.layout.page.template.model.impl.LayoutPageTemplateEntryModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>com.liferay.layout.page.template.model.impl.LayoutPageTemplateEntryModelImpl</code>.
 	 * </p>
 	 *
 	 * @param dynamicQuery the dynamic query
@@ -276,7 +313,7 @@ public interface LayoutPageTemplateEntryLocalService
 	 * Returns a range of all the layout page template entries.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>com.liferay.layout.page.template.model.impl.LayoutPageTemplateEntryModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>com.liferay.layout.page.template.model.impl.LayoutPageTemplateEntryModelImpl</code>.
 	 * </p>
 	 *
 	 * @param start the lower bound of the range of layout page template entries
@@ -286,6 +323,10 @@ public interface LayoutPageTemplateEntryLocalService
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public List<LayoutPageTemplateEntry> getLayoutPageTemplateEntries(
 		int start, int end);
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public List<LayoutPageTemplateEntry> getLayoutPageTemplateEntries(
+		long groupId);
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public List<LayoutPageTemplateEntry> getLayoutPageTemplateEntries(
@@ -326,6 +367,10 @@ public interface LayoutPageTemplateEntryLocalService
 		long groupId, long layoutPageTemplateCollectionId, String name,
 		int start, int end,
 		OrderByComparator<LayoutPageTemplateEntry> orderByComparator);
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public List<LayoutPageTemplateEntry>
+		getLayoutPageTemplateEntriesByLayoutPrototypeId(long layoutPrototypeId);
 
 	/**
 	 * Returns all the layout page template entries matching the UUID and company.
@@ -417,6 +462,10 @@ public interface LayoutPageTemplateEntryLocalService
 			long layoutPageTemplateEntryId, long previewFileEntryId)
 		throws PortalException;
 
+	/**
+	 * @deprecated As of Mueller (7.2.x)
+	 */
+	@Deprecated
 	public LayoutPageTemplateEntry updateLayoutPageTemplateEntry(
 			long layoutPageTemplateEntryId, long classNameId, long classTypeId)
 		throws PortalException;

@@ -57,8 +57,9 @@ if (kbArticle != null) {
 					%>
 
 					<liferay-ui:icon
-						iconCssClass="icon-paper-clip"
+						icon="paperclip"
 						label="<%= true %>"
+						markupView="lexicon"
 						message='<%= HtmlUtil.escape(fileEntry.getTitle()) + " (" + TextFormatter.formatStorageSize(fileEntry.getSize(), locale) + ")" %>'
 						method="get"
 						url="<%= rowURL %>"
@@ -83,57 +84,59 @@ if (kbArticle != null) {
 </div>
 
 <aui:script use="liferay-upload">
-	new Liferay.Upload(
-		{
-			boundingBox: '#<portlet:namespace />fileUpload',
-			deleteFile: '<liferay-portlet:actionURL name="deleteTempAttachment"><portlet:param name="resourcePrimKey" value="<%= String.valueOf(resourcePrimKey) %>" /></liferay-portlet:actionURL>',
+	new Liferay.Upload({
+		boundingBox: '#<portlet:namespace />fileUpload',
+		deleteFile:
+			'<liferay-portlet:actionURL name="deleteTempAttachment"><portlet:param name="resourcePrimKey" value="<%= String.valueOf(resourcePrimKey) %>" /></liferay-portlet:actionURL>',
 
-			<%
-			DLConfiguration dlConfiguration = ConfigurationProviderUtil.getSystemConfiguration(DLConfiguration.class);
-			%>
+		<%
+		DLConfiguration dlConfiguration = ConfigurationProviderUtil.getSystemConfiguration(DLConfiguration.class);
+		%>
 
-			fileDescription: '<%= StringUtil.merge(dlConfiguration.fileExtensions()) %>',
-			maxFileSize: '<%= dlConfiguration.fileMaxSize() %> B',
-			metadataContainer: '#<portlet:namespace />selectedFileNameMetadataContainer',
-			metadataExplanationContainer: '#<portlet:namespace />metadataExplanationContainer',
-			namespace: '<portlet:namespace />',
-			tempFileURL: {
-				method: Liferay.Service.bind('/kb.kbarticle/get-temp-attachment-names'),
-				params: {
-					groupId: <%= scopeGroupId %>,
-					tempFolderName: '<%= KBWebKeys.TEMP_FOLDER_NAME %>'
-				}
-			},
-			uploadFile: '<liferay-portlet:actionURL name="addTempAttachment"><portlet:param name="resourcePrimKey" value="<%= String.valueOf(resourcePrimKey) %>" /></liferay-portlet:actionURL>'
-		}
-	);
+		fileDescription:
+			'<%= StringUtil.merge(dlConfiguration.fileExtensions()) %>',
+		maxFileSize: '<%= dlConfiguration.fileMaxSize() %> B',
+		metadataContainer:
+			'#<portlet:namespace />selectedFileNameMetadataContainer',
+		metadataExplanationContainer:
+			'#<portlet:namespace />metadataExplanationContainer',
+		namespace: '<portlet:namespace />',
+		tempFileURL: {
+			method: Liferay.Service.bind('/kb.kbarticle/get-temp-attachment-names'),
+			params: {
+				groupId: <%= scopeGroupId %>,
+				tempFolderName: '<%= KBWebKeys.TEMP_FOLDER_NAME %>'
+			}
+		},
+		uploadFile:
+			'<liferay-portlet:actionURL name="addTempAttachment"><portlet:param name="resourcePrimKey" value="<%= String.valueOf(resourcePrimKey) %>" /></liferay-portlet:actionURL>'
+	});
 </aui:script>
 
 <aui:script>
-	Liferay.provide(
-		window,
-		'<portlet:namespace />deleteFileEntry',
-		function(fileEntryId) {
-			var A = AUI();
+	Liferay.provide(window, '<portlet:namespace />deleteFileEntry', function(
+		fileEntryId
+	) {
+		var removeFileEntryIdsInput = document.getElementById(
+			'<portlet:namespace />removeFileEntryIds'
+		);
 
-			var removeFileEntryIdsInput = A.one('#<portlet:namespace />removeFileEntryIds');
+		var fileEntries = removeFileEntryIdsInput.value;
 
-			var fileEntries = removeFileEntryIdsInput.val();
+		if (fileEntries.length) {
+			fileEntries += ',';
+		}
 
-			if (fileEntries.length) {
-				fileEntries += ',';
-			}
+		fileEntries += fileEntryId;
 
-			fileEntries += fileEntryId;
+		removeFileEntryIdsInput.value = fileEntries;
 
-			removeFileEntryIdsInput.val(fileEntries);
+		var fileEntryIdWrapper = document.getElementById(
+			'<portlet:namespace />fileEntryIdWrapper' + fileEntryId
+		);
 
-			var fileEntryIdWrapper = A.one('#<portlet:namespace />fileEntryIdWrapper' + fileEntryId);
-
-			if (fileEntryIdWrapper) {
-				fileEntryIdWrapper.hide();
-			}
-		},
-		['aui-base']
-	);
+		if (fileEntryIdWrapper) {
+			fileEntryIdWrapper.hide();
+		}
+	});
 </aui:script>

@@ -72,17 +72,15 @@ public class CORSAnnotationDynamicFeature implements DynamicFeature {
 			MultivaluedMap<String, String> headers =
 				containerRequestContext.getHeaders();
 
-			if (corsSupport.isCORSRequest(headers::getFirst)) {
-				if (corsSupport.isValidCORSRequest(
-						containerRequestContext.getMethod(),
-						headers::getFirst)) {
+			if (corsSupport.isCORSRequest(headers::getFirst) &&
+				corsSupport.isValidCORSRequest(
+					containerRequestContext.getMethod(), headers::getFirst)) {
 
-					MultivaluedMap<String, Object> responseHeaders =
-						containerResponseContext.getHeaders();
+				MultivaluedMap<String, Object> responseHeaders =
+					containerResponseContext.getHeaders();
 
-					corsSupport.writeResponseHeaders(
-						headers::getFirst, responseHeaders::addFirst);
-				}
+				corsSupport.writeResponseHeaders(
+					headers::getFirst, responseHeaders::addFirst);
 			}
 		};
 	}
@@ -99,8 +97,6 @@ public class CORSAnnotationDynamicFeature implements DynamicFeature {
 		Map<String, String> corsHeaders = new HashMap<>();
 
 		corsHeaders.put(
-			CORSSupport.ACCESS_CONTROL_ALLOW_ORIGIN, cors.allowOrigin());
-		corsHeaders.put(
 			CORSSupport.ACCESS_CONTROL_ALLOW_CREDENTIALS,
 			String.valueOf(cors.allowCredentials()));
 		corsHeaders.put(
@@ -109,6 +105,8 @@ public class CORSAnnotationDynamicFeature implements DynamicFeature {
 		corsHeaders.put(
 			CORSSupport.ACCESS_CONTROL_ALLOW_METHODS,
 			StringUtil.merge(cors.allowMethods(), StringPool.COMMA));
+		corsHeaders.put(
+			CORSSupport.ACCESS_CONTROL_ALLOW_ORIGIN, cors.allowOrigin());
 		corsHeaders.put(
 			CORSSupport.ACCESS_CONTROL_EXPOSE_HEADERS,
 			StringUtil.merge(cors.exposeHeaders(), StringPool.COMMA));
@@ -138,23 +136,17 @@ public class CORSAnnotationDynamicFeature implements DynamicFeature {
 			MultivaluedMap<String, String> headers =
 				containerRequestContext.getHeaders();
 
-			if (_corsSupport.isCORSRequest(headers::getFirst)) {
-				if (StringUtil.equals(
-						containerRequestContext.getMethod(), "OPTIONS")) {
+			if (_corsSupport.isCORSRequest(headers::getFirst) &&
+				StringUtil.equals(
+					containerRequestContext.getMethod(), "OPTIONS") &&
+				_corsSupport.isValidCORSPreflightRequest(headers::getFirst)) {
 
-					if (_corsSupport.isValidCORSPreflightRequest(
-							headers::getFirst)) {
+				Response.ResponseBuilder responseBuilder = Response.ok();
 
-						Response.ResponseBuilder responseBuilder =
-							Response.ok();
+				_corsSupport.writeResponseHeaders(
+					headers::getFirst, responseBuilder::header);
 
-						_corsSupport.writeResponseHeaders(
-							headers::getFirst, responseBuilder::header);
-
-						containerRequestContext.abortWith(
-							responseBuilder.build());
-					}
-				}
+				containerRequestContext.abortWith(responseBuilder.build());
 			}
 		}
 

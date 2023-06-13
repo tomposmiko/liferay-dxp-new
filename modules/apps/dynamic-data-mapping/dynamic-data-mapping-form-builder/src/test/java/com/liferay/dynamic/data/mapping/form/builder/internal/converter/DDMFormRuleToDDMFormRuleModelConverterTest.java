@@ -59,7 +59,7 @@ import org.skyscreamer.jsonassert.JSONAssert;
 @PrepareForTest(ServiceContextThreadLocal.class)
 @RunWith(PowerMockRunner.class)
 public class DDMFormRuleToDDMFormRuleModelConverterTest
-	extends BaseDDMConverterTest {
+	extends BaseDDMConverterTestCase {
 
 	@Before
 	public void setUp() throws Exception {
@@ -336,7 +336,7 @@ public class DDMFormRuleToDDMFormRuleModelConverterTest
 				com.liferay.dynamic.data.mapping.model.DDMFormRule[].class);
 
 		List<DDMFormRule> actualDDMFormRules = _ddmFormRuleConverter.convert(
-			ListUtil.toList(ddmFormRules));
+			ListUtil.fromArray(ddmFormRules));
 
 		JSONAssert.assertEquals(
 			read(toFileName), serialize(actualDDMFormRules), false);

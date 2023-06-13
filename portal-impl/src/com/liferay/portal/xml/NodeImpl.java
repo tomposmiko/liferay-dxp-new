@@ -51,10 +51,10 @@ public class NodeImpl implements Node {
 
 	@Override
 	public Node asXPathResult(Element parent) {
-		ElementImpl parentImpl = (ElementImpl)parent;
+		ElementImpl parentElementImpl = (ElementImpl)parent;
 
 		org.dom4j.Node node = _node.asXPathResult(
-			parentImpl.getWrappedElement());
+			parentElementImpl.getWrappedElement());
 
 		if (node == null) {
 			return null;
@@ -107,7 +107,9 @@ public class NodeImpl implements Node {
 			return false;
 		}
 
-		org.dom4j.Node node = ((NodeImpl)obj).getWrappedNode();
+		NodeImpl nodeImpl = (NodeImpl)obj;
+
+		org.dom4j.Node node = nodeImpl.getWrappedNode();
 
 		return _node.equals(node);
 	}
@@ -171,9 +173,9 @@ public class NodeImpl implements Node {
 
 	@Override
 	public String getPath(Element context) {
-		ElementImpl contextImpl = (ElementImpl)context;
+		ElementImpl contextElementImpl = (ElementImpl)context;
 
-		return _node.getPath(contextImpl.getWrappedElement());
+		return _node.getPath(contextElementImpl.getWrappedElement());
 	}
 
 	@Override
@@ -193,9 +195,9 @@ public class NodeImpl implements Node {
 
 	@Override
 	public String getUniquePath(Element context) {
-		ElementImpl contextImpl = (ElementImpl)context;
+		ElementImpl contextElementImpl = (ElementImpl)context;
 
-		return _node.getUniquePath(contextImpl.getWrappedElement());
+		return _node.getUniquePath(contextElementImpl.getWrappedElement());
 	}
 
 	public org.dom4j.Node getWrappedNode() {

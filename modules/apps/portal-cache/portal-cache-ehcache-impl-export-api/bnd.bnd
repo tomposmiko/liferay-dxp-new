@@ -1,0 +1,10 @@
+Bundle-Name: Liferay Portal Cache Ehcache Implementation Export API
+Bundle-SymbolicName: com.liferay.portal.cache.ehcache.impl.export.api
+Bundle-Version: 1.0.2
+Export-Package:\
+	net.sf.ehcache,\
+	net.sf.ehcache.config
+Fragment-Host: com.liferay.portal.cache.ehcache.impl
+Import-Package:\
+	net.sf.ehcache,\
+	net.sf.ehcache.config

@@ -802,6 +802,7 @@ public class RoleFinderImpl extends RoleFinderBaseImpl implements RoleFinder {
 					name, actionId);
 
 			qPos.add(resourceAction.getBitwiseValue());
+			qPos.add(resourceAction.getBitwiseValue());
 
 			return q.list(true);
 		}
@@ -1177,9 +1178,7 @@ public class RoleFinderImpl extends RoleFinderBaseImpl implements RoleFinder {
 		StringBundler sb = new StringBundler(params.size());
 
 		for (Map.Entry<String, Object> entry : params.entrySet()) {
-			Object value = entry.getValue();
-
-			if (Validator.isNotNull(value)) {
+			if (Validator.isNotNull(entry.getValue())) {
 				sb.append(getJoin(entry.getKey()));
 			}
 		}
@@ -1231,9 +1230,7 @@ public class RoleFinderImpl extends RoleFinderBaseImpl implements RoleFinder {
 		StringBundler sb = new StringBundler(params.size());
 
 		for (Map.Entry<String, Object> entry : params.entrySet()) {
-			Object value = entry.getValue();
-
-			if (Validator.isNotNull(value)) {
+			if (Validator.isNotNull(entry.getValue())) {
 				sb.append(getWhere(entry.getKey()));
 			}
 		}

@@ -1,4 +1,0 @@
-Bundle-Name: Liferay Change Tracking UAD
-Bundle-SymbolicName: com.liferay.change.tracking.uad
-Bundle-Version: 1.0.6
--dsannotations-options: inherit

@@ -29,12 +29,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 /**
  * @author Tomas Polesovsky
  */
-@ProviderType
 public class StagingPermissionChecker implements PermissionChecker {
 
 	public StagingPermissionChecker(PermissionChecker permissionChecker) {
@@ -84,9 +81,8 @@ public class StagingPermissionChecker implements PermissionChecker {
 
 	@Override
 	public long[] getRoleIds(long userId, long groupId) {
-		long liveGroupId = StagingUtil.getLiveGroupId(groupId);
-
-		return _permissionChecker.getRoleIds(userId, liveGroupId);
+		return _permissionChecker.getRoleIds(
+			userId, StagingUtil.getLiveGroupId(groupId));
 	}
 
 	@Override
@@ -128,10 +124,8 @@ public class StagingPermissionChecker implements PermissionChecker {
 
 		Group liveGroup = StagingUtil.getLiveGroup(group);
 
-		if (liveGroup != group) {
-			if (primKey == group.getGroupId()) {
-				primKey = liveGroup.getGroupId();
-			}
+		if ((liveGroup != group) && (primKey == group.getGroupId())) {
+			primKey = liveGroup.getGroupId();
 		}
 
 		if (_isStagingFolder(name, actionId)) {
@@ -148,10 +142,10 @@ public class StagingPermissionChecker implements PermissionChecker {
 
 		Group liveGroup = StagingUtil.getLiveGroup(group);
 
-		if (liveGroup != group) {
-			if (primKey.equals(String.valueOf(group.getGroupId()))) {
-				primKey = String.valueOf(liveGroup.getGroupId());
-			}
+		if ((liveGroup != group) &&
+			primKey.equals(String.valueOf(group.getGroupId()))) {
+
+			primKey = String.valueOf(liveGroup.getGroupId());
 		}
 
 		if (_isStagingFolder(name, actionId)) {
@@ -200,30 +194,26 @@ public class StagingPermissionChecker implements PermissionChecker {
 
 	@Override
 	public boolean isContentReviewer(long companyId, long groupId) {
-		long liveGroupId = StagingUtil.getLiveGroupId(groupId);
-
-		return _permissionChecker.isContentReviewer(companyId, liveGroupId);
+		return _permissionChecker.isContentReviewer(
+			companyId, StagingUtil.getLiveGroupId(groupId));
 	}
 
 	@Override
 	public boolean isGroupAdmin(long groupId) {
-		long liveGroupId = StagingUtil.getLiveGroupId(groupId);
-
-		return _permissionChecker.isGroupAdmin(liveGroupId);
+		return _permissionChecker.isGroupAdmin(
+			StagingUtil.getLiveGroupId(groupId));
 	}
 
 	@Override
 	public boolean isGroupMember(long groupId) {
-		long liveGroupId = StagingUtil.getLiveGroupId(groupId);
-
-		return _permissionChecker.isGroupMember(liveGroupId);
+		return _permissionChecker.isGroupMember(
+			StagingUtil.getLiveGroupId(groupId));
 	}
 
 	@Override
 	public boolean isGroupOwner(long groupId) {
-		long liveGroupId = StagingUtil.getLiveGroupId(groupId);
-
-		return _permissionChecker.isGroupOwner(liveGroupId);
+		return _permissionChecker.isGroupOwner(
+			StagingUtil.getLiveGroupId(groupId));
 	}
 
 	@Override

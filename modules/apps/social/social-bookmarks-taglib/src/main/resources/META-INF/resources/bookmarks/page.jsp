@@ -29,12 +29,12 @@ String dropdownMenuComponentId = randomNamespace + "socialBookmarksDropdownMenu"
 
 <div class="taglib-social-bookmarks" id="<%= randomNamespace %>socialBookmarks">
 	<c:choose>
-		<c:when test='<%= displayStyle.equals("menu") %>'>
+		<c:when test='<%= displayStyle.equals("menu") || BrowserSnifferUtil.isMobile(request) %>'>
 			<clay:dropdown-menu
 				componentId="<%= dropdownMenuComponentId %>"
 				dropdownItems="<%= SocialBookmarksTagUtil.getDropdownItems(request.getLocale(), types, className, classPK, title, url) %>"
 				icon="share"
-				label='<%= LanguageUtil.get(request, "share") %>'
+				label='<%= BrowserSnifferUtil.isMobile(request) ? null : LanguageUtil.get(request, "share") %>'
 				style="secondary"
 				triggerCssClasses="btn-outline-borderless btn-outline-secondary btn-sm"
 			/>
@@ -92,7 +92,14 @@ String dropdownMenuComponentId = randomNamespace + "socialBookmarksDropdownMenu"
 		outputKey="social_bookmarks"
 	>
 		<aui:script>
-			function socialBookmarks_handleItemClick(event, className, classPK, type, postURL, url) {
+			function socialBookmarks_handleItemClick(
+				event,
+				className,
+				classPK,
+				type,
+				postURL,
+				url
+			) {
 				var SHARE_WINDOW_HEIGHT = 436;
 				var SHARE_WINDOW_WIDTH = 626;
 
@@ -110,15 +117,12 @@ String dropdownMenuComponentId = randomNamespace + "socialBookmarksDropdownMenu"
 
 				window.open(postURL, null, shareWindowFeatures.join()).focus();
 
-				Liferay.fire(
-					'socialBookmarks:share',
-					{
-						className: className,
-						classPK: classPK,
-						type: type,
-						url: url
-					}
-				);
+				Liferay.fire('socialBookmarks:share', {
+					className: className,
+					classPK: classPK,
+					type: type,
+					url: url
+				});
 
 				return false;
 			}
@@ -126,26 +130,23 @@ String dropdownMenuComponentId = randomNamespace + "socialBookmarksDropdownMenu"
 	</liferay-util:html-bottom>
 
 	<aui:script sandbox="<%= true %>">
-		Liferay.componentReady('<%= dropdownMenuComponentId %>').then(
-			function(dropdownMenu) {
-				dropdownMenu.on(
-					['itemClicked'],
-					function(event) {
-						event.preventDefault();
+		Liferay.componentReady('<%= dropdownMenuComponentId %>').then(function(
+			dropdownMenu
+		) {
+			dropdownMenu.on(['itemClicked'], function(event) {
+				event.preventDefault();
 
-						var data = event.data.item.data;
+				var data = event.data.item.data;
 
-						socialBookmarks_handleItemClick(
-							event,
-							data.className,
-							parseInt(data.classPK),
-							data.type,
-							data.postURL,
-							data.url
-						);
-					}
+				socialBookmarks_handleItemClick(
+					event,
+					data.className,
+					parseInt(data.classPK),
+					data.type,
+					data.postURL,
+					data.url
 				);
-			}
-		);
+			});
+		});
 	</aui:script>
 </div>
