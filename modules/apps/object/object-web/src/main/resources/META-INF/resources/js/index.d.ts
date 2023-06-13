@@ -104,8 +104,7 @@ interface ObjectDefinition {
 	active: boolean;
 	dateCreated: string;
 	dateModified: string;
-	enableCategorization: boolean;
-	enableComments: boolean;
+	enabledCategorization: boolean;
 	id: number;
 	label: LocalizedValue<string>;
 	name: string;
@@ -117,6 +116,7 @@ interface ObjectDefinition {
 	parameterRequired?: boolean;
 	pluralLabel: LocalizedValue<string>;
 	portlet: boolean;
+	restContextPath: string;
 	scope: string;
 	status: {
 		code: number;
@@ -135,8 +135,31 @@ interface ObjectFieldSetting {
 		| string
 		| number
 		| boolean
+		| NameValueObject[]
 		| ObjectFieldFilterSetting[]
 		| ObjectFieldPicklistSetting;
+}
+
+interface ObjectEntry {
+	creator: {
+		additionalName: string;
+		contentType: string;
+		familyName: string;
+		givenName: string;
+		id: number;
+		name: string;
+	};
+	dateCreated: string;
+	dateModified: string;
+	externalReferenceCode: string;
+	id: number;
+	name: string;
+	status: {
+		code: number;
+		label: string;
+		label_i18n: string;
+	};
+	[key: string]: string | number | unknown;
 }
 
 type ObjectFieldPicklistSetting = {
@@ -257,6 +280,11 @@ interface PredefinedValue {
 
 interface LabelValueObject {
 	label: string;
+	value: string;
+}
+
+interface NameValueObject {
+	name: string;
 	value: string;
 }
 

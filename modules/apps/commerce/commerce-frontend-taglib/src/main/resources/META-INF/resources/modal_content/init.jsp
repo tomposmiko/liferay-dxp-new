@@ -21,7 +21,8 @@
 <%@ taglib uri="http://liferay.com/tld/aui" prefix="aui" %><%@
 taglib uri="http://liferay.com/tld/clay" prefix="clay" %><%@
 taglib uri="http://liferay.com/tld/frontend" prefix="liferay-frontend" %><%@
-taglib uri="http://liferay.com/tld/theme" prefix="liferay-theme" %>
+taglib uri="http://liferay.com/tld/theme" prefix="liferay-theme" %><%@
+taglib uri="http://liferay.com/tld/ui" prefix="liferay-ui" %>
 
 <%@ page import="com.liferay.petra.string.StringPool" %><%@
 page import="com.liferay.portal.kernel.language.LanguageUtil" %><%@
@@ -37,6 +38,7 @@ page import="com.liferay.portal.kernel.util.Validator" %>
 
 <%
 String contentCssClasses = (String)request.getAttribute("liferay-commerce:modal-content:contentCssClasses");
+String redirect = (String)request.getAttribute("liferay-commerce:modal-content:redirect");
 boolean showCancelButton = (boolean)request.getAttribute("liferay-commerce:modal-content:showCancelButton");
 boolean showSubmitButton = (boolean)request.getAttribute("liferay-commerce:modal-content:showSubmitButton");
 String submitButtonLabel = (String)request.getAttribute("liferay-commerce:modal-content:submitButtonLabel");

@@ -14,18 +14,21 @@
 
 package com.liferay.object.rest.internal.resource.v1_0;
 
-import com.liferay.object.exception.NoSuchObjectRelationshipException;
 import com.liferay.object.model.ObjectDefinition;
-import com.liferay.object.model.ObjectEntry;
 import com.liferay.object.model.ObjectRelationship;
+import com.liferay.object.rest.dto.v1_0.ObjectEntry;
 import com.liferay.object.rest.manager.v1_0.ObjectEntryManager;
 import com.liferay.object.rest.manager.v1_0.ObjectEntryManagerTracker;
 import com.liferay.object.service.ObjectDefinitionLocalService;
-import com.liferay.object.service.ObjectEntryLocalService;
 import com.liferay.object.service.ObjectRelationshipLocalService;
-import com.liferay.portal.kernel.dao.orm.QueryUtil;
-import com.liferay.portal.kernel.util.ListUtil;
+import com.liferay.object.service.ObjectRelationshipService;
+import com.liferay.object.system.SystemObjectDefinitionMetadata;
+import com.liferay.object.system.SystemObjectDefinitionMetadataTracker;
+import com.liferay.portal.kernel.service.ServiceContext;
+import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
+import com.liferay.portal.kernel.util.PropsUtil;
+import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.vulcan.dto.converter.DTOConverterRegistry;
 import com.liferay.portal.vulcan.dto.converter.DefaultDTOConverterContext;
 import com.liferay.portal.vulcan.pagination.Page;
@@ -33,9 +36,7 @@ import com.liferay.portal.vulcan.pagination.Pagination;
 
 import java.net.URI;
 
-import java.util.List;
-import java.util.Objects;
-
+import javax.ws.rs.NotFoundException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.UriInfo;
 
@@ -59,96 +60,126 @@ public class RelatedObjectEntryResourceImpl
 			String objectRelationshipName, Pagination pagination)
 		throws Exception {
 
-		ObjectRelationship objectRelationship = _getObjectRelationship(
-			objectRelationshipName);
+		if (!GetterUtil.getBoolean(PropsUtil.get("feature.flag.LPS-153324"))) {
+			throw new NotFoundException();
+		}
 
-		ObjectDefinition currentObjectDefinition = _getCurrentObjectDefinition(
-			objectEntryId, objectRelationship, _uriInfo);
+		ObjectDefinition systemObjectDefinition = _getSystemObjectDefinition(
+			previousPath);
+
+		ObjectRelationship objectRelationship =
+			_objectRelationshipLocalService.
+				getObjectRelationshipByObjectDefinitionId(
+					systemObjectDefinition.getObjectDefinitionId(),
+					objectRelationshipName);
 
 		ObjectDefinition relatedObjectDefinition = _getRelatedObjectDefinition(
-			currentObjectDefinition, objectRelationship);
+			systemObjectDefinition, objectRelationship);
 
 		ObjectEntryManager objectEntryManager =
 			_objectEntryManagerTracker.getObjectEntryManager(
-				currentObjectDefinition.getStorageType());
+				systemObjectDefinition.getStorageType());
 
 		if (relatedObjectDefinition.isSystem()) {
 			return objectEntryManager.getRelatedSystemObjectEntries(
-				currentObjectDefinition, objectEntryId, objectRelationshipName,
+				systemObjectDefinition, objectEntryId, objectRelationshipName,
 				pagination);
 		}
 
 		return (Page)objectEntryManager.getObjectEntryRelatedObjectEntries(
 			_getDefaultDTOConverterContext(
-				currentObjectDefinition, objectEntryId, _uriInfo),
-			currentObjectDefinition, objectEntryId, objectRelationshipName,
+				systemObjectDefinition, objectEntryId, _uriInfo),
+			systemObjectDefinition, objectEntryId, objectRelationshipName,
 			pagination);
 	}
 
-	private ObjectDefinition _getCurrentObjectDefinition(
-			long objectEntryId, ObjectRelationship objectRelationship,
-			UriInfo uriInfo)
+	@Override
+	public ObjectEntry putObjectRelationshipMappingTableValues(
+			String previousPath, Long objectEntryId,
+			String objectRelationshipName, Long relatedObjectEntryId,
+			Pagination pagination)
 		throws Exception {
 
-		ObjectEntry objectEntry = _objectEntryLocalService.fetchObjectEntry(
-			objectEntryId);
-
-		if (objectEntry != null) {
-			return _objectDefinitionLocalService.getObjectDefinition(
-				objectEntry.getObjectDefinitionId());
+		if (!GetterUtil.getBoolean(PropsUtil.get("feature.flag.LPS-153324"))) {
+			throw new NotFoundException();
 		}
+
+		ObjectDefinition systemObjectDefinition = _getSystemObjectDefinition(
+			previousPath);
+
+		ObjectRelationship objectRelationship =
+			_objectRelationshipLocalService.
+				getObjectRelationshipByObjectDefinitionId(
+					systemObjectDefinition.getObjectDefinitionId(),
+					objectRelationshipName);
 
 		ObjectDefinition objectDefinition =
 			_objectDefinitionLocalService.getObjectDefinition(
 				objectRelationship.getObjectDefinitionId1());
 
-		URI uri = uriInfo.getBaseUri();
+		_objectRelationshipService.addObjectRelationshipMappingTableValues(
+			objectRelationship.getObjectRelationshipId(),
+			_getPrimaryKey1(
+				objectDefinition, objectEntryId, relatedObjectEntryId,
+				systemObjectDefinition),
+			_getPrimaryKey2(
+				objectDefinition, objectEntryId, relatedObjectEntryId,
+				systemObjectDefinition),
+			new ServiceContext());
 
-		String path = uri.getPath();
+		ObjectEntryManager objectEntryManager =
+			_objectEntryManagerTracker.getObjectEntryManager(
+				systemObjectDefinition.getStorageType());
 
-		if (!Objects.equals(
-				objectDefinition.getRESTContextPath(), path.split("/")[2])) {
+		ObjectDefinition relatedObjectDefinition = _getRelatedObjectDefinition(
+			systemObjectDefinition, objectRelationship);
 
-			objectDefinition =
-				_objectDefinitionLocalService.getObjectDefinition(
-					objectRelationship.getObjectDefinitionId2());
-		}
-
-		return objectDefinition;
+		return objectEntryManager.getObjectEntry(
+			_getDefaultDTOConverterContext(
+				relatedObjectDefinition, relatedObjectEntryId, _uriInfo),
+			relatedObjectDefinition, relatedObjectEntryId);
 	}
 
 	private DefaultDTOConverterContext _getDefaultDTOConverterContext(
 		ObjectDefinition objectDefinition, Long objectEntryId,
 		UriInfo uriInfo) {
 
-		return new DefaultDTOConverterContext(
-			_dtoConverterRegistry, objectEntryId,
-			LocaleUtil.fromLanguageId(
-				objectDefinition.getDefaultLanguageId(), true, false),
-			uriInfo, null);
+		DefaultDTOConverterContext defaultDTOConverterContext =
+			new DefaultDTOConverterContext(
+				_dtoConverterRegistry, objectEntryId,
+				LocaleUtil.fromLanguageId(
+					objectDefinition.getDefaultLanguageId(), true, false),
+				uriInfo, null);
+
+		defaultDTOConverterContext.setAttribute("addActions", Boolean.FALSE);
+
+		return defaultDTOConverterContext;
 	}
 
-	private ObjectRelationship _getObjectRelationship(
-			String objectRelationshipName)
-		throws Exception {
+	private long _getPrimaryKey1(
+		ObjectDefinition objectDefinition, long objectEntryId,
+		long relatedObjectEntryId, ObjectDefinition systemObjectDefinition) {
 
-		List<ObjectRelationship> objectRelationships = ListUtil.filter(
-			_objectRelationshipLocalService.getObjectRelationships(
-				QueryUtil.ALL_POS, QueryUtil.ALL_POS),
-			objectRelationship ->
-				!objectRelationship.isReverse() &&
-				objectRelationship.getName(
-				).equals(
-					objectRelationshipName
-				));
+		if (objectDefinition.getObjectDefinitionId() ==
+				systemObjectDefinition.getObjectDefinitionId()) {
 
-		if (objectRelationships.isEmpty()) {
-			throw new NoSuchObjectRelationshipException(
-				"No ObjectRelationship exists with the name " +
-					objectRelationshipName);
+			return objectEntryId;
 		}
 
-		return objectRelationships.get(0);
+		return relatedObjectEntryId;
+	}
+
+	private long _getPrimaryKey2(
+		ObjectDefinition objectDefinition, long objectEntryId,
+		long relatedObjectEntryId, ObjectDefinition systemObjectDefinition) {
+
+		if (objectDefinition.getObjectDefinitionId() ==
+				systemObjectDefinition.getObjectDefinitionId()) {
+
+			return relatedObjectEntryId;
+		}
+
+		return objectEntryId;
 	}
 
 	private ObjectDefinition _getRelatedObjectDefinition(
@@ -167,6 +198,53 @@ public class RelatedObjectEntryResourceImpl
 			objectRelationship.getObjectDefinitionId2());
 	}
 
+	private ObjectDefinition _getSystemObjectDefinition(String previousPath) {
+		SystemObjectDefinitionMetadata systemObjectDefinitionMetadata =
+			_getSystemObjectDefinitionMetadata(previousPath);
+
+		ObjectDefinition systemObjectDefinition =
+			_objectDefinitionLocalService.fetchSystemObjectDefinition(
+				systemObjectDefinitionMetadata.getName());
+
+		if (systemObjectDefinition != null) {
+			return systemObjectDefinition;
+		}
+
+		throw new NotFoundException(
+			"No system object definition metadata for name \"" +
+				systemObjectDefinitionMetadata.getName() + "\"");
+	}
+
+	private SystemObjectDefinitionMetadata _getSystemObjectDefinitionMetadata(
+		String previousPath) {
+
+		URI uri = _uriInfo.getBaseUri();
+
+		String path = uri.getPath();
+
+		String restContextPath = path.split("/")[2] + "/v1.0/" + previousPath;
+
+		for (ObjectDefinition systemObjectDefinition :
+				_objectDefinitionLocalService.getSystemObjectDefinitions()) {
+
+			SystemObjectDefinitionMetadata systemObjectDefinitionMetadata =
+				_systemObjectDefinitionMetadataTracker.
+					getSystemObjectDefinitionMetadata(
+						systemObjectDefinition.getName());
+
+			if (StringUtil.equals(
+					systemObjectDefinitionMetadata.getRESTContextPath(),
+					restContextPath)) {
+
+				return systemObjectDefinitionMetadata;
+			}
+		}
+
+		throw new NotFoundException(
+			"No system object definition metadata for REST context path \"" +
+				restContextPath + "\"");
+	}
+
 	@Reference
 	private DTOConverterRegistry _dtoConverterRegistry;
 
@@ -174,13 +252,17 @@ public class RelatedObjectEntryResourceImpl
 	private ObjectDefinitionLocalService _objectDefinitionLocalService;
 
 	@Reference
-	private ObjectEntryLocalService _objectEntryLocalService;
-
-	@Reference
 	private ObjectEntryManagerTracker _objectEntryManagerTracker;
 
 	@Reference
 	private ObjectRelationshipLocalService _objectRelationshipLocalService;
+
+	@Reference
+	private ObjectRelationshipService _objectRelationshipService;
+
+	@Reference
+	private SystemObjectDefinitionMetadataTracker
+		_systemObjectDefinitionMetadataTracker;
 
 	@Context
 	private UriInfo _uriInfo;

@@ -117,7 +117,12 @@
 </tr>
 <tr>
 	<td>SUBSCRIPTION_DROPDOWN</td>
-	<td>//button[contains(@class, 'dropdown-toggle') and contains(text(), 'Partnership')]</td>
+	<td>//*[contains(text(), '${key_dropdownLabel}')]/following-sibling::*[@class='dropdown']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>SUBSCRIPTION_DROPDOWN_ITEM</td>
+	<td>//*[@class='dropdown-item' and text()='${key_text}']</td>
 	<td></td>
 </tr>
 <tr>
@@ -162,7 +167,7 @@
 </tr>
 <tr>
 	<td>GETTING_STARTED_MODAL</td>
-	<td>//header[contains(@class,'p-4')]//h2[contains(text(),'Let’s set up your project')]</td>
+	<td>//header[contains(@class,'p-4')]//h2[contains(text(),"Let's set up your project")]</td>
 	<td></td>
 </tr>
 <tr>

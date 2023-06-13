@@ -74,11 +74,7 @@ export function ModalAddFilter({
 		);
 	}, [objectFields, query]);
 
-	const getCheckedWorkflowStatusItems = (
-		itemValues: TWorkflowStatus[]
-	): IItem[] => {
-		let newItemsValues: IItem[] = [];
-
+	const setEditingFilterType = () => {
 		const currentFilterColumn = currentFilters.find((filterColumn) => {
 			if (filterColumn.objectFieldName === editingObjectFieldName) {
 				return filterColumn;
@@ -102,6 +98,16 @@ export function ModalAddFilter({
 			});
 		}
 
+		return valuesArray;
+	};
+
+	const getCheckedWorkflowStatusItems = (
+		itemValues: TWorkflowStatus[]
+	): IItem[] => {
+		let newItemsValues: IItem[] = [];
+
+		const valuesArray = setEditingFilterType() as number[];
+
 		newItemsValues = itemValues.map((itemValue) => {
 			const item = {
 				checked: false,
@@ -109,7 +115,7 @@ export function ModalAddFilter({
 				value: itemValue.value,
 			};
 
-			if (valuesArray?.includes(itemValue.value)) {
+			if (valuesArray?.includes(Number(itemValue.value))) {
 				item.checked = true;
 			}
 
@@ -122,30 +128,9 @@ export function ModalAddFilter({
 	const getCheckedPickListItems = (itemValues: PickListItem[]): IItem[] => {
 		let newItemsValues: IItem[] = [];
 
-		const currentFilterColumn = currentFilters.find((filterColumn) => {
-			if (filterColumn.objectFieldName === editingObjectFieldName) {
-				return filterColumn;
-			}
-		});
+		const valuesArray = setEditingFilterType() as string[];
 
-		const definition = currentFilterColumn?.definition;
-		const filterType = currentFilterColumn?.filterType;
-
-		const valuesArray =
-			definition && filterType ? definition[filterType] : null;
-
-		const editingFilterType = filterOperators.picklistOperators.find(
-			(filterType) => filterType.value === currentFilterColumn?.filterType
-		);
-
-		if (editingFilterType) {
-			setSelectedFilterType({
-				label: editingFilterType.label,
-				value: editingFilterType.value,
-			});
-		}
-
-		newItemsValues = itemValues.map((itemValue) => {
+		newItemsValues = (itemValues as PickListItem[]).map((itemValue) => {
 			const item = {
 				checked: false,
 				label: itemValue.name,
@@ -153,6 +138,55 @@ export function ModalAddFilter({
 			};
 
 			if (valuesArray?.includes(itemValue.key)) {
+				item.checked = true;
+			}
+
+			return item;
+		});
+
+		return newItemsValues;
+	};
+
+	const getCheckedRelationshipItems = (
+		relatedEntries: ObjectEntry[],
+		titleFieldName: string,
+		systemField: boolean
+	): IItem[] => {
+		let newItemsValues: IItem[] = [];
+
+		const valuesArray = setEditingFilterType() as string[];
+
+		newItemsValues = relatedEntries.map((entry) => {
+			let item = {
+				checked: false,
+				value: entry.externalReferenceCode,
+			} as IItem;
+
+			if (systemField && titleFieldName === 'creator') {
+				const {name} = entry.creator;
+
+				item = {
+					...item,
+					label: name,
+				};
+			}
+
+			if (systemField && titleFieldName === 'status') {
+				const {label_i18n} = entry.status;
+
+				item = {
+					...item,
+					label: label_i18n,
+				};
+			}
+			else {
+				item = {
+					...item,
+					label: entry[titleFieldName] as string,
+				};
+			}
+
+			if (valuesArray.includes(entry.externalReferenceCode)) {
 				item.checked = true;
 			}
 
@@ -205,6 +239,79 @@ export function ModalAddFilter({
 				}
 
 				setItems(newItems);
+			}
+			else if (objectField.businessType === 'Relationship') {
+				const makeFetch = async () => {
+					const {objectFieldSettings} = objectField;
+
+					const [{value}] = objectFieldSettings as NameValueObject[];
+
+					const [
+						{objectFields, restContextPath, titleObjectFieldId},
+					] = await API.getObjectDefinitions(
+						`filter=name eq '${value}'`
+					);
+
+					const titleField = objectFields.find((objectField) =>
+						titleObjectFieldId === 0
+							? objectField.system && objectField.name === 'id'
+							: objectField.id === titleObjectFieldId
+					) as ObjectField;
+
+					const relatedEntries = await API.getList<ObjectEntry>(
+						`${restContextPath}`
+					);
+
+					if (editingFilter) {
+						setItems(
+							getCheckedRelationshipItems(
+								relatedEntries,
+								titleField.name,
+								titleField.system as boolean
+							)
+						);
+					}
+					else {
+						const newItems = relatedEntries.map((entry) => {
+							const newItemsObject = {
+								value: entry.externalReferenceCode,
+							} as LabelValueObject;
+
+							if (
+								titleField.system &&
+								titleField.name === 'creator'
+							) {
+								const {name} = entry.creator;
+
+								return {
+									...newItemsObject,
+									label: name,
+								};
+							}
+
+							if (
+								titleField.system &&
+								titleField.name === 'status'
+							) {
+								const {label_i18n} = entry.status;
+
+								return {
+									...newItemsObject,
+									label: label_i18n,
+								};
+							}
+
+							return {
+								...newItemsObject,
+								label: entry[titleField?.name] as string,
+							};
+						});
+
+						setItems(newItems);
+					}
+				};
+
+				makeFetch();
 			}
 		},
 		// eslint-disable-next-line react-hooks/exhaustive-deps
@@ -275,7 +382,8 @@ export function ModalAddFilter({
 				selectedFilterBy?.businessType,
 				selectedFilterType?.value,
 				selectedFilterBy?.name === 'status' ||
-					selectedFilterBy?.businessType === 'Picklist'
+					selectedFilterBy?.businessType === 'Picklist' ||
+					selectedFilterBy?.businessType === 'Relationship'
 					? checkedItems
 					: undefined,
 				value ?? undefined
@@ -289,7 +397,8 @@ export function ModalAddFilter({
 				selectedFilterBy?.businessType,
 				selectedFilterType?.value,
 				selectedFilterBy?.name === 'status' ||
-					selectedFilterBy?.businessType === 'Picklist'
+					selectedFilterBy?.businessType === 'Picklist' ||
+					selectedFilterBy?.businessType === 'Relationship'
 					? checkedItems
 					: selectedFilterBy?.businessType === 'Date'
 					? items
@@ -384,7 +493,8 @@ export function ModalAddFilter({
 
 				{selectedFilterType &&
 					(selectedFilterBy?.name === 'status' ||
-						selectedFilterBy?.businessType === 'Picklist') && (
+						selectedFilterBy?.businessType === 'Picklist' ||
+						selectedFilterBy?.businessType === 'Relationship') && (
 						<MultipleSelect
 							error={errors.items}
 							label={Liferay.Language.get('value')}
@@ -524,7 +634,9 @@ export type FilterValidation = {
 };
 
 type TCurrentFilter = {
-	definition: {[key: string]: string[]} | null;
+	definition: {
+		[key: string]: string[] | number[];
+	} | null;
 	fieldLabel?: string;
 	filterBy?: string;
 	filterType: string | null;

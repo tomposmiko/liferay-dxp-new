@@ -17,8 +17,8 @@ import PropTypes from 'prop-types';
 import React, {useState} from 'react';
 
 import useControlledState from '../../../core/hooks/useControlledState';
+import {useId} from '../../../core/hooks/useId';
 import {ConfigurationFieldPropTypes} from '../../../prop-types/index';
-import {useId} from '../../utils/useId';
 
 export function TextField({field, onValueSelect, value}) {
 	const [errorMessage, setErrorMessage] = useState('');
@@ -86,9 +86,9 @@ export function TextField({field, onValueSelect, value}) {
 			/>
 
 			{field.description ? (
-				<div className="mt-1 small text-secondary" id={helpTextId}>
+				<p className="m-0 mt-1 small text-secondary" id={helpTextId}>
 					{field.description}
-				</div>
+				</p>
 			) : null}
 
 			{errorMessage && (

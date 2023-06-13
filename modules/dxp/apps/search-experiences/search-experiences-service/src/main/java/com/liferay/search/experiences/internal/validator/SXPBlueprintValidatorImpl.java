@@ -52,7 +52,7 @@ public class SXPBlueprintValidatorImpl implements SXPBlueprintValidator {
 			SXPBlueprintValidatorImpl.class, configurationJSON,
 			"dependencies/sxpblueprint.schema.json");
 
-		if (!ListUtil.isEmpty(problems)) {
+		if (ListUtil.isNotEmpty(problems)) {
 			throw new SXPBlueprintConfigurationJSONException(problems);
 		}
 	}
@@ -67,7 +67,8 @@ public class SXPBlueprintValidatorImpl implements SXPBlueprintValidator {
 		if (MapUtil.isEmpty(titleMap)) {
 			throw new SXPBlueprintTitleException(
 				ListUtil.fromArray(
-					new Problem.Builder().message(
+					new Problem.Builder(
+					).message(
 						"Title is empty"
 					).severity(
 						Severity.ERROR

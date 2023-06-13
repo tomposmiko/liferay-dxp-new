@@ -111,11 +111,6 @@
 	 <td></td>
 </tr>
 <tr>
-	<td>ORDER_AND_SHIPMENT_ERC_VALUE</td>
-	<td>//span[@title="External Reference Code"]//..//strong[contains(@class,'header-info-value') and normalize-space(text()='${key_erc}')]</td>
-	 <td></td>
-</tr>
-<tr>
 	<td>SHIPMENT_ITEM_ERC_COLUMN</td>
 	<td>//div[contains(@class,'dnd-tbody')]//div[contains(text(),'${key_ercColumnValue}')]/..//div[3]</td>
 	<td></td>
@@ -168,6 +163,11 @@
 <tr>
 	<td>PLACED_ORDERS_DETAILS_STATUS</td>
 	<td>//dl[contains(.,'Order Status')]/dd[contains(text(),'${key_status}')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>PLACED_ORDERS_LIST_ACCOUNT</td>
+	<td>//div[@class='dnd-tr']/div[@class='dnd-td'][6][contains(.,'${key_orderAccount}')]</td>
 	<td></td>
 </tr>
 <tr>

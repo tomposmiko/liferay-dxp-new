@@ -1,6 +1,7 @@
 @component-name = "portal-solutions"
 definition {
 
+	property custom.properties = "feature.flag.LPS-163118=true";
 	property osgi.modules.includes = "site-initializer-testray";
 	property portal.release = "false";
 	property portal.upstream = "true";
@@ -47,7 +48,7 @@ definition {
 		task ("Create a new Case Type and assert it was created") {
 			TestrayManage.createNewCaseTypes(caseName = "Case_Type");
 
-			Testray.assertItemName(name = "Case_Type");
+			Testray.assertItemName(key_name = "Case_Type");
 		}
 	}
 
@@ -71,7 +72,7 @@ definition {
 
 			TestrayManage.deleteCasesTypes(valueName = "Case_Type");
 
-			Testray.assertItemNotPresent(name = "Case_Type");
+			Testray.assertItemNotPresent(key_name = "Case_Type");
 		}
 	}
 
@@ -97,7 +98,7 @@ definition {
 				valueName = "Case_Type",
 				valueType = "Case_Type_Edited");
 
-			Testray.assertItemName(name = "Case_Type_Edited");
+			Testray.assertItemName(key_name = "Case_Type_Edited");
 		}
 	}
 

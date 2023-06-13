@@ -37,8 +37,6 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.security.permission.PermissionChecker;
-import com.liferay.portal.kernel.service.ServiceContext;
-import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.ListUtil;
@@ -139,7 +137,7 @@ public class JournalArticleContentDashboardItem
 						journalArticle.getStatus())),
 				WorkflowConstants.getStatusStyle(journalArticle.getStatus()),
 				String.valueOf(journalArticle.getVersion()), null,
-				journalArticle.getUserName(), journalArticle.getCreateDate()));
+				journalArticle.getUserName(), journalArticle.getStatusDate()));
 	}
 
 	@Override
@@ -173,11 +171,6 @@ public class JournalArticleContentDashboardItem
 		).collect(
 			Collectors.toList()
 		);
-	}
-
-	@Override
-	public Clipboard getClipboard() {
-		return Clipboard.EMPTY;
 	}
 
 	@Override
@@ -336,11 +329,6 @@ public class JournalArticleContentDashboardItem
 	}
 
 	@Override
-	public Preview getPreview() {
-		return new Preview(_getPreviewImageURL(), null);
-	}
-
-	@Override
 	public String getScopeName(Locale locale) {
 		return Optional.ofNullable(
 			_group
@@ -419,33 +407,6 @@ public class JournalArticleContentDashboardItem
 		List<Version> versions = getLatestVersions(locale);
 
 		return versions.get(versions.size() - 1);
-	}
-
-	private String _getPreviewImageURL() {
-		return Optional.ofNullable(
-			ServiceContextThreadLocal.getServiceContext()
-		).map(
-			ServiceContext::getLiferayPortletRequest
-		).map(
-			portletRequest -> {
-				List<ContentDashboardItemAction> contentDashboardItemActions =
-					getContentDashboardItemActions(
-						_portal.getHttpServletRequest(portletRequest),
-						ContentDashboardItemAction.Type.PREVIEW_IMAGE);
-
-				Stream<ContentDashboardItemAction> stream =
-					contentDashboardItemActions.stream();
-
-				return stream.findAny(
-				).map(
-					ContentDashboardItemAction::getURL
-				).orElse(
-					null
-				);
-			}
-		).orElse(
-			null
-		);
 	}
 
 	private ContentDashboardItemAction _toContentDashboardItemAction(

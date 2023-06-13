@@ -25,12 +25,14 @@ import com.liferay.object.service.ObjectDefinitionLocalService;
 import com.liferay.object.service.ObjectFieldLocalService;
 import com.liferay.object.service.ObjectRelationshipLocalService;
 import com.liferay.object.system.SystemObjectDefinitionMetadata;
+import com.liferay.object.system.SystemObjectDefinitionMetadataTracker;
 import com.liferay.petra.sql.dsl.Column;
 import com.liferay.petra.sql.dsl.DSLQueryFactoryUtil;
 import com.liferay.petra.sql.dsl.Table;
 import com.liferay.petra.sql.dsl.query.FromStep;
 import com.liferay.petra.sql.dsl.query.GroupByStep;
 import com.liferay.petra.string.StringBundler;
+import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.model.BaseModel;
 import com.liferay.portal.kernel.service.PersistedModelLocalService;
@@ -52,7 +54,9 @@ public class SystemObjectMtoMObjectRelatedModelsProviderImpl
 		ObjectFieldLocalService objectFieldLocalService,
 		ObjectRelationshipLocalService objectRelationshipLocalService,
 		PersistedModelLocalServiceRegistry persistedModelLocalServiceRegistry,
-		SystemObjectDefinitionMetadata systemObjectDefinitionMetadata) {
+		SystemObjectDefinitionMetadata systemObjectDefinitionMetadata,
+		SystemObjectDefinitionMetadataTracker
+			systemObjectDefinitionMetadataTracker) {
 
 		_objectDefinition = objectDefinition;
 		_objectDefinitionLocalService = objectDefinitionLocalService;
@@ -61,6 +65,8 @@ public class SystemObjectMtoMObjectRelatedModelsProviderImpl
 		_persistedModelLocalServiceRegistry =
 			persistedModelLocalServiceRegistry;
 		_systemObjectDefinitionMetadata = systemObjectDefinitionMetadata;
+		_systemObjectDefinitionMetadataTracker =
+			systemObjectDefinitionMetadataTracker;
 
 		_table = systemObjectDefinitionMetadata.getTable();
 	}
@@ -71,10 +77,11 @@ public class SystemObjectMtoMObjectRelatedModelsProviderImpl
 			long primaryKey)
 		throws PortalException {
 
-		int count = getRelatedModelsCount(
-			groupId, objectRelationshipId, primaryKey);
+		List<T> relatedModels = getRelatedModels(
+			groupId, objectRelationshipId, primaryKey, QueryUtil.ALL_POS,
+			QueryUtil.ALL_POS);
 
-		if (count == 0) {
+		if (relatedModels.isEmpty()) {
 			return;
 		}
 
@@ -82,32 +89,35 @@ public class SystemObjectMtoMObjectRelatedModelsProviderImpl
 			_objectRelationshipLocalService.getObjectRelationship(
 				objectRelationshipId);
 
-		if (objectRelationship.isReverse()) {
-			objectRelationship =
-				_objectRelationshipLocalService.fetchReverseObjectRelationship(
-					objectRelationship, false);
-		}
-
 		if (Objects.equals(
 				objectRelationship.getDeletionType(),
-				ObjectRelationshipConstants.DELETION_TYPE_CASCADE) ||
-			Objects.equals(
-				objectRelationship.getDeletionType(),
-				ObjectRelationshipConstants.DELETION_TYPE_DISASSOCIATE)) {
-
-			_objectRelationshipLocalService.
-				deleteObjectRelationshipMappingTableValues(
-					objectRelationshipId, primaryKey);
-		}
-		else if (Objects.equals(
-					objectRelationship.getDeletionType(),
-					ObjectRelationshipConstants.DELETION_TYPE_PREVENT)) {
+				ObjectRelationshipConstants.DELETION_TYPE_PREVENT) &&
+			!objectRelationship.isReverse()) {
 
 			throw new RequiredObjectRelationshipException(
 				StringBundler.concat(
 					"Object relationship ",
 					objectRelationship.getObjectRelationshipId(),
 					" does not allow deletes"));
+		}
+
+		_objectRelationshipLocalService.
+			deleteObjectRelationshipMappingTableValues(
+				objectRelationshipId, primaryKey);
+
+		if (Objects.equals(
+				objectRelationship.getDeletionType(),
+				ObjectRelationshipConstants.DELETION_TYPE_CASCADE) &&
+			!objectRelationship.isReverse()) {
+
+			SystemObjectDefinitionMetadata systemObjectDefinitionMetadata =
+				_systemObjectDefinitionMetadataTracker.
+					getSystemObjectDefinitionMetadata(
+						_objectDefinition.getName());
+
+			for (BaseModel<T> baseModel : relatedModels) {
+				systemObjectDefinitionMetadata.deleteBaseModel(baseModel);
+			}
 		}
 	}
 
@@ -330,6 +340,8 @@ public class SystemObjectMtoMObjectRelatedModelsProviderImpl
 		_persistedModelLocalServiceRegistry;
 	private final SystemObjectDefinitionMetadata
 		_systemObjectDefinitionMetadata;
+	private final SystemObjectDefinitionMetadataTracker
+		_systemObjectDefinitionMetadataTracker;
 	private final Table _table;
 
 }

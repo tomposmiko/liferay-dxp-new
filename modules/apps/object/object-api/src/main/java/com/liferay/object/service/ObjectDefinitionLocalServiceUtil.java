@@ -74,6 +74,13 @@ public class ObjectDefinitionLocalServiceUtil {
 		return getService().addObjectDefinition(objectDefinition);
 	}
 
+	public static ObjectDefinition addObjectDefinition(
+			String externalReferenceCode, long userId)
+		throws PortalException {
+
+		return getService().addObjectDefinition(externalReferenceCode, userId);
+	}
+
 	public static ObjectDefinition addOrUpdateSystemObjectDefinition(
 			long companyId,
 			com.liferay.object.system.SystemObjectDefinitionMetadata
@@ -285,6 +292,31 @@ public class ObjectDefinitionLocalServiceUtil {
 	}
 
 	/**
+	 * Returns the object definition with the matching external reference code and company.
+	 *
+	 * @param companyId the primary key of the company
+	 * @param externalReferenceCode the object definition's external reference code
+	 * @return the matching object definition, or <code>null</code> if a matching object definition could not be found
+	 */
+	public static ObjectDefinition fetchObjectDefinitionByExternalReferenceCode(
+		long companyId, String externalReferenceCode) {
+
+		return getService().fetchObjectDefinitionByExternalReferenceCode(
+			companyId, externalReferenceCode);
+	}
+
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link #fetchObjectDefinitionByExternalReferenceCode(long, String)}
+	 */
+	@Deprecated
+	public static ObjectDefinition fetchObjectDefinitionByReferenceCode(
+		long companyId, String externalReferenceCode) {
+
+		return getService().fetchObjectDefinitionByReferenceCode(
+			companyId, externalReferenceCode);
+	}
+
+	/**
 	 * Returns the object definition with the matching UUID and company.
 	 *
 	 * @param uuid the object definition's UUID
@@ -296,6 +328,10 @@ public class ObjectDefinitionLocalServiceUtil {
 
 		return getService().fetchObjectDefinitionByUuidAndCompanyId(
 			uuid, companyId);
+	}
+
+	public static ObjectDefinition fetchSystemObjectDefinition(String name) {
+		return getService().fetchSystemObjectDefinition(name);
 	}
 
 	public static com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery
@@ -336,6 +372,22 @@ public class ObjectDefinitionLocalServiceUtil {
 		throws PortalException {
 
 		return getService().getObjectDefinition(objectDefinitionId);
+	}
+
+	/**
+	 * Returns the object definition with the matching external reference code and company.
+	 *
+	 * @param companyId the primary key of the company
+	 * @param externalReferenceCode the object definition's external reference code
+	 * @return the matching object definition
+	 * @throws PortalException if a matching object definition could not be found
+	 */
+	public static ObjectDefinition getObjectDefinitionByExternalReferenceCode(
+			long companyId, String externalReferenceCode)
+		throws PortalException {
+
+		return getService().getObjectDefinitionByExternalReferenceCode(
+			companyId, externalReferenceCode);
 	}
 
 	/**
@@ -440,7 +492,8 @@ public class ObjectDefinitionLocalServiceUtil {
 	}
 
 	public static ObjectDefinition updateCustomObjectDefinition(
-			long objectDefinitionId, long accountEntryRestrictedObjectFieldId,
+			String externalReferenceCode, long objectDefinitionId,
+			long accountEntryRestrictedObjectFieldId,
 			long descriptionObjectFieldId, long titleObjectFieldId,
 			boolean accountEntryRestricted, boolean active,
 			boolean enableCategorization, boolean enableComments,
@@ -450,11 +503,19 @@ public class ObjectDefinitionLocalServiceUtil {
 		throws PortalException {
 
 		return getService().updateCustomObjectDefinition(
-			objectDefinitionId, accountEntryRestrictedObjectFieldId,
-			descriptionObjectFieldId, titleObjectFieldId,
-			accountEntryRestricted, active, enableCategorization,
-			enableComments, labelMap, name, panelAppOrder, panelCategoryKey,
-			portlet, pluralLabelMap, scope);
+			externalReferenceCode, objectDefinitionId,
+			accountEntryRestrictedObjectFieldId, descriptionObjectFieldId,
+			titleObjectFieldId, accountEntryRestricted, active,
+			enableCategorization, enableComments, labelMap, name, panelAppOrder,
+			panelCategoryKey, portlet, pluralLabelMap, scope);
+	}
+
+	public static ObjectDefinition updateExternalReferenceCode(
+			long objectDefinitionId, String externalReferenceCode)
+		throws PortalException {
+
+		return getService().updateExternalReferenceCode(
+			objectDefinitionId, externalReferenceCode);
 	}
 
 	/**

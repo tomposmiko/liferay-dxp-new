@@ -52,11 +52,26 @@ public class ObjectDefinitionServiceUtil {
 			scope, storageType, objectFields);
 	}
 
+	public static ObjectDefinition addObjectDefinition(
+			String externalReferenceCode)
+		throws PortalException {
+
+		return getService().addObjectDefinition(externalReferenceCode);
+	}
+
 	public static ObjectDefinition deleteObjectDefinition(
 			long objectDefinitionId)
 		throws PortalException {
 
 		return getService().deleteObjectDefinition(objectDefinitionId);
+	}
+
+	public static ObjectDefinition fetchObjectDefinitionByExternalReferenceCode(
+			String externalReferenceCode, long companyId)
+		throws PortalException {
+
+		return getService().fetchObjectDefinitionByExternalReferenceCode(
+			externalReferenceCode, companyId);
 	}
 
 	public static ObjectDefinition getObjectDefinition(long objectDefinitionId)
@@ -104,7 +119,8 @@ public class ObjectDefinitionServiceUtil {
 	}
 
 	public static ObjectDefinition updateCustomObjectDefinition(
-			long objectDefinitionId, long accountEntryRestrictedObjectFieldId,
+			String externalReferenceCode, long objectDefinitionId,
+			long accountEntryRestrictedObjectFieldId,
 			long descriptionObjectFieldId, long titleObjectFieldId,
 			boolean accountEntryRestricted, boolean active,
 			boolean enableCategorization, boolean enableComments,
@@ -114,11 +130,19 @@ public class ObjectDefinitionServiceUtil {
 		throws PortalException {
 
 		return getService().updateCustomObjectDefinition(
-			objectDefinitionId, accountEntryRestrictedObjectFieldId,
-			descriptionObjectFieldId, titleObjectFieldId,
-			accountEntryRestricted, active, enableCategorization,
-			enableComments, labelMap, name, panelAppOrder, panelCategoryKey,
-			portlet, pluralLabelMap, scope);
+			externalReferenceCode, objectDefinitionId,
+			accountEntryRestrictedObjectFieldId, descriptionObjectFieldId,
+			titleObjectFieldId, accountEntryRestricted, active,
+			enableCategorization, enableComments, labelMap, name, panelAppOrder,
+			panelCategoryKey, portlet, pluralLabelMap, scope);
+	}
+
+	public static ObjectDefinition updateExternalReferenceCode(
+			long objectDefinitionId, String externalReferenceCode)
+		throws PortalException {
+
+		return getService().updateExternalReferenceCode(
+			objectDefinitionId, externalReferenceCode);
 	}
 
 	public static ObjectDefinition updateTitleObjectFieldId(

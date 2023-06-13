@@ -18,8 +18,8 @@ import PropTypes from 'prop-types';
 import React from 'react';
 
 import useControlledState from '../../../core/hooks/useControlledState';
+import {useId} from '../../../core/hooks/useId';
 import {ConfigurationFieldPropTypes} from '../../../prop-types/index';
-import {useId} from '../../utils/useId';
 
 export function ButtonGroupField({field, onValueSelect, value}) {
 	const helpTextId = useId();
@@ -56,9 +56,9 @@ export function ButtonGroupField({field, onValueSelect, value}) {
 			))}
 
 			{field.description ? (
-				<div className="mt-1 small text-secondary" id={helpTextId}>
+				<p className="m-0 mt-1 small text-secondary" id={helpTextId}>
 					{field.description}
-				</div>
+				</p>
 			) : null}
 		</ClayForm.Group>
 	);

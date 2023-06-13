@@ -33,6 +33,8 @@ import com.liferay.poshi.runner.util.AntCommands;
 import com.liferay.poshi.runner.util.ArchiveUtil;
 import com.liferay.poshi.runner.util.EmailCommands;
 import com.liferay.poshi.runner.util.HtmlUtil;
+import com.liferay.poshi.runner.var.type.DefaultTable;
+import com.liferay.poshi.runner.var.type.Table;
 
 import com.testautomationguru.ocular.Ocular;
 import com.testautomationguru.ocular.OcularConfiguration;
@@ -449,41 +451,38 @@ public abstract class BaseWebDriverImpl implements LiferaySelenium, WebDriver {
 			return;
 		}
 
-		List<JavaScriptError> javaScriptErrors = new ArrayList<>();
+		PoshiRunnerWarningException poshiRunnerWarningException = null;
 
-		try {
-			javaScriptErrors.addAll(
-				JavaScriptError.readErrors(getWrappedWebDriver("//body")));
-		}
-		catch (Exception exception) {
-		}
+		List<JavaScriptError> javaScriptErrors = JavaScriptError.readErrors(
+			getWrappedWebDriver("//body"));
 
-		List<Exception> exceptions = new ArrayList<>();
+		for (JavaScriptError javaScriptError : javaScriptErrors) {
+			String javaScriptErrorValue = javaScriptError.toString();
 
-		if (!javaScriptErrors.isEmpty()) {
-			for (JavaScriptError javaScriptError : javaScriptErrors) {
-				String javaScriptErrorValue = javaScriptError.toString();
+			if ((Validator.isNotNull(ignoreJavaScriptError) &&
+				 javaScriptErrorValue.contains(ignoreJavaScriptError)) ||
+				LiferaySeleniumUtil.isInIgnoreErrorsFile(
+					javaScriptErrorValue, "javascript")) {
 
-				if ((Validator.isNotNull(ignoreJavaScriptError) &&
-					 javaScriptErrorValue.contains(ignoreJavaScriptError)) ||
-					LiferaySeleniumUtil.isInIgnoreErrorsFile(
-						javaScriptErrorValue, "javascript")) {
+				continue;
+			}
 
-					continue;
-				}
+			String message = "JAVA_SCRIPT_ERROR: " + javaScriptErrorValue;
 
-				String message = "JAVA_SCRIPT_ERROR: " + javaScriptErrorValue;
+			System.out.println(message);
 
-				System.out.println(message);
-
-				exceptions.add(new PoshiRunnerWarningException(message));
+			if (poshiRunnerWarningException == null) {
+				poshiRunnerWarningException = new PoshiRunnerWarningException(
+					message);
+			}
+			else {
+				PoshiRunnerWarningException.addException(
+					new PoshiRunnerWarningException(message));
 			}
 		}
 
-		if (!exceptions.isEmpty()) {
-			LiferaySeleniumUtil.addToJavaScriptExceptions(exceptions);
-
-			throw exceptions.get(0);
+		if (poshiRunnerWarningException != null) {
+			throw poshiRunnerWarningException;
 		}
 	}
 
@@ -699,6 +698,46 @@ public abstract class BaseWebDriverImpl implements LiferaySelenium, WebDriver {
 			selectLocator, pattern);
 
 		selectedLabelCondition.assertTrue();
+	}
+
+	@Override
+	public void assertTable(String locator, String tableString)
+		throws Exception {
+
+		Table htmlTable = getHTMLTable(locator);
+
+		Table table = new DefaultTable(tableString);
+
+		if (htmlTable.getTableSize() != table.getTableSize()) {
+			throw new Exception(
+				"Expected " + table.getTableSize() + " rows but found " +
+					htmlTable.getTableSize() + " rows");
+		}
+
+		for (int i = 0; i < htmlTable.getTableSize(); i++) {
+			List<String> htmlCellValues = htmlTable.getRowByIndex(i);
+
+			List<String> cellValues = table.getRowByIndex(i);
+
+			if (htmlCellValues.size() != cellValues.size()) {
+				throw new Exception(
+					"Expected " + cellValues.size() + " columns but found " +
+						htmlCellValues.size() + " columns");
+			}
+
+			for (int j = 0; j < htmlCellValues.size(); j++) {
+				String htmlCellValue = htmlCellValues.get(j);
+
+				String cellValue = cellValues.get(j);
+
+				if (!htmlCellValue.equals(cellValue)) {
+					throw new Exception(
+						"Expected text \"" + cellValue +
+							"\" does not match actual text \"" + htmlCellValue +
+								"\"");
+				}
+			}
+		}
 	}
 
 	@Override
@@ -3763,6 +3802,31 @@ public abstract class BaseWebDriverImpl implements LiferaySelenium, WebDriver {
 
 	protected Stack<WebElement> getFrameWebElements() {
 		return _frameWebElements;
+	}
+
+	protected Table getHTMLTable(String locator) {
+		List<List<String>> table = new ArrayList<>();
+
+		List<WebElement> rowWebElements = findElements(
+			By.xpath(locator + "//tr"));
+
+		for (int i = 2; i <= rowWebElements.size(); i++) {
+			List<String> webElementTexts = new ArrayList<>();
+
+			List<WebElement> columnWebElements = findElements(
+				By.xpath(locator + "//tr[" + i + "]//td"));
+
+			for (int j = 1; j <= columnWebElements.size(); j++) {
+				WebElement webElement = findElement(
+					By.xpath(locator + "//tr[" + i + "]//td[" + j + "]"));
+
+				webElementTexts.add(webElement.getText());
+			}
+
+			table.add(webElementTexts);
+		}
+
+		return new DefaultTable(table);
 	}
 
 	protected ImageTarget getImageTarget(String image) throws Exception {

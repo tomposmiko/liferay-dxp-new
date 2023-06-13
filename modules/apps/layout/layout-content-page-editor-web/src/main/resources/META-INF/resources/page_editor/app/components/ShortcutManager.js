@@ -15,6 +15,8 @@
 import React, {useEffect, useRef, useState} from 'react';
 
 import {CONTAINER_DISPLAY_OPTIONS} from '../config/constants/containerDisplayOptions';
+import {ITEM_ACTIVATION_ORIGINS} from '../config/constants/itemActivationOrigins';
+import {ITEM_TYPES} from '../config/constants/itemTypes';
 import {
 	ARROW_DOWN_KEYCODE,
 	ARROW_LEFT_KEYCODE,
@@ -26,8 +28,13 @@ import {
 	S_KEYCODE,
 	Z_KEYCODE,
 } from '../config/constants/keycodes';
+import {LAYOUT_DATA_ITEM_TYPES} from '../config/constants/layoutDataItemTypes';
 import {MOVE_ITEM_DIRECTIONS} from '../config/constants/moveItemDirections';
-import {useActiveItemId, useSelectItem} from '../contexts/ControlsContext';
+import {
+	useActiveItemId,
+	useActiveItemType,
+	useSelectItem,
+} from '../contexts/ControlsContext';
 import {useDispatch, useSelector} from '../contexts/StoreContext';
 import selectCanUpdatePageStructure from '../selectors/selectCanUpdatePageStructure';
 import deleteItem from '../thunks/deleteItem';
@@ -68,6 +75,7 @@ const isWithinIframe = () => {
 
 export default function ShortcutManager() {
 	const activeItemId = useActiveItemId();
+	const activeItemType = useActiveItemType();
 	const dispatch = useDispatch();
 	const canUpdatePageStructure = useSelector(selectCanUpdatePageStructure);
 	const [openSaveModal, setOpenSaveModal] = useState(false);
@@ -79,7 +87,10 @@ export default function ShortcutManager() {
 
 	const {fragmentEntryLinks, layoutData, segmentsExperienceId} = state;
 
-	const activeItem = layoutData.items[activeItemId];
+	const activeLayoutDataItem =
+		activeItemType === ITEM_TYPES.layoutDataItem
+			? layoutData.items[activeItemId]
+			: null;
 
 	const duplicate = () => {
 		dispatch(
@@ -96,7 +107,7 @@ export default function ShortcutManager() {
 	};
 
 	const move = (event) => {
-		const {itemId, parentId} = activeItem;
+		const {itemId, parentId} = activeLayoutDataItem;
 
 		const parentItem = layoutData.items[parentId];
 
@@ -163,6 +174,40 @@ export default function ShortcutManager() {
 		}
 	};
 
+	const selectParent = () => {
+		const getSelectableParent = (layoutDataItem) => {
+			if (!layoutDataItem) {
+				return null;
+			}
+
+			const parentItem = state.layoutData.items[layoutDataItem.parentId];
+
+			if (!parentItem) {
+				return null;
+			}
+
+			if (
+				parentItem.type !== LAYOUT_DATA_ITEM_TYPES.column &&
+				parentItem.type !== LAYOUT_DATA_ITEM_TYPES.collectionItem &&
+				parentItem.type !== LAYOUT_DATA_ITEM_TYPES.fragmentDropZone &&
+				parentItem.type !== LAYOUT_DATA_ITEM_TYPES.root
+			) {
+				return parentItem;
+			}
+
+			return getSelectableParent(parentItem);
+		};
+
+		const selectableParent = getSelectableParent(activeLayoutDataItem);
+
+		if (selectableParent) {
+			selectItem(selectableParent.itemId, {
+				itemType: ITEM_TYPES.layoutDataItem,
+				origin: ITEM_ACTIVATION_ORIGINS.pageEditor,
+			});
+		}
+	};
+
 	const keymapRef = useRef(null);
 
 	keymapRef.current = {
@@ -183,7 +228,6 @@ export default function ShortcutManager() {
 		hideSidebar: {
 			action: hideSidebar,
 			canBeExecuted: (event) =>
-				Liferay.FeatureFlags['LPS-153452'] &&
 				!isInteractiveElement(event.target) &&
 				!isWithinIframe() &&
 				!isEditingEditableField(),
@@ -201,11 +245,11 @@ export default function ShortcutManager() {
 				!isEditableField(event.target) &&
 				!isInteractiveElement(event.target),
 			isKeyCombination: (event) => {
-				if (!activeItem) {
+				if (!activeLayoutDataItem) {
 					return false;
 				}
 
-				const {parentId} = activeItem;
+				const {parentId} = activeLayoutDataItem;
 
 				const parentItem = layoutData.items[parentId];
 
@@ -228,7 +272,6 @@ export default function ShortcutManager() {
 		openShortcutModal: {
 			action: openShortcutModalAction,
 			canBeExecuted: (event) =>
-				Liferay.FeatureFlags['LPS-153452'] &&
 				!isInteractiveElement(event.target) &&
 				!isWithinIframe() &&
 				!isEditingEditableField(),
@@ -251,6 +294,13 @@ export default function ShortcutManager() {
 				canBeSaved(layoutData.items[activeItemId], layoutData),
 			isKeyCombination: (event) =>
 				ctrlOrMeta(event) && event.keyCode === S_KEYCODE,
+		},
+		selectParent: {
+			action: selectParent,
+			canBeExecuted: (event) =>
+				!isInteractiveElement(event.target) && activeLayoutDataItem,
+			isKeyCombination: (event) =>
+				event.shiftKey && event.key === 'Enter',
 		},
 		undo: {
 			action: undo,

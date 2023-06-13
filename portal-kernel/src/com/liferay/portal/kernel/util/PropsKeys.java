@@ -346,9 +346,6 @@ public interface PropsKeys {
 	public static final String BUFFERED_INCREMENT_THREADPOOL_MAX_SIZE =
 		"buffered.increment.threadpool.max.size";
 
-	public static final String CACHE_CLEAR_ON_PLUGIN_UNDEPLOY =
-		"cache.clear.on.plugin.undeploy";
-
 	public static final String CACHE_CONTENT_THRESHOLD_SIZE =
 		"cache.content.threshold.size";
 
@@ -1058,6 +1055,9 @@ public interface PropsKeys {
 
 	public static final String HIBERNATE_GENERATE_STATISTICS =
 		"hibernate.generate_statistics";
+
+	public static final String HIBERNATE_HBM_JAXB_CACHE =
+		"hibernate.hbm.jaxb.cache";
 
 	public static final String HIBERNATE_JDBC_BATCH_SIZE =
 		"hibernate.jdbc.batch_size";

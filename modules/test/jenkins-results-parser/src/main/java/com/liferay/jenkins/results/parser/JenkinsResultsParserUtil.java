@@ -1680,12 +1680,12 @@ public class JenkinsResultsParserUtil {
 		Pattern distPortalBundleFileNamesPattern =
 			_getDistPortalBundleFileNamesPattern(portalBranchName);
 
-		int buildNumber = lastCompletedBuildNumber;
+		int buildNumber = lastCompletedBuildNumber + 1;
 
 		while (buildNumber > Math.max(0, lastCompletedBuildNumber - 10)) {
 			String distPortalBundlesBuildURL = combine(
 				_getDistPortalBundlesURL(portalBranchName), "/",
-				String.valueOf(lastCompletedBuildNumber), "/");
+				String.valueOf(buildNumber), "/");
 
 			try {
 				Matcher matcher = distPortalBundleFileNamesPattern.matcher(
@@ -3139,19 +3139,24 @@ public class JenkinsResultsParserUtil {
 
 		String hostName = getHostName("");
 
-		List<String> jenkinsNodes = getJenkinsNodes();
+		try {
+			List<String> jenkinsNodes = getJenkinsNodes();
 
-		String hostNameSuffix = ".lax.liferay.com";
+			String hostNameSuffix = ".lax.liferay.com";
 
-		if (hostName.endsWith(hostNameSuffix)) {
-			hostName = hostName.substring(
-				0, hostName.length() - hostNameSuffix.length());
+			if (hostName.endsWith(hostNameSuffix)) {
+				hostName = hostName.substring(
+					0, hostName.length() - hostNameSuffix.length());
+			}
+
+			if (jenkinsNodes.contains(hostName)) {
+				_ciNode = true;
+			}
+			else {
+				_ciNode = false;
+			}
 		}
-
-		if (jenkinsNodes.contains(hostName)) {
-			_ciNode = true;
-		}
-		else {
+		catch (Exception exception) {
 			_ciNode = false;
 		}
 

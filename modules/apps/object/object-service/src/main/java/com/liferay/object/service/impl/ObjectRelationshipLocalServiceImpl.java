@@ -17,14 +17,17 @@ package com.liferay.object.service.impl;
 import com.liferay.object.constants.ObjectFieldConstants;
 import com.liferay.object.constants.ObjectRelationshipConstants;
 import com.liferay.object.exception.DuplicateObjectRelationshipException;
+import com.liferay.object.exception.NoSuchObjectRelationshipException;
 import com.liferay.object.exception.ObjectRelationshipNameException;
 import com.liferay.object.exception.ObjectRelationshipParameterObjectFieldIdException;
 import com.liferay.object.exception.ObjectRelationshipReverseException;
 import com.liferay.object.exception.ObjectRelationshipTypeException;
 import com.liferay.object.internal.petra.sql.dsl.DynamicObjectDefinitionTable;
+import com.liferay.object.internal.petra.sql.dsl.DynamicObjectRelationshipMappingTable;
 import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.model.ObjectField;
 import com.liferay.object.model.ObjectRelationship;
+import com.liferay.object.model.ObjectRelationshipTable;
 import com.liferay.object.service.ObjectDefinitionLocalService;
 import com.liferay.object.service.ObjectEntryLocalService;
 import com.liferay.object.service.ObjectFieldLocalService;
@@ -35,6 +38,8 @@ import com.liferay.object.service.persistence.ObjectLayoutTabPersistence;
 import com.liferay.object.system.SystemObjectDefinitionMetadata;
 import com.liferay.object.system.SystemObjectDefinitionMetadataTracker;
 import com.liferay.object.util.ObjectRelationshipUtil;
+import com.liferay.petra.sql.dsl.Column;
+import com.liferay.petra.sql.dsl.DSLQueryFactoryUtil;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.aop.AopService;
@@ -112,11 +117,26 @@ public class ObjectRelationshipLocalServiceImpl
 				_objectDefinitionPersistence.findByPrimaryKey(
 					objectRelationship.getObjectDefinitionId1());
 
+			if (_hasManyToManyObjectRelationshipMappingTableValues(
+					objectDefinition1, objectDefinition2, objectRelationship,
+					primaryKey1, primaryKey2)) {
+
+				return;
+			}
+
+			Map<String, String> pkObjectFieldDBColumnNames =
+				ObjectRelationshipUtil.getPKObjectFieldDBColumnNames(
+					objectDefinition1, objectDefinition2,
+					objectRelationship.isReverse());
+
 			runSQL(
 				StringBundler.concat(
 					"insert into ", objectRelationship.getDBTableName(), " (",
-					objectDefinition1.getPKObjectFieldDBColumnName(), " , ",
-					objectDefinition2.getPKObjectFieldDBColumnName(),
+					pkObjectFieldDBColumnNames.get(
+						"pkObjectFieldDBColumnName1"),
+					", ",
+					pkObjectFieldDBColumnNames.get(
+						"pkObjectFieldDBColumnName2"),
 					") values (", primaryKey1, ", ", primaryKey2, ")"));
 
 			return;
@@ -151,7 +171,8 @@ public class ObjectRelationshipLocalServiceImpl
 			objectRelationshipPersistence.findByPrimaryKey(
 				objectRelationshipId);
 
-		return deleteObjectRelationship(objectRelationship);
+		return objectRelationshipLocalService.deleteObjectRelationship(
+			objectRelationship);
 	}
 
 	@Indexable(type = IndexableType.DELETE)
@@ -193,6 +214,9 @@ public class ObjectRelationshipLocalServiceImpl
 			ObjectRelationship reverseObjectRelationship =
 				fetchReverseObjectRelationship(objectRelationship, true);
 
+			_objectLayoutTabPersistence.removeByObjectRelationshipId(
+				reverseObjectRelationship.getObjectRelationshipId());
+
 			objectRelationshipPersistence.remove(
 				reverseObjectRelationship.getObjectRelationshipId());
 
@@ -219,14 +243,20 @@ public class ObjectRelationshipLocalServiceImpl
 				objectRelationship.getType(),
 				ObjectRelationshipConstants.TYPE_MANY_TO_MANY)) {
 
-			ObjectDefinition objectDefinition1 =
-				_objectDefinitionPersistence.findByPrimaryKey(
-					objectRelationship.getObjectDefinitionId1());
+			Map<String, String> pkObjectFieldDBColumnNames =
+				ObjectRelationshipUtil.getPKObjectFieldDBColumnNames(
+					_objectDefinitionPersistence.findByPrimaryKey(
+						objectRelationship.getObjectDefinitionId1()),
+					_objectDefinitionPersistence.findByPrimaryKey(
+						objectRelationship.getObjectDefinitionId2()),
+					objectRelationship.isReverse());
 
 			runSQL(
 				StringBundler.concat(
 					"delete from ", objectRelationship.getDBTableName(),
-					" where ", objectDefinition1.getPKObjectFieldDBColumnName(),
+					" where ",
+					pkObjectFieldDBColumnNames.get(
+						"pkObjectFieldDBColumnName1"),
 					" = ", primaryKey1));
 		}
 	}
@@ -251,13 +281,34 @@ public class ObjectRelationshipLocalServiceImpl
 				_objectDefinitionPersistence.findByPrimaryKey(
 					objectRelationship.getObjectDefinitionId2());
 
+			Map<String, String> pkObjectFieldDBColumnNames =
+				ObjectRelationshipUtil.getPKObjectFieldDBColumnNames(
+					objectDefinition1, objectDefinition2,
+					objectRelationship.isReverse());
+
 			runSQL(
 				StringBundler.concat(
 					"delete from ", objectRelationship.getDBTableName(),
-					" where ", objectDefinition1.getPKObjectFieldDBColumnName(),
+					" where ",
+					pkObjectFieldDBColumnNames.get(
+						"pkObjectFieldDBColumnName1"),
 					" = ", primaryKey1, " and ",
-					objectDefinition2.getPKObjectFieldDBColumnName(), " = ",
-					primaryKey2));
+					pkObjectFieldDBColumnNames.get(
+						"pkObjectFieldDBColumnName2"),
+					" = ", primaryKey2));
+		}
+	}
+
+	@Override
+	public void deleteObjectRelationships(long objectDefinitionId1)
+		throws PortalException {
+
+		for (ObjectRelationship objectRelationship :
+				objectRelationshipPersistence.findByObjectDefinitionId1(
+					objectDefinitionId1)) {
+
+			objectRelationshipLocalService.deleteObjectRelationship(
+				objectRelationship);
 		}
 	}
 
@@ -285,9 +336,56 @@ public class ObjectRelationshipLocalServiceImpl
 			long objectDefinitionId1, String name)
 		throws PortalException {
 
-		return ObjectRelationshipUtil.getObjectRelationship(
-			objectRelationshipPersistence.findByODI1_N(
-				objectDefinitionId1, name));
+		try {
+			return ObjectRelationshipUtil.getObjectRelationship(
+				objectRelationshipPersistence.findByODI1_N(
+					objectDefinitionId1, name));
+		}
+		catch (NoSuchObjectRelationshipException
+					noSuchObjectRelationshipException) {
+
+			throw new NoSuchObjectRelationshipException(
+				String.format(
+					"No ObjectRelationship exists with the key " +
+						"{objectDefinitionId1=%s, name=%s}",
+					objectDefinitionId1, name),
+				noSuchObjectRelationshipException);
+		}
+	}
+
+	@Override
+	public ObjectRelationship getObjectRelationshipByObjectDefinitionId(
+			long objectDefinitionId, String objectRelationshipName)
+		throws Exception {
+
+		List<ObjectRelationship> objectRelationships = dslQuery(
+			DSLQueryFactoryUtil.select(
+			).from(
+				ObjectRelationshipTable.INSTANCE
+			).where(
+				ObjectRelationshipTable.INSTANCE.reverse.eq(
+					false
+				).and(
+					ObjectRelationshipTable.INSTANCE.name.eq(
+						objectRelationshipName
+					).and(
+						ObjectRelationshipTable.INSTANCE.objectDefinitionId1.eq(
+							objectDefinitionId
+						).or(
+							ObjectRelationshipTable.INSTANCE.
+								objectDefinitionId2.eq(objectDefinitionId)
+						)
+					)
+				)
+			));
+
+		if (objectRelationships.isEmpty()) {
+			throw new NoSuchObjectRelationshipException(
+				"No ObjectRelationship exists with the name " +
+					objectRelationshipName);
+		}
+
+		return objectRelationships.get(0);
 	}
 
 	@Override
@@ -347,11 +445,26 @@ public class ObjectRelationshipLocalServiceImpl
 			objectRelationship.getObjectDefinitionId2(), parameterObjectFieldId,
 			objectRelationship.getType());
 
-		objectRelationship.setParameterObjectFieldId(parameterObjectFieldId);
-		objectRelationship.setDeletionType(deletionType);
-		objectRelationship.setLabelMap(labelMap);
+		if (Objects.equals(
+				objectRelationship.getType(),
+				ObjectRelationshipConstants.TYPE_MANY_TO_MANY)) {
 
-		return objectRelationshipPersistence.update(objectRelationship);
+			ObjectRelationship reverseObjectRelationship =
+				fetchReverseObjectRelationship(objectRelationship, true);
+
+			_updateObjectRelationship(
+				parameterObjectFieldId, deletionType, labelMap,
+				reverseObjectRelationship);
+
+			Indexer<ObjectRelationship> indexer =
+				IndexerRegistryUtil.nullSafeGetIndexer(
+					ObjectRelationship.class);
+
+			indexer.reindex(reverseObjectRelationship);
+		}
+
+		return _updateObjectRelationship(
+			parameterObjectFieldId, deletionType, labelMap, objectRelationship);
 	}
 
 	private ObjectField _addObjectField(
@@ -508,6 +621,60 @@ public class ObjectRelationshipLocalServiceImpl
 			objectRelationship);
 	}
 
+	private boolean _hasManyToManyObjectRelationshipMappingTableValues(
+		ObjectDefinition objectDefinition1, ObjectDefinition objectDefinition2,
+		ObjectRelationship objectRelationship, long primaryKey1,
+		long primaryKey2) {
+
+		Map<String, String> pkObjectFieldDBColumnNames =
+			ObjectRelationshipUtil.getPKObjectFieldDBColumnNames(
+				objectDefinition1, objectDefinition2,
+				objectRelationship.isReverse());
+
+		DynamicObjectRelationshipMappingTable
+			dynamicObjectRelationshipMappingTable =
+				new DynamicObjectRelationshipMappingTable(
+					pkObjectFieldDBColumnNames.get(
+						"pkObjectFieldDBColumnName1"),
+					pkObjectFieldDBColumnNames.get(
+						"pkObjectFieldDBColumnName2"),
+					objectRelationship.getDBTableName());
+
+		Column<DynamicObjectRelationshipMappingTable, Long> primaryKeyColumn1 =
+			dynamicObjectRelationshipMappingTable.getPrimaryKeyColumn1();
+		Column<DynamicObjectRelationshipMappingTable, Long> primaryKeyColumn2 =
+			dynamicObjectRelationshipMappingTable.getPrimaryKeyColumn2();
+
+		int count = dslQueryCount(
+			DSLQueryFactoryUtil.count(
+			).from(
+				dynamicObjectRelationshipMappingTable
+			).where(
+				primaryKeyColumn1.eq(
+					primaryKey1
+				).and(
+					primaryKeyColumn2.eq(primaryKey2)
+				)
+			));
+
+		if (count > 0) {
+			return true;
+		}
+
+		return false;
+	}
+
+	private ObjectRelationship _updateObjectRelationship(
+		long parameterObjectFieldId, String deletionType,
+		Map<Locale, String> labelMap, ObjectRelationship objectRelationship) {
+
+		objectRelationship.setParameterObjectFieldId(parameterObjectFieldId);
+		objectRelationship.setDeletionType(deletionType);
+		objectRelationship.setLabelMap(labelMap);
+
+		return objectRelationshipPersistence.update(objectRelationship);
+	}
+
 	private void _validate(
 			long objectDefinitionId1, long objectDefinitionId2,
 			long parameterObjectFieldId, String name, String type)
@@ -536,11 +703,10 @@ public class ObjectRelationshipLocalServiceImpl
 				"Names must be less than 41 characters");
 		}
 
-		ObjectRelationship objectRelationship =
-			objectRelationshipLocalService.getObjectRelationship(
-				objectDefinitionId1, name);
+		int count = objectRelationshipPersistence.countByODI1_N(
+			objectDefinitionId1, name);
 
-		if (objectRelationship != null) {
+		if (count > 0) {
 			throw new DuplicateObjectRelationshipException(
 				"Duplicate name " + name);
 		}
@@ -577,7 +743,7 @@ public class ObjectRelationshipLocalServiceImpl
 				type, ObjectRelationshipConstants.TYPE_MANY_TO_MANY) ||
 			Objects.equals(type, ObjectRelationshipConstants.TYPE_ONE_TO_ONE)) {
 
-			int count = objectRelationshipPersistence.countByODI1_ODI2_N_T(
+			count = objectRelationshipPersistence.countByODI1_ODI2_N_T(
 				objectDefinitionId2, objectDefinitionId1, name, type);
 
 			if (count > 0) {

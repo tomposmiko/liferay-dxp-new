@@ -1,5 +1,25 @@
 definition {
 
+	macro _addAccountRole {
+		Variables.assertDefined(parameterList = "${name},${titleMap},${descriptionMap},${type}");
+
+		var portalURL = JSONCompany.getPortalURL();
+
+		var curl = '''
+			${portalURL}/api/jsonws/role/add-role \
+				-u test@liferay.com:test \
+				-d className=com.liferay.account.model.AccountRole \
+				-d classPK=0 \
+				-d name=${name} \
+				-d titleMap=${titleMap} \
+				-d descriptionMap=${descriptionMap} \
+				-d type=${type} \
+				-d subtype=
+		''';
+
+		com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
+	}
+
 	macro _addRole {
 		Variables.assertDefined(parameterList = "${name},${titleMap},${descriptionMap},${type}");
 
@@ -96,6 +116,29 @@ definition {
 		var roleId = JSONCurlUtil.post("${curl}", "$['roleId']");
 
 		return "${roleId}";
+	}
+
+	macro _searchRolesIds {
+		Variables.assertDefined(parameterList = "${roleName}");
+
+		var companyId = JSONCompany.getCompanyId();
+		var portalURL = JSONCompany.getPortalURL();
+
+		var curl = '''
+			${portalURL}/api/jsonws/role/search \
+				-u test@liferay.com:test \
+				-d companyId=${companyId} \
+				-d keywords=${roleName} \
+				-d types= \
+				-d -params= \
+				-d "start=-1" \
+				-d "end=-1"
+				-d -orderByComparator=
+		''';
+
+		var rolesIds = JSONCurlUtil.post("${curl}", "$..['roleId']");
+
+		return "${rolesIds}";
 	}
 
 }

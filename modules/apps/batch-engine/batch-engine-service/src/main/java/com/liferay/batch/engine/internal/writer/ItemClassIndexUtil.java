@@ -21,13 +21,13 @@ import com.liferay.petra.concurrent.ConcurrentReferenceValueHashMap;
 import com.liferay.petra.memory.FinalizeManager;
 import com.liferay.petra.string.CharPool;
 
-import java.lang.ref.Reference;
 import java.lang.reflect.Field;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -44,10 +44,14 @@ public class ItemClassIndexUtil {
 		return _fieldsMap.computeIfAbsent(
 			itemClass,
 			clazz -> {
-				Map<String, Field> fieldMap = new HashMap<>();
+				Map<String, Field> fieldsMap = new HashMap<>();
 
 				while (clazz != Object.class) {
 					for (Field field : clazz.getDeclaredFields()) {
+						if (isMultidimensionalArray(field.getType())) {
+							continue;
+						}
+
 						field.setAccessible(true);
 
 						String name = field.getName();
@@ -56,14 +60,44 @@ public class ItemClassIndexUtil {
 							name = name.substring(1);
 						}
 
-						fieldMap.put(name, field);
+						if (field.isSynthetic()) {
+							continue;
+						}
+
+						fieldsMap.put(name, field);
+
+						Class<?> fieldClass = field.getType();
+
+						if (!isMap(fieldClass) &&
+							!isSingleColumnAdoptableArray(fieldClass) &&
+							!isSingleColumnAdoptableValue(fieldClass) &&
+							!Objects.equals(clazz, fieldClass)) {
+
+							index(fieldClass);
+						}
+					}
+
+					if (Objects.equals(
+							clazz.getSuperclass(), clazz.getDeclaringClass())) {
+
+						break;
 					}
 
 					clazz = clazz.getSuperclass();
 				}
 
-				return fieldMap;
+				return fieldsMap;
 			});
+	}
+
+	public static boolean isIterable(Class<?> valueClass) {
+		if (valueClass.isArray() ||
+			Collection.class.isAssignableFrom(valueClass)) {
+
+			return true;
+		}
+
+		return false;
 	}
 
 	public static boolean isListEntry(Object object) {
@@ -72,6 +106,28 @@ public class ItemClassIndexUtil {
 		}
 
 		return false;
+	}
+
+	public static boolean isMap(Class<?> clazz) {
+		if (Objects.equals(clazz, Map.class)) {
+			return true;
+		}
+
+		return false;
+	}
+
+	public static boolean isMultidimensionalArray(Class<?> clazz) {
+		if (!clazz.isArray()) {
+			return false;
+		}
+
+		Class<?> componentTypeClass = clazz.getComponentType();
+
+		if (!componentTypeClass.isArray()) {
+			return false;
+		}
+
+		return true;
 	}
 
 	public static boolean isObjectEntryProperties(Field field) {
@@ -85,21 +141,21 @@ public class ItemClassIndexUtil {
 		return true;
 	}
 
-	public static boolean isSingleColumnAdoptableArray(Class<?> valueClass) {
-		if (!valueClass.isArray()) {
+	public static boolean isSingleColumnAdoptableArray(Class<?> clazz) {
+		if (!clazz.isArray()) {
 			return false;
 		}
 
-		if (isSingleColumnAdoptableValue(valueClass.getComponentType())) {
+		if (isSingleColumnAdoptableValue(clazz.getComponentType())) {
 			return true;
 		}
 
 		return false;
 	}
 
-	public static boolean isSingleColumnAdoptableValue(Class<?> valueClass) {
-		if (!valueClass.isPrimitive() && !_objectTypes.contains(valueClass) &&
-			!Enum.class.isAssignableFrom(valueClass)) {
+	public static boolean isSingleColumnAdoptableValue(Class<?> clazz) {
+		if (!clazz.isPrimitive() && !_objectTypes.contains(clazz) &&
+			!Enum.class.isAssignableFrom(clazz)) {
 
 			return false;
 		}
@@ -109,13 +165,12 @@ public class ItemClassIndexUtil {
 
 	private static final Map<Class<?>, Map<String, Field>> _fieldsMap =
 		new ConcurrentReferenceKeyHashMap<>(
-			new ConcurrentReferenceValueHashMap
-				<Reference<Class<?>>, Map<String, Field>>(
-					FinalizeManager.WEAK_REFERENCE_FACTORY),
+			new ConcurrentReferenceValueHashMap<>(
+				FinalizeManager.WEAK_REFERENCE_FACTORY),
 			FinalizeManager.WEAK_REFERENCE_FACTORY);
 	private static final List<Class<?>> _objectTypes = Arrays.asList(
 		Boolean.class, BigDecimal.class, BigInteger.class, Byte.class,
 		Date.class, Double.class, Float.class, Integer.class, Long.class,
-		Map.class, String.class);
+		String.class);
 
 }
