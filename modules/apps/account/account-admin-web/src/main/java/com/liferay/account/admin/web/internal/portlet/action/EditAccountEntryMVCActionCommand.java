@@ -38,7 +38,6 @@ import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portal.kernel.util.HttpComponentsUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Portal;
-import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 
@@ -83,21 +82,29 @@ public class EditAccountEntryMVCActionCommand
 		String cmd = ParamUtil.getString(actionRequest, Constants.CMD);
 
 		try {
-			String redirect = ParamUtil.getString(actionRequest, "redirect");
+			AccountEntry accountEntry = null;
 
 			if (cmd.equals(Constants.ADD)) {
-				AccountEntry accountEntry = _addAccountEntry(actionRequest);
+				accountEntry = _addAccountEntry(actionRequest);
 
-				redirect = HttpComponentsUtil.setParameter(
-					redirect, actionResponse.getNamespace() + "accountEntryId",
-					accountEntry.getAccountEntryId());
+				actionRequest.setAttribute(
+					WebKeys.REDIRECT,
+					HttpComponentsUtil.setParameter(
+						ParamUtil.getString(actionRequest, "redirect"),
+						actionResponse.getNamespace() + "accountEntryId",
+						accountEntry.getAccountEntryId()));
 			}
 			else if (cmd.equals(Constants.UPDATE)) {
-				updateAccountEntry(actionRequest);
+				accountEntry = updateAccountEntry(actionRequest);
 			}
 
-			if (Validator.isNotNull(redirect)) {
-				sendRedirect(actionRequest, actionResponse, redirect);
+			if (accountEntry != null) {
+				accountEntry.setRestrictMembership(
+					ParamUtil.getBoolean(
+						actionRequest, "restrictMembership",
+						accountEntry.isRestrictMembership()));
+
+				_accountEntryService.updateAccountEntry(accountEntry);
 			}
 		}
 		catch (Exception exception) {
@@ -111,23 +118,16 @@ public class EditAccountEntryMVCActionCommand
 					 exception instanceof
 						 DuplicateAccountEntryExternalReferenceCodeException) {
 
-				SessionErrors.add(actionRequest, exception.getClass());
-
 				hideDefaultErrorMessage(actionRequest);
 
-				actionResponse.setRenderParameter(
-					"mvcRenderCommandName",
-					"/account_admin/edit_account_entry");
+				sendRedirect(actionRequest, actionResponse);
 			}
 
-			throw exception;
-		}
-		catch (Throwable throwable) {
-			throw new Exception(throwable);
+			throw new PortletException(exception);
 		}
 	}
 
-	protected void updateAccountEntry(ActionRequest actionRequest)
+	protected AccountEntry updateAccountEntry(ActionRequest actionRequest)
 		throws Exception {
 
 		long accountEntryId = ParamUtil.getLong(
@@ -179,6 +179,8 @@ public class EditAccountEntryMVCActionCommand
 						accountEntryId);
 			}
 		}
+
+		return accountEntry;
 	}
 
 	private AccountEntry _addAccountEntry(ActionRequest actionRequest)

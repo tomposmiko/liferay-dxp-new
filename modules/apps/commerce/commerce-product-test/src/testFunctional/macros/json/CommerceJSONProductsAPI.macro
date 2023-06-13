@@ -411,6 +411,26 @@ definition {
 		return "${productImageIds}";
 	}
 
+	macro _getCommerceProductImageURL {
+		Variables.assertDefined(parameterList = "${channelId},${productId}");
+
+		var baseURL = "${baseURL}";
+
+		if (!(isSet(baseURL))) {
+			var baseURL = PropsUtil.get("portal.url");
+		}
+
+		var curl = '''
+			${baseURL}/o/headless-commerce-delivery-catalog/v1.0/channels/${channelId}/products/${productId} \
+			-u test@liferay.com:test \
+			-H 'accept: application/json' \
+		''';
+
+		var productImageURL = JSONCurlUtil.get("${curl}", "$..['urlImage']");
+
+		return "${productImageURL}";
+	}
+
 	macro _getCommerceProductOptionId {
 		Variables.assertDefined(parameterList = "${productName},${productOptionName}");
 
@@ -644,6 +664,78 @@ definition {
 		echo("The SKU ID is: ${skuId}");
 
 		return "${skuId}";
+	}
+
+	macro _patchCommerceProductConfiguration {
+		Variables.assertDefined(parameterList = "${productName}");
+
+		var productId = CommerceJSONProductsAPI._getProductId(productName = "${productName}");
+		var baseURL = "${baseURL}";
+
+		if (!(isSet(allowBackOrder))) {
+			var allowBackOrder = "true";
+		}
+
+		if (!(isSet(allowedOrderQuantities))) {
+			var allowedOrderQuantities = "";
+		}
+
+		if (!(isSet(baseURL))) {
+			var baseURL = PropsUtil.get("portal.url");
+		}
+
+		if (!(isSet(displayAvailability))) {
+			var displayAvailability = "false";
+		}
+
+		if (!(isSet(displayStockQuantity))) {
+			var displayStockQuantity = "false";
+		}
+
+		if (!(isSet(inventoryEngine))) {
+			var inventoryEngine = "default";
+		}
+
+		if (!(isSet(lowStockAction))) {
+			var lowStockAction = "";
+		}
+
+		if (!(isSet(maxOrderQuantity))) {
+			var maxOrderQuantity = "10000";
+		}
+
+		if (!(isSet(minOrderQuantity))) {
+			var minOrderQuantity = "1";
+		}
+
+		if (!(isSet(minStockQuantity))) {
+			var minStockQuantity = "0";
+		}
+
+		if (!(isSet(multipleOrderQuantity))) {
+			var multipleOrderQuantity = "1";
+		}
+
+		var curl = '''
+			${baseURL}/o/headless-commerce-admin-catalog/v1.0/products/${productId}/configuration \
+			-u test@liferay.com:test \
+			-H 'accept: application/json' \
+  			-H 'Content-Type: application/json' \
+  			-d '{
+					"allowBackOrder": ${allowBackOrder},
+					"allowedOrderQuantities": [${allowedOrderQuantities}],
+					"displayAvailability": ${displayAvailability},
+					"displayStockQuantity": ${displayStockQuantity},
+					"inventoryEngine": "${inventoryEngine}",
+					"lowStockAction": "${lowStockAction}",
+					"maxOrderQuantity": ${maxOrderQuantity},
+					"minOrderQuantity": ${minOrderQuantity},
+					"minStockQuantity": ${minStockQuantity},
+					"multipleOrderQuantity": ${multipleOrderQuantity}
+				}'
+			''';
+
+		com.liferay.poshi.runner.util.JSONCurlUtil.patch("${curl}");
 	}
 
 	macro _updateCommerceProduct {

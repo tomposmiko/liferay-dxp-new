@@ -117,7 +117,7 @@ public class OneToManyObjectFieldFilterStrategy
 
 		return new OneToManyAutocompleteFDSFilter(
 			parse(), restContextPath, titleObjectField.getLabel(locale),
-			_objectField.getDBColumnName(), titleObjectField.getName());
+			_objectField.getName(), titleObjectField.getName());
 	}
 
 	@Override
@@ -132,8 +132,8 @@ public class OneToManyObjectFieldFilterStrategy
 					HashMapBuilder.<String, Object>put(
 						"label",
 						_objectEntryLocalService.getTitleValue(
-							GetterUtil.getLong(jsonArray.get(i)),
-							_objectDefinition1.getObjectDefinitionId())
+							_objectDefinition1.getObjectDefinitionId(),
+							GetterUtil.getLong(jsonArray.get(i)))
 					).put(
 						"value", jsonArray.getLong(i)
 					).build());

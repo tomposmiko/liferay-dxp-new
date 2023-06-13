@@ -94,9 +94,6 @@ public class LayoutClassedModelUsageStagedModelDataHandler
 			layoutClassedModelUsage);
 
 		element.addAttribute(
-			"layout-classed-model-class-name",
-			_portal.getClassName(layoutClassedModelUsage.getClassNameId()));
-		element.addAttribute(
 			"layout-classed-model-container-class-name",
 			_portal.getClassName(layoutClassedModelUsage.getContainerType()));
 
@@ -197,7 +194,7 @@ public class LayoutClassedModelUsageStagedModelDataHandler
 		importedLayoutClassedModelUsage.setPlid(plid);
 
 		importedLayoutClassedModelUsage.setClassNameId(
-			_portal.getClassNameId(layoutClassedModelUsage.getClassName()));
+			layoutClassedModelUsage.getClassNameId());
 
 		Map<Long, Long> classPKs =
 			(Map<Long, Long>)portletDataContext.getNewPrimaryKeysMap(
@@ -216,6 +213,9 @@ public class LayoutClassedModelUsageStagedModelDataHandler
 			element.attributeValue(
 				"layout-classed-model-container-class-name"));
 
+		importedLayoutClassedModelUsage.setContainerType(
+			containerTypeClassNameId);
+
 		if (containerTypeClassNameId == _portal.getClassNameId(
 				FragmentEntryLink.class)) {
 
@@ -232,17 +232,13 @@ public class LayoutClassedModelUsageStagedModelDataHandler
 
 				importedLayoutClassedModelUsage.setContainerKey(
 					String.valueOf(containerKey));
-
-				importedLayoutClassedModelUsage.setContainerType(
-					_portal.getClassNameId(FragmentEntryLink.class));
 			}
 		}
 
 		LayoutClassedModelUsage existingLayoutClassedModelUsage =
 			_layoutClassedModelUsageLocalService.fetchLayoutClassedModelUsage(
-				_portal.getClassNameId(
-					element.attributeValue("layout-classed-model-class-name")),
-				classPK, importedLayoutClassedModelUsage.getContainerKey(),
+				importedLayoutClassedModelUsage.getClassNameId(), classPK,
+				importedLayoutClassedModelUsage.getContainerKey(),
 				containerTypeClassNameId, plid);
 
 		if (existingLayoutClassedModelUsage == null) {

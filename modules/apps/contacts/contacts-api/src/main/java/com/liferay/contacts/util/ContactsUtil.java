@@ -286,7 +286,7 @@ public class ContactsUtil {
 		for (EmailAddress emailAddress : emailAddresses) {
 			sb.append("EMAIL;TYPE=INTERNET;TYPE=");
 
-			ListType listType = emailAddress.getType();
+			ListType listType = emailAddress.getListType();
 
 			sb.append(StringUtil.toUpperCase(listType.getName()));
 
@@ -417,9 +417,9 @@ public class ContactsUtil {
 		for (Website website : websites) {
 			sb.append("URL;TYPE=");
 
-			ListType listType = website.getType();
-
-			sb.append(StringUtil.toUpperCase(_getVCardListTypeName(listType)));
+			sb.append(
+				StringUtil.toUpperCase(
+					_getVCardListTypeName(website.getListType())));
 
 			sb.append(StringPool.COLON);
 

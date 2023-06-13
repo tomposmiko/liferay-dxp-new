@@ -823,7 +823,11 @@ public class CPDefinitionIndexer extends BaseIndexer<CPDefinition> {
 						firstCPInstance.getCPInstanceUuid(),
 						CommercePriceListConstants.TYPE_PRICE_LIST);
 
-			BigDecimal lowestPrice = commercePriceEntry.getPrice();
+			BigDecimal lowestPrice = BigDecimal.ZERO;
+
+			if (commercePriceEntry != null) {
+				lowestPrice = commercePriceEntry.getPrice();
+			}
 
 			for (CPInstance cpInstance : cpInstances) {
 				commercePriceEntry =
@@ -880,8 +884,8 @@ public class CPDefinitionIndexer extends BaseIndexer<CPDefinition> {
 	@Override
 	protected void doReindex(CPDefinition cpDefinition) throws Exception {
 		_indexWriterHelper.updateDocument(
-			getSearchEngineId(), cpDefinition.getCompanyId(),
-			getDocument(cpDefinition), isCommitImmediately());
+			cpDefinition.getCompanyId(), getDocument(cpDefinition),
+			isCommitImmediately());
 	}
 
 	@Override
@@ -961,7 +965,6 @@ public class CPDefinitionIndexer extends BaseIndexer<CPDefinition> {
 					}
 				}
 			});
-		indexableActionableDynamicQuery.setSearchEngineId(getSearchEngineId());
 
 		indexableActionableDynamicQuery.performActions();
 	}

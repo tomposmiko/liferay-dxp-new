@@ -28,6 +28,30 @@
 			"name": "type",
 			"required": true,
 			"type": "String"
+		},
+		{
+			"DBType": "String",
+			"businessType": "Text",
+			"indexed": true,
+			"indexedAsKeyword": false,
+			"label": {
+				"en_US": "File Name"
+			},
+			"name": "fileName",
+			"required": true,
+			"type": "String"
+		},
+		{
+			"DBType": "String",
+			"businessType": "Text",
+			"indexed": true,
+			"indexedAsKeyword": false,
+			"label": {
+				"en_US": "File Size"
+			},
+			"name": "fileSize",
+			"required": true,
+			"type": "String"
 		}
 	],
 	"pluralLabel": {

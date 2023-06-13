@@ -120,9 +120,9 @@ public class LinkToPageLayoutTypeController
 	private static final String _EDIT_PAGE = "/layout/edit/link_to_layout.jsp";
 
 	private static final String _URL =
-		"${liferay:mainPath}/portal/layout?p_v_l_s_g_id=${liferay:pvlsgid}&" +
-			"groupId=${liferay:groupId}&privateLayout=${privateLayout}&" +
-				"layoutId=${linkToLayoutId}";
+		"${liferay:mainPath}/portal/layout?p_l_id=0&p_v_l_s_g_id=" +
+			"${liferay:pvlsgid}&groupId=${liferay:groupId}&privateLayout=" +
+				"${privateLayout}&layoutId=${linkToLayoutId}";
 
 	@Reference
 	private ItemSelector _itemSelector;

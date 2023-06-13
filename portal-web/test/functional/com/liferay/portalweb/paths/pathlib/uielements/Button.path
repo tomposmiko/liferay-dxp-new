@@ -97,7 +97,7 @@
 </tr>
 <tr>
 	<td>ANY_TITLE</td>
-	<td>//button[@title='${key_title}']</td>
+	<td>//button[@title='${key_title}'] | //button//span[@*='${key_title}']</td>
 	<td></td>
 </tr>
 <tr>
@@ -578,6 +578,11 @@
 <tr>
 	<td>OK</td>
 	<td>//button[contains(.,'OK')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>OPEN</td>
+	<td>//a[*[name()='svg'][contains(@class,'circle-open')]]</td>
 	<td></td>
 </tr>
 <tr>

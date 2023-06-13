@@ -234,6 +234,8 @@ public class AccountEntryServiceImpl extends AccountEntryServiceBaseImpl {
 					accountEntry.getAccountEntryId());
 
 			accountEntry.setDomains(originalAccountEntry.getDomains());
+			accountEntry.setRestrictMembership(
+				originalAccountEntry.isRestrictMembership());
 		}
 
 		return accountEntryLocalService.updateAccountEntry(accountEntry);
@@ -277,6 +279,19 @@ public class AccountEntryServiceImpl extends AccountEntryServiceBaseImpl {
 
 		return accountEntryLocalService.updateExternalReferenceCode(
 			accountEntryId, externalReferenceCode);
+	}
+
+	@Override
+	public AccountEntry updateRestrictMembership(
+			long accountEntryId, boolean restrictMembership)
+		throws PortalException {
+
+		_accountEntryModelResourcePermission.check(
+			getPermissionChecker(), accountEntryId,
+			AccountActionKeys.MANAGE_DOMAINS);
+
+		return accountEntryLocalService.updateRestrictMembership(
+			accountEntryId, restrictMembership);
 	}
 
 	private String[] _getManageableDomains(

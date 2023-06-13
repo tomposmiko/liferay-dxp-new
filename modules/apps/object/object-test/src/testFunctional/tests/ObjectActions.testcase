@@ -25,7 +25,6 @@ definition {
 	@priority = "5"
 	test CanActivateOrDeactivateAction {
 		property portal.acceptance = "true";
-		property portal.upstream = "quarantine";
 
 		task ("Add an object, field, action, and check if an action is active") {
 			ObjectAdmin.addObjectViaAPI(
@@ -58,7 +57,9 @@ definition {
 				thenAction = "Add an Object Entry",
 				whenAction = "On After Add");
 
-			ObjectAdmin.assertObjectActions(actionActive = "Yes");
+			ObjectAdmin.assertObjectActions(
+				actionActive = "Yes",
+				actionName = "Custom Action");
 		}
 
 		task ("Add an Entry and check if the action is works") {
@@ -147,6 +148,8 @@ definition {
 		ObjectAdmin.goToActionDetails(viewEntry = "Action Name");
 
 		ObjectAdmin.viewDetails();
+
+		SelectFrame(locator1 = "IFrame#IFRAME");
 
 		ObjectAdmin.fillObjectAction(
 			actionName = "Update Action Name",
@@ -266,8 +269,6 @@ definition {
 	@description = "LPS-145665 - Verify that you can edit the Action name"
 	@priority = "4"
 	test CanEditActionName {
-		property portal.upstream = "quarantine";
-
 		ObjectAdmin.addObjectViaAPI(
 			labelName = "Custom Object 145",
 			objectName = "CustomObject145",
@@ -286,18 +287,18 @@ definition {
 			urlAction = "www.liferay.com",
 			whenAction = "On After Add");
 
-		ObjectAdmin.assertObjectActions(actionActive = "Custom Action");
-
-		ObjectAdmin.assertObjectActions(actionActive = "Yes");
+		ObjectAdmin.assertObjectActions(
+			actionActive = "Yes",
+			actionName = "Custom Action");
 
 		ObjectAdmin.editObjectAction(
 			actionName = "New Action Update",
 			active = "false",
 			viewEntry = "Custom Action");
 
-		ObjectAdmin.assertObjectActions(actionActive = "No");
-
-		ObjectAdmin.assertObjectActions(actionActive = "New Action Update");
+		ObjectAdmin.assertObjectActions(
+			actionActive = "No",
+			actionName = "New Action Update");
 	}
 
 	@description = "LPS-145665 - Verify that the user can edit a previously saved expression"
@@ -412,9 +413,9 @@ definition {
 				thenAction = "Add an Object Entry",
 				whenAction = "On After Add");
 
-			ObjectAdmin.assertObjectActions(actionActive = "Custom Action");
-
-			ObjectAdmin.assertObjectActions(actionActive = "Yes");
+			ObjectAdmin.assertObjectActions(
+				actionActive = "Yes",
+				actionName = "Custom Action");
 		}
 
 		task ("Add entry and assert that condition it's works") {
@@ -441,9 +442,9 @@ definition {
 
 			ObjectAdmin.disableCondition();
 
-			ObjectAdmin.assertObjectActions(actionActive = "Custom Action");
-
-			ObjectAdmin.assertObjectActions(actionActive = "Yes");
+			ObjectAdmin.assertObjectActions(
+				actionActive = "Yes",
+				actionName = "Custom Action");
 		}
 	}
 
@@ -658,8 +659,6 @@ definition {
 	@description = "LPS-139008 - Verify it is possible to search for an Action"
 	@priority = "4"
 	test CanSearchAction {
-		property portal.upstream = "quarantine";
-
 		ObjectAdmin.addObjectViaAPI(
 			labelName = "Custom Object 191",
 			objectName = "CustomObject191",

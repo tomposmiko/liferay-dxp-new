@@ -26,7 +26,6 @@ import com.liferay.portal.kernel.search.SearchContext;
 import com.liferay.portal.kernel.security.permission.PermissionThreadLocal;
 import com.liferay.portal.kernel.service.LayoutLocalService;
 import com.liferay.portal.kernel.service.PortletLocalService;
-import com.liferay.portal.kernel.service.PortletPreferencesLocalService;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.StringUtil;
@@ -47,7 +46,6 @@ import java.util.Map;
 
 import javax.portlet.PortletConfig;
 import javax.portlet.PortletMode;
-import javax.portlet.RenderRequest;
 import javax.portlet.WindowState;
 
 import javax.servlet.ServletContext;
@@ -90,8 +88,7 @@ public class SuggestionResourceImpl extends BaseSuggestionResourceImpl {
 				_suggestionsRetriever.getSuggestionsContributorResults(
 					liferayRenderRequest,
 					RenderResponseFactory.create(
-						contextHttpServletResponse,
-						(RenderRequest)liferayRenderRequest),
+						contextHttpServletResponse, liferayRenderRequest),
 					_createSearchContext(
 						destinationFriendlyURL, _getGroupId(groupId), scope,
 						search, suggestionsContributorConfigurations)),
@@ -237,9 +234,6 @@ public class SuggestionResourceImpl extends BaseSuggestionResourceImpl {
 
 	@Reference
 	private PortletLocalService _portletLocalService;
-
-	@Reference
-	private PortletPreferencesLocalService _portletPreferencesLocalService;
 
 	private volatile SearchSuggestionsCompanyConfiguration
 		_searchSuggestionsCompanyConfiguration;

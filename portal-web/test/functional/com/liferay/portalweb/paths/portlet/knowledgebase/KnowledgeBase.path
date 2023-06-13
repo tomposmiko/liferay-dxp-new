@@ -106,6 +106,11 @@
 <!--CHILD_ARTICLES-->
 
 <tr>
+	<td>CHILD_PAGE_HEADER</td>
+	<td>//div[contains(@class,'container-fluid')]//span[contains(.,'Child Articles')]</td>
+	<td></td>
+</tr>
+<tr>
 	<td>CHILD_PAGE_TITLE</td>
 	<td>//li[@class='list-group-item']//a[contains(.,'${key_kbChildArticleTitle}')]</td>
 	<td></td>
@@ -277,6 +282,11 @@
 <tr>
 	<td>PAGE_TREE_ITEM_ELLIPSIS</td>
 	<td>//li[contains(@class,'treeview')]//div[@role='treeitem' and contains(.,'${key_itemName}')]//button[*[name()='svg'][contains(@class,'lexicon-icon-ellipsis')]]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>PAGE_TREE_ITEM_HIGHLIGHT</td>
+	<td>//li[contains(@class,'treeview-item')]//div[contains(@class,'knowledge-base-navigation-item-active')]//div[normalize-space(text())='${key_itemName}']</td>
 	<td></td>
 </tr>
 <tr>

@@ -409,6 +409,20 @@ definition {
 		Check.checkToggleSwitch(locator1 = "CommerceEntry#ACTIVE_CHECKBOX");
 	}
 
+	macro addNewWarehousesEntry {
+		WaitForElementPresent(locator1 = "IFrame#MODAL_BODY");
+
+		SelectFrame.selectFrameNoLoading(locator1 = "IFrame#MODAL_BODY");
+
+		Type(
+			locator1 = "CommerceEntry#NAME_FIELD",
+			value1 = "${warehouseName}");
+
+		Button.click(button = "Submit");
+
+		SelectFrameTop();
+	}
+
 	macro addNewWeightUnit {
 		Type(
 			locator1 = "CommerceEntry#NAME_FIELD",
@@ -1642,9 +1656,11 @@ definition {
 			}
 		}
 		else {
-			AssertChecked(
-				locator1 = "Radio#ANY",
-				radioLabel = "All Accounts");
+			if (IsElementPresent(key_eligibilityCardTitle = "Accounts Entry", locator1 = "CommerceEntry#ELIGIBILITY_CARD_TITLE")) {
+				AssertChecked(
+					locator1 = "Radio#ANY",
+					radioLabel = "All Accounts");
+			}
 		}
 
 		if (isSet(channelsEligibility)) {

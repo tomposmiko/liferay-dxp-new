@@ -269,12 +269,49 @@ public class UserGroupLocalServiceImpl extends UserGroupLocalServiceBaseImpl {
 
 		// Indexer
 
-		Indexer<UserGroup> indexer = IndexerRegistryUtil.nullSafeGetIndexer(
-			UserGroup.class);
-
-		indexer.reindex(userGroup);
+		reindexUserGroup(userGroup);
 
 		return userGroup;
+	}
+
+	@Override
+	public void addUserUserGroup(long userId, long userGroupId)
+		throws PortalException {
+
+		super.addUserUserGroup(userId, userGroupId);
+
+		reindexUserGroup(getUserGroup(userGroupId));
+	}
+
+	@Override
+	public void addUserUserGroup(long userId, UserGroup userGroup)
+		throws PortalException {
+
+		super.addUserUserGroup(userId, userGroup);
+
+		reindexUserGroup(userGroup);
+	}
+
+	@Override
+	public void addUserUserGroups(long userId, List<UserGroup> userGroups)
+		throws PortalException {
+
+		super.addUserUserGroups(userId, userGroups);
+
+		for (UserGroup userGroup : userGroups) {
+			reindexUserGroup(userGroup);
+		}
+	}
+
+	@Override
+	public void addUserUserGroups(long userId, long[] userGroupIds)
+		throws PortalException {
+
+		super.addUserUserGroups(userId, userGroupIds);
+
+		for (long userGroupId : userGroupIds) {
+			reindexUserGroup(getUserGroup(userGroupId));
+		}
 	}
 
 	/**
@@ -942,10 +979,7 @@ public class UserGroupLocalServiceImpl extends UserGroupLocalServiceBaseImpl {
 
 		// Indexer
 
-		Indexer<UserGroup> indexer = IndexerRegistryUtil.nullSafeGetIndexer(
-			UserGroup.class);
-
-		indexer.reindex(userGroup);
+		reindexUserGroup(userGroup);
 
 		return userGroup;
 	}
@@ -963,6 +997,14 @@ public class UserGroupLocalServiceImpl extends UserGroupLocalServiceBaseImpl {
 
 		attributes.put("description", description);
 		attributes.put("name", name);
+
+		if (params != null) {
+			long[] userIds = (long[])params.get("userIds");
+
+			if (ArrayUtil.isNotEmpty(userIds)) {
+				attributes.put("userIds", userIds);
+			}
+		}
 
 		searchContext.setAttributes(attributes);
 
@@ -1181,6 +1223,15 @@ public class UserGroupLocalServiceImpl extends UserGroupLocalServiceBaseImpl {
 		throws PortalException {
 
 		_reindexerBridge.reindex(companyId, User.class.getName(), userIds);
+	}
+
+	protected void reindexUserGroup(UserGroup userGroup)
+		throws PortalException {
+
+		Indexer<UserGroup> indexer = IndexerRegistryUtil.nullSafeGetIndexer(
+			UserGroup.class);
+
+		indexer.reindex(userGroup);
 	}
 
 	protected void reindexUsers(List<UserGroup> userGroups)

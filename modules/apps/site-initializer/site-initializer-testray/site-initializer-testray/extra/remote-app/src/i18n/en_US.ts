@@ -227,6 +227,7 @@ export default {
 	'password-may-contain-letters-and-numbers':
 		'Password may contain letters and numbers.',
 	'passwords-do-not-match': 'Passwords do not match.',
+	'please-select-one-or-more-roles': 'Please select one or more roles.',
 	'priority': 'Priority',
 	'product-version': 'Product Version',
 	'progress': 'Progress',
@@ -257,6 +258,7 @@ export default {
 	'screen-name': 'Screen Name',
 	'search': 'Search',
 	'search-in': 'Search in...',
+	'search-x': 'Search {0}',
 	'select-build': 'Select Build',
 	'select-case-parameters': 'Select Case Parameters',
 	'select-cases': 'Select Cases',

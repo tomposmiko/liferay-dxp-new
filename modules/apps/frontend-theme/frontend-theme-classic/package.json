@@ -3,6 +3,10 @@
 	"bugs": {
 		"url": "https://issues.liferay.com/"
 	},
+	"dependencies": {
+		"gulp": "*",
+		"liferay-theme-tasks": "*"
+	},
 	"keywords": [
 		"liferay-theme"
 	],
@@ -24,5 +28,5 @@
 		"checkFormat": "liferay-npm-scripts check",
 		"format": "liferay-npm-scripts fix"
 	},
-	"version": "5.0.54"
+	"version": "5.0.55"
 }

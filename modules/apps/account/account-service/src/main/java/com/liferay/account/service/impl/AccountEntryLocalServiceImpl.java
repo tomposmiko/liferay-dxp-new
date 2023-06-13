@@ -179,6 +179,7 @@ public class AccountEntryLocalServiceImpl
 			_userFileUploadsSettings.getImageMaxHeight(),
 			_userFileUploadsSettings.getImageMaxWidth());
 
+		accountEntry.setRestrictMembership(true);
 		accountEntry.setTaxIdNumber(taxIdNumber);
 
 		_validateType(type);
@@ -697,6 +698,22 @@ public class AccountEntryLocalServiceImpl
 
 		return updateExternalReferenceCode(
 			getAccountEntry(accountEntryId), externalReferenceCode);
+	}
+
+	@Override
+	public AccountEntry updateRestrictMembership(
+			long accountEntryId, boolean restrictMembership)
+		throws PortalException {
+
+		AccountEntry accountEntry = getAccountEntry(accountEntryId);
+
+		if (restrictMembership == accountEntry.isRestrictMembership()) {
+			return accountEntry;
+		}
+
+		accountEntry.setRestrictMembership(restrictMembership);
+
+		return updateAccountEntry(accountEntry);
 	}
 
 	@Indexable(type = IndexableType.REINDEX)

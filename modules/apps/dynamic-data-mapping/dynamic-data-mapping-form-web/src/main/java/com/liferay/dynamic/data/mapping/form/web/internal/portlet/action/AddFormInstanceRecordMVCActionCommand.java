@@ -26,7 +26,6 @@ import com.liferay.dynamic.data.mapping.model.DDMFormInstance;
 import com.liferay.dynamic.data.mapping.model.DDMFormInstanceRecord;
 import com.liferay.dynamic.data.mapping.model.DDMFormInstanceRecordVersion;
 import com.liferay.dynamic.data.mapping.model.DDMFormInstanceSettings;
-import com.liferay.dynamic.data.mapping.model.DDMFormSuccessPageSettings;
 import com.liferay.dynamic.data.mapping.model.DDMStructure;
 import com.liferay.dynamic.data.mapping.service.DDMFormInstanceRecordService;
 import com.liferay.dynamic.data.mapping.service.DDMFormInstanceRecordVersionLocalService;
@@ -146,25 +145,22 @@ public class AddFormInstanceRecordMVCActionCommand
 		DDMFormInstanceSettings ddmFormInstanceSettings =
 			ddmFormInstance.getSettingsModel();
 
-		String redirectURL = ParamUtil.getString(
-			actionRequest, "redirect", ddmFormInstanceSettings.redirectURL());
+		String ddmFormInstanceSettingsRedirectURL =
+			ddmFormInstanceSettings.redirectURL();
 
-		if (Validator.isNotNull(redirectURL)) {
-			portletSession.setAttribute(
-				DDMFormWebKeys.DYNAMIC_DATA_MAPPING_FORM_INSTANCE_ID,
-				formInstanceId);
-			portletSession.setAttribute(DDMFormWebKeys.GROUP_ID, groupId);
-
-			sendRedirect(actionRequest, actionResponse, redirectURL);
+		if (Validator.isNotNull(ddmFormInstanceSettingsRedirectURL)) {
+			hideDefaultSuccessMessage(actionRequest);
 		}
-		else {
-			DDMFormSuccessPageSettings ddmFormSuccessPageSettings =
-				ddmForm.getDDMFormSuccessPageSettings();
 
-			if (ddmFormSuccessPageSettings.isEnabled()) {
-				hideDefaultSuccessMessage(actionRequest);
-			}
-		}
+		portletSession.setAttribute(
+			DDMFormWebKeys.DYNAMIC_DATA_MAPPING_FORM_INSTANCE_ID,
+			formInstanceId);
+		portletSession.setAttribute(DDMFormWebKeys.GROUP_ID, groupId);
+
+		sendRedirect(
+			actionRequest, actionResponse,
+			ParamUtil.getString(
+				actionRequest, "redirect", ddmFormInstanceSettingsRedirectURL));
 	}
 
 	protected DDMForm getDDMForm(DDMFormInstance ddmFormInstance)

@@ -9,8 +9,8 @@
  * distribution rights of the Software.
  */
 
-import Button from '@clayui/button';
 import ClayIcon from '@clayui/icon';
+import Link from '@clayui/link';
 import {useModal} from '@clayui/modal';
 import ClayPanel from '@clayui/panel';
 import {FormikContextType} from 'formik';
@@ -18,6 +18,7 @@ import {useCallback, useState} from 'react';
 
 import PRMForm from '../../../../../../common/components/PRMForm';
 import PRMFormik from '../../../../../../common/components/PRMFormik';
+import {useWebDAV} from '../../../../../../common/context/WebDAV';
 import MDFClaim from '../../../../../../common/interfaces/mdfClaim';
 import MDFClaimActivity from '../../../../../../common/interfaces/mdfClaimActivity';
 import getIntlNumberFormat from '../../../../../../common/utils/getIntlNumberFormat';
@@ -53,6 +54,8 @@ const ActivityClaimPanel = ({
 			[activityIndex, setFieldValue]
 		)
 	);
+
+	const webDAV = useWebDAV();
 
 	const currentBudgetFieldName = `activities[${activityIndex}].budgets[${currentBudgetIndex}]`;
 
@@ -153,12 +156,19 @@ const ActivityClaimPanel = ({
 						/>
 
 						<div className="mb-3">
-							<Button displayType="secondary" outline small>
+							<Link
+								button
+								displayType="secondary"
+								download
+								href={`${webDAV}/claim/qualified_leads_template.xlsx`}
+								small
+								target="_blank"
+							>
 								<span className="inline-item inline-item-before">
 									<ClayIcon symbol="download" />
 								</span>
 								Download template
-							</Button>
+							</Link>
 						</div>
 					</div>
 				</PanelBody>

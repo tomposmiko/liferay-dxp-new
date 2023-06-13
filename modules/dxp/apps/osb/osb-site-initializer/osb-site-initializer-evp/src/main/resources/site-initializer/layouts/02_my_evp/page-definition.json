@@ -4,7 +4,8 @@
 			{
 				"definition": {
 					"fragmentStyle": {
-						"borderWidth": "0"
+						"borderWidth": "0",
+						"textAlign": ""
 					},
 					"indexed": true,
 					"layout": {
@@ -98,6 +99,59 @@
 									"indexed": true
 								},
 								"type": "Fragment"
+							},
+							{
+								"definition": {
+									"fragment": {
+										"key": "DIALECT-dialect-button"
+									},
+									"fragmentConfig": {
+										"buttonSize": "",
+										"inverted": false,
+										"style": "primary",
+										"type": "solid",
+										"uppercase": false
+									},
+									"fragmentFields": [
+										{
+											"id": "link",
+											"value": {
+												"fragmentLink": {
+													"value": {
+														"href": {
+															"mapping": {
+																"itemReference": {
+																	"className": "com.liferay.portal.kernel.model.Layout",
+																	"fields": [
+																		{
+																			"fieldName": "friendlyURL",
+																			"fieldValue": "/request-form"
+																		},
+																		{
+																			"fieldName": "privatePage",
+																			"fieldValue": "false"
+																		},
+																		{
+																			"fieldName": "siteKey",
+																			"fieldValue": "[$GROUP_KEY$]"
+																		}
+																	]
+																}
+															}
+														}
+													}
+												},
+												"text": {
+													"value_i18n": {
+														"en_US": "Create a Request"
+													}
+												}
+											}
+										}
+									],
+									"indexed": true
+								},
+								"type": "Fragment"
 							}
 						],
 						"type": "Section"
@@ -132,7 +186,8 @@
 										"backgroundColor": "colorNeutral0",
 										"borderColor": "colorNeutral4",
 										"borderWidth": "",
-										"height": "65px"
+										"height": "65px",
+										"textAlign": ""
 									},
 									"indexed": true,
 									"layout": {
@@ -160,6 +215,7 @@
 												"height": "65px",
 												"maxWidth": "12%",
 												"paddingLeft": "2",
+												"textAlign": "",
 												"width": "12%"
 											},
 											"indexed": true,
@@ -202,7 +258,8 @@
 														}
 													],
 													"fragmentStyle": {
-														"fontWeight": "fontWeightBold"
+														"fontWeight": "fontWeightBold",
+														"textAlign": ""
 													},
 													"indexed": true
 												},
@@ -218,6 +275,7 @@
 												"borderWidth": "",
 												"height": "65px",
 												"maxWidth": "18%",
+												"textAlign": "",
 												"width": "18%"
 											},
 											"indexed": true,
@@ -260,7 +318,8 @@
 														}
 													],
 													"fragmentStyle": {
-														"fontWeight": "fontWeightBold"
+														"fontWeight": "fontWeightBold",
+														"textAlign": ""
 													},
 													"indexed": true
 												},
@@ -276,6 +335,7 @@
 												"borderWidth": "",
 												"height": "65px",
 												"maxWidth": "16%",
+												"textAlign": "",
 												"width": "16%"
 											},
 											"indexed": true,
@@ -318,7 +378,8 @@
 														}
 													],
 													"fragmentStyle": {
-														"fontWeight": "fontWeightBold"
+														"fontWeight": "fontWeightBold",
+														"textAlign": ""
 													},
 													"indexed": true
 												},
@@ -334,6 +395,7 @@
 												"borderWidth": "",
 												"height": "65px",
 												"maxWidth": "12%",
+												"textAlign": "",
 												"width": "12%"
 											},
 											"indexed": true,
@@ -376,7 +438,8 @@
 														}
 													],
 													"fragmentStyle": {
-														"fontWeight": "fontWeightBold"
+														"fontWeight": "fontWeightBold",
+														"textAlign": ""
 													},
 													"indexed": true
 												},
@@ -392,6 +455,7 @@
 												"borderWidth": "",
 												"height": "65px",
 												"maxWidth": "16%",
+												"textAlign": "",
 												"width": "16%"
 											},
 											"indexed": true,
@@ -434,7 +498,8 @@
 														}
 													],
 													"fragmentStyle": {
-														"fontWeight": "fontWeightBold"
+														"fontWeight": "fontWeightBold",
+														"textAlign": ""
 													},
 													"indexed": true
 												},
@@ -450,6 +515,7 @@
 												"borderWidth": "",
 												"height": "65px",
 												"maxWidth": "18%",
+												"textAlign": "",
 												"width": "18%"
 											},
 											"indexed": true,
@@ -492,7 +558,8 @@
 														}
 													],
 													"fragmentStyle": {
-														"fontWeight": "fontWeightBold"
+														"fontWeight": "fontWeightBold",
+														"textAlign": ""
 													},
 													"indexed": true
 												},
@@ -560,7 +627,8 @@
 													"fragmentStyle": {
 														"borderColor": "colorNeutral4",
 														"borderWidth": "",
-														"height": "65px"
+														"height": "65px",
+														"textAlign": ""
 													},
 													"indexed": true,
 													"layout": {
@@ -587,6 +655,7 @@
 																"height": "65px",
 																"maxWidth": "12%",
 																"paddingLeft": "2",
+																"textAlign": "",
 																"width": "12%"
 															},
 															"indexed": true,
@@ -644,6 +713,7 @@
 																"borderWidth": "0",
 																"height": "65px",
 																"maxWidth": "18%",
+																"textAlign": "",
 																"width": "18%"
 															},
 															"indexed": true,
@@ -701,6 +771,7 @@
 																"borderWidth": "0",
 																"height": "65px",
 																"maxWidth": "16%",
+																"textAlign": "",
 																"width": "16%"
 															},
 															"indexed": true,
@@ -758,6 +829,7 @@
 																"borderWidth": "0",
 																"height": "65px",
 																"maxWidth": "12%",
+																"textAlign": "",
 																"width": "12%"
 															},
 															"indexed": true,
@@ -815,6 +887,7 @@
 																"borderWidth": "0",
 																"height": "65px",
 																"maxWidth": "16%",
+																"textAlign": "",
 																"width": "16%"
 															},
 															"indexed": true,
@@ -873,6 +946,7 @@
 																"height": "65px",
 																"maxWidth": "18%",
 																"paddingRight": "2",
+																"textAlign": "",
 																"width": "18%"
 															},
 															"indexed": true,
@@ -938,6 +1012,7 @@
 																"borderWidth": "0",
 																"height": "65px",
 																"maxWidth": "8%",
+																"textAlign": "",
 																"width": "8%"
 															},
 															"indexed": true,

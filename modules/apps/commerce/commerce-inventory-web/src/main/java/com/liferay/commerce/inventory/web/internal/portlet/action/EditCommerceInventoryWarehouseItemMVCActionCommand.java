@@ -92,13 +92,13 @@ public class EditCommerceInventoryWarehouseItemMVCActionCommand
 			ActionRequest actionRequest)
 		throws PortalException {
 
+		long mvccVersion = ParamUtil.getLong(actionRequest, "mvccVersion");
 		long commerceInventoryWarehouseItemId = ParamUtil.getLong(
 			actionRequest, "commerceInventoryWarehouseItemId");
 
 		int quantity = ParamUtil.getInteger(actionRequest, "quantity");
 		int reservedQuantity = ParamUtil.getInteger(
 			actionRequest, "reservedQuantity");
-		long mvccVersion = ParamUtil.getLong(actionRequest, "mvccVersion");
 
 		_commerceInventoryWarehouseItemService.
 			updateCommerceInventoryWarehouseItem(
