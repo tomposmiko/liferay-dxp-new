@@ -76,6 +76,7 @@ function ModalDeleteObjectDefinition({
 			observer={observer}
 			onClose={onClose}
 			onDelete={() => onDelete(id)}
+			placeholder={Liferay.Language.get('confirm-object-definition-name')}
 			title={Liferay.Language.get('delete-object-definition')}
 			token={name}
 		>
@@ -177,7 +178,7 @@ export default function ModalWithProvider({
 		onClose: () => setObjectDefinition(null),
 	});
 
-	const deleteRelationship = async (id: string) => {
+	const deleteObjectDefinition = async (id: string) => {
 		const response = await fetch(
 			`/o/object-admin/v1.0/object-definitions/${id}`,
 			{
@@ -194,8 +195,9 @@ export default function ModalWithProvider({
 				),
 				type: 'success',
 			});
-
-			window.location.reload();
+			setTimeout(() => {
+				window.location.reload();
+			}, 1500);
 
 			return;
 		}
@@ -218,7 +220,7 @@ export default function ModalWithProvider({
 					objectDefinition={objectDefinition}
 					observer={observer}
 					onClose={onClose}
-					onDelete={deleteRelationship}
+					onDelete={deleteObjectDefinition}
 				/>
 			)}
 		</ClayModalProvider>

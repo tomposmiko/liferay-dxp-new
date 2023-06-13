@@ -150,7 +150,7 @@ public abstract class BaseUpgradePortletPreferences
 			rightTableName, " on PortletPreferences.", leftColumnName, " = ",
 			rightTableName, StringPool.PERIOD, rightColumnName, sb.toString());
 
-		try (LoggingTimer loggingTimer = new LoggingTimer()) {
+		try (LoggingTimer loggingTimer = new LoggingTimer(rightTableName)) {
 			try (PreparedStatement preparedStatement1 =
 					connection.prepareStatement(sql);
 				PreparedStatement preparedStatement2 =

@@ -22,11 +22,16 @@ import GlobalCSSCETsConfiguration from '../../../../src/main/resources/META-INF/
 
 jest.mock('frontend-js-web', () => ({
 	openSelectionModal: jest.fn(),
+	openToast: () => {},
 }));
+
+const openSelectionModalMock = openSelectionModal as jest.Mock<
+	typeof openSelectionModal
+>;
 
 describe('GlobalCSSCETsConfiguration', () => {
 	afterEach(() => {
-		openSelectionModal.mockReset();
+		openSelectionModalMock.mockReset();
 	});
 
 	it('shows "no extensions loaded" if there are no extensions', async () => {
@@ -49,6 +54,8 @@ describe('GlobalCSSCETsConfiguration', () => {
 				globalCSSCETs={[
 					{
 						cetExternalReferenceCode: 'niceId',
+						inherited: false,
+						inheritedLabel: '',
 						name: 'Nice Global CSS',
 					},
 				]}
@@ -67,10 +74,14 @@ describe('GlobalCSSCETsConfiguration', () => {
 				globalCSSCETs={[
 					{
 						cetExternalReferenceCode: 'niceId',
+						inherited: false,
+						inheritedLabel: '',
 						name: 'Nice Global CSS',
 					},
 					{
 						cetExternalReferenceCode: 'anotherNiceId',
+						inherited: false,
+						inheritedLabel: '',
 						name: 'Nice Global CSS v2',
 					},
 				]}
@@ -79,7 +90,8 @@ describe('GlobalCSSCETsConfiguration', () => {
 			/>
 		);
 
-		await screen.findByDisplayValue('niceId,anotherNiceId');
+		await screen.findByDisplayValue('niceId');
+		await screen.findByDisplayValue('anotherNiceId');
 	});
 
 	it('opens a selection modal when "add" button is pressed', async () => {
@@ -89,6 +101,8 @@ describe('GlobalCSSCETsConfiguration', () => {
 				globalCSSCETs={[
 					{
 						cetExternalReferenceCode: 'niceId',
+						inherited: false,
+						inheritedLabel: '',
 						name: 'Nice Global CSS',
 					},
 				]}
@@ -105,7 +119,7 @@ describe('GlobalCSSCETsConfiguration', () => {
 	});
 
 	it('removes duplicated extensions if any', async () => {
-		openSelectionModal.mockImplementation(() => {});
+		openSelectionModalMock.mockImplementation(() => () => {});
 
 		render(
 			<GlobalCSSCETsConfiguration
@@ -113,6 +127,8 @@ describe('GlobalCSSCETsConfiguration', () => {
 				globalCSSCETs={[
 					{
 						cetExternalReferenceCode: 'niceId',
+						inherited: false,
+						inheritedLabel: '',
 						name: 'Nice Global CSS',
 					},
 				]}
@@ -133,24 +149,29 @@ describe('GlobalCSSCETsConfiguration', () => {
 			})
 		);
 
-		const [[{onSelect}]] = openSelectionModal.mock.calls;
+		const [[{onSelect}]] = openSelectionModalMock.mock.calls;
 
 		act(() => {
 			onSelect({
 				value: [
 					JSON.stringify({
 						cetExternalReferenceCode: 'niceId',
+						inherited: false,
+						inheritedLabel: '',
 						name: 'Nice Global CSS',
 					}),
 					JSON.stringify({
 						cetExternalReferenceCode: 'someNiceId',
+						inherited: false,
+						inheritedLabel: '',
 						name: 'Some Nice Global CSS',
 					}),
 				],
 			});
 		});
 
-		await screen.findByDisplayValue('niceId,someNiceId');
+		await screen.findByDisplayValue('niceId');
+		await screen.findByDisplayValue('someNiceId');
 	});
 
 	it('allows removing extensions by pressing dropdown "remove" button', async () => {
@@ -160,6 +181,8 @@ describe('GlobalCSSCETsConfiguration', () => {
 				globalCSSCETs={[
 					{
 						cetExternalReferenceCode: 'niceId',
+						inherited: false,
+						inheritedLabel: '',
 						name: 'Nice Global CSS',
 					},
 				]}
@@ -175,7 +198,7 @@ describe('GlobalCSSCETsConfiguration', () => {
 		userEvent.click(
 			await findByRole(
 				await screen.findByRole('menu', {name: 'show-options'}),
-				'button',
+				'menuitem',
 				{name: 'delete'}
 			)
 		);

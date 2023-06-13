@@ -23,9 +23,16 @@ function check_blade {
 		exit 1
 	fi
 
-	${bladePath} update -s
+	${bladePath} update -s > /dev/null
 
 	echo "${bladePath}"
+}
+
+function copy_template {
+	cp -R ../modules/apps/client-extension/client-extension-type-api/src/main/resources/com/liferay/client/extension/type/dependencies/templates/${1} "${2}"
+
+	find "${2}" -not -path '*/*\.ico' -type f -exec sed -i'.bak' "s/\${id}/$(basename ${2})/g" {} +
+	find "${2}" -not -path '*/*\.ico' -type f -exec sed -i'.bak' "s/\${name}/${3}/g" {} +
 }
 
 function refresh_sample_default_workspace {
@@ -37,26 +44,20 @@ function refresh_sample_default_workspace {
 
 	cd sample-default-workspace
 
-	${bladePath} init --liferay-version dxp-7.4-u30
+	${bladePath} init --liferay-version dxp-7.4-u32
 
 	echo -e "\n**/dist\n**/node_modules_cache\n.DS_Store" >> .gitignore
 
 	echo -e "\n\nfeature.flag.LPS-153457=true" >> configs/local/portal-ext.properties
 
-	echo -e "\nliferay.workspace.docker.image.liferay=liferay/dxp:7.4.13.nightly-d4.1.4-20220628211901" >> gradle.properties
+	echo -e "\nliferay.workspace.docker.image.liferay=liferay/7.4.13.nightly-d4.1.4-20220707214146" >> gradle.properties
 
-	sed -i'.bak' 's/4.0.0/4.0.1/g' settings.gradle
-
-	rm settings.gradle.bak
+	sort -o gradle.properties gradle.properties
 
 	touch modules/.touch
 	touch themes/.touch
 
 	cd ..
-
-	rm -fr sample-default-workspace/client-extensions
-
-	cp -R sample-minimal-workspace/client-extensions sample-default-workspace
 }
 
 function refresh_sample_minimal_workspace {
@@ -70,6 +71,19 @@ function refresh_sample_minimal_workspace {
 	mkdir -p sample-minimal-workspace/configs/local
 
 	cp sample-default-workspace/configs/local/portal-ext.properties sample-minimal-workspace/configs/local
+
+	rm -fr sample-minimal-workspace/client-extensions/able-*
+
+	copy_template custom-element sample-minimal-workspace/client-extensions/able-custom-element "Able Custom Element"
+	copy_template global-css sample-minimal-workspace/client-extensions/able-global-css "Able Global CSS"
+	copy_template global-js sample-minimal-workspace/client-extensions/able-global-js "Able Global JS"
+	copy_template iframe sample-minimal-workspace/client-extensions/able-iframe "Able IFrame"
+	copy_template theme-css sample-minimal-workspace/client-extensions/able-theme-css "Able Theme CSS"
+	copy_template theme-favicon sample-minimal-workspace/client-extensions/able-theme-favicon "Able Theme Favicon"
+
+	rm -fr sample-default-workspace/client-extensions
+
+	cp -R sample-minimal-workspace/client-extensions sample-default-workspace
 }
 
 function main {

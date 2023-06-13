@@ -51,7 +51,7 @@ int status = (Integer)request.getAttribute(KBWebKeys.KNOWLEDGE_BASE_STATUS);
 		<c:if test="<%= enableKBArticleSubscriptions && (kbArticle.isApproved() || !kbArticle.isFirstVersion()) && KBArticlePermission.contains(permissionChecker, kbArticle, KBActionKeys.SUBSCRIBE) %>">
 			<c:choose>
 				<c:when test="<%= SubscriptionLocalServiceUtil.isSubscribed(user.getCompanyId(), user.getUserId(), KBArticle.class.getName(), kbArticle.getResourcePrimKey()) %>">
-					<liferay-portlet:actionURL name="unsubscribeKBArticle" var="unsubscribeKBArticleURL">
+					<liferay-portlet:actionURL name="/knowledge_base/unsubscribe_kb_article" var="unsubscribeKBArticleURL">
 						<portlet:param name="redirect" value="<%= redirect %>" />
 						<portlet:param name="resourceClassNameId" value="<%= String.valueOf(kbArticle.getClassNameId()) %>" />
 						<portlet:param name="resourcePrimKey" value="<%= String.valueOf(kbArticle.getResourcePrimKey()) %>" />
@@ -66,7 +66,7 @@ int status = (Integer)request.getAttribute(KBWebKeys.KNOWLEDGE_BASE_STATUS);
 					/>
 				</c:when>
 				<c:otherwise>
-					<liferay-portlet:actionURL name="subscribeKBArticle" var="subscribeKBArticleURL">
+					<liferay-portlet:actionURL name="/knowledge_base/subscribe_kb_article" var="subscribeKBArticleURL">
 						<portlet:param name="redirect" value="<%= redirect %>" />
 						<portlet:param name="resourceClassNameId" value="<%= String.valueOf(kbArticle.getClassNameId()) %>" />
 						<portlet:param name="resourcePrimKey" value="<%= String.valueOf(kbArticle.getResourcePrimKey()) %>" />
@@ -204,7 +204,7 @@ int status = (Integer)request.getAttribute(KBWebKeys.KNOWLEDGE_BASE_STATUS);
 				<portlet:param name="mvcPath" value='<%= templatePath + "view.jsp" %>' />
 			</liferay-portlet:renderURL>
 
-			<liferay-portlet:actionURL name="deleteKBArticle" var="deleteURL">
+			<liferay-portlet:actionURL name="/knowledge_base/delete_kb_article" var="deleteURL">
 				<portlet:param name="mvcPath" value='<%= templatePath + "view_article.jsp" %>' />
 				<portlet:param name="redirect" value="<%= homeURL %>" />
 				<portlet:param name="resourceClassNameId" value="<%= String.valueOf(kbArticle.getClassNameId()) %>" />

@@ -157,11 +157,9 @@ public class ObjectDefinitionResourceTest
 	protected ObjectDefinition randomObjectDefinition() throws Exception {
 		ObjectDefinition objectDefinition = super.randomObjectDefinition();
 
-		if (!GetterUtil.getBoolean(PropsUtil.get("feature.flag.LPS-153768"))) {
-			objectDefinition.setAccountEntryRestricted((Boolean)null);
-			objectDefinition.setAccountEntryRestrictedObjectFieldId((Long)null);
-		}
-
+		objectDefinition.setAccountEntryRestricted(false);
+		objectDefinition.setAccountEntryRestrictedObjectFieldId(
+			Long.valueOf(0));
 		objectDefinition.setActive(false);
 		objectDefinition.setLabel(
 			Collections.singletonMap(

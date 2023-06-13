@@ -19,7 +19,7 @@ import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItem;
 import com.liferay.object.constants.ObjectValidationRuleConstants;
 import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.model.ObjectValidationRule;
-import com.liferay.object.validation.rule.ObjectValidationRuleEngineServicesTracker;
+import com.liferay.object.validation.rule.ObjectValidationRuleEngineTracker;
 import com.liferay.object.web.internal.object.definitions.display.context.util.ObjectCodeEditorUtil;
 import com.liferay.petra.function.UnsafeConsumer;
 import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
@@ -27,10 +27,8 @@ import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.portlet.LiferayWindowState;
 import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermission;
-import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.LocalizationUtil;
-import com.liferay.portal.kernel.util.PropsUtil;
 
 import java.util.Arrays;
 import java.util.Comparator;
@@ -51,13 +49,11 @@ public class ObjectDefinitionsValidationsDisplayContext
 		HttpServletRequest httpServletRequest,
 		ModelResourcePermission<ObjectDefinition>
 			objectDefinitionModelResourcePermission,
-		ObjectValidationRuleEngineServicesTracker
-			objectValidationRuleEngineServicesTracker) {
+		ObjectValidationRuleEngineTracker objectValidationRuleEngineTracker) {
 
 		super(httpServletRequest, objectDefinitionModelResourcePermission);
 
-		_objectValidationRuleEngineServicesTracker =
-			objectValidationRuleEngineServicesTracker;
+		_objectValidationRuleEngineTracker = objectValidationRuleEngineTracker;
 	}
 
 	public List<FDSActionDropdownItem> getFDSActionDropdownItems()
@@ -86,8 +82,7 @@ public class ObjectDefinitionsValidationsDisplayContext
 
 	public List<Map<String, String>> getObjectValidationRuleEngines() {
 		return Stream.of(
-			_objectValidationRuleEngineServicesTracker.
-				getObjectValidationRuleEngines()
+			_objectValidationRuleEngineTracker.getObjectValidationRuleEngines()
 		).flatMap(
 			List::stream
 		).map(
@@ -125,9 +120,6 @@ public class ObjectDefinitionsValidationsDisplayContext
 				"errorLabel",
 				LocalizationUtil.getLocalizationMap(
 					objectValidationRule.getErrorLabel())
-			).put(
-				"ffUseMetadataAsSystemFields",
-				GetterUtil.getBoolean(PropsUtil.get("feature.flag.LPS-154872"))
 			).put(
 				"id", objectValidationRule.getObjectValidationRuleId()
 			).put(
@@ -180,7 +172,7 @@ public class ObjectDefinitionsValidationsDisplayContext
 			objectRequestHelper.getLocale(), getObjectDefinitionId());
 	}
 
-	private final ObjectValidationRuleEngineServicesTracker
-		_objectValidationRuleEngineServicesTracker;
+	private final ObjectValidationRuleEngineTracker
+		_objectValidationRuleEngineTracker;
 
 }

@@ -26,8 +26,8 @@ public class JournalArticleTreePathUpgradeProcess extends UpgradeProcess {
 	protected void doUpgrade() throws Exception {
 		try (LoggingTimer loggingTimer = new LoggingTimer()) {
 			runSQL(
-				"update JournalArticle set treePath = '/' where folderId=0 " +
-					"and treePath='/0/'");
+				"update JournalArticle set treePath = '/' where folderId = 0 " +
+					"and treePath = '/0/'");
 		}
 	}
 

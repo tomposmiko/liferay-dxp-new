@@ -1831,6 +1831,35 @@ definition {
 			searchTerm = "Blogs");
 	}
 
+	@description = "Runs a basic search test on a non-root portal context."
+	@priority = "4"
+	test SearchNonRootContext {
+		property portal.context = "liferay";
+		property skip.clean-app-server-deploy-dir = "true";
+		property test.assert.warning.exceptions = "true";
+		property test.name.skip.portal.instance = "Search#SearchNonRootContext";
+
+		SearchAdministration.openSearchAdmin();
+
+		AssertTextEquals(
+			locator1 = "Portlet#HEADER",
+			value1 = "Search");
+
+		JSONWebcontent.addWebContent(
+			content = "Web Content",
+			groupName = "Guest",
+			title = "WC Title");
+
+		Search.openSearchPage();
+
+		SearchPortlets.searchEmbedded(searchTerm = "WC Title");
+
+		SearchResultPortlet.viewSearchResults(
+			searchAssetTitle = "WC Title",
+			searchAssetType = "Web Content Article",
+			searchTerm = "WC Title");
+	}
+
 	@priority = "4"
 	test SearchUser {
 		property test.name.skip.portal.instance = "Search#SearchUser";
@@ -2418,6 +2447,24 @@ definition {
 			searchAssetTitle = "WC Title",
 			searchAssetType = "Web Content Article",
 			searchTerm = "WC Title");
+
+		task ("Use case for LPS-157511, assert user is able to manually input a date") {
+			Click(
+				locator1 = "Search#MODIFIED_FACET_SELECTION",
+				range = "Custom Range");
+
+			Click(locator1 = "Search#CUSTOM_RANGE_FROM");
+
+			Type(
+				locator1 = "Search#CUSTOM_RANGE_FROM",
+				value1 = "01/01/2020");
+
+			Click(locator1 = "Button#SEARCH");
+
+			AssertTextEquals(
+				locator1 = "Search#CUSTOM_RANGE_FROM",
+				value1 = "01/01/2020");
+		}
 	}
 
 	@priority = "4"

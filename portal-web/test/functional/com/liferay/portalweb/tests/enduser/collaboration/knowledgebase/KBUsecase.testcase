@@ -34,8 +34,6 @@ definition {
 	@priority = "5"
 	@refactorneeded
 	test DeleteImportedArticles {
-		property testray.component.names = "Training";
-
 		JSONLayout.addPublicLayout(
 			groupName = "Guest",
 			layoutName = "Knowledge Base Display Page");
@@ -286,6 +284,8 @@ definition {
 	@priority = "4"
 	@refactorneeded
 	test SearchKBArticleViaSearchPortlet {
+		property portal.acceptance = "true";
+
 		KBAdmin.openKBAdmin(siteURLKey = "guest");
 
 		KBArticle.addCP(

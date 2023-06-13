@@ -287,10 +287,13 @@ public class UserAccountResourceDTOConverter
 	}
 
 	private SiteBrief _toSiteBrief(
-		DTOConverterContext dtoConverterContext, Group group) {
+			DTOConverterContext dtoConverterContext, Group group)
+		throws Exception {
 
 		return new SiteBrief() {
 			{
+				descriptiveName = group.getDescriptiveName(
+					dtoConverterContext.getLocale());
 				id = group.getGroupId();
 				name = group.getName(dtoConverterContext.getLocale());
 				name_i18n = LocalizedMapUtil.getI18nMap(

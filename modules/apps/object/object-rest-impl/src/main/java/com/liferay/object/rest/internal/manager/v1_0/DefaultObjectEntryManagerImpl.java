@@ -27,7 +27,7 @@ import com.liferay.object.model.ObjectField;
 import com.liferay.object.model.ObjectRelationship;
 import com.liferay.object.rest.dto.v1_0.ObjectEntry;
 import com.liferay.object.rest.internal.dto.v1_0.converter.ObjectEntryDTOConverter;
-import com.liferay.object.rest.internal.odata.entity.v1_0.ObjectEntryEntityModel;
+import com.liferay.object.rest.internal.petra.sql.dsl.expression.OrderByExpressionUtil;
 import com.liferay.object.rest.internal.petra.sql.dsl.expression.PredicateUtil;
 import com.liferay.object.rest.internal.resource.v1_0.ObjectEntryResourceImpl;
 import com.liferay.object.rest.manager.v1_0.BaseObjectEntryManager;
@@ -41,8 +41,6 @@ import com.liferay.object.service.ObjectRelationshipService;
 import com.liferay.petra.sql.dsl.expression.Predicate;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.search.BooleanClauseOccur;
 import com.liferay.portal.kernel.search.Field;
 import com.liferay.portal.kernel.search.Sort;
@@ -55,13 +53,10 @@ import com.liferay.portal.kernel.util.DateUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.ListUtil;
-import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
-import com.liferay.portal.odata.entity.EntityModel;
 import com.liferay.portal.odata.filter.ExpressionConvert;
 import com.liferay.portal.odata.filter.Filter;
-import com.liferay.portal.odata.filter.FilterParser;
 import com.liferay.portal.odata.filter.FilterParserProvider;
 import com.liferay.portal.search.aggregation.Aggregations;
 import com.liferay.portal.search.aggregation.bucket.FilterAggregation;
@@ -332,6 +327,14 @@ public class DefaultObjectEntryManagerImpl
 				accountEntries, AccountEntry::getAccountEntryId);
 		}
 
+		int start = QueryUtil.ALL_POS;
+		int end = QueryUtil.ALL_POS;
+
+		if (pagination != null) {
+			start = pagination.getStartPosition();
+			end = pagination.getEndPosition();
+		}
+
 		List<Facet> facets = new ArrayList<>();
 
 		if ((aggregation != null) &&
@@ -348,9 +351,7 @@ public class DefaultObjectEntryManagerImpl
 				Map<Object, Long> aggregationCounts =
 					_objectEntryLocalService.getAggregationCounts(
 						objectDefinition.getObjectDefinitionId(),
-						entry1.getKey(), predicate,
-						pagination.getStartPosition(),
-						pagination.getEndPosition());
+						entry1.getKey(), predicate, start, end);
 
 				for (Map.Entry<Object, Long> entry2 :
 						aggregationCounts.entrySet()) {
@@ -388,8 +389,10 @@ public class DefaultObjectEntryManagerImpl
 			TransformUtil.transform(
 				_objectEntryLocalService.getValuesList(
 					objectDefinition.getObjectDefinitionId(), groupId,
-					accountEntryIds, predicate, search,
-					pagination.getStartPosition(), pagination.getEndPosition()),
+					accountEntryIds, predicate, search, start, end,
+					OrderByExpressionUtil.getOrderByExpressions(
+						objectDefinition.getObjectDefinitionId(),
+						_objectFieldLocalService, sorts)),
 				values -> getObjectEntry(
 					dtoConverterContext, objectDefinition,
 					GetterUtil.getLong(
@@ -408,24 +411,14 @@ public class DefaultObjectEntryManagerImpl
 			Sort[] sorts)
 		throws Exception {
 
-		if (GetterUtil.getBoolean(PropsUtil.get("feature.flag.LPS-153768"))) {
-			return getObjectEntries(
-				companyId, objectDefinition, scopeKey, aggregation,
-				dtoConverterContext, pagination,
-				PredicateUtil.toPredicate(
-					_filterParserProvider, filterString,
-					objectDefinition.getObjectDefinitionId(),
-					_objectFieldLocalService),
-				search, sorts);
-		}
-
 		return getObjectEntries(
 			companyId, objectDefinition, scopeKey, aggregation,
-			dtoConverterContext,
-			_toFilter(
-				filterString, dtoConverterContext.getLocale(),
-				objectDefinition.getObjectDefinitionId()),
-			pagination, search, sorts);
+			dtoConverterContext, pagination,
+			PredicateUtil.toPredicate(
+				_filterParserProvider, filterString,
+				objectDefinition.getObjectDefinitionId(),
+				_objectFieldLocalService),
+			search, sorts);
 	}
 
 	@Override
@@ -656,28 +649,6 @@ public class DefaultObjectEntryManagerImpl
 		}
 	}
 
-	private com.liferay.portal.kernel.search.filter.Filter _toFilter(
-		String filterString, Locale locale, Long objectDefinitionId) {
-
-		try {
-			EntityModel entityModel = new ObjectEntryEntityModel(
-				_objectFieldLocalService.getObjectFields(objectDefinitionId));
-
-			FilterParser filterParser = _filterParserProvider.provide(
-				entityModel);
-
-			Filter oDataFilter = new Filter(filterParser.parse(filterString));
-
-			return _expressionConvert.convert(
-				oDataFilter.getExpression(), locale, entityModel);
-		}
-		catch (Exception exception) {
-			_log.error("Invalid filter " + filterString, exception);
-		}
-
-		return null;
-	}
-
 	private List<ObjectEntry> _toObjectEntries(
 			DTOConverterContext dtoConverterContext,
 			List<com.liferay.object.model.ObjectEntry> objectEntries)
@@ -778,25 +749,27 @@ public class DefaultObjectEntryManagerImpl
 					ObjectFieldConstants.DB_TYPE_DATE)) {
 
 				values.put(name, _toDate(locale, String.valueOf(object)));
+
+				continue;
 			}
 
-			if (objectField.getListTypeDefinitionId() != 0) {
+			if ((objectField.getListTypeDefinitionId() != 0) &&
+				(object instanceof Map)) {
+
 				Map<String, String> map = (HashMap<String, String>)object;
 
 				values.put(name, map.get("key"));
+
+				continue;
 			}
-			else {
-				values.put(name, (Serializable)object);
-			}
+
+			values.put(name, (Serializable)object);
 		}
 
 		return values;
 	}
 
 	private static final long _NONEXISTING_ACCOUNT_ENTRY_ID = -1;
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		DefaultObjectEntryManagerImpl.class);
 
 	@Reference
 	private AccountEntryLocalService _accountEntryLocalService;

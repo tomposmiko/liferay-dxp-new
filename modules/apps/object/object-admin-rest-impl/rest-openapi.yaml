@@ -1,10 +1,5 @@
 components:
     schemas:
-        NextObjectState:
-            properties:
-                listTypeEntryId:
-                    format: int64
-                    type: integer
         ObjectAction:
             properties:
                 actions:
@@ -168,8 +163,6 @@ components:
                     items:
                         $ref: "#/components/schemas/ObjectFieldSetting"
                     type: array
-                objectStateFlow:
-                    $ref: "#/components/schemas/ObjectStateFlow"
                 relationshipType:
                     enum: [oneToMany, oneToOne]
                     readOnly: true
@@ -345,12 +338,11 @@ components:
                 id:
                     format: int64
                     type: integer
-                listTypeEntryId:
-                    format: int64
-                    type: integer
-                nextObjectStates:
+                key:
+                    type: string
+                objectStateTransitions:
                     items:
-                        $ref: "#/components/schemas/NextObjectState"
+                        $ref: "#/components/schemas/ObjectStateTransition"
                     type: array
         ObjectStateFlow:
             properties:
@@ -361,6 +353,11 @@ components:
                     items:
                         $ref: "#/components/schemas/ObjectState"
                     type: array
+        ObjectStateTransition:
+            properties:
+                key:
+                    type: string
+            type: object
         ObjectValidationRule:
             properties:
                 actions:
@@ -504,7 +501,7 @@ components:
 info:
     description:
         "A Java client JAR is available for use with the group ID 'com.liferay', artifact ID
-        'com.liferay.object.admin.rest.client', and version '1.0.31'."
+        'com.liferay.object.admin.rest.client', and version '1.0.32'."
     license:
         name: "Apache 2.0"
         url: "http://www.apache.org/licenses/LICENSE-2.0.html"

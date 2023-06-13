@@ -990,9 +990,9 @@ public class LayoutStagedModelDataHandler
 		_updateLastMergeLayoutModifiedTime(
 			layoutElement, importedLayout, portletDataContext);
 
-		importedLayout = _layoutLocalService.updateLayout(importedLayout);
-
 		_importTheme(portletDataContext, layout, importedLayout);
+
+		importedLayout = _layoutLocalService.updateLayout(importedLayout);
 
 		if ((Objects.equals(layout.getType(), LayoutConstants.TYPE_PORTLET) &&
 			 Validator.isNotNull(layout.getTypeSettings())) ||
@@ -2494,26 +2494,18 @@ public class LayoutStagedModelDataHandler
 					"javascript", StringPool.BLANK));
 
 			if (Validator.isNotNull(javascript)) {
-				typeSettingsUnicodeProperties.setProperty(
+				UnicodeProperties importedLayoutTypeSettingsUnicodeProperties =
+					importedLayout.getTypeSettingsProperties();
+
+				importedLayoutTypeSettingsUnicodeProperties.setProperty(
 					"javascript",
 					_dlReferencesExportImportContentProcessor.
 						replaceImportContentReferences(
 							portletDataContext, layout, javascript));
 
 				importedLayout.setTypeSettingsProperties(
-					typeSettingsUnicodeProperties);
-
-				_layoutLocalService.updateLayout(
-					importedLayout.getGroupId(),
-					importedLayout.isPrivateLayout(),
-					importedLayout.getLayoutId(),
-					importedLayout.getTypeSettings());
+					importedLayoutTypeSettingsUnicodeProperties);
 			}
-
-			_layoutLocalService.updateLookAndFeel(
-				importedLayout.getGroupId(), importedLayout.isPrivateLayout(),
-				importedLayout.getLayoutId(), layout.getThemeId(),
-				layout.getColorSchemeId(), importedLayout.getCss());
 		}
 	}
 

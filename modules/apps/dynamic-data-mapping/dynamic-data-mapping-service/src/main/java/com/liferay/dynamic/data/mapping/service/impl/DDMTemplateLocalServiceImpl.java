@@ -55,6 +55,8 @@ import com.liferay.portal.kernel.module.configuration.ConfigurationException;
 import com.liferay.portal.kernel.module.configuration.ConfigurationProvider;
 import com.liferay.portal.kernel.search.Indexable;
 import com.liferay.portal.kernel.search.IndexableType;
+import com.liferay.portal.kernel.search.Indexer;
+import com.liferay.portal.kernel.search.IndexerRegistryUtil;
 import com.liferay.portal.kernel.search.SearchContext;
 import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
 import com.liferay.portal.kernel.service.ImageLocalService;
@@ -403,6 +405,11 @@ public class DDMTemplateLocalServiceImpl
 
 			newTemplates.add(newTemplate);
 		}
+
+		Indexer<DDMTemplate> indexer = IndexerRegistryUtil.nullSafeGetIndexer(
+			DDMTemplate.class);
+
+		indexer.reindex(newTemplates);
 
 		return newTemplates;
 	}

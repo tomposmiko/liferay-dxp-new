@@ -22,6 +22,23 @@ definition {
 		}
 	}
 
+	@description = "Can add a blueprint in a non-root portal context."
+	@priority = "4"
+	test AddBlueprintInNonRootContext {
+		property portal.context = "liferay";
+		property skip.clean-app-server-deploy-dir = "true";
+		property test.assert.warning.exceptions = "true";
+		property test.name.skip.portal.instance = "Blueprints#AddBlueprintInNonRootContext";
+
+		Blueprints.openBlueprintsAdmin();
+
+		Blueprints.createBlueprint(title = "Test Blueprint");
+
+		PortletEntry.save();
+
+		Blueprints.viewEntryTitle(title = "Test Blueprint");
+	}
+
 	test AddBlueprintWithDescription {
 		Blueprints.openBlueprintsAdmin();
 
@@ -1604,6 +1621,65 @@ definition {
 		AssertTextPresent(value1 = "Import Element");
 	}
 
+	test FederatedSearchKeyAppliesToBlueprintsOptions {
+		JSONDocument.addFile(
+			dmDocumentTitle = "Apple",
+			groupName = "Guest");
+
+		JSONWebcontent.addWebContent(
+			content = "",
+			groupName = "Guest",
+			title = "Apple Pie");
+
+		Blueprints.openBlueprintsAdmin();
+
+		Blueprints.createBlueprint(title = "Test Blueprint");
+
+		Blueprints.addElement(element = "Paste Any Elasticsearch Query");
+
+		var elasticsearchQueryJson = '''
+{
+	"match":
+	{
+		"title_en_US":
+		{
+			"query": "Pie"
+		}
+	}
+}
+		''';
+
+		Type.typeCodeMirrorEditorNoError(
+			locator1 = "Blueprints#CODE_MIRROR_EDITOR",
+			value1 = "${elasticsearchQueryJson}");
+
+		Blueprints.configureElementDropdown(
+			dropdownName = "Occur",
+			option = "MUST");
+
+		PortletEntry.save();
+
+		Search.openSearchPage();
+
+		Blueprints.applyBlueprintViaOptionsWidget(blueprintTitle = "Test Blueprint");
+
+		Blueprints.configureFederatedSearchKeyForOptionsWidget(federatedSearchKey = "key");
+
+		SearchPortlets.configureSearchBarWidget(federatedSearchKey = "key");
+
+		SearchResultPortlet.configureSearchResults(federatedSearchKey = "key");
+
+		SearchPortlets.searchWidget(searchTerm = "apple");
+
+		SearchResultPortlet.viewSearchResults(
+			searchAssetTitle = "Apple Pie",
+			searchAssetType = "Web Content Article");
+
+		SearchResultPortlet.viewSearchResultNotPresent(
+			searchAssetTitle = "Apple",
+			searchAssetType = "Document");
+	}
+
 	test HideAndShowAddElementsSidebar {
 		Blueprints.openBlueprintsAdmin();
 
@@ -2281,10 +2357,10 @@ definition {
 
 		Blueprints.createBlueprint(title = "Test Blueprint");
 
-		Blueprints.addElement(element = "Boost Contents in a Category for a User Segment");
+		Blueprints.addElement(element = "Boost Contents in a Category for User Segments");
 
 		Type(
-			elementName = "Boost Contents in a Category for a User Segment",
+			elementName = "Boost Contents in a Category for User Segments",
 			fieldLabel = "Asset Category ID",
 			locator1 = "Blueprints#BLUEPRINTS_ADDED_ELEMENT_INPUT_FIELD",
 			value1 = "${categoryId}");
@@ -2292,13 +2368,13 @@ definition {
 		var segmentId = JSONSegmentsentry.getSegmentId(segmentName = "Test Segment");
 
 		Type(
-			elementName = "Boost Contents in a Category for a User Segment",
+			elementName = "Boost Contents in a Category for User Segments",
 			fieldLabel = "User Segment IDs",
 			locator1 = "Blueprints#BLUEPRINTS_ADDED_ELEMENT_INPUT_FIELD",
 			value1 = "${segmentId}");
 
 		Type(
-			elementName = "Boost Contents in a Category for a User Segment",
+			elementName = "Boost Contents in a Category for User Segments",
 			fieldLabel = "Boost",
 			locator1 = "Blueprints#BLUEPRINTS_ADDED_ELEMENT_INPUT_FIELD",
 			value1 = "2000");

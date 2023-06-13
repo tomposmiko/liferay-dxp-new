@@ -26,7 +26,6 @@ import React, {useRef, useState} from 'react';
 
 export default function SearchBar({
 	emptySearchEnabled,
-	initialScope = '',
 	keywords = '',
 	keywordsParameterName = 'q',
 	letUserChooseScope = false,
@@ -35,6 +34,7 @@ export default function SearchBar({
 	scopeParameterStringCurrentSite,
 	scopeParameterStringEverything,
 	searchURL,
+	selectedEverythingSearchScope = false,
 	suggestionsContributorConfiguration = '{}',
 	suggestionsDisplayThreshold = '2',
 	suggestionsURL = '/o/portal-search-rest/v1.0/suggestions',
@@ -52,7 +52,11 @@ export default function SearchBar({
 		loading: false,
 		networkStatus: 4,
 	}));
-	const [scope, setScope] = useState(initialScope);
+	const [scope, setScope] = useState(
+		selectedEverythingSearchScope
+			? scopeParameterStringEverything
+			: scopeParameterStringCurrentSite
+	);
 
 	const alignElementRef = useRef();
 	const dropdownRef = useRef();
@@ -92,6 +96,9 @@ export default function SearchBar({
 
 	const _handleKeyDown = (event) => {
 		if (event.key === 'Enter') {
+			event.preventDefault();
+			event.stopPropagation();
+
 			_handleSubmit();
 		}
 	};
@@ -249,7 +256,7 @@ export default function SearchBar({
 			searchParams.delete(paginationStartParameterName);
 		}
 
-		if (scope) {
+		if (letUserChooseScope) {
 			searchParams.set(scopeParameterName, scope);
 		}
 

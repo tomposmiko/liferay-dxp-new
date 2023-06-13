@@ -171,6 +171,61 @@ definition {
 		}
 	}
 
+	@description = "The testcase asserts the override filtered by 'Selected Language'."
+	@priority = "4"
+	test CanFilterOverridesbySelectedLanguage {
+		task ("Given three new keys with en-US and es-ES language translations") {
+			LanguageOverride.addLanguageKey(
+				languageKey = "text-contains-error1",
+				translationOverrideList = "en-US",
+				translationOverrideValueList = "Text contains error1");
+
+			LanguageOverride.addLanguageKey(
+				languageKey = "text-contains-error2",
+				translationOverrideList = "en-US",
+				translationOverrideValueList = "Text contains error2");
+
+			LanguageOverride.addLanguageKey(
+				languageKey = "text-contains-error3",
+				translationOverrideList = "es-ES",
+				translationOverrideValueList = "El texto contiene error3");
+		}
+
+		task ("When the user filters by 'Selected Language', only language key with default en-US override displays") {
+			ManagementBar.setFilterAndOrder(filterBy = "Selected Language");
+
+			LexiconEntry.viewEntryName(rowEntry = "text-contains-error1");
+
+			LexiconList.viewListEntrySubtitle(
+				listEntry = "text-contains-error1",
+				listEntrySubtitle = "Languages With Override: en_US");
+
+			LexiconEntry.viewEntryName(rowEntry = "text-contains-error2");
+
+			LexiconList.viewListEntrySubtitle(
+				listEntry = "text-contains-error2",
+				listEntrySubtitle = "Languages With Override: en_US");
+
+			LexiconEntry.viewNoEntry(rowEntry = "text-contains-error3");
+		}
+
+		task ("Then change the language selector to es-ES, only language key with es-ES override displays") {
+			PageEditor.changeLocale(
+				currentLocale = "en-US",
+				locale = "es-ES");
+
+			LexiconEntry.viewEntryName(rowEntry = "text-contains-error3");
+
+			LexiconList.viewListEntrySubtitle(
+				listEntry = "text-contains-error3",
+				listEntrySubtitle = "Languages With Override: es_ES");
+
+			LexiconEntry.viewNoEntry(rowEntry = "text-contains-error1");
+
+			LexiconEntry.viewNoEntry(rowEntry = "text-contains-error2");
+		}
+	}
+
 	@description = "This test asserts that a user can remove all translation overrides on the main view page for language keys that are overridden and doing so will delete the language key"
 	@priority = "5"
 	test CanRemoveAllTranslationOverridesViaMenuItem {
@@ -390,6 +445,38 @@ definition {
 		}
 	}
 
+	@description = "It asserts proper override and translation infos for new language key."
+	@ignore = "true"
+	@priority = "4"
+	test CanViewProperOverrideInfosforNewLanguageKey {
+		task ("Given one new language key is created with all language override translations") {
+			LanguageOverride.addLanguageKey(
+				languageKey = "month",
+				translationOverrideList = "en-US,ar-SA,ca-ES,zh-CN,nl-NL,fi-FI,fr-FR,de-DE,hu-HU,ja-JP,pt-BR,es-ES,sv-SE",
+				translationOverrideValueList = "month,دقيقة,mes,月,maand,kuukausi,mois,Monat,hónap,のメモ,mês,mes,månad");
+		}
+
+		task ("When the user filters by 'Any Language' and change language to "pt-BR"") {
+			ManagementBar.setFilterAndOrder(filterBy = "Any Language");
+
+			PageEditor.changeLocale(
+				currentLocale = "en-US",
+				locale = "pt-BR");
+		}
+
+		task ("Then the key should appear and list all languages it has translations for") {
+			LexiconList.viewListEntryTitle(listEntry = "month");
+
+			LexiconList.viewListEntrySubtitle(
+				listEntry = "month",
+				listEntrySubtitle = "mês");
+
+			LexiconList.viewListEntrySubtitle(
+				listEntry = "month",
+				listEntrySubtitle = "Languages With Override: ar_SA, ca_ES, de_DE, en_US, es_ES, fi_FI, fr_FR, hu_HU, ja_JP, nl_NL, pt_BR, sv_SE, zh_CN");
+		}
+	}
+
 	@description = "This test clears all overrides for an overridden language key via the Edit page. Doing so will delete the language key."
 	@priority = "5"
 	test ClearingAllOverridesInEditPageWillDeleteCreatedKey {
@@ -490,7 +577,7 @@ definition {
 		}
 	}
 
-	@description = "This is a use case for LPS-146568. It asserts the language overriden will be bolded when it matches the selected language."
+	@description = "This is a use case for LPS-146568. It asserts the language overriden will be bolded and translation displayed when it matches the selected language."
 	@priority = "3"
 	test LanguageOverrideIsBoldedWhenMatchestheSelectedLanguage {
 		task ("Given new languages key are added for en-US and nl-NL separately") {
@@ -513,7 +600,7 @@ definition {
 				locale = "nl-NL");
 		}
 
-		task ("Then both keys should be present, but only the selected language 'nl-NL' should be bold") {
+		task ("Then both keys should be present, but only the selected language 'nl-NL' should be bold and translation in nl-NL display") {
 			AssertElementPresent(
 				key_languageKey = "text-not-bold",
 				locator1 = "LanguageOverride#VIEW_PAGE_LANGUAGE_KEY");
@@ -527,6 +614,14 @@ definition {
 				key_language = "en-US",
 				key_languageKey = "text-not-bold",
 				locator1 = "LanguageOverride#BOLD_LANGUAGE_WITH_OVERRIDE");
+
+			LexiconList.viewListEntrySubtitle(
+				listEntry = "new-key",
+				listEntrySubtitle = "Nieuwe Sleutel");
+
+			AssertElementNotPresent(
+				key_translation = "Text not bold",
+				locator1 = "LanguageOverride#VIEW_PAGE_LANGUAGE_KEY_TRANSLATION");
 		}
 	}
 

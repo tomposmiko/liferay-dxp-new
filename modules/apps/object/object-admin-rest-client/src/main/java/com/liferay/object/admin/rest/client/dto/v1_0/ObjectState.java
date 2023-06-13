@@ -53,48 +53,48 @@ public class ObjectState implements Cloneable, Serializable {
 
 	protected Long id;
 
-	public Long getListTypeEntryId() {
-		return listTypeEntryId;
+	public String getKey() {
+		return key;
 	}
 
-	public void setListTypeEntryId(Long listTypeEntryId) {
-		this.listTypeEntryId = listTypeEntryId;
+	public void setKey(String key) {
+		this.key = key;
 	}
 
-	public void setListTypeEntryId(
-		UnsafeSupplier<Long, Exception> listTypeEntryIdUnsafeSupplier) {
-
+	public void setKey(UnsafeSupplier<String, Exception> keyUnsafeSupplier) {
 		try {
-			listTypeEntryId = listTypeEntryIdUnsafeSupplier.get();
+			key = keyUnsafeSupplier.get();
 		}
 		catch (Exception e) {
 			throw new RuntimeException(e);
 		}
 	}
 
-	protected Long listTypeEntryId;
+	protected String key;
 
-	public NextObjectState[] getNextObjectStates() {
-		return nextObjectStates;
+	public ObjectStateTransition[] getObjectStateTransitions() {
+		return objectStateTransitions;
 	}
 
-	public void setNextObjectStates(NextObjectState[] nextObjectStates) {
-		this.nextObjectStates = nextObjectStates;
+	public void setObjectStateTransitions(
+		ObjectStateTransition[] objectStateTransitions) {
+
+		this.objectStateTransitions = objectStateTransitions;
 	}
 
-	public void setNextObjectStates(
-		UnsafeSupplier<NextObjectState[], Exception>
-			nextObjectStatesUnsafeSupplier) {
+	public void setObjectStateTransitions(
+		UnsafeSupplier<ObjectStateTransition[], Exception>
+			objectStateTransitionsUnsafeSupplier) {
 
 		try {
-			nextObjectStates = nextObjectStatesUnsafeSupplier.get();
+			objectStateTransitions = objectStateTransitionsUnsafeSupplier.get();
 		}
 		catch (Exception e) {
 			throw new RuntimeException(e);
 		}
 	}
 
-	protected NextObjectState[] nextObjectStates;
+	protected ObjectStateTransition[] objectStateTransitions;
 
 	@Override
 	public ObjectState clone() throws CloneNotSupportedException {

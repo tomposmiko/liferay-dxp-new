@@ -66,6 +66,8 @@ definition {
 			PagesAdmin.togglePageTemplateInheritChanges(toggleValue = "${inheritChanges}");
 		}
 
+		Navigator.gotoNavUnderline(navUnderline = "General");
+
 		AssertVisible(locator1 = "TextInput#NAME");
 
 		if (isSet(openGraph)) {
@@ -284,6 +286,8 @@ definition {
 		Click(
 			key_text = "Add JavaScript Extensions",
 			locator1 = "Button#ANY");
+
+		MenuItem.click(menuItem = "${insertion}");
 
 		SelectFrame(locator1 = "IFrame#MODAL_BODY");
 
@@ -586,6 +590,24 @@ definition {
 		WaitForSPARefresh();
 	}
 
+	macro addThemeCSSExtension {
+		WaitForEditable(
+			key_text = "Extension",
+			locator1 = "TextInput#ANY");
+
+		Click(
+			key_text = "Extension",
+			locator1 = "TextInput#ANY");
+
+		SelectFrame(locator1 = "IFrame#MODAL_BODY");
+
+		Click(
+			key_listEntry = "${extensionName}",
+			locator1 = "LexiconList#LIST_ENTRY_TITLE");
+
+		SelectFrameTop();
+	}
+
 	macro cannotDeletePagesAssociatedWithSiteTemplate {
 		if (isSet(pageName)) {
 			Click(
@@ -802,6 +824,34 @@ definition {
 		Click(
 			key_text = "Delete",
 			locator1 = "Modal#MODAL_FOOTER_BUTTON");
+
+		if (isSet(failure)) {
+			if (IsElementPresent(locator1 = "Message#ERROR_2")) {
+				Alert.viewRequestFailedToComplete();
+
+				AssertTextEquals(
+					locator1 = "Message#ERROR_2",
+					value1 = "${failure}");
+			}
+			else {
+				AssertTextEquals(
+					locator1 = "Message#ERROR",
+					value1 = "${failure}");
+			}
+		}
+		else {
+			Alert.viewSuccessMessage();
+		}
+	}
+
+	macro discardDraft {
+		WaitForPageLoad();
+
+		PagesAdmin.openPageEllipsisMenu(pageName = "${pageName}");
+
+		MenuItem.clickNoError(menuItem = "Discard Draft");
+
+		AssertConfirm(value1 = "Are you sure you want to discard the current draft and apply the latest published changes?");
 
 		if (isSet(failure)) {
 			if (IsElementPresent(locator1 = "Message#ERROR_2")) {

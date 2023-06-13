@@ -42,6 +42,7 @@ import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.model.LayoutFriendlyURLComposite;
 import com.liferay.portal.kernel.model.LayoutTypePortletConstants;
+import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.portlet.FriendlyURLResolver;
 import com.liferay.portal.kernel.portlet.PortletIdCodec;
 import com.liferay.portal.kernel.security.auth.AuthTokenUtil;
@@ -52,6 +53,9 @@ import com.liferay.portal.kernel.security.permission.PermissionThreadLocal;
 import com.liferay.portal.kernel.service.ClassNameLocalService;
 import com.liferay.portal.kernel.service.CompanyLocalService;
 import com.liferay.portal.kernel.service.LayoutLocalService;
+import com.liferay.portal.kernel.service.ServiceContext;
+import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
+import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.FriendlyURLNormalizer;
@@ -99,7 +103,7 @@ public class DefaultAssetDisplayPageFriendlyURLResolver
 			(HttpServletRequest)requestContext.get("request");
 
 		JournalArticle journalArticle = _getJournalArticle(
-			groupId, friendlyURL);
+			groupId, friendlyURL, params);
 
 		LayoutDisplayPageObjectProvider<?> layoutDisplayPageObjectProvider =
 			_getLayoutDisplayPageObjectProvider(journalArticle);
@@ -155,7 +159,7 @@ public class DefaultAssetDisplayPageFriendlyURLResolver
 		throws PortalException {
 
 		JournalArticle journalArticle = _getJournalArticle(
-			groupId, friendlyURL);
+			groupId, friendlyURL, params);
 
 		HttpServletRequest httpServletRequest =
 			(HttpServletRequest)requestContext.get("request");
@@ -406,16 +410,30 @@ public class DefaultAssetDisplayPageFriendlyURLResolver
 		return GetterUtil.getLong(paths.get(paths.size() - 1));
 	}
 
-	private JournalArticle _getJournalArticle(long groupId, String friendlyURL)
+	private JournalArticle _getJournalArticle(
+			long groupId, String friendlyURL, Map<String, String[]> params)
 		throws PortalException {
+
+		JournalArticle journalArticle = null;
+
+		String[] versionIds = params.get("version");
+
+		if (ArrayUtil.isNotEmpty(versionIds) && !_isDefaultUser()) {
+			long id = GetterUtil.getLong(versionIds[0]);
+
+			journalArticle = _journalArticleLocalService.fetchArticle(id);
+		}
 
 		String normalizedUrlTitle =
 			_friendlyURLNormalizer.normalizeWithEncoding(
 				_getFullURLTitle(friendlyURL));
 
-		JournalArticle journalArticle =
-			_journalArticleLocalService.fetchLatestArticleByUrlTitle(
-				groupId, normalizedUrlTitle, WorkflowConstants.STATUS_APPROVED);
+		if (journalArticle == null) {
+			journalArticle =
+				_journalArticleLocalService.fetchLatestArticleByUrlTitle(
+					groupId, normalizedUrlTitle,
+					WorkflowConstants.STATUS_APPROVED);
+		}
 
 		if (journalArticle == null) {
 			PermissionChecker permissionChecker =
@@ -427,10 +445,11 @@ public class DefaultAssetDisplayPageFriendlyURLResolver
 					WorkflowConstants.STATUS_PENDING);
 
 			if ((journalArticle != null) &&
-				!_workflowPermission.hasPermission(
-					permissionChecker, groupId,
-					"com.liferay.journal.model.JournalArticle",
-					journalArticle.getId(), ActionKeys.VIEW)) {
+				!GetterUtil.getBoolean(
+					_workflowPermission.hasPermission(
+						permissionChecker, groupId,
+						"com.liferay.journal.model.JournalArticle",
+						journalArticle.getId(), ActionKeys.VIEW))) {
 
 				throw new PrincipalException();
 			}
@@ -475,10 +494,11 @@ public class DefaultAssetDisplayPageFriendlyURLResolver
 					groupId, normalizedUrlTitle,
 					WorkflowConstants.STATUS_PENDING);
 
-			if (!_workflowPermission.hasPermission(
-					permissionChecker, groupId,
-					"com.liferay.journal.model.JournalArticle",
-					journalArticle.getId(), ActionKeys.VIEW)) {
+			if (!GetterUtil.getBoolean(
+					_workflowPermission.hasPermission(
+						permissionChecker, groupId,
+						"com.liferay.journal.model.JournalArticle",
+						journalArticle.getId(), ActionKeys.VIEW))) {
 
 				throw new PrincipalException();
 			}
@@ -548,6 +568,23 @@ public class DefaultAssetDisplayPageFriendlyURLResolver
 		return 0;
 	}
 
+	private boolean _isDefaultUser() {
+		ServiceContext serviceContext =
+			ServiceContextThreadLocal.getServiceContext();
+
+		if (serviceContext == null) {
+			return true;
+		}
+
+		User user = _userLocalService.fetchUser(serviceContext.getUserId());
+
+		if ((user == null) || user.isDefaultUser()) {
+			return true;
+		}
+
+		return false;
+	}
+
 	@Reference
 	private AssetDisplayPageFriendlyURLProvider
 		_assetDisplayPageFriendlyURLProvider;
@@ -578,6 +615,9 @@ public class DefaultAssetDisplayPageFriendlyURLResolver
 
 	@Reference
 	private Portal _portal;
+
+	@Reference
+	private UserLocalService _userLocalService;
 
 	@Reference
 	private WorkflowPermission _workflowPermission;

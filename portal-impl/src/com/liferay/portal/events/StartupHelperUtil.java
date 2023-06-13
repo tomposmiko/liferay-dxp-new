@@ -39,6 +39,7 @@ import com.liferay.portal.upgrade.PortalUpgradeProcess;
 import com.liferay.portal.util.PropsValues;
 
 import java.sql.Connection;
+import java.sql.SQLException;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -114,33 +115,29 @@ public class StartupHelperUtil {
 	public static void updateIndexes(boolean dropIndexes) {
 		DB db = DBManagerUtil.getDB();
 
-		try (Connection connection = DataAccess.getConnection()) {
-			updateIndexes(db, connection, dropIndexes);
-		}
-		catch (Exception exception) {
-			if (_log.isWarnEnabled()) {
-				_log.warn(exception);
-			}
-		}
-	}
-
-	public static void updateIndexes(
-		DB db, Connection connection, boolean dropIndexes) {
-
 		try {
-			Thread currentThread = Thread.currentThread();
+			db.process(
+				companyId -> {
+					String message = new String(
+						"Updating portal database indexes");
 
-			ClassLoader classLoader = currentThread.getContextClassLoader();
+					if (Validator.isNotNull(companyId) &&
+						_log.isInfoEnabled()) {
 
-			String tablesSQL = StringUtil.read(
-				classLoader,
-				"com/liferay/portal/tools/sql/dependencies/portal-tables.sql");
+						message += " for company " + companyId;
+					}
 
-			String indexesSQL = StringUtil.read(
-				classLoader,
-				"com/liferay/portal/tools/sql/dependencies/indexes.sql");
+					try (Connection connection = DataAccess.getConnection();
+						LoggingTimer loggingTimer = new LoggingTimer(message)) {
 
-			db.updateIndexes(connection, tablesSQL, indexesSQL, dropIndexes);
+						_updateIndexes(db, connection, dropIndexes);
+					}
+					catch (SQLException sqlException) {
+						if (_log.isWarnEnabled()) {
+							_log.warn(sqlException);
+						}
+					}
+				});
 		}
 		catch (Exception exception) {
 			if (_log.isWarnEnabled()) {
@@ -211,6 +208,25 @@ public class StartupHelperUtil {
 
 			throw new RuntimeException(msg);
 		}
+	}
+
+	private static void _updateIndexes(
+			DB db, Connection connection, boolean dropIndexes)
+		throws Exception {
+
+		Thread currentThread = Thread.currentThread();
+
+		ClassLoader classLoader = currentThread.getContextClassLoader();
+
+		String tablesSQL = StringUtil.read(
+			classLoader,
+			"com/liferay/portal/tools/sql/dependencies/portal-tables.sql");
+
+		String indexesSQL = StringUtil.read(
+			classLoader,
+			"com/liferay/portal/tools/sql/dependencies/indexes.sql");
+
+		db.updateIndexes(connection, tablesSQL, indexesSQL, dropIndexes);
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(

@@ -2105,6 +2105,15 @@ public class VerifyProperties {
 			"velocity.engine.restricted.variables"
 		},
 		{
+			"module.framework.properties.dependency.manager.sync.timeout",
+			"dependency.manager.sync.timeout"
+		},
+		{
+			"module.framework.properties.dependency.manager.thread.pool." +
+				"enabled",
+			"dependency.manager.thread.pool.enabled"
+		},
+		{
 			"module.framework.properties.felix.fileinstall.bundles.new.start",
 			"module.framework.file.install.bundles.start.new"
 		},
@@ -2146,6 +2155,10 @@ public class VerifyProperties {
 		{
 			"module.framework.properties.file.install.subdir.mode",
 			"module.framework.file.install.subdir.mode"
+		},
+		{
+			"module.framework.properties.initial.system.check.enabled",
+			"initial.system.check.enabled"
 		},
 		{
 			"passwords.passwordpolicytoolkit.charset.lowercase",

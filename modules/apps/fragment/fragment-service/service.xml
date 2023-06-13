@@ -328,6 +328,7 @@
 		<exception>FragmentCompositionName</exception>
 		<exception>FragmentEntryConfiguration</exception>
 		<exception>FragmentEntryContent</exception>
+		<exception>FragmentEntryFieldTypes</exception>
 		<exception>FragmentEntryName</exception>
 		<exception>FragmentEntryTypeOptions</exception>
 		<exception>InvalidFile</exception>

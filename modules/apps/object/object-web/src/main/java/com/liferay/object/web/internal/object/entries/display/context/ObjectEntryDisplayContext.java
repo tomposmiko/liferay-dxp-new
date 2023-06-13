@@ -43,7 +43,7 @@ import com.liferay.object.constants.ObjectFieldConstants;
 import com.liferay.object.constants.ObjectLayoutBoxConstants;
 import com.liferay.object.exception.NoSuchObjectLayoutException;
 import com.liferay.object.field.business.type.ObjectFieldBusinessType;
-import com.liferay.object.field.business.type.ObjectFieldBusinessTypeServicesTracker;
+import com.liferay.object.field.business.type.ObjectFieldBusinessTypeTracker;
 import com.liferay.object.field.render.ObjectFieldRenderingContext;
 import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.model.ObjectField;
@@ -57,7 +57,7 @@ import com.liferay.object.rest.dto.v1_0.FileEntry;
 import com.liferay.object.rest.dto.v1_0.ListEntry;
 import com.liferay.object.rest.dto.v1_0.ObjectEntry;
 import com.liferay.object.rest.manager.v1_0.ObjectEntryManager;
-import com.liferay.object.rest.manager.v1_0.ObjectEntryManagerServicesTracker;
+import com.liferay.object.rest.manager.v1_0.ObjectEntryManagerTracker;
 import com.liferay.object.scope.ObjectScopeProvider;
 import com.liferay.object.scope.ObjectScopeProviderRegistry;
 import com.liferay.object.service.ObjectDefinitionLocalService;
@@ -122,10 +122,9 @@ public class ObjectEntryDisplayContext {
 		DDMFormRenderer ddmFormRenderer, HttpServletRequest httpServletRequest,
 		ItemSelector itemSelector,
 		ObjectDefinitionLocalService objectDefinitionLocalService,
-		ObjectEntryManagerServicesTracker objectEntryManagerServicesTracker,
+		ObjectEntryManagerTracker objectEntryManagerTracker,
 		ObjectEntryService objectEntryService,
-		ObjectFieldBusinessTypeServicesTracker
-			objectFieldBusinessTypeServicesTracker,
+		ObjectFieldBusinessTypeTracker objectFieldBusinessTypeTracker,
 		ObjectFieldLocalService objectFieldLocalService,
 		ObjectLayoutLocalService objectLayoutLocalService,
 		ObjectRelationshipLocalService objectRelationshipLocalService,
@@ -135,10 +134,9 @@ public class ObjectEntryDisplayContext {
 		_ddmFormRenderer = ddmFormRenderer;
 		_itemSelector = itemSelector;
 		_objectDefinitionLocalService = objectDefinitionLocalService;
-		_objectEntryManagerServicesTracker = objectEntryManagerServicesTracker;
+		_objectEntryManagerTracker = objectEntryManagerTracker;
 		_objectEntryService = objectEntryService;
-		_objectFieldBusinessTypeServicesTracker =
-			objectFieldBusinessTypeServicesTracker;
+		_objectFieldBusinessTypeTracker = objectFieldBusinessTypeTracker;
 		_objectFieldLocalService = objectFieldLocalService;
 		_objectLayoutLocalService = objectLayoutLocalService;
 		_objectRelationshipLocalService = objectRelationshipLocalService;
@@ -260,7 +258,7 @@ public class ObjectEntryDisplayContext {
 		ObjectDefinition objectDefinition = getObjectDefinition();
 
 		ObjectEntryManager objectEntryManager =
-			_objectEntryManagerServicesTracker.getObjectEntryManager(
+			_objectEntryManagerTracker.getObjectEntryManager(
 				objectDefinition.getStorageType());
 
 		try {
@@ -598,45 +596,22 @@ public class ObjectEntryDisplayContext {
 			}
 		}
 
-		if (GetterUtil.getBoolean(PropsUtil.get("feature.flag.LPS-154872"))) {
-			List<ObjectField> objectFields =
-				_objectFieldLocalService.getCustomObjectFields(
-					objectDefinition.getObjectDefinitionId());
+		List<ObjectField> objectFields =
+			_objectFieldLocalService.getCustomObjectFields(
+				objectDefinition.getObjectDefinitionId());
 
-			if (objectLayoutTab == null) {
-				for (ObjectField objectField : objectFields) {
-					if (!_isActive(objectField)) {
-						continue;
-					}
-
-					ddmForm.addDDMFormField(
-						_getDDMFormField(objectField, readOnly));
+		if (objectLayoutTab == null) {
+			for (ObjectField objectField : objectFields) {
+				if (!_isActive(objectField)) {
+					continue;
 				}
-			}
-			else {
-				_addDDMFormFields(
-					ddmForm, objectFields, objectLayoutTab, readOnly);
+
+				ddmForm.addDDMFormField(
+					_getDDMFormField(objectField, readOnly));
 			}
 		}
 		else {
-			List<ObjectField> objectFields =
-				_objectFieldLocalService.getObjectFields(
-					objectDefinition.getObjectDefinitionId());
-
-			if (objectLayoutTab == null) {
-				for (ObjectField objectField : objectFields) {
-					if (!_isActive(objectField)) {
-						continue;
-					}
-
-					ddmForm.addDDMFormField(
-						_getDDMFormField(objectField, readOnly));
-				}
-			}
-			else {
-				_addDDMFormFields(
-					ddmForm, objectFields, objectLayoutTab, readOnly);
-			}
+			_addDDMFormFields(ddmForm, objectFields, objectLayoutTab, readOnly);
 		}
 
 		ddmForm.setDefaultLocale(_objectRequestHelper.getLocale());
@@ -651,7 +626,7 @@ public class ObjectEntryDisplayContext {
 		// TODO Store the type and the object field type in the database
 
 		ObjectFieldBusinessType objectFieldBusinessType =
-			_objectFieldBusinessTypeServicesTracker.getObjectFieldBusinessType(
+			_objectFieldBusinessTypeTracker.getObjectFieldBusinessType(
 				objectField.getBusinessType());
 
 		DDMFormField ddmFormField = new DDMFormField(
@@ -1076,11 +1051,10 @@ public class ObjectEntryDisplayContext {
 	private final ItemSelector _itemSelector;
 	private final ObjectDefinitionLocalService _objectDefinitionLocalService;
 	private ObjectEntry _objectEntry;
-	private final ObjectEntryManagerServicesTracker
-		_objectEntryManagerServicesTracker;
+	private final ObjectEntryManagerTracker _objectEntryManagerTracker;
 	private final ObjectEntryService _objectEntryService;
-	private final ObjectFieldBusinessTypeServicesTracker
-		_objectFieldBusinessTypeServicesTracker;
+	private final ObjectFieldBusinessTypeTracker
+		_objectFieldBusinessTypeTracker;
 	private final ObjectFieldLocalService _objectFieldLocalService;
 	private final Map<Long, String> _objectFieldNames = new HashMap<>();
 	private final ObjectLayoutLocalService _objectLayoutLocalService;

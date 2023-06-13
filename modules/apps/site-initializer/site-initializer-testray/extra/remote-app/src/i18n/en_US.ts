@@ -13,6 +13,7 @@
  */
 
 export default {
+	'add': 'Add',
 	'add-another': 'Add Another',
 	'add-case': 'Add Case',
 	'add-cases': 'Add Cases',
@@ -72,6 +73,8 @@ export default {
 	'change-password': 'Change Password',
 	'choose-an-option': 'Choose an Option',
 	'clear': 'Clear',
+	'clicking-save-will-assign-you-to-this-case-result':
+		'Clicking save will assign you to this case result.',
 	'close': 'Close',
 	'columns': 'Columns',
 	'comment': 'Comment',
@@ -164,6 +167,7 @@ export default {
 	'new-suite': 'New Suite',
 	'new-task': 'New Task',
 	'new-user-account': 'New User Account',
+	'next': 'Next',
 	'no-password-provided': 'No password provided',
 	'no-permissions': 'No Permissions',
 	'no-results-found': 'No results found',
@@ -192,6 +196,7 @@ export default {
 	'reopen-test': 'Reopen Test',
 	'reports': 'Reports',
 	'requirements': 'Requirements',
+	'reset-test': 'Reset Test',
 	'result': 'Result',
 	'results': 'Results',
 	'roles': 'Roles',
@@ -208,7 +213,9 @@ export default {
 	'select-case-parameters': 'Select Case Parameters',
 	'select-cases': 'Select Cases',
 	'select-default-environment-factors': 'Select Default Environment Factors',
+	'select-options': 'Select Options',
 	'select-requirements': 'Select Requirements',
+	'select-stacks': 'Select Stacks',
 	'show': 'Show',
 	'showing-x-to-x-of-x': 'Showing {0} to {1} of {2}',
 	'sign-out': 'Sign Out',
@@ -256,7 +263,8 @@ export default {
 	'total': 'Total',
 	'total-estimated-time': 'Total Estimated Time',
 	'total-test-cases': 'Total test cases',
-	'type': ' Type',
+	'type': 'Type',
+	'unassign-myself': 'Unassign Myself',
 	'untested': 'Untested',
 	'updated': 'Updated',
 	'upload-csv': 'Upload CSV',

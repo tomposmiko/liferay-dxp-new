@@ -18,7 +18,7 @@ import com.liferay.frontend.data.set.model.FDSActionDropdownItem;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.CreationMenu;
 import com.liferay.object.constants.ObjectActionKeys;
 import com.liferay.object.model.ObjectDefinition;
-import com.liferay.object.rest.manager.v1_0.ObjectEntryManagerServicesTracker;
+import com.liferay.object.rest.manager.v1_0.ObjectEntryManagerTracker;
 import com.liferay.object.web.internal.display.context.helper.ObjectRequestHelper;
 import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.petra.portlet.url.builder.ResourceURLBuilder;
@@ -52,11 +52,11 @@ public class ViewObjectDefinitionsDisplayContext {
 		HttpServletRequest httpServletRequest,
 		ModelResourcePermission<ObjectDefinition>
 			objectDefinitionModelResourcePermission,
-		ObjectEntryManagerServicesTracker objectEntryManagerServicesTracker) {
+		ObjectEntryManagerTracker objectEntryManagerTracker) {
 
 		_objectDefinitionModelResourcePermission =
 			objectDefinitionModelResourcePermission;
-		_objectEntryManagerServicesTracker = objectEntryManagerServicesTracker;
+		_objectEntryManagerTracker = objectEntryManagerTracker;
 
 		_objectRequestHelper = new ObjectRequestHelper(httpServletRequest);
 	}
@@ -132,7 +132,7 @@ public class ViewObjectDefinitionsDisplayContext {
 
 	public List<String> getStorageTypes() {
 		List<String> storageTypes = TransformUtil.transform(
-			_objectEntryManagerServicesTracker.getStorageTypes(),
+			_objectEntryManagerTracker.getStorageTypes(),
 			objectEntryManagerStorageType -> LanguageUtil.get(
 				_objectRequestHelper.getLocale(),
 				objectEntryManagerStorageType));
@@ -183,8 +183,7 @@ public class ViewObjectDefinitionsDisplayContext {
 
 	private final ModelResourcePermission<ObjectDefinition>
 		_objectDefinitionModelResourcePermission;
-	private final ObjectEntryManagerServicesTracker
-		_objectEntryManagerServicesTracker;
+	private final ObjectEntryManagerTracker _objectEntryManagerTracker;
 	private final ObjectRequestHelper _objectRequestHelper;
 
 }

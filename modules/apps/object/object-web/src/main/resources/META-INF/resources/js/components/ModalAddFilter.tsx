@@ -16,6 +16,7 @@ import ClayButton from '@clayui/button';
 import ClayModal from '@clayui/modal';
 import {
 	AutoComplete,
+	DatePicker,
 	FormCustomSelect,
 	Input,
 	invalidateRequired,
@@ -67,6 +68,9 @@ export function ModalAddFilter({
 	const [errors, setErrors] = useState<TErrors>({});
 
 	const [query, setQuery] = useState<string>('');
+
+	const [filterStartDate, setFilterStartDate] = useState('');
+	const [filterEndtDate, setFilterEndDate] = useState('');
 
 	const filteredAvailableFields = useMemo(() => {
 		return objectFields.filter(({label}: ObjectField) => {
@@ -258,16 +262,14 @@ export function ModalAddFilter({
 			currentErrors.selectedFilterBy = REQUIRED_MSG;
 		}
 		if (
-			!(
-				selectedFilterBy?.businessType === 'Modified Date' ||
-				selectedFilterBy?.businessType === 'Creation Date'
-			) &&
+			selectedFilterBy?.name !== 'createDate' &&
+			selectedFilterBy?.name !== 'modifiedDate' &&
 			!selectedFilterType
 		) {
 			currentErrors.selectedFilterType = REQUIRED_MSG;
 		}
 		if (
-			(selectedFilterBy?.businessType === 'Workflow Status' ||
+			(selectedFilterBy?.name === 'status' ||
 				selectedFilterBy?.businessType === 'Picklist') &&
 			!checkedItems.length
 		) {
@@ -319,7 +321,7 @@ export function ModalAddFilter({
 				selectedFilterBy?.businessType,
 				selectedFilterType?.value,
 				editingObjectFieldName,
-				selectedFilterBy?.businessType === 'Workflow Status' ||
+				selectedFilterBy?.name === 'status' ||
 					selectedFilterBy?.businessType === 'Picklist'
 					? checkedItems
 					: undefined,
@@ -333,7 +335,7 @@ export function ModalAddFilter({
 				selectedFilterBy?.businessType,
 				selectedFilterType?.value,
 				selectedFilterBy?.name,
-				selectedFilterBy?.businessType === 'Workflow Status' ||
+				selectedFilterBy?.name === 'status' ||
 					selectedFilterBy?.businessType === 'Picklist'
 					? checkedItems
 					: selectedFilterBy?.businessType === 'Date'
@@ -377,28 +379,26 @@ export function ModalAddFilter({
 					</AutoComplete>
 				)}
 
-				{!(
-					selectedFilterBy?.businessType === 'Modified Date' ||
-					selectedFilterBy?.businessType === 'Creation Date'
-				) && (
-					<FormCustomSelect
-						error={errors.selectedFilterType}
-						label={Liferay.Language.get('filter-type')}
-						onChange={(target: LabelValueObject) =>
-							setSelectedFilterType(target)
-						}
-						options={
-							selectedFilterBy?.businessType === 'Integer' ||
-							selectedFilterBy?.businessType === 'LongInteger'
-								? NUMERIC_OPERATORS
-								: selectedFilterBy?.businessType === 'Date'
-								? DATE_OPERATORS
-								: PICKLIST_OPERATORS
-						}
-						required
-						value={selectedFilterType?.label ?? ''}
-					/>
-				)}
+				{selectedFilterBy?.name !== 'createDate' &&
+					selectedFilterBy?.name !== 'modifiedDate' && (
+						<FormCustomSelect
+							error={errors.selectedFilterType}
+							label={Liferay.Language.get('filter-type')}
+							onChange={(target: LabelValueObject) =>
+								setSelectedFilterType(target)
+							}
+							options={
+								selectedFilterBy?.businessType === 'Integer' ||
+								selectedFilterBy?.businessType === 'LongInteger'
+									? NUMERIC_OPERATORS
+									: selectedFilterBy?.businessType === 'Date'
+									? DATE_OPERATORS
+									: PICKLIST_OPERATORS
+							}
+							required
+							value={selectedFilterType?.label ?? ''}
+						/>
+					)}
 
 				{(selectedFilterBy?.businessType === 'Integer' ||
 					selectedFilterBy?.businessType === 'LongInteger') && (
@@ -415,7 +415,7 @@ export function ModalAddFilter({
 					/>
 				)}
 
-				{(selectedFilterBy?.businessType === 'Workflow Status' ||
+				{(selectedFilterBy?.name === 'status' ||
 					selectedFilterBy?.businessType === 'Picklist') && (
 					<FormCustomSelect
 						error={errors.items}
@@ -427,45 +427,56 @@ export function ModalAddFilter({
 					/>
 				)}
 
-				{selectedFilterBy?.businessType === 'Date' && (
-					<>
-						<Input
-							error={errors.startDate}
-							label={Liferay.Language.get('start')}
-							onChange={({target: {value}}) => {
-								setItems([
-									...items.filter(
-										(item) => item.value !== 'ge'
-									),
-									{
-										label: value,
-										value: 'ge',
-									},
-								]);
-							}}
-							required
-							type="date"
-						/>
+				{selectedFilterBy?.businessType === 'Date' &&
+					selectedFilterBy.name !== 'createDate' &&
+					selectedFilterBy.name !== 'modifiedDate' &&
+					!selectedFilterBy.system && (
+						<div className="row">
+							<div className="col-lg-6">
+								<DatePicker
+									error={errors.startDate}
+									label={Liferay.Language.get('start')}
+									onChange={(value) => {
+										setItems([
+											...items.filter(
+												(item) => item.value !== 'ge'
+											),
+											{
+												label: value,
+												value: 'ge',
+											},
+										]);
 
-						<Input
-							error={errors.endDate}
-							label={Liferay.Language.get('end')}
-							onChange={({target: {value}}) => {
-								setItems([
-									...items.filter(
-										(item) => item.value !== 'le'
-									),
-									{
-										label: value,
-										value: 'le',
-									},
-								]);
-							}}
-							required
-							type="date"
-						/>
-					</>
-				)}
+										setFilterStartDate(value);
+									}}
+									required
+									value={filterStartDate}
+								/>
+							</div>
+
+							<div className="col-lg-6">
+								<DatePicker
+									error={errors.endDate}
+									label={Liferay.Language.get('end')}
+									onChange={(value) => {
+										setItems([
+											...items.filter(
+												(item) => item.value !== 'le'
+											),
+											{
+												label: value,
+												value: 'le',
+											},
+										]);
+
+										setFilterEndDate(value);
+									}}
+									required
+									value={filterEndtDate}
+								/>
+							</div>
+						</div>
+					)}
 			</ClayModal.Body>
 
 			<ClayModal.Footer

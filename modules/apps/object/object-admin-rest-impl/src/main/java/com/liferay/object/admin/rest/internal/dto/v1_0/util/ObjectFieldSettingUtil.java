@@ -15,7 +15,16 @@
 package com.liferay.object.admin.rest.internal.dto.v1_0.util;
 
 import com.liferay.object.admin.rest.dto.v1_0.ObjectFieldSetting;
+import com.liferay.object.admin.rest.dto.v1_0.ObjectStateFlow;
+import com.liferay.object.admin.rest.dto.v1_0.util.ObjectStateFlowUtil;
+import com.liferay.object.constants.ObjectFieldSettingConstants;
 import com.liferay.object.service.ObjectFieldSettingLocalService;
+import com.liferay.object.service.ObjectStateFlowLocalServiceUtil;
+import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.vulcan.util.ObjectMapperUtil;
+
+import java.util.Objects;
 
 /**
  * @author Carolina Barbosa
@@ -23,15 +32,30 @@ import com.liferay.object.service.ObjectFieldSettingLocalService;
 public class ObjectFieldSettingUtil {
 
 	public static com.liferay.object.model.ObjectFieldSetting
-		toObjectFieldSetting(
-			ObjectFieldSetting objectFieldSetting,
-			ObjectFieldSettingLocalService objectFieldSettingLocalService) {
+			toObjectFieldSetting(
+				ObjectFieldSetting objectFieldSetting,
+				ObjectFieldSettingLocalService objectFieldSettingLocalService)
+		throws PortalException {
 
 		com.liferay.object.model.ObjectFieldSetting
 			serviceBuilderObjectFieldSetting =
 				objectFieldSettingLocalService.createObjectFieldSetting(0L);
 
 		serviceBuilderObjectFieldSetting.setName(objectFieldSetting.getName());
+
+		if (Objects.equals(
+				ObjectFieldSettingConstants.NAME_STATE_FLOW,
+				objectFieldSetting.getName())) {
+
+			serviceBuilderObjectFieldSetting.setObjectStateFlow(
+				com.liferay.object.admin.rest.internal.dto.v1_0.util.
+					ObjectStateFlowUtil.toObjectStateFlow(
+						objectFieldSetting.getObjectFieldId(),
+						ObjectMapperUtil.readValue(
+							ObjectStateFlow.class,
+							objectFieldSetting.getValue())));
+		}
+
 		serviceBuilderObjectFieldSetting.setValue(
 			objectFieldSetting.getValue());
 
@@ -46,7 +70,7 @@ public class ObjectFieldSettingUtil {
 			return null;
 		}
 
-		return new ObjectFieldSetting() {
+		ObjectFieldSetting objectFieldSetting = new ObjectFieldSetting() {
 			{
 				id = serviceBuilderObjectFieldSetting.getObjectFieldId();
 				name = serviceBuilderObjectFieldSetting.getName();
@@ -55,6 +79,21 @@ public class ObjectFieldSettingUtil {
 				value = serviceBuilderObjectFieldSetting.getValue();
 			}
 		};
+
+		if (Objects.equals(
+				ObjectFieldSettingConstants.NAME_STATE_FLOW,
+				objectFieldSetting.getName())) {
+
+			ObjectStateFlow objectStateFlow =
+				ObjectStateFlowUtil.toObjectStateFlow(
+					ObjectStateFlowLocalServiceUtil.fetchObjectStateFlow(
+						GetterUtil.getLong(
+							serviceBuilderObjectFieldSetting.getValue())));
+
+			objectFieldSetting.setValue(objectStateFlow.toString());
+		}
+
+		return objectFieldSetting;
 	}
 
 }

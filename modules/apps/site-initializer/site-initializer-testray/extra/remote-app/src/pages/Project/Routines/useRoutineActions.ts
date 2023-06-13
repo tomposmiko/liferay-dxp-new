@@ -20,15 +20,15 @@ import useFormModal from '../../../hooks/useFormModal';
 import i18n from '../../../i18n';
 
 const useRoutineActions = () => {
+	const formModal = useFormModal();
 	const [onDeleteRoutine] = useMutation(DeleteRoutine);
 
-	const formModal = useFormModal();
 	const modal = formModal.modal;
 
 	return {
 		actions: [
 			{
-				action: modal.open,
+				action: () => modal.open(),
 				name: i18n.translate('edit'),
 			},
 			{
@@ -36,29 +36,8 @@ const useRoutineActions = () => {
 				name: i18n.translate('select-default-environment-factors'),
 			},
 			{
-				action: ({id: routineId}: TestrayRoutine) =>
-					onDeleteRoutine({variables: {routineId}})
-						.then(() => modal.onSave())
-						.catch(modal.onError),
-				name: i18n.translate('delete'),
-			},
-		],
-		actionsRoutine: [
-			{
-				action: () => alert('Archive'),
-				name: i18n.translate('archive'),
-			},
-			{
-				action: modal.open,
-				name: i18n.translate('edit'),
-			},
-			{
-				action: () => alert('Promote'),
-				name: i18n.translate('promote'),
-			},
-			{
-				action: ({id: routineId}: any) =>
-					onDeleteRoutine({variables: {routineId}})
+				action: ({id}: TestrayRoutine) =>
+					onDeleteRoutine({variables: {id}})
 						.then(() => modal.onSave())
 						.catch(modal.onError),
 				name: i18n.translate('delete'),

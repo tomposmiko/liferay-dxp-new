@@ -59,12 +59,28 @@ public class FormStyledLayoutStructureItem extends StyledLayoutStructureItem {
 		return super.equals(object);
 	}
 
+	public String getAlign() {
+		return _align;
+	}
+
 	public long getClassNameId() {
 		return _classNameId;
 	}
 
 	public long getClassTypeId() {
 		return _classTypeId;
+	}
+
+	public String getContentDisplay() {
+		return _contentDisplay;
+	}
+
+	public String getDisplay() {
+		return stylesJSONObject.getString("display");
+	}
+
+	public String getFlexWrap() {
+		return _flexWrap;
 	}
 
 	public int getFormConfig() {
@@ -76,15 +92,25 @@ public class FormStyledLayoutStructureItem extends StyledLayoutStructureItem {
 		JSONObject jsonObject = super.getItemConfigJSONObject();
 
 		return jsonObject.put(
+			"align", _align
+		).put(
 			"classNameId", _classNameId
 		).put(
 			"classTypeId", _classTypeId
+		).put(
+			"contentDisplay", _contentDisplay
+		).put(
+			"flexWrap", _flexWrap
 		).put(
 			"formConfig", _formConfig
 		).put(
 			"indexed", _indexed
 		).put(
+			"justify", _justify
+		).put(
 			"successMessage", _successMessageJSONObject
+		).put(
+			"widthType", _widthType
 		);
 	}
 
@@ -93,8 +119,16 @@ public class FormStyledLayoutStructureItem extends StyledLayoutStructureItem {
 		return LayoutDataItemTypeConstants.TYPE_FORM;
 	}
 
+	public String getJustify() {
+		return _justify;
+	}
+
 	public JSONObject getSuccessMessageJSONObject() {
 		return _successMessageJSONObject;
+	}
+
+	public String getWidthType() {
+		return _widthType;
 	}
 
 	@Override
@@ -106,12 +140,24 @@ public class FormStyledLayoutStructureItem extends StyledLayoutStructureItem {
 		return _indexed;
 	}
 
+	public void setAlign(String align) {
+		_align = align;
+	}
+
 	public void setClassNameId(long classNameId) {
 		_classNameId = classNameId;
 	}
 
 	public void setClassTypeId(long classTypeId) {
 		_classTypeId = classTypeId;
+	}
+
+	public void setContentDisplay(String contentDisplay) {
+		_contentDisplay = contentDisplay;
+	}
+
+	public void setFlexWrap(String flexWrap) {
+		_flexWrap = flexWrap;
 	}
 
 	public void setFormConfig(int formConfig) {
@@ -122,15 +168,27 @@ public class FormStyledLayoutStructureItem extends StyledLayoutStructureItem {
 		_indexed = indexed;
 	}
 
+	public void setJustify(String justify) {
+		_justify = justify;
+	}
+
 	public void setSuccessMessageJSONObject(
 		JSONObject successMessageJSONObject) {
 
 		_successMessageJSONObject = successMessageJSONObject;
 	}
 
+	public void setWidthType(String widthType) {
+		_widthType = widthType;
+	}
+
 	@Override
 	public void updateItemConfig(JSONObject itemConfigJSONObject) {
 		super.updateItemConfig(itemConfigJSONObject);
+
+		if (itemConfigJSONObject.has("align")) {
+			setAlign(itemConfigJSONObject.getString("align"));
+		}
 
 		if (itemConfigJSONObject.has("classNameId")) {
 			setClassNameId(itemConfigJSONObject.getLong("classNameId"));
@@ -140,8 +198,20 @@ public class FormStyledLayoutStructureItem extends StyledLayoutStructureItem {
 			setClassTypeId(itemConfigJSONObject.getLong("classTypeId"));
 		}
 
+		if (itemConfigJSONObject.has("contentDisplay")) {
+			setContentDisplay(itemConfigJSONObject.getString("contentDisplay"));
+		}
+
+		if (itemConfigJSONObject.has("flexWrap")) {
+			setFlexWrap(itemConfigJSONObject.getString("flexWrap"));
+		}
+
 		if (itemConfigJSONObject.has("formConfig")) {
 			setFormConfig(itemConfigJSONObject.getInt("formConfig"));
+		}
+
+		if (itemConfigJSONObject.has("justify")) {
+			setJustify(itemConfigJSONObject.getString("justify"));
 		}
 
 		if (itemConfigJSONObject.has("indexed")) {
@@ -152,12 +222,21 @@ public class FormStyledLayoutStructureItem extends StyledLayoutStructureItem {
 			setSuccessMessageJSONObject(
 				itemConfigJSONObject.getJSONObject("successMessage"));
 		}
+
+		if (itemConfigJSONObject.has("widthType")) {
+			setWidthType(itemConfigJSONObject.getString("widthType"));
+		}
 	}
 
+	private String _align = "";
 	private long _classNameId;
 	private long _classTypeId;
+	private String _contentDisplay = "";
+	private String _flexWrap = "";
 	private int _formConfig;
 	private boolean _indexed = true;
+	private String _justify = "";
 	private JSONObject _successMessageJSONObject;
+	private String _widthType = "fluid";
 
 }

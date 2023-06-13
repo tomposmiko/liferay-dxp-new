@@ -26,6 +26,7 @@ import com.liferay.portal.kernel.io.unsync.UnsyncBufferedReader;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.ClassUtil;
+import com.liferay.portal.kernel.util.LoggingTimer;
 import com.liferay.portal.kernel.util.ObjectValuePair;
 import com.liferay.portal.kernel.util.PortalClassLoaderUtil;
 import com.liferay.portal.kernel.util.StringUtil;
@@ -154,14 +155,17 @@ public abstract class UpgradeProcess
 
 	}
 
-	protected SafeCloseable addTempIndex(
+	protected SafeCloseable addTemporaryIndex(
 			String tableName, boolean unique, String... columnNames)
 		throws Exception {
 
 		IndexMetadata indexMetadata = new IndexMetadata(
 			"IX_TEMP", tableName, unique, columnNames);
 
-		addIndexes(connection, new ArrayList<>(Arrays.asList(indexMetadata)));
+		try (LoggingTimer loggingTimer = new LoggingTimer(tableName)) {
+			addIndexes(
+				connection, new ArrayList<>(Arrays.asList(indexMetadata)));
+		}
 
 		return () -> {
 			try {

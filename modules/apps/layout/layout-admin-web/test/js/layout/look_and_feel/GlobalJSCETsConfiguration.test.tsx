@@ -22,11 +22,16 @@ import GlobalJSCETsConfiguration from '../../../../src/main/resources/META-INF/r
 
 jest.mock('frontend-js-web', () => ({
 	openSelectionModal: jest.fn(),
+	openToast: () => {},
 }));
+
+const openSelectionModalMock = openSelectionModal as jest.Mock<
+	typeof openSelectionModal
+>;
 
 describe('GlobalJSCETsConfiguration', () => {
 	afterEach(() => {
-		openSelectionModal.mockReset();
+		openSelectionModalMock.mockReset();
 	});
 
 	it('shows "no extensions loaded" if there are no extensions', async () => {
@@ -49,6 +54,8 @@ describe('GlobalJSCETsConfiguration', () => {
 				globalJSCETs={[
 					{
 						cetExternalReferenceCode: 'niceId',
+						inherited: false,
+						inheritedLabel: '',
 						name: 'Nice Global JS',
 					},
 				]}
@@ -67,10 +74,15 @@ describe('GlobalJSCETsConfiguration', () => {
 				globalJSCETs={[
 					{
 						cetExternalReferenceCode: 'niceId',
+						inherited: false,
+						inheritedLabel: '',
 						name: 'Nice Global JS',
 					},
 					{
 						cetExternalReferenceCode: 'anotherNiceId',
+						inherited: false,
+						inheritedLabel: '',
+						loadType: 'defer',
 						name: 'Nice Global JS v2',
 					},
 				]}
@@ -79,7 +91,8 @@ describe('GlobalJSCETsConfiguration', () => {
 			/>
 		);
 
-		await screen.findByDisplayValue('niceId,anotherNiceId');
+		await screen.findByDisplayValue('niceId_default_bottom');
+		await screen.findByDisplayValue('anotherNiceId_defer_bottom');
 	});
 
 	it('opens a selection modal when "add" button is pressed', async () => {
@@ -89,6 +102,8 @@ describe('GlobalJSCETsConfiguration', () => {
 				globalJSCETs={[
 					{
 						cetExternalReferenceCode: 'niceId',
+						inherited: false,
+						inheritedLabel: '',
 						name: 'Nice Global JS',
 					},
 				]}
@@ -103,11 +118,15 @@ describe('GlobalJSCETsConfiguration', () => {
 			})
 		);
 
+		userEvent.click(
+			await screen.findByRole('menuitem', {name: 'in-page-bottom'})
+		);
+
 		expect(openSelectionModal).toHaveBeenCalled();
 	});
 
 	it('removes duplicated extensions if any', async () => {
-		openSelectionModal.mockImplementation(() => {});
+		openSelectionModalMock.mockImplementation(() => () => {});
 
 		render(
 			<GlobalJSCETsConfiguration
@@ -115,6 +134,8 @@ describe('GlobalJSCETsConfiguration', () => {
 				globalJSCETs={[
 					{
 						cetExternalReferenceCode: 'niceId',
+						inherited: false,
+						inheritedLabel: '',
 						name: 'Nice Global JS',
 					},
 				]}
@@ -127,6 +148,10 @@ describe('GlobalJSCETsConfiguration', () => {
 			await screen.findByRole('button', {
 				name: 'add-javascript-extensions',
 			})
+		);
+
+		userEvent.click(
+			await screen.findByRole('menuitem', {name: 'in-page-bottom'})
 		);
 
 		expect(openSelectionModal).toHaveBeenCalledTimes(1);
@@ -137,7 +162,7 @@ describe('GlobalJSCETsConfiguration', () => {
 			})
 		);
 
-		const [[{onSelect}]] = openSelectionModal.mock.calls;
+		const [[{onSelect}]] = openSelectionModalMock.mock.calls;
 
 		act(() => {
 			onSelect({
@@ -154,7 +179,8 @@ describe('GlobalJSCETsConfiguration', () => {
 			});
 		});
 
-		await screen.findByDisplayValue('niceId,someNiceId');
+		await screen.findByDisplayValue('niceId_default_bottom');
+		await screen.findByDisplayValue('someNiceId_default_bottom');
 	});
 
 	it('allows removing extensions by pressing dropdown "remove" button', async () => {
@@ -164,6 +190,8 @@ describe('GlobalJSCETsConfiguration', () => {
 				globalJSCETs={[
 					{
 						cetExternalReferenceCode: 'niceId',
+						inherited: false,
+						inheritedLabel: '',
 						name: 'Nice Global JS',
 					},
 				]}
@@ -179,7 +207,7 @@ describe('GlobalJSCETsConfiguration', () => {
 		userEvent.click(
 			await findByRole(
 				await screen.findByRole('menu', {name: 'show-options'}),
-				'button',
+				'menuitem',
 				{name: 'delete'}
 			)
 		);

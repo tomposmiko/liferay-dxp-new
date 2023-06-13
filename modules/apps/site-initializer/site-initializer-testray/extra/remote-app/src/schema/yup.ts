@@ -22,8 +22,8 @@ const yupSchema = {
 		description: yup.string(),
 		gitHash: yup.string(),
 		name: yup.string().required(),
-		productVersionId: yup.string(),
-		routineId: yup.string(),
+		productVersionId: yup.string().required(),
+		routineId: yup.string().required(),
 		template: yup.string(),
 	}),
 	case: yup.object({
@@ -38,6 +38,11 @@ const yupSchema = {
 		steps: yup.string(),
 		stepsType: yup.string(),
 	}),
+	caseResult: yup.object({
+		comment: yup.string(),
+		dueStatus: yup.string().required(),
+		issues: yup.string(),
+	}),
 	caseType: yup.object({
 		name: yup.string().required(),
 	}),
@@ -47,6 +52,9 @@ const yupSchema = {
 	factorOption: yup.object({
 		factorCategoryId: yup.string(),
 		name: yup.string().required(),
+	}),
+	option: yup.object({
+		name: yup.string(),
 	}),
 	project: yup.object({
 		description: yup.string(),

@@ -112,12 +112,35 @@ export default function ObjectFieldFormBase({
 		return businessTypeMap;
 	}, [objectFieldTypes]);
 
-	const [pickList, setPickList] = useState<PickList[]>([]);
+	const [pickLists, setPickLists] = useState<PickList[]>([]);
 	const [pickListItems, setPickListItems] = useState<PickListItem[]>([]);
+
+	const picklistBusinessType = values.businessType === 'Picklist';
+	const validListTypeDefinitionId =
+		values.listTypeDefinitionId !== undefined &&
+		values.listTypeDefinitionId !== 0;
+
+	useEffect(() => {
+		if (values.businessType === 'Picklist') {
+			getPickLists().then(setPickLists);
+
+			if (values.state) {
+				getPickListItems(values.listTypeDefinitionId!).then(
+					setPickListItems
+				);
+			}
+		}
+
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [values.businessType, values.listTypeDefinitionId]);
+
+	const selectedPicklist = useMemo(() => {
+		return pickLists.find(({id}) => values.listTypeDefinitionId === id);
+	}, [pickLists, values.listTypeDefinitionId]);
 
 	const handleTypeChange = async (option: ObjectFieldType) => {
 		if (option.businessType === 'Picklist') {
-			setPickList(await getPickLists());
+			setPickLists(await getPickLists());
 		}
 
 		let objectFieldSettings: ObjectFieldSetting[] | undefined;
@@ -167,6 +190,7 @@ export default function ObjectFieldFormBase({
 				defaultValue: '',
 				indexedAsKeyword,
 				indexedLanguageId,
+				listTypeDefinitionId: 0,
 				objectFieldSettings,
 				state: false,
 			});
@@ -177,12 +201,11 @@ export default function ObjectFieldFormBase({
 				businessType: option.businessType,
 				indexedAsKeyword,
 				indexedLanguageId,
+				listTypeDefinitionId: 0,
 				objectFieldSettings,
 			});
 		}
 	};
-
-	const picklist = values.businessType === 'Picklist';
 
 	return (
 		<>
@@ -235,7 +258,7 @@ export default function ObjectFieldFormBase({
 				/>
 			)}
 
-			{picklist && (
+			{picklistBusinessType && (
 				<Select
 					disabled={disabled}
 					error={errors.listTypeDefinitionId}
@@ -245,7 +268,7 @@ export default function ObjectFieldFormBase({
 							setValues({
 								defaultValue: '',
 								listTypeDefinitionId: Number(
-									pickList[value].id
+									pickLists[value].id
 								),
 								state: false,
 							});
@@ -253,13 +276,18 @@ export default function ObjectFieldFormBase({
 						else {
 							setValues({
 								listTypeDefinitionId: Number(
-									pickList[value].id
+									pickLists[value].id
 								),
 							});
 						}
 					}}
-					options={pickList.map(({name}) => name)}
+					options={pickLists.map(({name}) => name)}
 					required
+					value={
+						(validListTypeDefinitionId &&
+							selectedPicklist &&
+							pickLists.indexOf(selectedPicklist)) as number
+					}
 				/>
 			)}
 
@@ -277,20 +305,28 @@ export default function ObjectFieldFormBase({
 				)}
 
 				{Liferay.FeatureFlags['LPS-152677'] &&
-					picklist &&
-					values.listTypeDefinitionId !== undefined &&
-					values.listTypeDefinitionId !== 0 && (
+					picklistBusinessType &&
+					validListTypeDefinitionId && (
 						<ClayToggle
 							disabled={disabled}
 							label={Liferay.Language.get('mark-as-state')}
 							name="state"
 							onToggle={async (state) => {
-								setValues({required: state, state});
-								setPickListItems(
-									await getPickListItems(
-										values.listTypeDefinitionId!
-									)
-								);
+								if (state) {
+									setValues({required: state, state});
+									setPickListItems(
+										await getPickListItems(
+											values.listTypeDefinitionId!
+										)
+									);
+								}
+								else {
+									setValues({
+										defaultValue: '',
+										required: state,
+										state,
+									});
+								}
 							}}
 							toggled={values.state}
 						/>
@@ -309,6 +345,14 @@ export default function ObjectFieldFormBase({
 					}
 					options={pickListItems.map(({name}) => name)}
 					required
+					value={
+						values.defaultValue &&
+						pickListItems.indexOf(
+							pickListItems.find(
+								({key}) => values.defaultValue === key
+							)!
+						)
+					}
 				/>
 			)}
 		</>
@@ -510,7 +554,7 @@ function AggregationSourceProperty({
 		selectedAggregationFunction,
 		setSelectedAggregationFunction,
 	] = useState<{label: string; value: string}>();
-	const [objectRelationships, setObjectRelatonships] = useState<
+	const [objectRelationships, setObjectRelationships] = useState<
 		TObjectRelationship[]
 	>();
 	const [objectRelationshipFields, setObjectRelationshipFields] = useState<
@@ -519,7 +563,7 @@ function AggregationSourceProperty({
 
 	useEffect(() => {
 		const makeFetch = async () => {
-			setObjectRelatonships(
+			setObjectRelationships(
 				await getObjectRelationships(objectDefinitionId)
 			);
 		};
@@ -595,10 +639,6 @@ function AggregationSourceProperty({
 		setSelectRelatedObjectRelationship(objectRelationship);
 		setSelectedSummarizeField('');
 
-		if (onRelationshipChange) {
-			onRelationshipChange(objectRelationship.objectDefinitionId2);
-		}
-
 		const relatedFields = await getObjectFields(
 			objectRelationship.objectDefinitionId2
 		);
@@ -626,6 +666,10 @@ function AggregationSourceProperty({
 				name: 'relationship',
 				value: objectRelationship.name,
 			},
+			{
+				name: 'filters',
+				value: [],
+			},
 		];
 
 		if (onAggregationFilterChange) {
@@ -635,6 +679,10 @@ function AggregationSourceProperty({
 		setValues({
 			objectFieldSettings: newObjectFieldSettings,
 		});
+
+		if (onRelationshipChange) {
+			onRelationshipChange(objectRelationship.objectDefinitionId2);
+		}
 	};
 
 	const handleAggregationFunctionChange = ({
